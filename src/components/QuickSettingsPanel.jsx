@@ -5,8 +5,6 @@ import {
   Maximize2,
   Eye,
   Settings2,
-  Moon,
-  Sun,
   ArrowDown,
   Mic,
   Brain,
@@ -16,10 +14,7 @@ import {
   GripVertical
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import DarkModeToggle from './DarkModeToggle';
-
 import { useUiPreferences } from '../hooks/useUiPreferences';
-import { useTheme } from '../contexts/ThemeContext';
 import LanguageSelector from './LanguageSelector';
 
 import { useDeviceSettings } from '../hooks/useDeviceSettings';
@@ -31,8 +26,6 @@ const QuickSettingsPanel = () => {
   const [whisperMode, setWhisperMode] = useState(() => {
     return localStorage.getItem('whisperMode') || 'default';
   });
-  const { isDarkMode } = useTheme();
-
   const { isMobile } = useDeviceSettings({ trackPWA: false });
 
   const { preferences, setPreference } = useUiPreferences();
@@ -255,14 +248,6 @@ const QuickSettingsPanel = () => {
             {/* Appearance Settings */}
             <div className="space-y-2">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">{t('quickSettings.sections.appearance')}</h4>
-
-              <div className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-transparent hover:border-gray-300 dark:hover:border-gray-600">
-                <span className="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
-                  {isDarkMode ? <Moon className="h-4 w-4 text-gray-600 dark:text-gray-400" /> : <Sun className="h-4 w-4 text-gray-600 dark:text-gray-400" />}
-                  {t('quickSettings.darkMode')}
-                </span>
-                <DarkModeToggle />
-              </div>
 
               {/* Language Selector */}
               <div>

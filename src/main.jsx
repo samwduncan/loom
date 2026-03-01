@@ -7,6 +7,9 @@ import 'katex/dist/katex.min.css'
 // Initialize i18n
 import './i18n/config.js'
 
+// Dark-only theme — no toggle, no context overhead
+document.documentElement.style.colorScheme = 'dark';
+
 // Clean up stale service workers on app load to prevent caching issues after builds
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(registrations => {

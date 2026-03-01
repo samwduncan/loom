@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTheme } from '../../../contexts/ThemeContext';
 import { authenticatedFetch } from '../../../utils/api';
 import {
   AUTH_STATUS_ENDPOINTS,
@@ -24,11 +23,6 @@ import type {
   SettingsMainTab,
   SettingsProject,
 } from '../types/types';
-
-type ThemeContextValue = {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-};
 
 type UseSettingsControllerArgs = {
   isOpen: boolean;
@@ -186,7 +180,9 @@ const createEmptyCursorPermissions = (): CursorPermissionsState => ({
 });
 
 export function useSettingsController({ isOpen, initialTab, projects, onClose }: UseSettingsControllerArgs) {
-  const { isDarkMode, toggleDarkMode } = useTheme() as ThemeContextValue;
+  // Dark-only — no toggle, always dark
+  const isDarkMode = true;
+  const toggleDarkMode = () => {};
   const closeTimerRef = useRef<number | null>(null);
 
   const [activeTab, setActiveTab] = useState<SettingsMainTab>(() => normalizeMainTab(initialTab));
