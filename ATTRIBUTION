@@ -1,0 +1,20 @@
+ATTRIBUTION
+===========
+
+Loom is a fork of CloudCLI UI (https://github.com/siteboon/claudecodeui),
+originally created by CloudCLI UI Contributors.
+
+The original work is licensed under the GNU General Public License v3.0.
+This fork maintains the same license.
+
+Original Project: CloudCLI UI
+Original Repository: https://github.com/siteboon/claudecodeui
+Original Authors: CloudCLI UI Contributors
+Fork Date: 2026-03-01
+Fork Baseline Tag: fork-baseline
+
+Modifications in this fork:
+- Complete visual redesign with warm earthy dark theme ("Loom" identity)
+- Removal of i18n support (English only)
+- Removal of Cursor CLI and OpenAI Codex backend integrations
+- Custom chat rendering and streaming UX enhancements
