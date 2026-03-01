@@ -9,14 +9,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Design System
 
-- [ ] **DSGN-01**: App uses warm earthy CSS palette — deep chocolate brown (#1c1210) base, warm surfaces (#2a1f1a, #3d2e25), cream/beige text (#f5e6d3, #c4a882), amber/copper/terracotta accents (#d4a574, #c17f59, #b85c3a)
-- [ ] **DSGN-02**: All CSS variables use correct HSL `<alpha-value>` contract so Tailwind opacity modifiers work correctly (e.g., `bg-primary/50`)
-- [ ] **DSGN-03**: Typography uses JetBrains Mono as primary monospace font with fallback chain (Fira Code, Cascadia Code, monospace)
-- [ ] **DSGN-04**: Layout follows dense 4-8px grid spacing — compact padding, tight line heights, maximum information per screen
-- [ ] **DSGN-05**: Scrollbar styling matches warm dark theme (subtle, thin, warm-tinted track and thumb)
+- [x] **DSGN-01**: App uses warm earthy CSS palette — deep chocolate brown (#1c1210) base, warm surfaces (#2a1f1a, #3d2e25), cream/beige text (#f5e6d3, #c4a882), amber/copper/terracotta accents (#d4a574, #c17f59, #b85c3a)
+- [x] **DSGN-02**: All CSS variables use correct HSL `<alpha-value>` contract so Tailwind opacity modifiers work correctly (e.g., `bg-primary/50`)
+- [x] **DSGN-03**: Typography uses JetBrains Mono as primary monospace font with fallback chain (Fira Code, Cascadia Code, monospace)
+- [x] **DSGN-04**: Layout follows dense 4-8px grid spacing — compact padding, tight line heights, maximum information per screen
+- [x] **DSGN-05**: Scrollbar styling matches warm dark theme (subtle, thin, warm-tinted track and thumb)
 - [ ] **DSGN-06**: All 86+ files with hardcoded Tailwind color classes (bg-blue-500, text-gray-*, etc.) replaced with semantic aliases from CSS variable system
-- [ ] **DSGN-07**: Status colors are warm-tinted — connected (#6bbf59), reconnecting (#d4a574), disconnected (#c15a4a), error accents use terracotta
-- [ ] **DSGN-08**: Borders use subtle rgba transparency (rgba(196, 168, 130, 0.15)) for warm-tinted separation lines
+- [x] **DSGN-07**: Status colors are warm-tinted — connected (#6bbf59), reconnecting (#d4a574), disconnected (#c15a4a), error accents use terracotta
+- [x] **DSGN-08**: Borders use subtle rgba transparency (rgba(196, 168, 130, 0.15)) for warm-tinted separation lines
 
 ### Chat Rendering
 
@@ -110,14 +110,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DSGN-01 | Phase 1 | Pending |
-| DSGN-02 | Phase 1 | Pending |
-| DSGN-03 | Phase 1 | Pending |
-| DSGN-04 | Phase 1 | Pending |
-| DSGN-05 | Phase 1 | Pending |
+| DSGN-01 | Phase 1 | Complete |
+| DSGN-02 | Phase 1 | Complete |
+| DSGN-03 | Phase 1 | Complete |
+| DSGN-04 | Phase 1 | Complete |
+| DSGN-05 | Phase 1 | Complete |
 | DSGN-06 | Phase 2 | Pending |
-| DSGN-07 | Phase 1 | Pending |
-| DSGN-08 | Phase 1 | Pending |
+| DSGN-07 | Phase 1 | Complete |
+| DSGN-08 | Phase 1 | Complete |
 | CHAT-01 | Phase 5 | Pending |
 | CHAT-02 | Phase 5 | Pending |
 | CHAT-03 | Phase 5 | Pending |

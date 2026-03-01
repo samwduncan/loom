@@ -12,25 +12,25 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 Phase: 1 of 9 (Design System Foundation)
 Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-03-01 — Completed 01-02 Fork Governance plan
+Last activity: 2026-03-01 — Completed 01-01 CSS palette and alpha-value contract plan
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 7%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 2min
-- Total execution time: 2min
+- Total plans completed: 2
+- Average duration: 3min
+- Total execution time: 5min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-design-system-foundation | 1 | 2min | 2min |
+| 01-design-system-foundation | 2 | 5min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (2min)
+- Last 5 plans: 01-02 (2min), 01-01 (3min)
 - Trend: Starting
 
 *Updated after each plan completion*
@@ -48,6 +48,8 @@ Recent decisions affecting current work:
 - [Pre-phase]: Phase 4 (Terminal) depends only on Phase 1 — sequenced after Phase 3 for linear execution but not blocked by it
 - [01-02]: Added upstream as separate remote (kept origin as-is) for CloudCLI cherry-picking
 - [01-02]: upstream-sync branch starts at current HEAD for clean divergence tracking
+- [01-01]: Border color as bare HSL channels with 15% default in global * rule, preserving alpha-value contract
+- [01-01]: Textarea/placeholder styles consolidated using CSS variables instead of .dark-scoped hardcoded colors
 
 ### Pending Todos
 
@@ -63,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 01-02-PLAN.md (Fork Governance)
+Stopped at: Completed 01-01-PLAN.md (CSS palette, alpha-value contract, JetBrains Mono)
 Resume file: None
