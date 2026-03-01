@@ -151,7 +151,7 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
         mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
       }`}
     >
-      <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 dark:border-gray-700/50 bg-white dark:bg-gray-800/90 shadow-lg dark:shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 border-gray-700/50 bg-white bg-gray-800/90 shadow-lg shadow-2xl">
         {/* Accent line */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400" />
 
@@ -160,20 +160,20 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
           <div className="flex items-center gap-2.5 mb-1.5">
             {/* Question icon */}
             <div className="relative flex-shrink-0">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-400/15 dark:to-cyan-400/15 flex items-center justify-center">
-                <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.75} stroke="currentColor">
+              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500/10 to-cyan-500/10 from-blue-400/15 to-cyan-400/15 flex items-center justify-center">
+                <svg className="w-3.5 h-3.5 text-blue-600 text-blue-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.75} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827m0 3h.01" />
                 </svg>
               </div>
-              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyan-400 dark:bg-cyan-500 animate-pulse" />
+              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyan-400 bg-cyan-500 animate-pulse" />
             </div>
 
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <span className="text-[10px] font-medium tracking-wide uppercase text-gray-400 dark:text-gray-500">
+              <span className="text-[10px] font-medium tracking-wide uppercase text-gray-400 text-gray-500">
                 Claude needs your input
               </span>
               {q.header && (
-                <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] font-semibold uppercase tracking-wider bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
+                <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] font-semibold uppercase tracking-wider bg-blue-50 bg-blue-900/30 text-blue-600 text-blue-400 border border-blue-100 border-blue-800/50">
                   {q.header}
                 </span>
               )}
@@ -181,7 +181,7 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
 
             {/* Step counter */}
             {!isSingle && (
-              <span className="text-[10px] tabular-nums text-gray-400 dark:text-gray-500 flex-shrink-0">
+              <span className="text-[10px] tabular-nums text-gray-400 text-gray-500 flex-shrink-0">
                 {currentStep + 1}/{total}
               </span>
             )}
@@ -197,10 +197,10 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
                   onClick={() => setCurrentStep(i)}
                   className={`h-[3px] rounded-full transition-all duration-300 ${
                     i === currentStep
-                      ? 'w-5 bg-blue-500 dark:bg-blue-400'
+                      ? 'w-5 bg-blue-500 bg-blue-400'
                       : i < currentStep
-                        ? 'w-2.5 bg-blue-300 dark:bg-blue-600'
-                        : 'w-2.5 bg-gray-200 dark:bg-gray-700'
+                        ? 'w-2.5 bg-blue-300 bg-blue-600'
+                        : 'w-2.5 bg-gray-200 bg-gray-700'
                   }`}
                 />
               ))}
@@ -208,11 +208,11 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
           )}
 
           {/* Question text */}
-          <p className="text-[14px] leading-snug font-medium text-gray-900 dark:text-gray-100">
+          <p className="text-[14px] leading-snug font-medium text-gray-900 text-gray-100">
             {q.question}
           </p>
           {multi && (
-            <span className="text-[10px] text-gray-400 dark:text-gray-500">Select all that apply</span>
+            <span className="text-[10px] text-gray-400 text-gray-500">Select all that apply</span>
           )}
         </div>
 
@@ -228,15 +228,15 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
                   onClick={() => toggleOption(currentStep, opt.label, multi)}
                   className={`group w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-150 ${
                     isSelected
-                      ? 'border-blue-300 dark:border-blue-600 bg-blue-50/80 dark:bg-blue-900/25 ring-1 ring-blue-200/50 dark:ring-blue-700/30'
-                      : 'border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50/60 dark:hover:bg-gray-750/50'
+                      ? 'border-blue-300 border-blue-600 bg-blue-50/80 bg-blue-900/25 ring-1 ring-blue-200/50 ring-blue-700/30'
+                      : 'border-gray-200 border-gray-700/60 hover:border-gray-300 hover:border-gray-600 hover:bg-gray-50/60 hover:bg-gray-750/50'
                   }`}
                 >
                   {/* Keyboard hint */}
                   <kbd className={`flex-shrink-0 w-5 h-5 rounded text-[10px] font-mono flex items-center justify-center transition-all duration-150 ${
                     isSelected
-                      ? 'bg-blue-500 dark:bg-blue-500 text-white font-semibold'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 group-hover:border-gray-300 dark:group-hover:border-gray-600'
+                      ? 'bg-blue-500 bg-blue-500 text-white font-semibold'
+                      : 'bg-gray-100 bg-gray-800 text-gray-400 text-gray-500 border border-gray-200 border-gray-700 group-hover:border-gray-300 group-hover:border-gray-600'
                   }`}>
                     {optIdx + 1}
                   </kbd>
@@ -244,16 +244,16 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className={`text-[13px] leading-tight transition-colors duration-150 ${
                       isSelected
-                        ? 'text-gray-900 dark:text-gray-100 font-medium'
-                        : 'text-gray-700 dark:text-gray-300'
+                        ? 'text-gray-900 text-gray-100 font-medium'
+                        : 'text-gray-700 text-gray-300'
                     }`}>
                       {opt.label}
                     </div>
                     {opt.description && (
                       <div className={`text-[11px] leading-snug transition-colors duration-150 ${
                         isSelected
-                          ? 'text-blue-600/70 dark:text-blue-300/70'
-                          : 'text-gray-400 dark:text-gray-500'
+                          ? 'text-blue-600/70 text-blue-300/70'
+                          : 'text-gray-400 text-gray-500'
                       }`}>
                         {opt.description}
                       </div>
@@ -262,7 +262,7 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
 
                   {/* Selection check */}
                   {isSelected && (
-                    <svg className="w-4 h-4 text-blue-500 dark:text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <svg className="w-4 h-4 text-blue-500 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                     </svg>
                   )}
@@ -276,26 +276,26 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
               onClick={() => toggleOther(currentStep, multi)}
               className={`group w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-all duration-150 ${
                 isOtherOn
-                  ? 'border-blue-300 dark:border-blue-600 bg-blue-50/80 dark:bg-blue-900/25 ring-1 ring-blue-200/50 dark:ring-blue-700/30'
-                  : 'border-dashed border-gray-200 dark:border-gray-700/60 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50/60 dark:hover:bg-gray-750/50'
+                  ? 'border-blue-300 border-blue-600 bg-blue-50/80 bg-blue-900/25 ring-1 ring-blue-200/50 ring-blue-700/30'
+                  : 'border-dashed border-gray-200 border-gray-700/60 hover:border-gray-300 hover:border-gray-600 hover:bg-gray-50/60 hover:bg-gray-750/50'
               }`}
             >
               <kbd className={`flex-shrink-0 w-5 h-5 rounded text-[10px] font-mono flex items-center justify-center transition-all duration-150 ${
                 isOtherOn
-                  ? 'bg-blue-500 dark:bg-blue-500 text-white font-semibold'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700 group-hover:border-gray-300 dark:group-hover:border-gray-600'
+                  ? 'bg-blue-500 bg-blue-500 text-white font-semibold'
+                  : 'bg-gray-100 bg-gray-800 text-gray-400 text-gray-500 border border-gray-200 border-gray-700 group-hover:border-gray-300 group-hover:border-gray-600'
               }`}>
                 0
               </kbd>
               <span className={`text-[13px] leading-tight transition-colors ${
                 isOtherOn
-                  ? 'text-gray-900 dark:text-gray-100 font-medium'
-                  : 'text-gray-500 dark:text-gray-400'
+                  ? 'text-gray-900 text-gray-100 font-medium'
+                  : 'text-gray-500 text-gray-400'
               }`}>
                 Other...
               </span>
               {isOtherOn && (
-                <svg className="w-4 h-4 text-blue-500 dark:text-blue-400 flex-shrink-0 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <svg className="w-4 h-4 text-blue-500 text-blue-400 flex-shrink-0 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               )}
@@ -320,9 +320,9 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
                       e.stopPropagation();
                     }}
                     placeholder="Type your answer..."
-                    className="w-full text-[13px] rounded-lg border-0 bg-gray-50 dark:bg-gray-900/60 text-gray-900 dark:text-gray-100 px-3 py-1.5 outline-none ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500 placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-shadow duration-200"
+                    className="w-full text-[13px] rounded-lg border-0 bg-gray-50 bg-gray-900/60 text-gray-900 text-gray-100 px-3 py-1.5 outline-none ring-1 ring-gray-200 ring-gray-700 focus:ring-2 focus:ring-blue-400 focus:ring-blue-500 placeholder:text-gray-400 placeholder:text-gray-600 transition-shadow duration-200"
                   />
-                  <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-gray-300 dark:text-gray-600 bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded border border-gray-200 dark:border-gray-700">
+                  <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-mono text-gray-300 text-gray-600 bg-gray-100 bg-gray-800 px-1 py-0.5 rounded border border-gray-200 border-gray-700">
                     Enter
                   </kbd>
                 </div>
@@ -332,14 +332,14 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
         </div>
 
         {/* Footer — compact */}
-        <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50 flex items-center justify-between gap-2">
+        <div className="px-4 py-2 border-t border-gray-100 border-gray-700/50 bg-gray-50/50 bg-gray-800/50 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={handleSkip}
-            className="text-[11px] text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="text-[11px] text-gray-400 text-gray-500 hover:text-gray-600 hover:text-gray-300 transition-colors"
           >
             {isSingle ? 'Skip' : 'Skip all'}
-            <span className="ml-1 text-[9px] text-gray-300 dark:text-gray-600">Esc</span>
+            <span className="ml-1 text-[9px] text-gray-300 text-gray-600">Esc</span>
           </button>
 
           <div className="flex items-center gap-1.5">
@@ -347,7 +347,7 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
               <button
                 type="button"
                 onClick={() => setCurrentStep(s => s - 1)}
-                className="inline-flex items-center gap-0.5 text-[11px] font-medium px-2.5 py-1.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-all duration-150"
+                className="inline-flex items-center gap-0.5 text-[11px] font-medium px-2.5 py-1.5 rounded-lg text-gray-600 text-gray-300 hover:bg-gray-100 hover:bg-gray-700/60 transition-all duration-150"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -361,7 +361,7 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
                 type="button"
                 onClick={handleSubmit}
                 disabled={!hasCurrentSelection && !Object.keys(buildAnswers()).length}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-500 dark:to-blue-600 text-white shadow-sm hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200"
+                className="inline-flex items-center gap-1 text-[11px] font-semibold px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 from-blue-500 to-blue-600 text-white shadow-sm hover:shadow-md disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none transition-all duration-200"
               >
                 Submit
                 <span className="text-[9px] opacity-70 font-mono ml-0.5">Enter</span>
@@ -370,7 +370,7 @@ export const AskUserQuestionPanel: React.FC<PermissionPanelProps> = ({
               <button
                 type="button"
                 onClick={() => setCurrentStep(s => s + 1)}
-                className="inline-flex items-center gap-1 text-[11px] font-semibold px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-500 dark:to-blue-600 text-white shadow-sm hover:shadow-md transition-all duration-200"
+                className="inline-flex items-center gap-1 text-[11px] font-semibold px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 from-blue-500 to-blue-600 text-white shadow-sm hover:shadow-md transition-all duration-200"
               >
                 Next
                 <span className="text-[9px] opacity-70 font-mono ml-0.5">Enter</span>

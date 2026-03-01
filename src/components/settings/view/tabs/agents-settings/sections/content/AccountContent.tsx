@@ -24,35 +24,35 @@ type AgentVisualConfig = {
 const agentConfig: Record<AgentProvider, AgentVisualConfig> = {
   claude: {
     name: 'Claude',
-    bgClass: 'bg-blue-50 dark:bg-blue-900/20',
-    borderClass: 'border-blue-200 dark:border-blue-800',
-    textClass: 'text-blue-900 dark:text-blue-100',
-    subtextClass: 'text-blue-700 dark:text-blue-300',
+    bgClass: 'bg-blue-50 bg-blue-900/20',
+    borderClass: 'border-blue-200 border-blue-800',
+    textClass: 'text-blue-900 text-blue-100',
+    subtextClass: 'text-blue-700 text-blue-300',
     buttonClass: 'bg-blue-600 hover:bg-blue-700',
   },
   cursor: {
     name: 'Cursor',
-    bgClass: 'bg-purple-50 dark:bg-purple-900/20',
-    borderClass: 'border-purple-200 dark:border-purple-800',
-    textClass: 'text-purple-900 dark:text-purple-100',
-    subtextClass: 'text-purple-700 dark:text-purple-300',
+    bgClass: 'bg-purple-50 bg-purple-900/20',
+    borderClass: 'border-purple-200 border-purple-800',
+    textClass: 'text-purple-900 text-purple-100',
+    subtextClass: 'text-purple-700 text-purple-300',
     buttonClass: 'bg-purple-600 hover:bg-purple-700',
   },
   codex: {
     name: 'Codex',
-    bgClass: 'bg-gray-100 dark:bg-gray-800/50',
-    borderClass: 'border-gray-300 dark:border-gray-600',
-    textClass: 'text-gray-900 dark:text-gray-100',
-    subtextClass: 'text-gray-700 dark:text-gray-300',
-    buttonClass: 'bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600',
+    bgClass: 'bg-gray-100 bg-gray-800/50',
+    borderClass: 'border-gray-300 border-gray-600',
+    textClass: 'text-gray-900 text-gray-100',
+    subtextClass: 'text-gray-700 text-gray-300',
+    buttonClass: 'bg-gray-800 hover:bg-gray-900 bg-gray-700 hover:bg-gray-600',
   },
   gemini: {
     name: 'Gemini',
     description: 'Google Gemini AI assistant',
-    bgClass: 'bg-indigo-50 dark:bg-indigo-900/20',
-    borderClass: 'border-indigo-200 dark:border-indigo-800',
-    textClass: 'text-indigo-900 dark:text-indigo-100',
-    subtextClass: 'text-indigo-700 dark:text-indigo-300',
+    bgClass: 'bg-indigo-50 bg-indigo-900/20',
+    borderClass: 'border-indigo-200 border-indigo-800',
+    textClass: 'text-indigo-900 text-indigo-100',
+    subtextClass: 'text-indigo-700 text-indigo-300',
     buttonClass: 'bg-indigo-600 hover:bg-indigo-700',
   },
 };
@@ -92,22 +92,22 @@ export default function AccountContent({ agent, authStatus, onLogin }: AccountCo
             </div>
             <div>
               {authStatus.loading ? (
-                <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-800">
+                <Badge variant="secondary" className="bg-gray-100 bg-gray-800">
                   {t('agents.authStatus.checking')}
                 </Badge>
               ) : authStatus.authenticated ? (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                <Badge variant="secondary" className="bg-green-100 text-green-800 bg-green-900/30 text-green-300">
                   {t('agents.authStatus.connected')}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">
+                <Badge variant="secondary" className="bg-gray-100 text-gray-800 bg-gray-800 text-gray-300">
                   {t('agents.authStatus.disconnected')}
                 </Badge>
               )}
             </div>
           </div>
 
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+          <div className="border-t border-gray-200 border-gray-700 pt-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className={`font-medium ${config.textClass}`}>
@@ -131,8 +131,8 @@ export default function AccountContent({ agent, authStatus, onLogin }: AccountCo
           </div>
 
           {authStatus.error && (
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-              <div className="text-sm text-red-600 dark:text-red-400">
+            <div className="border-t border-gray-200 border-gray-700 pt-4">
+              <div className="text-sm text-red-600 text-red-400">
                 {t('agents.error', { error: authStatus.error })}
               </div>
             </div>

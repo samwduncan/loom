@@ -38,25 +38,25 @@ const colorClasses = {
   blue: {
     border: 'border-l-blue-500 md:border-l-blue-500',
     borderBottom: 'border-b-blue-500',
-    bg: 'bg-blue-50 dark:bg-blue-900/20',
+    bg: 'bg-blue-50 bg-blue-900/20',
     dot: 'bg-blue-500',
   },
   purple: {
     border: 'border-l-purple-500 md:border-l-purple-500',
     borderBottom: 'border-b-purple-500',
-    bg: 'bg-purple-50 dark:bg-purple-900/20',
+    bg: 'bg-purple-50 bg-purple-900/20',
     dot: 'bg-purple-500',
   },
   gray: {
-    border: 'border-l-gray-700 dark:border-l-gray-300',
-    borderBottom: 'border-b-gray-700 dark:border-b-gray-300',
-    bg: 'bg-gray-100 dark:bg-gray-800/50',
-    dot: 'bg-gray-700 dark:bg-gray-300',
+    border: 'border-l-gray-700 border-l-gray-300',
+    borderBottom: 'border-b-gray-700 border-b-gray-300',
+    bg: 'bg-gray-100 bg-gray-800/50',
+    dot: 'bg-gray-700 bg-gray-300',
   },
   indigo: {
     border: 'border-l-indigo-500 md:border-l-indigo-500',
     borderBottom: 'border-b-indigo-500',
-    bg: 'bg-indigo-50 dark:bg-indigo-900/20',
+    bg: 'bg-indigo-50 bg-indigo-900/20',
     dot: 'bg-indigo-500',
   },
 } as const;
@@ -78,7 +78,7 @@ export default function AgentListItem({
         onClick={onClick}
         className={`flex-1 text-center py-3 px-2 border-b-2 transition-colors ${isSelected
           ? `${colors.borderBottom} ${colors.bg}`
-          : 'border-transparent hover:bg-gray-50 dark:hover:bg-gray-800'
+          : 'border-transparent hover:bg-gray-50 hover:bg-gray-800'
           }`}
       >
         <div className="flex flex-col items-center gap-1">
@@ -97,7 +97,7 @@ export default function AgentListItem({
       onClick={onClick}
       className={`w-full text-left p-3 border-l-4 transition-colors ${isSelected
         ? `${colors.border} ${colors.bg}`
-        : 'border-transparent hover:bg-gray-50 dark:hover:bg-gray-800'
+        : 'border-transparent hover:bg-gray-50 hover:bg-gray-800'
         }`}
     >
       <div className="flex items-center gap-2 mb-1">

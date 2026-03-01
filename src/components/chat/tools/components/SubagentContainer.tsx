@@ -57,7 +57,7 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
   const title = `Subagent / ${subagentType}: ${description}`;
 
   return (
-    <div className="border-l-2 border-l-purple-500 dark:border-l-purple-400 pl-3 py-0.5 my-1">
+    <div className="border-l-2 border-l-purple-500 border-l-purple-400 pl-3 py-0.5 my-1">
       <CollapsibleSection
         title={title}
         toolName="Task"
@@ -65,21 +65,21 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
       >
         {/* Prompt/request to the subagent */}
         {prompt && (
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-2 whitespace-pre-wrap break-words line-clamp-4">
+          <div className="text-xs text-gray-600 text-gray-400 mb-2 whitespace-pre-wrap break-words line-clamp-4">
             {prompt}
           </div>
         )}
 
         {/* Current tool indicator (while running) */}
         {currentTool && !isComplete && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
-            <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-purple-500 dark:bg-purple-400 flex-shrink-0" />
-            <span className="text-gray-400 dark:text-gray-500">Currently:</span>
-            <span className="font-medium text-gray-600 dark:text-gray-300">{currentTool.toolName}</span>
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 text-gray-400 mt-1">
+            <span className="animate-pulse w-1.5 h-1.5 rounded-full bg-purple-500 bg-purple-400 flex-shrink-0" />
+            <span className="text-gray-400 text-gray-500">Currently:</span>
+            <span className="font-medium text-gray-600 text-gray-300">{currentTool.toolName}</span>
             {getCompactToolDisplay(currentTool.toolName, currentTool.toolInput) && (
               <>
-                <span className="text-gray-300 dark:text-gray-600">/</span>
-                <span className="font-mono truncate text-gray-500 dark:text-gray-400">
+                <span className="text-gray-300 text-gray-600">/</span>
+                <span className="font-mono truncate text-gray-500 text-gray-400">
                   {getCompactToolDisplay(currentTool.toolName, currentTool.toolInput)}
                 </span>
               </>
@@ -89,7 +89,7 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
 
         {/* Completion status */}
         {isComplete && (
-          <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 mt-1">
+          <div className="flex items-center gap-1.5 text-xs text-green-600 text-green-400 mt-1">
             <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
@@ -100,7 +100,7 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
         {/* Tool history (collapsed) */}
         {childTools.length > 0 && (
           <details className="mt-2 group/history">
-            <summary className="cursor-pointer text-[11px] text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 flex items-center gap-1">
+            <summary className="cursor-pointer text-[11px] text-gray-400 text-gray-500 hover:text-gray-600 hover:text-gray-300 flex items-center gap-1">
               <svg
                 className="w-2.5 h-2.5 transition-transform duration-150 group-open/history:rotate-90 flex-shrink-0"
                 fill="none"
@@ -111,13 +111,13 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
               </svg>
               <span>View tool history ({childTools.length})</span>
             </summary>
-            <div className="mt-1 pl-3 border-l border-gray-200 dark:border-gray-700 space-y-0.5">
+            <div className="mt-1 pl-3 border-l border-gray-200 border-gray-700 space-y-0.5">
               {childTools.map((child, index) => (
-                <div key={child.toolId} className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
-                  <span className="text-gray-400 dark:text-gray-500 w-4 text-right flex-shrink-0">{index + 1}.</span>
+                <div key={child.toolId} className="flex items-center gap-1.5 text-[11px] text-gray-500 text-gray-400">
+                  <span className="text-gray-400 text-gray-500 w-4 text-right flex-shrink-0">{index + 1}.</span>
                   <span className="font-medium">{child.toolName}</span>
                   {getCompactToolDisplay(child.toolName, child.toolInput) && (
-                    <span className="font-mono truncate text-gray-400 dark:text-gray-500">
+                    <span className="font-mono truncate text-gray-400 text-gray-500">
                       {getCompactToolDisplay(child.toolName, child.toolInput)}
                     </span>
                   )}
@@ -132,7 +132,7 @@ export const SubagentContainer: React.FC<SubagentContainerProps> = ({
 
         {/* Final result */}
         {isComplete && toolResult && (
-          <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+          <div className="mt-2 text-xs text-gray-600 text-gray-400">
             {(() => {
               let content = toolResult.content;
 

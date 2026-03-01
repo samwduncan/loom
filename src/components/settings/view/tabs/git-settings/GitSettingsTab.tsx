@@ -69,7 +69,7 @@ export default function GitSettingsTab() {
             </Button>
 
             {saveStatus === 'success' && (
-              <div className="text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
+              <div className="text-sm text-green-600 text-green-400 flex items-center gap-2">
                 <Check className="w-4 h-4" />
                 {t('git.status.success')}
               </div>

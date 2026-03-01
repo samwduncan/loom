@@ -69,7 +69,7 @@ function MobileNav({ activeTab, setActiveTab, isInputFocused }) {
                 aria-current={isActive ? 'page' : undefined}
               >
                 {isActive && (
-                  <div className="absolute inset-0 bg-primary/8 dark:bg-primary/12 rounded-xl" />
+                  <div className="absolute inset-0 bg-primary/8 bg-primary/12 rounded-xl" />
                 )}
                 <Icon
                   className={`relative z-10 transition-all duration-200 ${isActive ? 'w-5 h-5' : 'w-[18px] h-[18px]'}`}

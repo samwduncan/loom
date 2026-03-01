@@ -14,7 +14,7 @@ const TaskMasterStatus = () => {
 
   if (isLoading || isLoadingMCP) {
     return (
-      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex items-center text-sm text-gray-500 text-gray-400">
         <div className="animate-spin w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full mr-2"></div>
         Loading TaskMaster status...
       </div>
@@ -23,7 +23,7 @@ const TaskMasterStatus = () => {
 
   if (error) {
     return (
-      <div className="flex items-center text-sm text-red-500 dark:text-red-400">
+      <div className="flex items-center text-sm text-red-500 text-red-400">
         <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
         TaskMaster Error
       </div>
@@ -40,7 +40,7 @@ const TaskMasterStatus = () => {
 
   if (!currentProject) {
     return (
-      <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="flex items-center text-sm text-gray-500 text-gray-400">
         <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
         No project selected
       </div>
@@ -68,7 +68,7 @@ const TaskMasterStatus = () => {
 
       {/* Task Progress Info */}
       {projectConfigured && (
-        <div className="text-xs text-gray-600 dark:text-gray-400">
+        <div className="text-xs text-gray-600 text-gray-400">
           <span className="font-medium">
             {completedCount}/{taskCount} tasks
           </span>

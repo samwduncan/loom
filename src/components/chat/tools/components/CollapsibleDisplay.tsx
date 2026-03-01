@@ -16,15 +16,15 @@ interface CollapsibleDisplayProps {
 }
 
 const borderColorMap: Record<string, string> = {
-  edit: 'border-l-amber-500 dark:border-l-amber-400',
-  search: 'border-l-gray-400 dark:border-l-gray-500',
-  bash: 'border-l-green-500 dark:border-l-green-400',
-  todo: 'border-l-violet-500 dark:border-l-violet-400',
-  task: 'border-l-violet-500 dark:border-l-violet-400',
-  agent: 'border-l-purple-500 dark:border-l-purple-400',
-  plan: 'border-l-indigo-500 dark:border-l-indigo-400',
-  question: 'border-l-blue-500 dark:border-l-blue-400',
-  default: 'border-l-gray-300 dark:border-l-gray-600',
+  edit: 'border-l-amber-500 border-l-amber-400',
+  search: 'border-l-gray-400 border-l-gray-500',
+  bash: 'border-l-green-500 border-l-green-400',
+  todo: 'border-l-violet-500 border-l-violet-400',
+  task: 'border-l-violet-500 border-l-violet-400',
+  agent: 'border-l-purple-500 border-l-purple-400',
+  plan: 'border-l-indigo-500 border-l-indigo-400',
+  question: 'border-l-blue-500 border-l-blue-400',
+  default: 'border-l-gray-300 border-l-gray-600',
 };
 
 export const CollapsibleDisplay: React.FC<CollapsibleDisplayProps> = ({
@@ -55,7 +55,7 @@ export const CollapsibleDisplay: React.FC<CollapsibleDisplayProps> = ({
 
         {showRawParameters && rawContent && (
           <details className="relative mt-2 group/raw">
-            <summary className="flex items-center gap-1.5 text-[11px] text-gray-400 dark:text-gray-500 cursor-pointer hover:text-gray-600 dark:hover:text-gray-300 py-0.5">
+            <summary className="flex items-center gap-1.5 text-[11px] text-gray-400 text-gray-500 cursor-pointer hover:text-gray-600 hover:text-gray-300 py-0.5">
               <svg
                 className="w-2.5 h-2.5 transition-transform duration-150 group-open/raw:rotate-90"
                 fill="none"
@@ -66,7 +66,7 @@ export const CollapsibleDisplay: React.FC<CollapsibleDisplayProps> = ({
               </svg>
               raw params
             </summary>
-            <pre className="mt-1 text-[11px] bg-gray-50 dark:bg-gray-900/50 border border-gray-200/40 dark:border-gray-700/40 p-2 rounded whitespace-pre-wrap break-words overflow-hidden text-gray-600 dark:text-gray-400 font-mono">
+            <pre className="mt-1 text-[11px] bg-gray-50 bg-gray-900/50 border border-gray-200/40 border-gray-700/40 p-2 rounded whitespace-pre-wrap break-words overflow-hidden text-gray-600 text-gray-400 font-mono">
               {rawContent}
             </pre>
           </details>

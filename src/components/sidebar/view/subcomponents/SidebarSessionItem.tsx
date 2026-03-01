@@ -79,7 +79,7 @@ export default function SidebarSessionItem({
             'p-2 mx-3 my-0.5 rounded-md bg-card border active:scale-[0.98] transition-all duration-150 relative',
             isSelected ? 'bg-primary/5 border-primary/20' : '',
             !isSelected && sessionView.isActive
-              ? 'border-green-500/30 bg-green-50/5 dark:bg-green-900/5'
+              ? 'border-green-500/30 bg-green-50/5 bg-green-900/5'
               : 'border-border/30',
           )}
           onClick={selectMobileSession}
@@ -114,13 +114,13 @@ export default function SidebarSessionItem({
 
             {!sessionView.isCursorSession && (
               <button
-                className="w-5 h-5 rounded-md bg-red-50 dark:bg-red-900/20 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
+                className="w-5 h-5 rounded-md bg-red-50 bg-red-900/20 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
                 onClick={(event) => {
                   event.stopPropagation();
                   requestDeleteSession();
                 }}
               >
-                <Trash2 className="w-2.5 h-2.5 text-red-600 dark:text-red-400" />
+                <Trash2 className="w-2.5 h-2.5 text-red-600 text-red-400" />
               </button>
             )}
           </div>
@@ -182,49 +182,49 @@ export default function SidebarSessionItem({
                   autoFocus
                 />
                 <button
-                  className="w-6 h-6 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 rounded flex items-center justify-center"
+                  className="w-6 h-6 bg-green-50 hover:bg-green-100 bg-green-900/20 hover:bg-green-900/40 rounded flex items-center justify-center"
                   onClick={(event) => {
                     event.stopPropagation();
                     saveEditedSession();
                   }}
                   title={t('tooltips.save')}
                 >
-                  <Check className="w-3 h-3 text-green-600 dark:text-green-400" />
+                  <Check className="w-3 h-3 text-green-600 text-green-400" />
                 </button>
                 <button
-                  className="w-6 h-6 bg-gray-50 hover:bg-gray-100 dark:bg-gray-900/20 dark:hover:bg-gray-900/40 rounded flex items-center justify-center"
+                  className="w-6 h-6 bg-gray-50 hover:bg-gray-100 bg-gray-900/20 hover:bg-gray-900/40 rounded flex items-center justify-center"
                   onClick={(event) => {
                     event.stopPropagation();
                     onCancelEditingSession();
                   }}
                   title={t('tooltips.cancel')}
                 >
-                  <X className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                  <X className="w-3 h-3 text-gray-600 text-gray-400" />
                 </button>
               </>
             ) : (
               <>
                 {!sessionView.isCodexSession && (
                   <button
-                    className="w-6 h-6 bg-gray-50 hover:bg-gray-100 dark:bg-gray-900/20 dark:hover:bg-gray-900/40 rounded flex items-center justify-center"
+                    className="w-6 h-6 bg-gray-50 hover:bg-gray-100 bg-gray-900/20 hover:bg-gray-900/40 rounded flex items-center justify-center"
                     onClick={(event) => {
                       event.stopPropagation();
                       onStartEditingSession(session.id, session.summary || t('projects.newSession'));
                     }}
                     title={t('tooltips.editSessionName')}
                   >
-                    <Edit2 className="w-3 h-3 text-gray-600 dark:text-gray-400" />
+                    <Edit2 className="w-3 h-3 text-gray-600 text-gray-400" />
                   </button>
                 )}
                 <button
-                  className="w-6 h-6 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded flex items-center justify-center"
+                  className="w-6 h-6 bg-red-50 hover:bg-red-100 bg-red-900/20 hover:bg-red-900/40 rounded flex items-center justify-center"
                   onClick={(event) => {
                     event.stopPropagation();
                     requestDeleteSession();
                   }}
                   title={t('tooltips.deleteSession')}
                 >
-                  <Trash2 className="w-3 h-3 text-red-600 dark:text-red-400" />
+                  <Trash2 className="w-3 h-3 text-red-600 text-red-400" />
                 </button>
               </>
             )}

@@ -122,7 +122,7 @@ export default function GitPanelHeader({
                 <span className="flex items-center gap-1 text-xs">
                   {aheadCount > 0 && (
                     <span
-                      className="text-green-600 dark:text-green-400"
+                      className="text-green-600 text-green-400"
                       title={`${aheadCount} commit${aheadCount !== 1 ? 's' : ''} ahead`}
                     >
                       {'\u2191'}

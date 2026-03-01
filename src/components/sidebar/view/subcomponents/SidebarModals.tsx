@@ -104,8 +104,8 @@ export default function SidebarModals({
             <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
               <div className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <div className="w-12 h-12 rounded-full bg-red-100 bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="w-6 h-6 text-red-600 text-red-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -119,11 +119,11 @@ export default function SidebarModals({
                       ?
                     </p>
                     {deleteConfirmation.sessionCount > 0 && (
-                      <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+                      <div className="mt-3 p-3 bg-red-50 bg-red-900/20 border border-red-200 border-red-800 rounded-lg">
+                        <p className="text-sm text-red-700 text-red-300 font-medium">
                           {t('deleteConfirmation.sessionCount', { count: deleteConfirmation.sessionCount })}
                         </p>
-                        <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                        <p className="text-xs text-red-600 text-red-400 mt-1">
                           {t('deleteConfirmation.allConversationsDeleted')}
                         </p>
                       </div>
@@ -158,8 +158,8 @@ export default function SidebarModals({
             <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
               <div className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <div className="w-12 h-12 rounded-full bg-red-100 bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="w-6 h-6 text-red-600 text-red-400" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-semibold text-foreground mb-2">

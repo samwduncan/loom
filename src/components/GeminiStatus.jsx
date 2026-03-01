@@ -48,7 +48,7 @@ function GeminiStatus({ status, onAbort, isLoading }) {
 
   return (
     <div className="w-full mb-6 animate-in slide-in-from-bottom duration-300">
-      <div className="flex items-center justify-between max-w-4xl mx-auto bg-gradient-to-r from-cyan-900 to-blue-900 dark:from-cyan-950 dark:to-blue-950 text-white rounded-lg shadow-lg px-4 py-3">
+      <div className="flex items-center justify-between max-w-4xl mx-auto bg-gradient-to-r from-cyan-900 to-blue-900 from-cyan-950 to-blue-950 text-white rounded-lg shadow-lg px-4 py-3">
         <div className="flex-1">
           <div className="flex items-center gap-3">
             {/* Animated spinner */}

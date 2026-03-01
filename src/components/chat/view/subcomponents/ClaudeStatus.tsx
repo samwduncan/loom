@@ -69,7 +69,7 @@ export default function ClaudeStatus({
 
   return (
     <div className="w-full mb-3 sm:mb-6 animate-in slide-in-from-bottom duration-300">
-      <div className="flex items-center justify-between max-w-4xl mx-auto bg-gray-800 dark:bg-gray-900 text-white rounded-lg shadow-lg px-2.5 py-2 sm:px-4 sm:py-3 border border-gray-700 dark:border-gray-800">
+      <div className="flex items-center justify-between max-w-4xl mx-auto bg-gray-800 bg-gray-900 text-white rounded-lg shadow-lg px-2.5 py-2 sm:px-4 sm:py-3 border border-gray-700 border-gray-800">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 sm:gap-3">
             <span

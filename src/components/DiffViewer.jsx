@@ -20,8 +20,8 @@ function DiffViewer({ diff, fileName, isMobile, wrapText }) {
         className={`font-mono text-xs px-3 py-0.5 ${
           isMobile && wrapText ? 'whitespace-pre-wrap break-all' : 'whitespace-pre overflow-x-auto'
         } ${
-          isAddition ? 'bg-green-50 dark:bg-green-950/50 text-green-700 dark:text-green-300' :
-          isDeletion ? 'bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300' :
+          isAddition ? 'bg-green-50 bg-green-950/50 text-green-700 text-green-300' :
+          isDeletion ? 'bg-red-50 bg-red-950/50 text-red-700 text-red-300' :
           isHeader ? 'bg-primary/5 text-primary' :
           'text-muted-foreground/70'
         }`}

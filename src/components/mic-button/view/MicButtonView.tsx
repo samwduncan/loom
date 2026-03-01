@@ -51,7 +51,7 @@ export default function MicButtonView({
           w-12 h-12 rounded-full
           text-white transition-all duration-200
           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-          dark:ring-offset-gray-800
+          ring-offset-gray-800
           touch-action-manipulation
           ${isDisabled ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}
           ${state === MIC_BUTTON_STATES.RECORDING ? 'animate-pulse' : ''}

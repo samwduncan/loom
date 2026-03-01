@@ -227,8 +227,8 @@ const Onboarding = ({ onComplete }) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <GitBranch className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <div className="w-16 h-16 bg-blue-100 bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GitBranch className="w-8 h-8 text-blue-600 text-blue-400" />
               </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Git Configuration</h2>
               <p className="text-muted-foreground">
@@ -294,12 +294,12 @@ const Onboarding = ({ onComplete }) => {
             <div className="space-y-3">
               {/* Claude */}
               <div className={`border rounded-lg p-4 transition-colors ${claudeAuthStatus.authenticated
-                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                ? 'bg-blue-50 bg-blue-900/20 border-blue-200 border-blue-800'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-blue-100 bg-blue-900/30 rounded-full flex items-center justify-center">
                       <SessionProviderLogo provider="claude" className="w-5 h-5" />
                     </div>
                     <div>
@@ -326,12 +326,12 @@ const Onboarding = ({ onComplete }) => {
 
               {/* Cursor */}
               <div className={`border rounded-lg p-4 transition-colors ${cursorAuthStatus.authenticated
-                ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800'
+                ? 'bg-purple-50 bg-purple-900/20 border-purple-200 border-purple-800'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-purple-100 bg-purple-900/30 rounded-full flex items-center justify-center">
                       <SessionProviderLogo provider="cursor" className="w-5 h-5" />
                     </div>
                     <div>
@@ -358,12 +358,12 @@ const Onboarding = ({ onComplete }) => {
 
               {/* Codex */}
               <div className={`border rounded-lg p-4 transition-colors ${codexAuthStatus.authenticated
-                ? 'bg-gray-100 dark:bg-gray-800/50 border-gray-300 dark:border-gray-600'
+                ? 'bg-gray-100 bg-gray-800/50 border-gray-300 border-gray-600'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gray-100 bg-gray-800 rounded-full flex items-center justify-center">
                       <SessionProviderLogo provider="codex" className="w-5 h-5" />
                     </div>
                     <div>
@@ -380,7 +380,7 @@ const Onboarding = ({ onComplete }) => {
                   {!codexAuthStatus.authenticated && !codexAuthStatus.loading && (
                     <button
                       onClick={handleCodexLogin}
-                      className="bg-gray-800 hover:bg-gray-900 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="bg-gray-800 hover:bg-gray-900 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       Login
                     </button>
@@ -390,13 +390,13 @@ const Onboarding = ({ onComplete }) => {
 
               {/* Gemini */}
               <div className={`border rounded-lg p-4 transition-colors ${geminiAuthStatus.authenticated
-                ? 'bg-teal-50 dark:bg-teal-900/20 border-teal-200 dark:border-teal-800'
+                ? 'bg-teal-50 bg-teal-900/20 border-teal-200 border-teal-800'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center">
-                      <SessionProviderLogo provider="gemini" className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                    <div className="w-10 h-10 bg-teal-100 bg-teal-900/30 rounded-full flex items-center justify-center">
+                      <SessionProviderLogo provider="gemini" className="w-5 h-5 text-teal-600 text-teal-400" />
                     </div>
                     <div>
                       <div className="font-medium text-foreground flex items-center gap-2">
@@ -490,8 +490,8 @@ const Onboarding = ({ onComplete }) => {
 
             {/* Error Message */}
             {error && (
-              <div className="mt-6 p-4 bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+              <div className="mt-6 p-4 bg-red-100 bg-red-900/20 border border-red-300 border-red-800 rounded-lg">
+                <p className="text-sm text-red-700 text-red-400">{error}</p>
               </div>
             )}
 

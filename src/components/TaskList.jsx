@@ -179,43 +179,43 @@ const TaskList = ({
         id: 'pending',
         title: t('kanban.pending'),
         status: 'pending',
-        color: 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700',
-        headerColor: 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200'
+        color: 'bg-slate-50 bg-slate-900/50 border-slate-200 border-slate-700',
+        headerColor: 'bg-slate-100 bg-slate-800 text-slate-800 text-slate-200'
       },
       {
         id: 'in-progress',
         title: t('kanban.inProgress'),
         status: 'in-progress',
-        color: 'bg-blue-50 dark:bg-blue-900/50 border-blue-200 dark:border-blue-700',
-        headerColor: 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200'
+        color: 'bg-blue-50 bg-blue-900/50 border-blue-200 border-blue-700',
+        headerColor: 'bg-blue-100 bg-blue-800 text-blue-800 text-blue-200'
       },
       {
         id: 'done',
         title: t('kanban.done'),
         status: 'done',
-        color: 'bg-emerald-50 dark:bg-emerald-900/50 border-emerald-200 dark:border-emerald-700',
-        headerColor: 'bg-emerald-100 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-200'
+        color: 'bg-emerald-50 bg-emerald-900/50 border-emerald-200 border-emerald-700',
+        headerColor: 'bg-emerald-100 bg-emerald-800 text-emerald-800 text-emerald-200'
       },
       {
         id: 'blocked',
         title: t('kanban.blocked'),
         status: 'blocked',
-        color: 'bg-red-50 dark:bg-red-900/50 border-red-200 dark:border-red-700',
-        headerColor: 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200'
+        color: 'bg-red-50 bg-red-900/50 border-red-200 border-red-700',
+        headerColor: 'bg-red-100 bg-red-800 text-red-800 text-red-200'
       },
       {
         id: 'deferred',
         title: t('kanban.deferred'),
         status: 'deferred',
-        color: 'bg-amber-50 dark:bg-amber-900/50 border-amber-200 dark:border-amber-700',
-        headerColor: 'bg-amber-100 dark:bg-amber-800 text-amber-800 dark:text-amber-200'
+        color: 'bg-amber-50 bg-amber-900/50 border-amber-200 border-amber-700',
+        headerColor: 'bg-amber-100 bg-amber-800 text-amber-800 text-amber-200'
       },
       {
         id: 'cancelled',
         title: t('kanban.cancelled'),
         status: 'cancelled',
-        color: 'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700',
-        headerColor: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200'
+        color: 'bg-gray-50 bg-gray-900/50 border-gray-200 border-gray-700',
+        headerColor: 'bg-gray-100 bg-gray-800 text-gray-800 text-gray-200'
       }
     ];
 
@@ -264,22 +264,22 @@ const TaskList = ({
         {!hasTaskMasterDirectory ? (
           // TaskMaster not configured
           <div className="max-w-md mx-auto">
-            <div className="text-blue-600 dark:text-blue-400 mb-4">
+            <div className="text-blue-600 text-blue-400 mb-4">
               <Settings className="w-12 h-12 mx-auto mb-4" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 text-white mb-2">
               {t('notConfigured.title')}
             </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-sm text-gray-600 text-gray-400 mb-6">
               {t('notConfigured.description')}
             </p>
 
             {/* What is TaskMaster section */}
-            <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg text-left">
-              <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-3">
+            <div className="mb-6 p-4 bg-blue-50 bg-blue-950 rounded-lg text-left">
+              <h4 className="text-sm font-medium text-blue-900 text-blue-100 mb-3">
                 {t('notConfigured.whatIsTitle')}
               </h4>
-              <div className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+              <div className="text-xs text-blue-800 text-blue-200 space-y-1">
                 <p>• {t('notConfigured.features.aiPowered')}</p>
                 <p>• {t('notConfigured.features.prdTemplates')}</p>
                 <p>• {t('notConfigured.features.dependencyTracking')}</p>
@@ -302,30 +302,30 @@ const TaskList = ({
         ) : (
           // TaskMaster configured but no tasks - show Getting Started guide
           <div className="max-w-4xl mx-auto">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-xl border border-blue-200 dark:border-blue-800 p-6 mb-6">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 from-blue-950/50 to-indigo-950/50 rounded-xl border border-blue-200 border-blue-800 p-6 mb-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div className="w-10 h-10 bg-blue-100 bg-blue-900/50 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-600 text-blue-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('gettingStarted.title')}</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('gettingStarted.subtitle')}</p>
+                  <h2 className="text-xl font-semibold text-gray-900 text-white">{t('gettingStarted.title')}</h2>
+                  <p className="text-sm text-gray-600 text-gray-400">{t('gettingStarted.subtitle')}</p>
                 </div>
               </div>
               
               <div className="space-y-4 text-left">
                 <div className="grid gap-3">
                   {/* Step 1 */}
-                  <div className="flex gap-3 p-3 bg-white dark:bg-gray-800/50 rounded-lg border border-blue-100 dark:border-blue-800/50">
+                  <div className="flex gap-3 p-3 bg-white bg-gray-800/50 rounded-lg border border-blue-100 border-blue-800/50">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white text-xs font-semibold rounded-full flex items-center justify-center">1</div>
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-1">{t('gettingStarted.steps.createPRD.title')}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('gettingStarted.steps.createPRD.description')}</p>
+                      <h4 className="font-medium text-gray-900 text-white mb-1">{t('gettingStarted.steps.createPRD.title')}</h4>
+                      <p className="text-sm text-gray-600 text-gray-400 mb-2">{t('gettingStarted.steps.createPRD.description')}</p>
                       <button
                         onClick={() => {
                           onShowPRDEditor?.();
                         }}
-                        className="inline-flex items-center gap-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                        className="inline-flex items-center gap-1 text-xs bg-purple-100 bg-purple-900/30 text-purple-700 text-purple-300 px-2 py-1 rounded hover:bg-purple-200 hover:bg-purple-900/50 transition-colors"
                       >
                         <FileText className="w-3 h-3" />
                         {t('gettingStarted.steps.createPRD.addButton')}
@@ -333,8 +333,8 @@ const TaskList = ({
 
                       {/* Show existing PRDs if any */}
                       {existingPRDs.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t('gettingStarted.steps.createPRD.existingPRDs')}</p>
+                        <div className="mt-3 pt-3 border-t border-gray-200 border-gray-700">
+                          <p className="text-xs text-gray-500 text-gray-400 mb-2">{t('gettingStarted.steps.createPRD.existingPRDs')}</p>
                           <div className="flex flex-wrap gap-2">
                             {existingPRDs.map((prd) => (
                               <button
@@ -342,7 +342,7 @@ const TaskList = ({
                                 onClick={() => {
                                   void loadPRDOptions(prd);
                                 }}
-                                className="inline-flex items-center gap-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                className="inline-flex items-center gap-1 text-xs bg-gray-100 bg-gray-700 text-gray-700 text-gray-300 px-2 py-1 rounded hover:bg-gray-200 hover:bg-gray-600 transition-colors"
                               >
                                 <FileText className="w-3 h-3" />
                                 {prd.name}
@@ -355,34 +355,34 @@ const TaskList = ({
                   </div>
 
                   {/* Step 2 */}
-                  <div className="flex gap-3 p-3 bg-white dark:bg-gray-800/50 rounded-lg border border-blue-100 dark:border-blue-800/50">
+                  <div className="flex gap-3 p-3 bg-white bg-gray-800/50 rounded-lg border border-blue-100 border-blue-800/50">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white text-xs font-semibold rounded-full flex items-center justify-center">2</div>
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-1">{t('gettingStarted.steps.generateTasks.title')}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('gettingStarted.steps.generateTasks.description')}</p>
+                      <h4 className="font-medium text-gray-900 text-white mb-1">{t('gettingStarted.steps.generateTasks.title')}</h4>
+                      <p className="text-sm text-gray-600 text-gray-400">{t('gettingStarted.steps.generateTasks.description')}</p>
                     </div>
                   </div>
 
                   {/* Step 3 */}
-                  <div className="flex gap-3 p-3 bg-white dark:bg-gray-800/50 rounded-lg border border-blue-100 dark:border-blue-800/50">
+                  <div className="flex gap-3 p-3 bg-white bg-gray-800/50 rounded-lg border border-blue-100 border-blue-800/50">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white text-xs font-semibold rounded-full flex items-center justify-center">3</div>
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-1">{t('gettingStarted.steps.analyzeTasks.title')}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('gettingStarted.steps.analyzeTasks.description')}</p>
+                      <h4 className="font-medium text-gray-900 text-white mb-1">{t('gettingStarted.steps.analyzeTasks.title')}</h4>
+                      <p className="text-sm text-gray-600 text-gray-400">{t('gettingStarted.steps.analyzeTasks.description')}</p>
                     </div>
                   </div>
 
                   {/* Step 4 */}
-                  <div className="flex gap-3 p-3 bg-white dark:bg-gray-800/50 rounded-lg border border-blue-100 dark:border-blue-800/50">
+                  <div className="flex gap-3 p-3 bg-white bg-gray-800/50 rounded-lg border border-blue-100 border-blue-800/50">
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white text-xs font-semibold rounded-full flex items-center justify-center">4</div>
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-1">{t('gettingStarted.steps.startBuilding.title')}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{t('gettingStarted.steps.startBuilding.description')}</p>
+                      <h4 className="font-medium text-gray-900 text-white mb-1">{t('gettingStarted.steps.startBuilding.title')}</h4>
+                      <p className="text-sm text-gray-600 text-gray-400">{t('gettingStarted.steps.startBuilding.description')}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-4 border-t border-blue-200 dark:border-blue-700">
+                <div className="flex gap-3 pt-4 border-t border-blue-200 border-blue-700">
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -400,7 +400,7 @@ const TaskList = ({
             </div>
 
             <div className="text-center">
-              <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              <div className="text-sm text-gray-500 text-gray-400 mb-2">
                 {t('gettingStarted.tip')}
               </div>
             </div>
@@ -410,16 +410,16 @@ const TaskList = ({
         {/* TaskMaster CLI Setup Modal */}
         {showCLI && (
           <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-4xl h-[600px] flex flex-col">
+            <div className="bg-white bg-gray-900 rounded-lg shadow-xl border border-gray-200 border-gray-700 w-full max-w-4xl h-[600px] flex flex-col">
               {/* Modal Header */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 border-gray-700">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
-                    <Terminal className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <div className="w-8 h-8 bg-blue-100 bg-blue-900/50 rounded-lg flex items-center justify-center">
+                    <Terminal className="w-4 h-4 text-blue-600 text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('setupModal.title')}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('setupModal.subtitle', { projectName: currentProject?.displayName })}</p>
+                    <h2 className="text-lg font-semibold text-gray-900 text-white">{t('setupModal.title')}</h2>
+                    <p className="text-sm text-gray-500 text-gray-400">{t('setupModal.subtitle', { projectName: currentProject?.displayName })}</p>
                   </div>
                 </div>
                 <button
@@ -434,7 +434,7 @@ const TaskList = ({
                       }
                     }, 1000);
                   }}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:text-gray-300 rounded-md hover:bg-gray-100 hover:bg-gray-800"
                 >
                   <Plus className="w-5 h-5 rotate-45" />
                 </button>
@@ -475,11 +475,11 @@ const TaskList = ({
               </div>
               
               {/* Modal Footer */}
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <div className="p-4 border-t border-gray-200 border-gray-700 bg-gray-50 bg-gray-800/50">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="text-sm text-gray-600 text-gray-400">
                     {isTaskMasterComplete ? (
-                      <span className="flex items-center gap-2 text-green-600 dark:text-green-400">
+                      <span className="flex items-center gap-2 text-green-600 text-green-400">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         {t('setupModal.completed')}
                       </span>
@@ -504,7 +504,7 @@ const TaskList = ({
                       "px-4 py-2 text-sm font-medium rounded-md transition-colors",
                       isTaskMasterComplete
                         ? "bg-green-600 hover:bg-green-700 text-white"
-                        : "text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                        : "text-gray-700 text-gray-300 bg-white bg-gray-700 border border-gray-300 border-gray-600 hover:bg-gray-50 hover:bg-gray-600"
                     )}
                   >
                     {isTaskMasterComplete ? t('setupModal.closeContinueButton') : t('setupModal.closeButton')}
@@ -530,21 +530,21 @@ const TaskList = ({
             placeholder={t('search.placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 w-full border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="pl-10 pr-4 py-2 w-full border border-gray-300 border-gray-600 rounded-lg bg-white bg-gray-800 text-gray-900 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         {/* Controls */}
         <div className="flex flex-wrap items-center gap-2">
           {/* View Toggle */}
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className="flex bg-gray-100 bg-gray-800 rounded-lg p-1">
             <button
               onClick={() => setViewMode('kanban')}
               className={cn(
                 'p-2 rounded-md transition-colors',
                 viewMode === 'kanban' 
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? 'bg-white bg-gray-700 text-gray-900 text-white shadow-sm' 
+                  : 'text-gray-500 text-gray-400 hover:text-gray-700 hover:text-gray-300'
               )}
               title={t('views.kanban')}
             >
@@ -555,8 +555,8 @@ const TaskList = ({
               className={cn(
                 'p-2 rounded-md transition-colors',
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? 'bg-white bg-gray-700 text-gray-900 text-white shadow-sm'
+                  : 'text-gray-500 text-gray-400 hover:text-gray-700 hover:text-gray-300'
               )}
               title={t('views.list')}
             >
@@ -567,8 +567,8 @@ const TaskList = ({
               className={cn(
                 'p-2 rounded-md transition-colors',
                 viewMode === 'grid'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  ? 'bg-white bg-gray-700 text-gray-900 text-white shadow-sm'
+                  : 'text-gray-500 text-gray-400 hover:text-gray-700 hover:text-gray-300'
               )}
               title={t('views.grid')}
             >
@@ -582,8 +582,8 @@ const TaskList = ({
             className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors',
               showFilters 
-                ? 'bg-blue-50 dark:bg-blue-900 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300' 
-                : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                ? 'bg-blue-50 bg-blue-900 border-blue-200 border-blue-700 text-blue-700 text-blue-300' 
+                : 'bg-white bg-gray-800 border-gray-300 border-gray-600 text-gray-700 text-gray-300 hover:bg-gray-50 hover:bg-gray-700'
             )}
           >
             <Filter className="w-4 h-4" />
@@ -597,7 +597,7 @@ const TaskList = ({
               {/* Help Button */}
               <button
                 onClick={() => setShowHelpGuide(true)}
-                className="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600"
+                className="p-2 text-gray-600 text-gray-400 hover:text-blue-600 hover:text-blue-400 hover:bg-gray-100 hover:bg-gray-700 rounded-lg transition-colors border border-gray-300 border-gray-600"
                 title={t('buttons.help')}
               >
                 <HelpCircle className="w-4 h-4" />
@@ -622,27 +622,27 @@ const TaskList = ({
                     </button>
 
                     {showPRDDropdown && (
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-30">
+                      <div className="absolute right-0 top-full mt-2 w-56 bg-white bg-gray-800 border border-gray-200 border-gray-700 rounded-lg shadow-xl z-30">
                         <div className="p-2">
                           <button
                             onClick={() => {
                               onShowPRDEditor?.();
                               setShowPRDDropdown(false);
                             }}
-                            className="w-full text-left px-3 py-2 text-sm font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded flex items-center gap-2"
+                            className="w-full text-left px-3 py-2 text-sm font-medium text-purple-700 text-purple-300 hover:bg-purple-50 hover:bg-purple-900/30 rounded flex items-center gap-2"
                           >
                             <Plus className="w-4 h-4" />
                             {t('buttons.createNewPRD')}
                           </button>
-                          <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 px-3 py-1 font-medium">{t('gettingStarted.steps.createPRD.existingPRDs')}</div>
+                          <div className="border-t border-gray-200 border-gray-700 my-1"></div>
+                          <div className="text-xs text-gray-500 text-gray-400 px-3 py-1 font-medium">{t('gettingStarted.steps.createPRD.existingPRDs')}</div>
                           {existingPRDs.map((prd) => (
                             <button
                               key={prd.name}
                               onClick={() => {
                                 void loadPRDOptions(prd, true);
                               }}
-                              className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded flex items-center gap-2"
+                              className="w-full text-left px-3 py-2 text-sm text-gray-700 text-gray-300 hover:bg-gray-100 hover:bg-gray-700 rounded flex items-center gap-2"
                               title={t('prd.modified', { date: new Date(prd.modified).toLocaleDateString() })}
                             >
                               <FileText className="w-4 h-4" />
@@ -686,17 +686,17 @@ const TaskList = ({
 
       {/* Expanded Filters */}
       {showFilters && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4">
+        <div className="bg-gray-50 bg-gray-800 rounded-lg p-4 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-1">
                 {t('filters.status')}
               </label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md bg-white bg-gray-800 text-gray-900 text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">{t('filters.allStatuses')}</option>
                 {statuses.map(status => (
@@ -709,13 +709,13 @@ const TaskList = ({
 
             {/* Priority Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-1">
                 {t('filters.priority')}
               </label>
               <select
                 value={priorityFilter}
                 onChange={(e) => setPriorityFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md bg-white bg-gray-800 text-gray-900 text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">{t('filters.allPriorities')}</option>
                 {priorities.map(priority => (
@@ -728,7 +728,7 @@ const TaskList = ({
 
             {/* Sort By */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-1">
                 {t('filters.sortBy')}
               </label>
               <select
@@ -738,7 +738,7 @@ const TaskList = ({
                   setSortBy(field);
                   setSortOrder(order);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md bg-white bg-gray-800 text-gray-900 text-white focus:ring-2 focus:ring-blue-500"
               >
                 <option value="id-asc">{t('sort.idAsc')}</option>
                 <option value="id-desc">{t('sort.idDesc')}</option>
@@ -754,12 +754,12 @@ const TaskList = ({
 
           {/* Filter Actions */}
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="text-sm text-gray-600 text-gray-400">
               {t('filters.showing', { filtered: filteredAndSortedTasks.length, total: tasks.length })}
             </div>
             <button
               onClick={clearFilters}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+              className="text-sm text-blue-600 text-blue-400 hover:text-blue-700 hover:text-blue-300 font-medium"
             >
               {t('filters.clearFilters')}
             </button>
@@ -774,8 +774,8 @@ const TaskList = ({
           className={cn(
             'flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors',
             sortBy === 'id'
-              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              ? 'bg-blue-100 bg-blue-900 text-blue-700 text-blue-300'
+              : 'bg-gray-100 bg-gray-800 text-gray-600 text-gray-400 hover:bg-gray-200 hover:bg-gray-700'
           )}
         >
           {t('sort.id')} {getSortIcon('id')}
@@ -785,8 +785,8 @@ const TaskList = ({
           className={cn(
             'flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors',
             sortBy === 'status'
-              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              ? 'bg-blue-100 bg-blue-900 text-blue-700 text-blue-300'
+              : 'bg-gray-100 bg-gray-800 text-gray-600 text-gray-400 hover:bg-gray-200 hover:bg-gray-700'
           )}
         >
           {t('sort.status')} {getSortIcon('status')}
@@ -796,8 +796,8 @@ const TaskList = ({
           className={cn(
             'flex items-center gap-1 px-3 py-1.5 rounded-md text-sm transition-colors',
             sortBy === 'priority'
-              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-              : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+              ? 'bg-blue-100 bg-blue-900 text-blue-700 text-blue-300'
+              : 'bg-gray-100 bg-gray-800 text-gray-600 text-gray-400 hover:bg-gray-200 hover:bg-gray-700'
           )}
         >
           {t('sort.priority')} {getSortIcon('priority')}
@@ -807,7 +807,7 @@ const TaskList = ({
       {/* Task Cards */}
       {filteredAndSortedTasks.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 dark:text-gray-400">
+          <div className="text-gray-500 text-gray-400">
             <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-medium mb-2">{t('noMatchingTasks.title')}</h3>
             <p className="text-sm">{t('noMatchingTasks.description')}</p>
@@ -833,7 +833,7 @@ const TaskList = ({
                     {column.title}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium px-2 py-1 bg-white/60 dark:bg-black/20 rounded-full">
+                    <span className="text-xs font-medium px-2 py-1 bg-white/60 bg-black/20 rounded-full">
                       {column.tasks.length}
                     </span>
                   </div>
@@ -843,14 +843,14 @@ const TaskList = ({
               {/* Column Tasks */}
               <div className="p-3 space-y-3 min-h-[200px] max-h-[calc(100vh-300px)] overflow-y-auto">
                 {column.tasks.length === 0 ? (
-                  <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                    <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                      <div className="w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                  <div className="text-center py-8 text-gray-400 text-gray-500">
+                    <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-gray-200 bg-gray-700 flex items-center justify-center">
+                      <div className="w-3 h-3 rounded-full bg-gray-300 bg-gray-600"></div>
                     </div>
-                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    <div className="text-xs font-medium text-gray-500 text-gray-400">
                       {t('kanban.noTasksYet')}
                     </div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    <div className="text-xs text-gray-400 text-gray-500 mt-1">
                       {column.status === 'pending' ? t('kanban.tasksWillAppear') :
                        column.status === 'in-progress' ? t('kanban.moveTasksHere') :
                        column.status === 'done' ? t('kanban.completedTasksHere') :
@@ -907,21 +907,21 @@ const TaskList = ({
       {/* Help Guide Modal */}
       {showHelpGuide && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          <div className="bg-white bg-gray-900 rounded-lg shadow-xl border border-gray-200 border-gray-700 w-full max-w-4xl max-h-[90vh] overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 border-gray-700">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div className="w-10 h-10 bg-blue-100 bg-blue-900/50 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-600 text-blue-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('helpGuide.title')}</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t('helpGuide.subtitle')}</p>
+                  <h2 className="text-xl font-semibold text-gray-900 text-white">{t('helpGuide.title')}</h2>
+                  <p className="text-sm text-gray-600 text-gray-400">{t('helpGuide.subtitle')}</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowHelpGuide(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-600 hover:text-gray-300 rounded-lg hover:bg-gray-100 hover:bg-gray-700 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -931,17 +931,17 @@ const TaskList = ({
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
               <div className="space-y-4">
                 {/* Step 1 */}
-                <div className="flex gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="flex gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 from-blue-950/50 to-indigo-950/50 rounded-lg border border-blue-200 border-blue-800">
                   <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white text-sm font-semibold rounded-full flex items-center justify-center">1</div>
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">{t('gettingStarted.steps.createPRD.title')}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{t('gettingStarted.steps.createPRD.description')}</p>
+                    <h4 className="font-medium text-gray-900 text-white mb-2">{t('gettingStarted.steps.createPRD.title')}</h4>
+                    <p className="text-sm text-gray-600 text-gray-400 mb-3">{t('gettingStarted.steps.createPRD.description')}</p>
                     <button
                       onClick={() => {
                         onShowPRDEditor?.();
                         setShowHelpGuide(false);
                       }}
-                      className="inline-flex items-center gap-2 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1.5 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
+                      className="inline-flex items-center gap-2 text-sm bg-purple-100 bg-purple-900/30 text-purple-700 text-purple-300 px-3 py-1.5 rounded-lg hover:bg-purple-200 hover:bg-purple-900/50 transition-colors"
                     >
                       <FileText className="w-4 h-4" />
                       {t('buttons.addPRD')}
@@ -950,13 +950,13 @@ const TaskList = ({
                 </div>
 
                 {/* Step 2 */}
-                <div className="flex gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 rounded-lg border border-green-200 dark:border-green-800">
+                <div className="flex gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 from-green-950/50 to-emerald-950/50 rounded-lg border border-green-200 border-green-800">
                   <div className="flex-shrink-0 w-8 h-8 bg-green-600 text-white text-sm font-semibold rounded-full flex items-center justify-center">2</div>
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">{t('gettingStarted.steps.generateTasks.title')}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{t('gettingStarted.steps.generateTasks.description')}</p>
-                    <div className="bg-white dark:bg-gray-800/50 rounded border border-green-200 dark:border-green-700/50 p-3 mb-2">
-                      <p className="text-xs text-gray-900 dark:text-white font-mono whitespace-pre-wrap">
+                    <h4 className="font-medium text-gray-900 text-white mb-2">{t('gettingStarted.steps.generateTasks.title')}</h4>
+                    <p className="text-sm text-gray-600 text-gray-400 mb-3">{t('gettingStarted.steps.generateTasks.description')}</p>
+                    <div className="bg-white bg-gray-800/50 rounded border border-green-200 border-green-700/50 p-3 mb-2">
+                      <p className="text-xs text-gray-900 text-white font-mono whitespace-pre-wrap">
                         {t('helpGuide.examples.parsePRD')}
                       </p>
                     </div>
@@ -964,13 +964,13 @@ const TaskList = ({
                 </div>
 
                 {/* Step 3 */}
-                <div className="flex gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50 rounded-lg border border-amber-200 dark:border-amber-800">
+                <div className="flex gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 from-amber-950/50 to-orange-950/50 rounded-lg border border-amber-200 border-amber-800">
                   <div className="flex-shrink-0 w-8 h-8 bg-amber-600 text-white text-sm font-semibold rounded-full flex items-center justify-center">3</div>
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">{t('gettingStarted.steps.analyzeTasks.title')}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{t('gettingStarted.steps.analyzeTasks.description')}</p>
-                    <div className="bg-white dark:bg-gray-800/50 rounded border border-amber-200 dark:border-amber-700/50 p-3 mb-2">
-                      <p className="text-xs text-gray-900 dark:text-white font-mono whitespace-pre-wrap">
+                    <h4 className="font-medium text-gray-900 text-white mb-2">{t('gettingStarted.steps.analyzeTasks.title')}</h4>
+                    <p className="text-sm text-gray-600 text-gray-400 mb-3">{t('gettingStarted.steps.analyzeTasks.description')}</p>
+                    <div className="bg-white bg-gray-800/50 rounded border border-amber-200 border-amber-700/50 p-3 mb-2">
+                      <p className="text-xs text-gray-900 text-white font-mono whitespace-pre-wrap">
                         {t('helpGuide.examples.expandTask')}
                       </p>
                     </div>
@@ -978,13 +978,13 @@ const TaskList = ({
                 </div>
 
                 {/* Step 4 */}
-                <div className="flex gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 rounded-lg border border-purple-200 dark:border-purple-800">
+                <div className="flex gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 from-purple-950/50 to-pink-950/50 rounded-lg border border-purple-200 border-purple-800">
                   <div className="flex-shrink-0 w-8 h-8 bg-purple-600 text-white text-sm font-semibold rounded-full flex items-center justify-center">4</div>
                   <div>
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">{t('gettingStarted.steps.startBuilding.title')}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{t('gettingStarted.steps.startBuilding.description')}</p>
-                    <div className="bg-white dark:bg-gray-800/50 rounded border border-purple-200 dark:border-purple-700/50 p-3 mb-3">
-                      <p className="text-xs text-gray-900 dark:text-white font-mono whitespace-pre-wrap">
+                    <h4 className="font-medium text-gray-900 text-white mb-2">{t('gettingStarted.steps.startBuilding.title')}</h4>
+                    <p className="text-sm text-gray-600 text-gray-400 mb-3">{t('gettingStarted.steps.startBuilding.description')}</p>
+                    <div className="bg-white bg-gray-800/50 rounded border border-purple-200 border-purple-700/50 p-3 mb-3">
+                      <p className="text-xs text-gray-900 text-white font-mono whitespace-pre-wrap">
                         {t('helpGuide.examples.addTask')}
                       </p>
                     </div>
@@ -992,7 +992,7 @@ const TaskList = ({
                       href="https://github.com/eyaltoledano/claude-task-master/blob/main/docs/examples.md"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
+                      className="inline-block text-xs text-blue-600 text-blue-400 hover:text-blue-700 hover:text-blue-300 underline"
                     >
                       {t('helpGuide.moreExamples')}
                     </a>
@@ -1000,9 +1000,9 @@ const TaskList = ({
                 </div>
 
                 {/* Pro Tips */}
-                <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-3">{t('helpGuide.proTips.title')}</h4>
-                  <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="mt-6 p-4 bg-gray-50 bg-gray-800 rounded-lg border border-gray-200 border-gray-700">
+                  <h4 className="font-medium text-gray-900 text-white mb-3">{t('helpGuide.proTips.title')}</h4>
+                  <ul className="space-y-2 text-sm text-gray-600 text-gray-400">
                     <li className="flex items-start gap-2">
                       <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
                       {t('helpGuide.proTips.search')}
@@ -1023,9 +1023,9 @@ const TaskList = ({
                 </div>
 
                 {/* Learn More Section */}
-                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/50 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-3">{t('helpGuide.learnMore.title')}</h4>
-                  <p className="text-sm text-blue-800 dark:text-blue-200 mb-3">
+                <div className="mt-6 p-4 bg-blue-50 bg-blue-950/50 rounded-lg border border-blue-200 border-blue-800">
+                  <h4 className="font-medium text-blue-900 text-blue-100 mb-3">{t('helpGuide.learnMore.title')}</h4>
+                  <p className="text-sm text-blue-800 text-blue-200 mb-3">
                     {t('helpGuide.learnMore.description')}
                   </p>
                   <a
