@@ -34,13 +34,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. All body and code text renders in JetBrains Mono with the compact 4-8px grid spacing applied to existing layout components
   4. Scrollbars are thin, warm-tinted, and match the dark theme rather than showing OS-default chrome
   5. An upstream-sync branch tracks CloudCLI verbatim, the GPL-3.0 ATTRIBUTION file credits CloudCLI authors, and the baseline fork commit is tagged
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Define and apply CSS variable palette — `index.css` and `tailwind.config.js` with `<alpha-value>` contract
-- [ ] 01-02: Load JetBrains Mono, apply typography and density system globally
-- [ ] 01-03: Establish upstream-sync branch, tag baseline, add GPL-3.0 ATTRIBUTION file
-- [ ] 01-04: Apply status colors and scrollbar styling, verify opacity modifiers end-to-end
+- [ ] 01-01-PLAN.md — Define warm earthy CSS variable palette, fix alpha-value contract, load JetBrains Mono, apply typography/density/scrollbar foundation
+- [ ] 01-02-PLAN.md — Establish fork governance: upstream-sync branch, baseline tag, GPL-3.0 ATTRIBUTION file
+- [ ] 01-03-PLAN.md — Remove dark mode system: delete ThemeContext/DarkModeToggle, strip all dark: Tailwind prefixes
+- [ ] 01-04-PLAN.md — Verify end-to-end: build, grep audit, visual checkpoint for warm palette and opacity modifiers
 
 ### Phase 2: Color Sweep
 **Goal**: Every color reference in the codebase uses semantic CSS variable aliases so the warm palette propagates uniformly and visual QA is meaningful
@@ -198,7 +198,7 @@ Note: Phase 4 depends only on Phase 1 (not Phase 3) — terminal theming can beg
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design System Foundation | 0/4 | Not started | - |
+| 1. Design System Foundation | 0/4 | Planned | - |
 | 2. Color Sweep | 0/4 | Not started | - |
 | 3. Structural Cleanup | 0/5 | Not started | - |
 | 4. Terminal and Editor Theming | 0/3 | Not started | - |
