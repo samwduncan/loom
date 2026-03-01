@@ -55,8 +55,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **FORK-01**: i18n stripped from all 43 components — `useTranslation` calls replaced with English string literals
 - [ ] **FORK-02**: Cursor CLI backend integration removed — all Cursor-specific code, routes, and UI elements deleted
 - [ ] **FORK-03**: OpenAI Codex backend integration removed — all Codex-specific code, routes, and UI elements deleted
-- [ ] **FORK-04**: Upstream-sync branch established and documented — strategy for cherry-picking security/bug fixes from upstream CloudCLI without conflicts
-- [ ] **FORK-05**: GPL-3.0 license maintained with proper attribution — LICENSE file updated with fork notice, NOTICE file if required
+- [x] **FORK-04**: Upstream-sync branch established and documented — strategy for cherry-picking security/bug fixes from upstream CloudCLI without conflicts
+- [x] **FORK-05**: GPL-3.0 license maintained with proper attribution — LICENSE file updated with fork notice, NOTICE file if required
 
 ### Terminal & Editor
 
@@ -147,8 +147,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FORK-01 | Phase 3 | Pending |
 | FORK-02 | Phase 3 | Pending |
 | FORK-03 | Phase 3 | Pending |
-| FORK-04 | Phase 1 | Pending |
-| FORK-05 | Phase 1 | Pending |
+| FORK-04 | Phase 1 | Complete |
+| FORK-05 | Phase 1 | Complete |
 | TERM-01 | Phase 4 | Pending |
 | TERM-02 | Phase 4 | Pending |
 | TERM-03 | Phase 4 | Pending |
