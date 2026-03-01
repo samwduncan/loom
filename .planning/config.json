@@ -8,5 +8,11 @@
     "research": true,
     "plan_check": true,
     "verifier": true
+  },
+  "tooling": {
+    "lint": null,
+    "typecheck": "npm run typecheck",
+    "build": "npm run build",
+    "test": null
   }
 }
