@@ -110,13 +110,59 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated during roadmap creation) | | |
+| DSGN-01 | Phase 1 | Pending |
+| DSGN-02 | Phase 1 | Pending |
+| DSGN-03 | Phase 1 | Pending |
+| DSGN-04 | Phase 1 | Pending |
+| DSGN-05 | Phase 1 | Pending |
+| DSGN-06 | Phase 2 | Pending |
+| DSGN-07 | Phase 1 | Pending |
+| DSGN-08 | Phase 1 | Pending |
+| CHAT-01 | Phase 5 | Pending |
+| CHAT-02 | Phase 5 | Pending |
+| CHAT-03 | Phase 5 | Pending |
+| CHAT-04 | Phase 5 | Pending |
+| CHAT-05 | Phase 5 | Pending |
+| CHAT-06 | Phase 5 | Pending |
+| CHAT-07 | Phase 5 | Pending |
+| CHAT-08 | Phase 5 | Pending |
+| CHAT-09 | Phase 6 | Pending |
+| CHAT-10 | Phase 6 | Pending |
+| CHAT-11 | Phase 6 | Pending |
+| CHAT-12 | Phase 6 | Pending |
+| CHAT-13 | Phase 6 | Pending |
+| CHAT-14 | Phase 6 | Pending |
+| CHAT-15 | Phase 6 | Pending |
+| CHAT-16 | Phase 6 | Pending |
+| STRM-01 | Phase 7 | Pending |
+| STRM-02 | Phase 7 | Pending |
+| STRM-03 | Phase 7 | Pending |
+| STRM-04 | Phase 7 | Pending |
+| STRM-05 | Phase 7 | Pending |
+| STRM-06 | Phase 7 | Pending |
+| STRM-07 | Phase 8 | Pending |
+| STRM-08 | Phase 8 | Pending |
+| STRM-09 | Phase 8 | Pending |
+| STRM-10 | Phase 8 | Pending |
+| FORK-01 | Phase 3 | Pending |
+| FORK-02 | Phase 3 | Pending |
+| FORK-03 | Phase 3 | Pending |
+| FORK-04 | Phase 1 | Pending |
+| FORK-05 | Phase 1 | Pending |
+| TERM-01 | Phase 4 | Pending |
+| TERM-02 | Phase 4 | Pending |
+| TERM-03 | Phase 4 | Pending |
+| TERM-04 | Phase 4 | Pending |
+| SIDE-01 | Phase 9 | Pending |
+| SIDE-02 | Phase 9 | Pending |
+| SIDE-03 | Phase 9 | Pending |
+| SIDE-04 | Phase 9 | Pending |
 
 **Coverage:**
 - v1 requirements: 44 total
-- Mapped to phases: 0
-- Unmapped: 44
+- Mapped to phases: 44
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after initial definition*
+*Last updated: 2026-03-01 after roadmap creation — traceability populated*
