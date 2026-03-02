@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import QuickSettingsPanel from '../../QuickSettingsPanel';
 import { useTasksSettings } from '../../../contexts/TasksSettingsContext';
-import { useTranslation } from 'react-i18next';
 import ChatMessagesPane from './subcomponents/ChatMessagesPane';
 import ChatComposer from './subcomponents/ChatComposer';
 import type { ChatInterfaceProps } from '../types/types';
@@ -41,7 +40,6 @@ function ChatInterface({
   onShowAllTasks,
 }: ChatInterfaceProps) {
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings();
-  const { t } = useTranslation('chat');
 
   const streamBufferRef = useRef('');
   const streamTimerRef = useRef<number | null>(null);
@@ -251,21 +249,18 @@ function ChatInterface({
   if (!selectedProject) {
     const selectedProviderLabel =
       provider === 'cursor'
-        ? t('messageTypes.cursor')
+        ? 'Cursor'
         : provider === 'codex'
-          ? t('messageTypes.codex')
+          ? 'Codex'
           : provider === 'gemini'
-            ? t('messageTypes.gemini')
-            : t('messageTypes.claude');
+            ? 'Gemini'
+            : 'Claude';
 
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center text-muted-foreground">
           <p className="text-sm">
-            {t('projectSelection.startChatWithProvider', {
-              provider: selectedProviderLabel,
-              defaultValue: 'Select a project to start chatting with {{provider}}',
-            })}
+            {`Select a project to start chatting with ${selectedProviderLabel}`}
           </p>
         </div>
       </div>
@@ -376,16 +371,15 @@ function ChatInterface({
           onTextareaInput={handleTextareaInput}
           onInputFocusChange={handleInputFocusChange}
           isInputFocused={isInputFocused}
-          placeholder={t('input.placeholder', {
-            provider:
-              provider === 'cursor'
-                ? t('messageTypes.cursor')
-                : provider === 'codex'
-                  ? t('messageTypes.codex')
-                  : provider === 'gemini'
-                    ? t('messageTypes.gemini')
-                    : t('messageTypes.claude'),
-          })}
+          placeholder={`Type / for commands, @ for files, or ask ${
+            provider === 'cursor'
+              ? 'Cursor'
+              : provider === 'codex'
+                ? 'Codex'
+                : provider === 'gemini'
+                  ? 'Gemini'
+                  : 'Claude'
+          } anything...`}
           isTextareaExpanded={isTextareaExpanded}
           sendByCtrlEnter={sendByCtrlEnter}
           onTranscript={handleTranscript}

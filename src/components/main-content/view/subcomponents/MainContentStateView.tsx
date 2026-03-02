@@ -1,11 +1,8 @@
 import { Folder } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import MobileMenuButton from './MobileMenuButton';
 import type { MainContentStateViewProps } from '../../types/types';
 
 export default function MainContentStateView({ mode, isMobile, onMenuClick }: MainContentStateViewProps) {
-  const { t } = useTranslation();
-
   const isLoading = mode === 'loading';
 
   return (
@@ -29,8 +26,8 @@ export default function MainContentStateView({ mode, isMobile, onMenuClick }: Ma
                 }}
               />
             </div>
-            <h2 className="text-lg font-semibold text-foreground mb-1">{t('mainContent.loading')}</h2>
-            <p className="text-sm">{t('mainContent.settingUpWorkspace')}</p>
+            <h2 className="text-lg font-semibold text-foreground mb-1">Loading Claude Code UI</h2>
+            <p className="text-sm">Setting up your workspace...</p>
           </div>
         </div>
       ) : (
@@ -39,11 +36,11 @@ export default function MainContentStateView({ mode, isMobile, onMenuClick }: Ma
             <div className="w-14 h-14 mx-auto mb-5 bg-muted/50 rounded-2xl flex items-center justify-center">
               <Folder className="w-7 h-7 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-foreground">{t('mainContent.chooseProject')}</h2>
-            <p className="text-sm text-muted-foreground mb-5 leading-relaxed">{t('mainContent.selectProjectDescription')}</p>
+            <h2 className="text-xl font-semibold mb-2 text-foreground">Choose Your Project</h2>
+            <p className="text-sm text-muted-foreground mb-5 leading-relaxed">Select a project from the sidebar to start coding with Claude. Each project contains your chat sessions and file history.</p>
             <div className="bg-primary/5 rounded-xl p-3.5 border border-primary/10">
               <p className="text-sm text-primary">
-                <strong>{t('mainContent.tip')}:</strong> {isMobile ? t('mainContent.createProjectMobile') : t('mainContent.createProjectDesktop')}
+                <strong>Tip:</strong> {isMobile ? 'Tap the menu button above to access projects' : 'Create a new project by clicking the folder icon in the sidebar'}
               </p>
             </div>
           </div>

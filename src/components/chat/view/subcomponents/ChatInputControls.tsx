@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import ThinkingModeSelector from './ThinkingModeSelector';
 import TokenUsagePie from './TokenUsagePie';
 import type { PermissionMode, Provider } from '../../types/types';
@@ -35,8 +34,6 @@ export default function ChatInputControls({
   hasMessages,
   onScrollToBottom,
 }: ChatInputControlsProps) {
-  const { t } = useTranslation('chat');
-
   return (
     <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
       <button
@@ -51,7 +48,7 @@ export default function ChatInputControls({
                 ? 'bg-orange-50 bg-orange-900/15 text-orange-700 text-orange-300 border-orange-300/60 border-orange-600/40 hover:bg-orange-100 hover:bg-orange-900/25'
                 : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary/10'
         }`}
-        title={t('input.clickToChangeMode')}
+        title="Click to change permission mode (or press Tab in input)"
       >
         <div className="flex items-center gap-1.5">
           <div
@@ -66,10 +63,10 @@ export default function ChatInputControls({
             }`}
           />
           <span>
-            {permissionMode === 'default' && t('codex.modes.default')}
-            {permissionMode === 'acceptEdits' && t('codex.modes.acceptEdits')}
-            {permissionMode === 'bypassPermissions' && t('codex.modes.bypassPermissions')}
-            {permissionMode === 'plan' && t('codex.modes.plan')}
+            {permissionMode === 'default' && 'Default Mode'}
+            {permissionMode === 'acceptEdits' && 'Accept Edits'}
+            {permissionMode === 'bypassPermissions' && 'Bypass Permissions'}
+            {permissionMode === 'plan' && 'Plan Mode'}
           </span>
         </div>
       </button>
@@ -84,7 +81,7 @@ export default function ChatInputControls({
         type="button"
         onClick={onToggleCommandMenu}
         className="relative w-7 h-7 sm:w-8 sm:h-8 text-muted-foreground hover:text-foreground rounded-lg flex items-center justify-center transition-colors hover:bg-accent/60"
-        title={t('input.showAllCommands')}
+        title="Show all commands"
       >
         <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -108,7 +105,7 @@ export default function ChatInputControls({
           type="button"
           onClick={onClearInput}
           className="w-7 h-7 sm:w-8 sm:h-8 bg-card hover:bg-accent/60 border border-border/50 rounded-lg flex items-center justify-center transition-all duration-200 group shadow-sm"
-          title={t('input.clearInput', { defaultValue: 'Clear input' })}
+          title="Clear input"
         >
           <svg
             className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground group-hover:text-foreground transition-colors"
@@ -125,7 +122,7 @@ export default function ChatInputControls({
         <button
           onClick={onScrollToBottom}
           className="w-7 h-7 sm:w-8 sm:h-8 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-105"
-          title={t('input.scrollToBottom', { defaultValue: 'Scroll to bottom' })}
+          title="Scroll to bottom"
         >
           <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />

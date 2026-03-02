@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import type { AppTab, Project, ProjectSession } from '../../../../types/app';
 
@@ -9,13 +8,13 @@ type MainContentTitleProps = {
   shouldShowTasksTab: boolean;
 };
 
-function getTabTitle(activeTab: AppTab, shouldShowTasksTab: boolean, t: (key: string) => string) {
+function getTabTitle(activeTab: AppTab, shouldShowTasksTab: boolean) {
   if (activeTab === 'files') {
-    return t('mainContent.projectFiles');
+    return 'Project Files';
   }
 
   if (activeTab === 'git') {
-    return t('tabs.git');
+    return 'Source Control';
   }
 
   if (activeTab === 'tasks' && shouldShowTasksTab) {
@@ -39,8 +38,6 @@ export default function MainContentTitle({
   selectedSession,
   shouldShowTasksTab,
 }: MainContentTitleProps) {
-  const { t } = useTranslation();
-
   const showSessionIcon = activeTab === 'chat' && Boolean(selectedSession);
   const showChatNewSession = activeTab === 'chat' && !selectedSession;
 
@@ -62,13 +59,13 @@ export default function MainContentTitle({
           </div>
         ) : showChatNewSession ? (
           <div className="min-w-0">
-            <h2 className="text-base font-semibold text-foreground leading-tight">{t('mainContent.newSession')}</h2>
+            <h2 className="text-base font-semibold text-foreground leading-tight">New Session</h2>
             <div className="text-xs text-muted-foreground truncate leading-tight">{selectedProject.displayName}</div>
           </div>
         ) : (
           <div className="min-w-0">
             <h2 className="text-sm font-semibold text-foreground leading-tight">
-              {getTabTitle(activeTab, shouldShowTasksTab, t)}
+              {getTabTitle(activeTab, shouldShowTasksTab)}
             </h2>
             <div className="text-[11px] text-muted-foreground truncate leading-tight">{selectedProject.displayName}</div>
           </div>

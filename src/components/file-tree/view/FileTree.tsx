@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { cn } from '../../../lib/utils';
 import ImageViewer from './ImageViewer';
 import { ICON_SIZE_CLASS, getFileIconData } from '../constants/fileIcons';
@@ -21,7 +20,6 @@ type FileTreeProps =  {
 }
 
 export default function FileTree({ selectedProject, onFileOpen }: FileTreeProps) {
-  const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<FileTreeImageSelection | null>(null);
 
   const { files, loading } = useFileTreeData(selectedProject);
@@ -61,8 +59,8 @@ export default function FileTree({ selectedProject, onFileOpen }: FileTreeProps)
   );
 
   const formatRelativeTimeLabel = useCallback(
-    (date?: string) => formatRelativeTime(date, t),
-    [t],
+    (date?: string) => formatRelativeTime(date),
+    [],
   );
 
   if (loading) {

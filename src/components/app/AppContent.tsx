@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-
 import Sidebar from '../sidebar/view/Sidebar';
 import MainContent from '../main-content/view/MainContent';
 import MobileNav from '../MobileNav';
@@ -14,7 +12,6 @@ import { useProjectsState } from '../../hooks/useProjectsState';
 export default function AppContent() {
   const navigate = useNavigate();
   const { sessionId } = useParams<{ sessionId?: string }>();
-  const { t } = useTranslation('common');
   const { isMobile } = useDeviceSettings({ trackPWA: false });
   const { ws, sendMessage, latestMessage } = useWebSocket();
 
@@ -93,7 +90,7 @@ export default function AppContent() {
               event.stopPropagation();
               setSidebarOpen(false);
             }}
-            aria-label={t('versionUpdate.ariaLabels.closeSidebar')}
+            aria-label="Close sidebar"
           />
           <div
             className={`relative w-[85vw] max-w-sm sm:w-80 h-full bg-card border-r border-border/40 transform transition-transform duration-150 ease-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'

@@ -2,7 +2,6 @@ import { EditorView } from '@codemirror/view';
 import { unifiedMergeView } from '@codemirror/merge';
 import type { Extension } from '@codemirror/state';
 import { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useCodeEditorDocument } from '../hooks/useCodeEditorDocument';
 import { useCodeEditorSettings } from '../hooks/useCodeEditorSettings';
 import { useEditorKeyboardShortcuts } from '../hooks/useEditorKeyboardShortcuts';
@@ -34,7 +33,6 @@ export default function CodeEditor({
   onToggleExpand = null,
   onPopOut = null,
 }: CodeEditorProps) {
-  const { t } = useTranslation('codeEditor');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showDiff, setShowDiff] = useState(Boolean(file.diffInfo));
   const [markdownPreview, setMarkdownPreview] = useState(false);
@@ -94,17 +92,17 @@ export default function CodeEditor({
         onPopOut,
         onToggleExpand,
         labels: {
-          changes: t('toolbar.changes'),
-          previousChange: t('toolbar.previousChange'),
-          nextChange: t('toolbar.nextChange'),
-          hideDiff: t('toolbar.hideDiff'),
-          showDiff: t('toolbar.showDiff'),
-          collapse: t('toolbar.collapse'),
-          expand: t('toolbar.expand'),
+          changes: 'changes',
+          previousChange: 'Previous change',
+          nextChange: 'Next change',
+          hideDiff: 'Hide diff highlighting',
+          showDiff: 'Show diff highlighting',
+          collapse: 'Collapse editor',
+          expand: 'Expand editor to full width',
         },
       })
     ),
-    [file, isExpanded, isSidebar, onPopOut, onToggleExpand, showDiff, t],
+    [file, isExpanded, isSidebar, onPopOut, onToggleExpand, showDiff],
   );
 
   const extensions = useMemo(() => {
@@ -153,7 +151,7 @@ export default function CodeEditor({
       <CodeEditorLoadingState
         isDarkMode={isDarkMode}
         isSidebar={isSidebar}
-        loadingText={t('loading', { fileName: file.name })}
+        loadingText={`Loading ${file.name}...`}
       />
     );
   }
@@ -188,17 +186,17 @@ export default function CodeEditor({
             onToggleFullscreen={() => setIsFullscreen((previous) => !previous)}
             onClose={onClose}
             labels={{
-              showingChanges: t('header.showingChanges'),
-              editMarkdown: t('actions.editMarkdown'),
-              previewMarkdown: t('actions.previewMarkdown'),
-              settings: t('toolbar.settings'),
-              download: t('actions.download'),
-              save: t('actions.save'),
-              saving: t('actions.saving'),
-              saved: t('actions.saved'),
-              fullscreen: t('actions.fullscreen'),
-              exitFullscreen: t('actions.exitFullscreen'),
-              close: t('actions.close'),
+              showingChanges: 'Showing changes',
+              editMarkdown: 'Edit markdown',
+              previewMarkdown: 'Preview markdown',
+              settings: 'Editor Settings',
+              download: 'Download file',
+              save: 'Save',
+              saving: 'Saving...',
+              saved: 'Saved!',
+              fullscreen: 'Fullscreen',
+              exitFullscreen: 'Exit fullscreen',
+              close: 'Close',
             }}
           />
 
@@ -223,9 +221,9 @@ export default function CodeEditor({
 
           <CodeEditorFooter
             content={content}
-            linesLabel={t('footer.lines')}
-            charactersLabel={t('footer.characters')}
-            shortcutsLabel={t('footer.shortcuts')}
+            linesLabel="Lines:"
+            charactersLabel="Characters:"
+            shortcutsLabel="Press Ctrl+S to save \u2022 Esc to close"
           />
         </div>
       </div>

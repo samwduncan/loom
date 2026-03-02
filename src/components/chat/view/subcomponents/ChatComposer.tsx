@@ -4,7 +4,6 @@ import MicButton from '../../../mic-button/view/MicButton';
 import ImageAttachment from './ImageAttachment';
 import PermissionRequestsBanner from './PermissionRequestsBanner';
 import ChatInputControls from './ChatInputControls';
-import { useTranslation } from 'react-i18next';
 import type {
   ChangeEvent,
   ClipboardEvent,
@@ -150,7 +149,6 @@ export default function ChatComposer({
   sendByCtrlEnter,
   onTranscript,
 }: ChatComposerProps) {
-  const { t } = useTranslation('chat');
   const textareaRect = textareaRef.current?.getBoundingClientRect();
   const commandMenuPosition = {
     top: textareaRect ? Math.max(16, textareaRect.top - 316) : 0,
@@ -310,7 +308,7 @@ export default function ChatComposer({
               type="button"
               onClick={openImagePicker}
               className="absolute left-2 top-1/2 transform -translate-y-1/2 p-2 hover:bg-accent/60 rounded-xl transition-colors"
-              title={t('input.attachImages')}
+              title="Attach images"
             >
               <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -349,7 +347,7 @@ export default function ChatComposer({
                 input.trim() ? 'opacity-0' : 'opacity-100'
               }`}
             >
-              {sendByCtrlEnter ? t('input.hintText.ctrlEnter') : t('input.hintText.enter')}
+              {sendByCtrlEnter ? 'Ctrl+Enter to send \u2022 Shift+Enter for new line \u2022 Tab to change modes \u2022 / for slash commands' : 'Enter to send \u2022 Shift+Enter for new line \u2022 Tab to change modes \u2022 / for slash commands'}
             </div>
           </div>
         </div>

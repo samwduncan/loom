@@ -1,6 +1,5 @@
 import React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import NextTaskBanner from '../../../NextTaskBanner.jsx';
 import { CLAUDE_MODELS, CURSOR_MODELS, CODEX_MODELS, GEMINI_MODELS } from '../../../../../shared/modelConstants';
@@ -103,8 +102,7 @@ export default function ProviderSelectionEmptyState({
   onShowAllTasks,
   setInput,
 }: ProviderSelectionEmptyStateProps) {
-  const { t } = useTranslation('chat');
-  const nextTaskPrompt = t('tasks.nextTaskPrompt', { defaultValue: 'Start the next task' });
+  const nextTaskPrompt = 'Start the next task';
 
   const selectProvider = (next: SessionProvider) => {
     setProvider(next);
@@ -130,10 +128,10 @@ export default function ProviderSelectionEmptyState({
           {/* Heading */}
           <div className="text-center mb-8">
             <h2 className="text-lg sm:text-xl font-semibold text-foreground tracking-tight">
-              {t('providerSelection.title')}
+              Choose Your AI Assistant
             </h2>
             <p className="text-[13px] text-muted-foreground mt-1">
-              {t('providerSelection.description')}
+              Select a provider to start a new conversation
             </p>
           </div>
 
@@ -161,7 +159,12 @@ export default function ProviderSelectionEmptyState({
                   />
                   <div className="text-center">
                     <p className="text-[13px] font-semibold text-foreground leading-none">{p.name}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1 leading-tight">{t(p.infoKey)}</p>
+                    <p className="text-[10px] text-muted-foreground mt-1 leading-tight">{
+                      p.id === 'claude' ? 'by Anthropic' :
+                      p.id === 'codex' ? 'by OpenAI' :
+                      p.id === 'cursor' ? 'AI Code Editor' :
+                      'by Google'
+                    }</p>
                   </div>
                   {/* Check badge */}
                   {active && (
@@ -177,7 +180,7 @@ export default function ProviderSelectionEmptyState({
           {/* Model picker — appears after provider is chosen */}
           <div className={`transition-all duration-200 ${provider ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1 pointer-events-none'}`}>
             <div className="flex items-center justify-center gap-2 mb-5">
-              <span className="text-sm text-muted-foreground">{t('providerSelection.selectModel')}</span>
+              <span className="text-sm text-muted-foreground">Select Model</span>
               <div className="relative">
                 <select
                   value={currentModel}
@@ -196,10 +199,10 @@ export default function ProviderSelectionEmptyState({
             <p className="text-center text-sm text-muted-foreground/70">
               {
                 {
-                  claude: t('providerSelection.readyPrompt.claude', { model: claudeModel }),
-                  cursor: t('providerSelection.readyPrompt.cursor', { model: cursorModel }),
-                  codex: t('providerSelection.readyPrompt.codex', { model: codexModel }),
-                  gemini: t('providerSelection.readyPrompt.gemini', { model: geminiModel }),
+                  claude: `Ready to use Claude with ${claudeModel}. Start typing your message below.`,
+                  cursor: `Ready to use Cursor with ${cursorModel}. Start typing your message below.`,
+                  codex: `Ready to use Codex with ${codexModel}. Start typing your message below.`,
+                  gemini: `Ready to use Gemini with ${geminiModel}. Start typing your message below.`,
                 }[provider]
               }
             </p>
@@ -221,8 +224,8 @@ export default function ProviderSelectionEmptyState({
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center px-6 max-w-md">
-          <p className="text-lg font-semibold text-foreground mb-1.5">{t('session.continue.title')}</p>
-          <p className="text-sm text-muted-foreground leading-relaxed">{t('session.continue.description')}</p>
+          <p className="text-lg font-semibold text-foreground mb-1.5">Continue your conversation</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">Ask questions about your code, request changes, or get help with development tasks</p>
 
           {tasksEnabled && isTaskMasterInstalled && (
             <div className="mt-5">

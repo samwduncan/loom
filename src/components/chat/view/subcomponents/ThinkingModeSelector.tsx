@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { Brain, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 import { thinkingModes } from '../../constants/thinkingModes';
 
@@ -11,22 +10,23 @@ type ThinkingModeSelectorProps = {
   className?: string;
 };
 
-function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className = '' }: ThinkingModeSelectorProps) {
-  const { t } = useTranslation('chat');
+const MODE_LABELS: Record<string, { name: string; description: string; prefix: string }> = {
+  'none': { name: 'Standard', description: 'Regular Claude response', prefix: '' },
+  'think': { name: 'Think', description: 'Basic extended thinking', prefix: 'think' },
+  'think-hard': { name: 'Think Hard', description: 'More thorough evaluation', prefix: 'think hard' },
+  'think-harder': { name: 'Think Harder', description: 'Deep analysis with alternatives', prefix: 'think harder' },
+  'ultrathink': { name: 'Ultrathink', description: 'Maximum thinking budget', prefix: 'ultrathink' },
+};
 
-  // Mapping from mode ID to translation key
-  const modeKeyMap: Record<string, string> = {
-    'think-hard': 'thinkHard',
-    'think-harder': 'thinkHarder'
-  };
-  // Create translated modes for display
+function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className = '' }: ThinkingModeSelectorProps) {
+  // Create display modes with English labels
   const translatedModes = thinkingModes.map(mode => {
-    const modeKey = modeKeyMap[mode.id] || mode.id;
+    const labels = MODE_LABELS[mode.id] || { name: mode.id, description: '', prefix: '' };
     return {
       ...mode,
-      name: t(`thinkingMode.modes.${modeKey}.name`),
-      description: t(`thinkingMode.modes.${modeKey}.description`),
-      prefix: t(`thinkingMode.modes.${modeKey}.prefix`)
+      name: labels.name,
+      description: labels.description,
+      prefix: labels.prefix,
     };
   });
 
@@ -57,7 +57,7 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
             ? 'bg-gray-100 hover:bg-gray-200 bg-gray-700 hover:bg-gray-600'
             : 'bg-blue-100 hover:bg-blue-200 bg-blue-900 hover:bg-blue-800'
           }`}
-        title={t('thinkingMode.buttonTitle', { mode: currentMode.name })}
+        title={`Thinking mode: ${currentMode.name}`}
       >
         <IconComponent className={`w-5 h-5 ${currentMode.color}`} />
       </button>
@@ -67,7 +67,7 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
           <div className="p-3 border-b border-gray-200 border-gray-700">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-900 text-white">
-                {t('thinkingMode.selector.title')}
+                Thinking Mode
               </h3>
               <button
                 onClick={() => {
@@ -80,7 +80,7 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
               </button>
             </div>
             <p className="text-xs text-gray-500 text-gray-400 mt-1">
-              {t('thinkingMode.selector.description')}
+              Extended thinking gives Claude more time to evaluate alternatives
             </p>
           </div>
 
@@ -112,7 +112,7 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
                         </span>
                         {isSelected && (
                           <span className="text-xs bg-blue-100 bg-blue-900 text-blue-700 text-blue-300 px-2 py-0.5 rounded">
-                            {t('thinkingMode.selector.active')}
+                            Active
                           </span>
                         )}
                       </div>
@@ -133,7 +133,7 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
 
           <div className="p-3 border-t border-gray-200 border-gray-700 bg-gray-50 bg-gray-900">
             <p className="text-xs text-gray-600 text-gray-400">
-              <strong>Tip:</strong> {t('thinkingMode.selector.tip')}
+              <strong>Tip:</strong> Higher thinking modes take more time but provide more thorough analysis
             </p>
           </div>
         </div>

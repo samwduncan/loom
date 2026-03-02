@@ -5,7 +5,6 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { useTranslation } from 'react-i18next';
 import { normalizeInlineCodeFences } from '../../utils/chatFormatting';
 import { copyTextToClipboard } from '../../../../utils/clipboard';
 
@@ -22,7 +21,6 @@ type CodeBlockProps = {
 };
 
 const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockProps) => {
-  const { t } = useTranslation('chat');
   const [copied, setCopied] = useState(false);
   const raw = Array.isArray(children) ? children.join('') : String(children ?? '');
   const looksMultiline = /[\r\n]/.test(raw);
@@ -61,8 +59,8 @@ const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockPro
           })
         }
         className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 focus:opacity-100 active:opacity-100 transition-opacity text-xs px-2 py-1 rounded-md bg-gray-700/80 hover:bg-gray-700 text-white border border-gray-600"
-        title={copied ? t('codeBlock.copied') : t('codeBlock.copyCode')}
-        aria-label={copied ? t('codeBlock.copied') : t('codeBlock.copyCode')}
+        title={copied ? "Copied" : "Copy code"}
+        aria-label={copied ? "Copied" : "Copy code"}
       >
         {copied ? (
           <span className="flex items-center gap-1">
@@ -73,7 +71,7 @@ const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockPro
                 clipRule="evenodd"
               />
             </svg>
-            {t('codeBlock.copied')}
+            Copied
           </span>
         ) : (
           <span className="flex items-center gap-1">
@@ -89,7 +87,7 @@ const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockPro
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
               <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
             </svg>
-            {t('codeBlock.copy')}
+            Copy
           </span>
         )}
       </button>

@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import '@xterm/xterm/css/xterm.css';
 import type { Project, ProjectSession } from '../../../types/app';
 import { SHELL_RESTART_DELAY_MS } from '../constants/constants';
@@ -31,7 +30,6 @@ export default function Shell({
   autoConnect = false,
   isActive,
 }: ShellProps) {
-  const { t } = useTranslation('chat');
   const [isRestarting, setIsRestarting] = useState(false);
 
   // Keep the public API stable for existing callers that still pass `isActive`.
@@ -79,8 +77,8 @@ export default function Shell({
   if (!selectedProject) {
     return (
       <ShellEmptyState
-        title={t('shell.selectProject.title')}
-        description={t('shell.selectProject.description')}
+        title="Select a Project"
+        description="Choose a project to open an interactive shell in that directory"
       />
     );
   }
@@ -100,20 +98,14 @@ export default function Shell({
   }
 
   const readyDescription = isPlainShell
-    ? t('shell.runCommand', {
-        command: initialCommand || t('shell.defaultCommand'),
-        projectName: selectedProject.displayName,
-      })
+    ? `Run ${initialCommand || 'command'} in ${selectedProject.displayName}`
     : selectedSession
-      ? t('shell.resumeSession', { displayName: sessionDisplayNameLong })
-      : t('shell.startSession');
+      ? `Resume session: ${sessionDisplayNameLong}...`
+      : 'Start a new Claude session';
 
   const connectingDescription = isPlainShell
-    ? t('shell.runCommand', {
-        command: initialCommand || t('shell.defaultCommand'),
-        projectName: selectedProject.displayName,
-      })
-    : t('shell.startCli', { projectName: selectedProject.displayName });
+    ? `Run ${initialCommand || 'command'} in ${selectedProject.displayName}`
+    : `Starting Claude CLI in ${selectedProject.displayName}`;
 
   const overlayMode = !isInitialized ? 'loading' : isConnecting ? 'connecting' : !isConnected ? 'connect' : null;
   const overlayDescription = overlayMode === 'connecting' ? connectingDescription : readyDescription;
@@ -128,13 +120,13 @@ export default function Shell({
         sessionDisplayNameShort={sessionDisplayNameShort}
         onDisconnect={disconnectFromShell}
         onRestart={handleRestartShell}
-        statusNewSessionText={t('shell.status.newSession')}
-        statusInitializingText={t('shell.status.initializing')}
-        statusRestartingText={t('shell.status.restarting')}
-        disconnectLabel={t('shell.actions.disconnect')}
-        disconnectTitle={t('shell.actions.disconnectTitle')}
-        restartLabel={t('shell.actions.restart')}
-        restartTitle={t('shell.actions.restartTitle')}
+        statusNewSessionText="New Session"
+        statusInitializingText="Initializing..."
+        statusRestartingText="Restarting..."
+        disconnectLabel="Disconnect"
+        disconnectTitle="Disconnect from shell"
+        restartLabel="Restart"
+        restartTitle="Restart Shell (disconnect first)"
         disableRestart={isRestarting || isConnected}
       />
 
@@ -149,10 +141,10 @@ export default function Shell({
           <ShellConnectionOverlay
             mode={overlayMode}
             description={overlayDescription}
-            loadingLabel={t('shell.loading')}
-            connectLabel={t('shell.actions.connect')}
-            connectTitle={t('shell.actions.connectTitle')}
-            connectingLabel={t('shell.connecting')}
+            loadingLabel="Loading terminal..."
+            connectLabel="Continue in Shell"
+            connectTitle="Connect to shell"
+            connectingLabel="Connecting to shell..."
             onConnect={connectToShell}
           />
         )}

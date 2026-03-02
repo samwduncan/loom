@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { useCallback, useRef } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
@@ -100,7 +99,6 @@ export default function ChatMessagesPane({
   selectedProject,
   isLoading,
 }: ChatMessagesPaneProps) {
-  const { t } = useTranslation('chat');
   const messageKeyMapRef = useRef<WeakMap<ChatMessage, string>>(new WeakMap());
   const allocatedKeysRef = useRef<Set<string>>(new Set());
   const generatedMessageKeyCounterRef = useRef(0);
@@ -140,7 +138,7 @@ export default function ChatMessagesPane({
         <div className="text-center text-gray-500 text-gray-400 mt-8">
           <div className="flex items-center justify-center space-x-2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-            <p>{t('session.loading.sessionMessages')}</p>
+            <p>Loading session messages...</p>
           </div>
         </div>
       ) : chatMessages.length === 0 ? (
@@ -170,7 +168,7 @@ export default function ChatMessagesPane({
             <div className="text-center text-gray-500 text-gray-400 py-3">
               <div className="flex items-center justify-center space-x-2">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
-                <p className="text-sm">{t('session.loading.olderMessages')}</p>
+                <p className="text-sm">Loading older messages...</p>
               </div>
             </div>
           )}
@@ -180,8 +178,8 @@ export default function ChatMessagesPane({
             <div className="text-center text-gray-500 text-gray-400 text-sm py-2 border-b border-gray-200 border-gray-700">
               {totalMessages > 0 && (
                 <span>
-                  {t('session.messages.showingOf', { shown: sessionMessagesCount, total: totalMessages })}{' '}
-                  <span className="text-xs">{t('session.messages.scrollToLoad')}</span>
+                  {`Showing ${sessionMessagesCount} of ${totalMessages} messages`}{' '}
+                  <span className="text-xs">Scroll up to load more</span>
                 </span>
               )}
             </div>
@@ -195,7 +193,7 @@ export default function ChatMessagesPane({
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>{t('session.messages.allLoaded')}</span>
+                  <span>All messages loaded</span>
                 </div>
               ) : (
                 <button
@@ -208,8 +206,8 @@ export default function ChatMessagesPane({
                   )}
                   <span>
                     {isLoadingAllMessages
-                      ? t('session.messages.loadingAll')
-                      : <>{t('session.messages.loadAll')} {totalMessages > 0 && `(${totalMessages})`}</>
+                      ? 'Loading all messages...'
+                      : <>Load all messages {totalMessages > 0 && `(${totalMessages})`}</>
                     }
                   </span>
                 </button>
@@ -220,23 +218,23 @@ export default function ChatMessagesPane({
           {/* Performance warning when all messages are loaded */}
           {allMessagesLoaded && (
             <div className="text-center text-amber-600 text-amber-400 text-xs py-1.5 bg-amber-50 bg-amber-900/20 border-b border-amber-200 border-amber-800">
-              {t('session.messages.perfWarning')}
+              All messages loaded — scrolling may be slower. Click "Scroll to bottom" to restore performance.
             </div>
           )}
 
           {/* Legacy message count indicator (for non-paginated view) */}
           {!hasMoreMessages && chatMessages.length > visibleMessageCount && (
             <div className="text-center text-gray-500 text-gray-400 text-sm py-2 border-b border-gray-200 border-gray-700">
-              {t('session.messages.showingLast', { count: visibleMessageCount, total: chatMessages.length })} |
+              {`Showing last ${visibleMessageCount} messages (${chatMessages.length} total)`} |
               <button className="ml-1 text-blue-600 hover:text-blue-700 underline" onClick={loadEarlierMessages}>
-                {t('session.messages.loadEarlier')}
+                Load earlier messages
               </button>
               {' | '}
               <button
                 className="text-blue-600 hover:text-blue-700 text-blue-400 hover:text-blue-300 underline"
                 onClick={loadAllMessages}
               >
-                {t('session.messages.loadAll')}
+                Load all messages
               </button>
             </div>
           )}
