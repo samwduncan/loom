@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useId } from 'react';
+import React, { memo, useState, useEffect, useRef, useId } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
 interface ThinkingDisclosureProps {
@@ -7,7 +7,7 @@ interface ThinkingDisclosureProps {
   showByDefault?: boolean;
 }
 
-export function ThinkingDisclosure({
+export const ThinkingDisclosure = memo(function ThinkingDisclosure({
   content,
   isStreaming = false,
   showByDefault = false,
@@ -130,4 +130,4 @@ export function ThinkingDisclosure({
       </div>
     </div>
   );
-}
+});

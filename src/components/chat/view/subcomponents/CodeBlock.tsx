@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { memo, useEffect, useState, useCallback, useRef } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { copyTextToClipboard } from '../../../../utils/clipboard';
 import { highlightCode } from '../../hooks/useShikiHighlighter';
@@ -23,7 +23,7 @@ const TRUNCATED_VISIBLE = 25;
  *  - Long-block truncation (50+ lines -> show 25 with expand)
  *  - Soft word wrap (no horizontal scrollbar)
  */
-export function ShikiCodeBlock({ code, language, isStreaming = false, filename }: ShikiCodeBlockProps) {
+export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isStreaming = false, filename }: ShikiCodeBlockProps) {
   const [html, setHtml] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -140,7 +140,7 @@ export function ShikiCodeBlock({ code, language, isStreaming = false, filename }
       )}
     </div>
   );
-}
+});
 
 /**
  * Truncate Shiki HTML output to the first N lines.
