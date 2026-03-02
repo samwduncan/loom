@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import type { ChatMessage, Turn } from '../types/types';
 
+export type { Turn } from '../types/types';
+
 function extractFirstProseContent(messages: ChatMessage[]): string {
   for (const msg of messages) {
     if (msg.type === 'assistant' && !msg.isToolUse && !msg.isThinking && msg.content) {
