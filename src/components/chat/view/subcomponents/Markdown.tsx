@@ -1,12 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { normalizeInlineCodeFences } from '../../utils/chatFormatting';
-import { copyTextToClipboard } from '../../../../utils/clipboard';
+import { ShikiCodeBlock } from './CodeBlock';
 
 type MarkdownProps = {
   children: React.ReactNode;
@@ -21,7 +19,6 @@ type CodeBlockProps = {
 };
 
 const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockProps) => {
-  const [copied, setCopied] = useState(false);
   const raw = Array.isArray(children) ? children.join('') : String(children ?? '');
   const looksMultiline = /[\r\n]/.test(raw);
   const inlineDetected = inline || (node && node.type === 'inlineCode');
@@ -30,7 +27,7 @@ const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockPro
   if (shouldInline) {
     return (
       <code
-        className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-900 border border-gray-200 bg-gray-800/60 text-gray-100 border-gray-700 whitespace-pre-wrap break-words ${className || ''
+        className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-gray-800/60 text-gray-100 border border-gray-700 whitespace-pre-wrap break-words ${className || ''
           }`}
         {...props}
       >
@@ -42,76 +39,10 @@ const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockPro
   const match = /language-(\w+)/.exec(className || '');
   const language = match ? match[1] : 'text';
 
-  return (
-    <div className="relative group my-2">
-      {language && language !== 'text' && (
-        <div className="absolute top-2 left-3 z-10 text-xs text-gray-400 font-medium uppercase">{language}</div>
-      )}
+  // Strip trailing newline that react-markdown often appends
+  const trimmed = raw.replace(/\n$/, '');
 
-      <button
-        type="button"
-        onClick={() =>
-          copyTextToClipboard(raw).then((success) => {
-            if (success) {
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            }
-          })
-        }
-        className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 focus:opacity-100 active:opacity-100 transition-opacity text-xs px-2 py-1 rounded-md bg-gray-700/80 hover:bg-gray-700 text-white border border-gray-600"
-        title={copied ? "Copied" : "Copy code"}
-        aria-label={copied ? "Copied" : "Copy code"}
-      >
-        {copied ? (
-          <span className="flex items-center gap-1">
-            <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Copied
-          </span>
-        ) : (
-          <span className="flex items-center gap-1">
-            <svg
-              className="w-3.5 h-3.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-            </svg>
-            Copy
-          </span>
-        )}
-      </button>
-
-      <SyntaxHighlighter
-        language={language}
-        style={oneDark}
-        customStyle={{
-          margin: 0,
-          borderRadius: '0.5rem',
-          fontSize: '0.875rem',
-          padding: language && language !== 'text' ? '2rem 1rem 1rem 1rem' : '1rem',
-        }}
-        codeTagProps={{
-          style: {
-            fontFamily:
-              'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-          },
-        }}
-      >
-        {raw}
-      </SyntaxHighlighter>
-    </div>
-  );
+  return <ShikiCodeBlock code={trimmed} language={language} />;
 };
 
 const markdownComponents = {
