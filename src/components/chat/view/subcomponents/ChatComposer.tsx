@@ -204,6 +204,7 @@ export default function ChatComposer({
           isUserScrolledUp={isUserScrolledUp}
           hasMessages={hasMessages}
           onScrollToBottom={onScrollToBottom}
+          sessionCost={null}
         />}
       </div>
 
