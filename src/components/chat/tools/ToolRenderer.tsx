@@ -30,7 +30,7 @@ interface ToolRendererProps {
   };
 }
 
-function getToolCategory(toolName: string): string {
+export function getToolCategory(toolName: string): string {
   if (['Edit', 'Write', 'ApplyPatch'].includes(toolName)) return 'edit';
   if (['Grep', 'Glob'].includes(toolName)) return 'search';
   if (toolName === 'Bash') return 'bash';
