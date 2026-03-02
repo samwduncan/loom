@@ -699,7 +699,7 @@ const TaskList = ({
                 <option value="all">{'All Statuses'}</option>
                 {statuses.map(status => (
                   <option key={status} value={status}>
-                    {t(`statuses.${status}`, status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' '))}
+                    {status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
                   </option>
                 ))}
               </select>
@@ -718,7 +718,7 @@ const TaskList = ({
                 <option value="all">{'All Priorities'}</option>
                 {priorities.map(priority => (
                   <option key={priority} value={priority}>
-                    {t(`priorities.${priority}`, priority.charAt(0).toUpperCase() + priority.slice(1))}
+                    {priority.charAt(0).toUpperCase() + priority.slice(1)}
                   </option>
                 ))}
               </select>
