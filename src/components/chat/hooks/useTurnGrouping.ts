@@ -48,7 +48,9 @@ function buildTurn(messages: ChatMessage[]): Turn {
     ? undefined
     : endTime.getTime() - startTime.getTime();
 
-  // Extract usage data from the last assistant message that contains it
+  // Extract usage data from the last assistant message that contains it.
+  // Handles both camelCase (SDK) and snake_case (raw API) token field names,
+  // including cache variants: cacheReadInputTokens, cache_read_tokens, etc.
   let usage: Turn['usage'] | undefined;
   let model: string | undefined;
   for (let i = messages.length - 1; i >= 0; i--) {
