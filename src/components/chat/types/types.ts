@@ -91,6 +91,18 @@ export interface Question {
   multiSelect?: boolean;
 }
 
+export interface Turn {
+  id: string;
+  messages: ChatMessage[];
+  startTime: Date;
+  endTime?: Date;
+  isStreaming: boolean;
+  toolCallCount: number;
+  failedToolCount: number;
+  firstProseContent: string;
+  durationMs?: number;
+}
+
 export interface ChatInterfaceProps {
   selectedProject: Project | null;
   selectedSession: ProjectSession | null;
