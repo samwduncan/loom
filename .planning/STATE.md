@@ -32,9 +32,9 @@ Progress: [██████░░░░] 51%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 5.9min
-- Total execution time: 136min
+- Total plans completed: 17
+- Average duration: 5.6min
+- Total execution time: 139min
 
 **By Phase:**
 
@@ -43,14 +43,15 @@ Progress: [██████░░░░] 51%
 | 01-design-system-foundation | 4 | 14min | 3.5min |
 | 03-structural-cleanup | 5 | 94min | 18.8min |
 | 05-chat-message-architecture | 5 | 23min | 4.6min |
-| 06-chat-message-polish | 2/6 | 5min | 2.5min |
+| 06-chat-message-polish | 3/6 | 8min | 2.7min |
 
 **Recent Trend:**
-- Last 5 plans: 06-03 (2min), 05-05 (8min), 05-04 (5min), 05-03 (3min), 05-01 (5min)
+- Last 5 plans: 06-02 (3min), 06-03 (2min), 05-05 (8min), 05-04 (5min), 05-03 (3min)
 - Trend: Focused UI polish plans executing very quickly
 
 *Updated after each plan completion*
 | Phase 06 P01 | 3min | 2 tasks | 4 files |
+| Phase 06 P02 | 3min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,9 @@ Recent decisions affecting current work:
 - [06-01]: Used styles.variables.dark API for react-diff-viewer-continued theme overrides
 - [06-01]: Removed createDiff guard in ToolRenderer since library handles diffing internally
 - [06-01]: Set diffContainer minWidth to unset to prevent horizontal overflow in chat panels
+- [06-02]: Merged restyle + copy button into single DOM restructure (tasks 1+2 share same edit block)
+- [06-02]: lucide-react Copy/Check icons instead of inline SVG for consistency with CodeBlock and other subcomponents
+- [06-02]: Image lightbox overlay instead of window.open(_blank) per CONTEXT.md locked decision
 
 ### Pending Todos
 
@@ -121,5 +125,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 06-01-PLAN.md — react-diff-viewer-continued integration with warm earthy theme and Shiki highlighting
+Stopped at: Completed 06-02-PLAN.md — warm amber user messages, hover-reveal copy button, image lightbox
 Resume file: None

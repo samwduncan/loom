@@ -29,8 +29,8 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CHAT-07**: Bash tool calls render in terminal-styled dark mini-blocks — command shown monospace, output as pre-formatted text
 - [x] **CHAT-08**: Thinking blocks render as collapsed disclosure widgets — clickable "Thinking..." bar, collapsed by default, expandable to show full reasoning with muted styling
 - [x] **CHAT-09**: Diff events render as colored unified diffs — green additions, red removals, gray context lines, file path header, hunk headers
-- [ ] **CHAT-10**: User messages have subtle warm background tint to visually differentiate from AI messages
-- [ ] **CHAT-11**: User messages have a small copy button to grab previous prompts
+- [x] **CHAT-10**: User messages have subtle warm background tint to visually differentiate from AI messages
+- [x] **CHAT-11**: User messages have a small copy button to grab previous prompts
 - [x] **CHAT-12**: Permission prompts render as highlighted inline banners within message flow showing tool name and action
 - [ ] **CHAT-13**: Usage summaries (token counts, cost) always visible at the end of each AI response, not collapsed
 - [x] **CHAT-14**: System status messages render muted and inline — gray for info, amber for warnings, red for errors
@@ -127,8 +127,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-07 | Phase 5 | Complete |
 | CHAT-08 | Phase 5 | Complete |
 | CHAT-09 | Phase 6 | Complete |
-| CHAT-10 | Phase 6 | Pending |
-| CHAT-11 | Phase 6 | Pending |
+| CHAT-10 | Phase 6 | Complete |
+| CHAT-11 | Phase 6 | Complete |
 | CHAT-12 | Phase 6 | Complete |
 | CHAT-13 | Phase 6 | Pending |
 | CHAT-14 | Phase 6 | Complete |
