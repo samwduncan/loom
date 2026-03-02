@@ -13,7 +13,7 @@ Loom transforms CloudCLI — a capable but generic AI chat interface — into a 
 Decimal phases appear between their surrounding integers in numeric order.
 
 **Functional phases (build first):**
-- [ ] **Phase 3: Structural Cleanup** - Strip i18n, Cursor backend, and Codex backend from the codebase
+- [x] **Phase 3: Structural Cleanup** - Strip i18n, Cursor backend, and Codex backend from the codebase
 - [ ] **Phase 5: Chat Message Architecture** - Shiki, TurnBlock, tool call cards, thinking block disclosures
 - [ ] **Phase 6: Chat Message Polish** - Diffs, user messages, permission banners, usage summaries, layout
 - [ ] **Phase 7: Streaming UX** - requestAnimationFrame buffer, auto-scroll, scroll pill, typing indicators
@@ -75,11 +75,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Strip i18n from 22 chat/core components + remove i18n infrastructure (packages, locales, config, I18nextProvider, LanguageSelector)
-- [ ] 03-02-PLAN.md — Strip i18n from 20 settings/sidebar components + verify zero i18n references codebase-wide
-- [ ] 03-03-PLAN.md — Remove all Cursor CLI backend code from server and client (~65 files)
-- [ ] 03-04-PLAN.md — Build provider UX: header dropdown, composer mini-picker, welcome screen, default-to-Claude
-- [ ] 03-05-PLAN.md — Final verification audit + visual checkpoint
+- [x] 03-01-PLAN.md — Strip i18n from 22 chat/core components + remove i18n infrastructure (packages, locales, config, I18nextProvider, LanguageSelector)
+- [x] 03-02-PLAN.md — Strip i18n from 20 settings/sidebar components + verify zero i18n references codebase-wide
+- [x] 03-03-PLAN.md — Remove all Cursor CLI backend code from server and client (~65 files)
+- [x] 03-04-PLAN.md — Build provider UX: header dropdown, composer mini-picker, welcome screen, default-to-Claude
+- [x] 03-05-PLAN.md — Final verification audit + visual checkpoint
 
 ### Phase 4: Terminal and Editor Theming
 **Goal**: The terminal panel and file editor use the warm Loom aesthetic — Catppuccin Mocha ANSI colors in xterm.js and a matching warm dark theme in CodeMirror
@@ -204,7 +204,7 @@ Phase 1 (Design System) has partial work completed (CSS variables, dark mode rem
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | **Functional phases** | | | |
-| 3. Structural Cleanup | 4/5 | In Progress|  |
+| 3. Structural Cleanup | 5/5 | Complete |  |
 | 5. Chat Message Architecture | 0/7 | Not started | - |
 | 6. Chat Message Polish | 0/6 | Not started | - |
 | 7. Streaming UX | 0/5 | Not started | - |
