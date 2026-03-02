@@ -107,18 +107,16 @@ Plans:
   3. Tool call invocations appear as compact single-line action cards showing tool name and key argument — clicking one expands to show full arguments and result inline
   4. Three or more consecutive tool calls are automatically grouped under a typed summary header and can be expanded to show individual cards
   5. Thinking blocks render as a collapsed "Thinking..." disclosure widget with muted styling — during streaming a pulsing amber indicator appears; when complete the block collapses automatically but remains expandable
-  6. Bash tool calls appear in a dark terminal-styled mini-block with monospace command and pre-formatted output
+  6. Bash tool calls use same card style as other tools with faint gray tint (per user decision — no special terminal mini-block)
   7. The streaming performance does not cause visible frame-rate drops during active AI responses — token batching via requestAnimationFrame prevents per-token setState freezing
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 05-01: Install and configure Shiki v4 with `@shikijs/rehype` — VS Code Dark+ theme, streaming fallback (raw text while incomplete, Shiki on completion)
-- [ ] 05-02: Build `TurnBlock` component — turn ID assignment in `useChatRealtimeHandlers`, collapsible turn header with first-line preview and count badge
-- [ ] 05-03: Build tool call action cards — compact single-line display, expandable detail view, error state (red left border)
-- [ ] 05-04: Build tool call grouping logic — detect 3+ consecutive calls, render typed summary header with expand-all
-- [ ] 05-05: Build thinking block disclosure — pulsing indicator during stream, auto-collapse on completion, muted expanded styling
-- [ ] 05-06: Build Bash tool mini-block renderer — dark terminal-styled container, monospace command, pre-formatted output
-- [ ] 05-07: Upgrade streaming buffer from `setTimeout` to `requestAnimationFrame` flush — memoize `TurnBlock` and `MessageComponent` to prevent cascade re-renders
+- [ ] 05-01-PLAN.md — Install Shiki v4, create singleton highlighter with warm Dark+ theme, build CodeBlock component, replace react-syntax-highlighter
+- [ ] 05-02-PLAN.md — Build ThinkingDisclosure (Claude.ai-style) and ActivityIndicator (Claude CLI-style rotating phrases), replace AssistantThinkingIndicator
+- [ ] 05-03-PLAN.md — Build TurnBlock component with collapsible turns, useTurnGrouping hook, expand/collapse toolbar
+- [ ] 05-04-PLAN.md — Build ToolActionCard (compact cards with type tinting), ToolCallGroup (3+ grouping), update ToolRenderer
+- [ ] 05-05-PLAN.md — Upgrade streaming to requestAnimationFrame, wire streaming into CodeBlock, memoization audit, visual checkpoint
 
 ### Phase 6: Chat Message Polish
 **Goal**: The full chat message experience is complete — diffs, user messages, permission banners, usage summaries, system status messages, and layout all feel designed and intentional
@@ -205,7 +203,7 @@ Phase 1 (Design System) has partial work completed (CSS variables, dark mode rem
 |-------|----------------|--------|-----------|
 | **Functional phases** | | | |
 | 3. Structural Cleanup | 5/5 | Complete |  |
-| 5. Chat Message Architecture | 0/7 | Not started | - |
+| 5. Chat Message Architecture | 0/5 | Planned | - |
 | 6. Chat Message Polish | 0/6 | Not started | - |
 | 7. Streaming UX | 0/5 | Not started | - |
 | 8. Error Handling and Status | 0/4 | Not started | - |
