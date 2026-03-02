@@ -128,32 +128,78 @@ export default function ChatMessagesPane({
 
   // Turn grouping
   const { items, turnCount } = useTurnGrouping(visibleMessages);
-  const [expandedTurns, setExpandedTurns] = useState<Set<string>>(new Set());
-  const prevStreamingTurnIdRef = useRef<string | null>(null);
 
-  // Auto-collapse previous turns when a new streaming turn starts
-  const currentStreamingTurnId = useMemo(() => {
+  // All turns default expanded -- collapsedTurns tracks which are collapsed
+  const [collapsedTurns, setCollapsedTurns] = useState<Set<string>>(new Set());
+
+  // Track which turns are currently streaming (for IntersectionObserver protection)
+  const streamingTurnIdsRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const streaming = new Set<string>();
     for (const item of items) {
       if ('messages' in item && (item as Turn).isStreaming) {
-        return (item as Turn).id;
+        streaming.add((item as Turn).id);
       }
     }
-    return null;
+    streamingTurnIdsRef.current = streaming;
   }, [items]);
 
+  // IntersectionObserver-based collapse-on-scroll-away with re-expand on revisit
+  const collapseTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
   useEffect(() => {
-    if (
-      currentStreamingTurnId &&
-      currentStreamingTurnId !== prevStreamingTurnIdRef.current
-    ) {
-      // New streaming turn detected -- collapse all previous turns
-      setExpandedTurns(new Set());
-    }
-    prevStreamingTurnIdRef.current = currentStreamingTurnId;
-  }, [currentStreamingTurnId]);
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const turnId = (entry.target as HTMLElement).dataset.turnId;
+          if (!turnId) return;
+
+          if (entry.isIntersecting) {
+            // Clear any pending collapse timer
+            const timer = collapseTimers.current.get(turnId);
+            if (timer) {
+              clearTimeout(timer);
+              collapseTimers.current.delete(turnId);
+            }
+            // Re-expand when user scrolls back to this turn
+            setCollapsedTurns((prev) => {
+              if (!prev.has(turnId)) return prev;
+              const next = new Set(prev);
+              next.delete(turnId);
+              return next;
+            });
+          } else {
+            // Debounce collapse -- 300ms after scrolling away
+            const timer = setTimeout(() => {
+              // Don't collapse currently streaming turns
+              if (streamingTurnIdsRef.current.has(turnId)) {
+                collapseTimers.current.delete(turnId);
+                return;
+              }
+              setCollapsedTurns((prev) => {
+                const next = new Set(prev);
+                next.add(turnId);
+                return next;
+              });
+              collapseTimers.current.delete(turnId);
+            }, 300);
+            collapseTimers.current.set(turnId, timer);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    return () => {
+      observerRef.current?.disconnect();
+      collapseTimers.current.forEach((timer) => clearTimeout(timer));
+      collapseTimers.current.clear();
+    };
+  }, []);
 
   const handleTurnToggle = useCallback((turnId: string) => {
-    setExpandedTurns((prev) => {
+    setCollapsedTurns((prev) => {
       const next = new Set(prev);
       if (next.has(turnId)) {
         next.delete(turnId);
@@ -165,18 +211,18 @@ export default function ChatMessagesPane({
   }, []);
 
   const handleExpandAll = useCallback(() => {
+    setCollapsedTurns(new Set());
+  }, []);
+
+  const handleCollapseAll = useCallback(() => {
     const allTurnIds = new Set<string>();
     for (const item of items) {
       if ('messages' in item) {
         allTurnIds.add((item as Turn).id);
       }
     }
-    setExpandedTurns(allTurnIds);
+    setCollapsedTurns(allTurnIds);
   }, [items]);
-
-  const handleCollapseAll = useCallback(() => {
-    setExpandedTurns(new Set());
-  }, []);
 
   const messageProps = useMemo(() => ({
     createDiff,
@@ -307,43 +353,54 @@ export default function ChatMessagesPane({
             onCollapseAll={handleCollapseAll}
           />
 
-          {items.map((item) => {
-            if ('messages' in item) {
-              // It's a Turn
-              const turn = item as Turn;
-              const isExpanded = turn.isStreaming || expandedTurns.has(turn.id);
-              return (
-                <TurnBlock
-                  key={turn.id}
-                  turn={turn}
-                  isExpanded={isExpanded}
-                  onToggle={() => handleTurnToggle(turn.id)}
-                  messageProps={messageProps}
-                  getMessageKey={getMessageKey}
-                />
-              );
-            } else {
-              // Standalone user message
-              const message = item as ChatMessage;
-              return (
-                <MessageComponent
-                  key={getMessageKey(message)}
-                  message={message}
-                  index={0}
-                  prevMessage={null}
-                  createDiff={createDiff}
-                  onFileOpen={onFileOpen}
-                  onShowSettings={onShowSettings}
-                  onGrantToolPermission={onGrantToolPermission}
-                  autoExpandTools={autoExpandTools}
-                  showRawParameters={showRawParameters}
-                  showThinking={showThinking}
-                  selectedProject={selectedProject}
-                  provider={provider}
-                />
-              );
-            }
-          })}
+          <div className="max-w-[720px] mx-auto w-full">
+            {items.map((item) => {
+              if ('messages' in item) {
+                // It's a Turn
+                const turn = item as Turn;
+                const isExpanded = !collapsedTurns.has(turn.id) || turn.isStreaming;
+                return (
+                  <div
+                    key={turn.id}
+                    data-turn-id={turn.id}
+                    ref={(el) => {
+                      if (el && observerRef.current) {
+                        observerRef.current.observe(el);
+                      }
+                    }}
+                  >
+                    <TurnBlock
+                      turn={turn}
+                      isExpanded={isExpanded}
+                      onToggle={() => handleTurnToggle(turn.id)}
+                      messageProps={messageProps}
+                      getMessageKey={getMessageKey}
+                    />
+                  </div>
+                );
+              } else {
+                // Standalone user message
+                const message = item as ChatMessage;
+                return (
+                  <MessageComponent
+                    key={getMessageKey(message)}
+                    message={message}
+                    index={0}
+                    prevMessage={null}
+                    createDiff={createDiff}
+                    onFileOpen={onFileOpen}
+                    onShowSettings={onShowSettings}
+                    onGrantToolPermission={onGrantToolPermission}
+                    autoExpandTools={autoExpandTools}
+                    showRawParameters={showRawParameters}
+                    showThinking={showThinking}
+                    selectedProject={selectedProject}
+                    provider={provider}
+                  />
+                );
+              }
+            })}
+          </div>
         </>
       )}
 
