@@ -1,4 +1,5 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState } from 'react';
+import { Copy, Check } from 'lucide-react';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import type {
   ChatMessage,
@@ -14,6 +15,7 @@ import { getClaudePermissionSuggestion } from '../../utils/chatPermissions';
 import { copyTextToClipboard } from '../../../../utils/clipboard';
 import type { Project } from '../../../../types/app';
 import { ToolRenderer, shouldHideToolResult } from '../../tools';
+import { ImageLightbox } from './ImageLightbox';
 
 type DiffLine = {
   type: string;
@@ -55,6 +57,7 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
   const permissionSuggestion = getClaudePermissionSuggestion(message, provider);
   const [permissionGrantState, setPermissionGrantState] = React.useState<PermissionGrantState>('idle');
   const [messageCopied, setMessageCopied] = React.useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
 
   React.useEffect(() => {
@@ -100,71 +103,51 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
       className={`chat-message ${message.type} ${isGrouped ? 'grouped' : ''} ${message.type === 'user' ? 'flex justify-end px-3 sm:px-0' : 'px-3 sm:px-0'}`}
     >
       {message.type === 'user' ? (
-        /* User message bubble on the right */
-        <div className="flex items-end space-x-0 sm:space-x-3 w-full sm:w-auto sm:max-w-[85%] md:max-w-md lg:max-w-lg xl:max-w-xl">
-          <div className="bg-blue-600 text-white rounded-2xl rounded-br-md px-3 sm:px-4 py-2 shadow-sm flex-1 sm:flex-initial group">
-            <div className="text-sm whitespace-pre-wrap break-words">
-              {message.content}
-            </div>
+        /* User message -- warm amber tint, right-aligned, no avatar */
+        <div className="relative group max-w-[85%] sm:max-w-[75%] flex items-start gap-1.5">
+          <div className="bg-amber-900/15 text-[#f5e6d3] rounded-lg px-3 py-2 sm:px-4 sm:py-2.5 text-sm leading-relaxed break-words border border-amber-700/20 flex-1">
+            <div className="text-[10px] text-[#c4a882]/60 mb-0.5">{formattedTime}</div>
             {message.images && message.images.length > 0 && (
-              <div className="mt-2 grid grid-cols-2 gap-2">
+              <div className="mt-1 mb-2 grid grid-cols-2 gap-2">
                 {message.images.map((img, idx) => (
-                  <img
+                  <button
                     key={img.name || idx}
-                    src={img.data}
-                    alt={img.name}
-                    className="rounded-lg max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity"
-                    onClick={() => window.open(img.data, '_blank')}
-                  />
+                    type="button"
+                    onClick={() => setLightboxSrc(img.data)}
+                    className="cursor-pointer hover:opacity-80 transition-opacity"
+                  >
+                    <img
+                      src={img.data}
+                      alt={img.name || `Attached image ${idx + 1}`}
+                      className="max-w-[200px] max-h-[150px] rounded-md object-cover"
+                    />
+                  </button>
                 ))}
               </div>
             )}
-            <div className="flex items-center justify-end gap-1 mt-1 text-xs text-blue-100">
-              <button
-                type="button"
-                onClick={() => {
-                  const text = String(message.content || '');
-                  if (!text) return;
-
-                  copyTextToClipboard(text).then((success) => {
-                    if (!success) return;
-                    setMessageCopied(true);
-                  });
-                }}
-                title={messageCopied ? "Message copied" : "Copy message"}
-                aria-label={messageCopied ? "Message copied" : "Copy message"}
-              >
-                {messageCopied ? (
-                  <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-3.5 h-3.5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
-                  </svg>
-                )}
-              </button>
-              <span>{formattedTime}</span>
-            </div>
+            <div className="whitespace-pre-wrap">{message.content}</div>
           </div>
-          {!isGrouped && (
-            <div className="hidden sm:flex w-8 h-8 bg-blue-600 rounded-full items-center justify-center text-white text-sm flex-shrink-0">
-              U
-            </div>
-          )}
+          {/* Copy button -- hover reveal, positioned outside message */}
+          <button
+            type="button"
+            onClick={() => {
+              const text = String(message.content || '');
+              copyTextToClipboard(text).then((success) => {
+                if (!success) return;
+                setMessageCopied(true);
+                setTimeout(() => setMessageCopied(false), 2000);
+              });
+            }}
+            className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity duration-150 flex-shrink-0 self-center p-1 rounded hover:bg-[#3d2e25]/50 text-[#c4a882]/50 hover:text-[#c4a882]"
+            title={messageCopied ? "Message copied" : "Copy message"}
+            aria-label={messageCopied ? "Message copied" : "Copy message"}
+          >
+            {messageCopied ? (
+              <Check className="w-3.5 h-3.5 text-green-400" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
+          </button>
         </div>
       ) : message.isTaskNotification ? (
         /* Compact task notification on the left */
@@ -449,6 +432,14 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
             )}
           </div>
         </div>
+      )}
+
+      {/* Image lightbox overlay */}
+      {lightboxSrc && (
+        <ImageLightbox
+          src={lightboxSrc}
+          onClose={() => setLightboxSrc(null)}
+        />
       )}
     </div>
   );
