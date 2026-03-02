@@ -1,5 +1,4 @@
 import { ExternalLink } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import type { ReleaseInfo } from '../../../../../../types/sharedTypes';
 
 type VersionInfoSectionProps = {
@@ -15,7 +14,6 @@ export default function VersionInfoSection({
   latestVersion,
   releaseInfo,
 }: VersionInfoSectionProps) {
-  const { t } = useTranslation('settings');
   const releasesUrl = releaseInfo?.htmlUrl || 'https://github.com/siteboon/claudecodeui/releases';
 
   return (
@@ -36,7 +34,7 @@ export default function VersionInfoSection({
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 text-green-600 text-green-400 rounded-full hover:bg-green-500/20 transition-colors not-italic font-medium"
           >
-            <span className="text-[10px]">{t('apiKeys.version.updateAvailable', { version: latestVersion })}</span>
+            <span className="text-[10px]">{`Update available: v${latestVersion}`}</span>
             <ExternalLink className="h-2.5 w-2.5" />
           </a>
         )}

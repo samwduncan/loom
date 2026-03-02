@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import type { TFunction } from 'i18next';
 import type { LoadingProgress, Project, ProjectSession, SessionProvider } from '../../../../types/app';
 import type {
   LoadingSessionsByProject,
@@ -52,7 +51,6 @@ export type SidebarProjectListProps = {
   onCancelEditingSession: () => void;
   onSaveEditingSession: (projectName: string, sessionId: string, summary: string) => void;
   touchHandlerFactory: TouchHandlerFactory;
-  t: TFunction;
 };
 
 export default function SidebarProjectList({
@@ -92,7 +90,6 @@ export default function SidebarProjectList({
   onCancelEditingSession,
   onSaveEditingSession,
   touchHandlerFactory,
-  t,
 }: SidebarProjectListProps) {
   const state = (
     <SidebarProjectsState
@@ -100,7 +97,6 @@ export default function SidebarProjectList({
       loadingProgress={loadingProgress}
       projectsCount={projects.length}
       filteredProjectsCount={filteredProjects.length}
-      t={t}
     />
   );
 
@@ -155,7 +151,6 @@ export default function SidebarProjectList({
               onCancelEditingSession={onCancelEditingSession}
               onSaveEditingSession={onSaveEditingSession}
               touchHandlerFactory={touchHandlerFactory}
-              t={t}
             />
           ))}
     </div>

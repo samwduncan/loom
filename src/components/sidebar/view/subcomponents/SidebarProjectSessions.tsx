@@ -1,5 +1,4 @@
 import { ChevronDown, Plus } from 'lucide-react';
-import type { TFunction } from 'i18next';
 import { Button } from '../../../ui/button';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
 import type { SessionWithProvider, TouchHandlerFactory } from '../../types/types';
@@ -30,7 +29,6 @@ type SidebarProjectSessionsProps = {
   onLoadMoreSessions: (project: Project) => void;
   onNewSession: (project: Project) => void;
   touchHandlerFactory: TouchHandlerFactory;
-  t: TFunction;
 };
 
 function SessionListSkeleton() {
@@ -71,7 +69,6 @@ export default function SidebarProjectSessions({
   onLoadMoreSessions,
   onNewSession,
   touchHandlerFactory,
-  t,
 }: SidebarProjectSessionsProps) {
   if (!isExpanded) {
     return null;
@@ -86,7 +83,7 @@ export default function SidebarProjectSessions({
         <SessionListSkeleton />
       ) : !hasSessions && !isLoadingSessions ? (
         <div className="py-2 px-3 text-left">
-          <p className="text-xs text-muted-foreground">{t('sessions.noSessions')}</p>
+          <p className="text-xs text-muted-foreground">{"No sessions yet"}</p>
         </div>
       ) : (
         sessions.map((session) => (
@@ -106,7 +103,6 @@ export default function SidebarProjectSessions({
             onSessionSelect={onSessionSelect}
             onDeleteSession={onDeleteSession}
             touchHandlerFactory={touchHandlerFactory}
-            t={t}
           />
         ))
       )}
@@ -122,12 +118,12 @@ export default function SidebarProjectSessions({
           {isLoadingSessions ? (
             <>
               <div className="w-3 h-3 animate-spin rounded-full border border-muted-foreground border-t-transparent" />
-              {t('sessions.loading')}
+              {"Loading..."}
             </>
           ) : (
             <>
               <ChevronDown className="w-3 h-3" />
-              {t('sessions.showMore')}
+              {"Show more sessions"}
             </>
           )}
         </Button>
@@ -142,7 +138,7 @@ export default function SidebarProjectSessions({
           }}
         >
           <Plus className="w-3 h-3" />
-          {t('sessions.newSession')}
+          {"New Session"}
         </button>
       </div>
 
@@ -153,7 +149,7 @@ export default function SidebarProjectSessions({
         onClick={() => onNewSession(project)}
       >
         <Plus className="w-3 h-3" />
-        {t('sessions.newSession')}
+        {"New Session"}
       </Button>
     </div>
   );

@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDeviceSettings } from '../../../hooks/useDeviceSettings';
 import { useVersionCheck } from '../../../hooks/useVersionCheck';
 import { useUiPreferences } from '../../../hooks/useUiPreferences';
@@ -36,7 +35,6 @@ function Sidebar({
   onCloseSettings,
   isMobile,
 }: SidebarProps) {
-  const { t } = useTranslation(['sidebar', 'common']);
   const { isPWA } = useDeviceSettings({ trackMobile: false });
   const { updateAvailable, latestVersion, currentVersion, releaseInfo, installMode } = useVersionCheck(
     'siteboon',
@@ -98,7 +96,6 @@ function Sidebar({
     selectedSession,
     isLoading,
     isMobile,
-    t,
     onRefresh,
     onProjectSelect,
     onSessionSelect,
@@ -176,7 +173,6 @@ function Sidebar({
       void updateSessionSummary(projectName, sessionId, summary);
     },
     touchHandlerFactory: handleTouchClick,
-    t,
   };
 
   return (
@@ -201,7 +197,6 @@ function Sidebar({
         currentVersion={currentVersion}
         latestVersion={latestVersion}
         installMode={installMode}
-        t={t}
       />
 
       {isSidebarCollapsed ? (
@@ -210,7 +205,6 @@ function Sidebar({
           onShowSettings={onShowSettings}
           updateAvailable={updateAvailable}
           onShowVersionModal={() => setShowVersionModal(true)}
-          t={t}
         />
       ) : (
         <>
@@ -234,7 +228,6 @@ function Sidebar({
             onShowVersionModal={() => setShowVersionModal(true)}
             onShowSettings={onShowSettings}
             projectListProps={projectListProps}
-            t={t}
           />
         </>
       )}

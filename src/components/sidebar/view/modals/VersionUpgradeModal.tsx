@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { authenticatedFetch } from "../../../../utils/api";
 import { ReleaseInfo } from "../../../../types/sharedTypes";
 import { copyTextToClipboard } from "../../../../utils/clipboard";
@@ -22,9 +21,8 @@ export default function VersionUpgradeModal({
     latestVersion,
     installMode
 }: VersionUpgradeModalProps) {
-    const { t } = useTranslation('common');
     const upgradeCommand = installMode === 'npm'
-        ? t('versionUpdate.npmUpgradeCommand')
+        ? 'npm install -g @siteboon/claude-code-ui@latest'
         : 'git checkout main && git pull && npm install';
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateOutput, setUpdateOutput] = useState('');
@@ -67,7 +65,7 @@ export default function VersionUpgradeModal({
             <button
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
-                aria-label={t('versionUpdate.ariaLabels.closeModal')}
+                aria-label={"Close version upgrade modal"}
             />
 
             {/* Modal */}
@@ -81,9 +79,9 @@ export default function VersionUpgradeModal({
                             </svg>
                         </div>
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900 text-white">{t('versionUpdate.title')}</h2>
+                            <h2 className="text-lg font-semibold text-gray-900 text-white">{"Update Available"}</h2>
                             <p className="text-sm text-gray-500 text-gray-400">
-                                {releaseInfo?.title || t('versionUpdate.newVersionReady')}
+                                {releaseInfo?.title || "A new version is ready"}
                             </p>
                         </div>
                     </div>
@@ -100,11 +98,11 @@ export default function VersionUpgradeModal({
                 {/* Version Info */}
                 <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-gray-50 bg-gray-700/50 rounded-lg">
-                        <span className="text-sm font-medium text-gray-700 text-gray-300">{t('versionUpdate.currentVersion')}</span>
+                        <span className="text-sm font-medium text-gray-700 text-gray-300">{"Current Version"}</span>
                         <span className="text-sm text-gray-900 text-white font-mono">{currentVersion}</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-blue-50 bg-blue-900/20 rounded-lg border border-blue-200 border-blue-700">
-                        <span className="text-sm font-medium text-blue-700 text-blue-300">{t('versionUpdate.latestVersion')}</span>
+                        <span className="text-sm font-medium text-blue-700 text-blue-300">{"Latest Version"}</span>
                         <span className="text-sm text-blue-900 text-blue-100 font-mono">{latestVersion}</span>
                     </div>
                 </div>
@@ -113,7 +111,7 @@ export default function VersionUpgradeModal({
                 {releaseInfo?.body && (
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-medium text-gray-900 text-white">{t('versionUpdate.whatsNew')}</h3>
+                            <h3 className="text-sm font-medium text-gray-900 text-white">{"What's New:"}</h3>
                             {releaseInfo?.htmlUrl && (
                                 <a
                                     href={releaseInfo.htmlUrl}
@@ -121,7 +119,7 @@ export default function VersionUpgradeModal({
                                     rel="noopener noreferrer"
                                     className="text-xs text-blue-600 text-blue-400 hover:text-blue-700 hover:text-blue-300 hover:underline flex items-center gap-1"
                                 >
-                                    {t('versionUpdate.viewFullRelease')}
+                                    {"View full release"}
                                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                     </svg>
@@ -139,7 +137,7 @@ export default function VersionUpgradeModal({
                 {/* Update Output */}
                 {(updateOutput || updateError) && (
                     <div className="space-y-2">
-                        <h3 className="text-sm font-medium text-gray-900 text-white">{t('versionUpdate.updateProgress')}</h3>
+                        <h3 className="text-sm font-medium text-gray-900 text-white">{"Update Progress:"}</h3>
                         <div className="bg-gray-900 bg-gray-950 rounded-lg p-4 border border-gray-700 max-h-48 overflow-y-auto">
                             <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap">{updateOutput}</pre>
                         </div>
@@ -154,14 +152,14 @@ export default function VersionUpgradeModal({
                 {/* Upgrade Instructions */}
                 {!isUpdating && !updateOutput && (
                     <div className="space-y-3">
-                        <h3 className="text-sm font-medium text-gray-900 text-white">{t('versionUpdate.manualUpgrade')}</h3>
+                        <h3 className="text-sm font-medium text-gray-900 text-white">{"Manual upgrade:"}</h3>
                         <div className="bg-gray-100 bg-gray-800 rounded-lg p-3 border">
                             <code className="text-sm text-gray-800 text-gray-200 font-mono">
                                 {upgradeCommand}
                             </code>
                         </div>
                         <p className="text-xs text-gray-600 text-gray-400">
-                            {t('versionUpdate.manualUpgradeHint')}
+                            {"Or click \"Update Now\" to run the update automatically."}
                         </p>
                     </div>
                 )}
@@ -172,7 +170,7 @@ export default function VersionUpgradeModal({
                         onClick={onClose}
                         className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 text-gray-300 bg-gray-100 bg-gray-700 hover:bg-gray-200 hover:bg-gray-600 rounded-md transition-colors"
                     >
-                        {updateOutput ? t('versionUpdate.buttons.close') : t('versionUpdate.buttons.later')}
+                        {updateOutput ? "Close" : "Later"}
                     </button>
                     {!updateOutput && (
                         <>
@@ -180,7 +178,7 @@ export default function VersionUpgradeModal({
                                 onClick={() => copyTextToClipboard(upgradeCommand)}
                                 className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 text-gray-300 bg-gray-100 bg-gray-700 hover:bg-gray-200 hover:bg-gray-600 rounded-md transition-colors"
                             >
-                                {t('versionUpdate.buttons.copyCommand')}
+                                {"Copy Command"}
                             </button>
                             <button
                                 onClick={handleUpdateNow}
@@ -190,10 +188,10 @@ export default function VersionUpgradeModal({
                                 {isUpdating ? (
                                     <>
                                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                        {t('versionUpdate.buttons.updating')}
+                                        {"Updating..."}
                                     </>
                                 ) : (
-                                    t('versionUpdate.buttons.updateNow')
+                                    "Update Now"
                                 )}
                             </button>
                         </>

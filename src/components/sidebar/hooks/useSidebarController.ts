@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type React from 'react';
-import type { TFunction } from 'i18next';
 import { api } from '../../../utils/api';
 import type { Project, ProjectSession } from '../../../types/app';
 import type {
@@ -26,7 +25,6 @@ type UseSidebarControllerArgs = {
   selectedSession: ProjectSession | null;
   isLoading: boolean;
   isMobile: boolean;
-  t: TFunction;
   onRefresh: () => Promise<void> | void;
   onProjectSelect: (project: Project) => void;
   onSessionSelect: (session: ProjectSession) => void;
@@ -43,7 +41,6 @@ export function useSidebarController({
   selectedSession,
   isLoading,
   isMobile,
-  t,
   onRefresh,
   onProjectSelect,
   onSessionSelect,
@@ -294,13 +291,13 @@ export function useSidebarController({
           status: response.status,
           error: errorText,
         });
-        alert(t('messages.deleteSessionFailed'));
+        alert('Failed to delete session. Please try again.');
       }
     } catch (error) {
       console.error('[Sidebar] Error deleting session:', error);
-      alert(t('messages.deleteSessionError'));
+      alert('Error deleting session. Please try again.');
     }
-  }, [onSessionDelete, sessionDeleteConfirmation, t]);
+  }, [onSessionDelete, sessionDeleteConfirmation]);
 
   const requestProjectDelete = useCallback(
     (project: Project) => {
@@ -330,11 +327,11 @@ export function useSidebarController({
         onProjectDelete?.(project.name);
       } else {
         const error = (await response.json()) as { error?: string };
-        alert(error.error || t('messages.deleteProjectFailed'));
+        alert(error.error || 'Failed to delete project. Please try again.');
       }
     } catch (error) {
       console.error('Error deleting project:', error);
-      alert(t('messages.deleteProjectError'));
+      alert('Error deleting project. Please try again.');
     } finally {
       setDeletingProjects((prev) => {
         const next = new Set(prev);
@@ -342,7 +339,7 @@ export function useSidebarController({
         return next;
       });
     }
-  }, [deleteConfirmation, onProjectDelete, t]);
+  }, [deleteConfirmation, onProjectDelete]);
 
   const loadMoreSessions = useCallback(
     async (project: Project) => {

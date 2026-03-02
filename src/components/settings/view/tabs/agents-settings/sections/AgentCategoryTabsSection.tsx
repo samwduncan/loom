@@ -1,15 +1,18 @@
-import { useTranslation } from 'react-i18next';
 import type { AgentCategory } from '../../../../types/types';
 import type { AgentCategoryTabsSectionProps } from '../types';
 
 const AGENT_CATEGORIES: AgentCategory[] = ['account', 'permissions', 'mcp'];
 
+const CATEGORY_LABELS: Record<AgentCategory, string> = {
+  account: 'Account',
+  permissions: 'Permissions',
+  mcp: 'MCP Servers',
+};
+
 export default function AgentCategoryTabsSection({
   selectedCategory,
   onSelectCategory,
 }: AgentCategoryTabsSectionProps) {
-  const { t } = useTranslation('settings');
-
   return (
     <div className="border-b border-gray-200 border-gray-700 flex-shrink-0">
       <div role="tablist" className="flex px-2 md:px-4 overflow-x-auto">
@@ -25,9 +28,7 @@ export default function AgentCategoryTabsSection({
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
-            {category === 'account' && t('tabs.account')}
-            {category === 'permissions' && t('tabs.permissions')}
-            {category === 'mcp' && t('tabs.mcpServers')}
+            {CATEGORY_LABELS[category]}
           </button>
         ))}
       </div>

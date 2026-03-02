@@ -1,4 +1,3 @@
-import type { TFunction } from 'i18next';
 import type { Project } from '../../../types/app';
 import type {
   AdditionalSessionsByProject,
@@ -51,20 +50,20 @@ export const getSessionDate = (session: SessionWithProvider): Date => {
   return new Date(session.lastActivity || session.createdAt || 0);
 };
 
-export const getSessionName = (session: SessionWithProvider, t: TFunction): string => {
+export const getSessionName = (session: SessionWithProvider): string => {
   if (session.__provider === 'cursor') {
-    return session.name || t('projects.untitledSession');
+    return session.name || 'Untitled Session';
   }
 
   if (session.__provider === 'codex') {
-    return session.summary || session.name || t('projects.codexSession');
+    return session.summary || session.name || 'Codex Session';
   }
 
   if (session.__provider === 'gemini') {
-    return session.summary || session.name || t('projects.newSession');
+    return session.summary || session.name || 'New Session';
   }
 
-  return session.summary || t('projects.newSession');
+  return session.summary || 'New Session';
 };
 
 export const getSessionTime = (session: SessionWithProvider): string => {
@@ -82,7 +81,6 @@ export const getSessionTime = (session: SessionWithProvider): string => {
 export const createSessionViewModel = (
   session: SessionWithProvider,
   currentTime: Date,
-  t: TFunction,
 ): SessionViewModel => {
   const sessionDate = getSessionDate(session);
   const diffInMinutes = Math.floor((currentTime.getTime() - sessionDate.getTime()) / (1000 * 60));
@@ -92,7 +90,7 @@ export const createSessionViewModel = (
     isCodexSession: session.__provider === 'codex',
     isGeminiSession: session.__provider === 'gemini',
     isActive: diffInMinutes < 10,
-    sessionName: getSessionName(session, t),
+    sessionName: getSessionName(session),
     sessionTime: getSessionTime(session),
     messageCount: Number(session.messageCount || 0),
   };

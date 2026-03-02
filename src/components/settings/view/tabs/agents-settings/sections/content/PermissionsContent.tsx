@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { AlertTriangle, Plus, Shield, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '../../../../../../ui/button';
 import { Input } from '../../../../../../ui/input';
 import type { CodexPermissionMode, GeminiPermissionMode } from '../../../../../types/types';
@@ -68,7 +67,6 @@ function ClaudePermissions({
   disallowedTools,
   onDisallowedToolsChange,
 }: Omit<ClaudePermissionsProps, 'agent'>) {
-  const { t } = useTranslation('settings');
   const [newAllowedTool, setNewAllowedTool] = useState('');
   const [newDisallowedTool, setNewDisallowedTool] = useState('');
 
@@ -97,7 +95,7 @@ function ClaudePermissions({
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-orange-500" />
-          <h3 className="text-lg font-medium text-foreground">{t('permissions.title')}</h3>
+          <h3 className="text-lg font-medium text-foreground">{"Permission Settings"}</h3>
         </div>
         <div className="bg-orange-50 bg-orange-900/20 border border-orange-200 border-orange-800 rounded-lg p-4">
           <label className="flex items-center gap-3">
@@ -109,10 +107,10 @@ function ClaudePermissions({
             />
             <div>
               <div className="font-medium text-orange-900 text-orange-100">
-                {t('permissions.skipPermissions.label')}
+                {"Skip permission prompts (use with caution)"}
               </div>
               <div className="text-sm text-orange-700 text-orange-300">
-                {t('permissions.skipPermissions.claudeDescription')}
+                {"Equivalent to --dangerously-skip-permissions flag"}
               </div>
             </div>
           </label>
@@ -122,15 +120,15 @@ function ClaudePermissions({
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5 text-green-500" />
-          <h3 className="text-lg font-medium text-foreground">{t('permissions.allowedTools.title')}</h3>
+          <h3 className="text-lg font-medium text-foreground">{"Allowed Tools"}</h3>
         </div>
-        <p className="text-sm text-muted-foreground">{t('permissions.allowedTools.description')}</p>
+        <p className="text-sm text-muted-foreground">{"Tools that are automatically allowed without prompting for permission"}</p>
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={newAllowedTool}
             onChange={(event) => setNewAllowedTool(event.target.value)}
-            placeholder={t('permissions.allowedTools.placeholder')}
+            placeholder={'e.g., "Bash(git log:*)" or "Write"'}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault();
@@ -146,13 +144,13 @@ function ClaudePermissions({
             className="h-10 px-4"
           >
             <Plus className="w-4 h-4 mr-2 sm:mr-0" />
-            <span className="sm:hidden">{t('permissions.actions.add')}</span>
+            <span className="sm:hidden">{"Add"}</span>
           </Button>
         </div>
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700 text-gray-300">
-            {t('permissions.allowedTools.quickAdd')}
+            {"Quick add common tools:"}
           </p>
           <div className="flex flex-wrap gap-2">
             {COMMON_CLAUDE_TOOLS.map((tool) => (
@@ -186,7 +184,7 @@ function ClaudePermissions({
           ))}
           {allowedTools.length === 0 && (
             <div className="text-center py-6 text-gray-500 text-gray-400">
-              {t('permissions.allowedTools.empty')}
+              {"No allowed tools configured"}
             </div>
           )}
         </div>
@@ -195,15 +193,15 @@ function ClaudePermissions({
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-500" />
-          <h3 className="text-lg font-medium text-foreground">{t('permissions.blockedTools.title')}</h3>
+          <h3 className="text-lg font-medium text-foreground">{"Blocked Tools"}</h3>
         </div>
-        <p className="text-sm text-muted-foreground">{t('permissions.blockedTools.description')}</p>
+        <p className="text-sm text-muted-foreground">{"Tools that are automatically blocked without prompting for permission"}</p>
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={newDisallowedTool}
             onChange={(event) => setNewDisallowedTool(event.target.value)}
-            placeholder={t('permissions.blockedTools.placeholder')}
+            placeholder={'e.g., "Bash(rm:*)"'}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault();
@@ -219,7 +217,7 @@ function ClaudePermissions({
             className="h-10 px-4"
           >
             <Plus className="w-4 h-4 mr-2 sm:mr-0" />
-            <span className="sm:hidden">{t('permissions.actions.add')}</span>
+            <span className="sm:hidden">{"Add"}</span>
           </Button>
         </div>
 
@@ -239,7 +237,7 @@ function ClaudePermissions({
           ))}
           {disallowedTools.length === 0 && (
             <div className="text-center py-6 text-gray-500 text-gray-400">
-              {t('permissions.blockedTools.empty')}
+              {"No blocked tools configured"}
             </div>
           )}
         </div>
@@ -247,13 +245,13 @@ function ClaudePermissions({
 
       <div className="bg-blue-50 bg-blue-900/20 border border-blue-200 border-blue-800 rounded-lg p-4">
         <h4 className="font-medium text-blue-900 text-blue-100 mb-2">
-          {t('permissions.toolExamples.title')}
+          {"Tool Pattern Examples:"}
         </h4>
         <ul className="text-sm text-blue-800 text-blue-200 space-y-1">
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(git log:*)"</code> {t('permissions.toolExamples.bashGitLog')}</li>
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(git diff:*)"</code> {t('permissions.toolExamples.bashGitDiff')}</li>
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Write"</code> {t('permissions.toolExamples.write')}</li>
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(rm:*)"</code> {t('permissions.toolExamples.bashRm')}</li>
+          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(git log:*)"</code> {"- Allow all git log commands"}</li>
+          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(git diff:*)"</code> {"- Allow all git diff commands"}</li>
+          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Write"</code> {"- Allow all Write tool usage"}</li>
+          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(rm:*)"</code> {"- Block all rm commands (dangerous)"}</li>
         </ul>
       </div>
     </div>
@@ -278,7 +276,6 @@ function CursorPermissions({
   disallowedCommands,
   onDisallowedCommandsChange,
 }: Omit<CursorPermissionsProps, 'agent'>) {
-  const { t } = useTranslation('settings');
   const [newAllowedCommand, setNewAllowedCommand] = useState('');
   const [newDisallowedCommand, setNewDisallowedCommand] = useState('');
 
@@ -307,7 +304,7 @@ function CursorPermissions({
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-orange-500" />
-          <h3 className="text-lg font-medium text-foreground">{t('permissions.title')}</h3>
+          <h3 className="text-lg font-medium text-foreground">{"Permission Settings"}</h3>
         </div>
         <div className="bg-orange-50 bg-orange-900/20 border border-orange-200 border-orange-800 rounded-lg p-4">
           <label className="flex items-center gap-3">
@@ -319,10 +316,10 @@ function CursorPermissions({
             />
             <div>
               <div className="font-medium text-orange-900 text-orange-100">
-                {t('permissions.skipPermissions.label')}
+                {"Skip permission prompts (use with caution)"}
               </div>
               <div className="text-sm text-orange-700 text-orange-300">
-                {t('permissions.skipPermissions.cursorDescription')}
+                {"Equivalent to -f flag in Cursor CLI"}
               </div>
             </div>
           </label>
@@ -332,15 +329,15 @@ function CursorPermissions({
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5 text-green-500" />
-          <h3 className="text-lg font-medium text-foreground">{t('permissions.allowedCommands.title')}</h3>
+          <h3 className="text-lg font-medium text-foreground">{"Allowed Shell Commands"}</h3>
         </div>
-        <p className="text-sm text-muted-foreground">{t('permissions.allowedCommands.description')}</p>
+        <p className="text-sm text-muted-foreground">{"Shell commands that are automatically allowed without prompting"}</p>
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={newAllowedCommand}
             onChange={(event) => setNewAllowedCommand(event.target.value)}
-            placeholder={t('permissions.allowedCommands.placeholder')}
+            placeholder={'e.g., "Shell(ls)" or "Shell(git status)"'}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault();
@@ -356,13 +353,13 @@ function CursorPermissions({
             className="h-10 px-4"
           >
             <Plus className="w-4 h-4 mr-2 sm:mr-0" />
-            <span className="sm:hidden">{t('permissions.actions.add')}</span>
+            <span className="sm:hidden">{"Add"}</span>
           </Button>
         </div>
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700 text-gray-300">
-            {t('permissions.allowedCommands.quickAdd')}
+            {"Quick add common commands:"}
           </p>
           <div className="flex flex-wrap gap-2">
             {COMMON_CURSOR_COMMANDS.map((command) => (
@@ -396,7 +393,7 @@ function CursorPermissions({
           ))}
           {allowedCommands.length === 0 && (
             <div className="text-center py-6 text-gray-500 text-gray-400">
-              {t('permissions.allowedCommands.empty')}
+              {"No allowed commands configured"}
             </div>
           )}
         </div>
@@ -405,15 +402,15 @@ function CursorPermissions({
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-500" />
-          <h3 className="text-lg font-medium text-foreground">{t('permissions.blockedCommands.title')}</h3>
+          <h3 className="text-lg font-medium text-foreground">{"Blocked Shell Commands"}</h3>
         </div>
-        <p className="text-sm text-muted-foreground">{t('permissions.blockedCommands.description')}</p>
+        <p className="text-sm text-muted-foreground">{"Shell commands that are automatically blocked"}</p>
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={newDisallowedCommand}
             onChange={(event) => setNewDisallowedCommand(event.target.value)}
-            placeholder={t('permissions.blockedCommands.placeholder')}
+            placeholder={'e.g., "Shell(rm -rf)" or "Shell(sudo)"'}
             onKeyDown={(event) => {
               if (event.key === 'Enter') {
                 event.preventDefault();
@@ -429,7 +426,7 @@ function CursorPermissions({
             className="h-10 px-4"
           >
             <Plus className="w-4 h-4 mr-2 sm:mr-0" />
-            <span className="sm:hidden">{t('permissions.actions.add')}</span>
+            <span className="sm:hidden">{"Add"}</span>
           </Button>
         </div>
 
@@ -449,7 +446,7 @@ function CursorPermissions({
           ))}
           {disallowedCommands.length === 0 && (
             <div className="text-center py-6 text-gray-500 text-gray-400">
-              {t('permissions.blockedCommands.empty')}
+              {"No blocked commands configured"}
             </div>
           )}
         </div>
@@ -457,13 +454,13 @@ function CursorPermissions({
 
       <div className="bg-purple-50 bg-purple-900/20 border border-purple-200 border-purple-800 rounded-lg p-4">
         <h4 className="font-medium text-purple-900 text-purple-100 mb-2">
-          {t('permissions.shellExamples.title')}
+          {"Shell Command Examples:"}
         </h4>
         <ul className="text-sm text-purple-800 text-purple-200 space-y-1">
-          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(ls)"</code> {t('permissions.shellExamples.ls')}</li>
-          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(git status)"</code> {t('permissions.shellExamples.gitStatus')}</li>
-          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(npm install)"</code> {t('permissions.shellExamples.npmInstall')}</li>
-          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(rm -rf)"</code> {t('permissions.shellExamples.rmRf')}</li>
+          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(ls)"</code> {"- Allow ls command"}</li>
+          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(git status)"</code> {"- Allow git status"}</li>
+          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(npm install)"</code> {"- Allow npm install"}</li>
+          <li><code className="bg-purple-100 bg-purple-800 px-1 rounded">"Shell(rm -rf)"</code> {"- Block recursive delete"}</li>
         </ul>
       </div>
     </div>
@@ -477,16 +474,14 @@ type CodexPermissionsProps = {
 };
 
 function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<CodexPermissionsProps, 'agent'>) {
-  const { t } = useTranslation('settings');
-
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5 text-green-500" />
-          <h3 className="text-lg font-medium text-foreground">{t('permissions.codex.permissionMode')}</h3>
+          <h3 className="text-lg font-medium text-foreground">{"Permission Mode"}</h3>
         </div>
-        <p className="text-sm text-muted-foreground">{t('permissions.codex.description')}</p>
+        <p className="text-sm text-muted-foreground">{"Controls how Codex handles file modifications and command execution"}</p>
 
         <div
           className={`border rounded-lg p-4 cursor-pointer transition-all ${permissionMode === 'default'
@@ -504,9 +499,9 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
               className="mt-1 w-4 h-4 text-green-600"
             />
             <div>
-              <div className="font-medium text-foreground">{t('permissions.codex.modes.default.title')}</div>
+              <div className="font-medium text-foreground">{"Default"}</div>
               <div className="text-sm text-muted-foreground">
-                {t('permissions.codex.modes.default.description')}
+                {"Only trusted commands (ls, cat, grep, git status, etc.) run automatically. Other commands are skipped. Can write to workspace."}
               </div>
             </div>
           </label>
@@ -528,9 +523,9 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
               className="mt-1 w-4 h-4 text-green-600"
             />
             <div>
-              <div className="font-medium text-green-900 text-green-100">{t('permissions.codex.modes.acceptEdits.title')}</div>
+              <div className="font-medium text-green-900 text-green-100">{"Accept Edits"}</div>
               <div className="text-sm text-green-700 text-green-300">
-                {t('permissions.codex.modes.acceptEdits.description')}
+                {"All commands run automatically within the workspace. Full auto mode with sandboxed execution."}
               </div>
             </div>
           </label>
@@ -553,11 +548,11 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
             />
             <div>
               <div className="font-medium text-orange-900 text-orange-100 flex items-center gap-2">
-                {t('permissions.codex.modes.bypassPermissions.title')}
+                {"Bypass Permissions"}
                 <AlertTriangle className="w-4 h-4" />
               </div>
               <div className="text-sm text-orange-700 text-orange-300">
-                {t('permissions.codex.modes.bypassPermissions.description')}
+                {"Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution."}
               </div>
             </div>
           </label>
@@ -565,13 +560,13 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
 
         <details className="text-sm">
           <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-            {t('permissions.codex.technicalDetails')}
+            {"Technical details"}
           </summary>
           <div className="mt-2 p-3 bg-gray-50 bg-gray-900/50 rounded-lg text-xs text-muted-foreground space-y-2">
-            <p><strong>{t('permissions.codex.modes.default.title')}:</strong> {t('permissions.codex.technicalInfo.default')}</p>
-            <p><strong>{t('permissions.codex.modes.acceptEdits.title')}:</strong> {t('permissions.codex.technicalInfo.acceptEdits')}</p>
-            <p><strong>{t('permissions.codex.modes.bypassPermissions.title')}:</strong> {t('permissions.codex.technicalInfo.bypassPermissions')}</p>
-            <p className="text-xs opacity-75">{t('permissions.codex.technicalInfo.overrideNote')}</p>
+            <p><strong>{"Default"}:</strong> {"sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc."}</p>
+            <p><strong>{"Accept Edits"}:</strong> {"sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory."}</p>
+            <p><strong>{"Bypass Permissions"}:</strong> {"sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments."}</p>
+            <p className="text-xs opacity-75">{"You can override this per-session using the mode button in the chat interface."}</p>
           </div>
         </details>
       </div>
@@ -585,20 +580,18 @@ type GeminiPermissionsProps = {
   onPermissionModeChange: (value: GeminiPermissionMode) => void;
 };
 
-// Gemini Permissions
 function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<GeminiPermissionsProps, 'agent'>) {
-  const { t } = useTranslation(['settings', 'chat']);
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <Shield className="w-5 h-5 text-green-500" />
           <h3 className="text-lg font-medium text-foreground">
-            {t('gemini.permissionMode')}
+            {"Permission Mode"}
           </h3>
         </div>
         <p className="text-sm text-muted-foreground">
-          {t('gemini.description')}
+          {"Controls how Gemini handles file modifications and command execution"}
         </p>
 
         {/* Default Mode */}
@@ -618,9 +611,9 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
               className="mt-1 w-4 h-4 text-green-600"
             />
             <div>
-              <div className="font-medium text-foreground">{t('gemini.modes.default.title')}</div>
+              <div className="font-medium text-foreground">{"Default"}</div>
               <div className="text-sm text-muted-foreground">
-                {t('gemini.modes.default.description')}
+                {"Only trusted commands run automatically. Other commands require approval."}
               </div>
             </div>
           </label>
@@ -643,9 +636,9 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
               className="mt-1 w-4 h-4 text-green-600"
             />
             <div>
-              <div className="font-medium text-green-900 text-green-100">{t('gemini.modes.autoEdit.title')}</div>
+              <div className="font-medium text-green-900 text-green-100">{"Auto Edit"}</div>
               <div className="text-sm text-green-700 text-green-300">
-                {t('gemini.modes.autoEdit.description')}
+                {"All commands run automatically within the workspace."}
               </div>
             </div>
           </label>
@@ -669,11 +662,11 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
             />
             <div>
               <div className="font-medium text-orange-900 text-orange-100 flex items-center gap-2">
-                {t('gemini.modes.yolo.title')}
+                {"YOLO Mode"}
                 <AlertTriangle className="w-4 h-4" />
               </div>
               <div className="text-sm text-orange-700 text-orange-300">
-                {t('gemini.modes.yolo.description')}
+                {"Full system access with no restrictions. Use with caution."}
               </div>
             </div>
           </label>

@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { CodeEditorSettingsState, ProjectSortOrder } from '../../types/types';
 
 type AppearanceSettingsTabProps = {
@@ -69,8 +68,7 @@ export default function AppearanceSettingsTab({
   onCodeEditorLineNumbersChange,
   onCodeEditorFontSizeChange,
 }: AppearanceSettingsTabProps) {
-  const { t } = useTranslation('settings');
-  const codeEditorThemeLabel = t('appearanceSettings.codeEditor.theme.label');
+  const codeEditorThemeLabel = "Editor Theme";
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -79,10 +77,10 @@ export default function AppearanceSettingsTab({
           <div className="flex items-center justify-between">
             <div>
               <div className="font-medium text-foreground">
-                {t('appearanceSettings.projectSorting.label')}
+                {"Project Sorting"}
               </div>
               <div className="text-sm text-muted-foreground">
-                {t('appearanceSettings.projectSorting.description')}
+                {"How projects are ordered in the sidebar"}
               </div>
             </div>
             <select
@@ -90,56 +88,56 @@ export default function AppearanceSettingsTab({
               onChange={(event) => onProjectSortOrderChange(event.target.value as ProjectSortOrder)}
               className="text-sm bg-gray-50 bg-gray-800 border border-gray-300 border-gray-600 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 w-32"
             >
-              <option value="name">{t('appearanceSettings.projectSorting.alphabetical')}</option>
-              <option value="date">{t('appearanceSettings.projectSorting.recentActivity')}</option>
+              <option value="name">{"Alphabetical"}</option>
+              <option value="date">{"Recent Activity"}</option>
             </select>
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-foreground">{t('appearanceSettings.codeEditor.title')}</h3>
+        <h3 className="text-lg font-semibold text-foreground">{"Code Editor"}</h3>
 
         <ToggleCard
           label={codeEditorThemeLabel}
-          description={t('appearanceSettings.codeEditor.theme.description')}
+          description={"Default theme for the code editor"}
           checked={codeEditorSettings.theme === 'dark'}
           onChange={(enabled) => onCodeEditorThemeChange(enabled ? 'dark' : 'light')}
           ariaLabel={codeEditorThemeLabel}
         />
 
         <ToggleCard
-          label={t('appearanceSettings.codeEditor.wordWrap.label')}
-          description={t('appearanceSettings.codeEditor.wordWrap.description')}
+          label={"Word Wrap"}
+          description={"Enable word wrapping by default in the editor"}
           checked={codeEditorSettings.wordWrap}
           onChange={onCodeEditorWordWrapChange}
-          ariaLabel={t('appearanceSettings.codeEditor.wordWrap.label')}
+          ariaLabel={"Word Wrap"}
         />
 
         <ToggleCard
-          label={t('appearanceSettings.codeEditor.showMinimap.label')}
-          description={t('appearanceSettings.codeEditor.showMinimap.description')}
+          label={"Show Minimap"}
+          description={"Display a minimap for easier navigation in diff view"}
           checked={codeEditorSettings.showMinimap}
           onChange={onCodeEditorShowMinimapChange}
-          ariaLabel={t('appearanceSettings.codeEditor.showMinimap.label')}
+          ariaLabel={"Show Minimap"}
         />
 
         <ToggleCard
-          label={t('appearanceSettings.codeEditor.lineNumbers.label')}
-          description={t('appearanceSettings.codeEditor.lineNumbers.description')}
+          label={"Show Line Numbers"}
+          description={"Display line numbers in the editor"}
           checked={codeEditorSettings.lineNumbers}
           onChange={onCodeEditorLineNumbersChange}
-          ariaLabel={t('appearanceSettings.codeEditor.lineNumbers.label')}
+          ariaLabel={"Show Line Numbers"}
         />
 
         <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="font-medium text-foreground">
-                {t('appearanceSettings.codeEditor.fontSize.label')}
+                {"Font Size"}
               </div>
               <div className="text-sm text-muted-foreground">
-                {t('appearanceSettings.codeEditor.fontSize.description')}
+                {"Editor font size in pixels"}
               </div>
             </div>
             <select

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '../../../ui/button';
 import { Input } from '../../../ui/input';
 import { DEFAULT_CODEX_MCP_FORM } from '../../constants/constants';
@@ -34,7 +33,6 @@ export default function CodexMcpFormModal({
   onClose,
   onSubmit,
 }: CodexMcpFormModalProps) {
-  const { t } = useTranslation('settings');
   const [formData, setFormData] = useState<CodexMcpFormState>(DEFAULT_CODEX_MCP_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,7 +71,7 @@ export default function CodexMcpFormModal({
       <div className="bg-background border border-border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h3 className="text-lg font-medium text-foreground">
-            {editingServer ? t('mcpForm.title.edit') : t('mcpForm.title.add')}
+            {editingServer ? "Edit MCP Server" : "Add MCP Server"}
           </h3>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
@@ -83,19 +81,19 @@ export default function CodexMcpFormModal({
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              {t('mcpForm.fields.serverName')} *
+              {"Server Name"} *
             </label>
             <Input
               value={formData.name}
               onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
-              placeholder={t('mcpForm.placeholders.serverName')}
+              placeholder="my-server"
               required
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              {t('mcpForm.fields.command')} *
+              {"Command"} *
             </label>
             <Input
               value={formData.config.command}
@@ -113,7 +111,7 @@ export default function CodexMcpFormModal({
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              {t('mcpForm.fields.arguments')}
+              {"Arguments (one per line)"}
             </label>
             <textarea
               value={formData.config.args.join('\n')}
@@ -132,7 +130,7 @@ export default function CodexMcpFormModal({
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">
-              {t('mcpForm.fields.envVars')}
+              {"Environment Variables (KEY=value, one per line)"}
             </label>
             <textarea
               value={Object.entries(formData.config.env).map(([key, value]) => `${key}=${value}`).join('\n')}
@@ -157,7 +155,7 @@ export default function CodexMcpFormModal({
 
           <div className="flex justify-end gap-2 pt-4 border-t border-border">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t('mcpForm.actions.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               type="submit"
@@ -165,10 +163,10 @@ export default function CodexMcpFormModal({
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               {isSubmitting
-                ? t('mcpForm.actions.saving')
+                ? "Saving..."
                 : editingServer
-                ? t('mcpForm.actions.updateServer')
-                : t('mcpForm.actions.addServer')}
+                ? "Update Server"
+                : "Add Server"}
             </Button>
           </div>
         </form>

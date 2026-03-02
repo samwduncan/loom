@@ -1,5 +1,4 @@
 import { FolderPlus, Plus, RefreshCw, Search, X, PanelLeftClose } from 'lucide-react';
-import type { TFunction } from 'i18next';
 import { Button } from '../../../ui/button';
 import { Input } from '../../../ui/input';
 import { IS_PLATFORM } from '../../../../constants/config';
@@ -16,7 +15,6 @@ type SidebarHeaderProps = {
   isRefreshing: boolean;
   onCreateProject: () => void;
   onCollapseSidebar: () => void;
-  t: TFunction;
 };
 
 export default function SidebarHeader({
@@ -31,7 +29,6 @@ export default function SidebarHeader({
   isRefreshing,
   onCreateProject,
   onCollapseSidebar,
-  t,
 }: SidebarHeaderProps) {
   const LogoBlock = () => (
     <div className="flex items-center gap-2.5 min-w-0">
@@ -40,7 +37,7 @@ export default function SidebarHeader({
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       </div>
-      <h1 className="text-sm font-semibold text-foreground tracking-tight truncate">{t('app.title')}</h1>
+      <h1 className="text-sm font-semibold text-foreground tracking-tight truncate">{"Claude Code UI"}</h1>
     </div>
   );
 
@@ -56,7 +53,7 @@ export default function SidebarHeader({
             <a
               href="https://cloudcli.ai/dashboard"
               className="flex items-center gap-2.5 min-w-0 hover:opacity-80 transition-opacity"
-              title={t('tooltips.viewEnvironments')}
+              title={"View Environments"}
             >
               <LogoBlock />
             </a>
@@ -71,7 +68,7 @@ export default function SidebarHeader({
               className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground hover:bg-accent/80 rounded-lg"
               onClick={onRefresh}
               disabled={isRefreshing}
-              title={t('tooltips.refresh')}
+              title={"Refresh projects and sessions (Ctrl+R)"}
             >
               <RefreshCw
                 className={`w-3.5 h-3.5 ${
@@ -84,7 +81,7 @@ export default function SidebarHeader({
               size="sm"
               className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground hover:bg-accent/80 rounded-lg"
               onClick={onCreateProject}
-              title={t('tooltips.createProject')}
+              title={"Create new project"}
             >
               <Plus className="w-3.5 h-3.5" />
             </Button>
@@ -93,7 +90,7 @@ export default function SidebarHeader({
               size="sm"
               className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground hover:bg-accent/80 rounded-lg"
               onClick={onCollapseSidebar}
-              title={t('tooltips.hideSidebar')}
+              title={"Hide sidebar"}
             >
               <PanelLeftClose className="w-3.5 h-3.5" />
             </Button>
@@ -106,7 +103,7 @@ export default function SidebarHeader({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground/50 pointer-events-none" />
             <Input
               type="text"
-              placeholder={t('projects.searchPlaceholder')}
+              placeholder={"Search projects..."}
               value={searchFilter}
               onChange={(event) => onSearchFilterChange(event.target.value)}
               className="nav-search-input pl-9 pr-8 h-9 text-sm rounded-xl border-0 placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200"
@@ -136,7 +133,7 @@ export default function SidebarHeader({
             <a
               href="https://cloudcli.ai/dashboard"
               className="flex items-center gap-2.5 active:opacity-70 transition-opacity min-w-0"
-              title={t('tooltips.viewEnvironments')}
+              title={"View Environments"}
             >
               <LogoBlock />
             </a>
@@ -167,7 +164,7 @@ export default function SidebarHeader({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
             <Input
               type="text"
-              placeholder={t('projects.searchPlaceholder')}
+              placeholder={"Search projects..."}
               value={searchFilter}
               onChange={(event) => onSearchFilterChange(event.target.value)}
               className="nav-search-input pl-10 pr-9 h-10 text-sm rounded-xl border-0 placeholder:text-muted-foreground/40 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all duration-200"

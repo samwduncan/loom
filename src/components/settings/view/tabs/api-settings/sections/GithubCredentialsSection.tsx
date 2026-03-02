@@ -1,5 +1,4 @@
 import { Eye, EyeOff, Github, Plus, Trash2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '../../../../../ui/button';
 import { Input } from '../../../../../ui/input';
 import type { GithubCredentialItem } from '../types';
@@ -39,27 +38,25 @@ export default function GithubCredentialsSection({
   onToggleGithubCredential,
   onDeleteGithubCredential,
 }: GithubCredentialsSectionProps) {
-  const { t } = useTranslation('settings');
-
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Github className="h-5 w-5" />
-          <h3 className="text-lg font-semibold">{t('apiKeys.github.title')}</h3>
+          <h3 className="text-lg font-semibold">{"GitHub Tokens"}</h3>
         </div>
         <Button size="sm" onClick={() => onShowNewGithubFormChange(!showNewGithubForm)}>
           <Plus className="h-4 w-4 mr-1" />
-          {t('apiKeys.github.addButton')}
+          {"Add Token"}
         </Button>
       </div>
 
-      <p className="text-sm text-muted-foreground mb-4">{t('apiKeys.github.descriptionAlt')}</p>
+      <p className="text-sm text-muted-foreground mb-4">{"Add GitHub Personal Access Tokens to clone private repositories. You can also pass tokens directly in API requests without storing them."}</p>
 
       {showNewGithubForm && (
         <div className="mb-4 p-4 border rounded-lg bg-card space-y-3">
           <Input
-            placeholder={t('apiKeys.github.form.namePlaceholder')}
+            placeholder={"Token Name (e.g., Personal Repos)"}
             value={newGithubName}
             onChange={(event) => onNewGithubNameChange(event.target.value)}
           />
@@ -67,7 +64,7 @@ export default function GithubCredentialsSection({
           <div className="relative">
             <Input
               type={showNewTokenPlainText ? 'text' : 'password'}
-              placeholder={t('apiKeys.github.form.tokenPlaceholder')}
+              placeholder={"GitHub Personal Access Token (ghp_...)"}
               value={newGithubToken}
               onChange={(event) => onNewGithubTokenChange(event.target.value)}
               className="pr-10"
@@ -83,15 +80,15 @@ export default function GithubCredentialsSection({
           </div>
 
           <Input
-            placeholder={t('apiKeys.github.form.descriptionPlaceholder')}
+            placeholder={"Description (optional)"}
             value={newGithubDescription}
             onChange={(event) => onNewGithubDescriptionChange(event.target.value)}
           />
 
           <div className="flex gap-2">
-            <Button onClick={onCreateGithubCredential}>{t('apiKeys.github.form.addButton')}</Button>
+            <Button onClick={onCreateGithubCredential}>{"Add Token"}</Button>
             <Button variant="outline" onClick={onCancelCreateGithubCredential}>
-              {t('apiKeys.github.form.cancelButton')}
+              {"Cancel"}
             </Button>
           </div>
 
@@ -101,14 +98,14 @@ export default function GithubCredentialsSection({
             rel="noopener noreferrer"
             className="text-xs text-primary hover:underline block"
           >
-            {t('apiKeys.github.form.howToCreate')}
+            {"How to create a GitHub Personal Access Token \u2192"}
           </a>
         </div>
       )}
 
       <div className="space-y-2">
         {githubCredentials.length === 0 ? (
-          <p className="text-sm text-muted-foreground italic">{t('apiKeys.github.empty')}</p>
+          <p className="text-sm text-muted-foreground italic">{"No GitHub tokens added yet."}</p>
         ) : (
           githubCredentials.map((credential) => (
             <div key={credential.id} className="flex items-center justify-between p-3 border rounded-lg">
@@ -118,7 +115,7 @@ export default function GithubCredentialsSection({
                   <div className="text-xs text-muted-foreground">{credential.description}</div>
                 )}
                 <div className="text-xs text-muted-foreground mt-1">
-                  {t('apiKeys.github.added')} {new Date(credential.created_at).toLocaleDateString()}
+                  {"Added:"} {new Date(credential.created_at).toLocaleDateString()}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -127,7 +124,7 @@ export default function GithubCredentialsSection({
                   variant={credential.is_active ? 'outline' : 'secondary'}
                   onClick={() => onToggleGithubCredential(credential.id, credential.is_active)}
                 >
-                  {credential.is_active ? t('apiKeys.status.active') : t('apiKeys.status.inactive')}
+                  {credential.is_active ? "Active" : "Inactive"}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => onDeleteGithubCredential(credential.id)}>
                   <Trash2 className="h-4 w-4" />

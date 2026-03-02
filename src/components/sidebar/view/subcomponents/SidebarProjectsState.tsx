@@ -1,5 +1,4 @@
 import { Folder, Search } from 'lucide-react';
-import type { TFunction } from 'i18next';
 import type { LoadingProgress } from '../../../../types/app';
 
 type SidebarProjectsStateProps = {
@@ -7,7 +6,6 @@ type SidebarProjectsStateProps = {
   loadingProgress: LoadingProgress | null;
   projectsCount: number;
   filteredProjectsCount: number;
-  t: TFunction;
 };
 
 export default function SidebarProjectsState({
@@ -15,7 +13,6 @@ export default function SidebarProjectsState({
   loadingProgress,
   projectsCount,
   filteredProjectsCount,
-  t,
 }: SidebarProjectsStateProps) {
   if (isLoading) {
     return (
@@ -23,7 +20,7 @@ export default function SidebarProjectsState({
         <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4 md:mb-3">
           <div className="w-6 h-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
         </div>
-        <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">{t('projects.loadingProjects')}</h3>
+        <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">{"Loading projects..."}</h3>
         {loadingProgress && loadingProgress.total > 0 ? (
           <div className="space-y-2">
             <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
@@ -33,7 +30,7 @@ export default function SidebarProjectsState({
               />
             </div>
             <p className="text-sm text-muted-foreground">
-              {loadingProgress.current}/{loadingProgress.total} {t('projects.projects')}
+              {loadingProgress.current}/{loadingProgress.total} {"projects"}
             </p>
             {loadingProgress.currentProject && (
               <p
@@ -45,7 +42,7 @@ export default function SidebarProjectsState({
             )}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">{t('projects.fetchingProjects')}</p>
+          <p className="text-sm text-muted-foreground">{"Fetching your Claude projects and sessions"}</p>
         )}
       </div>
     );
@@ -57,8 +54,8 @@ export default function SidebarProjectsState({
         <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4 md:mb-3">
           <Folder className="w-6 h-6 text-muted-foreground" />
         </div>
-        <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">{t('projects.noProjects')}</h3>
-        <p className="text-sm text-muted-foreground">{t('projects.runClaudeCli')}</p>
+        <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">{"No projects found"}</h3>
+        <p className="text-sm text-muted-foreground">{"Run Claude CLI in a project directory to get started"}</p>
       </div>
     );
   }
@@ -69,8 +66,8 @@ export default function SidebarProjectsState({
         <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center mx-auto mb-4 md:mb-3">
           <Search className="w-6 h-6 text-muted-foreground" />
         </div>
-        <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">{t('projects.noMatchingProjects')}</h3>
-        <p className="text-sm text-muted-foreground">{t('projects.tryDifferentSearch')}</p>
+        <h3 className="text-base font-medium text-foreground mb-2 md:mb-1">{"No matching projects"}</h3>
+        <p className="text-sm text-muted-foreground">{"Try adjusting your search term"}</p>
       </div>
     );
   }

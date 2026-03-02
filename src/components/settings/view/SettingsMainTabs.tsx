@@ -1,5 +1,4 @@
 import { GitBranch, Key } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import type { SettingsMainTab } from '../types/types';
 
 type SettingsMainTabsProps = {
@@ -9,24 +8,22 @@ type SettingsMainTabsProps = {
 
 type MainTabConfig = {
   id: SettingsMainTab;
-  labelKey: string;
+  label: string;
   icon?: typeof GitBranch;
 };
 
 const TAB_CONFIG: MainTabConfig[] = [
-  { id: 'agents', labelKey: 'mainTabs.agents' },
-  { id: 'appearance', labelKey: 'mainTabs.appearance' },
-  { id: 'git', labelKey: 'mainTabs.git', icon: GitBranch },
-  { id: 'api', labelKey: 'mainTabs.apiTokens', icon: Key },
-  { id: 'tasks', labelKey: 'mainTabs.tasks' },
+  { id: 'agents', label: 'Agents' },
+  { id: 'appearance', label: 'Appearance' },
+  { id: 'git', label: 'Git', icon: GitBranch },
+  { id: 'api', label: 'API & Tokens', icon: Key },
+  { id: 'tasks', label: 'Tasks' },
 ];
 
 export default function SettingsMainTabs({ activeTab, onChange }: SettingsMainTabsProps) {
-  const { t } = useTranslation('settings');
-
   return (
     <div className="border-b border-border">
-       <div className="flex px-4 md:px-6" role="tablist" aria-label={t('mainTabs.label', { defaultValue: 'Settings' })}>
+       <div className="flex px-4 md:px-6" role="tablist" aria-label="Settings">
         {TAB_CONFIG.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -44,7 +41,7 @@ export default function SettingsMainTabs({ activeTab, onChange }: SettingsMainTa
               }`}
             >
               {Icon && <Icon className="w-4 h-4 inline mr-2" />}
-              {t(tab.labelKey)}
+              {tab.label}
             </button>
           );
         })}

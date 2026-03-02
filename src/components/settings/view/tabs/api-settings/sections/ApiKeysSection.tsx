@@ -1,5 +1,4 @@
 import { ExternalLink, Key, Plus, Trash2 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '../../../../../ui/button';
 import { Input } from '../../../../../ui/input';
 import type { ApiKeyItem } from '../types';
@@ -27,30 +26,28 @@ export default function ApiKeysSection({
   onToggleApiKey,
   onDeleteApiKey,
 }: ApiKeysSectionProps) {
-  const { t } = useTranslation('settings');
-
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Key className="h-5 w-5" />
-          <h3 className="text-lg font-semibold">{t('apiKeys.title')}</h3>
+          <h3 className="text-lg font-semibold">{"API Keys"}</h3>
         </div>
         <Button size="sm" onClick={() => onShowNewKeyFormChange(!showNewKeyForm)}>
           <Plus className="h-4 w-4 mr-1" />
-          {t('apiKeys.newButton')}
+          {"New API Key"}
         </Button>
       </div>
 
       <div className="mb-4">
-        <p className="text-sm text-muted-foreground mb-2">{t('apiKeys.description')}</p>
+        <p className="text-sm text-muted-foreground mb-2">{"Generate API keys to access the external API from other applications."}</p>
         <a
           href="/api-docs.html"
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-primary hover:underline inline-flex items-center gap-1"
         >
-          {t('apiKeys.apiDocsLink')}
+          {"API Documentation"}
           <ExternalLink className="h-3 w-3" />
         </a>
       </div>
@@ -58,15 +55,15 @@ export default function ApiKeysSection({
       {showNewKeyForm && (
         <div className="mb-4 p-4 border rounded-lg bg-card">
           <Input
-            placeholder={t('apiKeys.form.placeholder')}
+            placeholder={"API Key Name (e.g., Production Server)"}
             value={newKeyName}
             onChange={(event) => onNewKeyNameChange(event.target.value)}
             className="mb-2"
           />
           <div className="flex gap-2">
-            <Button onClick={onCreateApiKey}>{t('apiKeys.form.createButton')}</Button>
+            <Button onClick={onCreateApiKey}>{"Create"}</Button>
             <Button variant="outline" onClick={onCancelCreateApiKey}>
-              {t('apiKeys.form.cancelButton')}
+              {"Cancel"}
             </Button>
           </div>
         </div>
@@ -74,7 +71,7 @@ export default function ApiKeysSection({
 
       <div className="space-y-2">
         {apiKeys.length === 0 ? (
-          <p className="text-sm text-muted-foreground italic">{t('apiKeys.empty')}</p>
+          <p className="text-sm text-muted-foreground italic">{"No API keys created yet."}</p>
         ) : (
           apiKeys.map((key) => (
             <div key={key.id} className="flex items-center justify-between p-3 border rounded-lg">
@@ -82,9 +79,9 @@ export default function ApiKeysSection({
                 <div className="font-medium">{key.key_name}</div>
                 <code className="text-xs text-muted-foreground">{key.api_key}</code>
                 <div className="text-xs text-muted-foreground mt-1">
-                  {t('apiKeys.list.created')} {new Date(key.created_at).toLocaleDateString()}
+                  {"Created:"} {new Date(key.created_at).toLocaleDateString()}
                   {key.last_used
-                    ? ` - ${t('apiKeys.list.lastUsed')} ${new Date(key.last_used).toLocaleDateString()}`
+                    ? ` - ${"Last used:"} ${new Date(key.last_used).toLocaleDateString()}`
                     : ''}
                 </div>
               </div>
@@ -94,7 +91,7 @@ export default function ApiKeysSection({
                   variant={key.is_active ? 'outline' : 'secondary'}
                   onClick={() => onToggleApiKey(key.id, key.is_active)}
                 >
-                  {key.is_active ? t('apiKeys.status.active') : t('apiKeys.status.inactive')}
+                  {key.is_active ? "Active" : "Inactive"}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => onDeleteApiKey(key.id)}>
                   <Trash2 className="h-4 w-4" />

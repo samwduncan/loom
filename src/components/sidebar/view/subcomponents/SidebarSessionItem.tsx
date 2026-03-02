@@ -1,7 +1,6 @@
 import { Badge } from '../../../ui/badge';
 import { Button } from '../../../ui/button';
 import { Check, Clock, Edit2, Trash2, X } from 'lucide-react';
-import type { TFunction } from 'i18next';
 import { cn } from '../../../../lib/utils';
 import { formatTimeAgo } from '../../../../utils/dateUtils';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
@@ -29,7 +28,6 @@ type SidebarSessionItemProps = {
     provider: SessionProvider,
   ) => void;
   touchHandlerFactory: TouchHandlerFactory;
-  t: TFunction;
 };
 
 export default function SidebarSessionItem({
@@ -47,9 +45,8 @@ export default function SidebarSessionItem({
   onSessionSelect,
   onDeleteSession,
   touchHandlerFactory,
-  t,
 }: SidebarSessionItemProps) {
-  const sessionView = createSessionViewModel(session, currentTime, t);
+  const sessionView = createSessionViewModel(session, currentTime);
   const isSelected = selectedSession?.id === session.id;
 
   const selectMobileSession = () => {
@@ -99,7 +96,7 @@ export default function SidebarSessionItem({
               <div className="flex items-center gap-1 mt-0.5">
                 <Clock className="w-2.5 h-2.5 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  {formatTimeAgo(sessionView.sessionTime, currentTime, t)}
+                  {formatTimeAgo(sessionView.sessionTime, currentTime)}
                 </span>
                 {sessionView.messageCount > 0 && (
                   <Badge variant="secondary" className="text-xs px-1 py-0 ml-auto">
@@ -143,7 +140,7 @@ export default function SidebarSessionItem({
               <div className="flex items-center gap-1 mt-0.5">
                 <Clock className="w-2.5 h-2.5 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  {formatTimeAgo(sessionView.sessionTime, currentTime, t)}
+                  {formatTimeAgo(sessionView.sessionTime, currentTime)}
                 </span>
                 {sessionView.messageCount > 0 && (
                   <Badge
@@ -187,7 +184,7 @@ export default function SidebarSessionItem({
                     event.stopPropagation();
                     saveEditedSession();
                   }}
-                  title={t('tooltips.save')}
+                  title={"Save"}
                 >
                   <Check className="w-3 h-3 text-green-600 text-green-400" />
                 </button>
@@ -197,7 +194,7 @@ export default function SidebarSessionItem({
                     event.stopPropagation();
                     onCancelEditingSession();
                   }}
-                  title={t('tooltips.cancel')}
+                  title={"Cancel"}
                 >
                   <X className="w-3 h-3 text-gray-600 text-gray-400" />
                 </button>
@@ -209,9 +206,9 @@ export default function SidebarSessionItem({
                     className="w-6 h-6 bg-gray-50 hover:bg-gray-100 bg-gray-900/20 hover:bg-gray-900/40 rounded flex items-center justify-center"
                     onClick={(event) => {
                       event.stopPropagation();
-                      onStartEditingSession(session.id, session.summary || t('projects.newSession'));
+                      onStartEditingSession(session.id, session.summary || 'New Session');
                     }}
-                    title={t('tooltips.editSessionName')}
+                    title={"Manually edit session name"}
                   >
                     <Edit2 className="w-3 h-3 text-gray-600 text-gray-400" />
                   </button>
@@ -222,7 +219,7 @@ export default function SidebarSessionItem({
                     event.stopPropagation();
                     requestDeleteSession();
                   }}
-                  title={t('tooltips.deleteSession')}
+                  title={"Delete this session permanently"}
                 >
                   <Trash2 className="w-3 h-3 text-red-600 text-red-400" />
                 </button>

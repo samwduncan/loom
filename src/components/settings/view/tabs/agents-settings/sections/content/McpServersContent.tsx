@@ -1,5 +1,4 @@
 import { Edit3, Globe, Plus, Server, Terminal, Trash2, Zap } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Badge } from '../../../../../../ui/badge';
 import { Button } from '../../../../../../ui/button';
 import type { McpServer, McpToolsResult, McpTestResult } from '../../../../../types/types';
@@ -52,20 +51,18 @@ function ClaudeMcpServers({
   serverTools,
   deleteError,
 }: Omit<ClaudeMcpServersProps, 'agent' | 'onTest' | 'onDiscoverTools' | 'toolsLoading'>) {
-  const { t } = useTranslation('settings');
-
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <Server className="w-5 h-5 text-purple-500" />
-        <h3 className="text-lg font-medium text-foreground">{t('mcpServers.title')}</h3>
+        <h3 className="text-lg font-medium text-foreground">{"MCP Servers"}</h3>
       </div>
-      <p className="text-sm text-muted-foreground">{t('mcpServers.description.claude')}</p>
+      <p className="text-sm text-muted-foreground">{"Model Context Protocol servers provide additional tools and data sources to Claude"}</p>
 
       <div className="flex justify-between items-center">
         <Button onClick={onAdd} className="bg-purple-600 hover:bg-purple-700 text-white" size="sm">
           <Plus className="w-4 h-4 mr-2" />
-          {t('mcpServers.addButton')}
+          {"Add MCP Server"}
         </Button>
       </div>
       {deleteError && (
@@ -92,9 +89,9 @@ function ClaudeMcpServers({
                     </Badge>
                     <Badge variant="outline" className="text-xs">
                       {server.scope === 'local'
-                        ? t('mcpServers.scope.local')
+                        ? "local"
                         : server.scope === 'user'
-                        ? t('mcpServers.scope.user')
+                        ? "user"
                         : server.scope}
                     </Badge>
                   </div>
@@ -102,19 +99,19 @@ function ClaudeMcpServers({
                   <div className="text-sm text-muted-foreground space-y-1">
                     {server.type === 'stdio' && server.config?.command && (
                       <div>
-                        {t('mcpServers.config.command')}:{' '}
+                        {"Command"}:{' '}
                         <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.command}</code>
                       </div>
                     )}
                     {(server.type === 'sse' || server.type === 'http') && server.config?.url && (
                       <div>
-                        {t('mcpServers.config.url')}:{' '}
+                        {"URL"}:{' '}
                         <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.url}</code>
                       </div>
                     )}
                     {server.config?.args && server.config.args.length > 0 && (
                       <div>
-                        {t('mcpServers.config.args')}:{' '}
+                        {"Args"}:{' '}
                         <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.args.join(' ')}</code>
                       </div>
                     )}
@@ -134,7 +131,7 @@ function ClaudeMcpServers({
                   {toolsResult && toolsResult.tools && toolsResult.tools.length > 0 && (
                     <div className="mt-2 p-2 rounded text-xs bg-blue-50 bg-blue-900/20 text-blue-800 text-blue-200">
                       <div className="font-medium">
-                        {t('mcpServers.tools.title')} {t('mcpServers.tools.count', { count: toolsResult.tools.length })}
+                        {"Tools"} {`(${toolsResult.tools.length}):`}
                       </div>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {toolsResult.tools.slice(0, 5).map((tool, index) => (
@@ -144,7 +141,7 @@ function ClaudeMcpServers({
                         ))}
                         {toolsResult.tools.length > 5 && (
                           <span className="text-xs opacity-75">
-                            {t('mcpServers.tools.more', { count: toolsResult.tools.length - 5 })}
+                            {`+${toolsResult.tools.length - 5} more`}
                           </span>
                         )}
                       </div>
@@ -158,7 +155,7 @@ function ClaudeMcpServers({
                     variant="ghost"
                     size="sm"
                     className="text-gray-600 hover:text-gray-700"
-                    title={t('mcpServers.actions.edit')}
+                    title="Edit server"
                   >
                     <Edit3 className="w-4 h-4" />
                   </Button>
@@ -167,7 +164,7 @@ function ClaudeMcpServers({
                     variant="ghost"
                     size="sm"
                     className="text-red-600 hover:text-red-700"
-                    title={t('mcpServers.actions.delete')}
+                    title="Delete server"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -177,7 +174,7 @@ function ClaudeMcpServers({
           );
         })}
         {servers.length === 0 && (
-          <div className="text-center py-8 text-gray-500 text-gray-400">{t('mcpServers.empty')}</div>
+          <div className="text-center py-8 text-gray-500 text-gray-400">{"No MCP servers configured"}</div>
         )}
       </div>
     </div>
@@ -193,20 +190,18 @@ type CursorMcpServersProps = {
 };
 
 function CursorMcpServers({ servers, onAdd, onEdit, onDelete }: Omit<CursorMcpServersProps, 'agent'>) {
-  const { t } = useTranslation('settings');
-
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <Server className="w-5 h-5 text-purple-500" />
-        <h3 className="text-lg font-medium text-foreground">{t('mcpServers.title')}</h3>
+        <h3 className="text-lg font-medium text-foreground">{"MCP Servers"}</h3>
       </div>
-      <p className="text-sm text-muted-foreground">{t('mcpServers.description.cursor')}</p>
+      <p className="text-sm text-muted-foreground">{"Model Context Protocol servers provide additional tools and data sources to Cursor"}</p>
 
       <div className="flex justify-between items-center">
         <Button onClick={onAdd} className="bg-purple-600 hover:bg-purple-700 text-white" size="sm">
           <Plus className="w-4 h-4 mr-2" />
-          {t('mcpServers.addButton')}
+          {"Add MCP Server"}
         </Button>
       </div>
 
@@ -226,7 +221,7 @@ function CursorMcpServers({ servers, onAdd, onEdit, onDelete }: Omit<CursorMcpSe
                   <div className="text-sm text-muted-foreground">
                     {server.config?.command && (
                       <div>
-                        {t('mcpServers.config.command')}:{' '}
+                        {"Command"}:{' '}
                         <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.command}</code>
                       </div>
                     )}
@@ -238,7 +233,7 @@ function CursorMcpServers({ servers, onAdd, onEdit, onDelete }: Omit<CursorMcpSe
                     variant="ghost"
                     size="sm"
                     className="text-gray-600 hover:text-gray-700"
-                    title={t('mcpServers.actions.edit')}
+                    title="Edit server"
                   >
                     <Edit3 className="w-4 h-4" />
                   </Button>
@@ -247,7 +242,7 @@ function CursorMcpServers({ servers, onAdd, onEdit, onDelete }: Omit<CursorMcpSe
                     variant="ghost"
                     size="sm"
                     className="text-red-600 hover:text-red-700"
-                    title={t('mcpServers.actions.delete')}
+                    title="Delete server"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -257,7 +252,7 @@ function CursorMcpServers({ servers, onAdd, onEdit, onDelete }: Omit<CursorMcpSe
           );
         })}
         {servers.length === 0 && (
-          <div className="text-center py-8 text-gray-500 text-gray-400">{t('mcpServers.empty')}</div>
+          <div className="text-center py-8 text-gray-500 text-gray-400">{"No MCP servers configured"}</div>
         )}
       </div>
     </div>
@@ -274,20 +269,18 @@ type CodexMcpServersProps = {
 };
 
 function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit<CodexMcpServersProps, 'agent'>) {
-  const { t } = useTranslation('settings');
-
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <Server className="w-5 h-5 text-gray-700 text-gray-300" />
-        <h3 className="text-lg font-medium text-foreground">{t('mcpServers.title')}</h3>
+        <h3 className="text-lg font-medium text-foreground">{"MCP Servers"}</h3>
       </div>
-      <p className="text-sm text-muted-foreground">{t('mcpServers.description.codex')}</p>
+      <p className="text-sm text-muted-foreground">{"Model Context Protocol servers provide additional tools and data sources to Codex"}</p>
 
       <div className="flex justify-between items-center">
         <Button onClick={onAdd} className="bg-gray-800 hover:bg-gray-900 bg-gray-700 hover:bg-gray-600 text-white" size="sm">
           <Plus className="w-4 h-4 mr-2" />
-          {t('mcpServers.addButton')}
+          {"Add MCP Server"}
         </Button>
       </div>
       {deleteError && (
@@ -310,19 +303,19 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
                 <div className="text-sm text-muted-foreground space-y-1">
                   {server.config?.command && (
                     <div>
-                      {t('mcpServers.config.command')}:{' '}
+                      {"Command"}:{' '}
                       <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.command}</code>
                     </div>
                   )}
                   {server.config?.args && server.config.args.length > 0 && (
                     <div>
-                      {t('mcpServers.config.args')}:{' '}
+                      {"Args"}:{' '}
                       <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.args.join(' ')}</code>
                     </div>
                   )}
                   {server.config?.env && Object.keys(server.config.env).length > 0 && (
                     <div>
-                      {t('mcpServers.config.environment')}:{' '}
+                      {"Environment"}:{' '}
                       <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">
                         {Object.entries(server.config.env).map(([key, value]) => `${key}=${maskSecret(value)}`).join(', ')}
                       </code>
@@ -337,7 +330,7 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
                   variant="ghost"
                   size="sm"
                   className="text-gray-600 hover:text-gray-700"
-                  title={t('mcpServers.actions.edit')}
+                  title="Edit server"
                 >
                   <Edit3 className="w-4 h-4" />
                 </Button>
@@ -346,7 +339,7 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
                   variant="ghost"
                   size="sm"
                   className="text-red-600 hover:text-red-700"
-                  title={t('mcpServers.actions.delete')}
+                  title="Delete server"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -355,13 +348,13 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
           </div>
         ))}
         {servers.length === 0 && (
-          <div className="text-center py-8 text-gray-500 text-gray-400">{t('mcpServers.empty')}</div>
+          <div className="text-center py-8 text-gray-500 text-gray-400">{"No MCP servers configured"}</div>
         )}
       </div>
 
       <div className="bg-gray-100 bg-gray-800/50 border border-gray-300 border-gray-600 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 text-gray-100 mb-2">{t('mcpServers.help.title')}</h4>
-        <p className="text-sm text-gray-700 text-gray-300">{t('mcpServers.help.description')}</p>
+        <h4 className="font-medium text-gray-900 text-gray-100 mb-2">{"About Codex MCP"}</h4>
+        <p className="text-sm text-gray-700 text-gray-300">{"Codex supports stdio-based MCP servers. You can add servers that extend Codex's capabilities with additional tools and resources."}</p>
       </div>
     </div>
   );

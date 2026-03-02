@@ -1,5 +1,4 @@
 import { ScrollArea } from '../../../ui/scroll-area';
-import type { TFunction } from 'i18next';
 import type { Project } from '../../../../types/app';
 import type { ReleaseInfo } from '../../../../types/sharedTypes';
 import SidebarFooter from './SidebarFooter';
@@ -24,7 +23,6 @@ type SidebarContentProps = {
   onShowVersionModal: () => void;
   onShowSettings: () => void;
   projectListProps: SidebarProjectListProps;
-  t: TFunction;
 };
 
 export default function SidebarContent({
@@ -45,7 +43,6 @@ export default function SidebarContent({
   onShowVersionModal,
   onShowSettings,
   projectListProps,
-  t,
 }: SidebarContentProps) {
   return (
     <div
@@ -64,7 +61,6 @@ export default function SidebarContent({
         isRefreshing={isRefreshing}
         onCreateProject={onCreateProject}
         onCollapseSidebar={onCollapseSidebar}
-        t={t}
       />
 
       <ScrollArea className="flex-1 md:px-1.5 md:py-2 overflow-y-auto overscroll-contain">
@@ -77,7 +73,6 @@ export default function SidebarContent({
         latestVersion={latestVersion}
         onShowVersionModal={onShowVersionModal}
         onShowSettings={onShowSettings}
-        t={t}
       />
     </div>
   );

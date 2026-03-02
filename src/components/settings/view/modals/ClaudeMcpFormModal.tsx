@@ -1,7 +1,6 @@
 import { FolderOpen, Globe, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Input } from '../../../ui/input';
 import { Button } from '../../../ui/button';
 import { DEFAULT_CLAUDE_MCP_FORM } from '../../constants/constants';
@@ -54,7 +53,6 @@ export default function ClaudeMcpFormModal({
   onClose,
   onSubmit,
 }: ClaudeMcpFormModalProps) {
-  const { t } = useTranslation('settings');
   const [formData, setFormData] = useState<ClaudeMcpFormState>(DEFAULT_CLAUDE_MCP_FORM);
   const [jsonValidationError, setJsonValidationError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -121,16 +119,16 @@ export default function ClaudeMcpFormModal({
     try {
       const parsed = JSON.parse(value) as { type?: string; command?: string; url?: string };
       if (!parsed.type) {
-        setJsonValidationError(t('mcpForm.validation.missingType'));
+        setJsonValidationError('Missing required field: type');
       } else if (parsed.type === 'stdio' && !parsed.command) {
-        setJsonValidationError(t('mcpForm.validation.stdioRequiresCommand'));
+        setJsonValidationError('stdio type requires a command field');
       } else if ((parsed.type === 'http' || parsed.type === 'sse') && !parsed.url) {
-        setJsonValidationError(t('mcpForm.validation.httpRequiresUrl', { type: parsed.type }));
+        setJsonValidationError(`${parsed.type} type requires a url field`);
       } else {
         setJsonValidationError('');
       }
     } catch {
-      setJsonValidationError(t('mcpForm.validation.invalidJson'));
+      setJsonValidationError('Invalid JSON format');
     }
   };
 
@@ -152,7 +150,7 @@ export default function ClaudeMcpFormModal({
       <div className="bg-background border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h3 className="text-lg font-medium text-foreground">
-            {isEditing ? t('mcpForm.title.edit') : t('mcpForm.title.add')}
+            {isEditing ? "Edit MCP Server" : "Add MCP Server"}
           </h3>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
@@ -171,7 +169,7 @@ export default function ClaudeMcpFormModal({
                     : 'bg-gray-100 bg-gray-800 text-gray-700 text-gray-300 hover:bg-gray-200 hover:bg-gray-700'
                 }`}
               >
-                {t('mcpForm.importMode.form')}
+                {"Form Input"}
               </button>
               <button
                 type="button"
@@ -182,7 +180,7 @@ export default function ClaudeMcpFormModal({
                     : 'bg-gray-100 bg-gray-800 text-gray-700 text-gray-300 hover:bg-gray-200 hover:bg-gray-700'
                 }`}
               >
-                {t('mcpForm.importMode.json')}
+                {"JSON Import"}
               </button>
             </div>
           )}
@@ -190,18 +188,18 @@ export default function ClaudeMcpFormModal({
           {formData.importMode === 'form' && isEditing && (
             <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-3">
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('mcpForm.scope.label')}
+                {"Scope"}
               </label>
               <div className="flex items-center gap-2">
                 {formData.scope === 'user' ? <Globe className="w-4 h-4" /> : <FolderOpen className="w-4 h-4" />}
                 <span className="text-sm">
-                  {formData.scope === 'user' ? t('mcpForm.scope.userGlobal') : t('mcpForm.scope.projectLocal')}
+                  {formData.scope === 'user' ? "User (Global)" : "Project (Local)"}
                 </span>
                 {formData.scope === 'local' && formData.projectPath && (
                   <span className="text-xs text-muted-foreground">- {formData.projectPath}</span>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground mt-2">{t('mcpForm.scope.cannotChange')}</p>
+              <p className="text-xs text-muted-foreground mt-2">{"Scope cannot be changed when editing an existing server"}</p>
             </div>
           )}
 
@@ -209,7 +207,7 @@ export default function ClaudeMcpFormModal({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  {t('mcpForm.scope.label')} *
+                  {"Scope"} *
                 </label>
                 <div className="flex gap-2">
                   <button
@@ -223,7 +221,7 @@ export default function ClaudeMcpFormModal({
                   >
                     <div className="flex items-center justify-center gap-2">
                       <Globe className="w-4 h-4" />
-                      <span>{t('mcpForm.scope.userGlobal')}</span>
+                      <span>{"User (Global)"}</span>
                     </div>
                   </button>
                   <button
@@ -237,21 +235,21 @@ export default function ClaudeMcpFormModal({
                   >
                     <div className="flex items-center justify-center gap-2">
                       <FolderOpen className="w-4 h-4" />
-                      <span>{t('mcpForm.scope.projectLocal')}</span>
+                      <span>{"Project (Local)"}</span>
                     </div>
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
                   {formData.scope === 'user'
-                    ? t('mcpForm.scope.userDescription')
-                    : t('mcpForm.scope.projectDescription')}
+                    ? "User scope: Available across all projects on your machine"
+                    : "Local scope: Only available in the selected project"}
                 </p>
               </div>
 
               {formData.scope === 'local' && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    {t('mcpForm.fields.selectProject')} *
+                    {"Select a project..."} *
                   </label>
                   <select
                     value={formData.projectPath}
@@ -261,7 +259,7 @@ export default function ClaudeMcpFormModal({
                     className="w-full px-3 py-2 border border-gray-300 border-gray-600 bg-gray-50 bg-gray-800 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                     required
                   >
-                    <option value="">{t('mcpForm.fields.selectProject')}...</option>
+                    <option value="">{"Select a project..."}...</option>
                     {projects.map((project) => (
                       <option key={project.name} value={project.path || project.fullPath}>
                         {project.displayName || project.name}
@@ -270,7 +268,7 @@ export default function ClaudeMcpFormModal({
                   </select>
                   {formData.projectPath && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      {t('mcpForm.projectPath', { path: formData.projectPath })}
+                      {`Path: ${formData.projectPath}`}
                     </p>
                   )}
                 </div>
@@ -281,12 +279,12 @@ export default function ClaudeMcpFormModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className={formData.importMode === 'json' ? 'md:col-span-2' : ''}>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('mcpForm.fields.serverName')} *
+                {"Server Name"} *
               </label>
               <Input
                 value={formData.name}
                 onChange={(event) => setFormData((prev) => ({ ...prev, name: event.target.value }))}
-                placeholder={t('mcpForm.placeholders.serverName')}
+                placeholder="my-server"
                 required
               />
             </div>
@@ -294,7 +292,7 @@ export default function ClaudeMcpFormModal({
             {formData.importMode === 'form' && (
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  {t('mcpForm.fields.transportType')} *
+                  {"Transport Type"} *
                 </label>
                 <select
                   value={formData.type}
@@ -317,9 +315,7 @@ export default function ClaudeMcpFormModal({
           {isEditing && Boolean(formData.raw) && formData.importMode === 'form' && (
             <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
               <h4 className="text-sm font-medium text-foreground mb-2">
-                {t('mcpForm.configDetails', {
-                  configFile: editingServer?.scope === 'global' ? '~/.claude.json' : 'project config',
-                })}
+                {`Configuration Details (from ${editingServer?.scope === 'global' ? '~/.claude.json' : 'project config'})`}
               </h4>
               <pre className="text-xs bg-gray-100 bg-gray-800 p-3 rounded overflow-x-auto">
                 {JSON.stringify(formData.raw, null, 2)}
@@ -331,7 +327,7 @@ export default function ClaudeMcpFormModal({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  {t('mcpForm.fields.jsonConfig')} *
+                  {"JSON Configuration"} *
                 </label>
                 <textarea
                   value={formData.jsonInput}
@@ -351,7 +347,7 @@ export default function ClaudeMcpFormModal({
                   <p className="text-xs text-red-500 mt-1">{jsonValidationError}</p>
                 )}
                 <p className="text-xs text-muted-foreground mt-2">
-                  {t('mcpForm.validation.jsonHelp')}
+                  {"Paste your MCP server configuration in JSON format. Example formats:"}
                   <br />
                   - stdio: {`{"type":"stdio","command":"npx","args":["@upstash/context7-mcp"]}`}
                   <br />
@@ -365,7 +361,7 @@ export default function ClaudeMcpFormModal({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  {t('mcpForm.fields.command')} *
+                  {"Command"} *
                 </label>
                 <Input
                   value={formData.config.command}
@@ -377,7 +373,7 @@ export default function ClaudeMcpFormModal({
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  {t('mcpForm.fields.arguments')}
+                  {"Arguments (one per line)"}
                 </label>
                 <textarea
                   value={formData.config.args.join('\n')}
@@ -396,7 +392,7 @@ export default function ClaudeMcpFormModal({
           {formData.importMode === 'form' && (formData.type === 'sse' || formData.type === 'http') && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('mcpForm.fields.url')} *
+                {"URL"} *
               </label>
               <Input
                 value={formData.config.url}
@@ -411,7 +407,7 @@ export default function ClaudeMcpFormModal({
           {formData.importMode === 'form' && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('mcpForm.fields.envVars')}
+                {"Environment Variables (KEY=value, one per line)"}
               </label>
               <textarea
                 value={Object.entries(formData.config.env).map(([key, value]) => `${key}=${value}`).join('\n')}
@@ -435,7 +431,7 @@ export default function ClaudeMcpFormModal({
           {formData.importMode === 'form' && (formData.type === 'sse' || formData.type === 'http') && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {t('mcpForm.fields.headers')}
+                {"Headers (KEY=value, one per line)"}
               </label>
               <textarea
                 value={Object.entries(formData.config.headers).map(([key, value]) => `${key}=${value}`).join('\n')}
@@ -458,7 +454,7 @@ export default function ClaudeMcpFormModal({
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t('mcpForm.actions.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               type="submit"
@@ -466,10 +462,10 @@ export default function ClaudeMcpFormModal({
               className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50"
             >
               {isSubmitting
-                ? t('mcpForm.actions.saving')
+                ? "Saving..."
                 : isEditing
-                ? t('mcpForm.actions.updateServer')
-                : t('mcpForm.actions.addServer')}
+                ? "Update Server"
+                : "Add Server"}
             </Button>
           </div>
         </form>

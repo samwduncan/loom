@@ -1,5 +1,4 @@
 import { Settings, ArrowUpCircle } from 'lucide-react';
-import type { TFunction } from 'i18next';
 import type { ReleaseInfo } from '../../../../types/sharedTypes';
 
 type SidebarFooterProps = {
@@ -8,7 +7,6 @@ type SidebarFooterProps = {
   latestVersion: string | null;
   onShowVersionModal: () => void;
   onShowSettings: () => void;
-  t: TFunction;
 };
 
 export default function SidebarFooter({
@@ -17,7 +15,6 @@ export default function SidebarFooter({
   latestVersion,
   onShowVersionModal,
   onShowSettings,
-  t,
 }: SidebarFooterProps) {
   return (
     <div className="flex-shrink-0" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0)' }}>
@@ -40,7 +37,7 @@ export default function SidebarFooter({
                   {releaseInfo?.title || `v${latestVersion}`}
                 </span>
                 <span className="text-[10px] text-blue-500/70 text-blue-400/60">
-                  {t('version.updateAvailable')}
+                  {"Update available"}
                 </span>
               </div>
             </button>
@@ -61,7 +58,7 @@ export default function SidebarFooter({
                   {releaseInfo?.title || `v${latestVersion}`}
                 </span>
                 <span className="text-xs text-blue-500/70 text-blue-400/60">
-                  {t('version.updateAvailable')}
+                  {"Update available"}
                 </span>
               </div>
             </button>
@@ -79,7 +76,7 @@ export default function SidebarFooter({
           onClick={onShowSettings}
         >
           <Settings className="w-3.5 h-3.5" />
-          <span className="text-sm">{t('actions.settings')}</span>
+          <span className="text-sm">{"Settings"}</span>
         </button>
       </div>
 
@@ -92,7 +89,7 @@ export default function SidebarFooter({
           <div className="w-8 h-8 rounded-xl bg-background/80 flex items-center justify-center">
             <Settings className="w-4.5 h-4.5 text-muted-foreground" />
           </div>
-          <span className="text-base font-medium text-foreground">{t('actions.settings')}</span>
+          <span className="text-base font-medium text-foreground">{"Settings"}</span>
         </button>
       </div>
     </div>

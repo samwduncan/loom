@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { useVersionCheck } from '../../../../../hooks/useVersionCheck';
 import { useCredentialsSettings } from '../../../hooks/useCredentialsSettings';
 import ApiKeysSection from './sections/ApiKeysSection';
@@ -7,7 +6,6 @@ import NewApiKeyAlert from './sections/NewApiKeyAlert';
 import VersionInfoSection from './sections/VersionInfoSection';
 
 export default function CredentialsSettingsTab() {
-  const { t } = useTranslation('settings');
   const { updateAvailable, latestVersion, currentVersion, releaseInfo } = useVersionCheck('siteboon', 'claudecodeui');
   const {
     apiKeys,
@@ -40,12 +38,12 @@ export default function CredentialsSettingsTab() {
     cancelNewGithubForm,
     toggleNewGithubTokenVisibility,
   } = useCredentialsSettings({
-    confirmDeleteApiKeyText: t('apiKeys.confirmDelete'),
-    confirmDeleteGithubCredentialText: t('apiKeys.github.confirmDelete'),
+    confirmDeleteApiKeyText: "Are you sure you want to delete this API key?",
+    confirmDeleteGithubCredentialText: "Are you sure you want to delete this GitHub token?",
   });
 
   if (loading) {
-    return <div className="text-muted-foreground">{t('apiKeys.loading')}</div>;
+    return <div className="text-muted-foreground">{"Loading..."}</div>;
   }
 
   return (

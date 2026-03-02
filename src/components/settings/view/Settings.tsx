@@ -1,5 +1,4 @@
 import { Settings as SettingsIcon, X } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import LoginModal from '../../LoginModal';
 import { Button } from '../../ui/button';
 import ClaudeMcpFormModal from '../view/modals/ClaudeMcpFormModal';
@@ -25,7 +24,6 @@ type LoginModalProps = {
 const LoginModalComponent = LoginModal as unknown as (props: LoginModalProps) => JSX.Element;
 
 function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: SettingsProps) {
-  const { t } = useTranslation('settings');
   const {
     activeTab,
     setActiveTab,
@@ -100,7 +98,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3">
             <SettingsIcon className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-            <h2 className="text-lg md:text-xl font-semibold text-foreground">{t('title')}</h2>
+            <h2 className="text-lg md:text-xl font-semibold text-foreground">{"Settings"}</h2>
           </div>
           <Button
             variant="ghost"
@@ -186,7 +184,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                {t('saveStatus.success')}
+                {"Settings saved successfully!"}
               </div>
             )}
             {saveStatus === 'error' && (
@@ -194,7 +192,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
-                {t('saveStatus.error')}
+                {"Failed to save settings"}
               </div>
             )}
           </div>
@@ -205,7 +203,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
               disabled={isSaving}
               className="flex-1 sm:flex-none h-10 touch-manipulation"
             >
-              {t('footerActions.cancel')}
+              {"Cancel"}
             </Button>
             <Button
               onClick={saveSettings}
@@ -215,10 +213,10 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
               {isSaving ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  {t('saveStatus.saving')}
+                  {"Saving..."}
                 </div>
               ) : (
-                t('footerActions.save')
+                "Save Settings"
               )}
             </Button>
           </div>

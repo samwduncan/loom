@@ -1,6 +1,5 @@
 import { Button } from '../../../ui/button';
 import { Check, ChevronDown, ChevronRight, Edit3, Folder, FolderOpen, Star, Trash2, X } from 'lucide-react';
-import type { TFunction } from 'i18next';
 import { cn } from '../../../../lib/utils';
 import TaskIndicator from '../../../TaskIndicator';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
@@ -47,7 +46,6 @@ type SidebarProjectItemProps = {
   onCancelEditingSession: () => void;
   onSaveEditingSession: (projectName: string, sessionId: string, summary: string) => void;
   touchHandlerFactory: TouchHandlerFactory;
-  t: TFunction;
 };
 
 const getSessionCountDisplay = (sessions: SessionWithProvider[], hasMoreSessions: boolean): string => {
@@ -93,7 +91,6 @@ export default function SidebarProjectItem({
   onCancelEditingSession,
   onSaveEditingSession,
   touchHandlerFactory,
-  t,
 }: SidebarProjectItemProps) {
   const isSelected = selectedProject?.name === project.name;
   const isEditing = editingProject === project.name;
@@ -153,7 +150,7 @@ export default function SidebarProjectItem({
                       value={editingName}
                       onChange={(event) => onEditingNameChange(event.target.value)}
                       className="w-full px-3 py-2 text-sm border-2 border-primary/40 focus:border-primary rounded-lg bg-background text-foreground shadow-sm focus:shadow-md transition-all duration-200 focus:outline-none"
-                      placeholder={t('projects.projectNamePlaceholder')}
+                      placeholder={"Project name"}
                       autoFocus
                       autoComplete="off"
                       onClick={(event) => event.stopPropagation()}
@@ -225,7 +222,7 @@ export default function SidebarProjectItem({
                         event.stopPropagation();
                         toggleStarProject();
                       }}
-                      title={isStarred ? t('tooltips.removeFromFavorites') : t('tooltips.addToFavorites')}
+                      title={isStarred ? "Remove from favorites" : "Add to favorites"}
                     >
                       <Star
                         className={cn(
@@ -296,7 +293,7 @@ export default function SidebarProjectItem({
                     value={editingName}
                     onChange={(event) => onEditingNameChange(event.target.value)}
                     className="w-full px-2 py-1 text-sm border border-border rounded bg-background text-foreground focus:ring-2 focus:ring-primary/20"
-                    placeholder={t('projects.projectNamePlaceholder')}
+                    placeholder={"Project name"}
                     autoFocus
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') {
@@ -363,7 +360,7 @@ export default function SidebarProjectItem({
                     event.stopPropagation();
                     toggleStarProject();
                   }}
-                  title={isStarred ? t('tooltips.removeFromFavorites') : t('tooltips.addToFavorites')}
+                  title={isStarred ? "Remove from favorites" : "Add to favorites"}
                 >
                   <Star
                     className={cn(
@@ -380,7 +377,7 @@ export default function SidebarProjectItem({
                     event.stopPropagation();
                     onStartEditingProject(project);
                   }}
-                  title={t('tooltips.renameProject')}
+                  title={"Rename project (F2)"}
                 >
                   <Edit3 className="w-3 h-3" />
                 </div>
@@ -390,7 +387,7 @@ export default function SidebarProjectItem({
                     event.stopPropagation();
                     onDeleteProject(project);
                   }}
-                  title={t('tooltips.deleteProject')}
+                  title={"Delete empty project (Delete)"}
                 >
                   <Trash2 className="w-3 h-3 text-red-600 text-red-400" />
                 </div>
@@ -425,7 +422,6 @@ export default function SidebarProjectItem({
         onLoadMoreSessions={onLoadMoreSessions}
         onNewSession={onNewSession}
         touchHandlerFactory={touchHandlerFactory}
-        t={t}
       />
     </div>
   );
