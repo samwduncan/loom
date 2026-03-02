@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState } from 'react';
-import { Copy, Check, HelpCircle } from 'lucide-react';
+import { Copy, Check, HelpCircle, XCircle } from 'lucide-react';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import type {
   ChatMessage,
@@ -10,6 +10,8 @@ import type {
 import { Markdown } from './Markdown';
 import { ThinkingDisclosure } from './ThinkingDisclosure';
 import { ToolActionCard } from './ToolActionCard';
+import { SystemStatusMessage } from './SystemStatusMessage';
+import type { StatusTier } from './SystemStatusMessage';
 import { formatUsageLimitText } from '../../utils/chatFormatting';
 import { getClaudePermissionSuggestion } from '../../utils/chatPermissions';
 import { copyTextToClipboard } from '../../../../utils/clipboard';
@@ -95,6 +97,51 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
 
   if (shouldHideThinkingMessage) {
     return null;
+  }
+
+  // System status messages -- render as muted inline status
+  if (message.type === 'system' || (message.type === 'info' && !message.isToolUse)) {
+    const tier: StatusTier = (message.content || '').toLowerCase().includes('error') ? 'error'
+      : (message.content || '').toLowerCase().includes('warning') ? 'warning'
+      : 'info';
+    return (
+      <div className="px-3 sm:px-0 my-1">
+        <SystemStatusMessage
+          tier={tier}
+          content={String(message.content || '')}
+          timestamp={formattedTime}
+        />
+      </div>
+    );
+  }
+
+  // Error messages (non-tool) -- inline terracotta banner
+  if (message.type === 'error' && !message.isToolUse) {
+    const content = String(message.content || '');
+    const lines = content.split('\n');
+    const isLongError = lines.length > 3;
+    return (
+      <div className="px-3 sm:px-0 my-1">
+        <div className="rounded-lg border-l-[3px] border-l-[#b85c3a] bg-[#b85c3a]/10 px-3 py-2">
+          <div className="flex items-start gap-2">
+            <XCircle className="w-4 h-4 text-[#b85c3a] flex-shrink-0 mt-0.5" />
+            <div className="text-xs text-[#dab8b8] font-mono whitespace-pre-wrap">
+              {isLongError ? lines.slice(0, 3).join('\n') : content}
+            </div>
+          </div>
+          {isLongError && (
+            <details className="mt-1">
+              <summary className="text-[10px] text-[#b85c3a]/60 cursor-pointer hover:text-[#b85c3a]/80">
+                Show full error ({lines.length} lines)
+              </summary>
+              <pre className="mt-1 text-xs text-[#dab8b8]/80 font-mono whitespace-pre-wrap overflow-x-auto">
+                {content}
+              </pre>
+            </details>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -278,7 +325,13 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                 )}
               </>
             ) : message.isInteractivePrompt ? (
-              // Interactive prompt -- warm copper card design
+              // Interactive prompt -- warm copper card (display-only record).
+              // Backend investigation (06-06): Interactive prompts use the AskUserQuestion
+              // tool via the SDK's canUseTool permission system. The actual user interaction
+              // happens through AskUserQuestionPanel in PermissionRequestsBanner, not through
+              // this display card. This card shows a historical record of the prompt content.
+              // The 'claude-interactive-prompt' message type is not currently sent by the
+              // server -- if enabled in the future, this card provides the visual display.
               <div className="bg-[#241a14] border border-[#b87333]/40 border-l-3 border-l-[#b87333] rounded-lg p-4">
                 <div className="flex items-start gap-2.5">
                   <HelpCircle className="w-5 h-5 text-[#b87333] flex-shrink-0 mt-0.5" />
