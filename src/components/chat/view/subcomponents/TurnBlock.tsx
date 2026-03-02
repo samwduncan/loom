@@ -1,6 +1,8 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import MessageComponent from './MessageComponent';
+import { ToolCallGroup } from './ToolCallGroup';
+import { groupConsecutiveToolCalls } from '../../utils/groupConsecutiveToolCalls';
 import type { Turn, ChatMessage } from '../../types/types';
 import type { Project } from '../../../../types/app';
 import type {
@@ -54,6 +56,12 @@ const TurnBlock = memo(function TurnBlock({
 }: TurnBlockProps) {
   // Skip empty turns
   if (turn.messages.length === 0) return null;
+
+  // Group consecutive tool calls (3+) under summary headers
+  const groupedItems = useMemo(
+    () => groupConsecutiveToolCalls(turn.messages),
+    [turn.messages]
+  );
 
   const canCollapse = !turn.isStreaming;
 
@@ -147,8 +155,31 @@ const TurnBlock = memo(function TurnBlock({
       >
         <div className="overflow-hidden">
           <div className="space-y-3 sm:space-y-4 pt-1">
-            {turn.messages.map((message, index) => {
-              const prevMessage = index > 0 ? turn.messages[index - 1] : null;
+            {groupedItems.map((item, index) => {
+              if (Array.isArray(item)) {
+                // Grouped tool calls (3+ consecutive) -- render as ToolCallGroup
+                const groupKey = item
+                  .map((m) => getMessageKey(m))
+                  .join('|');
+                return (
+                  <ToolCallGroup
+                    key={groupKey}
+                    messages={item}
+                    messageProps={{
+                      onFileOpen: messageProps.onFileOpen,
+                      createDiff: messageProps.createDiff,
+                      selectedProject: messageProps.selectedProject,
+                      showRawParameters: messageProps.showRawParameters,
+                    }}
+                  />
+                );
+              }
+
+              // Individual message -- render normally
+              const message = item;
+              // Find the previous non-grouped message for context
+              const prevItem = index > 0 ? groupedItems[index - 1] : null;
+              const prevMessage = prevItem && !Array.isArray(prevItem) ? prevItem : null;
               return (
                 <MessageComponent
                   key={getMessageKey(message)}
