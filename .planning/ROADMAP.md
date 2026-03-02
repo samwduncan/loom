@@ -2,7 +2,7 @@
 
 ## Overview
 
-Loom transforms CloudCLI — a capable but generic AI chat interface — into a premium, crafted developer tool with a warm earthy aesthetic, Claude.ai-level density, and Linear-level attention to detail. The transformation is layered: establish a correct design system before any visual work, sweep hardcoded colors before any QA is meaningful, strip dead code before the highest-complexity feature work begins, then redesign the chat experience from the ground up. Each phase delivers a coherent capability on a stable foundation laid by the phases before it.
+Loom transforms CloudCLI — a capable but generic AI chat interface — into a premium, crafted developer tool with a warm earthy aesthetic, Claude.ai-level density, and Linear-level attention to detail. The transformation prioritizes functional features first — strip dead code, build the chat experience, implement streaming UX and error handling — then applies visual polish (color sweep, terminal theming, sidebar styling) on top of a working, feature-complete foundation. Each phase delivers a coherent capability.
 
 ## Phases
 
@@ -12,14 +12,17 @@ Loom transforms CloudCLI — a capable but generic AI chat interface — into a 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Design System Foundation** - Warm earthy palette, CSS variable token system, typography, fork governance
-- [ ] **Phase 2: Color Sweep** - Replace all 86+ hardcoded Tailwind color classes with semantic aliases
+**Functional phases (build first):**
 - [ ] **Phase 3: Structural Cleanup** - Strip i18n, Cursor backend, and Codex backend from the codebase
-- [ ] **Phase 4: Terminal and Editor Theming** - Catppuccin Mocha xterm.js theme, CodeMirror warm theme
 - [ ] **Phase 5: Chat Message Architecture** - Shiki, TurnBlock, tool call cards, thinking block disclosures
 - [ ] **Phase 6: Chat Message Polish** - Diffs, user messages, permission banners, usage summaries, layout
 - [ ] **Phase 7: Streaming UX** - requestAnimationFrame buffer, auto-scroll, scroll pill, typing indicators
 - [ ] **Phase 8: Error Handling and Status** - Toasts, inline banners, global status line, stop button
+
+**Visual phases (polish after):**
+- [ ] **Phase 1: Design System Foundation** - Warm earthy palette, CSS variable token system, typography, fork governance
+- [ ] **Phase 2: Color Sweep** - Replace all 86+ hardcoded Tailwind color classes with semantic aliases
+- [ ] **Phase 4: Terminal and Editor Theming** - Catppuccin Mocha xterm.js theme, CodeMirror warm theme
 - [ ] **Phase 9: Sidebar and Global Polish** - Dense sidebar, settings panel, modals, mobile nav
 
 ## Phase Details
@@ -59,22 +62,24 @@ Plans:
 - [ ] 02-04: Final grep audit — verify zero remaining hardcoded color classes
 
 ### Phase 3: Structural Cleanup
-**Goal**: The codebase is free of i18n overhead and dead provider backends, reducing cognitive load and file count before the highest-complexity redesign work
-**Depends on**: Phase 2
+**Goal**: The codebase is free of i18n overhead and the dead Cursor backend, with a streamlined provider UX defaulting to Claude — reducing cognitive load and file count before the highest-complexity redesign work
+**Depends on**: Nothing (first functional phase)
 **Requirements**: FORK-01, FORK-02, FORK-03
 **Success Criteria** (what must be TRUE):
   1. No `useTranslation` imports or `t()` calls remain in any component — all 43 affected components display English string literals directly
-  2. No Cursor CLI code, routes, or UI elements exist in the codebase — provider dropdown shows Claude and Gemini only
-  3. No OpenAI Codex code, routes, or UI elements exist — `@openai/codex-sdk` is removed from `package.json` and not installed
+  2. No Cursor CLI code, routes, or UI elements exist in the codebase — provider dropdown shows Claude, Codex, and Gemini only
+  3. Codex is kept — `@openai/codex-sdk` remains in `package.json`, all Codex routes/hooks/UI intact
   4. Bundle size is measurably reduced — `react-i18next`, `i18next`, `i18next-browser-languagedetector` removed from dependencies
-**Plans**: TBD
+  5. New sessions default to Claude — header dropdown and composer picker enable switching between Claude, Codex, and Gemini
+  6. First-time welcome screen appears once, mentions other providers, then auto-dismisses permanently
+**Plans**: 5 plans
 
 Plans:
-- [ ] 03-01: Strip i18n from all 43 components — mechanical `useTranslation` → string literal replacement
-- [ ] 03-02: Remove i18n packages, locale files, and i18n configuration
-- [ ] 03-03: Strip Cursor CLI backend — routes, hooks, and UI references
-- [ ] 03-04: Strip OpenAI Codex backend — routes, SDK, and UI references
-- [ ] 03-05: Verify provider model — confirm Claude + Gemini selection works, no regressions
+- [ ] 03-01-PLAN.md — Strip i18n from 22 chat/core components + remove i18n infrastructure (packages, locales, config, I18nextProvider, LanguageSelector)
+- [ ] 03-02-PLAN.md — Strip i18n from 20 settings/sidebar components + verify zero i18n references codebase-wide
+- [ ] 03-03-PLAN.md — Remove all Cursor CLI backend code from server and client (~65 files)
+- [ ] 03-04-PLAN.md — Build provider UX: header dropdown, composer mini-picker, welcome screen, default-to-Claude
+- [ ] 03-05-PLAN.md — Final verification audit + visual checkpoint
 
 ### Phase 4: Terminal and Editor Theming
 **Goal**: The terminal panel and file editor use the warm Loom aesthetic — Catppuccin Mocha ANSI colors in xterm.js and a matching warm dark theme in CodeMirror
@@ -94,7 +99,7 @@ Plans:
 
 ### Phase 5: Chat Message Architecture
 **Goal**: The chat message experience has premium structure — VS Code-quality syntax highlighting, collapsible turns, compact tool call cards, animated thinking block disclosures, and correct streaming performance
-**Depends on**: Phase 3, Phase 4
+**Depends on**: Phase 3
 **Requirements**: CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-05, CHAT-06, CHAT-07, CHAT-08
 **Success Criteria** (what must be TRUE):
   1. Code blocks render with VS Code Dark+ syntax highlighting via Shiki — language tokens match VS Code's color output and a language label appears in the code block header with a working copy button
@@ -174,7 +179,7 @@ Plans:
 
 ### Phase 9: Sidebar and Global Polish
 **Goal**: Every surface of the app — sidebar, settings panel, modals, mobile nav — matches the warm earthy aesthetic with density improvements, completing the full-app transformation
-**Depends on**: Phase 8
+**Depends on**: Phase 2, Phase 8
 **Requirements**: SIDE-01, SIDE-02, SIDE-03, SIDE-04
 **Success Criteria** (what must be TRUE):
   1. The sidebar session and project list uses tighter spacing and smaller metadata fonts — more sessions are visible without scrolling compared to the pre-Loom baseline
@@ -192,18 +197,20 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
+Functional first, then visual polish: 3 → 5 → 6 → 7 → 8 → 1 → 2 → 4 → 9
 
-Note: Phase 4 depends only on Phase 1 (not Phase 3) — terminal theming can begin after design system is stable. It is sequenced after Phase 3 in practice to keep the execution path linear.
+Phase 1 (Design System) has partial work completed (CSS variables, dark mode removal) but is deferred as a group with the other visual phases.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design System Foundation | 0/4 | Planned | - |
-| 2. Color Sweep | 0/4 | Not started | - |
+| **Functional phases** | | | |
 | 3. Structural Cleanup | 0/5 | Not started | - |
-| 4. Terminal and Editor Theming | 0/3 | Not started | - |
 | 5. Chat Message Architecture | 0/7 | Not started | - |
 | 6. Chat Message Polish | 0/6 | Not started | - |
 | 7. Streaming UX | 0/5 | Not started | - |
 | 8. Error Handling and Status | 0/4 | Not started | - |
+| **Visual phases** | | | |
+| 1. Design System Foundation | 0/4 | Partial (deferred) | - |
+| 2. Color Sweep | 0/4 | Not started | - |
+| 4. Terminal and Editor Theming | 0/3 | Not started | - |
 | 9. Sidebar and Global Polish | 0/4 | Not started | - |
