@@ -9,6 +9,7 @@ import { ShikiCodeBlock } from './CodeBlock';
 type MarkdownProps = {
   children: React.ReactNode;
   className?: string;
+  isStreaming?: boolean;
 };
 
 type CodeBlockProps = {
@@ -18,35 +19,8 @@ type CodeBlockProps = {
   children?: React.ReactNode;
 };
 
-const CodeBlock = ({ node, inline, className, children, ...props }: CodeBlockProps) => {
-  const raw = Array.isArray(children) ? children.join('') : String(children ?? '');
-  const looksMultiline = /[\r\n]/.test(raw);
-  const inlineDetected = inline || (node && node.type === 'inlineCode');
-  const shouldInline = inlineDetected || !looksMultiline;
-
-  if (shouldInline) {
-    return (
-      <code
-        className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-gray-800/60 text-gray-100 border border-gray-700 whitespace-pre-wrap break-words ${className || ''
-          }`}
-        {...props}
-      >
-        {children}
-      </code>
-    );
-  }
-
-  const match = /language-(\w+)/.exec(className || '');
-  const language = match ? match[1] : 'text';
-
-  // Strip trailing newline that react-markdown often appends
-  const trimmed = raw.replace(/\n$/, '');
-
-  return <ShikiCodeBlock code={trimmed} language={language} />;
-};
-
-const markdownComponents = {
-  code: CodeBlock,
+/** Static markdown sub-components (no streaming dependency) */
+const staticComponents = {
   blockquote: ({ children }: { children?: React.ReactNode }) => (
     <blockquote className="border-l-4 border-gray-300 border-gray-600 pl-4 italic text-gray-600 text-gray-400 my-2">
       {children}
@@ -72,14 +46,49 @@ const markdownComponents = {
   ),
 };
 
-export function Markdown({ children, className }: MarkdownProps) {
+function makeCodeComponent(isStreaming: boolean) {
+  return function CodeBlockComponent({ node, inline, className, children, ...props }: CodeBlockProps) {
+    const raw = Array.isArray(children) ? children.join('') : String(children ?? '');
+    const looksMultiline = /[\r\n]/.test(raw);
+    const inlineDetected = inline || (node && node.type === 'inlineCode');
+    const shouldInline = inlineDetected || !looksMultiline;
+
+    if (shouldInline) {
+      return (
+        <code
+          className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-gray-800/60 text-gray-100 border border-gray-700 whitespace-pre-wrap break-words ${className || ''
+            }`}
+          {...props}
+        >
+          {children}
+        </code>
+      );
+    }
+
+    const match = /language-(\w+)/.exec(className || '');
+    const language = match ? match[1] : 'text';
+
+    // Strip trailing newline that react-markdown often appends
+    const trimmed = raw.replace(/\n$/, '');
+
+    return <ShikiCodeBlock code={trimmed} language={language} isStreaming={isStreaming} />;
+  };
+}
+
+export function Markdown({ children, className, isStreaming = false }: MarkdownProps) {
   const content = normalizeInlineCodeFences(String(children ?? ''));
   const remarkPlugins = useMemo(() => [remarkGfm, remarkMath], []);
   const rehypePlugins = useMemo(() => [rehypeKatex], []);
 
+  // Memoize components object; only rebuild when isStreaming changes
+  const components = useMemo(
+    () => ({ ...staticComponents, code: makeCodeComponent(isStreaming) }),
+    [isStreaming]
+  );
+
   return (
     <div className={className}>
-      <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={markdownComponents as any}>
+      <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components as any}>
         {content}
       </ReactMarkdown>
     </div>

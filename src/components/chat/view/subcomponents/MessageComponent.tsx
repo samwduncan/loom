@@ -430,7 +430,7 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
 
                   // Normal rendering for non-JSON content
                   return message.type === 'assistant' ? (
-                    <Markdown className="prose prose-sm max-w-none prose-invert prose-gray">
+                    <Markdown className="prose prose-sm max-w-none prose-invert prose-gray" isStreaming={message.isStreaming}>
                       {content}
                     </Markdown>
                   ) : (
