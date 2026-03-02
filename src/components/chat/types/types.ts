@@ -101,6 +101,13 @@ export interface Turn {
   failedToolCount: number;
   firstProseContent: string;
   durationMs?: number;
+  usage?: {
+    inputTokens: number;
+    outputTokens: number;
+    cacheReadTokens: number;
+    cacheCreationTokens: number;
+  };
+  model?: string;
 }
 
 export interface ChatInterfaceProps {

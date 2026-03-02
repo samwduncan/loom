@@ -48,6 +48,33 @@ function buildTurn(messages: ChatMessage[]): Turn {
     ? undefined
     : endTime.getTime() - startTime.getTime();
 
+  // Extract usage data from the last assistant message that contains it
+  let usage: Turn['usage'] | undefined;
+  let model: string | undefined;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const msg = messages[i];
+    if (msg.type === 'assistant' && !usage) {
+      const msgUsage = (msg as Record<string, unknown>).usage as Record<string, unknown> | undefined;
+      const msgTokenUsage = (msg as Record<string, unknown>).tokenUsage as Record<string, unknown> | undefined;
+      const usageData = msgUsage || msgTokenUsage;
+      if (usageData) {
+        usage = {
+          inputTokens: Number(usageData.inputTokens || usageData.input_tokens || 0),
+          outputTokens: Number(usageData.outputTokens || usageData.output_tokens || 0),
+          cacheReadTokens: Number(usageData.cacheReadTokens || usageData.cache_read_tokens || usageData.cacheReadInputTokens || 0),
+          cacheCreationTokens: Number(usageData.cacheCreationTokens || usageData.cache_creation_tokens || usageData.cacheCreationInputTokens || 0),
+        };
+      }
+    }
+    if (msg.type === 'assistant' && !model) {
+      const msgModel = (msg as Record<string, unknown>).model as string | undefined;
+      if (msgModel) {
+        model = msgModel;
+      }
+    }
+    if (usage && model) break;
+  }
+
   return {
     id: `turn-${startTime.getTime()}`,
     messages,
@@ -58,6 +85,8 @@ function buildTurn(messages: ChatMessage[]): Turn {
     failedToolCount,
     firstProseContent,
     durationMs,
+    usage,
+    model,
   };
 }
 
