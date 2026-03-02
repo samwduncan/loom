@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T22:07:20.212Z"
+last_updated: "2026-03-02T22:19:31.441Z"
 progress:
   total_phases: 4
   completed_phases: 3
@@ -53,6 +53,7 @@ Progress: [██████████] 100%
 | Phase 06 P01 | 3min | 2 tasks | 4 files |
 | Phase 06 P02 | 3min | 3 tasks | 2 files |
 | Phase 06 P06 | 4min | 2 tasks | 1 files |
+| Phase 06 P04 | 6 | 5 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,8 @@ Recent decisions affecting current work:
 - [06-06]: Interactive prompts already handled via AskUserQuestion tool + permission system -- no new websocket handler needed
 - [06-06]: Display card kept as display-only with documentation; actual interaction via AskUserQuestionPanel
 - [06-06]: Copper accent #b87333 for interactive prompt visual distinction
+- [Phase 06]: collapsedTurns inverted state: track collapsed (empty set = all expanded) instead of expandedTurns
+- [Phase 06]: IntersectionObserver with 300ms debounce for scroll-away collapse, streaming turns protected from observer
 
 ### Pending Todos
 

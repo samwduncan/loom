@@ -32,10 +32,10 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **CHAT-10**: User messages have subtle warm background tint to visually differentiate from AI messages
 - [x] **CHAT-11**: User messages have a small copy button to grab previous prompts
 - [x] **CHAT-12**: Permission prompts render as highlighted inline banners within message flow showing tool name and action
-- [ ] **CHAT-13**: Usage summaries (token counts, cost) always visible at the end of each AI response, not collapsed
+- [x] **CHAT-13**: Usage summaries (token counts, cost) always visible at the end of each AI response, not collapsed
 - [x] **CHAT-14**: System status messages render muted and inline — gray for info, amber for warnings, red for errors
 - [x] **CHAT-15**: Messages use full-width blocks (not left/right bubbles), role label only ("You" / "Claude" / "Gemini"), max-width ~720px centered
-- [ ] **CHAT-16**: AI turns flow as continuous blocks — tool calls, thinking, code, prose within one visual unit with subtle dividers, no gaps
+- [x] **CHAT-16**: AI turns flow as continuous blocks — tool calls, thinking, code, prose within one visual unit with subtle dividers, no gaps
 
 ### Streaming & Status UX
 
@@ -130,10 +130,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-10 | Phase 6 | Complete |
 | CHAT-11 | Phase 6 | Complete |
 | CHAT-12 | Phase 6 | Complete |
-| CHAT-13 | Phase 6 | Pending |
+| CHAT-13 | Phase 6 | Complete |
 | CHAT-14 | Phase 6 | Complete |
 | CHAT-15 | Phase 6 | Complete |
-| CHAT-16 | Phase 6 | Pending |
+| CHAT-16 | Phase 6 | Complete |
 | STRM-01 | Phase 7 | Pending |
 | STRM-02 | Phase 7 | Pending |
 | STRM-03 | Phase 7 | Pending |
