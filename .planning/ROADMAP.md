@@ -129,15 +129,14 @@ Plans:
   4. Token count and cost appear at the bottom of every AI response unconditionally — not collapsed, always visible
   5. System status messages (info, warning, error) render inline with the correct muted color tier — gray info, amber warning, terracotta error — and do not look like regular chat messages
   6. AI turn content flows as one continuous visual unit with tool calls, thinking, code, and prose inside one block separated by subtle dividers, with no gaps between message elements
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 06-01: Integrate `react-diff-viewer-continued` for file edit diff rendering — warm palette custom theme
-- [ ] 06-02: Style user messages — warm background tint, copy button with clipboard feedback
-- [ ] 06-03: Build permission banner component — inline, non-modal, highlighted within message flow
-- [ ] 06-04: Add usage summary footer to AI responses — token counts, cost, always visible
-- [ ] 06-05: Style system status messages — gray/amber/terracotta tiers, muted visual weight
-- [ ] 06-06: Enforce continuous AI turn layout — full-width blocks, role labels, max-width centered, no bubble gaps
+- [ ] 06-01-PLAN.md — Install react-diff-viewer-continued, build warm theme, replace basic DiffViewer with unified diff + context lines + word-level highlighting
+- [ ] 06-02-PLAN.md — Restyle user messages with warm amber tint background, hover-reveal copy button outside message block
+- [ ] 06-03-PLAN.md — Restyle permission banners with warm theme + distinct left border, create 3-tier SystemStatusMessage component
+- [ ] 06-04-PLAN.md — Add TurnUsageFooter with pricing table, remove auto-collapse, enforce max-width 720px centered layout, continuous turn flow with thin dividers, wire system status into MessageComponent
+- [ ] 06-05-PLAN.md — Build verification + visual checkpoint for all 8 Phase 6 requirements
 
 ### Phase 7: Streaming UX
 **Goal**: Streaming responses feel smooth and respect user control — token buffering prevents jank, scroll behavior never fights the user, indicators communicate AI state clearly
