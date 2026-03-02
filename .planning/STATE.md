@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T20:26:04.770Z"
+last_updated: "2026-03-02T22:05:10Z"
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 15
+  completed_plans: 15
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The chat interface must feel designed, not generated — every interaction, animation, and pixel serves the developer experience.
-**Current focus:** Phase 5 COMPLETE — chat message architecture (all 5 plans done, ready for Phase 6)
+**Current focus:** Phase 6 IN PROGRESS — chat message polish (plan 04 of 6 complete)
 
 ## Current Position
 
-Phase: 5 of 9 (Chat Message Architecture) — COMPLETE
-Plan: 5 of 5 in current phase — COMPLETE
-Status: Phase 5 complete, ready for Phase 6
-Last activity: 2026-03-02 — Plan 05-05 complete (rAF streaming, memoization, visual verification)
+Phase: 6 of 9 (Chat Message Polish)
+Plan: 4 of 6 in current phase
+Status: Executing Phase 6 — user messages restyled, diff viewer, permission banners done
+Last activity: 2026-03-02 — Plan 06-02 complete (warm amber user messages, copy button, image lightbox)
 
-Progress: [██████░░░░] 45%
+Progress: [██████░░░░] 51%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 6.4min
-- Total execution time: 131min
+- Total plans completed: 16
+- Average duration: 5.9min
+- Total execution time: 136min
 
 **By Phase:**
 
@@ -43,10 +43,11 @@ Progress: [██████░░░░] 45%
 | 01-design-system-foundation | 4 | 14min | 3.5min |
 | 03-structural-cleanup | 5 | 94min | 18.8min |
 | 05-chat-message-architecture | 5 | 23min | 4.6min |
+| 06-chat-message-polish | 2/6 | 5min | 2.5min |
 
 **Recent Trend:**
-- Last 5 plans: 05-05 (8min), 05-04 (5min), 05-03 (3min), 05-01 (5min), 05-02 (2min)
-- Trend: Small focused plans executing quickly, integration plans slightly longer
+- Last 5 plans: 06-03 (2min), 05-05 (8min), 05-04 (5min), 05-03 (3min), 05-01 (5min)
+- Trend: Focused UI polish plans executing very quickly
 
 *Updated after each plan completion*
 
@@ -98,6 +99,12 @@ Recent decisions affecting current work:
 - [05-05]: requestAnimationFrame replaces setTimeout(100ms) for frame-aligned stream batching
 - [05-05]: Streaming awareness threaded via isStreaming prop on Markdown rather than React context
 - [05-05]: ShikiCodeBlock wrapped in React.memo to prevent re-highlight on parent re-renders
+- [06-03]: Dark-only theme: removed all dual light/dark Tailwind classes from PermissionRequestsBanner
+- [06-03]: Local resolved state with 2s auto-clear for Approved/Denied permission status display
+- [06-03]: Tailwind arbitrary opacity values (bg-amber-500/[0.08]) for warning tier background
+- [06-01]: Used styles.variables.dark API for react-diff-viewer-continued theme overrides
+- [06-01]: Removed createDiff guard in ToolRenderer since library handles diffing internally
+- [06-01]: Set diffContainer minWidth to unset to prevent horizontal overflow in chat panels
 
 ### Pending Todos
 
@@ -113,5 +120,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-05-PLAN.md — Phase 5 complete (rAF streaming, memoization, visual verification)
+Stopped at: Completed 06-01-PLAN.md — react-diff-viewer-continued integration with warm earthy theme and Shiki highlighting
 Resume file: None
