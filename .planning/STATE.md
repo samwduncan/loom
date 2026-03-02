@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 5 of 9 (Chat Message Architecture)
-Plan: 2 of 5 in current phase — COMPLETE
+Plan: 4 of 5 in current phase — COMPLETE
 Status: Executing phase 5
-Last activity: 2026-03-02 — Plan 05-01 complete (Shiki code blocks + warm Dark+ highlighting)
+Last activity: 2026-03-02 — Plan 05-04 complete (Tool action cards with compact card system)
 
-Progress: [████░░░░░░] 33%
+Progress: [█████░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 7.3min
-- Total execution time: 115min
+- Total plans completed: 13
+- Average duration: 6.5min
+- Total execution time: 123min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████░░░░░░] 33%
 |-------|-------|-------|----------|
 | 01-design-system-foundation | 4 | 14min | 3.5min |
 | 03-structural-cleanup | 5 | 94min | 18.8min |
-| 05-chat-message-architecture | 2 | 7min | 3.5min |
+| 05-chat-message-architecture | 4 | 15min | 3.8min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (5min), 05-02 (2min), 03-05 (2min), 03-04 (3min), 03-03 (45min)
+- Last 5 plans: 05-04 (5min), 05-03 (3min), 05-01 (5min), 05-02 (2min), 03-05 (2min)
 - Trend: Small focused plans executing quickly
 
 *Updated after each plan completion*
@@ -76,6 +76,12 @@ Recent decisions affecting current work:
 - [05-02]: CSS grid 0fr/1fr animation instead of native <details> for smooth height transitions
 - [05-02]: Plain text whitespace-pre-wrap for thinking content (not Markdown) since reasoning is raw text
 - [05-02]: Per-block eye toggle only visible during streaming to reduce UI noise on completed blocks
+- [05-03]: TurnBlock receives getMessageKey callback from parent for stable React keys across turn boundaries
+- [05-03]: Custom React.memo comparator on TurnBlock to avoid re-renders when turn messages array reference changes
+- [05-03]: Auto-collapse uses ref-tracked previous streaming turn ID to detect only genuinely new streaming turns
+- [05-04]: Permission UI passed as prop to ToolActionCard rather than coupling to permission system directly
+- [05-04]: Simplified dark-mode class usage in permission buttons (dark-only app, removed dual light/dark classes)
+- [05-04]: ToolCallGroup created as standalone component ready for TurnBlock consumption in 05-05
 
 ### Pending Todos
 
@@ -91,5 +97,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-01-PLAN.md — Shiki v4 code blocks with warm Dark+ highlighting
+Stopped at: Completed 05-04-PLAN.md — Tool action cards with compact card system
 Resume file: None

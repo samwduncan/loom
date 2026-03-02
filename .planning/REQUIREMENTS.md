@@ -22,7 +22,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **CHAT-01**: Code blocks use Shiki v4 with VS Code Dark+ theme for syntax highlighting — 99% VS Code token parity
 - [x] **CHAT-02**: Code blocks display language label in header, copy-to-clipboard button with success state feedback
-- [ ] **CHAT-03**: Completed AI turns are collapsible — first line of response text + count badge (e.g., "I'll fix the auth... [+12 tool calls]"), click to expand full turn
+- [x] **CHAT-03**: Completed AI turns are collapsible — first line of response text + count badge (e.g., "I'll fix the auth... [+12 tool calls]"), click to expand full turn
 - [ ] **CHAT-04**: Tool call invocations render as compact inline action cards — single-line showing tool name + key argument (e.g., "Read — src/auth/login.ts"), expandable to show full arguments and nested result
 - [ ] **CHAT-05**: 3+ consecutive tool calls grouped under a typed summary header (e.g., "3 tool calls: 2 Read, 1 Edit") — expandable to show each card individually
 - [ ] **CHAT-06**: Tool cards with errors display red left border or red-tinted background with error message inline in expanded card
@@ -120,7 +120,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DSGN-08 | Phase 1 | Complete |
 | CHAT-01 | Phase 5 | Complete |
 | CHAT-02 | Phase 5 | Complete |
-| CHAT-03 | Phase 5 | Pending |
+| CHAT-03 | Phase 5 | Complete |
 | CHAT-04 | Phase 5 | Pending |
 | CHAT-05 | Phase 5 | Pending |
 | CHAT-06 | Phase 5 | Pending |

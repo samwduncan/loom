@@ -114,7 +114,7 @@ Plans:
 Plans:
 - [ ] 05-01-PLAN.md — Install Shiki v4, create singleton highlighter with warm Dark+ theme, build CodeBlock component, replace react-syntax-highlighter
 - [x] 05-02-PLAN.md — Build ThinkingDisclosure (Claude.ai-style) and ActivityIndicator (Claude CLI-style rotating phrases), replace AssistantThinkingIndicator
-- [ ] 05-03-PLAN.md — Build TurnBlock component with collapsible turns, useTurnGrouping hook, expand/collapse toolbar
+- [x] 05-03-PLAN.md — Build TurnBlock component with collapsible turns, useTurnGrouping hook, expand/collapse toolbar
 - [ ] 05-04-PLAN.md — Build ToolActionCard (compact cards with type tinting), ToolCallGroup (3+ grouping), update ToolRenderer
 - [ ] 05-05-PLAN.md — Upgrade streaming to requestAnimationFrame, wire streaming into CodeBlock, memoization audit, visual checkpoint
 
@@ -203,7 +203,7 @@ Phase 1 (Design System) has partial work completed (CSS variables, dark mode rem
 |-------|----------------|--------|-----------|
 | **Functional phases** | | | |
 | 3. Structural Cleanup | 5/5 | Complete |  |
-| 5. Chat Message Architecture | 1/5 | In Progress | - |
+| 5. Chat Message Architecture | 3/5 | In Progress | - |
 | 6. Chat Message Polish | 0/6 | Not started | - |
 | 7. Streaming UX | 0/5 | Not started | - |
 | 8. Error Handling and Status | 0/4 | Not started | - |
