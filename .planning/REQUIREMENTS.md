@@ -52,7 +52,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Cleanup & Fork Governance
 
-- [ ] **FORK-01**: i18n stripped from all 43 components — `useTranslation` calls replaced with English string literals
+- [x] **FORK-01**: i18n stripped from all 43 components — `useTranslation` calls replaced with English string literals
 - [ ] **FORK-02**: Cursor CLI backend integration removed — all Cursor-specific code, routes, and UI elements deleted
 - [ ] **FORK-03**: OpenAI Codex backend integration removed — all Codex-specific code, routes, and UI elements deleted
 - [x] **FORK-04**: Upstream-sync branch established and documented — strategy for cherry-picking security/bug fixes from upstream CloudCLI without conflicts
@@ -144,7 +144,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STRM-08 | Phase 8 | Pending |
 | STRM-09 | Phase 8 | Pending |
 | STRM-10 | Phase 8 | Pending |
-| FORK-01 | Phase 3 | Pending |
+| FORK-01 | Phase 3 | Complete |
 | FORK-02 | Phase 3 | Pending |
 | FORK-03 | Phase 3 | Pending |
 | FORK-04 | Phase 1 | Complete |
