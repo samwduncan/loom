@@ -12,16 +12,16 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 Phase: 5 of 9 (Chat Message Architecture)
 Plan: 2 of 5 in current phase — COMPLETE
 Status: Executing phase 5
-Last activity: 2026-03-02 — Plan 05-02 complete (thinking disclosure + activity indicator)
+Last activity: 2026-03-02 — Plan 05-01 complete (Shiki code blocks + warm Dark+ highlighting)
 
-Progress: [████░░░░░░] 30%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 7.6min
-- Total execution time: 110min
+- Total plans completed: 11
+- Average duration: 7.3min
+- Total execution time: 115min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████░░░░░░] 30%
 |-------|-------|-------|----------|
 | 01-design-system-foundation | 4 | 14min | 3.5min |
 | 03-structural-cleanup | 5 | 94min | 18.8min |
-| 05-chat-message-architecture | 1 | 2min | 2min |
+| 05-chat-message-architecture | 2 | 7min | 3.5min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (2min), 03-05 (2min), 03-04 (3min), 03-03 (45min), 03-02 (29min)
+- Last 5 plans: 05-01 (5min), 05-02 (2min), 03-05 (2min), 03-04 (3min), 03-03 (45min)
 - Trend: Small focused plans executing quickly
 
 *Updated after each plan completion*
@@ -69,6 +69,10 @@ Recent decisions affecting current work:
 - [03-04]: Welcome screen uses useState+localStorage for instant dismiss without remount
 - [03-04]: Provider selection grid entirely replaced with welcome screen — clean break from old UX
 - [03-05]: ROADMAP/REQUIREMENTS already updated in prior commit — re-verified instead of duplicating
+- [05-01]: Used shiki/bundle/web over full bundle for smaller payload (~3.8 MB vs ~6.4 MB)
+- [05-01]: Loose Highlighter interface type to avoid TypeScript generic mismatch between web/full bundle
+- [05-01]: 17 web-bundle languages pre-registered; unknown languages fall back to plaintext
+- [05-01]: Migrated code-editor MarkdownCodeBlock alongside chat Markdown for full react-syntax-highlighter removal
 - [05-02]: CSS grid 0fr/1fr animation instead of native <details> for smooth height transitions
 - [05-02]: Plain text whitespace-pre-wrap for thinking content (not Markdown) since reasoning is raw text
 - [05-02]: Per-block eye toggle only visible during streaming to reduce UI noise on completed blocks
@@ -79,7 +83,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- **Shiki async in streaming context:** `codeToHtml()` is async; incomplete code blocks during streaming must fall back to raw text rendering. Address in Phase 5 Plan 05-01.
+- **Shiki async in streaming context:** RESOLVED in 05-01 -- ShikiCodeBlock falls back to raw monospace during streaming/loading, then swaps to highlighted HTML. Full streaming awareness to be wired in 05-05.
 - **TurnId assignment boundary:** Exact WebSocket message type that signals a new turn start needs a brief audit before Phase 5 begins. Low-risk, one session observation resolves it.
 - **ANSI chat parser interaction with Shiki:** Phase 5 must verify these operate on different message types and don't conflict. Likely safe — different pipelines.
 - **`LazyMotion` placement:** Correct insertion point in `App.tsx` provider tree must be confirmed when `motion` is first used (Phase 5).
@@ -87,5 +91,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-02-PLAN.md — ThinkingDisclosure + ActivityIndicator components built and wired
+Stopped at: Completed 05-01-PLAN.md — Shiki v4 code blocks with warm Dark+ highlighting
 Resume file: None
