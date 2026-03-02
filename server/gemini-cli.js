@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import crossSpawn from 'cross-spawn';
 
-// Use cross-spawn on Windows for correct .cmd resolution (same pattern as cursor-cli.js)
+// Use cross-spawn on Windows for correct .cmd resolution
 const spawnFunction = process.platform === 'win32' ? crossSpawn : spawn;
 import { promises as fs } from 'fs';
 import path from 'path';
