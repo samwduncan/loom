@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The chat interface must feel designed, not generated — every interaction, animation, and pixel serves the developer experience.
-**Current focus:** Phase 5 IN PROGRESS — chat message architecture (thinking blocks, activity indicators)
+**Current focus:** Phase 5 COMPLETE — chat message architecture (all 5 plans done, ready for Phase 6)
 
 ## Current Position
 
-Phase: 5 of 9 (Chat Message Architecture)
-Plan: 4 of 5 in current phase — COMPLETE
-Status: Executing phase 5
-Last activity: 2026-03-02 — Plan 05-04 complete (Tool action cards with compact card system)
+Phase: 5 of 9 (Chat Message Architecture) — COMPLETE
+Plan: 5 of 5 in current phase — COMPLETE
+Status: Phase 5 complete, ready for Phase 6
+Last activity: 2026-03-02 — Plan 05-05 complete (rAF streaming, memoization, visual verification)
 
-Progress: [█████░░░░░] 40%
+Progress: [██████░░░░] 45%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 6.5min
-- Total execution time: 123min
+- Total plans completed: 14
+- Average duration: 6.4min
+- Total execution time: 131min
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [█████░░░░░] 40%
 |-------|-------|-------|----------|
 | 01-design-system-foundation | 4 | 14min | 3.5min |
 | 03-structural-cleanup | 5 | 94min | 18.8min |
-| 05-chat-message-architecture | 4 | 15min | 3.8min |
+| 05-chat-message-architecture | 5 | 23min | 4.6min |
 
 **Recent Trend:**
-- Last 5 plans: 05-04 (5min), 05-03 (3min), 05-01 (5min), 05-02 (2min), 03-05 (2min)
-- Trend: Small focused plans executing quickly
+- Last 5 plans: 05-05 (8min), 05-04 (5min), 05-03 (3min), 05-01 (5min), 05-02 (2min)
+- Trend: Small focused plans executing quickly, integration plans slightly longer
 
 *Updated after each plan completion*
 
@@ -82,6 +82,9 @@ Recent decisions affecting current work:
 - [05-04]: Permission UI passed as prop to ToolActionCard rather than coupling to permission system directly
 - [05-04]: Simplified dark-mode class usage in permission buttons (dark-only app, removed dual light/dark classes)
 - [05-04]: ToolCallGroup created as standalone component ready for TurnBlock consumption in 05-05
+- [05-05]: requestAnimationFrame replaces setTimeout(100ms) for frame-aligned stream batching
+- [05-05]: Streaming awareness threaded via isStreaming prop on Markdown rather than React context
+- [05-05]: ShikiCodeBlock wrapped in React.memo to prevent re-highlight on parent re-renders
 
 ### Pending Todos
 
@@ -89,7 +92,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- **Shiki async in streaming context:** RESOLVED in 05-01 -- ShikiCodeBlock falls back to raw monospace during streaming/loading, then swaps to highlighted HTML. Full streaming awareness to be wired in 05-05.
+- **Shiki async in streaming context:** RESOLVED -- ShikiCodeBlock falls back to raw monospace during streaming/loading, then swaps to highlighted HTML. Full streaming awareness wired in 05-05 via isStreaming prop threading.
 - **TurnId assignment boundary:** Exact WebSocket message type that signals a new turn start needs a brief audit before Phase 5 begins. Low-risk, one session observation resolves it.
 - **ANSI chat parser interaction with Shiki:** Phase 5 must verify these operate on different message types and don't conflict. Likely safe — different pipelines.
 - **`LazyMotion` placement:** Correct insertion point in `App.tsx` provider tree must be confirmed when `motion` is first used (Phase 5).
@@ -97,5 +100,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 05-04-PLAN.md — Tool action cards with compact card system
+Stopped at: Completed 05-05-PLAN.md — Phase 5 complete (rAF streaming, memoization, visual verification)
 Resume file: None

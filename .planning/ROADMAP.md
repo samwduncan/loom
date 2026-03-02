@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Functional phases (build first):**
 - [x] **Phase 3: Structural Cleanup** - Strip i18n, Cursor backend, and Codex backend from the codebase
-- [ ] **Phase 5: Chat Message Architecture** - Shiki, TurnBlock, tool call cards, thinking block disclosures
+- [x] **Phase 5: Chat Message Architecture** - Shiki, TurnBlock, tool call cards, thinking block disclosures
 - [ ] **Phase 6: Chat Message Polish** - Diffs, user messages, permission banners, usage summaries, layout
 - [ ] **Phase 7: Streaming UX** - requestAnimationFrame buffer, auto-scroll, scroll pill, typing indicators
 - [ ] **Phase 8: Error Handling and Status** - Toasts, inline banners, global status line, stop button
@@ -112,11 +112,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Install Shiki v4, create singleton highlighter with warm Dark+ theme, build CodeBlock component, replace react-syntax-highlighter
+- [x] 05-01-PLAN.md — Install Shiki v4, create singleton highlighter with warm Dark+ theme, build CodeBlock component, replace react-syntax-highlighter
 - [x] 05-02-PLAN.md — Build ThinkingDisclosure (Claude.ai-style) and ActivityIndicator (Claude CLI-style rotating phrases), replace AssistantThinkingIndicator
 - [x] 05-03-PLAN.md — Build TurnBlock component with collapsible turns, useTurnGrouping hook, expand/collapse toolbar
-- [ ] 05-04-PLAN.md — Build ToolActionCard (compact cards with type tinting), ToolCallGroup (3+ grouping), update ToolRenderer
-- [ ] 05-05-PLAN.md — Upgrade streaming to requestAnimationFrame, wire streaming into CodeBlock, memoization audit, visual checkpoint
+- [x] 05-04-PLAN.md — Build ToolActionCard (compact cards with type tinting), ToolCallGroup (3+ grouping), update ToolRenderer
+- [x] 05-05-PLAN.md — Upgrade streaming to requestAnimationFrame, wire streaming into CodeBlock, memoization audit, visual checkpoint
 
 ### Phase 6: Chat Message Polish
 **Goal**: The full chat message experience is complete — diffs, user messages, permission banners, usage summaries, system status messages, and layout all feel designed and intentional
@@ -203,7 +203,7 @@ Phase 1 (Design System) has partial work completed (CSS variables, dark mode rem
 |-------|----------------|--------|-----------|
 | **Functional phases** | | | |
 | 3. Structural Cleanup | 5/5 | Complete |  |
-| 5. Chat Message Architecture | 3/5 | In Progress | - |
+| 5. Chat Message Architecture | 5/5 | Complete | 2026-03-02 |
 | 6. Chat Message Polish | 0/6 | Not started | - |
 | 7. Streaming UX | 0/5 | Not started | - |
 | 8. Error Handling and Status | 0/4 | Not started | - |
