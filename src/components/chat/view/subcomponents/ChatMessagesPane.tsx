@@ -1,11 +1,14 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, RefObject, SetStateAction } from 'react';
 
 import MessageComponent from './MessageComponent';
+import TurnBlock from './TurnBlock';
+import { TurnToolbar } from './TurnToolbar';
 import ProviderSelectionEmptyState from './ProviderSelectionEmptyState';
-import type { ChatMessage } from '../../types/types';
+import type { ChatMessage, Turn } from '../../types/types';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
 import AssistantThinkingIndicator from './AssistantThinkingIndicator';
+import { useTurnGrouping } from '../../hooks/useTurnGrouping';
 import { getIntrinsicMessageKey } from '../../utils/messageKeys';
 
 interface ChatMessagesPaneProps {
@@ -123,6 +126,70 @@ export default function ChatMessagesPane({
     return candidateKey;
   }, []);
 
+  // Turn grouping
+  const { items, turnCount } = useTurnGrouping(visibleMessages);
+  const [expandedTurns, setExpandedTurns] = useState<Set<string>>(new Set());
+  const prevStreamingTurnIdRef = useRef<string | null>(null);
+
+  // Auto-collapse previous turns when a new streaming turn starts
+  const currentStreamingTurnId = useMemo(() => {
+    for (const item of items) {
+      if ('messages' in item && (item as Turn).isStreaming) {
+        return (item as Turn).id;
+      }
+    }
+    return null;
+  }, [items]);
+
+  useEffect(() => {
+    if (
+      currentStreamingTurnId &&
+      currentStreamingTurnId !== prevStreamingTurnIdRef.current
+    ) {
+      // New streaming turn detected -- collapse all previous turns
+      setExpandedTurns(new Set());
+    }
+    prevStreamingTurnIdRef.current = currentStreamingTurnId;
+  }, [currentStreamingTurnId]);
+
+  const handleTurnToggle = useCallback((turnId: string) => {
+    setExpandedTurns((prev) => {
+      const next = new Set(prev);
+      if (next.has(turnId)) {
+        next.delete(turnId);
+      } else {
+        next.add(turnId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleExpandAll = useCallback(() => {
+    const allTurnIds = new Set<string>();
+    for (const item of items) {
+      if ('messages' in item) {
+        allTurnIds.add((item as Turn).id);
+      }
+    }
+    setExpandedTurns(allTurnIds);
+  }, [items]);
+
+  const handleCollapseAll = useCallback(() => {
+    setExpandedTurns(new Set());
+  }, []);
+
+  const messageProps = useMemo(() => ({
+    createDiff,
+    onFileOpen,
+    onShowSettings,
+    onGrantToolPermission,
+    autoExpandTools,
+    showRawParameters,
+    showThinking,
+    selectedProject,
+    provider,
+  }), [createDiff, onFileOpen, onShowSettings, onGrantToolPermission, autoExpandTools, showRawParameters, showThinking, selectedProject, provider]);
+
   return (
     <div
       ref={scrollContainerRef}
@@ -233,25 +300,49 @@ export default function ChatMessagesPane({
             </div>
           )}
 
-          {visibleMessages.map((message, index) => {
-            const prevMessage = index > 0 ? visibleMessages[index - 1] : null;
-            return (
-              <MessageComponent
-                key={getMessageKey(message)}
-                message={message}
-                index={index}
-                prevMessage={prevMessage}
-                createDiff={createDiff}
-                onFileOpen={onFileOpen}
-                onShowSettings={onShowSettings}
-                onGrantToolPermission={onGrantToolPermission}
-                autoExpandTools={autoExpandTools}
-                showRawParameters={showRawParameters}
-                showThinking={showThinking}
-                selectedProject={selectedProject}
-                provider={provider}
-              />
-            );
+          {/* Turn toolbar */}
+          <TurnToolbar
+            turnCount={turnCount}
+            onExpandAll={handleExpandAll}
+            onCollapseAll={handleCollapseAll}
+          />
+
+          {items.map((item) => {
+            if ('messages' in item) {
+              // It's a Turn
+              const turn = item as Turn;
+              const isExpanded = turn.isStreaming || expandedTurns.has(turn.id);
+              return (
+                <TurnBlock
+                  key={turn.id}
+                  turn={turn}
+                  isExpanded={isExpanded}
+                  onToggle={() => handleTurnToggle(turn.id)}
+                  messageProps={messageProps}
+                  getMessageKey={getMessageKey}
+                />
+              );
+            } else {
+              // Standalone user message
+              const message = item as ChatMessage;
+              return (
+                <MessageComponent
+                  key={getMessageKey(message)}
+                  message={message}
+                  index={0}
+                  prevMessage={null}
+                  createDiff={createDiff}
+                  onFileOpen={onFileOpen}
+                  onShowSettings={onShowSettings}
+                  onGrantToolPermission={onGrantToolPermission}
+                  autoExpandTools={autoExpandTools}
+                  showRawParameters={showRawParameters}
+                  showThinking={showThinking}
+                  selectedProject={selectedProject}
+                  provider={provider}
+                />
+              );
+            }
           })}
         </>
       )}
