@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, HelpCircle } from 'lucide-react';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import type {
   ChatMessage,
@@ -278,16 +278,12 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                 )}
               </>
             ) : message.isInteractivePrompt ? (
-              // Special handling for interactive prompts
-              <div className="bg-amber-50 bg-amber-900/20 border border-amber-200 border-amber-800 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
+              // Interactive prompt -- warm copper card design
+              <div className="bg-[#241a14] border border-[#b87333]/40 border-l-3 border-l-[#b87333] rounded-lg p-4">
+                <div className="flex items-start gap-2.5">
+                  <HelpCircle className="w-5 h-5 text-[#b87333] flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-amber-900 text-amber-100 text-base mb-3">
+                    <h4 className="font-semibold text-[#f5e6d3] text-sm mb-2">
                       Interactive Prompt
                     </h4>
                     {(() => {
@@ -311,46 +307,35 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
 
                       return (
                         <>
-                          <p className="text-sm text-amber-800 text-amber-200 mb-4">
+                          <p className="text-sm text-[#c4a882] mb-3">
                             {questionLine}
                           </p>
 
-                          {/* Option buttons */}
-                          <div className="space-y-2 mb-4">
+                          {/* Option buttons -- display-only; interactive response handled via AskUserQuestion permission panel */}
+                          <div className="space-y-1.5 mb-3">
                             {options.map((option) => (
                               <button
                                 key={option.number}
-                                className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-all ${option.isSelected
-                                  ? 'bg-amber-600 bg-amber-700 text-white border-amber-600 border-amber-700 shadow-md'
-                                  : 'bg-white bg-gray-800 text-amber-900 text-amber-100 border-amber-300 border-amber-700'
-                                  } cursor-not-allowed opacity-75`}
+                                className={`w-full text-left px-3 py-2 rounded-md border transition-all text-sm ${
+                                  option.isSelected
+                                    ? 'bg-[#b87333]/20 text-[#f5e6d3] border-[#b87333]/60'
+                                    : 'bg-[#1c1210] text-[#c4a882] border-[#3d2e25]/40 hover:border-[#b87333]/40 hover:bg-[#b87333]/10'
+                                } cursor-not-allowed opacity-75`}
                                 disabled
                               >
-                                <div className="flex items-center gap-3">
-                                  <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${option.isSelected
-                                    ? 'bg-white/20'
-                                    : 'bg-amber-100 bg-amber-800/50'
-                                    }`}>
+                                <div className="flex items-center gap-2">
+                                  <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold bg-[#b87333]/20 text-[#b87333]">
                                     {option.number}
                                   </span>
-                                  <span className="text-sm sm:text-base font-medium flex-1">
-                                    {option.text}
-                                  </span>
-                                  {option.isSelected && (
-                                    <span className="text-lg">❯</span>
-                                  )}
+                                  <span className="font-medium flex-1">{option.text}</span>
                                 </div>
                               </button>
                             ))}
                           </div>
 
-                          <div className="bg-amber-100 bg-amber-800/30 rounded-lg p-3">
-                            <p className="text-amber-900 text-amber-100 text-sm font-medium mb-1">
-                              Waiting for your response in the CLI
-                            </p>
-                            <p className="text-amber-800 text-amber-200 text-xs">
-                              Please select an option in your terminal where Claude is running.
-                            </p>
+                          <div className="flex items-center gap-2 mt-3 text-xs text-[#b87333]/60">
+                            <div className="w-2 h-2 rounded-full bg-[#b87333]/60 animate-pulse" />
+                            <span>Waiting for response...</span>
                           </div>
                         </>
                       );
