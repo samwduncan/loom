@@ -54,7 +54,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **FORK-01**: i18n stripped from all 43 components — `useTranslation` calls replaced with English string literals
 - [x] **FORK-02**: Cursor CLI backend integration removed — all Cursor-specific code, routes, and UI elements deleted
-- [x] **FORK-03**: OpenAI Codex backend integration removed — all Codex-specific code, routes, and UI elements deleted
+- [x] **FORK-03**: Codex KEPT — three providers remain (Claude, Codex, Gemini). Provider UX features added: default-to-Claude, header dropdown, composer picker, welcome screen, per-provider model memory
 - [x] **FORK-04**: Upstream-sync branch established and documented — strategy for cherry-picking security/bug fixes from upstream CloudCLI without conflicts
 - [x] **FORK-05**: GPL-3.0 license maintained with proper attribution — LICENSE file updated with fork notice, NOTICE file if required
 
@@ -94,7 +94,7 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Feature | Reason |
 |---------|--------|
-| Additional AI providers (Cursor, Codex, etc.) | Focused scope — Claude + Gemini covers needs |
+| Additional AI providers beyond Claude/Codex/Gemini (e.g., Cursor) | Focused scope — three providers cover needs |
 | Dark/light mode toggle | Single warm dark theme is the brand identity — toggle dilutes it |
 | Mobile-native app | Web PWA is sufficient |
 | Video/voice features | Text-first tool |
