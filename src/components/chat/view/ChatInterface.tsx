@@ -56,8 +56,6 @@ function ChatInterface({
   const {
     provider,
     setProvider,
-    cursorModel,
-    setCursorModel,
     claudeModel,
     setClaudeModel,
     codexModel,
@@ -171,7 +169,6 @@ function ChatInterface({
     provider,
     permissionMode,
     cyclePermissionMode,
-    cursorModel,
     claudeModel,
     codexModel,
     geminiModel,
@@ -248,13 +245,11 @@ function ChatInterface({
 
   if (!selectedProject) {
     const selectedProviderLabel =
-      provider === 'cursor'
-        ? 'Cursor'
-        : provider === 'codex'
-          ? 'Codex'
-          : provider === 'gemini'
-            ? 'Gemini'
-            : 'Claude';
+      provider === 'codex'
+        ? 'Codex'
+        : provider === 'gemini'
+          ? 'Gemini'
+          : 'Claude';
 
     return (
       <div className="flex items-center justify-center h-full">
@@ -283,8 +278,6 @@ function ChatInterface({
           textareaRef={textareaRef}
           claudeModel={claudeModel}
           setClaudeModel={setClaudeModel}
-          cursorModel={cursorModel}
-          setCursorModel={setCursorModel}
           codexModel={codexModel}
           setCodexModel={setCodexModel}
           geminiModel={geminiModel}
@@ -372,13 +365,11 @@ function ChatInterface({
           onInputFocusChange={handleInputFocusChange}
           isInputFocused={isInputFocused}
           placeholder={`Type / for commands, @ for files, or ask ${
-            provider === 'cursor'
-              ? 'Cursor'
-              : provider === 'codex'
-                ? 'Codex'
-                : provider === 'gemini'
-                  ? 'Gemini'
-                  : 'Claude'
+            provider === 'codex'
+              ? 'Codex'
+              : provider === 'gemini'
+                ? 'Gemini'
+                : 'Claude'
           } anything...`}
           isTextareaExpanded={isTextareaExpanded}
           sendByCtrlEnter={sendByCtrlEnter}

@@ -30,15 +30,6 @@ const agentConfig: Record<AgentProvider, AgentVisualConfig> = {
     buttonClass: 'bg-blue-600 hover:bg-blue-700',
     description: 'Anthropic Claude AI assistant',
   },
-  cursor: {
-    name: 'Cursor',
-    bgClass: 'bg-purple-50 bg-purple-900/20',
-    borderClass: 'border-purple-200 border-purple-800',
-    textClass: 'text-purple-900 text-purple-100',
-    subtextClass: 'text-purple-700 text-purple-300',
-    buttonClass: 'bg-purple-600 hover:bg-purple-700',
-    description: 'Cursor AI-powered code editor',
-  },
   codex: {
     name: 'Codex',
     bgClass: 'bg-gray-100 bg-gray-800/50',

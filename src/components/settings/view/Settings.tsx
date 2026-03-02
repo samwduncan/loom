@@ -36,12 +36,9 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
     updateCodeEditorSetting,
     claudePermissions,
     setClaudePermissions,
-    cursorPermissions,
-    setCursorPermissions,
     codexPermissionMode,
     setCodexPermissionMode,
     mcpServers,
-    cursorMcpServers,
     codexMcpServers,
     mcpTestResults,
     mcpServerTools,
@@ -61,7 +58,6 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
     submitCodexMcpForm,
     handleCodexMcpDelete,
     claudeAuthStatus,
-    cursorAuthStatus,
     codexAuthStatus,
     geminiAuthStatus,
     geminiPermissionMode,
@@ -86,9 +82,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
 
   const isAuthenticated = loginProvider === 'claude'
     ? claudeAuthStatus.authenticated
-    : loginProvider === 'cursor'
-      ? cursorAuthStatus.authenticated
-      : loginProvider === 'codex'
+    : loginProvider === 'codex'
         ? codexAuthStatus.authenticated
         : false;
 
@@ -132,23 +126,18 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
             {activeTab === 'agents' && (
               <AgentsSettingsTab
                 claudeAuthStatus={claudeAuthStatus}
-                cursorAuthStatus={cursorAuthStatus}
                 codexAuthStatus={codexAuthStatus}
                 geminiAuthStatus={geminiAuthStatus}
                 onClaudeLogin={() => openLoginForProvider('claude')}
-                onCursorLogin={() => openLoginForProvider('cursor')}
                 onCodexLogin={() => openLoginForProvider('codex')}
                 onGeminiLogin={() => openLoginForProvider('gemini')}
                 claudePermissions={claudePermissions}
                 onClaudePermissionsChange={setClaudePermissions}
-                cursorPermissions={cursorPermissions}
-                onCursorPermissionsChange={setCursorPermissions}
                 codexPermissionMode={codexPermissionMode}
                 onCodexPermissionModeChange={setCodexPermissionMode}
                 geminiPermissionMode={geminiPermissionMode}
                 onGeminiPermissionModeChange={setGeminiPermissionMode}
                 mcpServers={mcpServers}
-                cursorMcpServers={cursorMcpServers}
                 codexMcpServers={codexMcpServers}
                 mcpTestResults={mcpTestResults}
                 mcpServerTools={mcpServerTools}

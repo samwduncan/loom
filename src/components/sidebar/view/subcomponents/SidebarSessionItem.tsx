@@ -109,17 +109,15 @@ export default function SidebarSessionItem({
               </div>
             </div>
 
-            {!sessionView.isCursorSession && (
-              <button
-                className="w-5 h-5 rounded-md bg-red-50 bg-red-900/20 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  requestDeleteSession();
-                }}
-              >
-                <Trash2 className="w-2.5 h-2.5 text-red-600 text-red-400" />
-              </button>
-            )}
+            <button
+              className="w-5 h-5 rounded-md bg-red-50 bg-red-900/20 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
+              onClick={(event) => {
+                event.stopPropagation();
+                requestDeleteSession();
+              }}
+            >
+              <Trash2 className="w-2.5 h-2.5 text-red-600 text-red-400" />
+            </button>
           </div>
         </div>
       </div>
@@ -158,9 +156,8 @@ export default function SidebarSessionItem({
           </div>
         </Button>
 
-        {!sessionView.isCursorSession && (
-          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
-            {editingSession === session.id && !sessionView.isCodexSession ? (
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
+          {editingSession === session.id && !sessionView.isCodexSession ? (
               <>
                 <input
                   type="text"
@@ -226,7 +223,6 @@ export default function SidebarSessionItem({
               </>
             )}
           </div>
-        )}
       </div>
     </div>
   );

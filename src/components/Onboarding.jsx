@@ -23,13 +23,6 @@ const Onboarding = ({ onComplete }) => {
     error: null
   });
 
-  const [cursorAuthStatus, setCursorAuthStatus] = useState({
-    authenticated: false,
-    email: null,
-    loading: true,
-    error: null
-  });
-
   const [codexAuthStatus, setCodexAuthStatus] = useState({
     authenticated: false,
     email: null,
@@ -74,7 +67,6 @@ const Onboarding = ({ onComplete }) => {
 
     if (isInitialMount || isModalClosing) {
       checkClaudeAuthStatus();
-      checkCursorAuthStatus();
       checkCodexAuthStatus();
       checkGeminiAuthStatus();
     }
@@ -111,12 +103,10 @@ const Onboarding = ({ onComplete }) => {
   };
 
   const checkClaudeAuthStatus = () => checkProviderAuthStatus('claude', setClaudeAuthStatus);
-  const checkCursorAuthStatus = () => checkProviderAuthStatus('cursor', setCursorAuthStatus);
   const checkCodexAuthStatus = () => checkProviderAuthStatus('codex', setCodexAuthStatus);
   const checkGeminiAuthStatus = () => checkProviderAuthStatus('gemini', setGeminiAuthStatus);
 
   const handleClaudeLogin = () => setActiveLoginProvider('claude');
-  const handleCursorLogin = () => setActiveLoginProvider('cursor');
   const handleCodexLogin = () => setActiveLoginProvider('codex');
   const handleGeminiLogin = () => setActiveLoginProvider('gemini');
 
@@ -124,8 +114,6 @@ const Onboarding = ({ onComplete }) => {
     if (exitCode === 0) {
       if (activeLoginProvider === 'claude') {
         checkClaudeAuthStatus();
-      } else if (activeLoginProvider === 'cursor') {
-        checkCursorAuthStatus();
       } else if (activeLoginProvider === 'codex') {
         checkCodexAuthStatus();
       } else if (activeLoginProvider === 'gemini') {
@@ -317,38 +305,6 @@ const Onboarding = ({ onComplete }) => {
                     <button
                       onClick={handleClaudeLogin}
                       className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                      Login
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Cursor */}
-              <div className={`border rounded-lg p-4 transition-colors ${cursorAuthStatus.authenticated
-                ? 'bg-purple-50 bg-purple-900/20 border-purple-200 border-purple-800'
-                : 'border-border bg-card'
-                }`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 bg-purple-900/30 rounded-full flex items-center justify-center">
-                      <SessionProviderLogo provider="cursor" className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-foreground flex items-center gap-2">
-                        Cursor
-                        {cursorAuthStatus.authenticated && <Check className="w-4 h-4 text-green-500" />}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {cursorAuthStatus.loading ? 'Checking...' :
-                          cursorAuthStatus.authenticated ? cursorAuthStatus.email || 'Connected' : 'Not connected'}
-                      </div>
-                    </div>
-                  </div>
-                  {!cursorAuthStatus.authenticated && !cursorAuthStatus.loading && (
-                    <button
-                      onClick={handleCursorLogin}
-                      className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       Login
                     </button>

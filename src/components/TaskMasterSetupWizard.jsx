@@ -247,7 +247,7 @@ const TaskMasterSetupWizard = ({
                   Rule Profiles
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {['claude', 'cursor', 'vscode', 'roo', 'cline', 'windsurf'].map(rule => (
+                  {['claude', 'vscode', 'roo', 'cline', 'windsurf'].map(rule => (
                     <label key={rule} className="flex items-center gap-2">
                       <input
                         type="checkbox"

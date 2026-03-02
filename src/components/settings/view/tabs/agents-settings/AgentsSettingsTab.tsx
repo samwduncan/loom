@@ -7,23 +7,18 @@ import type { AgentContext, AgentsSettingsTabProps } from './types';
 
 export default function AgentsSettingsTab({
   claudeAuthStatus,
-  cursorAuthStatus,
   codexAuthStatus,
   geminiAuthStatus,
   onClaudeLogin,
-  onCursorLogin,
   onCodexLogin,
   onGeminiLogin,
   claudePermissions,
   onClaudePermissionsChange,
-  cursorPermissions,
-  onCursorPermissionsChange,
   codexPermissionMode,
   onCodexPermissionModeChange,
   geminiPermissionMode,
   onGeminiPermissionModeChange,
   mcpServers,
-  cursorMcpServers,
   codexMcpServers,
   mcpTestResults,
   mcpServerTools,
@@ -44,10 +39,6 @@ export default function AgentsSettingsTab({
       authStatus: claudeAuthStatus,
       onLogin: onClaudeLogin,
     },
-    cursor: {
-      authStatus: cursorAuthStatus,
-      onLogin: onCursorLogin,
-    },
     codex: {
       authStatus: codexAuthStatus,
       onLogin: onCodexLogin,
@@ -59,11 +50,9 @@ export default function AgentsSettingsTab({
   }), [
     claudeAuthStatus,
     codexAuthStatus,
-    cursorAuthStatus,
     geminiAuthStatus,
     onClaudeLogin,
     onCodexLogin,
-    onCursorLogin,
     onGeminiLogin,
   ]);
 
@@ -87,14 +76,11 @@ export default function AgentsSettingsTab({
           agentContextById={agentContextById}
           claudePermissions={claudePermissions}
           onClaudePermissionsChange={onClaudePermissionsChange}
-          cursorPermissions={cursorPermissions}
-          onCursorPermissionsChange={onCursorPermissionsChange}
           codexPermissionMode={codexPermissionMode}
           onCodexPermissionModeChange={onCodexPermissionModeChange}
           geminiPermissionMode={geminiPermissionMode}
           onGeminiPermissionModeChange={onGeminiPermissionModeChange}
           mcpServers={mcpServers}
-          cursorMcpServers={cursorMcpServers}
           codexMcpServers={codexMcpServers}
           mcpTestResults={mcpTestResults}
           mcpServerTools={mcpServerTools}

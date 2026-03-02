@@ -38,7 +38,6 @@ interface UseChatComposerStateArgs {
   provider: SessionProvider;
   permissionMode: PermissionMode | string;
   cyclePermissionMode: () => void;
-  cursorModel: string;
   claudeModel: string;
   codexModel: string;
   geminiModel: string;
@@ -91,7 +90,6 @@ export function useChatComposerState({
   provider,
   permissionMode,
   cyclePermissionMode,
-  cursorModel,
   claudeModel,
   codexModel,
   geminiModel,
@@ -291,7 +289,7 @@ export function useChatComposerState({
           projectName: selectedProject.name,
           sessionId: currentSessionId,
           provider,
-          model: provider === 'cursor' ? cursorModel : provider === 'codex' ? codexModel : provider === 'gemini' ? geminiModel : claudeModel,
+          model: provider === 'codex' ? codexModel : provider === 'gemini' ? geminiModel : claudeModel,
           tokenUsage: tokenBudget,
         };
 
@@ -344,7 +342,6 @@ export function useChatComposerState({
       claudeModel,
       codexModel,
       currentSessionId,
-      cursorModel,
       geminiModel,
       handleBuiltInCommand,
       handleCustomCommand,
@@ -563,7 +560,7 @@ export function useChatComposerState({
       setTimeout(() => scrollToBottom(), 100);
 
       const effectiveSessionId =
-        currentSessionId || selectedSession?.id || sessionStorage.getItem('cursorSessionId');
+        currentSessionId || selectedSession?.id;
       const sessionToActivate = effectiveSessionId || `new-session-${Date.now()}`;
 
       if (!effectiveSessionId && !selectedSession?.id) {
@@ -581,13 +578,11 @@ export function useChatComposerState({
       const getToolsSettings = () => {
         try {
           const settingsKey =
-            provider === 'cursor'
-              ? 'cursor-tools-settings'
-              : provider === 'codex'
-                ? 'codex-settings'
-                : provider === 'gemini'
-                  ? 'gemini-settings'
-                  : 'claude-settings';
+            provider === 'codex'
+              ? 'codex-settings'
+              : provider === 'gemini'
+                ? 'gemini-settings'
+                : 'claude-settings';
           const savedSettings = safeLocalStorage.getItem(settingsKey);
           if (savedSettings) {
             return JSON.parse(savedSettings);
@@ -606,22 +601,7 @@ export function useChatComposerState({
       const toolsSettings = getToolsSettings();
       const resolvedProjectPath = selectedProject.fullPath || selectedProject.path || '';
 
-      if (provider === 'cursor') {
-        sendMessage({
-          type: 'cursor-command',
-          command: messageContent,
-          sessionId: effectiveSessionId,
-          options: {
-            cwd: resolvedProjectPath,
-            projectPath: resolvedProjectPath,
-            sessionId: effectiveSessionId,
-            resume: Boolean(effectiveSessionId),
-            model: cursorModel,
-            skipPermissions: toolsSettings?.skipPermissions || false,
-            toolsSettings,
-          },
-        });
-      } else if (provider === 'codex') {
+      if (provider === 'codex') {
         sendMessage({
           type: 'codex-command',
           command: messageContent,
@@ -687,7 +667,6 @@ export function useChatComposerState({
       claudeModel,
       codexModel,
       currentSessionId,
-      cursorModel,
       executeCommand,
       geminiModel,
       isLoading,
@@ -863,14 +842,10 @@ export function useChatComposerState({
 
     const pendingSessionId =
       typeof window !== 'undefined' ? sessionStorage.getItem('pendingSessionId') : null;
-    const cursorSessionId =
-      typeof window !== 'undefined' ? sessionStorage.getItem('cursorSessionId') : null;
-
     const candidateSessionIds = [
       currentSessionId,
       pendingViewSessionRef.current?.sessionId || null,
       pendingSessionId,
-      provider === 'cursor' ? cursorSessionId : null,
       selectedSession?.id || null,
     ];
 

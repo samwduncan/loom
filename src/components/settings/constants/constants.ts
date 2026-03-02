@@ -5,7 +5,6 @@ import type {
   ClaudeMcpFormState,
   CodexMcpFormState,
   CodeEditorSettingsState,
-  CursorPermissionsState,
   McpToolsResult,
   McpTestResult,
   ProjectSortOrder,
@@ -20,7 +19,7 @@ export const SETTINGS_MAIN_TABS: SettingsMainTab[] = [
   'tasks',
 ];
 
-export const AGENT_PROVIDERS: AgentProvider[] = ['claude', 'cursor', 'codex'];
+export const AGENT_PROVIDERS: AgentProvider[] = ['claude', 'codex'];
 export const AGENT_CATEGORIES: AgentCategory[] = ['account', 'permissions', 'mcp'];
 
 export const DEFAULT_PROJECT_SORT_ORDER: ProjectSortOrder = 'name';
@@ -81,15 +80,8 @@ export const DEFAULT_CODEX_MCP_FORM: CodexMcpFormState = {
   },
 };
 
-export const DEFAULT_CURSOR_PERMISSIONS: CursorPermissionsState = {
-  allowedCommands: [],
-  disallowedCommands: [],
-  skipPermissions: false,
-};
-
 export const AUTH_STATUS_ENDPOINTS: Record<AgentProvider, string> = {
   claude: '/api/cli/claude/status',
-  cursor: '/api/cli/cursor/status',
   codex: '/api/cli/codex/status',
   gemini: '/api/cli/gemini/status',
 };

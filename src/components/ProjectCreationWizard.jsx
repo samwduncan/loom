@@ -635,10 +635,10 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                 ) : (
                   <p className="text-sm text-blue-800 text-blue-200">
                     {workspaceType === 'existing'
-                      ? 'The workspace will be added to your project list and will be available for Claude/Cursor sessions.'
+                      ? 'The workspace will be added to your project list and will be available for AI agent sessions.'
                       : githubUrl
                       ? 'The repository will be cloned from this folder.'
-                      : 'The workspace will be added to your project list and will be available for Claude/Cursor sessions.'}
+                      : 'The workspace will be added to your project list and will be available for AI agent sessions.'}
                   </p>
                 )}
               </div>

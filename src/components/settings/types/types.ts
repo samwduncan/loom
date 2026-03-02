@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 
 export type SettingsMainTab = 'agents' | 'appearance' | 'git' | 'api' | 'tasks';
-export type AgentProvider = 'claude' | 'cursor' | 'codex' | 'gemini';
+export type AgentProvider = 'claude' | 'codex' | 'gemini';
 export type AgentCategory = 'account' | 'permissions' | 'mcp';
 export type ProjectSortOrder = 'name' | 'date';
 export type SaveStatus = 'success' | 'error' | null;
@@ -105,12 +105,6 @@ export type ClaudePermissionsState = {
   skipPermissions: boolean;
 };
 
-export type CursorPermissionsState = {
-  allowedCommands: string[];
-  disallowedCommands: string[];
-  skipPermissions: boolean;
-};
-
 export type CodeEditorSettingsState = {
   theme: 'dark' | 'light';
   wordWrap: boolean;
@@ -121,7 +115,6 @@ export type CodeEditorSettingsState = {
 
 export type SettingsStoragePayload = {
   claude: ClaudePermissionsState & { projectSortOrder: ProjectSortOrder; lastUpdated: string };
-  cursor: CursorPermissionsState & { lastUpdated: string };
   codex: { permissionMode: CodexPermissionMode; lastUpdated: string };
 };
 

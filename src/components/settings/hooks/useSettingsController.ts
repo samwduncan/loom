@@ -4,7 +4,6 @@ import {
   AUTH_STATUS_ENDPOINTS,
   DEFAULT_AUTH_STATUS,
   DEFAULT_CODE_EDITOR_SETTINGS,
-  DEFAULT_CURSOR_PERMISSIONS,
 } from '../constants/constants';
 import type {
   AgentProvider,
@@ -14,7 +13,6 @@ import type {
   CodeEditorSettingsState,
   CodexMcpFormState,
   CodexPermissionMode,
-  CursorPermissionsState,
   GeminiPermissionMode,
   McpServer,
   McpToolsResult,
@@ -77,12 +75,6 @@ type ClaudeSettingsStorage = {
   disallowedTools?: string[];
   skipPermissions?: boolean;
   projectSortOrder?: ProjectSortOrder;
-};
-
-type CursorSettingsStorage = {
-  allowedCommands?: string[];
-  disallowedCommands?: string[];
-  skipPermissions?: boolean;
 };
 
 type CodexSettingsStorage = {
@@ -175,10 +167,6 @@ const createEmptyClaudePermissions = (): ClaudePermissionsState => ({
   skipPermissions: false,
 });
 
-const createEmptyCursorPermissions = (): CursorPermissionsState => ({
-  ...DEFAULT_CURSOR_PERMISSIONS,
-});
-
 export function useSettingsController({ isOpen, initialTab, projects, onClose }: UseSettingsControllerArgs) {
   // Dark-only — no toggle, always dark
   const isDarkMode = true;
@@ -197,14 +185,10 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
   const [claudePermissions, setClaudePermissions] = useState<ClaudePermissionsState>(() => (
     createEmptyClaudePermissions()
   ));
-  const [cursorPermissions, setCursorPermissions] = useState<CursorPermissionsState>(() => (
-    createEmptyCursorPermissions()
-  ));
   const [codexPermissionMode, setCodexPermissionMode] = useState<CodexPermissionMode>('default');
   const [geminiPermissionMode, setGeminiPermissionMode] = useState<GeminiPermissionMode>('default');
 
   const [mcpServers, setMcpServers] = useState<McpServer[]>([]);
-  const [cursorMcpServers, setCursorMcpServers] = useState<McpServer[]>([]);
   const [codexMcpServers, setCodexMcpServers] = useState<McpServer[]>([]);
   const [mcpTestResults, setMcpTestResults] = useState<Record<string, McpTestResult>>({});
   const [mcpServerTools, setMcpServerTools] = useState<Record<string, McpToolsResult>>({});
@@ -220,18 +204,12 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
   const [selectedProject, setSelectedProject] = useState<SettingsProject | null>(null);
 
   const [claudeAuthStatus, setClaudeAuthStatus] = useState<AuthStatus>(DEFAULT_AUTH_STATUS);
-  const [cursorAuthStatus, setCursorAuthStatus] = useState<AuthStatus>(DEFAULT_AUTH_STATUS);
   const [codexAuthStatus, setCodexAuthStatus] = useState<AuthStatus>(DEFAULT_AUTH_STATUS);
   const [geminiAuthStatus, setGeminiAuthStatus] = useState<AuthStatus>(DEFAULT_AUTH_STATUS);
 
   const setAuthStatusByProvider = useCallback((provider: AgentProvider, status: AuthStatus) => {
     if (provider === 'claude') {
       setClaudeAuthStatus(status);
-      return;
-    }
-
-    if (provider === 'cursor') {
-      setCursorAuthStatus(status);
       return;
     }
 
@@ -274,21 +252,6 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
       });
     }
   }, [setAuthStatusByProvider]);
-
-  const fetchCursorMcpServers = useCallback(async () => {
-    try {
-      const response = await authenticatedFetch('/api/cursor/mcp');
-      if (!response.ok) {
-        console.error('Failed to fetch Cursor MCP servers');
-        return;
-      }
-
-      const data = await toResponseJson<{ servers?: McpServer[] }>(response);
-      setCursorMcpServers(data.servers || []);
-    } catch (error) {
-      console.error('Error fetching Cursor MCP servers:', error);
-    }
-  }, []);
 
   const fetchCodexMcpServers = useCallback(async () => {
     try {
@@ -643,16 +606,6 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
       });
       setProjectSortOrder(savedClaudeSettings.projectSortOrder === 'date' ? 'date' : 'name');
 
-      const savedCursorSettings = parseJson<CursorSettingsStorage>(
-        localStorage.getItem('cursor-tools-settings'),
-        {},
-      );
-      setCursorPermissions({
-        allowedCommands: savedCursorSettings.allowedCommands || [],
-        disallowedCommands: savedCursorSettings.disallowedCommands || [],
-        skipPermissions: Boolean(savedCursorSettings.skipPermissions),
-      });
-
       const savedCodexSettings = parseJson<CodexSettingsStorage>(
         localStorage.getItem('codex-settings'),
         {},
@@ -667,17 +620,15 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
 
       await Promise.all([
         fetchMcpServers(),
-        fetchCursorMcpServers(),
         fetchCodexMcpServers(),
       ]);
     } catch (error) {
       console.error('Error loading settings:', error);
       setClaudePermissions(createEmptyClaudePermissions());
-      setCursorPermissions(createEmptyCursorPermissions());
       setCodexPermissionMode('default');
       setProjectSortOrder('name');
     }
-  }, [fetchCodexMcpServers, fetchCursorMcpServers, fetchMcpServers]);
+  }, [fetchCodexMcpServers, fetchMcpServers]);
 
   const openLoginForProvider = useCallback((provider: AgentProvider) => {
     setLoginProvider(provider);
@@ -708,13 +659,6 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
         lastUpdated: now,
       }));
 
-      localStorage.setItem('cursor-tools-settings', JSON.stringify({
-        allowedCommands: cursorPermissions.allowedCommands,
-        disallowedCommands: cursorPermissions.disallowedCommands,
-        skipPermissions: cursorPermissions.skipPermissions,
-        lastUpdated: now,
-      }));
-
       localStorage.setItem('codex-settings', JSON.stringify({
         permissionMode: codexPermissionMode,
         lastUpdated: now,
@@ -742,9 +686,6 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
     claudePermissions.disallowedTools,
     claudePermissions.skipPermissions,
     codexPermissionMode,
-    cursorPermissions.allowedCommands,
-    cursorPermissions.disallowedCommands,
-    cursorPermissions.skipPermissions,
     onClose,
     projectSortOrder,
   ]);
@@ -784,7 +725,6 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
     setActiveTab(normalizeMainTab(initialTab));
     void loadSettings();
     void checkAuthStatus('claude');
-    void checkAuthStatus('cursor');
     void checkAuthStatus('codex');
     void checkAuthStatus('gemini');
   }, [checkAuthStatus, initialTab, isOpen, loadSettings]);
@@ -819,12 +759,9 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
     updateCodeEditorSetting,
     claudePermissions,
     setClaudePermissions,
-    cursorPermissions,
-    setCursorPermissions,
     codexPermissionMode,
     setCodexPermissionMode,
     mcpServers,
-    cursorMcpServers,
     codexMcpServers,
     mcpTestResults,
     mcpServerTools,
@@ -844,7 +781,6 @@ export function useSettingsController({ isOpen, initialTab, projects, onClose }:
     submitCodexMcpForm,
     handleCodexMcpDelete,
     claudeAuthStatus,
-    cursorAuthStatus,
     codexAuthStatus,
     geminiAuthStatus,
     geminiPermissionMode,

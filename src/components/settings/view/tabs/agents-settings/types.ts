@@ -3,7 +3,6 @@ import type {
   AuthStatus,
   AgentCategory,
   ClaudePermissionsState,
-  CursorPermissionsState,
   CodexPermissionMode,
   GeminiPermissionMode,
   McpServer,
@@ -20,23 +19,18 @@ export type AgentContextByProvider = Record<AgentProvider, AgentContext>;
 
 export type AgentsSettingsTabProps = {
   claudeAuthStatus: AuthStatus;
-  cursorAuthStatus: AuthStatus;
   codexAuthStatus: AuthStatus;
   geminiAuthStatus: AuthStatus;
   onClaudeLogin: () => void;
-  onCursorLogin: () => void;
   onCodexLogin: () => void;
   onGeminiLogin: () => void;
   claudePermissions: ClaudePermissionsState;
   onClaudePermissionsChange: (value: ClaudePermissionsState) => void;
-  cursorPermissions: CursorPermissionsState;
-  onCursorPermissionsChange: (value: CursorPermissionsState) => void;
   codexPermissionMode: CodexPermissionMode;
   onCodexPermissionModeChange: (value: CodexPermissionMode) => void;
   geminiPermissionMode: GeminiPermissionMode;
   onGeminiPermissionModeChange: (value: GeminiPermissionMode) => void;
   mcpServers: McpServer[];
-  cursorMcpServers: McpServer[];
   codexMcpServers: McpServer[];
   mcpTestResults: Record<string, McpTestResult>;
   mcpServerTools: Record<string, McpToolsResult>;
@@ -67,14 +61,11 @@ export type AgentCategoryContentSectionProps = {
   agentContextById: AgentContextByProvider;
   claudePermissions: ClaudePermissionsState;
   onClaudePermissionsChange: (value: ClaudePermissionsState) => void;
-  cursorPermissions: CursorPermissionsState;
-  onCursorPermissionsChange: (value: CursorPermissionsState) => void;
   codexPermissionMode: CodexPermissionMode;
   onCodexPermissionModeChange: (value: CodexPermissionMode) => void;
   geminiPermissionMode: GeminiPermissionMode;
   onGeminiPermissionModeChange: (value: GeminiPermissionMode) => void;
   mcpServers: McpServer[];
-  cursorMcpServers: McpServer[];
   codexMcpServers: McpServer[];
   mcpTestResults: Record<string, McpTestResult>;
   mcpServerTools: Record<string, McpToolsResult>;

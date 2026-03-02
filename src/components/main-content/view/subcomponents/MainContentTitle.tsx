@@ -25,10 +25,6 @@ function getTabTitle(activeTab: AppTab, shouldShowTasksTab: boolean) {
 }
 
 function getSessionTitle(session: ProjectSession): string {
-  if (session.__provider === 'cursor') {
-    return (session.name as string) || 'Untitled Session';
-  }
-
   return (session.summary as string) || 'New Session';
 }
 

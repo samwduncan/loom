@@ -2,7 +2,7 @@ import React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import NextTaskBanner from '../../../NextTaskBanner.jsx';
-import { CLAUDE_MODELS, CURSOR_MODELS, CODEX_MODELS, GEMINI_MODELS } from '../../../../../shared/modelConstants';
+import { CLAUDE_MODELS, CODEX_MODELS, GEMINI_MODELS } from '../../../../../shared/modelConstants';
 import type { ProjectSession, SessionProvider } from '../../../../types/app';
 
 interface ProviderSelectionEmptyStateProps {
@@ -13,8 +13,6 @@ interface ProviderSelectionEmptyStateProps {
   textareaRef: React.RefObject<HTMLTextAreaElement>;
   claudeModel: string;
   setClaudeModel: (model: string) => void;
-  cursorModel: string;
-  setCursorModel: (model: string) => void;
   codexModel: string;
   setCodexModel: (model: string) => void;
   geminiModel: string;
@@ -44,14 +42,6 @@ const PROVIDERS: ProviderDef[] = [
     check: 'bg-primary text-primary-foreground',
   },
   {
-    id: 'cursor',
-    name: 'Cursor',
-    infoKey: 'providerSelection.providerInfo.cursorEditor',
-    accent: 'border-violet-500 border-violet-400',
-    ring: 'ring-violet-500/15',
-    check: 'bg-violet-500 text-white',
-  },
-  {
     id: 'codex',
     name: 'Codex',
     infoKey: 'providerSelection.providerInfo.openai',
@@ -73,14 +63,14 @@ function getModelConfig(p: SessionProvider) {
   if (p === 'claude') return CLAUDE_MODELS;
   if (p === 'codex') return CODEX_MODELS;
   if (p === 'gemini') return GEMINI_MODELS;
-  return CURSOR_MODELS;
+  return CLAUDE_MODELS;
 }
 
-function getModelValue(p: SessionProvider, c: string, cu: string, co: string, g: string) {
+function getModelValue(p: SessionProvider, c: string, co: string, g: string) {
   if (p === 'claude') return c;
   if (p === 'codex') return co;
   if (p === 'gemini') return g;
-  return cu;
+  return c;
 }
 
 export default function ProviderSelectionEmptyState({
@@ -91,8 +81,6 @@ export default function ProviderSelectionEmptyState({
   textareaRef,
   claudeModel,
   setClaudeModel,
-  cursorModel,
-  setCursorModel,
   codexModel,
   setCodexModel,
   geminiModel,
@@ -114,11 +102,11 @@ export default function ProviderSelectionEmptyState({
     if (provider === 'claude') { setClaudeModel(value); localStorage.setItem('claude-model', value); }
     else if (provider === 'codex') { setCodexModel(value); localStorage.setItem('codex-model', value); }
     else if (provider === 'gemini') { setGeminiModel(value); localStorage.setItem('gemini-model', value); }
-    else { setCursorModel(value); localStorage.setItem('cursor-model', value); }
+    else { setClaudeModel(value); localStorage.setItem('claude-model', value); }
   };
 
   const modelConfig = getModelConfig(provider);
-  const currentModel = getModelValue(provider, claudeModel, cursorModel, codexModel, geminiModel);
+  const currentModel = getModelValue(provider, claudeModel, codexModel, geminiModel);
 
   /* ── New session — provider picker ── */
   if (!selectedSession && !currentSessionId) {
@@ -136,7 +124,7 @@ export default function ProviderSelectionEmptyState({
           </div>
 
           {/* Provider cards — horizontal row, equal width */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 mb-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-6">
             {PROVIDERS.map((p) => {
               const active = provider === p.id;
               return (
@@ -162,7 +150,6 @@ export default function ProviderSelectionEmptyState({
                     <p className="text-[10px] text-muted-foreground mt-1 leading-tight">{
                       p.id === 'claude' ? 'by Anthropic' :
                       p.id === 'codex' ? 'by OpenAI' :
-                      p.id === 'cursor' ? 'AI Code Editor' :
                       'by Google'
                     }</p>
                   </div>
@@ -200,7 +187,6 @@ export default function ProviderSelectionEmptyState({
               {
                 {
                   claude: `Ready to use Claude with ${claudeModel}. Start typing your message below.`,
-                  cursor: `Ready to use Cursor with ${cursorModel}. Start typing your message below.`,
                   codex: `Ready to use Codex with ${codexModel}. Start typing your message below.`,
                   gemini: `Ready to use Gemini with ${geminiModel}. Start typing your message below.`,
                 }[provider]

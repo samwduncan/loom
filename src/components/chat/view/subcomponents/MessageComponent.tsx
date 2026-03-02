@@ -191,7 +191,7 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                 </div>
               )}
               <div className="text-sm font-medium text-gray-900 text-white">
-                {message.type === 'error' ? 'Error' : message.type === 'tool' ? 'Tool' : (provider === 'cursor' ? 'Cursor' : provider === 'codex' ? 'Codex' : provider === 'gemini' ? 'Gemini' : 'Claude')}
+                {message.type === 'error' ? 'Error' : message.type === 'tool' ? 'Tool' : (provider === 'codex' ? 'Codex' : provider === 'gemini' ? 'Gemini' : 'Claude')}
               </div>
             </div>
           )}

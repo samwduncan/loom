@@ -140,10 +140,10 @@ export function useChatRealtimeHandlers({
     const lifecycleMessageTypes = new Set([
       'claude-complete',
       'codex-complete',
-      'cursor-result',
+
       'session-aborted',
       'claude-error',
-      'cursor-error',
+
       'codex-error',
       'gemini-error',
     ]);
@@ -154,17 +154,9 @@ export function useChatRealtimeHandlers({
       structuredMessageData.type === 'system' &&
       structuredMessageData.subtype === 'init';
 
-    const isCursorSystemInit =
-      latestMessage.type === 'cursor-system' &&
-      rawStructuredData &&
-      rawStructuredData.type === 'system' &&
-      rawStructuredData.subtype === 'init';
-
     const systemInitSessionId = isClaudeSystemInit
       ? structuredMessageData?.session_id
-      : isCursorSystemInit
-        ? rawStructuredData?.session_id
-        : null;
+      : null;
 
     const activeViewSessionId =
       selectedSession?.id || currentSessionId || pendingViewSessionRef.current?.sessionId || null;
@@ -176,7 +168,6 @@ export function useChatRealtimeHandlers({
       pendingViewSessionRef.current &&
       !pendingViewSessionRef.current.sessionId &&
       (latestMessage.type === 'claude-error' ||
-        latestMessage.type === 'cursor-error' ||
         latestMessage.type === 'codex-error' ||
         latestMessage.type === 'gemini-error');
 
@@ -555,146 +546,6 @@ export function useChatRealtimeHandlers({
         ]);
         break;
 
-      case 'cursor-system':
-        try {
-          const cursorData = latestMessage.data;
-          if (
-            cursorData &&
-            cursorData.type === 'system' &&
-            cursorData.subtype === 'init' &&
-            cursorData.session_id
-          ) {
-            if (!isSystemInitForView) {
-              return;
-            }
-
-            if (currentSessionId && cursorData.session_id !== currentSessionId) {
-              setIsSystemSessionChange(true);
-              onNavigateToSession?.(cursorData.session_id);
-              return;
-            }
-
-            if (!currentSessionId) {
-              setIsSystemSessionChange(true);
-              onNavigateToSession?.(cursorData.session_id);
-              return;
-            }
-          }
-        } catch (error) {
-          console.warn('Error handling cursor-system message:', error);
-        }
-        break;
-
-      case 'cursor-user':
-        break;
-
-      case 'cursor-tool-use':
-        setChatMessages((previous) => [
-          ...previous,
-          {
-            type: 'assistant',
-            content: `Using tool: ${latestMessage.tool} ${latestMessage.input ? `with ${latestMessage.input}` : ''
-              }`,
-            timestamp: new Date(),
-            isToolUse: true,
-            toolName: latestMessage.tool,
-            toolInput: latestMessage.input,
-          },
-        ]);
-        break;
-
-      case 'cursor-error':
-        setChatMessages((previous) => [
-          ...previous,
-          {
-            type: 'error',
-            content: `Cursor error: ${latestMessage.error || 'Unknown error'}`,
-            timestamp: new Date(),
-          },
-        ]);
-        break;
-
-      case 'cursor-result': {
-        const cursorCompletedSessionId = latestMessage.sessionId || currentSessionId;
-        const pendingCursorSessionId = sessionStorage.getItem('pendingSessionId');
-
-        clearLoadingIndicators();
-        markSessionsAsCompleted(
-          cursorCompletedSessionId,
-          currentSessionId,
-          selectedSession?.id,
-          pendingCursorSessionId,
-        );
-
-        try {
-          const resultData = latestMessage.data || {};
-          const textResult = typeof resultData.result === 'string' ? resultData.result : '';
-
-          if (streamTimerRef.current) {
-            clearTimeout(streamTimerRef.current);
-            streamTimerRef.current = null;
-          }
-          const pendingChunk = streamBufferRef.current;
-          streamBufferRef.current = '';
-
-          setChatMessages((previous) => {
-            const updated = [...previous];
-            const lastIndex = updated.length - 1;
-            const last = updated[lastIndex];
-            if (last && last.type === 'assistant' && !last.isToolUse && last.isStreaming) {
-              const finalContent =
-                textResult && textResult.trim()
-                  ? textResult
-                  : `${last.content || ''}${pendingChunk || ''}`;
-              // Clone the message instead of mutating in place so React can reliably detect state updates.
-              updated[lastIndex] = { ...last, content: finalContent, isStreaming: false };
-            } else if (textResult && textResult.trim()) {
-              updated.push({
-                type: resultData.is_error ? 'error' : 'assistant',
-                content: textResult,
-                timestamp: new Date(),
-                isStreaming: false,
-              });
-            }
-            return updated;
-          });
-        } catch (error) {
-          console.warn('Error handling cursor-result message:', error);
-        }
-
-        if (cursorCompletedSessionId && !currentSessionId && cursorCompletedSessionId === pendingCursorSessionId) {
-          setCurrentSessionId(cursorCompletedSessionId);
-          sessionStorage.removeItem('pendingSessionId');
-          if (window.refreshProjects) {
-            setTimeout(() => window.refreshProjects?.(), 500);
-          }
-        }
-        break;
-      }
-
-      case 'cursor-output':
-        try {
-          const raw = String(latestMessage.data ?? '');
-          const cleaned = raw
-            .replace(/\x1b\[[0-9;?]*[A-Za-z]/g, '')
-            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '')
-            .trim();
-
-          if (cleaned) {
-            streamBufferRef.current += streamBufferRef.current ? `\n${cleaned}` : cleaned;
-            if (!streamTimerRef.current) {
-              streamTimerRef.current = window.setTimeout(() => {
-                const chunk = streamBufferRef.current;
-                streamBufferRef.current = '';
-                streamTimerRef.current = null;
-                appendStreamingChunk(setChatMessages, chunk, true);
-              }, 100);
-            }
-          }
-        } catch (error) {
-          console.warn('Error handling cursor-output message:', error);
-        }
-        break;
 
       case 'claude-complete': {
         const pendingSessionId = sessionStorage.getItem('pendingSessionId');
