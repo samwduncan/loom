@@ -325,13 +325,21 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                 )}
               </>
             ) : message.isInteractivePrompt ? (
-              // Interactive prompt -- warm copper card (display-only record).
-              // Backend investigation (06-06): Interactive prompts use the AskUserQuestion
-              // tool via the SDK's canUseTool permission system. The actual user interaction
-              // happens through AskUserQuestionPanel in PermissionRequestsBanner, not through
-              // this display card. This card shows a historical record of the prompt content.
-              // The 'claude-interactive-prompt' message type is not currently sent by the
-              // server -- if enabled in the future, this card provides the visual display.
+              // -----------------------------------------------------------------------
+              // DEAD CODE PATH: Interactive prompt display card
+              //
+              // The 'claude-interactive-prompt' message type is NEVER sent by the server.
+              // Interactive prompts are handled via the AskUserQuestion tool through the
+              // SDK's canUseTool permission system. The actual user interaction happens in
+              // AskUserQuestionPanel (rendered by PermissionRequestsBanner), NOT here.
+              //
+              // This card exists as a display-only historical record in case the message
+              // type is enabled in the future. Buttons are intentionally disabled since
+              // no websocket handler exists for this code path and none is needed.
+              //
+              // See: plan 06-06 backend investigation for full analysis.
+              // See: PermissionRequestsBanner > AskUserQuestionPanel for live interaction.
+              // -----------------------------------------------------------------------
               <div className="bg-[#241a14] border border-[#b87333]/40 border-l-3 border-l-[#b87333] rounded-lg p-4">
                 <div className="flex items-start gap-2.5">
                   <HelpCircle className="w-5 h-5 text-[#b87333] flex-shrink-0 mt-0.5" />
@@ -364,7 +372,9 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                             {questionLine}
                           </p>
 
-                          {/* Option buttons -- display-only; interactive response handled via AskUserQuestion permission panel */}
+                          {/* Option buttons -- disabled (dead code path). Interactive responses
+                              are handled via AskUserQuestionPanel in PermissionRequestsBanner,
+                              not through this display card. See comment block above. */}
                           <div className="space-y-1.5 mb-3">
                             {options.map((option) => (
                               <button
