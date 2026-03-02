@@ -7,6 +7,7 @@ import type {
   Provider,
 } from '../../types/types';
 import { Markdown } from './Markdown';
+import { ThinkingDisclosure } from './ThinkingDisclosure';
 import { formatUsageLimitText } from '../../utils/chatFormatting';
 import { getClaudePermissionSuggestion } from '../../utils/chatPermissions';
 import { copyTextToClipboard } from '../../../../utils/clipboard';
@@ -395,36 +396,23 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                 </div>
               </div>
             ) : message.isThinking ? (
-              /* Thinking messages - collapsible by default */
+              /* Thinking messages - ThinkingDisclosure with smooth animation */
               <div className="text-sm text-gray-700 text-gray-300">
-                <details className="group">
-                  <summary className="cursor-pointer text-gray-500 text-gray-400 hover:text-gray-700 hover:text-gray-200 font-medium flex items-center gap-2">
-                    <svg className="w-3 h-3 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                    <span>{'💭 Thinking...'}</span>
-                  </summary>
-                  <div className="mt-2 pl-4 border-l-2 border-gray-300 border-gray-600 text-gray-600 text-gray-400 text-sm">
-                    <Markdown className="prose prose-sm max-w-none prose-invert prose-gray">
-                      {message.content}
-                    </Markdown>
-                  </div>
-                </details>
+                <ThinkingDisclosure
+                  content={message.content || ''}
+                  isStreaming={message.isStreaming}
+                  showByDefault={showThinking}
+                />
               </div>
             ) : (
               <div className="text-sm text-gray-700 text-gray-300">
-                {/* Thinking accordion for reasoning */}
-                {showThinking && message.reasoning && (
-                  <details className="mb-3">
-                    <summary className="cursor-pointer text-gray-600 text-gray-400 hover:text-gray-800 hover:text-gray-200 font-medium">
-                      {'💭 Thinking...'}
-                    </summary>
-                    <div className="mt-2 pl-4 border-l-2 border-gray-300 border-gray-600 italic text-gray-600 text-gray-400 text-sm">
-                      <div className="whitespace-pre-wrap">
-                        {message.reasoning}
-                      </div>
-                    </div>
-                  </details>
+                {/* Thinking disclosure for reasoning */}
+                {message.reasoning && (
+                  <ThinkingDisclosure
+                    content={message.reasoning}
+                    isStreaming={false}
+                    showByDefault={showThinking}
+                  />
                 )}
 
                 {(() => {
