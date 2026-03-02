@@ -4,9 +4,6 @@ import App from './App.tsx'
 import './index.css'
 import 'katex/dist/katex.min.css'
 
-// Initialize i18n
-import './i18n/config.js'
-
 // Dark-only theme — no toggle, no context overhead
 document.documentElement.style.colorScheme = 'dark';
 

@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUiPreferences } from '../hooks/useUiPreferences';
-import LanguageSelector from './LanguageSelector';
 
 import { useDeviceSettings } from '../hooks/useDeviceSettings';
 
@@ -245,16 +244,6 @@ const QuickSettingsPanel = () => {
 
           {/* Settings Content */}
           <div className={`flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-6 bg-background ${isMobile ? 'pb-mobile-nav' : ''}`}>
-            {/* Appearance Settings */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 text-gray-400 mb-2">{t('quickSettings.sections.appearance')}</h4>
-
-              {/* Language Selector */}
-              <div>
-                <LanguageSelector compact={true} />
-              </div>
-            </div>
-
             {/* Tool Display Settings */}
             <div className="space-y-2">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 text-gray-400 mb-2">{t('quickSettings.sections.toolDisplay')}</h4>

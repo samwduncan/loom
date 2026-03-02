@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import LanguageSelector from '../../../LanguageSelector';
 import type { CodeEditorSettingsState, ProjectSortOrder } from '../../types/types';
 
 type AppearanceSettingsTabProps = {
@@ -75,10 +74,6 @@ export default function AppearanceSettingsTab({
 
   return (
     <div className="space-y-6 md:space-y-8">
-      <div className="space-y-4">
-        <LanguageSelector />
-      </div>
-
       <div className="space-y-4">
         <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
           <div className="flex items-center justify-between">
