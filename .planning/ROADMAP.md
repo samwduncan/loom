@@ -203,7 +203,7 @@ Phase 1 (Design System) has partial work completed (CSS variables, dark mode rem
 | **Functional phases** | | | |
 | 3. Structural Cleanup | 5/5 | Complete |  |
 | 5. Chat Message Architecture | 5/5 | Complete | 2026-03-02 |
-| 6. Chat Message Polish | 0/6 | Not started | - |
+| 6. Chat Message Polish | 4/6 | In Progress|  |
 | 7. Streaming UX | 0/5 | Not started | - |
 | 8. Error Handling and Status | 0/4 | Not started | - |
 | **Visual phases** | | | |
