@@ -45,6 +45,7 @@ export default defineConfig(({ command, mode }) => {
               '@codemirror/lang-python',
               '@codemirror/theme-one-dark'
             ],
+            'vendor-shiki': ['shiki'],
             'vendor-xterm': ['@xterm/xterm', '@xterm/addon-fit', '@xterm/addon-clipboard', '@xterm/addon-webgl']
           }
         }
