@@ -4,6 +4,7 @@ import MicButton from '../../../mic-button/view/MicButton';
 import ImageAttachment from './ImageAttachment';
 import PermissionRequestsBanner from './PermissionRequestsBanner';
 import ChatInputControls from './ChatInputControls';
+import ComposerProviderPicker from './ComposerProviderPicker';
 import type {
   ChangeEvent,
   ClipboardEvent,
@@ -17,6 +18,7 @@ import type {
   TouchEvent,
 } from 'react';
 import type { PendingPermissionRequest, PermissionMode, Provider } from '../../types/types';
+import type { SessionProvider } from '../../../../types/app';
 
 interface MentionableFile {
   name: string;
@@ -91,6 +93,7 @@ interface ChatComposerProps {
   isTextareaExpanded: boolean;
   sendByCtrlEnter?: boolean;
   onTranscript: (text: string) => void;
+  onProviderChange?: (provider: SessionProvider) => void;
 }
 
 export default function ChatComposer({
@@ -148,6 +151,7 @@ export default function ChatComposer({
   isTextareaExpanded,
   sendByCtrlEnter,
   onTranscript,
+  onProviderChange,
 }: ChatComposerProps) {
   const textareaRect = textareaRef.current?.getBoundingClientRect();
   const commandMenuPosition = {
@@ -323,6 +327,16 @@ export default function ChatComposer({
             <div className="absolute right-16 sm:right-16 top-1/2 transform -translate-y-1/2" style={{ display: 'none' }}>
               <MicButton onTranscript={onTranscript} className="w-10 h-10 sm:w-10 sm:h-10" />
             </div>
+
+            {/* Provider mini-picker near send button */}
+            {onProviderChange && (
+              <div className="absolute right-14 sm:right-[60px] top-1/2 transform -translate-y-1/2">
+                <ComposerProviderPicker
+                  provider={provider as SessionProvider}
+                  onProviderChange={onProviderChange}
+                />
+              </div>
+            )}
 
             <button
               type="submit"

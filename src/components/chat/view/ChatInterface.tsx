@@ -1,14 +1,17 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import QuickSettingsPanel from '../../QuickSettingsPanel';
 import { useTasksSettings } from '../../../contexts/TasksSettingsContext';
 import ChatMessagesPane from './subcomponents/ChatMessagesPane';
 import ChatComposer from './subcomponents/ChatComposer';
+import ProviderDropdown from './subcomponents/ProviderDropdown';
 import type { ChatInterfaceProps } from '../types/types';
 import { useChatProviderState } from '../hooks/useChatProviderState';
 import { useChatSessionState } from '../hooks/useChatSessionState';
 import { useChatRealtimeHandlers } from '../hooks/useChatRealtimeHandlers';
 import { useChatComposerState } from '../hooks/useChatComposerState';
 import type { Provider } from '../types/types';
+import { CLAUDE_MODELS, CODEX_MODELS, GEMINI_MODELS } from '../../../../shared/modelConstants';
+import type { SessionProvider } from '../../../types/app';
 
 type PendingViewSession = {
   sessionId: string | null;
@@ -193,6 +196,29 @@ function ChatInterface({
     setPendingPermissionRequests,
   });
 
+  // Derive model label and providers list for the header dropdown
+  const currentModelLabel = useMemo(() => {
+    const getLabel = (models: typeof CLAUDE_MODELS, value: string) => {
+      const found = models.OPTIONS.find((m: { value: string; label: string }) => m.value === value);
+      return found ? found.label : value;
+    };
+    if (provider === 'codex') return getLabel(CODEX_MODELS, codexModel);
+    if (provider === 'gemini') return getLabel(GEMINI_MODELS, geminiModel);
+    return getLabel(CLAUDE_MODELS, claudeModel);
+  }, [provider, claudeModel, codexModel, geminiModel]);
+
+  const providerOptions = useMemo(() => {
+    const getLabel = (models: typeof CLAUDE_MODELS, value: string) => {
+      const found = models.OPTIONS.find((m: { value: string; label: string }) => m.value === value);
+      return found ? found.label : value;
+    };
+    return [
+      { id: 'claude' as SessionProvider, name: 'Claude', model: getLabel(CLAUDE_MODELS, claudeModel) },
+      { id: 'codex' as SessionProvider, name: 'Codex', model: getLabel(CODEX_MODELS, codexModel) },
+      { id: 'gemini' as SessionProvider, name: 'Gemini', model: getLabel(GEMINI_MODELS, geminiModel) },
+    ];
+  }, [claudeModel, codexModel, geminiModel]);
+
   useChatRealtimeHandlers({
     latestMessage,
     provider,
@@ -265,6 +291,18 @@ function ChatInterface({
   return (
     <>
       <div className="h-full flex flex-col">
+        {/* Header bar with provider dropdown */}
+        {selectedProject && (
+          <div className="flex items-center px-3 py-1.5 border-b border-border/30 flex-shrink-0">
+            <ProviderDropdown
+              provider={provider}
+              modelLabel={currentModelLabel}
+              onProviderChange={(next) => setProvider(next as Provider)}
+              providers={providerOptions}
+            />
+          </div>
+        )}
+
         <ChatMessagesPane
           scrollContainerRef={scrollContainerRef}
           onWheel={handleScroll}
@@ -374,6 +412,7 @@ function ChatInterface({
           isTextareaExpanded={isTextareaExpanded}
           sendByCtrlEnter={sendByCtrlEnter}
           onTranscript={handleTranscript}
+          onProviderChange={(next) => setProvider(next as Provider)}
         />
       </div>
 
