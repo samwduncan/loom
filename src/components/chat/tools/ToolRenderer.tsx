@@ -140,15 +140,16 @@ export const ToolRenderer: React.FC<ToolRendererProps> = memo(({
 
     switch (displayConfig.contentType) {
       case 'diff':
-        if (createDiff) {
-          contentComponent = (
-            <DiffViewer
-              {...contentProps}
-              createDiff={createDiff}
-              onFileClick={() => onFileOpen?.(contentProps.filePath)}
-            />
-          );
-        }
+        contentComponent = (
+          <DiffViewer
+            oldContent={contentProps.oldContent || ''}
+            newContent={contentProps.newContent || ''}
+            filePath={contentProps.filePath || ''}
+            onFileClick={() => onFileOpen?.(contentProps.filePath)}
+            badge={contentProps.badge}
+            badgeColor={contentProps.badgeColor}
+          />
+        );
         break;
 
       case 'markdown':
