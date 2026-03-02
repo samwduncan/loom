@@ -20,6 +20,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 8: Error Handling and Status** - Toasts, inline banners, global status line, stop button
 
 **Visual phases (polish after):**
+> **NOTE:** User wants a complete professional UI overhaul before these phases are planned. Reference products: Open WebUI, Claude.ai chat, ChatGPT (post-GPT5 rainbow-dark styling), Perplexity. The warm earthy palette may be replaced. Run `/gsd:discuss-phase` on these phases before planning to capture the new design direction.
+
 - [ ] **Phase 1: Design System Foundation** - Warm earthy palette, CSS variable token system, typography, fork governance
 - [ ] **Phase 2: Color Sweep** - Replace all 86+ hardcoded Tailwind color classes with semantic aliases
 - [ ] **Phase 4: Terminal and Editor Theming** - Catppuccin Mocha xterm.js theme, CodeMirror warm theme
@@ -148,14 +150,14 @@ Plans:
   3. A pulsing typing indicator appears before the first token arrives, then transitions seamlessly into streaming content without a layout jump
   4. The "Thinking..." pulsing indicator is visually distinct from the typing indicator — uses amber pulse color to signal extended thinking specifically
   5. Skeleton shimmer bars replace content during reconnect scrollback load, fading to real content when parsed
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 07-01: Implement `isUserAtBottom` scroll tracking with 100px threshold and `overflow-anchor: auto` CSS — stable `IntersectionObserver` sentinel via `useCallback`
-- [ ] 07-02: Build scroll-to-bottom floating pill — new message count badge, auto-dismiss on reaching bottom, appear/disappear animation
-- [ ] 07-03: Build typing indicator component — pulsing dots before first token, seamless transition into streaming content
-- [ ] 07-04: Build thinking state indicator — amber pulsing animation distinct from typing indicator, transitions into collapsed thinking disclosure (Phase 5) on completion
-- [ ] 07-05: Build skeleton shimmer placeholder system — bars shown during reconnect scrollback, fade transition to real content
+- [ ] 07-01-PLAN.md — Aurora shimmer CSS foundation, streaming cursor CSS, CSS containment, global imports (STRM-01)
+- [ ] 07-02-PLAN.md — useScrollAnchor hook (IntersectionObserver sentinel), useNewTurnCounter hook, overflow-anchor CSS (STRM-02)
+- [ ] 07-03-PLAN.md — ScrollToBottomPill component, wire scroll anchor into ChatMessagesPane/ChatInterface, remove old scroll button (STRM-02, STRM-03)
+- [ ] 07-04-PLAN.md — PreTokenIndicator (aurora skeleton), ThinkingShimmer (aurora text), replace ActivityIndicator, wire into ChatMessagesPane (STRM-04, STRM-05)
+- [ ] 07-05-PLAN.md — ReconnectSkeletons, ConnectionStatusDot, WebSocket connectionState, visual verification checkpoint (STRM-06)
 
 ### Phase 8: Error Handling and Status
 **Goal**: Errors are communicated clearly and non-disruptively, the AI's current activity is always visible, and the user can stop generation at any time
@@ -203,7 +205,7 @@ Phase 1 (Design System) has partial work completed (CSS variables, dark mode rem
 | **Functional phases** | | | |
 | 3. Structural Cleanup | 5/5 | Complete |  |
 | 5. Chat Message Architecture | 5/5 | Complete | 2026-03-02 |
-| 6. Chat Message Polish | 4/6 | In Progress|  |
+| 6. Chat Message Polish | 6/6 | Complete | 2026-03-02 |
 | 7. Streaming UX | 0/5 | Not started | - |
 | 8. Error Handling and Status | 0/4 | Not started | - |
 | **Visual phases** | | | |
