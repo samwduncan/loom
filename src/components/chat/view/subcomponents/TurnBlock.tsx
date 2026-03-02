@@ -2,6 +2,7 @@ import React, { memo, useMemo } from 'react';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
 import MessageComponent from './MessageComponent';
 import { ToolCallGroup } from './ToolCallGroup';
+import { TurnUsageFooter } from './TurnUsageFooter';
 import { groupConsecutiveToolCalls } from '../../utils/groupConsecutiveToolCalls';
 import type { Turn, ChatMessage } from '../../types/types';
 import type { Project } from '../../../../types/app';
@@ -154,7 +155,7 @@ const TurnBlock = memo(function TurnBlock({
         }}
       >
         <div className="overflow-hidden">
-          <div className="space-y-3 sm:space-y-4 pt-1">
+          <div className="pt-1">
             {groupedItems.map((item, index) => {
               if (Array.isArray(item)) {
                 // Grouped tool calls (3+ consecutive) -- render as ToolCallGroup
@@ -162,16 +163,20 @@ const TurnBlock = memo(function TurnBlock({
                   .map((m) => getMessageKey(m))
                   .join('|');
                 return (
-                  <ToolCallGroup
-                    key={groupKey}
-                    messages={item}
-                    messageProps={{
-                      onFileOpen: messageProps.onFileOpen,
-                      createDiff: messageProps.createDiff,
-                      selectedProject: messageProps.selectedProject,
-                      showRawParameters: messageProps.showRawParameters,
-                    }}
-                  />
+                  <React.Fragment key={groupKey}>
+                    {index > 0 && (
+                      <div className="border-t border-[#3d2e25]/20 mx-3" />
+                    )}
+                    <ToolCallGroup
+                      messages={item}
+                      messageProps={{
+                        onFileOpen: messageProps.onFileOpen,
+                        createDiff: messageProps.createDiff,
+                        selectedProject: messageProps.selectedProject,
+                        showRawParameters: messageProps.showRawParameters,
+                      }}
+                    />
+                  </React.Fragment>
                 );
               }
 
@@ -181,23 +186,32 @@ const TurnBlock = memo(function TurnBlock({
               const prevItem = index > 0 ? groupedItems[index - 1] : null;
               const prevMessage = prevItem && !Array.isArray(prevItem) ? prevItem : null;
               return (
-                <MessageComponent
-                  key={getMessageKey(message)}
-                  message={message}
-                  index={index}
-                  prevMessage={prevMessage}
-                  createDiff={messageProps.createDiff}
-                  onFileOpen={messageProps.onFileOpen}
-                  onShowSettings={messageProps.onShowSettings}
-                  onGrantToolPermission={messageProps.onGrantToolPermission}
-                  autoExpandTools={messageProps.autoExpandTools}
-                  showRawParameters={messageProps.showRawParameters}
-                  showThinking={messageProps.showThinking}
-                  selectedProject={messageProps.selectedProject}
-                  provider={messageProps.provider}
-                />
+                <React.Fragment key={getMessageKey(message)}>
+                  {index > 0 && (
+                    <div className="border-t border-[#3d2e25]/20 mx-3" />
+                  )}
+                  <MessageComponent
+                    message={message}
+                    index={index}
+                    prevMessage={prevMessage}
+                    createDiff={messageProps.createDiff}
+                    onFileOpen={messageProps.onFileOpen}
+                    onShowSettings={messageProps.onShowSettings}
+                    onGrantToolPermission={messageProps.onGrantToolPermission}
+                    autoExpandTools={messageProps.autoExpandTools}
+                    showRawParameters={messageProps.showRawParameters}
+                    showThinking={messageProps.showThinking}
+                    selectedProject={messageProps.selectedProject}
+                    provider={messageProps.provider}
+                  />
+                </React.Fragment>
               );
             })}
+
+            {/* Usage footer -- always visible at bottom of completed turns */}
+            {!turn.isStreaming && turn.usage && turn.model && (
+              <TurnUsageFooter usage={turn.usage} model={turn.model} />
+            )}
           </div>
         </div>
       </div>
@@ -211,6 +225,8 @@ const TurnBlock = memo(function TurnBlock({
     prevProps.turn.messages.length === nextProps.turn.messages.length &&
     prevProps.turn.toolCallCount === nextProps.turn.toolCallCount &&
     prevProps.turn.failedToolCount === nextProps.turn.failedToolCount &&
+    prevProps.turn.usage === nextProps.turn.usage &&
+    prevProps.turn.model === nextProps.turn.model &&
     prevProps.isExpanded === nextProps.isExpanded &&
     prevProps.messageProps.provider === nextProps.messageProps.provider &&
     prevProps.messageProps.autoExpandTools === nextProps.messageProps.autoExpandTools &&
