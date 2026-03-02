@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 3 of 9 (Structural Cleanup)
-Plan: 3 of 5 in current phase — COMPLETE
+Plan: 4 of 5 in current phase — COMPLETE
 Status: Executing phase
-Last activity: 2026-03-02 — Plan 03-03 complete (removed all Cursor CLI backend code from server and client, 46 files, -2689 lines)
+Last activity: 2026-03-02 — Plan 03-04 complete (provider UX: header dropdown, composer mini-picker, one-time welcome screen)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [██░░░░░░░░] 22%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 9.6min
-- Total execution time: 103min
+- Total plans completed: 8
+- Average duration: 8.9min
+- Total execution time: 106min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-design-system-foundation | 4 | 14min | 3.5min |
-| 03-structural-cleanup | 3 | 89min | 29.7min |
+| 03-structural-cleanup | 4 | 92min | 23min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (45min), 03-02 (29min), 03-01 (15min), 01-04 (5min), 01-03 (4min)
-- Trend: Phase 3 plans large scope (46-file Cursor removal, 33-file i18n removal)
+- Last 5 plans: 03-04 (3min), 03-03 (45min), 03-02 (29min), 03-01 (15min), 01-04 (5min)
+- Trend: Plan 03-04 fast (2 tasks, focused component creation); Phase 3 overall trending faster
 
 *Updated after each plan completion*
 
@@ -63,6 +63,10 @@ Recent decisions affecting current work:
 - [03-03]: Simplified SidebarSessionItem conditional wrappers to unconditional rendering after Cursor removal
 - [03-03]: Updated ProviderSelectionEmptyState grid from 4-col to 3-col for 3 remaining providers
 - [03-03]: Changed ProjectCreationWizard text to provider-agnostic "AI agent sessions"
+- [03-04]: Header bar added above ChatMessagesPane for ProviderDropdown placement
+- [03-04]: ComposerProviderPicker positioned left of send button with absolute positioning
+- [03-04]: Welcome screen uses useState+localStorage for instant dismiss without remount
+- [03-04]: Provider selection grid entirely replaced with welcome screen — clean break from old UX
 
 ### Pending Todos
 
@@ -78,5 +82,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 03-03-PLAN.md — removed all Cursor CLI backend from server and client (46 files, -2689 lines)
+Stopped at: Completed 03-04-PLAN.md — provider UX: header dropdown, composer mini-picker, welcome screen
 Resume file: None
