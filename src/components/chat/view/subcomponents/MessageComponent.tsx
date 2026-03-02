@@ -8,6 +8,7 @@ import type {
 } from '../../types/types';
 import { Markdown } from './Markdown';
 import { ThinkingDisclosure } from './ThinkingDisclosure';
+import { ToolActionCard } from './ToolActionCard';
 import { formatUsageLimitText } from '../../utils/chatFormatting';
 import { getClaudePermissionSuggestion } from '../../utils/chatPermissions';
 import { copyTextToClipboard } from '../../../../utils/clipboard';
@@ -209,7 +210,8 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                   </div>
                 </div>
 
-                {message.toolInput && (
+                {/* Subagent containers use their dedicated SubagentContainer component via ToolRenderer */}
+                {message.isSubagentContainer && message.toolInput && (
                   <ToolRenderer
                     toolName={message.toolName || 'UnknownTool'}
                     toolInput={message.toolInput}
@@ -227,91 +229,69 @@ const MessageComponent = memo(({ message, index, prevMessage, createDiff, onFile
                   />
                 )}
 
-                {/* Tool Result Section */}
-                {message.toolResult && !shouldHideToolResult(message.toolName || 'UnknownTool', message.toolResult) && (
-                  message.toolResult.isError ? (
-                    // Error results - red error box with content
-                    <div
-                      id={`tool-result-${message.toolId}`}
-                      className="relative mt-2 p-3 rounded border scroll-mt-4 bg-red-50/50 bg-red-950/10 border-red-200/60 border-red-800/40"
-                    >
-                      <div className="relative flex items-center gap-1.5 mb-2">
-                        <svg className="w-4 h-4 text-red-500 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                        <span className="text-xs font-medium text-red-700 text-red-300">Error</span>
-                      </div>
-                      <div className="relative text-sm text-red-900 text-red-100">
-                        <Markdown className="prose prose-sm max-w-none prose-red prose-invert">
-                          {String(message.toolResult.content || '')}
-                        </Markdown>
-                        {permissionSuggestion && (
-                          <div className="mt-4 border-t border-red-200/60 border-red-800/60 pt-3">
-                            <div className="flex flex-wrap items-center gap-2">
+                {/* Non-subagent tool calls: unified ToolActionCard handles input + result display */}
+                {!message.isSubagentContainer && message.toolInput && (
+                  <ToolActionCard
+                    toolName={message.toolName || 'UnknownTool'}
+                    toolInput={message.toolInput}
+                    toolResult={message.toolResult}
+                    toolId={message.toolId}
+                    onFileOpen={onFileOpen}
+                    createDiff={createDiff}
+                    selectedProject={selectedProject}
+                    showRawParameters={showRawParameters}
+                    permissionUI={
+                      permissionSuggestion && message.toolResult?.isError ? (
+                        <div className="mt-3 border-t border-red-800/60 pt-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!onGrantToolPermission) return;
+                                const result = onGrantToolPermission(permissionSuggestion);
+                                if (result?.success) {
+                                  setPermissionGrantState('granted');
+                                } else {
+                                  setPermissionGrantState('error');
+                                }
+                              }}
+                              disabled={permissionSuggestion.isAllowed || permissionGrantState === 'granted'}
+                              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${permissionSuggestion.isAllowed || permissionGrantState === 'granted'
+                                ? 'bg-green-900/30 border-green-800/60 text-green-200 cursor-default'
+                                : 'bg-gray-900/40 border-red-800/60 text-red-200 hover:bg-gray-900/70'
+                                }`}
+                            >
+                              {permissionSuggestion.isAllowed || permissionGrantState === 'granted'
+                                ? 'Permission added'
+                                : `Grant permission for ${permissionSuggestion.toolName}`}
+                            </button>
+                            {onShowSettings && (
                               <button
                                 type="button"
-                                onClick={() => {
-                                  if (!onGrantToolPermission) return;
-                                  const result = onGrantToolPermission(permissionSuggestion);
-                                  if (result?.success) {
-                                    setPermissionGrantState('granted');
-                                  } else {
-                                    setPermissionGrantState('error');
-                                  }
-                                }}
-                                disabled={permissionSuggestion.isAllowed || permissionGrantState === 'granted'}
-                                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${permissionSuggestion.isAllowed || permissionGrantState === 'granted'
-                                  ? 'bg-green-100 bg-green-900/30 border-green-300/70 border-green-800/60 text-green-800 text-green-200 cursor-default'
-                                  : 'bg-white/80 bg-gray-900/40 border-red-300/70 border-red-800/60 text-red-700 text-red-200 hover:bg-white hover:bg-gray-900/70'
-                                  }`}
+                                onClick={(e) => { e.stopPropagation(); onShowSettings(); }}
+                                className="text-xs text-red-200 underline hover:text-red-100"
                               >
-                                {permissionSuggestion.isAllowed || permissionGrantState === 'granted'
-                                  ? 'Permission added'
-                                  : `Grant permission for ${permissionSuggestion.toolName}`}
+                                Open settings
                               </button>
-                              {onShowSettings && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => { e.stopPropagation(); onShowSettings(); }}
-                                  className="text-xs text-red-700 text-red-200 underline hover:text-red-800 hover:text-red-100"
-                                >
-                                  Open settings
-                                </button>
-                              )}
-                            </div>
-                            <div className="mt-2 text-xs text-red-700/90 text-red-200/80">
-                              {`Adds ${permissionSuggestion.entry} to Allowed Tools.`}
-                            </div>
-                            {permissionGrantState === 'error' && (
-                              <div className="mt-2 text-xs text-red-700 text-red-200">
-                                Unable to update permissions. Please try again.
-                              </div>
-                            )}
-                            {(permissionSuggestion.isAllowed || permissionGrantState === 'granted') && (
-                              <div className="mt-2 text-xs text-green-700 text-green-200">
-                                Permission saved. Retry the request to use the tool.
-                              </div>
                             )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    // Non-error results - route through ToolRenderer (single source of truth)
-                    <div id={`tool-result-${message.toolId}`} className="scroll-mt-4">
-                      <ToolRenderer
-                        toolName={message.toolName || 'UnknownTool'}
-                        toolInput={message.toolInput}
-                        toolResult={message.toolResult}
-                        toolId={message.toolId}
-                        mode="result"
-                        onFileOpen={onFileOpen}
-                        createDiff={createDiff}
-                        selectedProject={selectedProject}
-                        autoExpandTools={autoExpandTools}
-                      />
-                    </div>
-                  )
+                          <div className="mt-2 text-xs text-red-200/80">
+                            {`Adds ${permissionSuggestion.entry} to Allowed Tools.`}
+                          </div>
+                          {permissionGrantState === 'error' && (
+                            <div className="mt-2 text-xs text-red-200">
+                              Unable to update permissions. Please try again.
+                            </div>
+                          )}
+                          {(permissionSuggestion.isAllowed || permissionGrantState === 'granted') && (
+                            <div className="mt-2 text-xs text-green-200">
+                              Permission saved. Retry the request to use the tool.
+                            </div>
+                          )}
+                        </div>
+                      ) : undefined
+                    }
+                  />
                 )}
               </>
             ) : message.isInteractivePrompt ? (
