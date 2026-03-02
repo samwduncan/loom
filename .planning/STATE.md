@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** The chat interface must feel designed, not generated — every interaction, animation, and pixel serves the developer experience.
-**Current focus:** Phase 3 COMPLETE — structural cleanup verified (i18n removed, Cursor removed, provider UX added)
+**Current focus:** Phase 5 IN PROGRESS — chat message architecture (thinking blocks, activity indicators)
 
 ## Current Position
 
-Phase: 3 of 9 (Structural Cleanup) — COMPLETE
-Plan: 5 of 5 in current phase — COMPLETE
-Status: Phase complete (awaiting visual verification checkpoint)
-Last activity: 2026-03-02 — Plan 03-05 complete (final verification audit, all automated checks pass)
+Phase: 5 of 9 (Chat Message Architecture)
+Plan: 2 of 5 in current phase — COMPLETE
+Status: Executing phase 5
+Last activity: 2026-03-02 — Plan 05-02 complete (thinking disclosure + activity indicator)
 
-Progress: [███░░░░░░░] 25%
+Progress: [████░░░░░░] 30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 8.2min
-- Total execution time: 108min
+- Total plans completed: 10
+- Average duration: 7.6min
+- Total execution time: 110min
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [███░░░░░░░] 25%
 |-------|-------|-------|----------|
 | 01-design-system-foundation | 4 | 14min | 3.5min |
 | 03-structural-cleanup | 5 | 94min | 18.8min |
+| 05-chat-message-architecture | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 03-05 (2min), 03-04 (3min), 03-03 (45min), 03-02 (29min), 03-01 (15min)
-- Trend: Verification plans are fast; Phase 3 complete in 94min total
+- Last 5 plans: 05-02 (2min), 03-05 (2min), 03-04 (3min), 03-03 (45min), 03-02 (29min)
+- Trend: Small focused plans executing quickly
 
 *Updated after each plan completion*
 
@@ -68,6 +69,9 @@ Recent decisions affecting current work:
 - [03-04]: Welcome screen uses useState+localStorage for instant dismiss without remount
 - [03-04]: Provider selection grid entirely replaced with welcome screen — clean break from old UX
 - [03-05]: ROADMAP/REQUIREMENTS already updated in prior commit — re-verified instead of duplicating
+- [05-02]: CSS grid 0fr/1fr animation instead of native <details> for smooth height transitions
+- [05-02]: Plain text whitespace-pre-wrap for thinking content (not Markdown) since reasoning is raw text
+- [05-02]: Per-block eye toggle only visible during streaming to reduce UI noise on completed blocks
 
 ### Pending Todos
 
@@ -83,5 +87,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-02
-Stopped at: Completed 03-05-PLAN.md — Phase 3 verification audit complete, visual checkpoint awaiting user
+Stopped at: Completed 05-02-PLAN.md — ThinkingDisclosure + ActivityIndicator components built and wired
 Resume file: None

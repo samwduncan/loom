@@ -27,7 +27,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **CHAT-05**: 3+ consecutive tool calls grouped under a typed summary header (e.g., "3 tool calls: 2 Read, 1 Edit") — expandable to show each card individually
 - [ ] **CHAT-06**: Tool cards with errors display red left border or red-tinted background with error message inline in expanded card
 - [ ] **CHAT-07**: Bash tool calls render in terminal-styled dark mini-blocks — command shown monospace, output as pre-formatted text
-- [ ] **CHAT-08**: Thinking blocks render as collapsed disclosure widgets — clickable "Thinking..." bar, collapsed by default, expandable to show full reasoning with muted styling
+- [x] **CHAT-08**: Thinking blocks render as collapsed disclosure widgets — clickable "Thinking..." bar, collapsed by default, expandable to show full reasoning with muted styling
 - [ ] **CHAT-09**: Diff events render as colored unified diffs — green additions, red removals, gray context lines, file path header, hunk headers
 - [ ] **CHAT-10**: User messages have subtle warm background tint to visually differentiate from AI messages
 - [ ] **CHAT-11**: User messages have a small copy button to grab previous prompts
@@ -125,7 +125,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-05 | Phase 5 | Pending |
 | CHAT-06 | Phase 5 | Pending |
 | CHAT-07 | Phase 5 | Pending |
-| CHAT-08 | Phase 5 | Pending |
+| CHAT-08 | Phase 5 | Complete |
 | CHAT-09 | Phase 6 | Pending |
 | CHAT-10 | Phase 6 | Pending |
 | CHAT-11 | Phase 6 | Pending |
