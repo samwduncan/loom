@@ -52,12 +52,12 @@ Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements
   3. All borders throughout the app are subtle white at 6-10% opacity -- no hard solid borders visible anywhere
   4. Input fields show a dusty rose focus glow ring on focus, text selection uses rose at 25% opacity, and scrollbars are thin/subtle matching the charcoal surfaces
   5. Tailwind transition utilities work correctly throughout the app -- the global `transition: none` reset is resolved
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
-- [ ] 10-03: TBD
+- [ ] 10-01-PLAN.md -- Token palette swap + Tailwind config + transition fix
+- [ ] 10-02-PLAN.md -- Focus glow, text selection, scrollbar restyle, ambient gradient, hardcoded color fixes
+- [ ] 10-03-PLAN.md -- Visual verification checkpoint
 
 ### Phase 11: Hardcoded Color Sweep
 **Goal**: Every color reference in the codebase uses semantic CSS variable aliases -- zero hardcoded hex values or generic Tailwind color utilities remain
@@ -186,7 +186,7 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 10. Design System Foundation | v1.1 | 0/TBD | Not started | - |
+| 10. Design System Foundation | v1.1 | 0/3 | Planned | - |
 | 11. Hardcoded Color Sweep | v1.1 | 0/TBD | Not started | - |
 | 12. Specialty Surfaces | v1.1 | 0/TBD | Not started | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
