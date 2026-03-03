@@ -2,11 +2,14 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { useAuth } from './AuthContext';
 import { IS_PLATFORM } from '../constants/config';
 
+export type ConnectionState = 'connected' | 'reconnecting' | 'disconnected';
+
 type WebSocketContextType = {
   ws: WebSocket | null;
   sendMessage: (message: any) => void;
   latestMessage: any | null;
   isConnected: boolean;
+  connectionState: ConnectionState;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
@@ -31,6 +34,8 @@ const useWebSocketProviderState = (): WebSocketContextType => {
   const unmountedRef = useRef(false); // Track if component is unmounted
   const [latestMessage, setLatestMessage] = useState<any>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
+  const wasConnectedRef = useRef(false); // Tracks if we ever connected — distinguishes "never connected" from "lost connection"
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { token } = useAuth();
 
@@ -60,6 +65,8 @@ const useWebSocketProviderState = (): WebSocketContextType => {
 
       websocket.onopen = () => {
         setIsConnected(true);
+        setConnectionState('connected');
+        wasConnectedRef.current = true;
         wsRef.current = websocket;
       };
 
@@ -74,8 +81,10 @@ const useWebSocketProviderState = (): WebSocketContextType => {
 
       websocket.onclose = () => {
         setIsConnected(false);
+        // Distinguish "never connected" (disconnected) from "was connected, now dropped" (reconnecting)
+        setConnectionState(wasConnectedRef.current ? 'reconnecting' : 'disconnected');
         wsRef.current = null;
-        
+
         // Attempt to reconnect after 3 seconds
         reconnectTimeoutRef.current = setTimeout(() => {
           if (unmountedRef.current) return; // Prevent reconnection if unmounted
@@ -106,8 +115,9 @@ const useWebSocketProviderState = (): WebSocketContextType => {
     ws: wsRef.current,
     sendMessage,
     latestMessage,
-    isConnected
-  }), [sendMessage, latestMessage, isConnected]);
+    isConnected,
+    connectionState,
+  }), [sendMessage, latestMessage, isConnected, connectionState]);
 
   return value;
 };
