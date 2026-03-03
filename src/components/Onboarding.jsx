@@ -346,13 +346,13 @@ const Onboarding = ({ onComplete }) => {
 
               {/* Gemini */}
               <div className={`border rounded-lg p-4 transition-colors ${geminiAuthStatus.authenticated
-                ? 'bg-teal-900/20 border-teal-800'
+                ? 'bg-primary/10 border-primary/30'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-teal-900/30 rounded-full flex items-center justify-center">
-                      <SessionProviderLogo provider="gemini" className="w-5 h-5 text-teal-400" />
+                    <div className="w-10 h-10 bg-primary/15 rounded-full flex items-center justify-center">
+                      <SessionProviderLogo provider="gemini" className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <div className="font-medium text-foreground flex items-center gap-2">
@@ -368,7 +368,7 @@ const Onboarding = ({ onComplete }) => {
                   {!geminiAuthStatus.authenticated && !geminiAuthStatus.loading && (
                     <button
                       onClick={handleGeminiLogin}
-                      className="bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="bg-primary hover:bg-primary/90 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       Login
                     </button>
