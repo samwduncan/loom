@@ -136,11 +136,11 @@ Plans:
   2. Running tool calls show a pulsing dusty rose indicator that is visually distinct from completed and failed states
   3. Completed tool calls collapse to a minimal chip, failed tool calls expand with a muted red background showing the error message
   4. Three or more sequential tool calls group into an accordion with a count badge -- expandable to show individual pills, collapsed by default
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 15-01: TBD
-- [ ] 15-02: TBD
+- [ ] 15-01-PLAN.md -- ToolActionCard pill shape, state-driven borders, pulse animation, auto-expand errors
+- [ ] 15-02-PLAN.md -- ToolCallGroup pill header, count badges, state-aware auto-expand/collapse
 
 ### Phase 16: Sidebar & Global Polish
 **Goal**: Every non-chat surface -- sidebar, settings, modals, mobile nav -- matches the charcoal + rose palette with density improvements and polished interactions
