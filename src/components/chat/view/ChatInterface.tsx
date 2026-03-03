@@ -4,6 +4,7 @@ import { useTasksSettings } from '../../../contexts/TasksSettingsContext';
 import ChatMessagesPane from './subcomponents/ChatMessagesPane';
 import ChatComposer from './subcomponents/ChatComposer';
 import ProviderDropdown from './subcomponents/ProviderDropdown';
+import ConnectionStatusDot from './subcomponents/ConnectionStatusDot';
 import type { ChatInterfaceProps } from '../types/types';
 import { useChatProviderState } from '../hooks/useChatProviderState';
 import { useChatSessionState } from '../hooks/useChatSessionState';
@@ -12,6 +13,7 @@ import { useChatComposerState } from '../hooks/useChatComposerState';
 import type { Provider } from '../types/types';
 import { CLAUDE_MODELS, CODEX_MODELS, GEMINI_MODELS } from '../../../../shared/modelConstants';
 import type { SessionProvider } from '../../../types/app';
+import { useWebSocket } from '../../../contexts/WebSocketContext';
 
 type PendingViewSession = {
   sessionId: string | null;
@@ -43,6 +45,7 @@ function ChatInterface({
   onShowAllTasks,
 }: ChatInterfaceProps) {
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings();
+  const { connectionState } = useWebSocket();
 
   const streamBufferRef = useRef('');
   const streamTimerRef = useRef<number | null>(null);
@@ -293,7 +296,8 @@ function ChatInterface({
       <div className="h-full flex flex-col">
         {/* Header bar with provider dropdown */}
         {selectedProject && (
-          <div className="flex items-center px-3 py-1.5 border-b border-border/30 flex-shrink-0">
+          <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border/30 flex-shrink-0">
+            <ConnectionStatusDot state={connectionState} />
             <ProviderDropdown
               provider={provider}
               modelLabel={currentModelLabel}

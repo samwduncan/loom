@@ -9,6 +9,7 @@ import ScrollToBottomPill from './ScrollToBottomPill';
 import type { ChatMessage, Turn } from '../../types/types';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
 import AssistantThinkingIndicator from './AssistantThinkingIndicator';
+import ReconnectSkeletons from './ReconnectSkeletons';
 import { useTurnGrouping } from '../../hooks/useTurnGrouping';
 import { useScrollAnchor } from '../../hooks/useScrollAnchor';
 import { useNewTurnCounter } from '../../hooks/useNewTurnCounter';
@@ -441,6 +442,11 @@ export default function ChatMessagesPane({
       )}
 
       {showIndicator && <AssistantThinkingIndicator selectedProvider={provider} isVisible={isLoading} />}
+
+      {/* Reconnect skeleton placeholders: shown when reloading messages after WebSocket reconnection */}
+      {isLoadingSessionMessages && chatMessages.length > 0 && (
+        <ReconnectSkeletons count={3} isLoading={isLoadingSessionMessages} />
+      )}
 
       {/* Sentinel div for IntersectionObserver-based bottom detection */}
       <div ref={sentinelRef} style={{ height: '1px', width: '100%' }} aria-hidden="true" />
