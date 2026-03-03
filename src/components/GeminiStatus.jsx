@@ -48,13 +48,13 @@ function GeminiStatus({ status, onAbort, isLoading }) {
 
   return (
     <div className="w-full mb-6 animate-in slide-in-from-bottom duration-300">
-      <div className="flex items-center justify-between max-w-4xl mx-auto bg-gradient-to-r from-cyan-950 to-blue-950 text-white rounded-lg shadow-lg px-4 py-3">
+      <div className="flex items-center justify-between max-w-4xl mx-auto bg-gradient-to-r from-surface-base to-surface-raised text-foreground rounded-lg shadow-lg px-4 py-3">
         <div className="flex-1">
           <div className="flex items-center gap-3">
             {/* Animated spinner */}
             <span className={cn(
               "text-xl transition-all duration-500",
-              animationPhase % 2 === 0 ? "text-cyan-400 scale-110" : "text-cyan-300"
+              animationPhase % 2 === 0 ? "text-primary scale-110" : "text-primary/75"
             )}>
               {currentSpinner}
             </span>
