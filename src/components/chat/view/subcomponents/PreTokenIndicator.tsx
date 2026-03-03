@@ -6,12 +6,11 @@ interface PreTokenIndicatorProps {
 }
 
 /**
- * Pre-token skeleton indicator with aurora shimmer effect.
+ * Pre-token aurora aura indicator.
  *
- * Renders 4 uniform-width skeleton placeholder lines that shimmer with a
- * full rainbow aurora gradient while waiting for the first streamed token.
- * When isVisible transitions to false, the skeleton collapses upward using
- * a CSS Grid 1fr->0fr animation before unmounting.
+ * Renders a soft, pulsing rainbow glow bar (Gemini-style) beneath where
+ * AI content will appear. When isVisible transitions to false, the aura
+ * collapses upward using a CSS Grid 1fr->0fr animation before unmounting.
  */
 export default function PreTokenIndicator({ isVisible }: PreTokenIndicatorProps) {
   const [exiting, setExiting] = useState(false);
@@ -24,14 +23,12 @@ export default function PreTokenIndicator({ isVisible }: PreTokenIndicatorProps)
     prevVisible.current = isVisible;
 
     if (wasVisible && !isVisible) {
-      // Transition from visible to hidden: trigger collapse animation
       setExiting(true);
       exitTimer.current = setTimeout(() => {
         setShouldRender(false);
         setExiting(false);
       }, 300);
     } else if (!wasVisible && isVisible) {
-      // Transition from hidden to visible: mount immediately
       setShouldRender(true);
       setExiting(false);
     }
@@ -54,11 +51,19 @@ export default function PreTokenIndicator({ isVisible }: PreTokenIndicatorProps)
       }}
     >
       <div style={{ overflow: 'hidden' }}>
-        <div className="py-3 px-4 space-y-2">
-          <div className="aurora-skeleton-line" style={{ width: '100%' }} />
-          <div className="aurora-skeleton-line" style={{ width: '100%' }} />
-          <div className="aurora-skeleton-line" style={{ width: '100%' }} />
-          <div className="aurora-skeleton-line" style={{ width: '85%' }} />
+        <div className="py-4 px-4">
+          <div className="relative" style={{ height: '16px' }}>
+            {/* Diffused glow layer */}
+            <div
+              className="aurora-aura absolute inset-x-0"
+              style={{ top: '6px' }}
+            />
+            {/* Bright core line on top */}
+            <div
+              className="aurora-aura-core absolute inset-x-0"
+              style={{ top: '7px' }}
+            />
+          </div>
         </div>
       </div>
     </div>

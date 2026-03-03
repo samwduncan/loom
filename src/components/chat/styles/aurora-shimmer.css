@@ -101,11 +101,64 @@
   animation: aurora-rotate 4s linear infinite;
 }
 
-/* Respect reduced motion: freeze the rotation */
+/*
+ * .aurora-aura — Soft pulsing rainbow glow bar (Gemini-style thinking indicator).
+ *
+ * A thin gradient strip with a large blur radius that creates a soft,
+ * diffused rainbow glow. The opacity pulses gently to create a breathing
+ * effect. Used as the pre-token thinking indicator instead of skeleton lines.
+ */
+@keyframes aurora-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.aurora-aura {
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    calc(var(--aurora-angle) + 90deg),
+    oklch(65% 0.28 0) 0%,
+    oklch(70% 0.25 45) 12.5%,
+    oklch(75% 0.22 90) 25%,
+    oklch(70% 0.25 150) 37.5%,
+    oklch(65% 0.28 210) 50%,
+    oklch(60% 0.28 270) 62.5%,
+    oklch(65% 0.25 330) 75%,
+    oklch(65% 0.28 360) 100%
+  );
+  filter: blur(6px);
+  animation: aurora-rotate 4s linear infinite, aurora-pulse 2s ease-in-out infinite;
+}
+
+.aurora-aura-core {
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(
+    calc(var(--aurora-angle) + 90deg),
+    oklch(75% 0.28 0) 0%,
+    oklch(80% 0.25 45) 12.5%,
+    oklch(85% 0.22 90) 25%,
+    oklch(80% 0.25 150) 37.5%,
+    oklch(75% 0.28 210) 50%,
+    oklch(70% 0.28 270) 62.5%,
+    oklch(75% 0.25 330) 75%,
+    oklch(75% 0.28 360) 100%
+  );
+  animation: aurora-rotate 4s linear infinite, aurora-pulse 2s ease-in-out infinite;
+}
+
+/* Respect reduced motion: freeze the rotation and pulse */
 @media (prefers-reduced-motion: reduce) {
   .aurora-gradient,
   .aurora-skeleton-line,
-  .aurora-thinking-text {
+  .aurora-thinking-text,
+  .aurora-aura,
+  .aurora-aura-core {
     animation: none;
   }
 }
