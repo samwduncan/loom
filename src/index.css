@@ -81,6 +81,7 @@
 
     --muted: 30 2.8% 14.5%;              /* #252423 -- same as secondary */
     --muted-foreground: 0 3% 59%;         /* #989494 -- dim text */
+    --foreground-secondary: 0 5% 74%;       /* ~#bdb9b9 -- mid-tone text between foreground and muted */
 
     --accent: 4 54.7% 62.7%;             /* #D4736C -- dusty rose (sole accent) */
     --accent-foreground: 0 10% 88%;       /* #e4dbd9 -- warm white */
@@ -99,6 +100,9 @@
     --status-reconnecting: 35 50% 55%;
     --status-disconnected: 0 40% 50%;
     --status-error: 0 45% 48%;
+    --status-info: 201 50% 61%;             /* #6bacce -- informational/link blue tone */
+    --diff-added-bg: 140 35% 12%;           /* dark green tint -- diff added lines (Phase 12 ready) */
+    --diff-removed-bg: 0 35% 14%;           /* dark red tint -- diff removed lines (Phase 12 ready) */
 
     /* Nav design tokens -- charcoal + rose palette */
     --nav-glass-bg: 30 3.0% 12.9% / 0.7;
