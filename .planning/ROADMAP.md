@@ -35,7 +35,7 @@ Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements
 
 **Independent component work (after foundation):**
 - [ ] **Phase 13: Message Experience** - Hidden-hover actions, full-width messages, spacing, entrance animations, streaming fade
-- [ ] **Phase 14: Toast & Overlay System** - Z-index scale, Sonner toasts, WebSocket status toasts, glassmorphic blur, portals
+- [x] **Phase 14: Toast & Overlay System** - Z-index scale, Sonner toasts, WebSocket status toasts, glassmorphic blur, portals (completed 2026-03-03)
 - [ ] **Phase 15: Tool Call Display** - Action pills, pulsing indicators, collapse states, error expansion, accordion grouping
 - [ ] **Phase 16: Sidebar & Global Polish** - Sidebar restyle, settings, mobile nav, modals, session grouping, collapse mode
 - [ ] **Phase 17: Streaming & Status** - RAF buffer, smart auto-scroll, scroll pill, typing/thinking indicators, status line, stop button
@@ -120,12 +120,12 @@ Plans:
   3. WebSocket disconnect shows a warning toast and reconnect shows a success toast -- connection state changes are always communicated
   4. Modals, toasts, and dropdowns use glassmorphic blur styling, while scrolling content does not -- floating vs. inline elements are visually distinct
   5. All overlay elements render via ReactDOM.createPortal to document.body -- no stacking context conflicts cause overlays to appear behind content
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
-- [ ] 14-03: TBD
+- [x] 14-01-PLAN.md -- Z-index scale, Sonner & portal infrastructure (7-tier CSS variable scale, toast provider, OverlayPortal, 16-file migration)
+- [x] 14-02-PLAN.md -- Modal portal migration (18 modals to OverlayPortal + formal z-index + backdrop standardization)
+- [x] 14-03-PLAN.md -- WebSocket toasts & glassmorphic dropdowns (useWebSocketToasts hook, 7 dropdown glass treatments)
 
 ### Phase 15: Tool Call Display
 **Goal**: Tool call invocations are compact, informative, and scannable -- running/complete/failed states are instantly distinguishable, and sequential calls group into manageable accordions
@@ -190,9 +190,9 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 |-------|-----------|----------------|--------|-----------|
 | 10. Design System Foundation | 3/3 | Complete    | 2026-03-03 | - |
 | 11. Hardcoded Color Sweep | 5/5 | Complete   | 2026-03-03 | - |
-| 12. Specialty Surfaces | 4/4 | Complete   | 2026-03-03 | - |
+| 12. Specialty Surfaces | 4/4 | Complete    | 2026-03-03 | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
-| 14. Toast & Overlay System | v1.1 | 0/TBD | Not started | - |
+| 14. Toast & Overlay System | v1.1 | 3/3 | Complete | 2026-03-03 |
 | 15. Tool Call Display | v1.1 | 0/TBD | Not started | - |
 | 16. Sidebar & Global Polish | v1.1 | 0/TBD | Not started | - |
 | 17. Streaming & Status | v1.1 | 0/TBD | Not started | - |
