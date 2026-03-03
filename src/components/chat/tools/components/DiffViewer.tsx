@@ -1,6 +1,7 @@
 import React, { memo, useMemo, useCallback } from 'react';
 import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 import { ShikiDiffLine } from './ShikiDiffLine';
+import { catppuccinMocha } from '../../../../shared/catppuccin-mocha';
 
 interface DiffViewerProps {
   oldContent: string;
@@ -28,37 +29,37 @@ function detectLanguage(filePath: string): string {
 }
 
 /**
- * Warm earthy diff theme — overrides ALL dark theme variables to prevent
+ * Charcoal + Catppuccin diff theme — overrides ALL dark theme variables to prevent
  * blue-gray bleed-through from the library defaults.
  */
-const warmDiffStyles = {
+const charcoalDiffStyles = {
   variables: {
     dark: {
-      diffViewerBackground: '#1c1210',
-      diffViewerColor: '#f5e6d3',
-      addedBackground: '#1a2e1a',
-      addedColor: '#b8dab8',
-      removedBackground: '#2e1a1a',
-      removedColor: '#dab8b8',
-      changedBackground: '#2a1f1a',
-      wordAddedBackground: '#2a4a2a',
-      wordRemovedBackground: '#4a2a2a',
-      addedGutterBackground: '#152815',
-      removedGutterBackground: '#281515',
-      gutterBackground: '#241a14',
-      gutterBackgroundDark: '#1c1210',
-      gutterColor: '#c4a882',
-      addedGutterColor: '#b8dab8',
-      removedGutterColor: '#dab8b8',
-      emptyLineBackground: '#1c1210',
-      codeFoldBackground: '#241a14',
-      codeFoldGutterBackground: '#1c1210',
-      codeFoldContentColor: '#c4a882',
-      diffViewerTitleBackground: '#241a14',
-      diffViewerTitleColor: '#c4a882',
-      diffViewerTitleBorderColor: '#3d2e25',
-      highlightBackground: '#3d2e25',
-      highlightGutterBackground: '#2a1f1a',
+      diffViewerBackground: catppuccinMocha.base,
+      diffViewerColor: catppuccinMocha.text,
+      addedBackground: 'hsl(140 35% 12%)',
+      addedColor: catppuccinMocha.green,
+      removedBackground: 'hsl(0 35% 14%)',
+      removedColor: catppuccinMocha.red,
+      changedBackground: catppuccinMocha.surface0,
+      wordAddedBackground: 'hsl(140 35% 20%)',
+      wordRemovedBackground: 'hsl(0 35% 22%)',
+      addedGutterBackground: 'hsl(140 35% 10%)',
+      removedGutterBackground: 'hsl(0 35% 11%)',
+      gutterBackground: catppuccinMocha.mantle,
+      gutterBackgroundDark: catppuccinMocha.base,
+      gutterColor: catppuccinMocha.subtext0,
+      addedGutterColor: catppuccinMocha.green,
+      removedGutterColor: catppuccinMocha.red,
+      emptyLineBackground: catppuccinMocha.base,
+      codeFoldBackground: catppuccinMocha.mantle,
+      codeFoldGutterBackground: catppuccinMocha.base,
+      codeFoldContentColor: catppuccinMocha.subtext0,
+      diffViewerTitleBackground: catppuccinMocha.mantle,
+      diffViewerTitleColor: catppuccinMocha.subtext0,
+      diffViewerTitleBorderColor: catppuccinMocha.surface0,
+      highlightBackground: catppuccinMocha.surface0,
+      highlightGutterBackground: catppuccinMocha.surface0,
     },
   },
   line: {
@@ -101,7 +102,7 @@ export const DiffViewer: React.FC<DiffViewerProps> = memo(({
   }, [language]);
 
   // Stable reference for styles object
-  const styles = useMemo(() => warmDiffStyles, []);
+  const styles = useMemo(() => charcoalDiffStyles, []);
 
   return (
     <div className="rounded-lg overflow-hidden border border-border/10 my-2">

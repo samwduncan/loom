@@ -111,7 +111,7 @@ export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isS
       {isStreaming || html === null ? (
         /* Streaming / loading fallback: raw monospace */
         <pre
-          className="bg-surface-base text-foreground text-sm font-mono p-4 overflow-x-auto"
+          className="bg-[#191817] text-foreground text-sm font-mono p-4 overflow-x-auto"
           style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
         >
           <code>{shouldTruncate ? lines.slice(0, TRUNCATED_VISIBLE).join('\n') : code}</code>
@@ -119,7 +119,7 @@ export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isS
       ) : (
         /* Highlighted HTML from Shiki */
         <div
-          className="shiki-code-block text-sm overflow-x-auto [&_pre]:!bg-surface-base [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:!rounded-none [&_code]:!whitespace-pre-wrap [&_code]:!break-words [&_pre]:!overflow-x-auto"
+          className="shiki-code-block text-sm overflow-x-auto [&_pre]:!bg-[#191817] [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:!rounded-none [&_code]:!whitespace-pre-wrap [&_code]:!break-words [&_pre]:!overflow-x-auto"
           dangerouslySetInnerHTML={{
             __html: shouldTruncate
               ? truncateShikiHtml(html, TRUNCATED_VISIBLE)

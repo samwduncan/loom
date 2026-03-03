@@ -1,10 +1,16 @@
 /**
- * Singleton Shiki highlighter with warm Dark+ color replacements.
+ * Singleton Shiki highlighter with Catppuccin Mocha theme.
  *
  * Uses the web bundle (~3.8 MB) instead of the full bundle (~6.4 MB).
  * Languages are loaded lazily on first use; the highlighter instance
  * and its WASM engine are created exactly once.
+ *
+ * Catppuccin Mocha is a bundled Shiki theme. We warm-shift only the
+ * base/surface/text colors via colorReplacements so backgrounds blend
+ * with the app's charcoal palette. Token/accent colors stay pure Catppuccin.
  */
+
+import { catppuccinMocha, shikiBaseReplacements } from '../../../shared/catppuccin-mocha';
 
 // We use a loose `Highlighter` interface because the web bundle's
 // BundledLanguage type is narrower than the full bundle's type that
@@ -18,23 +24,6 @@ interface Highlighter {
   }): string;
   getLoadedLanguages(): string[];
 }
-
-// ---- warm Dark+ color replacements ----
-// Maps exact VS Code Dark+ hex values to warm Loom equivalents
-const WARM_COLOR_REPLACEMENTS: Record<string, string> = {
-  '#1E1E1E': '#1c1210', // background -> Loom base
-  '#D4D4D4': '#f5e6d3', // foreground -> Loom cream
-  '#264F78': '#3d2e25', // selection -> warm selection
-  '#808080': '#c4a882', // comments -> muted gold
-  '#569CD6': '#6bacce', // keywords -> slightly warmer blue
-  '#4EC9B0': '#5cc0a0', // types -> slightly warmer teal
-  '#CE9178': '#d4a574', // strings -> Loom amber
-  '#DCDCAA': '#e0d0a0', // functions -> warmer yellow
-  '#9CDCFE': '#a0ccde', // variables -> warmer light blue
-  '#C586C0': '#c48aab', // control flow -> warmer mauve
-  '#6A9955': '#7a9960', // comments green -> warmer green
-  '#B5CEA8': '#c0c8a0', // numbers -> warmer green
-};
 
 // ---- singleton promise ----
 let highlighterPromise: Promise<Highlighter> | null = null;
@@ -51,7 +40,7 @@ export async function getHighlighter(): Promise<Highlighter> {
       const { createHighlighter } = await import('shiki/bundle/web');
 
       const highlighter = await createHighlighter({
-        themes: ['dark-plus'],
+        themes: ['catppuccin-mocha'],
         langs: [
           'javascript',
           'typescript',
@@ -106,8 +95,8 @@ export async function highlightCode(code: string, lang: string): Promise<string>
   try {
     return highlighter.codeToHtml(code, {
       lang: safeLang,
-      theme: 'dark-plus',
-      colorReplacements: WARM_COLOR_REPLACEMENTS,
+      theme: 'catppuccin-mocha',
+      colorReplacements: shikiBaseReplacements,
     });
   } catch {
     // Absolute fallback — return escaped plain text
@@ -115,6 +104,6 @@ export async function highlightCode(code: string, lang: string): Promise<string>
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
-    return `<pre style="background:#1c1210;color:#f5e6d3;padding:1rem;border-radius:0.5rem;overflow-x:auto"><code>${escaped}</code></pre>`;
+    return `<pre style="background:${catppuccinMocha.mantle};color:${catppuccinMocha.text};padding:1rem;border-radius:0.5rem;overflow-x:auto"><code>${escaped}</code></pre>`;
   }
 }
