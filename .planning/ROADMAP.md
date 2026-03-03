@@ -67,12 +67,14 @@ Plans:
   1. A grep for arbitrary hex values in Tailwind classes (`bg-[#`, `text-[#`, `border-[#`) returns zero matches across the entire codebase
   2. A grep for generic gray/slate/zinc/neutral Tailwind utilities returns zero matches -- all replaced with Loom semantic palette aliases
   3. Every visible surface -- chat, sidebar, file explorer, git panel, settings, terminal wrapper -- displays the charcoal + rose palette with no warm brown, blue, or gray artifacts
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
-- [ ] 11-03: TBD
+- [ ] 11-01-PLAN.md -- Token additions (foreground-secondary, status-info, diff-added/removed) + Tailwind config
+- [ ] 11-02-PLAN.md -- Hardcoded hex sweep + gray utilities in chat/ and shell/ components (~38 files)
+- [ ] 11-03-PLAN.md -- Gray utilities in settings/, code-editor/, sidebar/, file-tree/ components (~21 files)
+- [ ] 11-04-PLAN.md -- Gray + blue/red/green/amber sweep in TaskMaster JSX files (~16 files)
+- [ ] 11-05-PLAN.md -- COLR-03 verification audit, straggler fixes, human visual verification
 
 ### Phase 12: Specialty Surfaces
 **Goal**: Third-party embedded surfaces (terminal, code editor, syntax highlighting, diffs, markdown prose) all match the charcoal + rose palette -- no visual seams between app and embedded content
