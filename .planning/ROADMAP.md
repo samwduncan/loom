@@ -189,7 +189,7 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 10. Design System Foundation | 3/3 | Complete    | 2026-03-03 | - |
-| 11. Hardcoded Color Sweep | 1/5 | In Progress|  | - |
+| 11. Hardcoded Color Sweep | 3/5 | In Progress|  | - |
 | 12. Specialty Surfaces | v1.1 | 0/TBD | Not started | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
 | 14. Toast & Overlay System | v1.1 | 0/TBD | Not started | - |
