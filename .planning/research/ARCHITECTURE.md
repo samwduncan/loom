@@ -1,526 +1,507 @@
-# Architecture Research
+# Architecture Patterns: Visual Redesign Integration
 
-**Domain:** Brownfield React + Tailwind web app transformation (CloudCLI → Loom)
-**Researched:** 2026-03-01
-**Confidence:** HIGH (based on direct codebase analysis of 197 source files)
-
----
-
-## Standard Architecture
-
-### System Overview
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Browser Client                            │
-├──────────────────┬──────────────────┬───────────────────────────┤
-│   Sidebar        │   Main Content   │   Panels                  │
-│ ┌──────────────┐ │ ┌──────────────┐ │ ┌──────────┐ ┌─────────┐ │
-│ │ ProjectList  │ │ │ChatInterface │ │ │FileTree  │ │GitPanel │ │
-│ │ SessionList  │ │ │ChatMessages  │ │ │CodeEditor│ │Shell    │ │
-│ │ Settings     │ │ │ChatComposer  │ │ └──────────┘ └─────────┘ │
-│ └──────────────┘ │ └──────────────┘ │                           │
-├──────────────────┴──────────────────┴───────────────────────────┤
-│                     Context Layer (React Context API)            │
-│  ThemeContext  AuthContext  WebSocketContext  TasksSettings       │
-├─────────────────────────────────────────────────────────────────┤
-│                   WebSocket (latestMessage)                       │
-├─────────────────────────────────────────────────────────────────┤
-│                     Express Backend                               │
-│  ┌────────────┐  ┌───────────────┐  ┌─────────────────────┐    │
-│  │ claude-sdk │  │  gemini-cli   │  │ sessionManager/DB   │    │
-│  └────────────┘  └───────────────┘  └─────────────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Component Boundaries
-
-| Component | Responsibility | Communicates With |
-|-----------|----------------|-------------------|
-| `AppContent` | Top-level layout, route-to-session binding | Sidebar, MainContent, MobileNav |
-| `ChatInterface` | Orchestrates all chat state via 4 custom hooks | ChatMessagesPane, ChatComposer |
-| `ChatMessagesPane` | Renders scrollable message list | MessageComponent (per message) |
-| `MessageComponent` | Renders one message (user/assistant/tool/thinking) | Markdown, ToolRenderer |
-| `ToolRenderer` | Routes tool calls to display components | OneLineDisplay, CollapsibleDisplay, DiffViewer, SubagentContainer |
-| `ChatComposer` | Input area, permission banners, scroll-to-bottom | ChatInterface (via props) |
-| `useChatRealtimeHandlers` | Processes all WebSocket messages into state | setChatMessages (up to ChatInterface) |
-| `WebSocketContext` | Single WS connection, broadcasts `latestMessage` | All consumers via `useWebSocket()` |
-| `ThemeContext` | `isDarkMode` toggle, writes `.dark` class to `<html>` | All components via `useTheme()` |
+**Domain:** Brownfield React 18 visual redesign -- charcoal + dusty rose palette replacing warm earthy palette
+**Researched:** 2026-03-03
+**Confidence:** HIGH (based on direct codebase analysis of built v1.0 architecture)
 
 ---
 
-## Existing Codebase Map
+## Recommended Architecture
+
+The visual redesign integrates into the existing architecture through five integration layers, each with a specific transformation strategy. The core principle: **change values, not structures**. The v1.0 architecture was designed for exactly this kind of palette swap -- CSS variables abstract color from components. The redesign exploits this by working from the inside out: token values first, then hardcoded references, then new systems (toast, animation), then specialty surfaces (terminal, code).
+
+### Integration Layer Map
 
 ```
-src/
-├── index.css                    # HSL CSS variable definitions (:root + .dark)
-├── App.tsx                      # Provider tree (I18n, Theme, Auth, WS, Tasks)
-├── contexts/
-│   ├── ThemeContext.jsx          # Dark mode toggle — writes .dark to <html>
-│   ├── WebSocketContext.tsx      # Single WS, exposes latestMessage
-│   ├── AuthContext.jsx           # JWT auth state
-│   └── TasksSettingsContext.jsx  # TaskMaster feature flags
-├── hooks/
-│   ├── useProjectsState.ts      # Project/session selection, sidebar state
-│   └── useSessionProtection.ts  # Active/processing session tracking
-├── components/
-│   ├── app/AppContent.tsx        # Layout root (sidebar + main)
-│   ├── chat/
-│   │   ├── view/
-│   │   │   ├── ChatInterface.tsx          # Chat root — composes 4 hooks
-│   │   │   └── subcomponents/
-│   │   │       ├── ChatMessagesPane.tsx   # Scrollable message list
-│   │   │       ├── MessageComponent.tsx   # Single message renderer
-│   │   │       ├── ChatComposer.tsx       # Input + controls
-│   │   │       └── AssistantThinkingIndicator.tsx
-│   │   ├── hooks/
-│   │   │   ├── useChatRealtimeHandlers.ts # WS message → state mutations
-│   │   │   ├── useChatSessionState.ts     # Message list, scroll, session load
-│   │   │   ├── useChatComposerState.ts    # Input, submit, abort, commands
-│   │   │   └── useChatProviderState.ts    # Provider/model selection
-│   │   └── tools/
-│   │       ├── ToolRenderer.tsx           # Routes tool → display component
-│   │       └── components/
-│   │           ├── CollapsibleDisplay.tsx
-│   │           ├── OneLineDisplay.tsx
-│   │           ├── DiffViewer.tsx
-│   │           ├── SubagentContainer.tsx
-│   │           └── ContentRenderers/      # Markdown, FileList, TodoList etc.
-│   ├── sidebar/                  # Session/project list
-│   ├── shell/                    # xterm.js terminal
-│   ├── git-panel/                # Git changes/history
-│   ├── file-tree/                # File explorer
-│   ├── code-editor/              # CodeMirror 6 viewer
-│   └── ui/                      # CVA primitives (button, input, badge)
-├── i18n/
-│   └── locales/                  # 43 components use useTranslation — strip all
-└── types/app.ts                  # Project, ProjectSession, SessionProvider types
+Layer 1: CSS Variable Values (index.css :root)
+  ↓ propagates to all semantic-alias components automatically
+Layer 2: Hardcoded Color References (86 occurrences across 13 files)
+  ↓ requires per-file find-and-replace
+Layer 3: Specialty Surface Themes (xterm.js, Shiki, DiffViewer, scrollbars)
+  ↓ requires JS theme object updates
+Layer 4: New Component Systems (toast, activity status, animation)
+  ↓ additive -- no existing code changes
+Layer 5: Component Visual Polish (hover states, transitions, micro-interactions)
+  ↓ CSS additions + minor JSX className changes
 ```
 
 ---
 
-## Architectural Patterns
+## Component Boundaries
 
-### Pattern 1: CSS Variable Theming (Two-Layer System)
+### Existing Components: Change Classification
 
-**What:** Tailwind color aliases (`bg-background`, `text-foreground`, `border-border`) point to CSS custom properties in `index.css`. The `:root` selector defines light theme values; `.dark` selector overrides them. React toggles the `dark` class on `<html>`.
+| Component | File | Change Type | Rationale |
+|-----------|------|-------------|-----------|
+| `ChatInterface` | `src/components/chat/view/ChatInterface.tsx` | **None** | Pure orchestrator -- no color references, delegates to subcomponents |
+| `ChatMessagesPane` | `src/.../subcomponents/ChatMessagesPane.tsx` | **Visual-only** | Has `text-gray-500`, `text-gray-400`, `border-gray-200` hardcoded classes in loading indicators and "load more" UI |
+| `TurnBlock` | `src/.../subcomponents/TurnBlock.tsx` | **Visual-only** | Has `border-amber-500`, `bg-amber-500/5`, `bg-gray-800/30`, `text-gray-500`, `text-gray-300` hardcoded. Also `border-[#3d2e25]/20` dividers |
+| `MessageComponent` | `src/.../subcomponents/MessageComponent.tsx` | **Visual-only** | Heavy -- 11 hardcoded warm hex references (`#f5e6d3`, `#c4a882`, `#b85c3a`, `#3d2e25`, `#241a14`, `#b87333`, `#dab8b8`), plus `bg-amber-900/15`, `border-amber-700/20` |
+| `ToolActionCard` | `src/.../subcomponents/ToolActionCard.tsx` | **Visual-only** | Uses `bg-gray-500`, `text-gray-300/400/500`, `bg-gray-900/30`, `border-gray-700/50`. Category tinting stays (blue/purple/gray semantically appropriate) |
+| `ThinkingDisclosure` | `src/.../subcomponents/ThinkingDisclosure.tsx` | **Visual-only** | 6 hardcoded warm hex references (`#c4a882`, `#3d2e25`) |
+| `CodeBlock (ShikiCodeBlock)` | `src/.../subcomponents/CodeBlock.tsx` | **Visual-only** | 7 hardcoded warm hex references (`#241a14`, `#c4a882`, `#1c1210`, `#f5e6d3`, `#a08a6e`, `#3d2e25`) |
+| `ScrollToBottomPill` | `src/.../subcomponents/ScrollToBottomPill.tsx` | **Visual-only** | Fully hardcoded warm hex: `bg-[#2a1f1a]`, `border-[#c4a882]/30`, `text-[#f5e6d3]`, `hover:bg-[#3d2e25]` |
+| `ConnectionStatusDot` | `src/.../subcomponents/ConnectionStatusDot.tsx` | **Visual-only** | Hardcoded status hex: `bg-[#6bbf59]`, `bg-[#d4a574]`, `bg-[#c15a4a]` -- should migrate to CSS variable status tokens |
+| `SystemStatusMessage` | `src/.../subcomponents/SystemStatusMessage.tsx` | **Visual-only** | 6 hardcoded warm hex references in tier config |
+| `TurnUsageFooter` | `src/.../subcomponents/TurnUsageFooter.tsx` | **Visual-only** | 1 hardcoded reference: `border-[#3d2e25]/30`, `text-[#c4a882]/50` |
+| `DiffViewer` | `src/.../tools/components/DiffViewer.tsx` | **Visual-only** | Full `warmDiffStyles` JS theme object with 19 hardcoded warm hex values |
+| `useShikiHighlighter` | `src/.../hooks/useShikiHighlighter.ts` | **Visual-only** | `WARM_COLOR_REPLACEMENTS` map with 12 hardcoded hex values mapping Dark+ to warm palette |
+| `PreTokenIndicator` | `src/.../subcomponents/PreTokenIndicator.tsx` | **None** | Uses CSS classes from `aurora-shimmer.css` -- aurora colors are palette-independent (oklch rainbow) |
+| `ThinkingShimmer` | `src/.../subcomponents/ThinkingShimmer.tsx` | **None** | Same as above -- aurora classes only |
+| `ChatComposer` | `src/.../subcomponents/ChatComposer.tsx` | **Minor** | Orchestrator; any color is in child components. May need className updates for new composer styling |
+| `ChatInputControls` | `src/.../subcomponents/ChatInputControls.tsx` | **Visual-only** | Uses semantic Tailwind classes (bg-muted, text-primary) plus some hardcoded green/orange/amber for permission states |
+| `MobileNav` | `src/components/MobileNav.jsx` | **Visual-only** | Uses `nav-glass`, `mobile-nav-float` utility classes that read from CSS variable tokens. Token value change propagates automatically. Active tab styling needs attention |
+| `Sidebar` + subcomponents | `src/components/sidebar/` | **Visual-only** | Bulk of sidebar uses inherited semantic classes. Individual subcomponents need audit |
+| Terminal (`constants.ts`) | `src/components/shell/constants/constants.ts` | **Visual-only** | `TERMINAL_OPTIONS.theme` is a JS object with 20 hardcoded hex values for xterm.js ITheme |
+| `index.css` | `src/index.css` | **Foundation** | All 22 CSS variables redefined. Plus 8 nav design tokens. Plus hardcoded scrollbar colors (3 instances). Plus select dropdown SVG arrow color |
+| `streaming-cursor.css` | `src/.../styles/streaming-cursor.css` | **Visual-only** | Hardcoded `#d4a574` amber cursor color (2 instances) |
+| `aurora-shimmer.css` | `src/.../styles/aurora-shimmer.css` | **None** | Rainbow oklch gradients are palette-independent by design |
+| `tailwind.config.js` | Root | **Foundation** | Add new semantic tokens (toast, activity-status). Existing mapping structure stays identical |
 
-**Current state:** 22 semantic variables defined (`--background`, `--foreground`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--border`, `--input`, `--ring`, `--card`, `--popover`, and their `-foreground` variants).
+### New Components (Additive)
 
-**Transformation approach:** Only change the HSL values inside `:root` and `.dark` in `index.css`. Variable names stay identical — Tailwind config and all component classnames that use semantic aliases require zero changes. This is the correct target for palette replacement.
+| Component | Purpose | Mounts In | Communicates With |
+|-----------|---------|-----------|-------------------|
+| `ToastProvider` + `Toast` | Transient notification system | App root (portal) | WebSocketContext (connection errors), useChatRealtimeHandlers (session errors) |
+| `ToastContainer` | Positions and stacks toasts | Fixed viewport overlay | ToastProvider context |
+| `ActivityStatusLine` | Shows current tool execution | ChatInterface, above ChatComposer | useChatRealtimeHandlers (tool events), isLoading state |
+| `StopButton` | Replaces send during streaming | ChatComposer | onAbortSession callback (already exists) |
 
-**Example — current dark theme values to replace:**
+---
+
+## Integration Strategy: CSS Variable Migration
+
+### The Problem
+
+The :root block in `index.css` defines 22 semantic HSL variables with warm earthy values. These propagate automatically to any component using Tailwind semantic classes (`bg-background`, `text-foreground`, etc.). However, **86 occurrences across 13 files use hardcoded hex values** that bypass this system entirely.
+
+### The Solution: Two-Pass Migration
+
+**Pass 1: Redefine CSS variable values (instant full-app effect)**
+
+Change only the HSL channel values in `:root`. Variable names stay identical. Every component using semantic Tailwind classes updates automatically.
+
 ```css
-.dark {
-  --background: 222.2 84% 4.9%;     /* replace: 15 10% 7%  (deep chocolate) */
-  --foreground: 210 40% 98%;         /* replace: 30 60% 92% (cream) */
-  --primary: 217.2 91.2% 59.8%;     /* replace: 32 70% 65% (amber/copper) */
-  --muted: 217.2 32.6% 17.5%;       /* replace: 20 25% 18% (warm surface) */
-  --accent: 217.2 32.6% 17.5%;      /* replace: 20 25% 18% (warm surface) */
-  --border: 217.2 32.6% 17.5%;      /* replace: 20 20% 22% (warm border) */
+/* BEFORE (warm earthy) */
+:root {
+  --background: 10 27.3% 8.6%;          /* #1c1210 */
+  --foreground: 33.5 63% 89.4%;         /* #f5e6d3 */
+  --primary: 30.6 52.7% 64.3%;          /* #d4a574 -- amber */
+  --accent: 21.9 45.6% 55.3%;           /* #c17f59 -- copper */
+  --card: 18.8 23.5% 13.3%;             /* #2a1f1a */
+  --secondary: 22.5 24.5% 19.2%;        /* #3d2e25 */
+  --muted-foreground: 34.5 35.9% 63.9%; /* #c4a882 */
+  --destructive: 16.2 52.1% 47.5%;      /* #b85c3a */
+  --border: 34.5 35.9% 63.9%;           /* #c4a882 */
+}
+
+/* AFTER (charcoal + dusty rose) */
+:root {
+  --background: 0 0% 10.2%;             /* #1a1a1a -- charcoal base */
+  --foreground: 0 0% 93%;               /* #ededed -- near-white text */
+  --primary: 4 38% 63%;                 /* #D4736C -- dusty rose */
+  --accent: 4 28% 60%;                  /* #C97B7B -- muted rose */
+  --card: 0 0% 13.3%;                   /* #222222 -- surface 1 */
+  --secondary: 0 0% 17%;                /* #2b2b2b -- surface 2 */
+  --muted-foreground: 0 0% 55%;         /* #8c8c8c -- muted gray */
+  --destructive: 0 60% 50%;             /* #cc3333 -- pure red */
+  --border: 0 0% 22%;                   /* #383838 -- subtle border */
 }
 ```
 
-**Trade-offs:**
-- Pro: Zero component changes for semantic aliases
-- Con: Does not catch the 86 files with hardcoded Tailwind colors (separate problem)
+The exact HSL values above are illustrative. The actual values should be finalized during design system planning with visual verification. The point is: **only this block changes for Pass 1**.
+
+**Pass 2: Replace hardcoded hex references**
+
+The 86 hardcoded references fall into two categories:
+
+| Category | Count | Strategy |
+|----------|-------|----------|
+| **Warm palette hex** (`#1c1210`, `#2a1f1a`, `#3d2e25`, `#c4a882`, `#d4a574`, `#f5e6d3`, `#241a14`, `#a08a6e`, `#b85c3a`, `#b87333`, `#dab8b8`) | ~80 | Replace with `hsl(var(--token-name))` or equivalent Tailwind semantic class |
+| **Status/accent hex** (`#6bbf59`, `#c15a4a`) | ~6 | Already have CSS variable tokens (`--status-connected`, etc.) -- use `bg-status-connected` |
+
+### Critical: What NOT to Change in Pass 1
+
+- CSS variable **names** stay identical (no `--primary` to `--rose` rename)
+- `tailwind.config.js` color mapping structure stays identical
+- `hsl(var(--X) / <alpha-value>)` contract stays identical
+- Component classNames using semantic aliases (`bg-background`, `text-foreground`) -- zero changes needed
 
 ---
 
-### Pattern 2: Hardcoded Color Audit + Replacement
+## Integration Strategy: Animation System
 
-**What:** 86 files contain hardcoded Tailwind color classes (`bg-blue-600`, `text-gray-500`, `bg-red-950`, etc.). These bypass the CSS variable system and will not respond to the palette swap.
+### Current Animation Inventory
 
-**Audit approach:**
-```bash
-# Find all hardcoded colors sorted by frequency
-grep -rh "bg-[a-z]*-[0-9]\|text-[a-z]*-[0-9]\|border-[a-z]*-[0-9]" \
-  src --include="*.tsx" --include="*.jsx" | \
-  grep -oE "(bg|text|border)-[a-z]+-[0-9]+" | sort | uniq -c | sort -rn
-```
+| Animation | Location | Mechanism | Performance |
+|-----------|----------|-----------|-------------|
+| Aurora rainbow shimmer | `aurora-shimmer.css` | CSS `@property --aurora-angle` + compositor thread | GPU-accelerated, zero main-thread cost |
+| Streaming cursor blink | `streaming-cursor.css` | CSS `@keyframes cursor-blink` with `step-end` | Lightweight, no layout triggers |
+| Turn expand/collapse | TurnBlock, ToolActionCard, ThinkingDisclosure | CSS Grid `gridTemplateRows: 0fr/1fr` with `transition` | Layout-contained, single reflow |
+| Scroll pill entrance | ScrollToBottomPill | CSS `@keyframes pill-enter` (inline `<style>`) | Lightweight, runs once |
+| Sidebar slide | `index.css` `.sidebar-transition` | CSS `transform + opacity` | GPU-accelerated |
+| Spinner | `index.css` `@keyframes spin` | CSS `transform: rotate()` with `will-change` | GPU-accelerated |
 
-**Priority groups:**
-1. **User message bubble** (`bg-blue-600` — 60 occurrences): Replace with `bg-primary` (or new amber token)
-2. **Error states** (`bg-red-*`, `text-red-*`): Replace with `bg-destructive` / `text-destructive`
-3. **Assistant/system text** (`text-gray-500`, `text-gray-700`, `dark:text-gray-300`): Replace with `text-muted-foreground`
-4. **Status colors** (`bg-amber-*`, `bg-green-*`): Add named semantic tokens (`--status-warning`, `--status-success`) to CSS variables
-5. **Thinking indicator** (`text-gray-900 dark:text-white`, `text-gray-500 dark:text-gray-400`): Replace with `text-foreground` / `text-muted-foreground`
+### New Animation Needs
 
-**Tool assistance:** A scoped find-and-replace with verification is the right approach:
-```bash
-# Example: Replace user bubble color across all files
-find src -name "*.tsx" -o -name "*.jsx" | \
-  xargs sed -i 's/bg-blue-600 text-white/bg-primary text-primary-foreground/g'
-```
+| Animation | Recommended Mechanism | Why |
+|-----------|----------------------|-----|
+| Toast enter/exit | CSS `@keyframes` with `translateX` slide + `opacity` fade | Must not interfere with streaming -- GPU-composited, no layout reflow. Define in `index.css` or a new `toast.css` |
+| Hover state transitions | CSS `transition` on individual properties | Already partially in place (150ms cubic-bezier). Extend to new palette colors |
+| Button press feedback | CSS `transform: scale(0.98)` on `:active` | Already in place for touch devices. Apply consistently |
+| Status line slide-up | CSS Grid `gridTemplateRows: 0fr/1fr` | Same pattern as TurnBlock -- proven to work with streaming |
+| Send-to-stop morph | CSS `transition` on `opacity` + `transform` | Swap icons with crossfade. No JS animation needed |
 
-**Trade-offs:**
-- Pro: Once replaced, components automatically honor future palette changes
-- Con: Some hardcoded colors are intentionally semantic (red for error, amber for warning) and need new CSS variable tokens rather than existing aliases
+### Performance Rules for Animations + Streaming
+
+1. **Never animate `height`, `width`, or `top`/`left` during streaming** -- these trigger layout recalculation that competes with `requestAnimationFrame` token batching
+2. **Use CSS Grid 0fr/1fr for expand/collapse** -- established pattern in TurnBlock, ToolActionCard, ThinkingDisclosure, PreTokenIndicator. Browser optimizes this well
+3. **Use `will-change: transform` sparingly** -- only on elements with continuous animation (spinner, aurora). Not on hover transitions
+4. **`contain: content` on streaming messages** -- already in place via `.message-streaming` class. Keeps token DOM mutations from triggering ancestor reflows
+5. **Toast animations must use `position: fixed` portal** -- rendering toasts inside the scroll container would cause scroll position shifts during streaming
+
+### Where Animations Live
+
+**CSS files (preferred for visual-only animations):**
+- `src/index.css` -- global transitions, hover states, new utility classes
+- `src/components/chat/styles/streaming-cursor.css` -- streaming cursor (update color only)
+- `src/components/chat/styles/aurora-shimmer.css` -- no changes needed
+- New: `src/components/toast/styles/toast.css` -- toast enter/exit keyframes
+
+**Inline CSS-in-JS (for state-driven animations):**
+- CSS Grid `gridTemplateRows` in `style={{}}` -- keep this pattern for expand/collapse (TurnBlock, ToolActionCard, ActivityStatusLine)
+- ScrollToBottomPill inline `<style>` -- move keyframes to `index.css` during cleanup
+
+**No JS animation libraries needed.** The existing CSS-only approach is working well and performs better than JS animation during streaming.
 
 ---
 
-### Pattern 3: Streaming State Machine
+## Integration Strategy: Toast/Notification System
 
-**What:** The existing streaming architecture uses a `streamBufferRef` + 100ms `setTimeout` to batch tokens before calling `setChatMessages`. Messages have an `isStreaming` boolean. Two functions manage state: `appendStreamingChunk` (appends to last assistant message) and `finalizeStreamingMessage` (sets `isStreaming: false`).
+### Architecture Decision: Where Toasts Mount
 
-**Current code pattern (in `useChatRealtimeHandlers`):**
+```
+App.tsx
+├── AuthProvider
+│   └── WebSocketProvider        <-- connection state lives here
+│       ├── ToastProvider        <-- NEW: React Context for toast state
+│       │   ├── AppContent
+│       │   │   ├── Sidebar
+│       │   │   └── MainContent
+│       │   │       └── ChatInterface
+│       │   │           ├── ChatMessagesPane
+│       │   │           └── ChatComposer
+│       │   └── ToastContainer   <-- NEW: Fixed-position portal (renders via portal)
+```
+
+**Why this position:**
+- `ToastProvider` wraps inside `WebSocketProvider` so it can subscribe to connection state changes
+- `ToastContainer` renders via `ReactDOM.createPortal` to `document.body` -- completely outside the scroll container
+- Any component can call `useToast().show()` to trigger a notification
+- The toast system does NOT interfere with streaming because it renders in a separate DOM subtree
+
+### Toast → WebSocket Integration Points
+
+| Event | Source | Toast Behavior |
+|-------|--------|---------------|
+| WebSocket disconnected | `WebSocketContext.connectionState === 'disconnected'` | Warning toast: "Connection lost. Reconnecting..." (persists until reconnected) |
+| WebSocket reconnected | `connectionState` transition `'reconnecting' → 'connected'` | Success toast: "Reconnected" (auto-dismiss 3s) |
+| Session error (non-fatal) | `useChatRealtimeHandlers` `session-error` event | Error toast with error summary (auto-dismiss 5s) |
+| Process crash (fatal) | `useChatRealtimeHandlers` `session-error` with non-zero exit | Inline banner in message flow (NOT a toast -- uses existing `SystemStatusMessage` "error" tier) |
+
+### State Management
+
 ```typescript
-// Token arrives via WebSocket
-streamBufferRef.current += decodedText;
-if (!streamTimerRef.current) {
-  streamTimerRef.current = window.setTimeout(() => {
-    const chunk = streamBufferRef.current;
-    streamBufferRef.current = '';
-    streamTimerRef.current = null;
-    appendStreamingChunk(setChatMessages, chunk, false);
-  }, 100);  // 100ms debounce
+// Toast state is local to ToastProvider -- not in any existing context
+type Toast = {
+  id: string;
+  tier: 'info' | 'success' | 'warning' | 'error';
+  message: string;
+  autoDismissMs?: number;  // undefined = persistent until dismissed
+  timestamp: number;
+};
+
+// Context exposes:
+type ToastContextType = {
+  toasts: Toast[];
+  show: (toast: Omit<Toast, 'id' | 'timestamp'>) => string;
+  dismiss: (id: string) => void;
+};
+```
+
+---
+
+## Integration Strategy: Scroll Behavior
+
+### Current Scroll Architecture (v1.0)
+
+```
+ChatMessagesPane (overflow-y-auto container)
+  ├── [messages rendered in max-w-[720px] centered div]
+  ├── AssistantThinkingIndicator (conditional)
+  ├── ReconnectSkeletons (conditional)
+  └── Sentinel div (1px, ref={sentinelRef})  <-- IntersectionObserver target
+
+useScrollAnchor hook:
+  - IntersectionObserver on sentinel div with 100px rootMargin
+  - isAtBottom: true when sentinel is visible
+  - isUserScrolledUp: true when user scrolls away from bottom
+  - Auto re-engage: when sentinel becomes visible again, reset isUserScrolledUp
+
+ScrollToBottomPill:
+  - Absolute positioned in ChatMessagesPane container
+  - Shows when isUserScrolledUp && newTurnCount > 0
+  - Smooth scroll to bottom on click
+```
+
+### What Changes for v1.1
+
+The scroll behavior architecture is **correct and does not need structural changes**. The visual redesign affects:
+
+1. **ScrollToBottomPill styling** -- replace hardcoded warm hex with new palette tokens. Currently `bg-[#2a1f1a]`, `border-[#c4a882]/30`, `text-[#f5e6d3]` -- change to `bg-card`, `border-border/30`, `text-foreground`
+2. **Scroll container padding** -- may adjust for new spacing/density, but `overflow-y-auto` container stays identical
+3. **Scrollbar styling** -- `scrollbar-thin` class in `index.css` has hardcoded `hsl(34.5 35.9% 63.9% / 0.3)` -- update to use `var(--muted-foreground)` via CSS
+
+### No Scroll Architecture Changes Needed
+
+The IntersectionObserver-based scroll anchor with sentinel div is the correct modern pattern. The `requestAnimationFrame` streaming buffer is orthogonal to scroll behavior -- they don't interact. The `contain: content` on `.message-streaming` prevents streaming DOM changes from affecting scroll position calculations.
+
+---
+
+## Integration Strategy: Theme Token Organization
+
+### Current Token System (22 semantic variables)
+
+```
+Surfaces:     --background, --card, --popover, --secondary, --muted
+Text:         --foreground, --card-foreground, --popover-foreground,
+              --secondary-foreground, --muted-foreground, --accent-foreground,
+              --primary-foreground, --destructive-foreground
+Accent:       --primary, --accent, --destructive
+UI:           --border, --input, --ring, --radius
+Status:       --status-connected, --status-reconnecting,
+              --status-disconnected, --status-error
+Nav:          --nav-glass-bg, --nav-glass-blur, --nav-glass-saturate,
+              --nav-tab-glow, --nav-tab-ring, --nav-float-shadow,
+              --nav-float-ring, --nav-divider-color, --nav-input-bg,
+              --nav-input-focus-ring
+Layout:       --mobile-nav-height, --mobile-nav-padding, --mobile-nav-total,
+              --safe-area-inset-*, --header-*
+```
+
+### Proposed New Tokens for v1.1
+
+| Token | Purpose | Why New |
+|-------|---------|---------|
+| `--toast-bg` | Toast notification background | Distinct from card -- slightly brighter surface for overlay feel |
+| `--toast-border` | Toast border | May differ from --border for better overlay contrast |
+| `--activity-bg` | Activity status line background | Subtle surface above composer, needs to be distinct but not distracting |
+| `--code-bg` | Code block background | Currently hardcoded as `#1c1210` in CodeBlock and Shiki fallback -- should be tokenized |
+| `--code-header-bg` | Code block header bar | Currently hardcoded as `#241a14` |
+| `--diff-bg` | Diff viewer base background | Currently hardcoded in `warmDiffStyles` object |
+| `--streaming-cursor` | Streaming cursor color | Currently hardcoded as `#d4a574` in `streaming-cursor.css` |
+
+### Token Naming Convention
+
+The existing convention follows shadcn/ui: `--{surface}` for backgrounds, `--{surface}-foreground` for text on that surface. New tokens should follow the same pattern. Do NOT create a separate naming scheme.
+
+### Token File Organization
+
+All tokens remain in a single `:root` block in `src/index.css`. Do NOT split into multiple CSS files -- the single-file approach means one place to see the entire palette, which is critical for a visual redesign where you're tuning many values simultaneously.
+
+---
+
+## Integration Strategy: Specialty Surfaces
+
+### xterm.js Terminal Theme
+
+**File:** `src/components/shell/constants/constants.ts`
+**Current:** Default VS Code dark theme colors (not warm palette)
+**Change:** Replace `TERMINAL_OPTIONS.theme` JS object values with Catppuccin Mocha palette
+
+```typescript
+// The object structure stays identical -- only hex values change
+theme: {
+  background: '#1a1a1a',   // match --background
+  foreground: '#ededed',   // match --foreground
+  cursor: '#D4736C',       // match --primary (dusty rose)
+  cursorAccent: '#1a1a1a', // match --background
+  selectionBackground: '#3a3a3a', // match --secondary
+  // ANSI 16 colors: Catppuccin Mocha values
+  black: '#45475a',
+  red: '#f38ba8',
+  green: '#a6e3a1',
+  // ... etc
 }
-
-// appendStreamingChunk clones last message to avoid mutation:
-updated[lastIndex] = { ...last, content: nextContent };
 ```
 
-**Strengths to preserve:**
-- Object cloning (not mutation) ensures React detects state changes
-- Debounce prevents excessive re-renders during fast token streams
-- `isStreaming` flag enables UI differentiation (typing animation, no copy button during stream)
+### Shiki Syntax Highlighting
 
-**Enhancement for new features:**
-- Add `turnId` to `ChatMessage` to group messages by conversation turn
-- Add `isCollapsed` boolean to enable turn-level collapse
-- Tool call grouping: collect consecutive tool messages under a single `TurnBlock` component
+**File:** `src/components/chat/hooks/useShikiHighlighter.ts`
+**Current:** `WARM_COLOR_REPLACEMENTS` maps VS Code Dark+ hex to warm equivalents
+**Change:** Update the replacement map values to match new charcoal palette
 
-```typescript
-// Enhanced ChatMessage type additions:
-interface ChatMessage {
-  // ... existing fields ...
-  turnId?: string;           // Groups messages into collapsible turns
-  isCollapsed?: boolean;     // Turn-level collapse state
-  toolGroupId?: string;      // Groups 3+ consecutive tool calls
-}
-```
+The Shiki `colorReplacements` API is perfect for this -- it maps exact hex input to exact hex output. Structure stays identical, values change.
 
----
+### DiffViewer Theme
 
-### Pattern 4: Hook Decomposition for State Management
+**File:** `src/components/chat/tools/components/DiffViewer.tsx`
+**Current:** `warmDiffStyles.variables.dark` object with 19 warm hex values
+**Change:** Update all values in the theme object. Structure stays identical.
 
-**What:** `ChatInterface` delegates state to 4 isolated hooks. This is the existing pattern and the correct architecture for adding new features without breaking existing ones.
+### Scrollbar Colors
 
-```
-ChatInterface
-├── useChatProviderState    → provider, model selection
-├── useChatSessionState     → message list, scroll, session loading
-├── useChatComposerState    → input, submit, commands, file mentions
-└── useChatRealtimeHandlers → WebSocket message processing
-```
-
-**Adding new state (collapsible turns, usage summaries):**
-- Add `collapsedTurns: Set<string>` to `useChatSessionState` — owns the turn collapse state
-- Add `toggleTurn(turnId: string)` action
-- Do NOT add new Context — prop-drill down from `useChatSessionState` to `ChatMessagesPane` → `TurnBlock`
-
-**Rationale for no new Context:** The collapse state is local to the chat view. Context would over-share scope and create unnecessary subscriptions in unrelated components.
+**File:** `src/index.css`
+**Current:** Three hardcoded instances of `hsl(34.5 35.9% 63.9% / 0.3)` for scrollbar colors
+**Change:** Replace with `hsl(var(--muted-foreground) / 0.3)` to auto-follow palette
 
 ---
 
-### Pattern 5: i18n Removal (Simplification)
+## Component Refactoring: Build Order
 
-**What:** 43 components call `useTranslation()`. The i18n system adds ~200 lines of config and locale files across 4 languages.
+The build order is driven by three constraints:
+1. **Foundation before surfaces** -- CSS variables must be defined before components can reference them
+2. **Streaming safety** -- no changes that break `requestAnimationFrame` buffer or `contain: content`
+3. **Testability** -- each step produces a visually verifiable result
 
-**Safe removal approach:**
-1. For each component: replace `t('key.path', { defaultValue: 'English text' })` with the `'English text'` string literal
-2. For keys without defaultValue: look up the English locale JSON at `src/i18n/locales/en/`
-3. Remove `useTranslation` import and hook call
-4. Delete `src/i18n/` directory and `react-i18next` from `package.json`
-5. Remove `I18nextProvider` from `App.tsx`
-
-**Risk:** Low — pure text substitution with no logic change. The `defaultValue` pattern present in many calls makes this straightforward.
-
----
-
-## Data Flow
-
-### WebSocket Message Flow (Streaming)
+### Phase Ordering Rationale
 
 ```
-Claude CLI (subprocess)
-    ↓ stdout (JSON events)
-Express server (server/claude-sdk.js)
-    ↓ ws.send({ type: 'claude-response', data: ... })
-WebSocketContext (browser)
-    ↓ setLatestMessage(parsed) — triggers re-render
-useChatRealtimeHandlers (effect fires on latestMessage)
-    ↓ content_block_delta → streamBufferRef.current += text
-    ↓ 100ms setTimeout fires → appendStreamingChunk(setChatMessages)
-ChatInterface.chatMessages (React state)
-    ↓ prop-drills to ChatMessagesPane
-ChatMessagesPane → MessageComponent (renders per message)
-    ↓
-DOM (visible text update)
+Step 1: CSS Variable Redefinition (index.css :root)
+  ↓ Unblocks: all semantic-class components update immediately
+  ↓ Verifiable: bg-background, text-foreground change globally
+
+Step 2: New Token Additions (index.css + tailwind.config.js)
+  ↓ Unblocks: hardcoded hex replacement can use new tokens
+  ↓ Verifiable: new classes available in Tailwind
+
+Step 3: Hardcoded Hex Sweep (13 component files)
+  ↓ Unblocks: full palette consistency
+  ↓ Verifiable: grep for old hex values returns zero
+  ↓ CRITICAL: Do NOT change component structure, only className strings
+
+Step 4: Specialty Surface Themes (terminal, Shiki, DiffViewer, scrollbars)
+  ↓ Unblocks: visual consistency in code/terminal/diff views
+  ↓ Verifiable: terminal background matches app, code blocks match
+
+Step 5: Toast System (new components)
+  ↓ Unblocks: error handling phase
+  ↓ Additive: no existing code modified
+  ↓ Verifiable: toast appears on WebSocket disconnect
+
+Step 6: Activity Status Line (new component)
+  ↓ Unblocks: "current tool" display
+  ↓ Additive: small integration point in ChatInterface
+  ↓ Verifiable: status line shows during AI response
+
+Step 7: Micro-interactions and Polish
+  ↓ Depends on: all above complete
+  ↓ Verifiable: hover states, transitions, density adjustments
 ```
 
-### Theme Toggle Flow
+### What Must NOT Be Changed
+
+| Item | Why Protected |
+|------|--------------|
+| `requestAnimationFrame` streaming buffer in `useChatRealtimeHandlers` | Performance-critical path -- visual changes must not touch |
+| `contain: content` on `.message-streaming` | Prevents layout thrash during streaming |
+| IntersectionObserver in `useScrollAnchor` | Scroll behavior is correct -- visual changes only |
+| IntersectionObserver in `ChatMessagesPane` for turn collapse | Working collapse/expand system -- visual changes only |
+| `React.memo` + custom comparators on `TurnBlock` | Performance boundary -- must be preserved exactly |
+| `useTurnGrouping` hook | Message grouping logic -- visual changes only |
+| CSS Grid `gridTemplateRows: 0fr/1fr` expand/collapse pattern | Proven animation pattern -- reuse, don't replace |
+| `WebSocketContext` message handling | Backend integration -- no visual changes |
+
+---
+
+## Data Flow: New Toast System
 
 ```
-User clicks toggle
-    ↓
-ThemeContext.toggleDarkMode()
-    ↓
-document.documentElement.classList.toggle('dark')
-    ↓
-Tailwind dark: variants activate
-    ↓ simultaneously
-CSS variables in .dark {} take effect
-    ↓
-All bg-background / text-foreground / border-border update
+WebSocket closes unexpectedly
+  ↓
+WebSocketContext.onclose → setConnectionState('disconnected')
+  ↓
+useEffect in ToastProvider (watches connectionState)
+  ↓
+show({ tier: 'warning', message: 'Connection lost...', autoDismissMs: undefined })
+  ↓
+ToastProvider state updates → ToastContainer re-renders (portal)
+  ↓
+Toast slides in from right (CSS animation, position: fixed)
+  ↓ [WebSocket reconnects]
+ToastProvider detects 'connected' → auto-dismiss warning toast
+  ↓
+show({ tier: 'success', message: 'Reconnected', autoDismissMs: 3000 })
 ```
 
-### State Management: What Goes Where
-
-| State | Location | Rationale |
-|-------|----------|-----------|
-| Dark mode | ThemeContext | Global, affects all components |
-| Auth token | AuthContext | Global, affects all routes |
-| WebSocket connection | WebSocketContext | Singleton, shared across views |
-| Chat messages | useChatSessionState | Scoped to active chat session |
-| Streaming buffer | useRef in ChatInterface | Not UI state, no re-render needed |
-| Turn collapse | useChatSessionState (new) | Scoped to chat, owned by message list |
-| Tool group expansion | local useState in TurnBlock (new) | Ephemeral per-group UI state |
-| Provider/model | useChatProviderState | Scoped to chat session |
-| Input text | useChatComposerState | Scoped to composer |
+This flow is completely isolated from the streaming path. Toast re-renders do not trigger ChatMessagesPane re-renders because they render in a separate portal DOM subtree.
 
 ---
 
-## Suggested Build Order
+## Anti-Patterns to Avoid
 
-The following order minimizes risk by addressing pure-visual changes first, then additive features, then structural refactoring.
+### Anti-Pattern 1: Inline Style Objects for Colors
 
-### Phase 1 — Theme Foundation (Zero Breakage Risk)
+**What:** Using `style={{ color: '#D4736C' }}` instead of Tailwind classes or CSS variables.
+**Why bad:** Bypasses the entire token system. Cannot be audited with grep. Cannot be changed in one place.
+**Instead:** Always use `className="text-primary"` or `className="text-[hsl(var(--primary))]"` for one-off colors.
 
-**What changes:** `src/index.css` (HSL variable values only), `tailwind.config.js` (add new semantic tokens)
-**What doesn't change:** Any component file
+### Anti-Pattern 2: Adding JS Animation During Streaming
 
-1. Replace HSL values in `:root` and `.dark` blocks in `index.css`
-2. Add missing semantic tokens to `tailwind.config.js` (e.g., `status-warning`, `status-success`)
-3. Update `meta[name="theme-color"]` hardcoded hex in `ThemeContext.jsx` to match new dark background
-4. Replace `ThemeContext.jsx` hardcoded color comment `#0c1117` with new dark base hex
+**What:** Using `framer-motion`, `react-spring`, or `requestAnimationFrame`-based JS animations for visual effects in the message flow.
+**Why bad:** Competes with the streaming `requestAnimationFrame` buffer for main thread time. Creates jank during active AI responses.
+**Instead:** Use CSS-only animations (`@keyframes`, `transition`, CSS Grid animate). The existing aurora shimmer proves this works -- it runs on the compositor thread with zero main-thread cost.
 
-**Verification:** Visual check in browser — all `bg-background`, `text-foreground`, etc. update globally.
+### Anti-Pattern 3: Toast Inside Scroll Container
 
-### Phase 2 — Hardcoded Color Sweep (Low Risk)
+**What:** Rendering toast notifications as children of `ChatMessagesPane` scroll container.
+**Why bad:** Toast appear/dismiss changes scroll height, which fights the IntersectionObserver sentinel-based scroll anchor. User gets unexpected scroll jumps.
+**Instead:** Render toasts via `ReactDOM.createPortal(toastContainer, document.body)` with `position: fixed`.
 
-**What changes:** 86 component files — find-and-replace color classes with semantic aliases
+### Anti-Pattern 4: Changing Component Props for Visual Changes
 
-Priority:
-1. User bubble: `bg-blue-600 text-white` → `bg-primary text-primary-foreground`
-2. Error states: `bg-red-*` → `bg-destructive`, `text-red-*` → `text-destructive`
-3. Muted text: `text-gray-500 dark:text-gray-400` → `text-muted-foreground`
-4. Body text: `text-gray-700 dark:text-gray-300` → `text-foreground`
-5. Intentional status colors (amber warning, green success): Add new CSS variables, keep Tailwind classes mapped to them
+**What:** Adding new props like `colorScheme` or `variant` to existing components to support the new palette.
+**Why bad:** Breaks `React.memo` comparators (TurnBlock's custom comparator would need updating). Adds unnecessary re-render triggers.
+**Instead:** Visual changes should be CSS-only where possible. If a component needs different styling, change its `className` strings directly -- don't route it through props.
 
-**Verification:** Grep for remaining `bg-blue-` / `text-gray-` after each batch.
+### Anti-Pattern 5: Splitting CSS Variables Across Multiple Files
 
-### Phase 3 — Typography + Font (Low Risk)
-
-**What changes:** `index.css` body font-family, heading sizes, `tailwind.config.js` for JetBrains Mono
-
-1. Add JetBrains Mono Google Font or self-hosted `@font-face`
-2. Update `font-family` in `body {}` in `index.css`
-3. Add `fontFamily.mono` override in `tailwind.config.js`
-4. Add compact `line-height` values to `tailwind.config.js` (e.g., `leading-snug` adjustments)
-
-### Phase 4 — i18n Removal (Low Risk, Mechanical)
-
-**What changes:** 43 components — replace `t('key')` with string literals, remove imports
-
-1. Process by domain: chat (15 files), sidebar (8 files), settings (10 files), others
-2. For each: extract English strings, replace `t(...)` calls, remove hook
-3. Delete `src/i18n/` directory
-4. Remove `I18nextProvider` wrapper from `App.tsx`
-5. `npm uninstall react-i18next i18next`
-
-### Phase 5 — Strip Unused Backends (Medium Risk)
-
-**What changes:** `useChatProviderState`, `useChatRealtimeHandlers`, `ChatComposer`, server routes
-
-1. Remove Cursor and Codex provider options from `useChatProviderState`
-2. Delete `case 'cursor-*'` and `case 'codex-*'` handlers from `useChatRealtimeHandlers`
-3. Remove Cursor/Codex model selectors from `ChatComposer` and `ChatMessagesPane`
-4. Delete `server/cursor-cli.js`, `server/openai-codex.js`, `server/routes/cursor.js`
-5. Remove Cursor/Codex imports and `LanguageSelector.jsx` if unused
-
-**Risk:** Medium — tight coupling in switch statements. Use search to verify all references removed.
-
-### Phase 6 — Chat Component Redesign (High Risk, Core Value)
-
-**What changes:** `MessageComponent`, `ChatMessagesPane`, new `TurnBlock` component
-
-**Dependencies:** Phases 1–3 must be complete (stable palette) before visual redesign.
-
-Sequence within this phase:
-1. Add `turnId` to `ChatMessage` type and assignment logic in `useChatRealtimeHandlers`
-2. Build new `TurnBlock` component (wraps N messages for a single turn, handles collapse)
-3. Refactor `ChatMessagesPane` to group messages by `turnId` before rendering
-4. Replace `MessageComponent` internals — new user bubble, new assistant layout, remove old avatar circles
-5. Redesign tool call cards (`CollapsibleDisplay`, `OneLineDisplay`) with new earthy styling
-6. Add thinking block disclosure redesign (pulsing amber indicator while `isStreaming`)
-
-**Isolation strategy:** New components alongside old until verified, then cut over.
-
-### Phase 7 — Streaming UX Polish (Medium Risk)
-
-**What changes:** `AssistantThinkingIndicator`, auto-scroll logic, scroll pill
-
-1. Replace animated dots with skeleton shimmer or pulsing avatar
-2. Add smart auto-scroll: detect `isUserScrolledUp` (already exists) → show "N new messages" pill
-3. Build `ScrollToBottomPill` component with message count badge
-4. Add skeleton loading state for initial session load
-
-### Phase 8 — Sidebar + Global Polish (Low-Medium Risk)
-
-**What changes:** Sidebar components, terminal theming, settings page cleanup
-
-1. Apply Catppuccin Mocha theme to xterm.js (palette constants in `Shell.tsx`)
-2. Sidebar density improvements (tighter spacing, session list redesign)
-3. Global status line (bottom bar showing current Claude activity)
-4. Toast system for transient errors (use existing pattern or add lightweight lib)
+**What:** Putting toast tokens in `toast.css`, terminal tokens in `terminal.css`, etc.
+**Why bad:** During a palette redesign, you need to see ALL color values simultaneously to ensure harmony. Splitting across files makes palette tuning a multi-file hunt.
+**Instead:** ALL color tokens in one `:root` block in `index.css`. Animation keyframes can live in separate CSS files (they don't define colors).
 
 ---
 
-## Anti-Patterns
+## Scalability Considerations
 
-### Anti-Pattern 1: Changing CSS Variable Names
-
-**What people do:** Rename `--primary` to `--amber` or add new variable names in `tailwind.config.js` without updating all component usages.
-
-**Why it's wrong:** Tailwind config maps color aliases to variable names. A rename breaks every component using that alias. With 197 source files, finding all usages manually is error-prone.
-
-**Do this instead:** Keep all variable names identical. Only change the HSL values inside `:root` and `.dark`. If new semantic categories are needed (e.g., `--status-warning`), add them as new variables — don't rename existing ones.
-
----
-
-### Anti-Pattern 2: Global State for Turn Collapse
-
-**What people do:** Add `collapsedTurns` to `WebSocketContext` or `ThemeContext` because "it's shared state."
-
-**Why it's wrong:** Turn collapse is ephemeral UI state scoped entirely to the active chat session. Putting it in a global context causes unrelated components to re-render on every collapse toggle, and the state resets incorrectly when sessions change.
-
-**Do this instead:** Add collapse state to `useChatSessionState` (already owns message list state). Reset on session change alongside `chatMessages`.
-
----
-
-### Anti-Pattern 3: Re-rendering the Entire Message List on Each Token
-
-**What people do:** Store streaming content in React state and append on every token, causing the full `ChatMessagesPane` to re-render at token velocity.
-
-**Why it's wrong:** At 20-60 tokens/second, this creates significant jank. The existing 100ms debounce buffer is correct but not sufficient protection if `ChatMessagesPane` is not memoized.
-
-**Do this instead:**
-- Keep the 100ms debounce buffer (already in place)
-- Ensure `MessageComponent` is memoized with `React.memo` (already done via `memo()` wrapper)
-- Ensure `ChatMessagesPane` passes stable references: avoid creating new arrays or objects in render that break memo comparisons
-- Use `React.memo` with custom comparison for `TurnBlock` — only re-render if the last message in the turn changed
-
-```typescript
-// Custom comparison for TurnBlock — only re-render if turn content changed
-export const TurnBlock = React.memo(
-  ({ turn, isCollapsed, onToggle }) => { ... },
-  (prev, next) =>
-    prev.isCollapsed === next.isCollapsed &&
-    prev.turn.messages.length === next.turn.messages.length &&
-    prev.turn.messages[prev.turn.messages.length - 1]?.content ===
-      next.turn.messages[next.turn.messages.length - 1]?.content
-);
-```
-
----
-
-### Anti-Pattern 4: Blocking Streaming with Heavy Markdown Parse
-
-**What people do:** Run `react-markdown` on the full accumulated content string on each token append.
-
-**Why it's wrong:** Markdown parsing is O(n) in content length. At 1000 tokens, each new token triggers a full re-parse of the entire message, creating O(n²) total work per message.
-
-**Do this instead:**
-- While `isStreaming: true`, render raw text with `whitespace-pre-wrap` — no Markdown parsing
-- When `isStreaming` transitions to `false` (on `content_block_stop`), switch to `<Markdown>` rendering
-- This is a single conditional in `MessageComponent` — already partially structured for this
-
-```typescript
-// In MessageComponent, assistant content branch:
-{message.isStreaming ? (
-  <div className="whitespace-pre-wrap text-foreground text-sm">
-    {message.content}
-  </div>
-) : (
-  <Markdown className="prose prose-sm max-w-none dark:prose-invert">
-    {message.content}
-  </Markdown>
-)}
-```
-
----
-
-### Anti-Pattern 5: Scattering `dark:` Variants After Theming
-
-**What people do:** After replacing CSS variables, continue adding `dark:text-gray-400` / `dark:bg-gray-800` for new components instead of using semantic aliases.
-
-**Why it's wrong:** Defeats the purpose of CSS variable theming. The `dark:` variant approach requires knowing both light and dark values at authoring time, creating split-brain maintenance.
-
-**Do this instead:** New components ONLY use semantic aliases (`text-muted-foreground`, `bg-card`, `border-border`). Never write `dark:` variants for colors — only for structural differences (layout, display, opacity changes that differ by mode).
-
----
-
-## Integration Points
-
-### External Services
-
-| Service | Integration Pattern | Notes |
-|---------|---------------------|-------|
-| Claude CLI | `node-pty` subprocess in `server/claude-sdk.js`, stdout parsed to WS events | Keep untouched during UI work |
-| Gemini CLI | `server/gemini-cli.js` + response handler | Keep — Loom supports Gemini |
-| SQLite (better-sqlite3) | `server/database/db.js` — sync API | Sessions, settings persistence |
-| xterm.js | `src/components/shell/` — DOM ref, requires `Shell.tsx` for theme config | Catppuccin Mocha palette in Phase 8 |
-
-### Internal Boundaries
-
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| Server → Client | WebSocket JSON events | `latestMessage` is the single entry point |
-| `ChatInterface` ↔ hooks | Props + destructured returns | No Context used within chat subsystem |
-| `ChatMessagesPane` ↔ `MessageComponent` | Props per message | Memoized boundary — critical for performance |
-| `ToolRenderer` ↔ display components | Props (toolName, toolInput, toolResult, mode) | Config-driven routing via `getToolConfig()` |
-| Theme toggle → CSS | `document.documentElement.classList` + CSS custom properties | ThemeContext owns this boundary |
-
----
-
-## Scaling Considerations
-
-This is a self-hosted single-user app. Scaling in the traditional sense is not relevant. The relevant "scaling" concern is UI performance as session length grows.
-
-| Session Length | Architecture Notes |
-|----------------|-------------------|
-| 0–50 messages | No issues — current architecture handles fine |
-| 50–200 messages | Memoized TurnBlock with collapse becomes important — collapsed turns drastically reduce DOM nodes |
-| 200–1000 messages | Windowing (react-window or similar) may become necessary; existing "load earlier messages" pagination helps |
-| 1000+ messages | Virtual list strongly recommended; collapse to avoid rendering all turns |
-
-The existing `visibleMessages` / `loadEarlierMessages` architecture in `useChatSessionState` already provides the pagination hook point for future virtualization.
+| Concern | At Current State | At Full Redesign | Future |
+|---------|-----------------|------------------|--------|
+| **CSS variable count** | 30 tokens | ~37 tokens (7 new) | Manageable in single :root |
+| **Hardcoded hex references** | 86 across 13 files | 0 (all migrated) | Enforce via lint rule |
+| **Animation count** | 6 CSS animations | ~9 CSS animations | No performance concern -- all GPU-composited |
+| **Toast render cost** | N/A | 0-3 visible toasts | Negligible -- portal, outside main tree |
+| **Component re-renders** | Streaming-optimized | Unchanged | memo boundaries preserved |
 
 ---
 
 ## Sources
 
-- Direct analysis of `/home/swd/loom/src/` (197 TypeScript/React source files)
-- `src/index.css` — CSS variable definitions and hardcoded color audit
-- `src/components/chat/hooks/useChatRealtimeHandlers.ts` — streaming architecture
-- `src/components/chat/view/ChatInterface.tsx` — hook composition pattern
-- `src/components/chat/view/subcomponents/MessageComponent.tsx` — render branches
-- `tailwind.config.js` — semantic alias → CSS variable mapping
-- `src/contexts/ThemeContext.jsx` — dark mode toggle mechanism
-- `.planning/PROJECT.md` — transformation requirements and constraints
+- Direct analysis of `/home/swd/loom/src/` built codebase (v1.0 complete)
+- `src/index.css` lines 24-100 -- CSS variable definitions with warm palette values
+- `tailwind.config.js` -- semantic alias mapping with `hsl(var(--X) / <alpha-value>)` contract
+- `src/components/chat/view/subcomponents/TurnBlock.tsx` -- CSS Grid expand/collapse pattern
+- `src/components/chat/view/subcomponents/ScrollToBottomPill.tsx` -- hardcoded warm hex example
+- `src/components/chat/view/subcomponents/MessageComponent.tsx` -- heaviest hardcoded hex file
+- `src/components/chat/hooks/useShikiHighlighter.ts` -- `WARM_COLOR_REPLACEMENTS` map
+- `src/components/chat/tools/components/DiffViewer.tsx` -- `warmDiffStyles` theme object
+- `src/components/shell/constants/constants.ts` -- xterm.js `TERMINAL_OPTIONS.theme`
+- `src/components/chat/hooks/useScrollAnchor.ts` -- IntersectionObserver scroll tracking
+- `src/components/chat/styles/aurora-shimmer.css` -- GPU-composited animation pattern
+- `src/components/chat/styles/streaming-cursor.css` -- hardcoded cursor color
+- `src/contexts/WebSocketContext.tsx` -- connection state for toast integration
+- `.planning/phases/08-error-handling-and-status/08-CONTEXT.md` -- toast/status decisions
 
 ---
 
-*Architecture research for: Loom (CloudCLI fork transformation)*
-*Researched: 2026-03-01*
+*Architecture research for: Loom v1.1 Design Overhaul (visual redesign integration)*
+*Researched: 2026-03-03*

@@ -1,464 +1,465 @@
-# Stack Research
+# Technology Stack: v1.1 Visual Redesign
 
-**Domain:** AI chat interface web UI (developer tool, React 18 + Tailwind CSS)
-**Researched:** 2026-03-01
-**Confidence:** HIGH (most findings verified via Context7, npm registry, or official docs)
-
----
-
-## Baseline Stack (Inherited — Keep As-Is)
-
-The CloudCLI fork already includes a solid, working stack. These decisions are NOT up for debate — migrating them would cost weeks and provide no functional benefit.
-
-| Technology | Version | Role | Status |
-|------------|---------|------|--------|
-| React | ^18.2.0 | UI framework | Keep |
-| TypeScript | ^5.9.3 | Type safety | Keep |
-| Vite | ^7.0.4 | Build tool | Keep |
-| Tailwind CSS | ^3.4.0 | Styling | Keep |
-| Express + WebSocket | express ^4.18.2, ws ^8.14.2 | Backend + realtime | Keep |
-| better-sqlite3 | ^12.6.2 | Session persistence | Keep |
-| @xterm/xterm | ^5.5.0 (latest: 6.0.0) | Terminal emulator | Upgrade + retheme |
-| react-router-dom | ^6.8.1 | Routing | Keep |
-| CVA + tailwind-merge | latest | Class composition | Keep |
-| lucide-react | ^0.515.0 | Icons | Keep |
+**Project:** Loom -- v1.1 Design Overhaul
+**Researched:** 2026-03-03
+**Scope:** NEW stack additions/changes for the visual redesign milestone only
+**Confidence:** HIGH (verified via npm registry, Gemini research, codebase audit)
 
 ---
 
-## Recommended Stack (Enhancements)
+## Baseline Stack (Validated -- No Changes)
 
-### 1. Syntax Highlighting in Chat
+These are inherited and already working. This research does NOT cover them.
 
-**Recommendation: Replace `react-syntax-highlighter` (Prism) with `shiki` ^4.x**
-
-| Library | Version | Confidence |
-|---------|---------|-----------|
-| `shiki` | ^4.0.0 (verified via npm registry 2026-03-01) | HIGH |
-| `@shikijs/rehype` | ^4.0.0 (verified via npm registry 2026-03-01) | HIGH |
-
-**Why Shiki, not Prism or Highlight.js:**
-
-The current codebase uses `react-syntax-highlighter` with its bundled Prism backend (`oneDark` theme). This approach has three problems for Loom's goals:
-
-1. **Theme fidelity:** Prism uses regex-based tokenization with ~80% accuracy. Shiki uses TextMate grammars — the same engine as VS Code — giving 99% parity with VS Code Dark+. Since Loom targets developers who live in VS Code, this matters.
-2. **Bundle weight:** `react-syntax-highlighter` bundles ALL language grammars eagerly. Shiki supports dynamic import of only the languages actually needed.
-3. **VS Code Dark+ is a native Shiki theme:** `dark-plus` ships as a bundled theme in Shiki with zero additional work.
-
-**Why not CodeMirror for chat:** CodeMirror 6 is already in the stack for the file editor. Using it for read-only chat code blocks is overkill — it carries ~70KB+ overhead, requires mounting a full editor instance per code block, and complicates DOM management in a streamed chat context. Shiki renders to static HTML with inline styles.
-
-**Why not Highlight.js:** Superior auto-detection is Highlight.js's only advantage, and it doesn't apply here — Claude/Gemini always provide language tags in fenced code blocks. Highlight.js tokenization quality is also ~80% (regex-based).
-
-**Implementation pattern (client-side, no RSC):**
-
-```tsx
-import { createHighlighter } from 'shiki/bundle/web'
-
-// Lazy singleton — create once, reuse
-let highlighter: ReturnType<typeof createHighlighter> | null = null
-
-async function getHighlighter() {
-  if (!highlighter) {
-    highlighter = createHighlighter({
-      themes: ['dark-plus'],
-      langs: ['typescript', 'javascript', 'python', 'bash', 'json', 'css', 'html', 'rust', 'go'],
-    })
-  }
-  return highlighter
-}
-
-// In CodeBlock component:
-const html = await (await getHighlighter()).codeToHtml(code, {
-  lang: language,
-  theme: 'dark-plus',
-})
-// Render via dangerouslySetInnerHTML — Shiki output is safe (no user-controlled input in HTML generation)
-```
-
-**Shiki bundle strategy:** Use `shiki/bundle/web` (not `shiki` full bundle) to limit initial load. Pre-register the 10-15 languages Claude/Gemini most commonly emit. Lazy-load additional languages on first encounter.
-
-**Version note:** Shiki v4.x is the current stable release (verified 2026-03-01 via npm: `4.0.0`). The `createHighlighter` API is stable in v4.x. `@shikijs/rehype` is also at v4.0.0 — install matching major versions. Gemini research cited 3.23.0 but npm registry confirms 4.0.0 is latest; install with `npm install shiki@^4 @shikijs/rehype@^4`.
+| Technology | Version | Status |
+|------------|---------|--------|
+| React 18 + TypeScript | ^18.2.0 / ^5.9.3 | Keep |
+| Vite | ^7.0.4 | Keep |
+| Tailwind CSS | ^3.4.17 (installed) | Keep |
+| CSS Variables (HSL) | `hsl(var(--token) / <alpha-value>)` | Keep -- migrate values only |
+| CVA + tailwind-merge + clsx | 0.7.1 / 3.3.1 / 2.1.1 | Keep |
+| Shiki v4 | ^4.0.1 | Keep (added in v1.0 research) |
+| react-markdown + rehype/remark | ^10.1.0 | Keep |
+| react-diff-viewer-continued | ^4.1.2 | Keep |
+| lucide-react | ^0.515.0 | Keep |
+| @xterm/xterm | ^5.5.0 | Keep -- retheme only |
+| CodeMirror 6 | ^4.23.13 (@uiw/react-codemirror) | Keep -- retheme only |
+| useScrollAnchor (custom hook) | IntersectionObserver + sentinel | Keep -- already implements smart auto-scroll |
 
 ---
 
-### 2. Markdown Rendering
+## New Stack Additions for v1.1
 
-**Recommendation: Keep `react-markdown` v10 — do NOT switch to Streamdown yet**
+### 1. Toast Notifications: Sonner
 
-| Library | Version | Confidence |
-|---------|---------|-----------|
-| `react-markdown` | ^10.1.0 (current, already installed) | HIGH |
-| `remark-gfm` | ^4.0.0 (already installed) | HIGH |
-| `remark-math` | ^6.0.0 (already installed) | HIGH |
-| `rehype-katex` | ^7.0.1 (already installed) | HIGH |
-| `@shikijs/rehype` | ^1.x | HIGH — replaces `react-syntax-highlighter` |
+**Add: `sonner` ^2.0.7**
 
-**Why keep react-markdown:**
+| Library | Version | Unpacked Size | Gzipped | Confidence |
+|---------|---------|---------------|---------|-----------|
+| `sonner` | ^2.0.7 | ~166KB unpacked | ~3KB gzipped | HIGH |
 
-Streamdown is the emerging "streaming-first" alternative (Context7 ID: `/vercel/streamdown`, benchmark score 90.2, 607 code snippets). It offers incremental parsing that prevents layout shifts during streaming. However:
+**Why Sonner:**
 
-- The current codebase already has `react-markdown` v10 with a complete custom component system (see `src/components/chat/view/subcomponents/Markdown.tsx`)
-- The custom `CodeBlock` component, table styling, and blockquote rendering would need to be rewritten for Streamdown's component API (which is similar but not identical)
-- Streamdown is Vercel-project status — it has not yet demonstrated long-term maintenance stability vs the remarkjs ecosystem's track record
-- react-markdown v10 supports React 19 and has `MarkdownAsync` for RSC — it is not stagnant
+The v1.1 milestone requires transient toast notifications for: error states, copy confirmations, connection status changes, successful actions, and async operation lifecycle (promise toasts). The codebase currently has zero toast infrastructure -- errors are either `console.error`'d or shown inline with ad-hoc patterns.
 
-**The right fix for streaming jank is a token buffer**, not a library swap:
+Sonner is the right choice because:
 
-```tsx
-// Debounce markdown re-renders during streaming
-const [displayContent, setDisplayContent] = useState('')
-const updateTimer = useRef<number>()
+1. **Dark theme native.** `theme="dark"` works immediately. Custom CSS variables (`--normal-bg`, `--normal-border`, `--normal-text`, `--error-bg`, etc.) map directly to Loom's CSS variable architecture via `[data-sonner-toast]` selectors.
+2. **Exit animations handled internally.** Sonner manages its own mount/unmount lifecycle with smooth slide-out transitions. No need for `isExiting` state patterns or animation libraries for toasts.
+3. **Promise toasts.** `toast.promise(fetchData(), { loading, success, error })` covers the async operation pattern needed for git operations, session saves, and settings changes.
+4. **3KB gzipped.** Negligible bundle impact. Zero dependencies.
+5. **Used by shadcn/ui.** Battle-tested in the most popular React component library ecosystem.
 
-// Update at most every 50ms during streaming
-function onToken(token: string) {
-  buffer.current += token
-  clearTimeout(updateTimer.current)
-  updateTimer.current = setTimeout(() => {
-    setDisplayContent(buffer.current)
-  }, 50)
-}
-```
-
-**Why not MDX:** MDX requires a bundler transform or runtime compilation. Runtime MDX compilation of untrusted LLM output is a security risk (arbitrary JSX execution). Not appropriate for a chat interface.
-
-**Keep `rehype-raw` removed** (or gated behind sanitization): The current Markdown.tsx does NOT use `rehype-raw`, which is correct — enabling raw HTML from LLM output opens XSS vectors.
-
-**Plugin to add:** `@shikijs/rehype` as a rehype plugin handles Shiki highlighting within the react-markdown pipeline, replacing the manual `CodeBlock` component with Prism:
-
-```tsx
-import { rehypeShiki } from '@shikijs/rehype'
-
-const rehypePlugins = useMemo(() => [
-  [rehypeShiki, { theme: 'dark-plus' }],
-  rehypeKatex,
-], [])
-```
-
----
-
-### 3. Diff Rendering
-
-**Recommendation: `react-diff-viewer-continued` ^4.1.2**
-
-| Library | Version | Confidence |
-|---------|---------|-----------|
-| `react-diff-viewer-continued` | ^4.1.2 | HIGH (verified via npm registry) |
-
-**Why react-diff-viewer-continued:**
-
-- Active maintenance fork of the original `react-diff-viewer` (which went stale)
-- v4.1.x: React 18/19 compatible, dark theme support via `useDarkTheme` prop and `styles.variables.dark` customization object
-- Accepts `oldValue`/`newValue` as strings — the existing git diff infrastructure already produces these
-- Custom styles API allows overriding diff colors to match the warm chocolate palette:
-
-```tsx
-const diffStyles = {
-  variables: {
-    dark: {
-      diffViewerBackground: '#1c1210',  // Loom base
-      diffViewerColor: '#f5e6d3',       // Loom cream text
-      addedBackground: '#1a3a1a',       // Dark green tint
-      addedColor: '#a8d5a2',
-      removedBackground: '#3a1a1a',     // Dark red tint
-      removedColor: '#d5a2a2',
-      gutterBackground: '#2a1f1a',      // Loom warm surface
-    },
-  },
-}
-
-<ReactDiffViewer useDarkTheme={true} styles={diffStyles} oldValue={old} newValue={new} />
-```
-
-**Why not diff2html:** diff2html is an excellent library but is designed for rendering raw unified diff strings into HTML, not React components. Integration requires either dangerouslySetInnerHTML or a wrapper layer. react-diff-viewer-continued is React-native and integrates with Tailwind class patterns more cleanly.
-
-**Why not @codemirror/merge (already installed):** `@codemirror/merge` is CodeMirror's merge/diff extension. It's the right choice for an interactive diff editor (e.g., the git panel's diff view where users might want to stage individual hunks). For read-only chat display of Claude's file edits, react-diff-viewer-continued is simpler and lighter.
-
-**Recommendation: Use both, different contexts:**
-- `@codemirror/merge` → git panel interactive diff (already works, keep)
-- `react-diff-viewer-continued` → chat tool call display of file edits
-
----
-
-### 4. Animation and Transitions
-
-**Recommendation: `motion` (formerly Framer Motion) ^12.x for complex animations; CSS transitions for simple state changes**
-
-| Library | Version | Confidence |
-|---------|---------|-----------|
-| `motion` | ^12.34.3 (current, verified via npm) | HIGH |
-
-**Why motion (Framer Motion):**
-
-Loom's design requirements include: collapsible turn animations, thinking block disclosure expand/collapse, streaming typing indicators, tool call group accordion behavior, scroll-to-bottom pill appearance, and toast/banner entrance animations. These are all layout-dependent animations where `motion.div layout` provides significant value over hand-rolled CSS.
-
-Key API for Loom's needs:
-```tsx
-import { motion, AnimatePresence } from 'motion/react'
-
-// Collapsible turn — layout animation handles height changes
-<motion.div layout initial={false} animate={{ height: collapsed ? 0 : 'auto' }}>
-  {content}
-</motion.div>
-
-// Thinking block disclosure
-<AnimatePresence>
-  {isOpen && (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: 'auto' }}
-      exit={{ opacity: 0, height: 0 }}
-    >
-      {thinking}
-    </motion.div>
-  )}
-</AnimatePresence>
-```
-
-**Bundle size strategy:** Use the `m` component + `LazyMotion` to reduce initial bundle from 34KB to ~4.6KB:
-
-```tsx
-import { LazyMotion, domAnimation } from 'motion/react'
-import * as m from 'motion/react-m'
-
-// Wrap app root
-<LazyMotion features={domAnimation}>
-  <m.div layout>...</m.div>
-</LazyMotion>
-```
-
-**When to use CSS transitions instead:** For simple opacity/color/transform changes on hover states, focus rings, and button active states — Tailwind's `transition-*` utilities are sufficient and add zero JS overhead. Reserve motion for: layout animations, exit animations (AnimatePresence), and spring-physics effects.
-
-**Do NOT use:** CSS Animations for collapsible content — `height: auto` is not animatable with pure CSS without JavaScript measurement. Motion handles this correctly with layout animations.
-
----
-
-### 5. Dark Theme Implementation
-
-**Recommendation: Reuse existing CSS variable + Tailwind class strategy, replace HSL values**
-
-The inherited codebase already uses the correct architecture:
-- `tailwind.config.js` maps Tailwind color tokens to `hsl(var(--token))` CSS variables
-- `src/index.css` defines `:root {}` (light) and `.dark {}` overrides
-- `darkMode: ["class"]` in tailwind config — toggled by adding/removing `dark` class on `<html>`
-
-**The only work is replacing the variable VALUES** in `src/index.css`. The warm palette maps to the existing token names:
+**Integration with Loom's palette:**
 
 ```css
-/* src/index.css — .dark overrides for warm Loom palette */
-.dark {
-  /* Base surfaces (HSL format: H S% L%) */
-  --background: 10 30% 9%;        /* #1c1210 deep chocolate */
-  --foreground: 30 70% 88%;       /* #f5e6d3 cream */
-  --card: 12 28% 14%;             /* #2a1f1a warm surface */
-  --card-foreground: 30 55% 72%;  /* #c4a882 warm beige */
-  --muted: 14 26% 19%;            /* #3d2e25 elevated surface */
-  --muted-foreground: 28 35% 60%; /* muted text */
-
-  /* Accent colors */
-  --primary: 28 55% 64%;          /* #d4a574 amber */
-  --primary-foreground: 10 30% 9%;
-  --accent: 20 48% 56%;           /* #c17f59 copper */
-  --destructive: 10 60% 46%;      /* #b85c3a terracotta */
-
-  /* Borders */
-  --border: 14 26% 22%;           /* subtle warm border */
-  --input: 14 26% 22%;
-  --ring: 28 55% 64%;             /* amber focus ring */
+/* In index.css -- charcoal + rose toast overrides */
+[data-sonner-toast][data-theme='dark'] {
+  --normal-bg: hsl(var(--card));
+  --normal-border: hsl(var(--border) / 0.3);
+  --normal-text: hsl(var(--foreground));
+  --success-bg: hsl(140 20% 12%);
+  --success-border: hsl(140 30% 25%);
+  --success-text: hsl(140 60% 70%);
+  --error-bg: hsl(0 25% 14%);
+  --error-border: hsl(0 35% 30%);
+  --error-text: hsl(0 60% 75%);
+  --warning-bg: hsl(35 25% 14%);
+  --warning-border: hsl(35 35% 30%);
+  --warning-text: hsl(35 60% 70%);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  border-radius: var(--radius);
 }
 ```
 
-**Why CSS variables over Tailwind arbitrary values:** The existing `hsl(var(--token))` pattern allows runtime theme switching without rebuilding CSS. Adding a `data-theme="warm"` variant or future theme presets is trivial. Hard-coding hex values in Tailwind classes would require touching every component.
+**Toaster placement:**
 
-**Typography CSS variables to add:**
+```tsx
+// In App.tsx or AppContent.tsx
+import { Toaster } from 'sonner'
+
+<Toaster
+  theme="dark"
+  position="bottom-right"
+  richColors
+  toastOptions={{
+    className: 'font-mono text-xs',
+    duration: 4000,
+  }}
+/>
+```
+
+**Why NOT react-hot-toast:** react-hot-toast (202KB unpacked) requires manual dark mode styling, has no native `richColors` or promise toast lifecycle, and its default bright white appearance requires significant CSS overrides for dark themes. Sonner was purpose-built for the modern dark UI pattern.
+
+**Why NOT @radix-ui/react-toast:** Radix toast is headless/unstyled -- it provides accessibility primitives but requires building the entire visual layer. Sonner provides both accessibility and polished defaults with customization hooks. For a project where we want to SHIP a redesign, not build a design system from scratch, Sonner is faster.
+
+---
+
+### 2. Animation: tailwindcss-animate (NOT Motion/Framer Motion)
+
+**Add: `tailwindcss-animate` ^1.0.7**
+**REMOVE from plan: `motion` (Framer Motion)**
+
+| Library | Version | Unpacked Size | Runtime JS Cost | Confidence |
+|---------|---------|---------------|-----------------|-----------|
+| `tailwindcss-animate` | ^1.0.7 | ~18KB (Tailwind plugin) | 0KB -- CSS only | HIGH |
+
+**Why tailwindcss-animate INSTEAD of Motion:**
+
+The previous v1.0 stack research recommended `motion` (Framer Motion) at ^12.x for layout animations and `AnimatePresence`. After deeper analysis of the actual v1.1 requirements and existing codebase patterns, this recommendation is revised:
+
+**The exit animation problem is already solved for every case we need:**
+
+1. **Toasts:** Sonner handles its own enter/exit lifecycle. No external animation library needed.
+2. **Modals:** Already use `backdrop-blur-sm` overlays with conditional rendering. The `isExiting` + `onTransitionEnd` pattern (already used in 46+ components via `isVisible`/`isOpen`/`isExpanded` state) handles exit transitions in 10 lines of code. No library needed.
+3. **Tool panel expand/collapse:** CSS `grid-template-rows: 0fr -> 1fr` transition handles animated height to/from zero. Already supported by Tailwind 3.4 via `grid-rows-[0fr]` / `grid-rows-[1fr]` with `transition-[grid-template-rows]`. No library needed.
+4. **Thinking disclosure, tool call groups:** Same grid-rows trick. Already expand/collapse via `isExpanded` state.
+5. **Scroll pill enter/exit:** Already uses CSS `@keyframes pill-enter` with conditional rendering. Exit is instant unmount (acceptable -- pill is small).
+6. **Message entrance:** `fade-in` + `slide-in-from-bottom-2` via tailwindcss-animate utilities. No exit animation needed (messages don't leave).
+7. **Sidebar slide:** Already uses CSS `transform` transition via `.sidebar-transition` class.
+
+**What tailwindcss-animate provides that Tailwind core does not:**
+
+- Composable `animate-in` / `animate-out` base classes
+- `fade-in`, `fade-out`, `slide-in-from-top`, `slide-out-to-bottom`, `zoom-in-95`, `zoom-out-95`
+- Data attribute support: `data-[state=open]:animate-in data-[state=closed]:animate-out`
+- Fill mode utilities: `fill-mode-forwards`
+- All CSS-only -- zero runtime JavaScript, zero bundle size impact on JS
+
+**Example usage for v1.1 components:**
+
+```tsx
+// Modal overlay with enter/exit
+<div className={cn(
+  "fixed inset-0 bg-black/60 backdrop-blur-sm",
+  "animate-in fade-in-0 duration-200",
+  isExiting && "animate-out fade-out-0 duration-150"
+)} />
+
+// Tool panel expand
+<div className={cn(
+  "grid transition-[grid-template-rows] duration-200 ease-out",
+  isExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+)}>
+  <div className="overflow-hidden">
+    {children}
+  </div>
+</div>
+
+// New message entrance
+<div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-300">
+  <MessageComponent />
+</div>
+```
+
+**Why NOT motion (Framer Motion):**
+
+| Concern | Motion | tailwindcss-animate |
+|---------|--------|---------------------|
+| Gzipped JS cost | 34KB standard, 55KB with layout+gestures | 0KB (CSS only) |
+| Runtime overhead | JS animation engine on main thread | Browser compositor thread (GPU) |
+| Learning curve | New API (`<m.div>`, `LazyMotion`, `AnimatePresence`) | Tailwind utility classes (team already knows) |
+| `height: auto` animation | Solved with `layout` prop | Solved with `grid-rows-[0fr/1fr]` trick |
+| Exit animations | `AnimatePresence` -- elegant but heavy | `isExiting` state + CSS -- 10 lines, already used in 46 components |
+| Bundle size impact on 1.38MB main JS | +2.5-4% | 0% |
+
+The codebase already has 281 instances of `transition`/`animation`/`@keyframes` across 77 files, all CSS-based. Introducing a JS animation library for the 3-4 cases that need exit animations is not justified when the CSS pattern is already established and working.
+
+**The one case where Motion would genuinely help:** Spring-physics easing. CSS `cubic-bezier` cannot perfectly replicate spring dynamics. However, Loom's design language targets "professional and clean" (Claude.ai, Linear), not "playful and bouncy" (Notion, Arc). `cubic-bezier(0.4, 0, 0.2, 1)` (Tailwind's default ease-out) is the correct easing for this product.
+
+**Tailwind config addition:**
+
+```js
+// tailwind.config.js
+plugins: [
+  require('@tailwindcss/typography'),
+  require('tailwindcss-animate'),  // Add
+],
+```
+
+---
+
+### 3. Color System Migration: CSS Variable Value Swap
+
+**No new library needed. Strategy change only.**
+
+The existing CSS variable architecture (`hsl(var(--token) / <alpha-value>)` in tailwind.config.js, `:root {}` definitions in index.css) is exactly right. The v1.1 migration is a VALUE swap, not an architecture change.
+
+**Current palette (warm earthy -- to be replaced):**
+
+```css
+--background: 10 27.3% 8.6%;      /* #1c1210 chocolate */
+--foreground: 33.5 63% 89.4%;     /* #f5e6d3 cream */
+--primary: 30.6 52.7% 64.3%;      /* #d4a574 amber */
+--accent: 21.9 45.6% 55.3%;       /* #c17f59 copper */
+```
+
+**New palette (charcoal + dusty rose):**
+
+```css
+--background: 0 0% 10.2%;         /* #1a1a1a charcoal */
+--foreground: 0 0% 93%;           /* #ededed near-white */
+--primary: 4 38% 63%;             /* ~#D4736C dusty rose */
+--accent: 4 25% 55%;              /* ~#C97B7B muted pink */
+```
+
+**What changes:**
+- Replace ALL HSL values in `:root {}` block of `index.css`
+- Update `--nav-glass-bg`, `--nav-*` token values
+- Replace hardcoded HSL values in scrollbar styles (currently hardcoded `34.5 35.9% 63.9%`)
+- Replace hardcoded hex colors in `ScrollToBottomPill.tsx` (`#2a1f1a`, `#c4a882`, `#f5e6d3`, `#3d2e25`)
+- Replace hardcoded `#d4a574` in `streaming-cursor.css`
+- Replace select dropdown SVG stroke color (`%23c4a882` URL-encoded)
+- Add CSS variables for scrollbar colors instead of hardcoded values
+
+**New CSS variables to add (not in current system):**
 
 ```css
 :root {
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
-  --font-sans: 'Inter', system-ui, sans-serif;
+  /* Scrollbar -- currently hardcoded, should be tokenized */
+  --scrollbar-thumb: 0 0% 35%;
+  --scrollbar-thumb-hover: 0 0% 45%;
+
+  /* Surface hierarchy -- more granular for charcoal */
+  --surface-0: 0 0% 10.2%;        /* #1a1a1a -- deepest */
+  --surface-1: 0 0% 13.3%;        /* #222222 -- cards, panels */
+  --surface-2: 0 0% 16.5%;        /* #2a2a2a -- elevated */
+  --surface-3: 0 0% 20%;          /* #333333 -- highest elevation */
+
+  /* Rose accent scale */
+  --rose-50: 4 38% 63%;           /* Primary rose */
+  --rose-muted: 4 20% 45%;        /* Muted for borders/subtle */
+  --rose-glow: 4 45% 70%;         /* Bright for active states */
 }
 ```
 
-Then reference in Tailwind config:
+**Why surface hierarchy matters:** The current 3-tier model (`--background`, `--card`, `--secondary`) maps cleanly. Adding explicit `--surface-N` tokens makes the charcoal depth system more intentional, since pure charcoal grays lack the natural contrast that warm browns provided.
+
+**Hardcoded colors audit (must be converted to CSS variables):**
+
+| File | Hardcoded Value | Replace With |
+|------|----------------|--------------|
+| `ScrollToBottomPill.tsx` | `bg-[#2a1f1a]`, `border-[#c4a882]/30`, `text-[#f5e6d3]`, `hover:bg-[#3d2e25]` | `bg-card`, `border-border/30`, `text-foreground`, `hover:bg-secondary` |
+| `streaming-cursor.css` | `color: #d4a574` | `color: hsl(var(--primary))` |
+| `index.css` (scrollbar) | `hsl(34.5 35.9% 63.9% / 0.3)` | `hsl(var(--scrollbar-thumb))` |
+| `index.css` (select SVG) | `stroke='%23c4a882'` | Use CSS `mask-image` or new variable |
+| `ShellMinimalView.tsx` | Multiple `gray-700`, `gray-800`, `gray-900` | Semantic tokens |
+| `TurnToolbar.tsx` | `gray-500`, `gray-900/80`, `gray-700/50` | Semantic tokens |
+
+---
+
+### 4. Glassmorphism / Blur Effects
+
+**No new library needed. Already established in codebase.**
+
+The codebase already has 25+ instances of `backdrop-blur-sm` and a complete `nav-glass` utility class system with CSS variable tokens:
+
+```css
+.nav-glass {
+  background: hsl(var(--nav-glass-bg));
+  backdrop-filter: blur(var(--nav-glass-blur)) saturate(var(--nav-glass-saturate));
+}
+```
+
+**What to change for v1.1:**
+- Update `--nav-glass-bg` HSL values to charcoal
+- Audit `backdrop-blur-sm` vs `backdrop-blur-md` usage for consistency
+- Consider adding a `glass-surface` utility class for panels (not just nav) that want the frost effect
+
+**No performance concern:** `backdrop-filter: blur()` is GPU-composited. The existing usage across 25+ components confirms it performs well on the target hardware.
+
+---
+
+### 5. Scroll Behavior
+
+**No new library needed. Already implemented.**
+
+The `useScrollAnchor` hook already implements the optimal smart auto-scroll pattern:
+- IntersectionObserver + sentinel div (zero scroll-event overhead)
+- `isAtBottom` state driven by observer
+- `isUserScrolledUp` for disengage detection
+- `scrollToBottom('smooth')` for re-engage
+- 100px rootMargin tolerance
+
+**What to change for v1.1:**
+- Improve the `ScrollToBottomPill` visual design (currently hardcoded warm colors -- see color audit above)
+- Add new message count badge styling to match charcoal + rose palette
+- Consider adding subtle `animate-in slide-in-from-bottom-2` entrance via tailwindcss-animate
+
+**What NOT to add:** No virtualization library (`@tanstack/react-virtual`) needed yet. Chat sessions rarely exceed 100 turns, and CSS `contain: content` on `.message-streaming` already prevents layout thrash.
+
+---
+
+### 6. Micro-Interactions
+
+**No new library needed. CSS transitions + tailwindcss-animate cover all cases.**
+
+The codebase already has a solid transition foundation:
+
+```css
+/* Global interactive element transitions */
+button, a, input, textarea, select, [role="button"], .transition-all {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+```
+
+**v1.1 micro-interaction patterns (all achievable with CSS):**
+
+| Interaction | CSS Approach |
+|------------|-------------|
+| Button hover glow | `hover:shadow-[0_0_12px_hsl(var(--primary)/0.3)]` |
+| Button active press | `active:scale-[0.98]` (already in codebase) |
+| Icon rotation on expand | `transition-transform duration-200` + conditional `rotate-180` |
+| Focus ring with rose accent | `focus-visible:ring-2 ring-primary/40 ring-offset-2 ring-offset-background` |
+| Sidebar item hover | `hover:bg-surface-2` with `transition-colors duration-150` |
+| Code block copy feedback | Swap icon from Copy to Check with `animate-in fade-in-0 zoom-in-75` |
+| Input focus border glow | `focus-within:border-primary/40 focus-within:shadow-[0_0_8px_hsl(var(--primary)/0.15)]` |
+
+**Easing tokens to standardize:**
+
 ```js
-fontFamily: {
-  mono: ['var(--font-mono)', ...defaultTheme.fontFamily.mono],
-  sans: ['var(--font-sans)', ...defaultTheme.fontFamily.sans],
-}
+// tailwind.config.js extend
+transitionTimingFunction: {
+  'ease-out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',   // Fast start, gentle decelerate
+  'ease-in-out-smooth': 'cubic-bezier(0.4, 0, 0.2, 1)', // Default (already used)
+},
+transitionDuration: {
+  'fast': '100ms',    // Active states
+  'normal': '150ms',  // Hover states
+  'slow': '300ms',    // Layout changes
+  'slower': '500ms',  // Page-level transitions
+},
 ```
-
-**Font loading:** Add JetBrains Mono via `@fontsource/jetbrains-mono` (npm package, no CDN dependency):
-
-```bash
-npm install @fontsource/jetbrains-mono
-```
-
-```tsx
-// In main.tsx or App.tsx
-import '@fontsource/jetbrains-mono/400.css'
-import '@fontsource/jetbrains-mono/500.css'
-import '@fontsource/jetbrains-mono/700.css'
-```
-
----
-
-### 6. Terminal Theming (xterm.js)
-
-**Recommendation: Replace the current VS Code-inspired theme with Catppuccin Mocha colors in `TERMINAL_OPTIONS.theme`**
-
-The current terminal theme in `src/components/shell/constants/constants.ts` is VS Code's default dark colors (blues, greens). Replace with Catppuccin Mocha, blended to match the warm app background:
-
-```ts
-export const TERMINAL_OPTIONS: ITerminalOptions = {
-  // ...existing options...
-  fontFamily: 'var(--font-mono, "JetBrains Mono", "Menlo", monospace)',
-  fontSize: 13,
-  theme: {
-    // Blend Catppuccin Mocha with Loom's warm dark palette
-    background: '#1c1210',        // Loom base (not Mocha's #1e1e2e — warmer)
-    foreground: '#cdd6f4',        // Mocha text
-    cursor: '#d4a574',            // Loom amber
-    cursorAccent: '#1c1210',
-    selectionBackground: '#45475a',
-    selectionForeground: '#cdd6f4',
-
-    // Catppuccin Mocha ANSI colors (standard Mocha palette)
-    black: '#45475a',
-    red: '#f38ba8',
-    green: '#a6e3a1',
-    yellow: '#f9e2af',
-    blue: '#89b4fa',
-    magenta: '#cba6f7',
-    cyan: '#94e2d5',
-    white: '#bac2de',
-    brightBlack: '#585b70',
-    brightRed: '#f38ba8',
-    brightGreen: '#a6e3a1',
-    brightYellow: '#f9e2af',
-    brightBlue: '#89b4fa',
-    brightMagenta: '#cba6f7',
-    brightCyan: '#94e2d5',
-    brightWhite: '#a6adc8',
-  },
-}
-```
-
-**Why Catppuccin Mocha:** It is the most widely adopted warm-toned dark terminal theme in developer tools (2025). Its muted, pastel ANSI colors avoid the harsh neon saturation of VS Code's default palette, which clashes with warm earthy UI surfaces. The Mocha palette was designed for exactly the "warm dark" aesthetic Loom targets.
-
-**xterm.js version note:** The project currently uses `@xterm/xterm ^5.5.0`. npm shows latest is `6.0.0`. Version 6 is a significant API change — verify changelog before upgrading. For theming purposes, v5.5 supports the full `ITheme` interface including `extendedAnsi`. No upgrade needed for theming work.
-
----
-
-## Packages to Remove
-
-| Package | Why Remove | Impact |
-|---------|-----------|--------|
-| `react-syntax-highlighter` | Replaced by Shiki | High — requires updating Markdown.tsx CodeBlock |
-| `@openai/codex-sdk` | Codex backend being stripped per PROJECT.md | Medium — backend changes |
-| `i18next` + `react-i18next` + `i18next-browser-languagedetector` | Stripping i18n per PROJECT.md | High — touch every component with `useTranslation` |
 
 ---
 
 ## Packages to Add
 
 ```bash
-# Syntax highlighting (replaces react-syntax-highlighter)
-npm install shiki@^4 @shikijs/rehype@^4
+# Toast notifications
+npm install sonner
 
-# Animation
-npm install motion
+# Animation utilities (Tailwind plugin -- CSS only, zero JS runtime)
+npm install -D tailwindcss-animate
+```
 
-# Diff rendering (for chat tool calls display)
-npm install react-diff-viewer-continued
+**Total JS bundle impact: ~3KB gzipped** (Sonner only; tailwindcss-animate adds zero JS)
 
-# Fonts (no CDN dependency)
-npm install @fontsource/jetbrains-mono
+---
 
-# Terminal themes (optional — or inline values)
-# No package needed; use hex values directly in TERMINAL_OPTIONS
+## Packages NOT to Add (Revised from v1.0 Research)
+
+| Package | Previous Recommendation | Why NOT for v1.1 |
+|---------|------------------------|-------------------|
+| `motion` (Framer Motion) | v1.0 research: ADD | 34-55KB gzipped JS for 3-4 exit animation cases; CSS `grid-rows` trick + `isExiting` pattern + tailwindcss-animate covers all v1.1 needs at 0KB JS cost |
+| `@formkit/auto-animate` | Not previously considered | 56KB unpacked for "magic" list transitions; insufficient control for specific animation timing |
+| `react-hot-toast` | Not recommended | Worse dark mode support than Sonner; requires manual CSS overrides for charcoal theme |
+| `@radix-ui/react-toast` | Not recommended | Headless/unstyled -- would need to build entire visual layer; Sonner provides both a11y + visuals |
+| `@tanstack/react-virtual` | Not recommended for v1.1 | Premature optimization; chat sessions rarely exceed 100 turns; `contain: content` already prevents layout thrash |
+| `tailwind-scrollbar` | Not recommended | Custom scrollbar styling already implemented via CSS in index.css; a plugin would just duplicate what exists |
+
+---
+
+## Alternatives Considered (v1.1 Specific)
+
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Toast | `sonner` ^2.0.7 | `react-hot-toast` | No native dark theme, no richColors, no promise toasts; requires manual CSS overrides |
+| Toast | `sonner` ^2.0.7 | `@radix-ui/react-toast` | Headless only -- must build all visuals; slower to ship |
+| Toast | `sonner` ^2.0.7 | Custom implementation | Toast lifecycle (stacking, timing, exit animation, accessibility) is deceptively complex; Sonner handles it in 3KB |
+| Animation | `tailwindcss-animate` | `motion` (Framer Motion) | 34-55KB JS overhead for cases solvable with CSS; team already uses CSS transition patterns throughout 77 files |
+| Animation | `tailwindcss-animate` | CSS-only (no plugin) | Plugin provides composable `animate-in`/`animate-out` + `fade-in`/`slide-in-from-*` utilities; writing these as raw `@keyframes` in index.css is viable but messier |
+| Animation | `tailwindcss-animate` | `react-transition-group` | Heavier than the `isExiting` pattern already used; adds React component wrapper overhead |
+| Scroll | `useScrollAnchor` (keep) | `@tanstack/react-virtual` | Premature; current IntersectionObserver pattern performs well |
+| Color system | CSS variable value swap | Tailwind config color objects | CSS variables allow runtime theming; hardcoded Tailwind colors require rebuild |
+
+---
+
+## Installation
+
+```bash
+# New runtime dependency
+npm install sonner
+
+# New dev dependency (Tailwind plugin)
+npm install -D tailwindcss-animate
+```
+
+**Tailwind config update:**
+
+```js
+// tailwind.config.js
+plugins: [
+  require('@tailwindcss/typography'),
+  require('tailwindcss-animate'),  // ADD THIS
+],
 ```
 
 ---
 
-## Alternatives Considered
+## Integration Points with Existing System
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Syntax highlighting | `shiki` | `react-syntax-highlighter` (current) | Prism grammars are ~80% accurate vs TextMate 99%; no VS Code Dark+ parity |
-| Syntax highlighting | `shiki` | `highlight.js` | No advantage when language tags are always provided; weaker grammar quality |
-| Syntax highlighting | `shiki` | CodeMirror 6 (already installed) | ~70KB+ per editor instance; designed for interactive editing not read-only display |
-| Markdown | `react-markdown` v10 | `streamdown` v2.3.0 | Migration cost high; token buffer approach fixes streaming jank without library swap; react-markdown has longer maintenance track record |
-| Markdown | `react-markdown` v10 | MDX | Runtime MDX compilation is unsafe for LLM output (arbitrary JSX execution risk) |
-| Animation | `motion` | CSS transitions | `height: auto` not animatable with CSS alone; layout shift corrections require JS measurement |
-| Animation | `motion` | `@react-spring/web` | Motion has better React 18 integration, `AnimatePresence` for exit animations; React Spring is lower-level |
-| Diff display (chat) | `react-diff-viewer-continued` | `diff2html` | diff2html outputs HTML strings, not React components; requires wrapper layer |
-| Diff display (chat) | `react-diff-viewer-continued` | `@codemirror/merge` (installed) | CodemMirror merge is for interactive editors; overkill for read-only chat display |
-| Terminal theming | Inline object in constants.ts | npm theme package | No package provides Catppuccin Mocha as ITheme format; inline is simpler |
-| Fonts | `@fontsource/jetbrains-mono` | Google Fonts CDN | No external CDN dependency; self-hosted, works offline |
+### Sonner + CSS Variables
 
----
+Sonner reads `data-theme` attribute on its toast container. Set `theme="dark"` on `<Toaster>` to get dark defaults, then override specific colors via `[data-sonner-toast]` CSS selectors using Loom's CSS variables. This means toast colors automatically update when the palette variables change -- no component-level styling needed.
 
-## What NOT to Use
+### tailwindcss-animate + CVA
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| `react-syntax-highlighter` for new work | Bundled grammars, poor tree-shaking, Prism accuracy ~80%, no VS Code parity | `shiki` with `shiki/bundle/web` |
-| `rehype-highlight` (lowlight/highlight.js) | Same grammar quality issues as Highlight.js, worse than Shiki | `@shikijs/rehype` |
-| `rehype-raw` without `rehype-sanitize` | Enables XSS from LLM-generated raw HTML | Use react-markdown `components` prop for custom elements |
-| `MDX` for chat rendering | Runtime compilation risk, security risk on untrusted LLM output | `react-markdown` with custom components |
-| `framer-motion` package name | Deprecated — package is now published as `motion` | `motion` (same library, new package name) |
-| Tailwind arbitrary hex values for theme colors | Can't switch themes at runtime, must touch every file | CSS variables via `hsl(var(--token))` pattern (already established) |
-| `@xterm/xterm` v6.0.0 upgrade (yet) | Breaking API change — audit changelog before upgrading | Stay on v5.5.0 for now |
-| `styled-components` or CSS Modules | Incompatible with Tailwind-first approach; massive migration | Tailwind + CSS variables (already established) |
+The existing CVA (class-variance-authority) patterns compose cleanly with tailwindcss-animate classes:
+
+```tsx
+const toolPanel = cva(
+  "grid transition-[grid-template-rows] duration-200 ease-out",
+  {
+    variants: {
+      state: {
+        open: "grid-rows-[1fr] animate-in fade-in-0",
+        closed: "grid-rows-[0fr]",
+      },
+    },
+  }
+);
+```
+
+### CSS Variable Architecture
+
+The `hsl(var(--token) / <alpha-value>)` pattern in tailwind.config.js is preserved. Only the `:root {}` values in index.css change. Every component using `bg-background`, `text-foreground`, `border-border`, `bg-primary`, etc. automatically picks up the new charcoal + rose palette.
 
 ---
 
-## Stack Patterns by Context
+## What to Change in Existing Files (No New Libraries Needed)
 
-**For code blocks in chat messages:**
-- Use Shiki (`shiki/bundle/web`) via async `codeToHtml()`
-- Render with `dangerouslySetInnerHTML` (safe — Shiki input is code string, not user HTML)
-- Add language badge and copy button as React overlay (position: absolute)
-
-**For git diffs in the git panel (interactive):**
-- Keep `@codemirror/merge` — already installed, already works
-
-**For Claude's file edit tool calls in chat:**
-- Use `react-diff-viewer-continued` with warm dark theme styles
-
-**For collapsible content (turns, thinking blocks, tool call groups):**
-- Use `motion` with `AnimatePresence` + `layout` prop
-- For simple show/hide without height animation: CSS `transition-opacity`
-
-**For theme variables:**
-- All semantic colors via `hsl(var(--token))` CSS variables
-- Override only the `.dark {}` block in `index.css`
-- Never use hardcoded hex in Tailwind classes for themed colors
+| File | Change | Why |
+|------|--------|-----|
+| `src/index.css` `:root {}` | Replace all HSL values with charcoal + rose | Palette migration |
+| `src/index.css` scrollbar styles | Replace hardcoded HSL with `var(--scrollbar-thumb)` | Tokenize scrollbar colors |
+| `src/index.css` select SVG | Replace hardcoded stroke color | Palette migration |
+| `tailwind.config.js` | Add `tailwindcss-animate` plugin, easing tokens, duration tokens | Animation utilities |
+| `streaming-cursor.css` | Replace `#d4a574` with `hsl(var(--primary))` | Palette migration |
+| `aurora-shimmer.css` | No change needed | Aurora uses oklch, palette-independent |
+| Components with hardcoded hex/gray | Replace with semantic Tailwind tokens | Palette migration |
 
 ---
 
-## Version Compatibility
+## Version Compatibility Matrix
 
-| Package | Compatible With | Notes |
-|---------|-----------------|-------|
-| `shiki` ^4.0.0 | React 18, Vite 7, TypeScript 5 | `shiki/bundle/web` for browser; async API — wrap in `useEffect` or Suspense |
-| `@shikijs/rehype` ^4.0.0 | `react-markdown` ^10, `rehype` unified pipeline | Install same major version as `shiki` — both are `^4.0.0` |
-| `motion` ^12.x | React 18 (full support) | Import from `motion/react`, not `framer-motion` |
-| `react-diff-viewer-continued` ^4.1.x | React 18/19 | `useDarkTheme` prop for dark mode |
-| `@fontsource/jetbrains-mono` | Vite, webpack | Import specific weights to avoid loading all variants |
-| `@xterm/xterm` ^5.5.0 | node-pty ^1.1.0 | Current version; v6 has breaking changes — do not upgrade yet |
+| Package | React 18 | Tailwind 3.4 | Vite 7 | TypeScript 5 |
+|---------|----------|-------------|--------|-------------|
+| `sonner` ^2.0.7 | Yes (peer dep: ^18.0.0) | N/A (CSS only theming) | Yes | Yes (ships types) |
+| `tailwindcss-animate` ^1.0.7 | N/A (Tailwind plugin) | Yes (peer dep: >=3.0.0) | N/A | N/A |
 
 ---
 
 ## Sources
 
-- Context7 `/shikijs/shiki` — React integration patterns, bundle/web API, theme usage (HIGH confidence)
-- Context7 `/vercel/streamdown` — Streamdown API, component system, streaming behavior (HIGH confidence)
-- Context7 `/remarkjs/react-markdown` — v10 API, plugin pipeline, custom components (HIGH confidence)
-- Context7 `/websites/motion_dev` — Motion API, bundle size strategy, layout animations (HIGH confidence)
-- npm registry (via `npm view`, verified 2026-03-01) — shiki@4.0.0, @shikijs/rehype@4.0.0, motion@12.34.3, react-diff-viewer-continued@4.1.2, streamdown@2.3.0, @xterm/xterm@6.0.0, @fontsource/jetbrains-mono@5.2.8 (HIGH confidence)
-- Gemini research — Shiki vs Prism vs Highlight.js ecosystem analysis, react-markdown vs Streamdown tradeoffs (HIGH confidence on synthesis, MEDIUM on specific claims without Context7 verification)
-- Existing codebase audit — `src/components/chat/view/subcomponents/Markdown.tsx`, `src/components/shell/constants/constants.ts`, `tailwind.config.js`, `src/index.css` (HIGH confidence — direct inspection)
+- npm registry (verified 2026-03-03): `sonner@2.0.7` (166KB unpacked, peer: react ^18), `tailwindcss-animate@1.0.7` (18KB, peer: tailwindcss >=3.0.0), `motion@12.34.4` (597KB unpacked), `framer-motion@12.34.4` (4.59MB unpacked), `react-hot-toast@2.6.0` (203KB unpacked), `@radix-ui/react-toast@1.2.15` (180KB unpacked), `@formkit/auto-animate@0.9.0` (56KB unpacked)
+- Gemini research (2026-03-03): Sonner API (theme, richColors, promise toasts, CSS variable overrides), Framer Motion vs CSS-only analysis, tailwindcss-animate composable utilities, smart auto-scroll patterns, CSS grid-rows height animation technique
+- Codebase audit (2026-03-03): 281 transition/animation/keyframes instances across 77 files (all CSS-based), 25+ backdrop-blur instances, 46+ isVisible/isOpen/isExpanded state patterns, useScrollAnchor hook (IntersectionObserver + sentinel), ScrollToBottomPill (hardcoded colors), streaming-cursor.css (hardcoded #d4a574), index.css scrollbar styles (hardcoded HSL)
+- Tailwind CSS 3.4.17 installed version confirmed via `npx tailwindcss --help`
+- Current main JS bundle: 1.38MB (dist/assets/index-*.js); adding Motion would increase by 2.5-4%
 
 ---
 
-*Stack research for: Loom — React 18 AI chat interface (CloudCLI fork)*
-*Researched: 2026-03-01*
+*Stack research for: Loom v1.1 -- Visual Redesign (charcoal + dusty rose palette)*
+*Researched: 2026-03-03*
+*Previous research (v1.0): 2026-03-01 -- recommendations for Shiki, react-markdown, motion (Framer Motion) revised here*

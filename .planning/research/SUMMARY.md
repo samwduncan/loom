@@ -1,269 +1,206 @@
 # Project Research Summary
 
-**Project:** Loom — Premium AI Coding Chat Interface
-**Domain:** Brownfield React + Tailwind web app transformation (CloudCLI fork → Loom)
-**Researched:** 2026-03-01
+**Project:** Loom v1.1 -- Visual Redesign (charcoal + dusty rose)
+**Domain:** Brownfield visual redesign of a React 18 streaming AI chat interface
+**Researched:** 2026-03-03
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Loom is a brownfield transformation of CloudCLI — a working React 18 + Express + WebSocket AI chat interface — into a premium, visually distinctive developer tool targeting power users of Claude Code and Gemini CLI. The foundational plumbing (chat, sessions, file explorer, git panel, terminal, WebSocket, auth) already exists and must be treated as immovable. The transformation work is almost entirely a UI/UX and visual redesign: replacing the current VS Code-inspired dark palette with a warm earthy aesthetic, upgrading syntax highlighting to VS Code-quality (Shiki), and redesigning the chat message experience to match or exceed Claude.ai and Cursor. The codebase analysis confirmed 197 source files, 43 components with i18n dependency to strip, and 86 files with hardcoded Tailwind color classes that will resist theming unless addressed systematically before any visual work begins.
+Loom v1.1 is a visual redesign of a complete, functional AI chat product. The features are built; the work is replacing the warm earthy palette (#1c1210 chocolate, #d4a574 amber) with charcoal + dusty rose (#1a1a1a, #D4736C) and elevating the visual experience to the standard set by Claude.ai, ChatGPT, Perplexity, and Open WebUI. The recommended approach is conservative and surgical: swap CSS variable values first, then audit and eliminate the 86+ hardcoded color references that bypass the variable system, then add new systems (toast notifications, animation utilities) as additive layers. The v1.0 architecture was explicitly designed for this kind of palette migration -- the `hsl(var(--token) / <alpha-value>)` contract in tailwind.config.js means that changing `:root` values in index.css instantly updates every semantic-class component. The complexity lies entirely in the hardcoded hex references scattered across 13 files.
 
-The recommended approach is layered transformation: establish the design system foundation first (CSS variables, palette, typography), then sweep hardcoded colors, then strip unused backends and i18n, then redesign the chat message experience, then add the streaming UX polish features that differentiate Loom from generic AI tools. This order is non-negotiable — attempting visual redesign before the CSS variable system is correct will produce inconsistent results that require re-work. The key competitive differentiators are: warm earthy identity (unique in the space), high information density (Linear-style versus Claude.ai's spacious layout), collapsible turn management for long agentic sessions, and VS Code-quality syntax highlighting.
+The recommended premium identity follows the **Claude.ai playbook** adapted with Loom's distinctive warmth: invisible borders at 6-10% opacity, hidden-until-hover message actions, full-width assistant messages, generous 32px inter-turn spacing, and the dusty rose accent applied sparingly (5% of surface area maximum). The only new dependencies justified are Sonner for toast notifications (~3KB gzipped) and tailwindcss-animate as a CSS-only Tailwind plugin (0KB JS runtime). Motion/Framer Motion is explicitly rejected: its 34-55KB JS cost is not warranted when CSS grid-rows tricks and the existing isExiting pattern (used in 46+ components) cover all exit animation needs. The codebase already has 281 CSS transition/animation instances across 77 files -- the pattern is established and working.
 
-The top risks are technical and architectural, not product-level. The Tailwind HSL opacity modifier contract (`<alpha-value>` placeholder) is a silent failure mode that breaks all interactive states if not implemented correctly from the start. Per-token React streaming re-renders are a CPU/performance hazard that must be designed around from day one (buffer + rAF pattern). Auto-scroll fighting the user is the single most disruptive UX pitfall in AI chat interfaces. Fork divergence from CloudCLI upstream is a long-term governance risk. All four of these are preventable with specific patterns documented in research — they are not discovered-later problems if the build order is followed correctly.
+The critical risk is the "hardcoded color hydra": 51 arbitrary hex values in chat components alone plus 371 Tailwind gray/slate/neutral/zinc classes inherited from CloudCLI, all bypassing the CSS variable system. Skipping this audit before changing `:root` values produces a visually inconsistent half-migrated UI with warm brown adjacent to charcoal. A second risk is animation-induced scroll regression: CSS transitions that animate height during streaming break the IntersectionObserver sentinel, causing scroll pill flicker and auto-scroll failure. The mitigation is precise -- animate only opacity and transform (layout-safe), never height, during or near streaming.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The inherited CloudCLI stack (React 18, TypeScript 5, Vite 7, Tailwind CSS 3, Express + WebSocket, better-sqlite3, react-router-dom, CVA + tailwind-merge, lucide-react) is solid and must not be migrated. Three targeted library additions close the gap to premium quality: Shiki replaces `react-syntax-highlighter` for VS Code-grade syntax highlighting (TextMate grammars, 99% accuracy vs Prism's ~80%), `motion` (formerly Framer Motion, now published as the `motion` package) handles layout animations for collapsible turns and thinking block disclosure, and `react-diff-viewer-continued` handles read-only diff display for Claude's file edit tool calls. The existing `@codemirror/merge` stays for the interactive git panel. Packages to remove include `react-syntax-highlighter`, `@openai/codex-sdk`, and the entire i18n stack (`i18next`, `react-i18next`, `i18next-browser-languagedetector`).
+The existing stack requires minimal additions. React 18, TypeScript, Vite 7, Tailwind CSS 3.4, Shiki v4, react-markdown, CodeMirror 6, @xterm/xterm, lucide-react, and the `hsl(var(--token) / <alpha-value>)` CSS variable architecture are all inherited without change. The only new runtime dependency is Sonner for toast notifications. The only new dev dependency is tailwindcss-animate as a Tailwind plugin.
 
 **Core technologies:**
-- `shiki@^4` + `@shikijs/rehype@^4`: Syntax highlighting — TextMate grammars give VS Code Dark+ parity; replaces Prism
-- `react-markdown@^10` (already installed): Markdown rendering — keep as-is; streaming jank fixed via token buffer, not library swap
-- `motion@^12` (already installed): Animations — `AnimatePresence` + `layout` prop for collapsible height animations; use `LazyMotion` to reduce bundle to ~4.6KB
-- `react-diff-viewer-continued@^4.1.2`: Diff display in chat — React-native, dark theme support, warm palette customizable
-- `@fontsource/jetbrains-mono`: Monospace font — self-hosted, no CDN dependency
-- `@xterm/xterm@^5.5.0` (keep at v5.5, do not upgrade to v6): Terminal — themed via `TERMINAL_OPTIONS.theme` JS object with Catppuccin Mocha hex values
-- CSS variables + `hsl(var(--token) / <alpha-value>)` pattern: Theme system — channel-only variables in CSS, `<alpha-value>` required for opacity modifiers
+- `sonner ^2.0.7`: Toast notifications -- dark theme native, promise toasts, 3KB gzipped, maps directly to Loom's CSS variables via `[data-sonner-toast]` selectors. Zero dependencies.
+- `tailwindcss-animate ^1.0.7`: Animation utilities -- provides composable `animate-in`, `fade-in`, `slide-in-from-bottom-2` etc. as pure Tailwind CSS classes; 0KB JS runtime impact.
+- CSS variable value swap (no new library): The `:root` block in index.css changes HSL values but not variable names or the Tailwind config structure; every semantic-class component updates automatically.
 
-**Critical version note:** Shiki is at `4.0.0` (not `3.23.0` — some secondary sources are stale). Install `shiki@^4 @shikijs/rehype@^4` with matching major versions. `motion` is at `^12.34.3` — import from `motion/react`, not the deprecated `framer-motion` package name.
+**Total new JS bundle impact:** ~3KB gzipped (Sonner only).
+
+**Rejected additions (documented rationale):**
+- `motion` (Framer Motion): 34-55KB gzipped JS; CSS grid-rows trick + tailwindcss-animate + isExiting pattern covers all v1.1 animation needs at 0KB JS cost
+- Any virtualization library: Chat sessions rarely exceed 100 turns; premature
+- Light mode / theme switching: Single dark theme is the brand identity; would require a complete second design system
 
 ### Expected Features
 
-Research cross-verified against Claude.ai, Cursor, Windsurf, and GitHub Copilot Chat. The feature landscape splits cleanly: table stakes are what make the tool feel professional, differentiators are where Loom's "designed, not generated" thesis lives.
+Analysis of six reference products (Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat) produced a clear priority ranking. The dependency chain is firm: the design system (CSS variables, palette, typography) is the prerequisite for all other visual work.
 
-**Must have (table stakes) — launch blockers:**
-- Markdown rendering with GFM (already exists, needs Shiki integration)
-- VS Code-quality syntax highlighting (Shiki upgrade)
-- Copy-to-clipboard on code blocks (one-line addition, show on hover)
-- Stop generation with backend abort propagation (AbortController + `req.on('close')`)
-- Auto-scroll with manual override (sticky-bottom pattern, break at 10px upward scroll)
-- Jump-to-bottom pill with new message count badge
-- Distinct thinking vs. generating indicators (pulsing amber, not generic spinner)
-- Collapsible thinking blocks (pulse while streaming, auto-collapse on output, always expandable)
-- Tool call action cards (compact, expandable, grouped for 3+ calls)
-- Session persistence (already exists, needs visual "resuming" indicator)
-- Status feedback for errors (toast for transient, inline banner for persistent)
+**Must have (table stakes):**
+- 3-4 tier surface elevation: base (#1a1a1a) -> cards (#222222) -> elevated (#2a2a2a) -> overlays. Use background lightness steps, NOT drop shadows.
+- Subtle borders at 6-10% white opacity -- single most impactful "premium" signal. Replace all hard borders with `hsl(var(--border) / 0.08-0.12)`.
+- Hidden-until-hover action buttons on messages -- single biggest clutter reducer. `opacity-0 group-hover:opacity-100 transition-opacity duration-200`.
+- Full-width assistant messages with transparent background (no bubble wrapper)
+- Generous 32-48px inter-turn spacing, tight spacing within turns
+- Toast notifications (glassmorphic style, bottom-right position, 2-4s auto-dismiss)
+- Chronological sidebar grouping with tracked time-group labels (Today, Yesterday, Last 7 Days)
+- Monospace code blocks with hover-reveal copy button (already built; verify new palette)
+- Semantic error states: gray=info, amber=warning, muted red=error
+- Dusty rose input focus glow: `box-shadow: 0 0 0 2px hsl(var(--accent)/0.15)` on focus
 
 **Should have (competitive differentiators):**
-- Warm earthy design language — chocolate/amber/copper/terracotta palette (unique identity)
-- Dense professional layout — 4-8px grid, tight line heights, JetBrains Mono throughout
-- Collapsible completed turns — critical for long agentic sessions
-- Live agentic status line — real-time "Reading auth.ts... Executing command..." micro-status
-- Token count + cost per response — key for self-hosting power users
-- Context window gauge — visual progress bar near input
-- Diff rendering with colored unified diffs — file edits as readable diffs, not raw text
-- Inline permission banners — non-blocking, replaces modals
-- System/status message categorization — gray/amber/red visual hierarchy
+- Tool call action card restyle: compact pill, icon + name + semantic state (pulsing rose = running, collapsed chip = success, expanded muted red = error)
+- Execution chain grouping: 3+ sequential tool calls collapse into accordion with count badge
+- Semantic streaming states: "Reading auth.ts..." text status above ChatComposer via ActivityStatusLine component
+- Spring-physics message entrance: translateY(8px) + opacity 0->1, 250ms, `cubic-bezier(0.22, 1, 0.36, 1)` (CSS only)
+- Slim sidebar collapse to icon-only strip
+- Active session indicator: 2px dusty rose left border + `bg-accent/0.08` background tint
+- Token/cost display per response (muted footer text, session total in sidebar)
+- Custom text selection: `::selection { background-color: hsl(var(--accent)/0.25); }`
+- Glassmorphic overlays for floating elements only (modals, toasts, dropdowns -- NOT scrolling content)
 
-**Defer (v2+):**
-- Keyboard shortcut system / command palette (Cmd+K) — high value, significant implementation
-- Live streaming diffs (like Cursor's ghost text) — major architectural work
-- Compact/comfortable density toggle — second-order customization
-- Multi-agent status visualization — SDK dependency
-
-**Anti-features to explicitly avoid:**
-- Character-by-character typewriter effect (eye strain, artificial latency)
-- Modal permission dialogs (blocks flow in agentic sessions)
-- Generic three-dot typing indicator (no information value)
-- Dark mode toggle (Loom's identity is specifically warm dark)
-- Customizable color themes (disproportionate effort; offer density/font instead)
-- Infinite scroll for session history (browser performance degrades with markdown + code blocks)
+**Defer to v2+:**
+- Context window gauge (after token display works)
+- Density toggle (after base density is correct)
+- Command palette (significant scope)
+- Font customization
+- Conversation branching / tree view (wrong mental model)
+- Light mode (dilutes brand)
+- Model comparison side-by-side (unnecessary for 2-model product)
+- Right-side artifact panel (conflicts with 720px centered rail)
 
 ### Architecture Approach
 
-The existing architecture is well-decomposed and should be extended, not replaced. `ChatInterface` delegates to four isolated hooks (`useChatProviderState`, `useChatSessionState`, `useChatComposerState`, `useChatRealtimeHandlers`), which is the correct pattern for adding features without breaking existing behavior. The CSS variable theming system already uses the right two-layer architecture (`:root` light + `.dark` override), and the Tailwind config correctly maps semantic aliases to CSS custom properties — the transformation only changes HSL values, not variable names or component classnames. The streaming architecture uses a 100ms `setTimeout` buffer in `useChatRealtimeHandlers`, which is correct in principle but should be upgraded to `requestAnimationFrame` for better frame-rate alignment.
+The architecture strategy is "change values, not structures." Five integration layers handle the full redesign without touching any business logic or streaming performance boundaries. Every new overlay element must use ReactDOM.createPortal to document.body to escape stacking contexts and overflow clipping. The streaming performance boundaries (requestAnimationFrame buffer, `contain: content` on `.message-streaming`, IntersectionObserver scroll anchor, React.memo + custom comparators on TurnBlock) are protected and must not be modified.
 
-**Major components and transformation responsibilities:**
-1. `src/index.css` + `tailwind.config.js` — palette and token system (Phase 1 work only)
-2. 86 files with hardcoded Tailwind colors — systematic sweep to semantic aliases (Phase 2)
-3. 43 components with `useTranslation()` — mechanical string literal substitution + i18n removal (Phase 3)
-4. `useChatProviderState` + server routes — Cursor/Codex backend strip (Phase 4)
-5. `ChatMessagesPane` + new `TurnBlock` component — turn collapse, tool call grouping (Phase 5)
-6. `MessageComponent` — user bubble, assistant layout, thinking block, tool card redesign (Phase 5)
-7. `useChatRealtimeHandlers` — add `turnId` assignment, enhance streaming buffer to rAF (Phase 5)
-8. `AssistantThinkingIndicator` + scroll logic — streaming UX polish (Phase 6)
-9. `src/components/shell/constants/constants.ts` — Catppuccin Mocha terminal theme (Phase 7)
-
-**State placement rules (critical for performance):**
-- Turn collapse state: `useChatSessionState` (scoped to chat, reset on session change) — NOT global Context
-- Tool group expansion: local `useState` in `TurnBlock` (ephemeral per-group) — NOT lifted
-- Streaming content: isolated `useRef` buffer, flushed via rAF — NEVER in Context consumed by layout components
+**Five integration layers:**
+1. **CSS Variable Values** (`index.css :root`): 22 existing variables get new HSL channel values; 7 new tokens added (--toast-bg, --code-bg, --diff-bg, --streaming-cursor, scrollbar tokens). Variable names and Tailwind config structure stay identical.
+2. **Hardcoded Color References** (13 component files): 51 arbitrary hex values in Tailwind arbitrary syntax + 371 gray/slate/neutral/zinc classes. All must be replaced with semantic aliases. This is the largest single body of work.
+3. **Specialty Surface Themes**: xterm.js `TERMINAL_OPTIONS.theme` JS object (20 hex values -> Catppuccin Mocha), Shiki `WARM_COLOR_REPLACEMENTS` map (12 mappings), `warmDiffStyles` object in DiffViewer (25+ hex values), Tailwind Typography plugin overrides.
+4. **New Component Systems** (additive, no existing code changes): `ToastProvider` + `ToastContainer` (portal to document.body, subscribes to WebSocketContext connection state), `ActivityStatusLine` (CSS Grid 0fr/1fr reveal above ChatComposer).
+5. **Component Visual Polish**: hover states, micro-interactions, message spacing, message entrance animations -- CSS className additions only.
 
 ### Critical Pitfalls
 
-1. **Tailwind HSL `<alpha-value>` contract** — CSS variables must be defined as bare channel values (no `hsl()` wrapper), then referenced as `hsl(var(--token) / <alpha-value>)` in `tailwind.config.js`. Without this, all opacity modifiers (`bg-primary/50`, `text-accent/70`) silently render at full opacity. This is a Phase 1 day-1 requirement — get it wrong and every interactive state, overlay, and hover effect in the app is broken invisibly.
+1. **The Hardcoded Color Hydra** (CRITICAL): 51 arbitrary hex values (`bg-[#1c1210]`, `text-[#c4a882]`) + 371 gray/slate/zinc classes across 13 files bypass CSS variables entirely. Changing `:root` leaves 40% of the app in the old palette. Run the full grep audit and create a token map (old hex -> semantic class) BEFORE touching `:root` values. The migration plan must sequence audit first, then variables.
 
-2. **86 files with hardcoded Tailwind colors** — The existing codebase bypasses the CSS variable system in 86 files (`bg-blue-600`, `text-gray-500`, `bg-red-950`, etc.). These will not respond to the palette swap. A pre-retheme audit grep and systematic replacement sprint is required before any visual QA is meaningful. Primary targets: user bubble (`bg-blue-600` → `bg-primary`), error states (`bg-red-*` → `bg-destructive`), muted text (`text-gray-500` → `text-muted-foreground`).
+2. **HSL Alpha-Value Contract Breakage** (CRITICAL): The Tailwind config stores `hsl(var(--X) / <alpha-value>)`. CSS variables MUST contain bare HSL channels (`0 0% 10%`), never `hsl(0 0% 10%)` or comma-separated (`0, 0%, 10%`). Adding the `hsl()` wrapper produces nested `hsl(hsl(...) / 0.5)` which browsers silently ignore, breaking ALL opacity modifiers. Create an opacity test page immediately after variable changes and verify before proceeding.
 
-3. **Per-token React streaming re-renders** — Naive token-by-token `setState` causes 100–400 renders/second during Claude streaming responses. The existing 100ms setTimeout buffer helps but is not sufficient without memoized `MessageComponent` and `TurnBlock` components. Upgrade to `requestAnimationFrame` flush and ensure stable references prevent memo comparison failures. Never put streaming state in a Context consumed by sidebar or layout-level components.
+3. **Animation Jank During Streaming** (HIGH): `transition: all 150ms` on buttons/inputs triggers layout recalculation during streaming token arrival. Multiple aurora gradient elements (thinking + skeleton + aura = 3-5) create GPU compositing layers that exceed the AMD Radeon 780M iGPU budget (~8-10 layers), dropping frame rate. Replace `transition: all` with specific property transitions; add `.is-streaming` CSS guard class to disable non-critical animations; cap concurrent GPU layers.
 
-4. **Auto-scroll fighting the user** — The hardest UX problem in AI chat interfaces. Solution: track `isUserAtBottom` explicitly in `onScroll` (threshold: 100px from bottom), use CSS `overflow-anchor: auto` on the scroll container, never call `scrollIntoView()` in a `useEffect` that fires on every streaming token, stable `IntersectionObserver` refs via `useCallback`.
+4. **Scroll Behavior Regression from Animations** (HIGH): CSS transitions that animate height change `scrollHeight` over time, causing the IntersectionObserver sentinel to fire incorrectly (scroll pill flicker, auto-scroll failure, scroll position jumps after expand). Only animate `opacity` and `transform` -- these are layout-safe and don't affect `scrollHeight`. Use the CSS Grid 0fr/1fr pattern (already established in TurnBlock/ToolActionCard) for any expand/collapse near scroll containers.
 
-5. **Fork divergence from CloudCLI upstream** — Without a strategy, Loom will accumulate merge conflicts as CloudCLI continues shipping. Maintain an `upstream-sync` branch tracking CloudCLI exactly. Make Loom changes atomic and scoped (one concern per commit). Prefer disabling code over deleting it (reduces conflict surface). Tag the upstream baseline commit before the fork diverges. This must be established before any code changes — not retroactively.
+5. **Z-Index Wars** (HIGH): Current codebase has unmanaged z-indexes spanning z-10 to z-[9999] across 20+ components. Adding toast notifications requires a formal z-index scale (sticky=10, floating=20, dropdown=30, overlay=40, modal=50, toast=60, critical=70) and portal-to-body strategy for ALL overlays. Must be established before adding any new overlay element.
 
-**Additional pitfalls of note:**
-- xterm.js theme cannot be set via CSS — must use `terminal.options.theme` JS object with hex values (CSS variables have no effect on the canvas-rendered terminal)
-- WebSocket cleanup required in every `useEffect` — React 18 StrictMode double-mount reveals missing cleanup immediately in dev; production leaks memory silently
-- GPL-3.0 compliance — retain LICENSE file, add ATTRIBUTION/NOTICE crediting CloudCLI authors; non-negotiable legal requirement
-- `rehype-raw` must never be enabled without `rehype-sanitize` — LLM output can contain XSS vectors
+6. **Contrast Ratio Failures on Charcoal** (HIGH): Dusty rose `#D4736C` on charcoal `#1a1a1a` = 4.2:1 contrast ratio, failing WCAG AA for small text (requires 4.5:1). Muted text at reduced opacity (`/30`) falls to 2:1 or below. Every text/background pair must be audited; opacity floor raised to `/40` minimum for readable text; a lighter rose variant added for text-use cases vs. decorative accent use.
 
 ## Implications for Roadmap
 
-Research strongly supports a layered transformation order. Visual work cannot precede token system correctness. Structural cleanup (i18n, dead backends) should happen before UI redesign to reduce the file count being actively worked. Chat redesign is the highest-risk, highest-value phase and should occur on a stable foundation.
+The architecture's five integration layers map directly to a natural phase order. The dependency chain is unambiguous: nothing can be visually correct until the design system is in place, and the design system requires the hardcoded color audit to be complete before variables are changed.
 
-### Phase 1: Foundation — Design System and Fork Governance
+### Phase 1: Design System Foundation
+**Rationale:** CSS variable values are the prerequisite for everything else. Once variables are correct, every semantic-class component updates automatically. This must complete before any component work is judged visually.
+**Delivers:** Global palette switch (charcoal + dusty rose), 3-tier surface elevation, opacity modifiers verified working, WCAG contrast compliance checked, new token vocabulary (surface hierarchy, rose scale, scrollbar tokens, streaming cursor token), input focus glow, text selection color.
+**Addresses:** CSS variable value swap, border opacity standardization, warm text hierarchy, scrollbar tokenization, select dropdown arrow SVG update.
+**Avoids:** HSL alpha contract breakage (#2), contrast ratio failures (#6). Requires completing the hardcoded color audit grep BEFORE changing `:root` values -- the audit informs the token map needed for Phase 2.
+**Research flag:** Skip -- well-documented CSS variable migration pattern with fully specified target values.
 
-**Rationale:** Every subsequent phase depends on a correct CSS variable + Tailwind token system. Doing this first means zero re-work later. Fork governance (upstream-sync branch, GPL compliance, git workflow) must be established before any code diverges — it cannot be retrofitted.
+### Phase 2: Hardcoded Color Sweep
+**Rationale:** The 51+ arbitrary hex values and 371 gray/slate/zinc classes are the exact blocker preventing design system propagation. This is mechanical but critical: without it, 40% of the app stays warm brown after Phase 1.
+**Delivers:** 100% palette consistency across all chat components; grep audit for `[#` returns zero matches; all warm brown/amber/terracotta eliminated; semantic token coverage complete.
+**Addresses:** MessageComponent.tsx (17 hex refs), CodeBlock.tsx (7), SystemStatusMessage.tsx (7), ThinkingDisclosure.tsx (6), ScrollToBottomPill.tsx (full hardcode), streaming-cursor.css (#d4a574 cursor), ConnectionStatusDot.tsx (3 status hex), gray/slate/zinc class migration.
+**Avoids:** Component cascade at panel junctions (#7), hardcoded color hydra (#1).
+**Research flag:** Skip -- mechanical find-and-replace using the token map created during Phase 1 audit.
 
-**Delivers:** Warm earthy palette active across all existing UI using semantic aliases; `<alpha-value>` opacity contract verified; ATTRIBUTION file; upstream-sync branch established; JetBrains Mono loaded.
+### Phase 3: Specialty Surface Rethemes
+**Rationale:** Third-party components (xterm.js, Shiki, DiffViewer, Tailwind Typography) have independent color systems that don't read from CSS variables. They require individual configuration updates with explicit hex values.
+**Delivers:** Terminal background matches charcoal; syntax highlighting matches new palette; diff viewer palette correct; markdown prose content uses rose accent for links and correct heading colors.
+**Addresses:** xterm.js TERMINAL_OPTIONS.theme (20 hex values -> Catppuccin Mocha charcoal variant), useShikiHighlighter WARM_COLOR_REPLACEMENTS (12 mappings), warmDiffStyles object (25+ colors), tailwind.config.js typography prose overrides (`--tw-prose-body`, `--tw-prose-code`, etc.).
+**Avoids:** Dark mode consistency / third-party color leakage (#8), prose typography plugin leakage (#11).
+**Research flag:** Skip -- direct file updates with known target values. Catppuccin Mocha is a published palette with documented hex values.
 
-**Addresses:** Design system (palette, CSS variables, typography) — the prerequisite for all visual differentiators.
+### Phase 4: Message Experience and Micro-Interactions
+**Rationale:** With the palette fully consistent across all surfaces, message-level visual polish is the highest-impact next step. Hidden-until-hover actions alone transform the perceived density of the interface.
+**Delivers:** Hidden-until-hover message actions, full-width assistant messages confirmed, 32px inter-turn spacing, message entrance animation (translateY(8px) + opacity, CSS only, cubic-bezier spring approximation), streaming batch opacity fade-in, button hover glows, active:scale-[0.98] press feedback, `::selection` dusty rose.
+**Uses:** tailwindcss-animate for `animate-in fade-in-0 slide-in-from-bottom-2` utilities, CSS Grid 0fr/1fr for expand/collapse, Tailwind semantic tokens.
+**Avoids:** Animation jank during streaming (#3 -- only opacity/transform used), scroll behavior regression (#4 -- no height animations during streaming), bundle size creep (#10 -- CSS only, no animation JS library), global `transition: none` override (#15 -- must account for this before writing animation CSS).
+**Research flag:** Skip -- established CSS animation patterns; tailwindcss-animate well-documented.
 
-**Avoids:** HSL opacity contract failure (Pitfall 1), hardcoded color survival (Pitfall 2), fork divergence (Pitfall 5), GPL non-compliance (Pitfall 12).
+### Phase 5: Toast Notifications and Z-Index System
+**Rationale:** Toast system requires establishing the z-index scale first. The current z-index landscape spans z-10 to z-[9999] with no formal system -- adding any new overlay layer without a scale creates conflicts.
+**Delivers:** Formal z-index CSS custom property scale (--z-sticky through --z-critical), Sonner Toaster installed and themed to charcoal+rose via CSS variable overrides, WebSocket connection state toasts (warning on disconnect, success on reconnect), session error toasts, portal strategy documented.
+**Uses:** `sonner ^2.0.7`, ReactDOM.createPortal, WebSocketContext connection state (ToastProvider wraps inside WebSocketProvider).
+**Avoids:** Z-index wars (#6), toast inside scroll container (anti-pattern 3 from ARCHITECTURE.md), backdrop contrast failure on charcoal (#14 -- increase `bg-black/50` to `bg-black/70`).
+**Research flag:** Skip -- Sonner API is documented; portal pattern is standard React.
 
-**Research flag:** Standard patterns — CSS variable theming is well-documented. No research phase needed.
+### Phase 6: Tool Call Display and Sidebar Polish
+**Rationale:** Tool calls are central to Loom's coding workflow. Once the palette foundation is established and toast system provides the z-index framework, tool call action cards and the sidebar are the next highest-impact component areas.
+**Delivers:** Tool call action pills (compact, icon + name + semantic state colors), pulsing rose indicator for running state, collapsed chip for success, expanded muted red background for errors, execution chain grouping (3+ calls -> accordion with count badge), sidebar time groups with tracked labels, active session 2px rose border + bg tint, slim sidebar icon-only collapse mode.
+**Avoids:** Component cascade at panel junctions (#7 -- sidebar edge cases require checking sidebar/chat boundary), mobile breakpoint regression (#9 -- sidebar collapse must work at 375px).
+**Research flag:** Low confidence needed. If exact visual parity with ChatGPT action pill pattern is required, a brief research pass on pill CSS specifics would reduce design iteration. Otherwise, the FEATURES.md competitive matrix has sufficient detail.
 
-### Phase 2: Color Sweep — Hardcoded Color Replacement
-
-**Rationale:** The 86 files with hardcoded Tailwind colors will produce visual inconsistency that makes QA impossible until they're resolved. This is a mechanical operation that can be largely scripted with grep + find-and-replace. Doing it before UI redesign means the new components will be authored correctly from the start.
-
-**Delivers:** All color references in the codebase using semantic aliases; grep audit returns zero non-token color classes; consistent warm palette across every screen.
-
-**Addresses:** System message categorization (gray/amber/red) starts here with new semantic tokens.
-
-**Avoids:** Hardcoded colors surviving retheme (Pitfall 2), specificity conflicts with third-party components (Pitfall 9).
-
-**Research flag:** Mechanical work — no research phase needed. Use the audit grep commands documented in ARCHITECTURE.md Pattern 2.
-
-### Phase 3: Structural Cleanup — i18n Removal and Backend Strip
-
-**Rationale:** 43 components with `useTranslation()` add cognitive overhead and import noise to every file touched during redesign. Removing i18n before redesigning those components is cleaner than removing it after. Similarly, stripping Cursor/Codex backends clarifies the provider model before the chat UI is redesigned around it.
-
-**Delivers:** Codebase without i18n overhead; provider model simplified to Claude + Gemini only; 3 packages removed (`react-i18next`, `i18next`, `@openai/codex-sdk`); bundle size reduced.
-
-**Avoids:** Touching i18n-infected components twice during redesign; Codex-specific edge cases appearing in chat message handling.
-
-**Research flag:** Standard patterns — mechanical string substitution. No research phase needed.
-
-### Phase 4: Raw Terminal View (Existing Phase)
-
-**Rationale:** Per existing roadmap planning, Phase 03 (raw terminal view) has planning files already in progress. This phase likely slots between structural cleanup and chat redesign — implementing the terminal panel with correct Catppuccin Mocha theming while the codebase is clean and the design system is stable.
-
-**Delivers:** Terminal view with warm-themed Catppuccin Mocha palette correctly applied via `terminal.options.theme`.
-
-**Avoids:** xterm.js canvas theming confusion (Pitfall 10) — must use JS object, not CSS.
-
-**Research flag:** Terminal theming is well-documented. Pitfall 10 is the main hazard.
-
-### Phase 5: Chat Message Redesign — Core Experience
-
-**Rationale:** The highest-value and highest-risk phase. Depends on stable palette (Phases 1-2) and clean codebase (Phase 3). Introduces `TurnBlock` component, redesigns `MessageComponent`, upgrades streaming buffer to rAF, adds tool call action cards, thinking block disclosure redesign, and syntax highlighting upgrade to Shiki.
-
-**Delivers:** Premium chat experience — warm earthy message design, collapsible turns, VS Code-quality syntax highlighting, tool call action cards (compact, grouped, expandable), animated thinking blocks, diff rendering for file edits.
-
-**Addresses:** Shiki syntax highlighting, collapsible thinking blocks, tool call action cards, collapsible completed turns, diff rendering, warm design language, dense professional layout.
-
-**Avoids:** Per-token re-render cascade (Pitfall 3) — upgrade to rAF buffer and memoized TurnBlock; anti-pattern of blocking streaming with heavy Markdown parse (render raw text during stream, switch to Markdown on completion).
-
-**Research flag:** This phase needs careful implementation of the streaming performance patterns. The rAF buffer pattern, memoized TurnBlock comparator, and the "raw text while streaming / Markdown after" split are all documented in ARCHITECTURE.md and PITFALLS.md. No additional research-phase needed — the patterns are defined. However, this is the phase most likely to surface unexpected edge cases requiring mid-phase design decisions.
-
-### Phase 6: Streaming UX Polish — Scroll, Status, Indicators
-
-**Rationale:** Auto-scroll, jump-to-bottom pill, thinking indicators, and status line are best implemented after the chat component structure is stable (Phase 5). They instrument existing components rather than restructuring them.
-
-**Delivers:** Sticky auto-scroll with manual override, jump-to-bottom pill with new message count badge, pulsing streaming indicator with thinking vs. generating states, global activity status bar, token count/cost display per response, connection status indicator.
-
-**Addresses:** Auto-scroll with manual override, jump-to-bottom pill, thinking/generating state distinction, usage summary, status feedback for errors, connection status.
-
-**Avoids:** Auto-scroll fighting the user (Pitfall 4) — must implement `isUserAtBottom` tracking and `overflow-anchor` CSS; `IntersectionObserver` sentinel stability.
-
-**Research flag:** Auto-scroll is a well-documented problem with established solution patterns. No research phase needed — follow the PITFALLS.md Pitfall 4 prevention steps exactly.
-
-### Phase 7: Sidebar, Settings, and Global Polish
-
-**Rationale:** After the core chat experience is designed and working, the peripheral surfaces (sidebar session list, settings panel, error toasts, global status line) get the same treatment without risk of blocking chat functionality.
-
-**Delivers:** Dense sidebar with tight session list, settings panel cleanup, toast system for transient errors, session-level token totals in sidebar, compact/comfortable density toggle.
-
-**Addresses:** Dense professional layout applied to sidebar, usage summary (session totals), global status bar, connection status indicator.
-
-**Avoids:** Tailwind dynamic class purge (Pitfall 8) — any toast severity classes must be in lookup tables, not template literals.
-
-**Research flag:** Standard patterns throughout. No research phase needed.
+### Phase 7: Activity Status and Streaming States
+**Rationale:** Semantic streaming states ("Reading auth.ts...", "Writing server.ts...") are a meaningful differentiator but require reading tool event data from the stream. Depends on solid animation foundation from Phase 4 and palette from Phases 1-3.
+**Delivers:** ActivityStatusLine component (CSS Grid 0fr/1fr reveal above ChatComposer, shows during streaming), semantic status text parsed from useChatRealtimeHandlers tool events, send-to-stop icon morph (CSS opacity crossfade), streaming cursor color updated to hsl(var(--primary)).
+**Uses:** CSS Grid expand/collapse, useChatRealtimeHandlers tool event subscription, CSS transition crossfade for send/stop swap.
+**Avoids:** Animation jank during streaming (#3), scroll regression (#4). The ActivityStatusLine must use the CSS Grid 0fr/1fr pattern (not max-height) and must not trigger scroll height changes.
+**Research flag:** Skip for CSS/animation work. If backend stream tool event format is undocumented or complex, a brief audit of actual WebSocket message shapes before planning will reduce mid-phase surprises.
 
 ### Phase Ordering Rationale
 
-- **Design system before all visual work:** The CSS variable + `<alpha-value>` contract must be correct before any component is judged visually. Building components on a broken token system means re-testing everything.
-- **Color sweep before redesign:** 86 hardcoded files contaminate visual QA. Sweeping them first means new components are authored correctly and old ones respond to the palette.
-- **Structural cleanup before feature work:** Reducing the codebase surface (43 i18n components, dead providers) reduces the cognitive load and file count during the highest-complexity work.
-- **Chat redesign as a single phase:** Splitting `MessageComponent`, `TurnBlock`, streaming buffer, and Shiki integration across multiple phases creates integration risks. They should be developed together with a stable palette foundation under them.
-- **Streaming UX polish after structure:** Scroll management and indicators instrument existing components — they don't define structure. Doing them after Phase 5 means the DOM structure they target is stable.
+- Phases 1-3 are strictly sequential: CSS variables -> component hardcodes -> third-party systems. None can be reordered.
+- Phases 4-7 are largely independent but Phase 5 (z-index scale) should precede any work adding new overlay elements to avoid rework.
+- Every phase must include mobile regression testing at 375px. The mobile-specific CSS in index.css (lines 351-436) has critical fixed-position and safe-area dependencies that break silently on desktop.
+- Scroll behavior must be regression-tested at the end of Phases 4 and 7 (the phases adding CSS transitions and new animated components).
+- The hardcoded color audit grep should be run as the first action of Phase 1, before changing any values, to inform the token replacement map used in Phase 2.
 
 ### Research Flags
 
 Phases needing deeper research during planning:
-- **None identified.** All implementation patterns are documented in STACK.md, ARCHITECTURE.md, and PITFALLS.md with sufficient detail for direct execution. The research phase has front-loaded the hard decisions.
+- **Phase 6 (tool call display):** If tight visual fidelity to ChatGPT's action pill pattern is a goal, a focused research pass on the CSS/component structure would reduce design iteration time. The FEATURES.md competitive matrix provides sufficient guidance for a competent implementation.
+- **Phase 7 (semantic streaming states):** A brief audit of actual WebSocket message shapes from useChatRealtimeHandlers (what fields are available when a tool call starts/completes) before planning will prevent scope surprises.
 
-Phases with standard patterns (skip research-phase):
-- **Phase 1 (Foundation):** CSS variable theming is fully specified in STACK.md and PITFALLS.md.
-- **Phase 2 (Color Sweep):** Mechanical grep-and-replace; patterns in ARCHITECTURE.md Pattern 2.
-- **Phase 3 (Structural Cleanup):** i18n removal approach in ARCHITECTURE.md Pattern 5; backend strip in Phase 5 notes.
-- **Phase 5 (Chat Redesign):** Streaming patterns, TurnBlock memoization, Shiki integration all documented. Mid-phase decisions expected but not requiring pre-research.
-- **Phase 6 (Streaming UX):** Auto-scroll solution in PITFALLS.md Pitfall 4; scroll-anchor CSS documented.
+Phases with well-documented patterns (skip research):
+- **Phase 1:** CSS variable migration is a solved pattern; all target values and the two-pass strategy are fully specified in ARCHITECTURE.md.
+- **Phase 2:** Mechanical grep-and-replace with a known token map. The audit commands are in PITFALLS.md Pitfall 1.
+- **Phase 3:** Direct config file updates with known targets. Catppuccin Mocha hex values are a published palette.
+- **Phase 4:** tailwindcss-animate utilities are documented; CSS-only animation pattern is established in 281 existing instances.
+- **Phase 5:** Sonner API is documented; portal pattern is standard React.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Most findings verified via Context7, npm registry (verified 2026-03-01), and official docs. Shiki 4.0.0 version confirmed directly via npm. `motion` package API verified via Context7. |
-| Features | HIGH | Cross-verified against Claude.ai, Cursor, Windsurf, GitHub Copilot Chat direct analysis. Feature tiers validated against established patterns in the competitive landscape. |
-| Architecture | HIGH | Based on direct analysis of 197 source files. Component boundaries, data flow, and state placement recommendations are grounded in actual code inspection, not inference. |
-| Pitfalls | HIGH | Most pitfalls verified via official GitHub issues (Tailwind, React), official documentation (CodeMirror, xterm.js), and high-quality community sources. GPL compliance via GNU Project FAQ. |
+| Stack | HIGH | Verified via npm registry (actual package sizes measured 2026-03-03), direct codebase audit (bundle size 1.38MB measured), peer dependency compatibility confirmed, Tailwind 3.4.17 install verified. |
+| Features | HIGH | Cross-verified across 6 reference products via Gemini research. Competitive matrix covers palette, message styling, tool call display, streaming indicators, and sidebar design. Some ChatGPT post-GPT5 details MEDIUM (may reflect unreleased features). |
+| Architecture | HIGH | Based on direct analysis of the built v1.0 codebase. All file paths, line numbers, class names, and component counts verified against actual source. The 86 hardcoded hex count and 13-file distribution are audited facts, not estimates. |
+| Pitfalls | HIGH | All critical pitfalls verified against actual codebase. The 51 arbitrary hex count, z-index value distribution (z-10 to z-[9999]), and streaming performance boundary locations are direct grep results. WCAG contrast ratios are calculated against actual planned hex values. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Shiki async integration in streaming context:** Shiki's `codeToHtml()` is async. During streaming, code blocks may be incomplete (no closing fence). The handling of incomplete code blocks during streaming (render as raw text until `isStreaming: false`) is the recommended approach, but the exact UX during long code blocks may need iteration. Not a blocker — the fallback (raw text while streaming) is well-specified.
-
-- **`TurnId` assignment logic:** Research specifies that `turnId` should be added to `ChatMessage` and assigned in `useChatRealtimeHandlers`, but the exact boundary condition (when does a new turn begin vs. continue?) depends on Claude Code's streaming event structure. This needs a brief audit of the actual WebSocket message types during a real session before Phase 5 begins. Low-risk gap — one session observation answers the question.
-
-- **ANSI chat parser interaction with Shiki:** Phase 05 (ANSI chat parser) appears in the planning directory alongside the chat redesign work. The interaction between ANSI escape code handling and Shiki's syntax highlighting pipeline is not fully specified. These likely operate on different message types (terminal output vs. markdown code blocks) and should not conflict, but verify before Phase 5.
-
-- **`motion` LazyMotion boundary placement:** The `LazyMotion` wrapper for bundle optimization must wrap the component tree above all `m.*` components. Given the existing Provider tree in `App.tsx`, the correct insertion point needs to be confirmed to avoid breaking animation features in scattered components. Low-risk — `LazyMotion` placement is a single-file decision.
+- **Exact charcoal HSL values need visual calibration:** ARCHITECTURE.md notes the target HSL values are "illustrative." The approach is correct, but specific lightness levels for --card, --secondary, --muted-foreground need visual verification during Phase 1 execution. A slightly lighter rose may be required to clear WCAG AA for small text.
+- **Dusty rose WCAG AA boundary:** `#D4736C` on `#1a1a1a` = 4.2:1, failing WCAG AA for small text (4.5:1 required). A lighter rose variant for text-use cases (e.g., `--accent-text: 5 35% 75%`) may need to be added to the token vocabulary in Phase 1.
+- **Backend stream event shapes for Phase 7:** The ActivityStatusLine depends on tool event data from useChatRealtimeHandlers. A brief audit of actual WebSocket message fields before Phase 7 planning will prevent scope changes mid-phase.
+- **Mobile safe-area final verification:** `env(safe-area-inset-bottom)` only works correctly in standalone/PWA mode. DevTools responsive mode cannot fully simulate this. Real device or iOS simulator testing is required, particularly after Phase 1 changes padding/spacing.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Context7 `/shikijs/shiki` — React integration patterns, `shiki/bundle/web` API, theme usage
-- Context7 `/vercel/streamdown` — Streamdown API comparison, confirming react-markdown retention decision
-- Context7 `/remarkjs/react-markdown` — v10 API, plugin pipeline, custom components
-- Context7 `/websites/motion_dev` — Motion API, `LazyMotion` bundle strategy, layout animations
-- npm registry (direct queries, 2026-03-01) — shiki@4.0.0, @shikijs/rehype@4.0.0, motion@12.34.3, react-diff-viewer-continued@4.1.2, @xterm/xterm@6.0.0, @fontsource/jetbrains-mono@5.2.8
-- Direct analysis of `/home/swd/loom/src/` (197 TypeScript/React source files)
-- `src/components/chat/hooks/useChatRealtimeHandlers.ts` — streaming architecture ground truth
-- Tailwind CSS GitHub issue #7575 — HSL opacity modifier `<alpha-value>` requirement
-- React GitHub issue #25614 — StrictMode double-mount WebSocket cleanup behavior
-- CodeMirror official styling guide — `EditorView.theme()` extension API
-- GNU Project GPL-3.0 FAQ — license compliance requirements
+- Direct codebase audit of `/home/swd/loom/src/` (v1.0 built) -- hardcoded hex counts, z-index values, file paths, animation inventories, bundle size, Tailwind version
+- npm registry (verified 2026-03-03) -- sonner@2.0.7 (3KB gzipped), tailwindcss-animate@1.0.7 (0KB JS), motion@12.34.4 (34-55KB gzipped), react-hot-toast@2.6.0, @radix-ui/react-toast@1.2.15
+- Tailwind CSS documentation -- HSL `<alpha-value>` contract, tailwindcss-animate peer dep compatibility (>=3.0.0)
+- WCAG 2.1 Level AA -- 4.5:1 contrast ratio requirement for normal text, 3:1 for large text
 
-### Secondary (MEDIUM confidence)
-- Gemini research — Shiki vs Prism ecosystem analysis, react-markdown vs Streamdown tradeoffs, AI interface feature landscape 2025-2026
-- Claude.ai, Cursor, Windsurf, GitHub Copilot Chat — direct interface analysis for feature baseline
-- Akash Builds: "Why React Apps Lag With Streaming Text" — streaming re-render cascade patterns
-- LogRocket: "Pitfalls of overusing React Context" — context performance patterns
-- GitHub Blog: "Friendly Fork Management Strategies" — upstream sync approach
-- Oliver Roick (2024): "Setting Colors in xterm.js" — canvas theming constraints
-- Oliver Roick (2024): Tailwind dark mode specificity post-v3.4.1
+### Secondary (MEDIUM-HIGH confidence)
+- Gemini research (2026-03-03) -- Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat interface analysis; competitive pattern matrix across palette, message styling, tool calls, streaming indicators, sidebar design
+- MDN documentation -- CSS `contain`, `content-visibility: auto`, CSS Grid `grid-template-rows` animation, IntersectionObserver spec
+- Chrome DevTools documentation -- Layers panel, GPU compositing layer analysis, performance profiling during streaming
 
-### Tertiary (MEDIUM-LOW confidence, validate if needed)
-- ProTailwind workshop — implementing color opacity with CSS variables (consistent with official Tailwind docs but third-party source)
-- SitePoint: "Streaming Backends & React: Re-render Chaos" — practical streaming analysis
-- TanStack Virtual GitHub issue #832 — dynamic height estimation (applies if virtualization is added in v2+)
+### Tertiary (MEDIUM confidence)
+- ChatGPT post-GPT5 interface specifics -- some details may reflect speculative analysis about features not yet publicly released; core patterns (action pills, batch streaming, aggressive tool grouping) are established
+- LobeChat spring physics specifics (stiffness: 100, damping: 20) -- community documentation quality varies; spring approximation via `cubic-bezier(0.22, 1, 0.36, 1)` is the CSS-based safe substitute
 
 ---
-*Research completed: 2026-03-01*
+*Research completed: 2026-03-03*
 *Ready for roadmap: yes*
