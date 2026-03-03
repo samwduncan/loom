@@ -1,5 +1,6 @@
 import React, { memo, useState, useEffect, useRef, useId } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import ThinkingShimmer from './ThinkingShimmer';
 
 interface ThinkingDisclosureProps {
   content: string;
@@ -52,6 +53,11 @@ export const ThinkingDisclosure = memo(function ThinkingDisclosure({
   };
 
   const isEmpty = !content || content.trim().length === 0;
+
+  // During streaming with no content, show the aurora ThinkingShimmer instead
+  if (isStreaming && isEmpty) {
+    return <ThinkingShimmer isThinking={true} />;
+  }
 
   // Character count for collapsed label
   const charCount = content.length;

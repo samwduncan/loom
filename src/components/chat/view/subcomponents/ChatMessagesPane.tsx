@@ -125,6 +125,28 @@ export default function ChatMessagesPane({
     return candidateKey;
   }, []);
 
+  // Indicator collapse lifecycle: keep mounted for exit animation
+  const [showIndicator, setShowIndicator] = useState(false);
+  const indicatorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (isLoading) {
+      setShowIndicator(true);
+      if (indicatorTimerRef.current) {
+        clearTimeout(indicatorTimerRef.current);
+        indicatorTimerRef.current = null;
+      }
+    } else if (showIndicator) {
+      // Keep mounted for collapse animation
+      indicatorTimerRef.current = setTimeout(() => {
+        setShowIndicator(false);
+      }, 350); // Slightly longer than 300ms collapse
+    }
+    return () => {
+      if (indicatorTimerRef.current) clearTimeout(indicatorTimerRef.current);
+    };
+  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Turn grouping
   const { items, turnCount } = useTurnGrouping(visibleMessages);
 
@@ -418,7 +440,7 @@ export default function ChatMessagesPane({
         </>
       )}
 
-      {isLoading && <AssistantThinkingIndicator selectedProvider={provider} />}
+      {showIndicator && <AssistantThinkingIndicator selectedProvider={provider} isVisible={isLoading} />}
 
       {/* Sentinel div for IntersectionObserver-based bottom detection */}
       <div ref={sentinelRef} style={{ height: '1px', width: '100%' }} aria-hidden="true" />

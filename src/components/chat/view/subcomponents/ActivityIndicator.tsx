@@ -1,3 +1,5 @@
+// DEPRECATED: Replaced by PreTokenIndicator (aurora shimmer skeleton) in Phase 7.
+// Kept for potential future use. See ThinkingShimmer for the new thinking indicator.
 import { useState, useEffect, useRef } from 'react';
 import type { SessionProvider } from '../../../../types/app';
 import SessionProviderLogo from '../../../llm-logo-provider/SessionProviderLogo';
