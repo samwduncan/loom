@@ -19,6 +19,7 @@ export default {
         ring: "hsl(var(--ring) / <alpha-value>)",
         background: "hsl(var(--background) / <alpha-value>)",
         foreground: "hsl(var(--foreground) / <alpha-value>)",
+        "foreground-secondary": "hsl(var(--foreground-secondary) / <alpha-value>)",
         primary: {
           DEFAULT: "hsl(var(--primary) / <alpha-value>)",
           foreground: "hsl(var(--primary-foreground) / <alpha-value>)",
@@ -58,6 +59,11 @@ export default {
           reconnecting: "hsl(var(--status-reconnecting) / <alpha-value>)",
           disconnected: "hsl(var(--status-disconnected) / <alpha-value>)",
           error: "hsl(var(--status-error) / <alpha-value>)",
+          info: "hsl(var(--status-info) / <alpha-value>)",
+        },
+        diff: {
+          added: "hsl(var(--diff-added-bg) / <alpha-value>)",
+          removed: "hsl(var(--diff-removed-bg) / <alpha-value>)",
         },
       },
       borderRadius: {
