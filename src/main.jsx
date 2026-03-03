@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import 'katex/dist/katex.min.css'
+import './components/chat/styles/aurora-shimmer.css'
+import './components/chat/styles/streaming-cursor.css'
 
 // Dark-only theme — no toggle, no context overhead
 document.documentElement.style.colorScheme = 'dark';

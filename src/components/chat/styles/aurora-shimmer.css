@@ -1,0 +1,111 @@
+/*
+ * Aurora Shimmer — Full rainbow gradient animation for streaming indicators.
+ *
+ * Uses CSS @property to register --aurora-angle as an <angle>, which allows
+ * the browser to interpolate the custom property on the compositor thread
+ * (GPU-accelerated) rather than requiring main-thread style recalculation.
+ *
+ * oklch color stops are chosen for perceptual uniformity — each hue step
+ * maintains similar lightness/chroma so there are no "dead gray zones"
+ * between stops.
+ */
+
+/* Register custom property for compositor-thread animation */
+@property --aurora-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Full 360-degree rotation keyframes */
+@keyframes aurora-rotate {
+  0% {
+    --aurora-angle: 0deg;
+  }
+  100% {
+    --aurora-angle: 360deg;
+  }
+}
+
+/*
+ * .aurora-gradient — Base rainbow gradient class.
+ *
+ * The gradient uses 8 oklch stops evenly spaced across the hue wheel.
+ * Chroma values (0.22-0.28) are kept high for vivid color, while lightness
+ * (60-75%) stays in a visible-on-dark-background range. The final stop
+ * wraps back to the starting hue for seamless looping.
+ */
+.aurora-gradient {
+  background: linear-gradient(
+    calc(var(--aurora-angle) + 45deg),
+    oklch(65% 0.28 0) 0%,        /* red */
+    oklch(70% 0.25 45) 12.5%,    /* orange */
+    oklch(75% 0.22 90) 25%,      /* yellow */
+    oklch(70% 0.25 150) 37.5%,   /* green */
+    oklch(65% 0.28 210) 50%,     /* cyan */
+    oklch(60% 0.28 270) 62.5%,   /* blue */
+    oklch(65% 0.25 330) 75%,     /* purple */
+    oklch(65% 0.28 360) 100%     /* red (wrap) */
+  );
+  animation: aurora-rotate 4s linear infinite;
+}
+
+/*
+ * .aurora-skeleton-line — Placeholder skeleton bar with aurora shimmer.
+ *
+ * Self-contained: includes its own gradient declaration so it does NOT
+ * depend on .aurora-gradient via CSS inheritance or composition.
+ */
+.aurora-skeleton-line {
+  height: 14px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+  background: linear-gradient(
+    calc(var(--aurora-angle) + 45deg),
+    oklch(65% 0.28 0) 0%,
+    oklch(70% 0.25 45) 12.5%,
+    oklch(75% 0.22 90) 25%,
+    oklch(70% 0.25 150) 37.5%,
+    oklch(65% 0.28 210) 50%,
+    oklch(60% 0.28 270) 62.5%,
+    oklch(65% 0.25 330) 75%,
+    oklch(65% 0.28 360) 100%
+  );
+  animation: aurora-rotate 4s linear infinite;
+}
+
+/*
+ * .aurora-thinking-text — "Thinking..." text with rainbow gradient fill.
+ *
+ * Uses brighter oklch lightness values (75-85%) so the text remains
+ * legible against a dark background. background-clip: text makes the
+ * gradient paint the letterforms directly.
+ */
+.aurora-thinking-text {
+  background: linear-gradient(
+    calc(var(--aurora-angle) + 45deg),
+    oklch(80% 0.28 0) 0%,        /* bright red */
+    oklch(85% 0.25 45) 12.5%,    /* bright orange */
+    oklch(85% 0.22 90) 25%,      /* bright yellow */
+    oklch(80% 0.25 150) 37.5%,   /* bright green */
+    oklch(75% 0.28 210) 50%,     /* bright cyan */
+    oklch(75% 0.28 270) 62.5%,   /* bright blue */
+    oklch(80% 0.25 330) 75%,     /* bright purple */
+    oklch(80% 0.28 360) 100%     /* bright red (wrap) */
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 500;
+  animation: aurora-rotate 4s linear infinite;
+}
+
+/* Respect reduced motion: freeze the rotation */
+@media (prefers-reduced-motion: reduce) {
+  .aurora-gradient,
+  .aurora-skeleton-line,
+  .aurora-thinking-text {
+    animation: none;
+  }
+}
