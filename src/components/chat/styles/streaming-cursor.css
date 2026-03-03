@@ -26,7 +26,7 @@
  */
 .streaming-cursor::after {
   content: "|";
-  color: #d4a574; /* amber — matches --primary */
+  color: hsl(var(--primary));
   font-weight: bold;
   animation: cursor-blink 1s step-end infinite;
   margin-left: 1px;
@@ -36,7 +36,7 @@
    and instead show it on the last child so it sits inline with text. */
 .streaming-cursor > :last-child::after {
   content: "|";
-  color: #d4a574;
+  color: hsl(var(--primary));
   font-weight: bold;
   animation: cursor-blink 1s step-end infinite;
   margin-left: 1px;

@@ -21,6 +21,46 @@
   }
 }
 
+/* Ambient gradient -- slowly cycling atmospheric background (ChatGPT-inspired) */
+@property --ambient-hue {
+  syntax: "<number>";
+  initial-value: 0;
+  inherits: false;
+}
+
+@keyframes ambient-cycle {
+  0%   { --ambient-hue: 0; }     /* rose */
+  25%  { --ambient-hue: 270; }   /* violet */
+  50%  { --ambient-hue: 180; }   /* teal */
+  75%  { --ambient-hue: 35; }    /* warm amber */
+  100% { --ambient-hue: 360; }   /* rose (wrap) */
+}
+
+/* Reusable ambient gradient utility class */
+.ambient-gradient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    hsl(var(--ambient-hue) 35% 55% / var(--fx-ambient-opacity, 0.04)) 0%,
+    transparent 70%
+  );
+  animation: ambient-cycle var(--fx-ambient-speed, 45s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-gradient {
+    animation: none;
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      hsl(0 35% 55% / 0.03) 0%,
+      transparent 70%
+    );
+  }
+}
+
 @layer base {
   :root {
     /* Surface hierarchy -- 3-tier depth model (charcoal + rose) */
@@ -151,6 +191,21 @@
     padding: 0;
   }
 
+  /* Page-level ambient gradient via pseudo-element (no React changes needed) */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      hsl(var(--ambient-hue) 35% 55% / var(--fx-ambient-opacity, 0.04)) 0%,
+      transparent 70%
+    );
+    animation: ambient-cycle var(--fx-ambient-speed, 45s) linear infinite;
+  }
+
   ::selection {
     background-color: hsl(var(--primary) / 0.25);
     color: hsl(var(--foreground));
@@ -223,6 +278,16 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+
+    /* Static rose-tinted gradient at 3% opacity when motion is reduced */
+    body::before {
+      animation: none;
+      background: radial-gradient(
+        ellipse at 50% 0%,
+        hsl(0 35% 55% / 0.03) 0%,
+        transparent 70%
+      );
     }
   }
 }
@@ -657,7 +722,7 @@
 
   /* Select dropdown styling with warm arrow */
   select {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c4a882' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23989494' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 0.5rem center;
     background-size: 1.5em 1.5em;
