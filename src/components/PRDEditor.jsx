@@ -5,6 +5,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView } from '@codemirror/view';
 import { X, Save, Download, Maximize2, Minimize2, Eye, FileText, Sparkles, AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { OverlayPortal } from './ui/overlay-portal';
 import { api, authenticatedFetch } from '../utils/api';
 
 const PRDEditor = ({
@@ -505,7 +506,8 @@ This document outlines the requirements for building an AI-powered task manageme
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[200] md:bg-black/50 md:flex md:items-center md:justify-center">
+      <OverlayPortal>
+      <div className="fixed inset-0 z-[var(--z-modal)] md:bg-black/60 md:backdrop-blur-sm md:flex md:items-center md:justify-center">
         <div className="w-full h-full md:rounded-lg md:w-auto md:h-auto p-8 flex items-center justify-center bg-surface-base">
           <div className="flex items-center gap-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
@@ -513,12 +515,14 @@ This document outlines the requirements for building an AI-powered task manageme
           </div>
         </div>
       </div>
+      </OverlayPortal>
     );
   }
 
   return (
-    <div className={`fixed inset-0 z-[200] ${
-      'md:bg-black/50 md:flex md:items-center md:justify-center md:p-4'
+    <OverlayPortal>
+    <div className={`fixed inset-0 z-[var(--z-modal)] ${
+      'md:bg-black/60 md:backdrop-blur-sm md:flex md:items-center md:justify-center md:p-4'
     } ${isFullscreen ? 'md:p-0' : ''}`}>
       <div className={cn(
         'bg-surface-base shadow-2xl flex flex-col',
@@ -744,7 +748,7 @@ This document outlines the requirements for building an AI-powered task manageme
 
       {/* Generate Tasks Modal */}
       {showGenerateModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
           <div className="bg-surface-raised rounded-lg shadow-xl w-full max-w-md border border-border/10">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-border/10">
@@ -824,8 +828,8 @@ This document outlines the requirements for building an AI-powered task manageme
 
       {/* Overwrite Confirmation Modal */}
       {showOverwriteConfirm && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setShowOverwriteConfirm(false)} />
+        <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowOverwriteConfirm(false)} />
           <div className="relative bg-surface-raised rounded-lg shadow-xl max-w-md w-full border border-border/10">
             <div className="p-6">
               <div className="flex items-center mb-4">
@@ -865,6 +869,7 @@ This document outlines the requirements for building an AI-powered task manageme
         </div>
       )}
     </div>
+    </OverlayPortal>
   );
 };
 

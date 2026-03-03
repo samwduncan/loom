@@ -3,6 +3,7 @@ import { X, FolderPlus, GitBranch, Key, ChevronRight, ChevronLeft, Check, Loader
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { api } from '../utils/api';
+import { OverlayPortal } from './ui/overlay-portal';
 
 const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
   // Wizard state
@@ -257,7 +258,8 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-0 sm:p-4">
+    <OverlayPortal>
+    <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-0 sm:p-4">
       <div className="bg-surface-raised rounded-none sm:rounded-lg shadow-xl w-full h-full sm:h-auto sm:max-w-2xl border-0 sm:border border-border/10 overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border/10">
@@ -401,7 +403,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                       className="w-full"
                     />
                     {showPathDropdown && pathSuggestions.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-surface-raised border border-border/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-surface-raised/80 backdrop-blur-[16px] backdrop-saturate-[1.4] border border-border/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                         {pathSuggestions.map((suggestion, index) => (
                           <button
                             key={index}
@@ -689,7 +691,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
 
       {/* Folder Browser Modal */}
       {showFolderBrowser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
           <div className="bg-surface-raised rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] border border-border/10 flex flex-col">
             {/* Browser Header */}
             <div className="flex items-center justify-between p-4 border-b border-border/10">
@@ -867,6 +869,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
         </div>
       )}
     </div>
+    </OverlayPortal>
   );
 };
 

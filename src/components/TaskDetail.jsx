@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Flag, User, ArrowRight, CheckCircle, Circle, AlertCircle, Pause, Edit, Save, Copy, ChevronDown, ChevronRight, Clock } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { OverlayPortal } from './ui/overlay-portal';
 import TaskIndicator from './TaskIndicator';
 import { api } from '../utils/api';
 import { useTaskMaster } from '../contexts/TaskMasterContext';
@@ -123,7 +124,8 @@ const TaskDetail = ({
   ];
 
   return (
-    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[100] md:p-4 bg-black/50">
+    <OverlayPortal>
+    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[var(--z-modal)] md:p-4 bg-black/60 backdrop-blur-sm">
       <div className={cn(
         'bg-surface-base border border-border/10 md:rounded-lg shadow-xl',
         'w-full md:max-w-4xl h-full md:h-[90vh] flex flex-col',
@@ -401,6 +403,7 @@ const TaskDetail = ({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };
 

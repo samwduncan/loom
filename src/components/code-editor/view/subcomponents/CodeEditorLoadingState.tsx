@@ -1,3 +1,4 @@
+import { OverlayPortal } from '../../../ui/overlay-portal';
 import { getEditorLoadingStyles } from '../../utils/editorStyles';
 
 type CodeEditorLoadingStateProps = {
@@ -11,7 +12,7 @@ export default function CodeEditorLoadingState({
   isSidebar,
   loadingText,
 }: CodeEditorLoadingStateProps) {
-  return (
+  const loadingContent = (
     <>
       <style>{getEditorLoadingStyles(isDarkMode)}</style>
       {isSidebar ? (
@@ -22,7 +23,7 @@ export default function CodeEditorLoadingState({
           </div>
         </div>
       ) : (
-        <div className="fixed inset-0 z-[9999] md:bg-black/50 md:flex md:items-center md:justify-center">
+        <div className="fixed inset-0 z-[var(--z-modal)] md:bg-black/60 md:backdrop-blur-sm md:flex md:items-center md:justify-center">
           <div className="code-editor-loading w-full h-full md:rounded-lg md:w-auto md:h-auto p-8 flex items-center justify-center">
             <div className="flex items-center gap-3">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
@@ -33,4 +34,6 @@ export default function CodeEditorLoadingState({
       )}
     </>
   );
+
+  return isSidebar ? loadingContent : <OverlayPortal>{loadingContent}</OverlayPortal>;
 }

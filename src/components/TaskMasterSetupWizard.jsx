@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, CheckCircle, AlertCircle, Settings, Server, FileText, Sparkles, ExternalLink, Copy } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { OverlayPortal } from './ui/overlay-portal';
 import { api } from '../utils/api';
 import { copyTextToClipboard } from '../utils/clipboard';
 
@@ -478,7 +479,8 @@ Describe your project or feature...
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[100] md:p-4 bg-black/50">
+    <OverlayPortal>
+    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[var(--z-modal)] md:p-4 bg-black/60 backdrop-blur-sm">
       <div className={cn(
         'bg-surface-base border border-border/10 md:rounded-lg shadow-xl',
         'w-full md:max-w-4xl h-full md:h-[90vh] flex flex-col',
@@ -598,6 +600,7 @@ Describe your project or feature...
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };
 

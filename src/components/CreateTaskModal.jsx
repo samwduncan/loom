@@ -1,10 +1,12 @@
 import React from 'react';
 import { X, Sparkles } from 'lucide-react';
+import { OverlayPortal } from './ui/overlay-portal';
 
 const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <OverlayPortal>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
       <div className="bg-surface-raised rounded-lg shadow-xl w-full max-w-md border border-border/10">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border/10">
@@ -82,6 +84,7 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 };
 

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, List, Clock, Flag, CheckCircle, Circle, AlertCircle, Pause, ChevronDown, ChevronUp, Plus, FileText, Settings, X, Terminal, Eye, Play, Zap, Target } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { OverlayPortal } from './ui/overlay-portal';
 import { useTaskMaster } from '../contexts/TaskMasterContext';
 import { api } from '../utils/api';
 import Shell from './shell/view/Shell';
@@ -268,7 +269,8 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
 
       {/* TaskMaster CLI Setup Modal */}
       {showCLI && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <OverlayPortal>
+        <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-base rounded-lg shadow-xl border border-border/10 w-full max-w-4xl h-[600px] flex flex-col">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-border/10">
@@ -318,6 +320,7 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
             </div>
           </div>
         </div>
+        </OverlayPortal>
       )}
 
       {/* Task Detail Modal */}
@@ -373,7 +376,8 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <OverlayPortal>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
       <div className="bg-surface-raised rounded-lg p-6 w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">Create New Task</h3>
@@ -478,6 +482,7 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
         </form>
       </div>
     </div>
+    </OverlayPortal>
   );
 };
 
@@ -566,7 +571,8 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <OverlayPortal>
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
         <div className="bg-surface-raised rounded-lg p-6 w-full max-w-md">
           <div className="flex items-center gap-3">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
@@ -574,11 +580,13 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
           </div>
         </div>
       </div>
+      </OverlayPortal>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <OverlayPortal>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
       <div className="bg-surface-raised rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">
@@ -689,6 +697,7 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
         )}
       </div>
     </div>
+    </OverlayPortal>
   );
 };
 

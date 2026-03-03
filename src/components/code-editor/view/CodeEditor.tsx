@@ -9,6 +9,7 @@ import type { CodeEditorFile } from '../types/types';
 import { createMinimapExtension, createScrollToFirstChunkExtension, getLanguageExtensions } from '../utils/editorExtensions';
 import { getEditorStyles } from '../utils/editorStyles';
 import { createEditorToolbarPanelExtension } from '../utils/editorToolbarPanel';
+import { OverlayPortal } from '../../ui/overlay-portal';
 import CodeEditorFooter from './subcomponents/CodeEditorFooter';
 import CodeEditorHeader from './subcomponents/CodeEditorHeader';
 import CodeEditorLoadingState from './subcomponents/CodeEditorLoadingState';
@@ -158,7 +159,7 @@ export default function CodeEditor({
 
   const outerContainerClassName = isSidebar
     ? 'w-full h-full flex flex-col'
-    : `fixed inset-0 z-[9999] md:bg-black/50 md:flex md:items-center md:justify-center md:p-4 ${isFullscreen ? 'md:p-0' : ''}`;
+    : `fixed inset-0 z-[var(--z-modal)] md:bg-black/60 md:backdrop-blur-sm md:flex md:items-center md:justify-center md:p-4 ${isFullscreen ? 'md:p-0' : ''}`;
 
   const innerContainerClassName = isSidebar
     ? 'bg-background flex flex-col w-full h-full'
@@ -166,7 +167,7 @@ export default function CodeEditor({
       isFullscreen ? ' md:w-full md:h-full md:rounded-none' : ' md:w-full md:max-w-6xl md:h-[80vh] md:max-h-[80vh]'
     }`;
 
-  return (
+  const editorContent = (
     <>
       <style>{getEditorStyles(isDarkMode)}</style>
       <div className={outerContainerClassName}>
@@ -229,4 +230,6 @@ export default function CodeEditor({
       </div>
     </>
   );
+
+  return isSidebar ? editorContent : <OverlayPortal>{editorContent}</OverlayPortal>;
 }
