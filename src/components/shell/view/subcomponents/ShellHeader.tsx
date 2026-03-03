@@ -34,7 +34,7 @@ export default function ShellHeader({
   disableRestart,
 }: ShellHeaderProps) {
   return (
-    <div className="flex-shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-2">
+    <div className="flex-shrink-0 bg-surface-raised border-b border-border/10 px-4 py-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -43,7 +43,7 @@ export default function ShellHeader({
             <span className="text-xs text-blue-300">({sessionDisplayNameShort}...)</span>
           )}
 
-          {!hasSession && <span className="text-xs text-gray-400">{statusNewSessionText}</span>}
+          {!hasSession && <span className="text-xs text-muted-foreground">{statusNewSessionText}</span>}
 
           {!isInitialized && <span className="text-xs text-yellow-400">{statusInitializingText}</span>}
 
@@ -67,7 +67,7 @@ export default function ShellHeader({
           <button
             onClick={onRestart}
             disabled={disableRestart}
-            className="text-xs text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+            className="text-xs text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
             title={restartTitle}
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

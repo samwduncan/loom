@@ -69,7 +69,7 @@ export default function ClaudeStatus({
 
   return (
     <div className="w-full mb-3 sm:mb-6 animate-in slide-in-from-bottom duration-300">
-      <div className="flex items-center justify-between max-w-4xl mx-auto bg-gray-800 bg-gray-900 text-white rounded-lg shadow-lg px-2.5 py-2 sm:px-4 sm:py-3 border border-gray-700 border-gray-800">
+      <div className="flex items-center justify-between max-w-4xl mx-auto bg-surface-raised text-foreground rounded-lg shadow-lg px-2.5 py-2 sm:px-4 sm:py-3 border border-border/10">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 sm:gap-3">
             <span
@@ -84,17 +84,17 @@ export default function ClaudeStatus({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="font-medium text-xs sm:text-sm truncate">{statusText}...</span>
-                <span className="text-gray-400 text-xs sm:text-sm flex-shrink-0">({elapsedTime}s)</span>
+                <span className="text-muted-foreground text-xs sm:text-sm flex-shrink-0">({elapsedTime}s)</span>
                 {tokens > 0 && (
                   <>
-                    <span className="text-gray-500 hidden sm:inline">|</span>
-                    <span className="text-gray-300 text-xs sm:text-sm hidden sm:inline flex-shrink-0">
+                    <span className="text-muted-foreground hidden sm:inline">|</span>
+                    <span className="text-foreground-secondary text-xs sm:text-sm hidden sm:inline flex-shrink-0">
                       tokens {tokens.toLocaleString()}
                     </span>
                   </>
                 )}
-                <span className="text-gray-500 hidden sm:inline">|</span>
-                <span className="text-gray-400 text-xs sm:text-sm hidden sm:inline">esc to stop</span>
+                <span className="text-muted-foreground hidden sm:inline">|</span>
+                <span className="text-muted-foreground text-xs sm:text-sm hidden sm:inline">esc to stop</span>
               </div>
             </div>
           </div>

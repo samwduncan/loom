@@ -124,7 +124,7 @@ export default function PermissionRequestsBanner({
                 <summary className="cursor-pointer text-xs text-amber-200 hover:text-amber-100">
                   View tool input
                 </summary>
-                <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-gray-900/60 border border-amber-800/60 p-2 text-xs text-amber-100 whitespace-pre-wrap">
+                <pre className="mt-2 max-h-40 overflow-auto rounded-md bg-surface-base/60 border border-amber-800/60 p-2 text-xs text-amber-100 whitespace-pre-wrap">
                   {rawInput}
                 </pre>
               </details>
@@ -163,7 +163,7 @@ export default function PermissionRequestsBanner({
                   className={`inline-flex items-center gap-2 rounded-md text-xs font-medium px-3 py-1.5 border transition-colors ${
                     permissionEntry
                       ? 'border-amber-700 text-amber-100 hover:bg-amber-900/30'
-                      : 'border-gray-300 text-gray-400 cursor-not-allowed'
+                      : 'border-border/20 text-muted-foreground cursor-not-allowed'
                   }`}
                   disabled={!permissionEntry}
                 >

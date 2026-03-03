@@ -6,9 +6,9 @@ type ShellEmptyStateProps = {
 export default function ShellEmptyState({ title, description }: ShellEmptyStateProps) {
   return (
     <div className="h-full flex items-center justify-center">
-      <div className="text-center text-gray-500 text-gray-400">
-        <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 bg-gray-800 rounded-full flex items-center justify-center">
-          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="text-center text-muted-foreground">
+        <div className="w-16 h-16 mx-auto mb-4 bg-surface-elevated rounded-full flex items-center justify-center">
+          <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -156,7 +156,7 @@ export default function CommandMenu({
     return (
       <div
         ref={menuRef}
-        className="command-menu command-menu-empty border border-gray-200 bg-white text-gray-500 border-gray-700 bg-gray-800 text-gray-400"
+        className="command-menu command-menu-empty border border-border/10 bg-surface-raised text-muted-foreground"
         style={{ ...menuPosition, ...menuBaseStyle, overflowY: 'hidden', padding: '20px', opacity: 1, transform: 'translateY(0)', textAlign: 'center' }}
       >
         No commands available
@@ -169,13 +169,13 @@ export default function CommandMenu({
       ref={menuRef}
       role="listbox"
       aria-label="Available commands"
-      className="command-menu border border-gray-200 bg-white border-gray-700 bg-gray-800"
+      className="command-menu border border-border/10 bg-surface-raised"
       style={{ ...menuPosition, ...menuBaseStyle, opacity: 1, transform: 'translateY(0)' }}
     >
       {orderedNamespaces.map((namespace) => (
         <div key={namespace} className="command-group">
           {orderedNamespaces.length > 1 && (
-            <div className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-gray-500 text-gray-400">
+            <div className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               {namespaceLabels[namespace] || namespace}
             </div>
           )}
@@ -191,7 +191,7 @@ export default function CommandMenu({
                 role="option"
                 aria-selected={isSelected}
                 className={`command-item mb-0.5 flex cursor-pointer items-start rounded-md px-3 py-2.5 transition-colors ${
-                  isSelected ? 'bg-blue-50 bg-blue-900' : 'bg-transparent'
+                  isSelected ? 'bg-status-info/10' : 'bg-transparent'
                 }`}
                 onMouseEnter={() => onSelect && commandIndex >= 0 && onSelect(command, commandIndex, true)}
                 onClick={() => onSelect && commandIndex >= 0 && onSelect(command, commandIndex, false)}
@@ -199,21 +199,21 @@ export default function CommandMenu({
               >
                 <div className="min-w-0 flex-1">
                   <div className={`flex items-center gap-2 ${command.description ? 'mb-1' : 'mb-0'}`}>
-                    <span className="shrink-0 text-xs text-gray-500 text-gray-300">{namespaceIcons[namespace] || namespaceIcons.other}</span>
-                    <span className="font-mono text-sm font-semibold text-gray-900 text-gray-100">{command.name}</span>
+                    <span className="shrink-0 text-xs text-foreground-secondary">{namespaceIcons[namespace] || namespaceIcons.other}</span>
+                    <span className="font-mono text-sm font-semibold text-foreground">{command.name}</span>
                     {command.metadata?.type && (
-                      <span className="command-metadata-badge rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 bg-gray-700 text-gray-300">
+                      <span className="command-metadata-badge rounded bg-surface-elevated px-1.5 py-0.5 text-[10px] font-medium text-foreground-secondary">
                         {command.metadata.type}
                       </span>
                     )}
                   </div>
                   {command.description && (
-                    <div className="ml-6 truncate whitespace-nowrap text-[13px] text-gray-500 text-gray-300">
+                    <div className="ml-6 truncate whitespace-nowrap text-[13px] text-foreground-secondary">
                       {command.description}
                     </div>
                   )}
                 </div>
-                {isSelected && <span className="ml-2 text-xs font-semibold text-blue-500 text-blue-300">{'<-'}</span>}
+                {isSelected && <span className="ml-2 text-xs font-semibold text-status-info">{'<-'}</span>}
               </div>
             );
           })}

@@ -69,27 +69,27 @@ type CodeBlockProps = {
 /** Static markdown sub-components (no streaming dependency) */
 const staticComponents = {
   blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-4 border-gray-300 border-gray-600 pl-4 italic text-gray-600 text-gray-400 my-2">
+    <blockquote className="border-l-4 border-border/10 pl-4 italic text-muted-foreground my-2">
       {children}
     </blockquote>
   ),
   a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
-    <a href={href} className="text-blue-600 text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
+    <a href={href} className="text-status-info hover:underline" target="_blank" rel="noopener noreferrer">
       {children}
     </a>
   ),
   p: ({ children }: { children?: React.ReactNode }) => <div className="mb-2 last:mb-0">{children}</div>,
   table: ({ children }: { children?: React.ReactNode }) => (
     <div className="overflow-x-auto my-2">
-      <table className="min-w-full border-collapse border border-gray-200 border-gray-700">{children}</table>
+      <table className="min-w-full border-collapse border border-border/10">{children}</table>
     </div>
   ),
-  thead: ({ children }: { children?: React.ReactNode }) => <thead className="bg-gray-50 bg-gray-800">{children}</thead>,
+  thead: ({ children }: { children?: React.ReactNode }) => <thead className="bg-surface-raised">{children}</thead>,
   th: ({ children }: { children?: React.ReactNode }) => (
-    <th className="px-3 py-2 text-left text-sm font-semibold border border-gray-200 border-gray-700">{children}</th>
+    <th className="px-3 py-2 text-left text-sm font-semibold border border-border/10">{children}</th>
   ),
   td: ({ children }: { children?: React.ReactNode }) => (
-    <td className="px-3 py-2 align-top text-sm border border-gray-200 border-gray-700">{children}</td>
+    <td className="px-3 py-2 align-top text-sm border border-border/10">{children}</td>
   ),
 };
 
@@ -103,7 +103,7 @@ function makeCodeComponent(isStreaming: boolean) {
     if (shouldInline) {
       return (
         <code
-          className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-gray-800/60 text-gray-100 border border-gray-700 whitespace-pre-wrap break-words ${className || ''
+          className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-surface-raised/60 text-foreground border border-border/10 whitespace-pre-wrap break-words ${className || ''
             }`}
           {...props}
         >

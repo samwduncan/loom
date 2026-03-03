@@ -111,7 +111,7 @@ export default function Shell({
   const overlayDescription = overlayMode === 'connecting' ? connectingDescription : readyDescription;
 
   return (
-    <div className="h-full flex flex-col bg-gray-900 w-full">
+    <div className="h-full flex flex-col bg-surface-base w-full">
       <ShellHeader
         isConnected={isConnected}
         isInitialized={isInitialized}

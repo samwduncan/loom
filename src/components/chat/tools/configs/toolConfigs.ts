@@ -57,10 +57,10 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       wrapText: true,
       colorScheme: {
         primary: 'text-green-400 font-mono',
-        secondary: 'text-gray-400',
+        secondary: 'text-muted-foreground',
         background: '',
-        border: 'border-green-500 border-green-400',
-        icon: 'text-green-500 text-green-400'
+        border: 'border-status-connected',
+        icon: 'text-status-connected'
       }
     },
     result: {
@@ -80,10 +80,10 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       getValue: (input) => input.file_path || '',
       action: 'open-file',
       colorScheme: {
-        primary: 'text-gray-700 text-gray-300',
+        primary: 'text-foreground-secondary',
         background: '',
-        border: 'border-gray-300 border-gray-600',
-        icon: 'text-gray-500 text-gray-400'
+        border: 'border-border/20',
+        icon: 'text-muted-foreground'
       }
     },
     result: {
@@ -172,11 +172,11 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       getSecondary: (input) => input.path ? `in ${input.path}` : undefined,
       action: 'jump-to-results',
       colorScheme: {
-        primary: 'text-gray-700 text-gray-300',
-        secondary: 'text-gray-500 text-gray-400',
+        primary: 'text-foreground-secondary',
+        secondary: 'text-muted-foreground',
         background: '',
-        border: 'border-gray-400 border-gray-500',
-        icon: 'text-gray-500 text-gray-400'
+        border: 'border-muted',
+        icon: 'text-muted-foreground'
       }
     },
     result: {
@@ -205,11 +205,11 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       getSecondary: (input) => input.path ? `in ${input.path}` : undefined,
       action: 'jump-to-results',
       colorScheme: {
-        primary: 'text-gray-700 text-gray-300',
-        secondary: 'text-gray-500 text-gray-400',
+        primary: 'text-foreground-secondary',
+        secondary: 'text-muted-foreground',
         background: '',
-        border: 'border-gray-400 border-gray-500',
-        icon: 'text-gray-500 text-gray-400'
+        border: 'border-muted',
+        icon: 'text-muted-foreground'
       }
     },
     result: {
@@ -258,8 +258,8 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       getValue: () => 'reading list',
       action: 'none',
       colorScheme: {
-        primary: 'text-gray-500 text-gray-400',
-        border: 'border-violet-400 border-violet-500'
+        primary: 'text-muted-foreground',
+        border: 'border-violet-400'
       }
     },
     result: {
@@ -292,9 +292,9 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       getSecondary: (input) => input.status || undefined,
       action: 'none',
       colorScheme: {
-        primary: 'text-gray-700 text-gray-300',
-        border: 'border-violet-400 border-violet-500',
-        icon: 'text-violet-500 text-violet-400'
+        primary: 'text-foreground-secondary',
+        border: 'border-violet-400',
+        icon: 'text-violet-400'
       }
     },
     result: {
@@ -315,9 +315,9 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       },
       action: 'none',
       colorScheme: {
-        primary: 'text-gray-700 text-gray-300',
-        border: 'border-violet-400 border-violet-500',
-        icon: 'text-violet-500 text-violet-400'
+        primary: 'text-foreground-secondary',
+        border: 'border-violet-400',
+        icon: 'text-violet-400'
       }
     },
     result: {
@@ -332,8 +332,8 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       getValue: () => 'listing tasks',
       action: 'none',
       colorScheme: {
-        primary: 'text-gray-500 text-gray-400',
-        border: 'border-violet-400 border-violet-500',
+        primary: 'text-muted-foreground',
+        border: 'border-violet-400',
         icon: 'text-violet-500 text-violet-400'
       }
     },
@@ -355,9 +355,9 @@ export const TOOL_CONFIGS: Record<string, ToolDisplayConfig> = {
       getValue: (input) => input.taskId ? `#${input.taskId}` : 'fetching',
       action: 'none',
       colorScheme: {
-        primary: 'text-gray-700 text-gray-300',
-        border: 'border-violet-400 border-violet-500',
-        icon: 'text-violet-500 text-violet-400'
+        primary: 'text-foreground-secondary',
+        border: 'border-violet-400',
+        icon: 'text-violet-400'
       }
     },
     result: {

@@ -7,7 +7,7 @@ export const thinkingModes = [
     description: 'Regular Claude response',
     icon: null,
     prefix: '',
-    color: 'text-gray-600'
+    color: 'text-muted-foreground'
   },
   {
     id: 'think',
@@ -15,7 +15,7 @@ export const thinkingModes = [
     description: 'Basic extended thinking',
     icon: Brain,
     prefix: 'think',
-    color: 'text-blue-600'
+    color: 'text-status-info'
   },
   {
     id: 'think-hard',

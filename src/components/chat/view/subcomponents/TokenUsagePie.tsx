@@ -21,7 +21,7 @@ export default function TokenUsagePie({ used, total }: TokenUsagePieProps) {
   };
 
   return (
-    <div className="flex items-center gap-2 text-xs text-gray-600 text-gray-400">
+    <div className="flex items-center gap-2 text-xs text-muted-foreground">
       <svg width="24" height="24" viewBox="0 0 24 24" className="transform -rotate-90">
         {/* Background circle */}
         <circle
@@ -31,7 +31,7 @@ export default function TokenUsagePie({ used, total }: TokenUsagePieProps) {
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          className="text-gray-300 text-gray-600"
+          className="text-surface-elevated"
         />
         {/* Progress circle */}
         <circle

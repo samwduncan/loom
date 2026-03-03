@@ -10,7 +10,7 @@ export function TurnToolbar({ turnCount, onExpandAll, onCollapseAll }: TurnToolb
   if (turnCount < 2) return null;
 
   return (
-    <div className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-4 py-1 text-xs text-gray-500 text-gray-400 bg-gray-50/80 bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/50 border-gray-700/50">
+    <div className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-4 py-1 text-xs text-muted-foreground bg-surface-base/80 backdrop-blur-sm border-b border-border/10">
       <span className="font-medium">
         {turnCount} turn{turnCount !== 1 ? 's' : ''}
       </span>
@@ -18,7 +18,7 @@ export function TurnToolbar({ turnCount, onExpandAll, onCollapseAll }: TurnToolb
         <button
           type="button"
           onClick={onExpandAll}
-          className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-gray-200/60 hover:bg-gray-700/60 transition-colors"
+          className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-surface-raised/60 transition-colors"
           title="Expand all turns"
         >
           <ChevronsDown className="w-3.5 h-3.5" />
@@ -27,7 +27,7 @@ export function TurnToolbar({ turnCount, onExpandAll, onCollapseAll }: TurnToolb
         <button
           type="button"
           onClick={onCollapseAll}
-          className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-gray-200/60 hover:bg-gray-700/60 transition-colors"
+          className="flex items-center gap-1 px-2 py-0.5 rounded hover:bg-surface-raised/60 transition-colors"
           title="Collapse all turns"
         >
           <ChevronsUp className="w-3.5 h-3.5" />

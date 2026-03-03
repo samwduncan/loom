@@ -77,7 +77,7 @@ export const ToolCallGroup: React.FC<ToolCallGroupProps> = memo(
     }, [isExpanded]);
 
     return (
-      <div className="my-1 rounded-md bg-gray-500/[0.03] border border-gray-700/30">
+      <div className="my-1 rounded-md bg-muted/[0.03] border border-border/10">
         {/* Group header */}
         <button
           type="button"
@@ -86,11 +86,11 @@ export const ToolCallGroup: React.FC<ToolCallGroupProps> = memo(
           aria-expanded={isExpanded}
         >
           <ChevronRight
-            className={`w-3 h-3 text-gray-500 flex-shrink-0 transition-transform duration-200 ${
+            className={`w-3 h-3 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${
               isExpanded ? 'rotate-90' : ''
             }`}
           />
-          <span className="text-xs font-medium text-gray-400">
+          <span className="text-xs font-medium text-muted-foreground">
             {summary}
           </span>
           {hasErrors && (
@@ -102,7 +102,7 @@ export const ToolCallGroup: React.FC<ToolCallGroupProps> = memo(
             <button
               type="button"
               onClick={handleExpandAll}
-              className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-0.5"
+              className="text-[10px] text-muted-foreground hover:text-foreground-secondary transition-colors flex items-center gap-0.5"
               title={allInnerExpanded ? 'Collapse all' : 'Expand all'}
             >
               <ChevronsUpDown className="w-3 h-3" />

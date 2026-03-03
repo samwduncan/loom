@@ -54,8 +54,8 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`w-10 h-10 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-200 ${selectedMode === 'none'
-            ? 'bg-gray-100 hover:bg-gray-200 bg-gray-700 hover:bg-gray-600'
-            : 'bg-blue-100 hover:bg-blue-200 bg-blue-900 hover:bg-blue-800'
+            ? 'bg-surface-elevated hover:bg-muted'
+            : 'bg-status-info/15 hover:bg-status-info/25'
           }`}
         title={`Thinking mode: ${currentMode.name}`}
       >
@@ -63,10 +63,10 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full right-0 mb-2 w-64 bg-white bg-gray-800 rounded-lg shadow-xl border border-gray-200 border-gray-700 overflow-hidden">
-          <div className="p-3 border-b border-gray-200 border-gray-700">
+        <div className="absolute bottom-full right-0 mb-2 w-64 bg-surface-raised rounded-lg shadow-xl border border-border/10 overflow-hidden">
+          <div className="p-3 border-b border-border/10">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900 text-white">
+              <h3 className="text-sm font-semibold text-foreground">
                 Thinking Mode
               </h3>
               <button
@@ -74,12 +74,12 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
                   setIsOpen(false);
                   if (onClose) onClose();
                 }}
-                className="p-1 hover:bg-gray-100 hover:bg-gray-700 rounded"
+                className="p-1 hover:bg-surface-elevated rounded"
               >
-                <X className="w-4 h-4 text-gray-500" />
+                <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
-            <p className="text-xs text-gray-500 text-gray-400 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Extended thinking gives Claude more time to evaluate alternatives
             </p>
           </div>
@@ -97,30 +97,30 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
                     setIsOpen(false);
                     if (onClose) onClose();
                   }}
-                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 hover:bg-gray-700 transition-colors ${isSelected ? 'bg-gray-50 bg-gray-700' : ''
+                  className={`w-full px-4 py-3 text-left hover:bg-surface-elevated transition-colors ${isSelected ? 'bg-surface-elevated' : ''
                     }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`mt-0.5 ${mode.icon ? mode.color : 'text-gray-400'}`}>
+                    <div className={`mt-0.5 ${mode.icon ? mode.color : 'text-muted-foreground'}`}>
                       {ModeIcon ? <ModeIcon className="w-5 h-5" /> : <div className="w-5 h-5" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className={`font-medium text-sm ${isSelected ? 'text-gray-900 text-white' : 'text-gray-700 text-gray-300'
+                        <span className={`font-medium text-sm ${isSelected ? 'text-foreground' : 'text-foreground-secondary'
                           }`}>
                           {mode.name}
                         </span>
                         {isSelected && (
-                          <span className="text-xs bg-blue-100 bg-blue-900 text-blue-700 text-blue-300 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-status-info/15 text-status-info px-2 py-0.5 rounded">
                             Active
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 text-gray-400 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {mode.description}
                       </p>
                       {mode.prefix && (
-                        <code className="text-xs bg-gray-100 bg-gray-700 px-1.5 py-0.5 rounded mt-1 inline-block">
+                        <code className="text-xs bg-surface-elevated px-1.5 py-0.5 rounded mt-1 inline-block">
                           {mode.prefix}
                         </code>
                       )}
@@ -131,8 +131,8 @@ function ThinkingModeSelector({ selectedMode, onModeChange, onClose, className =
             })}
           </div>
 
-          <div className="p-3 border-t border-gray-200 border-gray-700 bg-gray-50 bg-gray-900">
-            <p className="text-xs text-gray-600 text-gray-400">
+          <div className="p-3 border-t border-border/10 bg-surface-base">
+            <p className="text-xs text-muted-foreground">
               <strong>Tip:</strong> Higher thinking modes take more time but provide more thorough analysis
             </p>
           </div>
