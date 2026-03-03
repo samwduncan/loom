@@ -47,7 +47,12 @@ export default {
           DEFAULT: "hsl(var(--card) / <alpha-value>)",
           foreground: "hsl(var(--card-foreground) / <alpha-value>)",
         },
-        // Status colors -- warm tinted (DSGN-07)
+        surface: {
+          base: "hsl(var(--surface-base) / <alpha-value>)",
+          raised: "hsl(var(--surface-raised) / <alpha-value>)",
+          elevated: "hsl(var(--surface-elevated) / <alpha-value>)",
+        },
+        // Status colors -- charcoal palette (DSGN-10)
         status: {
           connected: "hsl(var(--status-connected) / <alpha-value>)",
           reconnecting: "hsl(var(--status-reconnecting) / <alpha-value>)",
