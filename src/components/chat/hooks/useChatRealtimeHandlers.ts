@@ -251,6 +251,8 @@ export function useChatRealtimeHandlers({
         if (messageData && typeof messageData === 'object' && messageData.type) {
           if (messageData.type === 'content_block_delta' && messageData.delta?.text) {
             const decodedText = decodeHtmlEntities(messageData.delta.text);
+            // STRM-01: Buffer flush every animation frame (~16ms).
+            // Chunks accumulate in streamBufferRef between frames, then flush on next rAF.
             streamBufferRef.current += decodedText;
             if (!streamTimerRef.current) {
               streamTimerRef.current = requestAnimationFrame(() => {
@@ -459,6 +461,8 @@ export function useChatRealtimeHandlers({
       case 'claude-output': {
         const cleaned = String(latestMessage.data || '');
         if (cleaned.trim()) {
+          // STRM-01: Buffer flush every animation frame (~16ms).
+          // Chunks accumulate in streamBufferRef between frames, then flush on next rAF.
           streamBufferRef.current += streamBufferRef.current ? `\n${cleaned}` : cleaned;
           if (!streamTimerRef.current) {
             streamTimerRef.current = requestAnimationFrame(() => {
@@ -773,6 +777,8 @@ export function useChatRealtimeHandlers({
             }
             finalizeStreamingMessage(setChatMessages);
           } else if (!streamTimerRef.current && streamBufferRef.current) {
+            // STRM-01: Buffer flush every animation frame (~16ms).
+            // Chunks accumulate in streamBufferRef between frames, then flush on next rAF.
             streamTimerRef.current = requestAnimationFrame(() => {
               const chunk = streamBufferRef.current;
               streamBufferRef.current = '';

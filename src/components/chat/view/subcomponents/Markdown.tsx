@@ -13,6 +13,52 @@ type MarkdownProps = {
   isStreaming?: boolean;
 };
 
+/**
+ * Preprocess markdown during streaming to handle incomplete block elements.
+ *
+ * - Inline markdown (bold, italic, inline code) renders live — untouched.
+ * - Incomplete block starters (headers, list markers) at the very end are stripped
+ *   so they don't flash as plain text before the delimiter completes.
+ * - Unclosed code fences get a synthetic closing fence so ReactMarkdown renders
+ *   a proper <pre><code> block immediately; the synthetic fence disappears once
+ *   the real closing fence arrives (fence count becomes even).
+ *
+ * Designed to run every render frame — string operations only, no backtracking regexes.
+ */
+function preprocessStreamingMarkdown(text: string): string {
+  if (!text) return text;
+
+  // --- Part C: Unclosed code fence detection ---
+  // Count triple-backtick fences that start at the beginning of a line.
+  // Using /^```/gm (start-of-line anchor) avoids false positives from
+  // triple backticks inside inline code spans (which don't start a line).
+  const fenceMatches = text.match(/^```/gm);
+  const fenceCount = fenceMatches ? fenceMatches.length : 0;
+
+  // Odd number of fences means an unclosed code block — close it synthetically
+  if (fenceCount % 2 === 1) {
+    return text + '\n```';
+  }
+
+  // --- Part B: Incomplete block element stripping ---
+  const lastNewlineIdx = text.lastIndexOf('\n');
+  if (lastNewlineIdx === -1) return text; // Single line — render as-is
+
+  const lastLine = text.slice(lastNewlineIdx + 1);
+
+  // Incomplete header: line starts with 1-6 # chars followed by optional spaces but no content
+  if (/^#{1,6}\s*$/.test(lastLine)) {
+    return text.slice(0, lastNewlineIdx);
+  }
+
+  // Incomplete list item: line starts with bullet/number marker but has no content yet
+  if (/^(\s*[-*+]|\s*\d+\.)\s*$/.test(lastLine)) {
+    return text.slice(0, lastNewlineIdx);
+  }
+
+  return text;
+}
+
 type CodeBlockProps = {
   node?: any;
   inline?: boolean;
@@ -77,7 +123,10 @@ function makeCodeComponent(isStreaming: boolean) {
 }
 
 export function Markdown({ children, className, isStreaming = false }: MarkdownProps) {
-  const content = normalizeInlineCodeFences(String(children ?? ''));
+  const normalized = normalizeInlineCodeFences(String(children ?? ''));
+  // During streaming, preprocess to defer incomplete block elements and close unclosed fences.
+  // When not streaming, pass through unchanged — complete markdown renders fully.
+  const content = isStreaming ? preprocessStreamingMarkdown(normalized) : normalized;
   const remarkPlugins = useMemo(() => [remarkGfm, remarkMath], []);
   const rehypePlugins = useMemo(() => [rehypeKatex], []);
 
