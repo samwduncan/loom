@@ -190,7 +190,7 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 |-------|-----------|----------------|--------|-----------|
 | 10. Design System Foundation | 3/3 | Complete    | 2026-03-03 | - |
 | 11. Hardcoded Color Sweep | 5/5 | Complete   | 2026-03-03 | - |
-| 12. Specialty Surfaces | 1/4 | In Progress|  | - |
+| 12. Specialty Surfaces | 3/4 | In Progress|  | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
 | 14. Toast & Overlay System | v1.1 | 0/TBD | Not started | - |
 | 15. Tool Call Display | v1.1 | 0/TBD | Not started | - |
