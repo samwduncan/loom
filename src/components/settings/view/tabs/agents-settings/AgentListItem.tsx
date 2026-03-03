@@ -11,7 +11,7 @@ type AgentListItemProps = {
 
 type AgentConfig = {
   name: string;
-  color: 'blue' | 'purple' | 'gray' | 'indigo';
+  color: 'blue' | 'purple' | 'muted' | 'indigo';
 };
 
 const agentConfig: Record<AgentProvider, AgentConfig> = {
@@ -21,7 +21,7 @@ const agentConfig: Record<AgentProvider, AgentConfig> = {
   },
   codex: {
     name: 'Codex',
-    color: 'gray',
+    color: 'muted',
   },
   gemini: {
     name: 'Gemini',
@@ -42,11 +42,11 @@ const colorClasses = {
     bg: 'bg-purple-50 bg-purple-900/20',
     dot: 'bg-purple-500',
   },
-  gray: {
-    border: 'border-l-gray-700 border-l-gray-300',
-    borderBottom: 'border-b-gray-700 border-b-gray-300',
-    bg: 'bg-gray-100 bg-gray-800/50',
-    dot: 'bg-gray-700 bg-gray-300',
+  muted: {
+    border: 'border-l-border/20',
+    borderBottom: 'border-b-border/20',
+    bg: 'bg-surface-raised',
+    dot: 'bg-muted-foreground',
   },
   indigo: {
     border: 'border-l-indigo-500 md:border-l-indigo-500',
@@ -72,7 +72,7 @@ export default function AgentListItem({
         onClick={onClick}
         className={`flex-1 text-center py-3 px-2 border-b-2 transition-colors ${isSelected
           ? `${colors.borderBottom} ${colors.bg}`
-          : 'border-transparent hover:bg-gray-50 hover:bg-gray-800'
+          : 'border-transparent hover:bg-surface-raised'
           }`}
       >
         <div className="flex flex-col items-center gap-1">
@@ -91,7 +91,7 @@ export default function AgentListItem({
       onClick={onClick}
       className={`w-full text-left p-3 border-l-4 transition-colors ${isSelected
         ? `${colors.border} ${colors.bg}`
-        : 'border-transparent hover:bg-gray-50 hover:bg-gray-800'
+        : 'border-transparent hover:bg-surface-raised'
         }`}
     >
       <div className="flex items-center gap-2 mb-1">
@@ -100,7 +100,7 @@ export default function AgentListItem({
       </div>
       <div className="text-xs text-muted-foreground pl-6">
         {authStatus.loading ? (
-          <span className="text-gray-400">{"Checking..."}</span>
+          <span className="text-muted-foreground">{"Checking..."}</span>
         ) : authStatus.authenticated ? (
           <div className="flex items-center gap-1">
             <span className={`w-1.5 h-1.5 rounded-full ${colors.dot}`} />
@@ -110,7 +110,7 @@ export default function AgentListItem({
           </div>
         ) : (
           <div className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+            <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
             <span>{"Not connected"}</span>
           </div>
         )}

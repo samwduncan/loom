@@ -82,19 +82,19 @@ function ClaudePermissions({
           <AlertTriangle className="w-5 h-5 text-orange-500" />
           <h3 className="text-lg font-medium text-foreground">{"Permission Settings"}</h3>
         </div>
-        <div className="bg-orange-50 bg-orange-900/20 border border-orange-200 border-orange-800 rounded-lg p-4">
+        <div className="bg-orange-900/20 border border-orange-800 rounded-lg p-4">
           <label className="flex items-center gap-3">
             <input
               type="checkbox"
               checked={skipPermissions}
               onChange={(event) => onSkipPermissionsChange(event.target.checked)}
-              className="w-4 h-4 text-blue-600 bg-gray-100 bg-gray-700 border-gray-300 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+              className="w-4 h-4 text-primary bg-surface-raised border-border/10 rounded focus:ring-primary focus:ring-2"
             />
             <div>
-              <div className="font-medium text-orange-900 text-orange-100">
+              <div className="font-medium text-orange-100">
                 {"Skip permission prompts (use with caution)"}
               </div>
-              <div className="text-sm text-orange-700 text-orange-300">
+              <div className="text-sm text-orange-300">
                 {"Equivalent to --dangerously-skip-permissions flag"}
               </div>
             </div>
@@ -104,7 +104,7 @@ function ClaudePermissions({
 
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <Shield className="w-5 h-5 text-green-500" />
+          <Shield className="w-5 h-5 text-status-connected" />
           <h3 className="text-lg font-medium text-foreground">{"Allowed Tools"}</h3>
         </div>
         <p className="text-sm text-muted-foreground">{"Tools that are automatically allowed without prompting for permission"}</p>
@@ -134,7 +134,7 @@ function ClaudePermissions({
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-gray-700 text-gray-300">
+          <p className="text-sm font-medium text-muted-foreground">
             {"Quick add common tools:"}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -155,20 +155,20 @@ function ClaudePermissions({
 
         <div className="space-y-2">
           {allowedTools.map((tool) => (
-            <div key={tool} className="flex items-center justify-between bg-green-50 bg-green-900/20 border border-green-200 border-green-800 rounded-lg p-3">
-              <span className="font-mono text-sm text-green-800 text-green-200">{tool}</span>
+            <div key={tool} className="flex items-center justify-between bg-status-connected/10 border border-status-connected/30 rounded-lg p-3">
+              <span className="font-mono text-sm text-status-connected">{tool}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onAllowedToolsChange(removeValue(allowedTools, tool))}
-                className="text-green-600 hover:text-green-700"
+                className="text-status-connected hover:text-status-connected"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
           ))}
           {allowedTools.length === 0 && (
-            <div className="text-center py-6 text-gray-500 text-gray-400">
+            <div className="text-center py-6 text-muted-foreground">
               {"No allowed tools configured"}
             </div>
           )}
@@ -177,7 +177,7 @@ function ClaudePermissions({
 
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-500" />
+          <AlertTriangle className="w-5 h-5 text-status-error" />
           <h3 className="text-lg font-medium text-foreground">{"Blocked Tools"}</h3>
         </div>
         <p className="text-sm text-muted-foreground">{"Tools that are automatically blocked without prompting for permission"}</p>
@@ -208,35 +208,35 @@ function ClaudePermissions({
 
         <div className="space-y-2">
           {disallowedTools.map((tool) => (
-            <div key={tool} className="flex items-center justify-between bg-red-50 bg-red-900/20 border border-red-200 border-red-800 rounded-lg p-3">
-              <span className="font-mono text-sm text-red-800 text-red-200">{tool}</span>
+            <div key={tool} className="flex items-center justify-between bg-status-error/10 border border-status-error/30 rounded-lg p-3">
+              <span className="font-mono text-sm text-status-error">{tool}</span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onDisallowedToolsChange(removeValue(disallowedTools, tool))}
-                className="text-red-600 hover:text-red-700"
+                className="text-status-error hover:text-status-error"
               >
                 <X className="w-4 h-4" />
               </Button>
             </div>
           ))}
           {disallowedTools.length === 0 && (
-            <div className="text-center py-6 text-gray-500 text-gray-400">
+            <div className="text-center py-6 text-muted-foreground">
               {"No blocked tools configured"}
             </div>
           )}
         </div>
       </div>
 
-      <div className="bg-blue-50 bg-blue-900/20 border border-blue-200 border-blue-800 rounded-lg p-4">
-        <h4 className="font-medium text-blue-900 text-blue-100 mb-2">
+      <div className="bg-status-info/10 border border-status-info/30 rounded-lg p-4">
+        <h4 className="font-medium text-status-info mb-2">
           {"Tool Pattern Examples:"}
         </h4>
-        <ul className="text-sm text-blue-800 text-blue-200 space-y-1">
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(git log:*)"</code> {"- Allow all git log commands"}</li>
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(git diff:*)"</code> {"- Allow all git diff commands"}</li>
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Write"</code> {"- Allow all Write tool usage"}</li>
-          <li><code className="bg-blue-100 bg-blue-800 px-1 rounded">"Bash(rm:*)"</code> {"- Block all rm commands (dangerous)"}</li>
+        <ul className="text-sm text-status-info space-y-1">
+          <li><code className="bg-status-info/20 px-1 rounded">"Bash(git log:*)"</code> {"- Allow all git log commands"}</li>
+          <li><code className="bg-status-info/20 px-1 rounded">"Bash(git diff:*)"</code> {"- Allow all git diff commands"}</li>
+          <li><code className="bg-status-info/20 px-1 rounded">"Write"</code> {"- Allow all Write tool usage"}</li>
+          <li><code className="bg-status-info/20 px-1 rounded">"Bash(rm:*)"</code> {"- Block all rm commands (dangerous)"}</li>
         </ul>
       </div>
     </div>
@@ -254,15 +254,15 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <Shield className="w-5 h-5 text-green-500" />
+          <Shield className="w-5 h-5 text-status-connected" />
           <h3 className="text-lg font-medium text-foreground">{"Permission Mode"}</h3>
         </div>
         <p className="text-sm text-muted-foreground">{"Controls how Codex handles file modifications and command execution"}</p>
 
         <div
           className={`border rounded-lg p-4 cursor-pointer transition-all ${permissionMode === 'default'
-            ? 'bg-gray-100 bg-gray-800 border-gray-400 border-gray-500'
-            : 'bg-gray-50 bg-gray-900/50 border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+            ? 'bg-surface-elevated border-border/20'
+            : 'bg-surface-raised border-border/10 hover:border-border/20'
             }`}
           onClick={() => onPermissionModeChange('default')}
         >
@@ -272,7 +272,7 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
               name="codexPermissionMode"
               checked={permissionMode === 'default'}
               onChange={() => onPermissionModeChange('default')}
-              className="mt-1 w-4 h-4 text-green-600"
+              className="mt-1 w-4 h-4 text-status-connected"
             />
             <div>
               <div className="font-medium text-foreground">{"Default"}</div>
@@ -285,8 +285,8 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
 
         <div
           className={`border rounded-lg p-4 cursor-pointer transition-all ${permissionMode === 'acceptEdits'
-            ? 'bg-green-50 bg-green-900/20 border-green-400 border-green-600'
-            : 'bg-gray-50 bg-gray-900/50 border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+            ? 'bg-status-connected/10 border-status-connected/40'
+            : 'bg-surface-raised border-border/10 hover:border-border/20'
             }`}
           onClick={() => onPermissionModeChange('acceptEdits')}
         >
@@ -296,11 +296,11 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
               name="codexPermissionMode"
               checked={permissionMode === 'acceptEdits'}
               onChange={() => onPermissionModeChange('acceptEdits')}
-              className="mt-1 w-4 h-4 text-green-600"
+              className="mt-1 w-4 h-4 text-status-connected"
             />
             <div>
-              <div className="font-medium text-green-900 text-green-100">{"Accept Edits"}</div>
-              <div className="text-sm text-green-700 text-green-300">
+              <div className="font-medium text-status-connected">{"Accept Edits"}</div>
+              <div className="text-sm text-status-connected/70">
                 {"All commands run automatically within the workspace. Full auto mode with sandboxed execution."}
               </div>
             </div>
@@ -309,8 +309,8 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
 
         <div
           className={`border rounded-lg p-4 cursor-pointer transition-all ${permissionMode === 'bypassPermissions'
-            ? 'bg-orange-50 bg-orange-900/20 border-orange-400 border-orange-600'
-            : 'bg-gray-50 bg-gray-900/50 border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+            ? 'bg-orange-900/20 border-orange-600'
+            : 'bg-surface-raised border-border/10 hover:border-border/20'
             }`}
           onClick={() => onPermissionModeChange('bypassPermissions')}
         >
@@ -323,11 +323,11 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
               className="mt-1 w-4 h-4 text-orange-600"
             />
             <div>
-              <div className="font-medium text-orange-900 text-orange-100 flex items-center gap-2">
+              <div className="font-medium text-orange-100 flex items-center gap-2">
                 {"Bypass Permissions"}
                 <AlertTriangle className="w-4 h-4" />
               </div>
-              <div className="text-sm text-orange-700 text-orange-300">
+              <div className="text-sm text-orange-300">
                 {"Full system access with no restrictions. All commands run automatically with full disk and network access. Use with caution."}
               </div>
             </div>
@@ -338,7 +338,7 @@ function CodexPermissions({ permissionMode, onPermissionModeChange }: Omit<Codex
           <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
             {"Technical details"}
           </summary>
-          <div className="mt-2 p-3 bg-gray-50 bg-gray-900/50 rounded-lg text-xs text-muted-foreground space-y-2">
+          <div className="mt-2 p-3 bg-surface-raised rounded-lg text-xs text-muted-foreground space-y-2">
             <p><strong>{"Default"}:</strong> {"sandboxMode=workspace-write, approvalPolicy=untrusted. Trusted commands: cat, cd, grep, head, ls, pwd, tail, git status/log/diff/show, find (without -exec), etc."}</p>
             <p><strong>{"Accept Edits"}:</strong> {"sandboxMode=workspace-write, approvalPolicy=never. All commands auto-execute within project directory."}</p>
             <p><strong>{"Bypass Permissions"}:</strong> {"sandboxMode=danger-full-access, approvalPolicy=never. Full system access, use only in trusted environments."}</p>
@@ -361,7 +361,7 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <Shield className="w-5 h-5 text-green-500" />
+          <Shield className="w-5 h-5 text-status-connected" />
           <h3 className="text-lg font-medium text-foreground">
             {"Permission Mode"}
           </h3>
@@ -373,8 +373,8 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
         {/* Default Mode */}
         <div
           className={`border rounded-lg p-4 cursor-pointer transition-all ${permissionMode === 'default'
-            ? 'bg-gray-100 bg-gray-800 border-gray-400 border-gray-500'
-            : 'bg-gray-50 bg-gray-900/50 border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+            ? 'bg-surface-elevated border-border/20'
+            : 'bg-surface-raised border-border/10 hover:border-border/20'
             }`}
           onClick={() => onPermissionModeChange('default')}
         >
@@ -384,7 +384,7 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
               name="geminiPermissionMode"
               checked={permissionMode === 'default'}
               onChange={() => onPermissionModeChange('default')}
-              className="mt-1 w-4 h-4 text-green-600"
+              className="mt-1 w-4 h-4 text-status-connected"
             />
             <div>
               <div className="font-medium text-foreground">{"Default"}</div>
@@ -398,8 +398,8 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
         {/* Auto Edit Mode */}
         <div
           className={`border rounded-lg p-4 cursor-pointer transition-all ${permissionMode === 'auto_edit'
-            ? 'bg-green-50 bg-green-900/20 border-green-400 border-green-600'
-            : 'bg-gray-50 bg-gray-900/50 border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+            ? 'bg-status-connected/10 border-status-connected/40'
+            : 'bg-surface-raised border-border/10 hover:border-border/20'
             }`}
           onClick={() => onPermissionModeChange('auto_edit')}
         >
@@ -409,11 +409,11 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
               name="geminiPermissionMode"
               checked={permissionMode === 'auto_edit'}
               onChange={() => onPermissionModeChange('auto_edit')}
-              className="mt-1 w-4 h-4 text-green-600"
+              className="mt-1 w-4 h-4 text-status-connected"
             />
             <div>
-              <div className="font-medium text-green-900 text-green-100">{"Auto Edit"}</div>
-              <div className="text-sm text-green-700 text-green-300">
+              <div className="font-medium text-status-connected">{"Auto Edit"}</div>
+              <div className="text-sm text-status-connected/70">
                 {"All commands run automatically within the workspace."}
               </div>
             </div>
@@ -423,8 +423,8 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
         {/* YOLO Mode */}
         <div
           className={`border rounded-lg p-4 cursor-pointer transition-all ${permissionMode === 'yolo'
-            ? 'bg-orange-50 bg-orange-900/20 border-orange-400 border-orange-600'
-            : 'bg-gray-50 bg-gray-900/50 border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+            ? 'bg-orange-900/20 border-orange-600'
+            : 'bg-surface-raised border-border/10 hover:border-border/20'
             }`}
           onClick={() => onPermissionModeChange('yolo')}
         >
@@ -437,11 +437,11 @@ function GeminiPermissions({ permissionMode, onPermissionModeChange }: Omit<Gemi
               className="mt-1 w-4 h-4 text-orange-600"
             />
             <div>
-              <div className="font-medium text-orange-900 text-orange-100 flex items-center gap-2">
+              <div className="font-medium text-orange-100 flex items-center gap-2">
                 {"YOLO Mode"}
                 <AlertTriangle className="w-4 h-4" />
               </div>
-              <div className="text-sm text-orange-700 text-orange-300">
+              <div className="text-sm text-orange-300">
                 {"Full system access with no restrictions. Use with caution."}
               </div>
             </div>

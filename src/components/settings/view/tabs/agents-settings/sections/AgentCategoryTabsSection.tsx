@@ -14,7 +14,7 @@ export default function AgentCategoryTabsSection({
   onSelectCategory,
 }: AgentCategoryTabsSectionProps) {
   return (
-    <div className="border-b border-gray-200 border-gray-700 flex-shrink-0">
+    <div className="border-b border-border/10 flex-shrink-0">
       <div role="tablist" className="flex px-2 md:px-4 overflow-x-auto">
         {AGENT_CATEGORIES.map((category) => (
           <button
@@ -24,7 +24,7 @@ export default function AgentCategoryTabsSection({
             onClick={() => onSelectCategory(category)}
             className={`px-3 md:px-4 py-2 md:py-3 text-xs md:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               selectedCategory === category
-                ? 'border-blue-600 text-blue-600 text-blue-400'
+                ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >

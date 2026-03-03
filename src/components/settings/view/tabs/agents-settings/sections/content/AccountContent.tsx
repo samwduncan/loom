@@ -23,28 +23,28 @@ type AgentVisualConfig = {
 const agentConfig: Record<AgentProvider, AgentVisualConfig> = {
   claude: {
     name: 'Claude',
-    bgClass: 'bg-blue-50 bg-blue-900/20',
-    borderClass: 'border-blue-200 border-blue-800',
-    textClass: 'text-blue-900 text-blue-100',
-    subtextClass: 'text-blue-700 text-blue-300',
+    bgClass: 'bg-blue-900/20',
+    borderClass: 'border-blue-800',
+    textClass: 'text-blue-100',
+    subtextClass: 'text-blue-300',
     buttonClass: 'bg-blue-600 hover:bg-blue-700',
     description: 'Anthropic Claude AI assistant',
   },
   codex: {
     name: 'Codex',
-    bgClass: 'bg-gray-100 bg-gray-800/50',
-    borderClass: 'border-gray-300 border-gray-600',
-    textClass: 'text-gray-900 text-gray-100',
-    subtextClass: 'text-gray-700 text-gray-300',
-    buttonClass: 'bg-gray-800 hover:bg-gray-900 bg-gray-700 hover:bg-gray-600',
+    bgClass: 'bg-surface-raised',
+    borderClass: 'border-border/10',
+    textClass: 'text-foreground',
+    subtextClass: 'text-muted-foreground',
+    buttonClass: 'bg-surface-elevated hover:bg-muted',
     description: 'OpenAI Codex AI assistant',
   },
   gemini: {
     name: 'Gemini',
-    bgClass: 'bg-indigo-50 bg-indigo-900/20',
-    borderClass: 'border-indigo-200 border-indigo-800',
-    textClass: 'text-indigo-900 text-indigo-100',
-    subtextClass: 'text-indigo-700 text-indigo-300',
+    bgClass: 'bg-indigo-900/20',
+    borderClass: 'border-indigo-800',
+    textClass: 'text-indigo-100',
+    subtextClass: 'text-indigo-300',
     buttonClass: 'bg-indigo-600 hover:bg-indigo-700',
     description: 'Google Gemini AI assistant',
   },
@@ -82,22 +82,22 @@ export default function AccountContent({ agent, authStatus, onLogin }: AccountCo
             </div>
             <div>
               {authStatus.loading ? (
-                <Badge variant="secondary" className="bg-gray-100 bg-gray-800">
+                <Badge variant="secondary" className="bg-surface-raised">
                   {"Checking..."}
                 </Badge>
               ) : authStatus.authenticated ? (
-                <Badge variant="secondary" className="bg-green-100 text-green-800 bg-green-900/30 text-green-300">
+                <Badge variant="secondary" className="bg-green-900/30 text-status-connected">
                   {"Connected"}
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-gray-100 text-gray-800 bg-gray-800 text-gray-300">
+                <Badge variant="secondary" className="bg-surface-raised text-muted-foreground">
                   {"Disconnected"}
                 </Badge>
               )}
             </div>
           </div>
 
-          <div className="border-t border-gray-200 border-gray-700 pt-4">
+          <div className="border-t border-border/10 pt-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className={`font-medium ${config.textClass}`}>
@@ -121,8 +121,8 @@ export default function AccountContent({ agent, authStatus, onLogin }: AccountCo
           </div>
 
           {authStatus.error && (
-            <div className="border-t border-gray-200 border-gray-700 pt-4">
-              <div className="text-sm text-red-600 text-red-400">
+            <div className="border-t border-border/10 pt-4">
+              <div className="text-sm text-status-error">
                 {`Error: ${authStatus.error}`}
               </div>
             </div>

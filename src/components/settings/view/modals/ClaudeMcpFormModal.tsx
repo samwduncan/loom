@@ -165,8 +165,8 @@ export default function ClaudeMcpFormModal({
                 onClick={() => setFormData((prev) => ({ ...prev, importMode: 'form' }))}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   formData.importMode === 'form'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 bg-gray-800 text-gray-700 text-gray-300 hover:bg-gray-200 hover:bg-gray-700'
+                    ? 'bg-primary text-white'
+                    : 'bg-surface-raised text-muted-foreground hover:bg-surface-elevated'
                 }`}
               >
                 {"Form Input"}
@@ -176,8 +176,8 @@ export default function ClaudeMcpFormModal({
                 onClick={() => setFormData((prev) => ({ ...prev, importMode: 'json' }))}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   formData.importMode === 'json'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 bg-gray-800 text-gray-700 text-gray-300 hover:bg-gray-200 hover:bg-gray-700'
+                    ? 'bg-primary text-white'
+                    : 'bg-surface-raised text-muted-foreground hover:bg-surface-elevated'
                 }`}
               >
                 {"JSON Import"}
@@ -186,7 +186,7 @@ export default function ClaudeMcpFormModal({
           )}
 
           {formData.importMode === 'form' && isEditing && (
-            <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-3">
+            <div className="bg-surface-raised border border-border/10 rounded-lg p-3">
               <label className="block text-sm font-medium text-foreground mb-2">
                 {"Scope"}
               </label>
@@ -215,8 +215,8 @@ export default function ClaudeMcpFormModal({
                     onClick={() => setFormData((prev) => ({ ...prev, scope: 'user', projectPath: '' }))}
                     className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                       formData.scope === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 bg-gray-800 text-gray-700 text-gray-300 hover:bg-gray-200 hover:bg-gray-700'
+                        ? 'bg-primary text-white'
+                        : 'bg-surface-raised text-muted-foreground hover:bg-surface-elevated'
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -229,8 +229,8 @@ export default function ClaudeMcpFormModal({
                     onClick={() => setFormData((prev) => ({ ...prev, scope: 'local' }))}
                     className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                       formData.scope === 'local'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 bg-gray-800 text-gray-700 text-gray-300 hover:bg-gray-200 hover:bg-gray-700'
+                        ? 'bg-primary text-white'
+                        : 'bg-surface-raised text-muted-foreground hover:bg-surface-elevated'
                     }`}
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -256,7 +256,7 @@ export default function ClaudeMcpFormModal({
                     onChange={(event) => {
                       setFormData((prev) => ({ ...prev, projectPath: event.target.value }));
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 border-gray-600 bg-gray-50 bg-gray-800 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-border/10 bg-surface-raised text-foreground rounded-lg focus:ring-primary focus:border-primary"
                     required
                   >
                     <option value="">{"Select a project..."}...</option>
@@ -302,7 +302,7 @@ export default function ClaudeMcpFormModal({
                       type: getSafeTransportType(event.target.value),
                     }));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 border-gray-600 bg-gray-50 bg-gray-800 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border/10 bg-surface-raised text-foreground rounded-lg focus:ring-primary focus:border-primary"
                 >
                   <option value="stdio">stdio</option>
                   <option value="sse">SSE</option>
@@ -313,11 +313,11 @@ export default function ClaudeMcpFormModal({
           </div>
 
           {isEditing && Boolean(formData.raw) && formData.importMode === 'form' && (
-            <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
+            <div className="bg-surface-raised border border-border/10 rounded-lg p-4">
               <h4 className="text-sm font-medium text-foreground mb-2">
                 {`Configuration Details (from ${editingServer?.scope === 'global' ? '~/.claude.json' : 'project config'})`}
               </h4>
-              <pre className="text-xs bg-gray-100 bg-gray-800 p-3 rounded overflow-x-auto">
+              <pre className="text-xs bg-surface-elevated p-3 rounded overflow-x-auto">
                 {JSON.stringify(formData.raw, null, 2)}
               </pre>
             </div>
@@ -337,14 +337,14 @@ export default function ClaudeMcpFormModal({
                     handleJsonValidation(value);
                   }}
                   className={`w-full px-3 py-2 border ${
-                    jsonValidationError ? 'border-red-500' : 'border-gray-300 border-gray-600'
-                  } bg-gray-50 bg-gray-800 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 font-mono text-sm`}
+                    jsonValidationError ? 'border-status-error' : 'border-border/10'
+                  } bg-surface-raised text-foreground rounded-lg focus:ring-primary focus:border-primary font-mono text-sm`}
                   rows={8}
                   placeholder={'{\n  "type": "stdio",\n  "command": "/path/to/server",\n  "args": ["--api-key", "abc123"],\n  "env": {\n    "CACHE_DIR": "/tmp"\n  }\n}'}
                   required
                 />
                 {jsonValidationError && (
-                  <p className="text-xs text-red-500 mt-1">{jsonValidationError}</p>
+                  <p className="text-xs text-status-error mt-1">{jsonValidationError}</p>
                 )}
                 <p className="text-xs text-muted-foreground mt-2">
                   {"Paste your MCP server configuration in JSON format. Example formats:"}
@@ -381,7 +381,7 @@ export default function ClaudeMcpFormModal({
                     const args = event.target.value.split('\n').filter((arg) => arg.trim());
                     updateConfig('args', args);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 border-gray-600 bg-gray-50 bg-gray-800 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-border/10 bg-surface-raised text-foreground rounded-lg focus:ring-primary focus:border-primary"
                   rows={3}
                   placeholder="--api-key&#10;abc123"
                 />
@@ -421,7 +421,7 @@ export default function ClaudeMcpFormModal({
                   });
                   updateConfig('env', env);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 border-gray-600 bg-gray-50 bg-gray-800 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-border/10 bg-surface-raised text-foreground rounded-lg focus:ring-primary focus:border-primary"
                 rows={3}
                 placeholder="API_KEY=your-key&#10;DEBUG=true"
               />
@@ -445,7 +445,7 @@ export default function ClaudeMcpFormModal({
                   });
                   updateConfig('headers', headers);
                 }}
-                className="w-full px-3 py-2 border border-gray-300 border-gray-600 bg-gray-50 bg-gray-800 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-border/10 bg-surface-raised text-foreground rounded-lg focus:ring-primary focus:border-primary"
                 rows={3}
                 placeholder="Authorization=Bearer token&#10;X-API-Key=your-key"
               />

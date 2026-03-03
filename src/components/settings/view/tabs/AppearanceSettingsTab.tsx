@@ -32,7 +32,7 @@ function ToggleCard({
   ariaLabel,
 }: ToggleCardProps) {
   return (
-    <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
+    <div className="bg-surface-raised border border-border/10 rounded-lg p-4">
       <div className="flex items-center justify-between">
         <div>
           <div className="font-medium text-foreground">{label}</div>
@@ -40,7 +40,7 @@ function ToggleCard({
         </div>
         <button
           onClick={() => onChange(!checked)}
-          className="relative inline-flex h-8 w-14 items-center rounded-full bg-gray-200 bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+          className="relative inline-flex h-8 w-14 items-center rounded-full bg-surface-elevated transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-base"
           role="switch"
           aria-checked={checked}
           aria-label={ariaLabel}
@@ -48,7 +48,7 @@ function ToggleCard({
           <span className="sr-only">{ariaLabel}</span>
           <span
             className={`${checked ? 'translate-x-7' : 'translate-x-1'
-              } h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-200 flex items-center justify-center`}
+              } h-6 w-6 transform rounded-full bg-foreground shadow-lg transition-transform duration-200 flex items-center justify-center`}
           >
             {checked ? onIcon : offIcon}
           </span>
@@ -73,7 +73,7 @@ export default function AppearanceSettingsTab({
   return (
     <div className="space-y-6 md:space-y-8">
       <div className="space-y-4">
-        <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
+        <div className="bg-surface-raised border border-border/10 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="font-medium text-foreground">
@@ -86,7 +86,7 @@ export default function AppearanceSettingsTab({
             <select
               value={projectSortOrder}
               onChange={(event) => onProjectSortOrderChange(event.target.value as ProjectSortOrder)}
-              className="text-sm bg-gray-50 bg-gray-800 border border-gray-300 border-gray-600 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 w-32"
+              className="text-sm bg-surface-elevated border border-border/10 text-foreground rounded-lg focus:ring-primary focus:border-primary p-2 w-32"
             >
               <option value="name">{"Alphabetical"}</option>
               <option value="date">{"Recent Activity"}</option>
@@ -130,7 +130,7 @@ export default function AppearanceSettingsTab({
           ariaLabel={"Show Line Numbers"}
         />
 
-        <div className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
+        <div className="bg-surface-raised border border-border/10 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="font-medium text-foreground">
@@ -143,7 +143,7 @@ export default function AppearanceSettingsTab({
             <select
               value={codeEditorSettings.fontSize}
               onChange={(event) => onCodeEditorFontSizeChange(event.target.value)}
-              className="text-sm bg-gray-50 bg-gray-800 border border-gray-300 border-gray-600 text-gray-900 text-gray-100 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2 w-24"
+              className="text-sm bg-surface-elevated border border-border/10 text-foreground rounded-lg focus:ring-primary focus:border-primary p-2 w-24"
             >
               <option value="10">10px</option>
               <option value="11">11px</option>

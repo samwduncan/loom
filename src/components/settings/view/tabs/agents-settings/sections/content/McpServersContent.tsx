@@ -66,7 +66,7 @@ function ClaudeMcpServers({
         </Button>
       </div>
       {deleteError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 border-red-800/60 bg-red-900/20 text-red-200">
+        <div className="rounded-lg border border-status-error/30 bg-status-error/10 px-3 py-2 text-sm text-status-error">
           {deleteError}
         </div>
       )}
@@ -78,7 +78,7 @@ function ClaudeMcpServers({
           const toolsResult = serverTools[serverId];
 
           return (
-            <div key={serverId} className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
+            <div key={serverId} className="bg-surface-raised border border-border/10 rounded-lg p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
@@ -100,19 +100,19 @@ function ClaudeMcpServers({
                     {server.type === 'stdio' && server.config?.command && (
                       <div>
                         {"Command"}:{' '}
-                        <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.command}</code>
+                        <code className="bg-surface-elevated px-1 rounded text-xs">{server.config.command}</code>
                       </div>
                     )}
                     {(server.type === 'sse' || server.type === 'http') && server.config?.url && (
                       <div>
                         {"URL"}:{' '}
-                        <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.url}</code>
+                        <code className="bg-surface-elevated px-1 rounded text-xs">{server.config.url}</code>
                       </div>
                     )}
                     {server.config?.args && server.config.args.length > 0 && (
                       <div>
                         {"Args"}:{' '}
-                        <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.args.join(' ')}</code>
+                        <code className="bg-surface-elevated px-1 rounded text-xs">{server.config.args.join(' ')}</code>
                       </div>
                     )}
                   </div>
@@ -120,8 +120,8 @@ function ClaudeMcpServers({
                   {testResult && (
                     <div className={`mt-2 p-2 rounded text-xs ${
                       testResult.success
-                        ? 'bg-green-50 bg-green-900/20 text-green-800 text-green-200'
-                        : 'bg-red-50 bg-red-900/20 text-red-800 text-red-200'
+                        ? 'bg-status-connected/10 text-status-connected'
+                        : 'bg-status-error/10 text-status-error'
                     }`}
                     >
                       <div className="font-medium">{testResult.message}</div>
@@ -129,13 +129,13 @@ function ClaudeMcpServers({
                   )}
 
                   {toolsResult && toolsResult.tools && toolsResult.tools.length > 0 && (
-                    <div className="mt-2 p-2 rounded text-xs bg-blue-50 bg-blue-900/20 text-blue-800 text-blue-200">
+                    <div className="mt-2 p-2 rounded text-xs bg-status-info/10 text-status-info">
                       <div className="font-medium">
                         {"Tools"} {`(${toolsResult.tools.length}):`}
                       </div>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {toolsResult.tools.slice(0, 5).map((tool, index) => (
-                          <code key={`${tool.name}-${index}`} className="bg-blue-100 bg-blue-800 px-1 rounded">
+                          <code key={`${tool.name}-${index}`} className="bg-status-info/20 px-1 rounded">
                             {tool.name}
                           </code>
                         ))}
@@ -154,7 +154,7 @@ function ClaudeMcpServers({
                     onClick={() => onEdit(server)}
                     variant="ghost"
                     size="sm"
-                    className="text-gray-600 hover:text-gray-700"
+                    className="text-muted-foreground hover:text-foreground"
                     title="Edit server"
                   >
                     <Edit3 className="w-4 h-4" />
@@ -163,7 +163,7 @@ function ClaudeMcpServers({
                     onClick={() => onDelete(serverId, server.scope)}
                     variant="ghost"
                     size="sm"
-                    className="text-red-600 hover:text-red-700"
+                    className="text-status-error hover:text-status-error"
                     title="Delete server"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -174,7 +174,7 @@ function ClaudeMcpServers({
           );
         })}
         {servers.length === 0 && (
-          <div className="text-center py-8 text-gray-500 text-gray-400">{"No MCP servers configured"}</div>
+          <div className="text-center py-8 text-muted-foreground">{"No MCP servers configured"}</div>
         )}
       </div>
     </div>
@@ -194,26 +194,26 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
-        <Server className="w-5 h-5 text-gray-700 text-gray-300" />
+        <Server className="w-5 h-5 text-muted-foreground" />
         <h3 className="text-lg font-medium text-foreground">{"MCP Servers"}</h3>
       </div>
       <p className="text-sm text-muted-foreground">{"Model Context Protocol servers provide additional tools and data sources to Codex"}</p>
 
       <div className="flex justify-between items-center">
-        <Button onClick={onAdd} className="bg-gray-800 hover:bg-gray-900 bg-gray-700 hover:bg-gray-600 text-white" size="sm">
+        <Button onClick={onAdd} className="bg-surface-elevated hover:bg-muted text-white" size="sm">
           <Plus className="w-4 h-4 mr-2" />
           {"Add MCP Server"}
         </Button>
       </div>
       {deleteError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 border-red-800/60 bg-red-900/20 text-red-200">
+        <div className="rounded-lg border border-status-error/30 bg-status-error/10 px-3 py-2 text-sm text-status-error">
           {deleteError}
         </div>
       )}
 
       <div className="space-y-2">
         {servers.map((server) => (
-          <div key={server.name} className="bg-gray-50 bg-gray-900/50 border border-gray-200 border-gray-700 rounded-lg p-4">
+          <div key={server.name} className="bg-surface-raised border border-border/10 rounded-lg p-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
@@ -226,19 +226,19 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
                   {server.config?.command && (
                     <div>
                       {"Command"}:{' '}
-                      <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.command}</code>
+                      <code className="bg-surface-elevated px-1 rounded text-xs">{server.config.command}</code>
                     </div>
                   )}
                   {server.config?.args && server.config.args.length > 0 && (
                     <div>
                       {"Args"}:{' '}
-                      <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">{server.config.args.join(' ')}</code>
+                      <code className="bg-surface-elevated px-1 rounded text-xs">{server.config.args.join(' ')}</code>
                     </div>
                   )}
                   {server.config?.env && Object.keys(server.config.env).length > 0 && (
                     <div>
                       {"Environment"}:{' '}
-                      <code className="bg-gray-100 bg-gray-800 px-1 rounded text-xs">
+                      <code className="bg-surface-elevated px-1 rounded text-xs">
                         {Object.entries(server.config.env).map(([key, value]) => `${key}=${maskSecret(value)}`).join(', ')}
                       </code>
                     </div>
@@ -251,7 +251,7 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
                   onClick={() => onEdit(server)}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-600 hover:text-gray-700"
+                  className="text-muted-foreground hover:text-foreground"
                   title="Edit server"
                 >
                   <Edit3 className="w-4 h-4" />
@@ -260,7 +260,7 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
                   onClick={() => onDelete(server.name)}
                   variant="ghost"
                   size="sm"
-                  className="text-red-600 hover:text-red-700"
+                  className="text-status-error hover:text-status-error"
                   title="Delete server"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -270,13 +270,13 @@ function CodexMcpServers({ servers, onAdd, onEdit, onDelete, deleteError }: Omit
           </div>
         ))}
         {servers.length === 0 && (
-          <div className="text-center py-8 text-gray-500 text-gray-400">{"No MCP servers configured"}</div>
+          <div className="text-center py-8 text-muted-foreground">{"No MCP servers configured"}</div>
         )}
       </div>
 
-      <div className="bg-gray-100 bg-gray-800/50 border border-gray-300 border-gray-600 rounded-lg p-4">
-        <h4 className="font-medium text-gray-900 text-gray-100 mb-2">{"About Codex MCP"}</h4>
-        <p className="text-sm text-gray-700 text-gray-300">{"Codex supports stdio-based MCP servers. You can add servers that extend Codex's capabilities with additional tools and resources."}</p>
+      <div className="bg-surface-raised border border-border/10 rounded-lg p-4">
+        <h4 className="font-medium text-foreground mb-2">{"About Codex MCP"}</h4>
+        <p className="text-sm text-muted-foreground">{"Codex supports stdio-based MCP servers. You can add servers that extend Codex's capabilities with additional tools and resources."}</p>
       </div>
     </div>
   );
