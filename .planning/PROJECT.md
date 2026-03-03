@@ -8,6 +8,20 @@ Loom is a premium, self-hostable web UI for Claude Code and Gemini CLI, forked f
 
 The chat interface must feel **designed, not generated** — every interaction, animation, and pixel serves the developer experience. If the UI doesn't make you want to use it over the raw terminal, it's not done.
 
+## Current Milestone: v1.1 Design Overhaul
+
+**Goal:** Transform every surface of the app with a new premium dark palette (charcoal base, cream text, dusty rose accent), complete the remaining functional features (streaming UX, error handling), and achieve A+ craft quality across density, animations, typography, and spacing.
+
+**Target features:**
+- New design system — near-black charcoal base, cream/white text, dusty rose/muted pink accent replacing warm earthy palette entirely
+- Full color sweep — every component, panel, and surface migrated to new palette
+- Terminal and editor theming — Catppuccin Mocha ANSI + charcoal-matching background
+- Sidebar and global polish — dense, professional, every modal and dialog restyled
+- Streaming UX completion — smart auto-scroll, scroll pill, typing indicators, skeleton shimmer
+- Error handling and status — toasts, inline banners, global status line, stop button
+- Micro-interactions and motion — hover states, transitions, expand/collapse animations
+- Competitive parity — informed by Open WebUI, Claude.ai, ChatGPT, Perplexity analysis
+
 ## Requirements
 
 ### Validated
@@ -32,27 +46,20 @@ The chat interface must feel **designed, not generated** — every interaction, 
 
 ### Active
 
-- [ ] Warm earthy color palette (chocolate browns, amber, copper, terracotta)
-- [ ] Dense, professional layout matching Claude.ai structure with more data per screen
-- [ ] Chat view significant redesign — collapsible turns, grouped tool calls, thinking block disclosures
-- [ ] VS Code Dark+ syntax highlighting for code blocks with copy-to-clipboard
-- [ ] Diff rendering (colored unified diffs with file headers and hunk markers)
-- [ ] Tool call cards (compact inline, expandable, grouped 3+, error accents)
-- [ ] Thinking blocks as collapsed disclosures (pulsing indicator while active)
-- [ ] Streaming UX polish (typing dots, token-by-token, skeleton shimmer on reconnect)
-- [ ] Smart auto-scroll with scroll-to-bottom pill ("N new messages")
-- [ ] Terminal Catppuccin Mocha theme blending with app dark theme
-- [ ] Typography overhaul (JetBrains Mono, tighter line heights, dev tool density)
-- [ ] Strip i18n — English only, reduce complexity
-- [ ] Strip Cursor and OpenAI Codex backends — Claude + Gemini only
-- [ ] Collapsible completed turns (first line + count badge, click to expand)
-- [ ] User message copy button for grabbing previous prompts
-- [ ] Permission prompts as inline banners
-- [ ] Usage summaries always visible (token counts, cost per response)
-- [ ] System status messages muted and color-coded (gray info, amber warning, red error)
-- [ ] Toast for transient errors, inline banner for permanent errors
-- [ ] Global status line showing current activity
-- [ ] Sidebar polish and density improvements
+<!-- v1.1 — Design Overhaul -->
+
+- [ ] New design system — charcoal base (#1a1a1a–#222222), cream text, dusty rose accent
+- [ ] Full color sweep — all components migrated from warm earthy to new palette
+- [ ] Terminal Catppuccin Mocha ANSI palette matching new dark base
+- [ ] CodeMirror warm dark theme matching new palette
+- [ ] Sidebar density and visual polish with new palette
+- [ ] Settings, modals, and dialogs restyled with new palette
+- [ ] Mobile navigation consistency with new theme
+- [ ] Streaming UX — smart auto-scroll, scroll pill, typing indicators, skeleton shimmer
+- [ ] Error handling — toasts (transient), inline banners (permanent), global status line
+- [ ] Stop generation button (replace send during streaming)
+- [ ] Micro-interactions — transitions, hover states, expand/collapse animations
+- [ ] Competitive-informed design — patterns from Open WebUI, Claude.ai, ChatGPT, Perplexity
 
 ### Out of Scope
 
@@ -61,6 +68,8 @@ The chat interface must feel **designed, not generated** — every interaction, 
 - Additional AI providers beyond Claude + Gemini — focused scope
 - Video/voice features — text-first tool
 - Self-hosted auth complexity (OAuth, SSO) — JWT is sufficient for self-hosted
+- Light mode / theme switching — single dark theme is the brand identity
+- Warm earthy palette — replaced by charcoal + rose direction in v1.1
 
 ## Context
 
@@ -68,12 +77,13 @@ The chat interface must feel **designed, not generated** — every interaction, 
 
 **Why fork:** CloudCLI works but looks generic. The UI is spacious and functional but lacks the craft and density of tools like Claude.ai or Linear. Loom's thesis is that a developer's AI chat interface should feel as polished as the best developer tools — warm, dense, intentional.
 
-**Design language:**
-- **Palette:** Deep chocolate brown (#1c1210) base, warm surfaces (#2a1f1a, #3d2e25), cream/beige text (#f5e6d3, #c4a882), amber/copper/terracotta accents (#d4a574, #c17f59, #b85c3a)
-- **Terminal:** Catppuccin Mocha ANSI colors on matching dark background
+**Design language (v1.1):**
+- **Palette:** Near-black charcoal base (#1a1a1a–#222222), cream/white text, dusty rose/muted pink accent (~#D4736C / #C97B7B range)
+- **Previous palette (v1.0):** Warm earthy (chocolate browns, amber, copper) — superseded
+- **Terminal:** Catppuccin Mocha ANSI colors on matching charcoal background
 - **Typography:** JetBrains Mono, compact line heights, professional spacing
-- **Reference:** "Claude.ai structure but denser and more data-rich — a developer's Claude.ai"
-- **Quality bar:** A+ execution. Every component should feel designed, not just functional
+- **Reference products:** Open WebUI, Claude.ai, ChatGPT (post-GPT5), Perplexity
+- **Quality bar:** A+ execution — density, animations, typography, spacing, micro-interactions. Every pixel intentional
 
 **Tech stack (inherited from CloudCLI):**
 - Frontend: React 18 + TypeScript + Vite + Tailwind CSS + CSS Variables (HSL)
@@ -103,6 +113,9 @@ The chat interface must feel **designed, not generated** — every interaction, 
 | Strip Cursor + Codex | Focused scope, less code to maintain, Claude + Gemini covers needs | — Pending |
 | Keep TaskMaster integration | Useful for project management workflows | — Pending |
 | GPL-3.0 license | Inherited from upstream, acceptable for open-source project | — Pending |
+| Replace warm earthy palette with charcoal + rose | User wants premium dark base with dusty rose accent, informed by competitive analysis | — Pending |
+| Full app redesign scope | Every surface — chat, sidebar, terminal, settings, modals, mobile | — Pending |
+| Bundle remaining functional work into v1.1 | Streaming UX + error handling complete the experience alongside visual overhaul | — Pending |
 
 ---
-*Last updated: 2026-03-01 after initialization*
+*Last updated: 2026-03-03 after milestone v1.1 initialization*
