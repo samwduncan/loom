@@ -150,7 +150,7 @@ export default function GitPanelHeader({
           </button>
 
           {showBranchDropdown && (
-            <div className="absolute top-full left-0 mt-1 w-64 bg-card rounded-xl shadow-lg border border-border z-[var(--z-dropdown)] overflow-hidden">
+            <div className="absolute top-full left-0 mt-1 w-64 bg-card/80 backdrop-blur-[16px] backdrop-saturate-[1.4] rounded-xl shadow-lg border border-border z-[var(--z-dropdown)] overflow-hidden">
               <div className="py-1 max-h-64 overflow-y-auto">
                 {branches.map((branch) => (
                   <button

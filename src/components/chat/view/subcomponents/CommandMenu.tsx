@@ -27,6 +27,8 @@ const menuBaseStyle: CSSProperties = {
   borderRadius: '8px',
   boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
   zIndex: 'var(--z-dropdown)' as unknown as number,
+  backdropFilter: 'blur(16px) saturate(1.4)',
+  WebkitBackdropFilter: 'blur(16px) saturate(1.4)',
   padding: '8px',
   transition: 'opacity 150ms ease-in-out, transform 150ms ease-in-out',
 };
@@ -156,7 +158,7 @@ export default function CommandMenu({
     return (
       <div
         ref={menuRef}
-        className="command-menu command-menu-empty border border-border/10 bg-surface-raised text-muted-foreground"
+        className="command-menu command-menu-empty border border-border/10 bg-surface-raised/80 text-muted-foreground"
         style={{ ...menuPosition, ...menuBaseStyle, overflowY: 'hidden', padding: '20px', opacity: 1, transform: 'translateY(0)', textAlign: 'center' }}
       >
         No commands available
@@ -169,7 +171,7 @@ export default function CommandMenu({
       ref={menuRef}
       role="listbox"
       aria-label="Available commands"
-      className="command-menu border border-border/10 bg-surface-raised"
+      className="command-menu border border-border/10 bg-surface-raised/80"
       style={{ ...menuPosition, ...menuBaseStyle, opacity: 1, transform: 'translateY(0)' }}
     >
       {orderedNamespaces.map((namespace) => (

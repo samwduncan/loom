@@ -80,7 +80,7 @@ export default function ProviderDropdown({
 
       {/* Dropdown panel */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-56 bg-card border border-border/50 rounded-xl shadow-lg z-[var(--z-dropdown)] overflow-hidden">
+        <div className="absolute top-full left-0 mt-1 w-56 bg-card/80 backdrop-blur-[16px] backdrop-saturate-[1.4] border border-border/50 rounded-xl shadow-lg z-[var(--z-dropdown)] overflow-hidden">
           {providers.map((p) => {
             const isActive = provider === p.id;
             return (

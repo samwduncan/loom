@@ -233,7 +233,7 @@ export default function ChatComposer({
         )}
 
         {showFileDropdown && filteredFiles.length > 0 && (
-          <div className="absolute bottom-full left-0 right-0 mb-2 bg-card/95 backdrop-blur-md border border-border/50 rounded-xl shadow-lg max-h-48 overflow-y-auto z-[var(--z-dropdown)]">
+          <div className="absolute bottom-full left-0 right-0 mb-2 bg-card/80 backdrop-blur-[16px] backdrop-saturate-[1.4] border border-border/50 rounded-xl shadow-lg max-h-48 overflow-y-auto z-[var(--z-dropdown)]">
             {filteredFiles.map((file, index) => (
               <div
                 key={file.path}
