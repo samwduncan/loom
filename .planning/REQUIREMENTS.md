@@ -51,11 +51,11 @@ Requirements for the Design Overhaul milestone. Charcoal + dusty rose palette, A
 
 ### Tool Call Display (TOOL)
 
-- [ ] **TOOL-01**: Tool call invocations display as compact action pills -- icon + tool name + semantic state color
-- [ ] **TOOL-02**: Running tool calls show pulsing dusty rose indicator
-- [ ] **TOOL-03**: Completed tool calls collapse to minimal chip with success state
-- [ ] **TOOL-04**: Failed tool calls expand with muted red background and error message visible
-- [ ] **TOOL-05**: 3+ sequential tool calls group into accordion with count badge, expandable to show individual pills
+- [x] **TOOL-01**: Tool call invocations display as compact action pills -- icon + tool name + semantic state color
+- [x] **TOOL-02**: Running tool calls show pulsing dusty rose indicator
+- [x] **TOOL-03**: Completed tool calls collapse to minimal chip with success state
+- [x] **TOOL-04**: Failed tool calls expand with muted red background and error message visible
+- [x] **TOOL-05**: 3+ sequential tool calls group into accordion with count badge, expandable to show individual pills
 
 ### Sidebar & Global (SIDE)
 
@@ -162,11 +162,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOST-03 | Phase 14 | Pending |
 | TOST-04 | Phase 14 | Pending |
 | TOST-05 | Phase 14 | Pending |
-| TOOL-01 | Phase 15 | Pending |
-| TOOL-02 | Phase 15 | Pending |
-| TOOL-03 | Phase 15 | Pending |
-| TOOL-04 | Phase 15 | Pending |
-| TOOL-05 | Phase 15 | Pending |
+| TOOL-01 | Phase 15 | Complete |
+| TOOL-02 | Phase 15 | Complete |
+| TOOL-03 | Phase 15 | Complete |
+| TOOL-04 | Phase 15 | Complete |
+| TOOL-05 | Phase 15 | Complete |
 | SIDE-01 | Phase 16 | Pending |
 | SIDE-02 | Phase 16 | Pending |
 | SIDE-03 | Phase 16 | Pending |

@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-03)
 
 **Core value:** The chat interface must feel designed, not generated -- every interaction, animation, and pixel serves the developer experience.
-**Current focus:** Phase 14 complete -- Toast & Overlay System
+**Current focus:** Phase 15 complete -- Tool Call Display
 
 ## Current Position
 
-Phase: 14 of 17 (Toast & Overlay System)
-Plan: 3 of 3
+Phase: 15 of 17 (Tool Call Display)
+Plan: 2 of 2
 Status: Complete
-Last activity: 2026-03-03 -- Phase 14 executed (3 plans, z-index scale + portal migration + WS toasts + glassmorphic dropdowns)
+Last activity: 2026-03-03 -- Phase 15 executed (2 plans, pill-shaped tool cards + grouped accordion headers)
 
-Progress: [##########] 100% (Phase 14)
+Progress: [##########] 100% (Phase 15)
 
 ## Performance Metrics
 
@@ -41,6 +41,7 @@ Progress: [##########] 100% (Phase 14)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 14 | 3 | ~70 min | ~23 min |
+| 15 | 2 | ~10 min | ~5 min |
 
 ## Accumulated Context
 | Phase 11 P01 | 2 | 2 tasks | 2 files |
@@ -80,5 +81,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-03
-Stopped at: Phase 14 complete -- all 3 plans executed, verified, and committed
+Stopped at: Phase 15 complete -- 2 plans executed (pill tool cards + grouped accordion headers)
 Resume file: None

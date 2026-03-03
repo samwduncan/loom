@@ -36,7 +36,7 @@ Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements
 **Independent component work (after foundation):**
 - [ ] **Phase 13: Message Experience** - Hidden-hover actions, full-width messages, spacing, entrance animations, streaming fade
 - [x] **Phase 14: Toast & Overlay System** - Z-index scale, Sonner toasts, WebSocket status toasts, glassmorphic blur, portals (completed 2026-03-03)
-- [ ] **Phase 15: Tool Call Display** - Action pills, pulsing indicators, collapse states, error expansion, accordion grouping
+- [x] **Phase 15: Tool Call Display** - Action pills, pulsing indicators, collapse states, error expansion, accordion grouping (completed 2026-03-03)
 - [ ] **Phase 16: Sidebar & Global Polish** - Sidebar restyle, settings, mobile nav, modals, session grouping, collapse mode
 - [ ] **Phase 17: Streaming & Status** - RAF buffer, smart auto-scroll, scroll pill, typing/thinking indicators, status line, stop button
 
@@ -193,6 +193,6 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 | 12. Specialty Surfaces | 4/4 | Complete    | 2026-03-03 | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
 | 14. Toast & Overlay System | v1.1 | 3/3 | Complete | 2026-03-03 |
-| 15. Tool Call Display | v1.1 | 0/TBD | Not started | - |
+| 15. Tool Call Display | 2/2 | Complete   | 2026-03-03 | - |
 | 16. Sidebar & Global Polish | v1.1 | 0/TBD | Not started | - |
 | 17. Streaming & Status | v1.1 | 0/TBD | Not started | - |
