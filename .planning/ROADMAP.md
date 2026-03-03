@@ -1,215 +1,196 @@
 # Roadmap: Loom
 
-## Overview
+## Milestones
 
-Loom transforms CloudCLI — a capable but generic AI chat interface — into a premium, crafted developer tool with a warm earthy aesthetic, Claude.ai-level density, and Linear-level attention to detail. The transformation prioritizes functional features first — strip dead code, build the chat experience, implement streaming UX and error handling — then applies visual polish (color sweep, terminal theming, sidebar styling) on top of a working, feature-complete foundation. Each phase delivers a coherent capability.
+- v1.0 Functional Foundation (Phases 1-9) -- shipped 2026-03-02
+- v1.1 Design Overhaul (Phases 10-17) -- in progress
 
 ## Phases
 
+<details>
+<summary>v1.0 Functional Foundation (Phases 1-9) -- SHIPPED 2026-03-02</summary>
+
+- [x] **Phase 3: Structural Cleanup** - Strip i18n, Cursor backend from codebase; build provider UX
+- [x] **Phase 5: Chat Message Architecture** - Shiki, TurnBlock, tool call cards, thinking disclosures
+- [x] **Phase 6: Chat Message Polish** - Diffs, user messages, permissions, usage, layout
+- [x] **Phase 7: Streaming UX** - Aurora shimmer, scroll anchor, scroll pill, typing indicators, reconnect skeletons
+- [x] **Phase 8: Error Handling and Status** - Phase context captured, folded into v1.1 scope
+
+Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements.
+
+</details>
+
+### v1.1 Design Overhaul
+
+**Milestone Goal:** Transform every surface with a charcoal + dusty rose palette, complete remaining functional features (streaming status, error handling), and achieve A+ craft quality across density, animations, typography, and spacing.
+
 **Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+- Integer phases (10, 11, 12...): Planned milestone work
+- Decimal phases (12.1, 12.2): Urgent insertions (marked with INSERTED)
 
-Decimal phases appear between their surrounding integers in numeric order.
+**Sequential foundation (strict order):**
+- [ ] **Phase 10: Design System Foundation** - Charcoal palette, surface elevation, rose accent tokens, borders, focus glow, scrollbars
+- [ ] **Phase 11: Hardcoded Color Sweep** - Replace all 51+ hex refs and 371 gray/slate/zinc classes with semantic tokens
+- [ ] **Phase 12: Specialty Surfaces** - Terminal Catppuccin Mocha, CodeMirror theme, Shiki remap, diff viewer, typography
 
-**Functional phases (build first):**
-- [x] **Phase 3: Structural Cleanup** - Strip i18n, Cursor backend, and Codex backend from the codebase
-- [x] **Phase 5: Chat Message Architecture** - Shiki, TurnBlock, tool call cards, thinking block disclosures
-- [ ] **Phase 6: Chat Message Polish** - Diffs, user messages, permission banners, usage summaries, layout
-- [ ] **Phase 7: Streaming UX** - requestAnimationFrame buffer, auto-scroll, scroll pill, typing indicators
-- [ ] **Phase 8: Error Handling and Status** - Toasts, inline banners, global status line, stop button
-
-**Visual phases (polish after):**
-> **NOTE:** User wants a complete professional UI overhaul before these phases are planned. Reference products: Open WebUI, Claude.ai chat, ChatGPT (post-GPT5 rainbow-dark styling), Perplexity. The warm earthy palette may be replaced. Run `/gsd:discuss-phase` on these phases before planning to capture the new design direction.
-
-- [ ] **Phase 1: Design System Foundation** - Warm earthy palette, CSS variable token system, typography, fork governance
-- [ ] **Phase 2: Color Sweep** - Replace all 86+ hardcoded Tailwind color classes with semantic aliases
-- [ ] **Phase 4: Terminal and Editor Theming** - Catppuccin Mocha xterm.js theme, CodeMirror warm theme
-- [ ] **Phase 9: Sidebar and Global Polish** - Dense sidebar, settings panel, modals, mobile nav
+**Independent component work (after foundation):**
+- [ ] **Phase 13: Message Experience** - Hidden-hover actions, full-width messages, spacing, entrance animations, streaming fade
+- [ ] **Phase 14: Toast & Overlay System** - Z-index scale, Sonner toasts, WebSocket status toasts, glassmorphic blur, portals
+- [ ] **Phase 15: Tool Call Display** - Action pills, pulsing indicators, collapse states, error expansion, accordion grouping
+- [ ] **Phase 16: Sidebar & Global Polish** - Sidebar restyle, settings, mobile nav, modals, session grouping, collapse mode
+- [ ] **Phase 17: Streaming & Status** - RAF buffer, smart auto-scroll, scroll pill, typing/thinking indicators, status line, stop button
 
 ## Phase Details
 
-### Phase 1: Design System Foundation
-**Goal**: The app renders with a warm earthy aesthetic and a correct CSS variable token system that all subsequent phases build on
-**Depends on**: Nothing (first phase)
-**Requirements**: DSGN-01, DSGN-02, DSGN-03, DSGN-04, DSGN-05, DSGN-07, DSGN-08, FORK-04, FORK-05
+### Phase 10: Design System Foundation
+**Goal**: The app renders with a charcoal base palette, dusty rose accent, and a complete CSS variable token system that all subsequent phases build on
+**Depends on**: v1.0 complete
+**Requirements**: DSGN-09, DSGN-10, DSGN-11, DSGN-12, DSGN-13, DSGN-14, DSGN-15
 **Success Criteria** (what must be TRUE):
-  1. Opening the app shows chocolate brown (#1c1210) base with warm surface layers, cream text, and amber/copper accents — not the previous blue/gray palette
-  2. Tailwind opacity modifiers work correctly — `bg-primary/50` renders at 50% opacity, not full opacity (verifiable with browser inspector)
-  3. All body and code text renders in JetBrains Mono with the compact 4-8px grid spacing applied to existing layout components
-  4. Scrollbars are thin, warm-tinted, and match the dark theme rather than showing OS-default chrome
-  5. An upstream-sync branch tracks CloudCLI verbatim, the GPL-3.0 ATTRIBUTION file credits CloudCLI authors, and the baseline fork commit is tagged
-**Plans**: 4 plans
-
-Plans:
-- [ ] 01-01-PLAN.md — Define warm earthy CSS variable palette, fix alpha-value contract, load JetBrains Mono, apply typography/density/scrollbar foundation
-- [ ] 01-02-PLAN.md — Establish fork governance: upstream-sync branch, baseline tag, GPL-3.0 ATTRIBUTION file
-- [ ] 01-03-PLAN.md — Remove dark mode system: delete ThemeContext/DarkModeToggle, strip all dark: Tailwind prefixes
-- [ ] 01-04-PLAN.md — Verify end-to-end: build, grep audit, visual checkpoint for warm palette and opacity modifiers
-
-### Phase 2: Color Sweep
-**Goal**: Every color reference in the codebase uses semantic CSS variable aliases so the warm palette propagates uniformly and visual QA is meaningful
-**Depends on**: Phase 1
-**Requirements**: DSGN-06
-**Success Criteria** (what must be TRUE):
-  1. A grep for hardcoded Tailwind color classes (`bg-blue-`, `text-gray-`, `bg-red-`, etc.) returns zero matches across all 86+ affected files
-  2. Every existing UI screen — sidebar, chat, file explorer, git panel, settings — displays the warm earthy palette with no blue or gray artifacts
-  3. No component uses raw hex values or hardcoded Tailwind color utilities in className strings
+  1. Opening the app shows charcoal base (#1a1a1a) with 3-4 tier surface elevation (base, cards, elevated, overlays) -- not the previous warm brown palette
+  2. Dusty rose accent appears sparingly on interactive elements (buttons, links, active states) and a lighter WCAG AA-compliant variant renders legibly as text on charcoal backgrounds
+  3. All borders throughout the app are subtle white at 6-10% opacity -- no hard solid borders visible anywhere
+  4. Input fields show a dusty rose focus glow ring on focus, text selection uses rose at 25% opacity, and scrollbars are thin/subtle matching the charcoal surfaces
+  5. Tailwind transition utilities work correctly throughout the app -- the global `transition: none` reset is resolved
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: Audit and replace hardcoded colors in chat and message components
-- [ ] 02-02: Audit and replace hardcoded colors in sidebar, file explorer, and git panel
-- [ ] 02-03: Audit and replace hardcoded colors in settings, modals, and utility components
-- [ ] 02-04: Final grep audit — verify zero remaining hardcoded color classes
+- [ ] 10-01: TBD
+- [ ] 10-02: TBD
+- [ ] 10-03: TBD
 
-### Phase 3: Structural Cleanup
-**Goal**: The codebase is free of i18n overhead and the dead Cursor backend, with a streamlined provider UX defaulting to Claude — reducing cognitive load and file count before the highest-complexity redesign work
-**Depends on**: Nothing (first functional phase)
-**Requirements**: FORK-01, FORK-02, FORK-03
+### Phase 11: Hardcoded Color Sweep
+**Goal**: Every color reference in the codebase uses semantic CSS variable aliases -- zero hardcoded hex values or generic Tailwind color utilities remain
+**Depends on**: Phase 10
+**Requirements**: COLR-01, COLR-02, COLR-03
 **Success Criteria** (what must be TRUE):
-  1. No `useTranslation` imports or `t()` calls remain in any component — all 43 affected components display English string literals directly
-  2. No Cursor CLI code, routes, or UI elements exist in the codebase — provider dropdown shows Claude, Codex, and Gemini only
-  3. Codex is kept — `@openai/codex-sdk` remains in `package.json`, all Codex routes/hooks/UI intact
-  4. Bundle size is measurably reduced — `react-i18next`, `i18next`, `i18next-browser-languagedetector` removed from dependencies
-  5. New sessions default to Claude — header dropdown and composer picker enable switching between Claude, Codex, and Gemini
-  6. First-time welcome screen appears once, mentions other providers, then auto-dismisses permanently
-**Plans**: 5 plans
-
-Plans:
-- [x] 03-01-PLAN.md — Strip i18n from 22 chat/core components + remove i18n infrastructure (packages, locales, config, I18nextProvider, LanguageSelector)
-- [x] 03-02-PLAN.md — Strip i18n from 20 settings/sidebar components + verify zero i18n references codebase-wide
-- [x] 03-03-PLAN.md — Remove all Cursor CLI backend code from server and client (~65 files)
-- [x] 03-04-PLAN.md — Build provider UX: header dropdown, composer mini-picker, welcome screen, default-to-Claude
-- [x] 03-05-PLAN.md — Final verification audit + visual checkpoint
-
-### Phase 4: Terminal and Editor Theming
-**Goal**: The terminal panel and file editor use the warm Loom aesthetic — Catppuccin Mocha ANSI colors in xterm.js and a matching warm dark theme in CodeMirror
-**Depends on**: Phase 1
-**Requirements**: TERM-01, TERM-02, TERM-03, TERM-04
-**Success Criteria** (what must be TRUE):
-  1. The terminal panel background matches the app background (#1c1210) — the terminal appears integrated, not an embedded black box
-  2. ANSI colors in the terminal follow Catppuccin Mocha — `ls` output, git diffs, and error text display the correct warm/muted colors
-  3. The terminal uses JetBrains Mono at 14px with a bar cursor style and 1.2 line height
-  4. The CodeMirror file viewer uses a warm dark theme that matches the app palette, consistent with the code block styling planned for Phase 5
+  1. A grep for arbitrary hex values in Tailwind classes (`bg-[#`, `text-[#`, `border-[#`) returns zero matches across the entire codebase
+  2. A grep for generic gray/slate/zinc/neutral Tailwind utilities returns zero matches -- all replaced with Loom semantic palette aliases
+  3. Every visible surface -- chat, sidebar, file explorer, git panel, settings, terminal wrapper -- displays the charcoal + rose palette with no warm brown, blue, or gray artifacts
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: Configure xterm.js Catppuccin Mocha theme via `terminal.options.theme` JS object (all 16 ANSI colors + background/foreground/cursor)
-- [ ] 04-02: Apply JetBrains Mono, cursor style, font size, and line height to xterm.js options
-- [ ] 04-03: Create warm CodeMirror theme extension matching Loom palette
+- [ ] 11-01: TBD
+- [ ] 11-02: TBD
+- [ ] 11-03: TBD
 
-### Phase 5: Chat Message Architecture
-**Goal**: The chat message experience has premium structure — VS Code-quality syntax highlighting, collapsible turns, compact tool call cards, animated thinking block disclosures, and correct streaming performance
-**Depends on**: Phase 3
-**Requirements**: CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-05, CHAT-06, CHAT-07, CHAT-08
+### Phase 12: Specialty Surfaces
+**Goal**: Third-party embedded surfaces (terminal, code editor, syntax highlighting, diffs, markdown prose) all match the charcoal + rose palette -- no visual seams between app and embedded content
+**Depends on**: Phase 11
+**Requirements**: SURF-01, SURF-02, SURF-03, SURF-04, SURF-05, SURF-06
 **Success Criteria** (what must be TRUE):
-  1. Code blocks render with VS Code Dark+ syntax highlighting via Shiki — language tokens match VS Code's color output and a language label appears in the code block header with a working copy button
-  2. Completed AI turns show collapsed (first line of text + tool call count badge) and expand to full content on click — agentic sessions with 20+ turns are navigable without scrolling through all content
-  3. Tool call invocations appear as compact single-line action cards showing tool name and key argument — clicking one expands to show full arguments and result inline
-  4. Three or more consecutive tool calls are automatically grouped under a typed summary header and can be expanded to show individual cards
-  5. Thinking blocks render as a collapsed "Thinking..." disclosure widget with muted styling — during streaming a pulsing amber indicator appears; when complete the block collapses automatically but remains expandable
-  6. Bash tool calls use same card style as other tools with faint gray tint (per user decision — no special terminal mini-block)
-  7. The streaming performance does not cause visible frame-rate drops during active AI responses — token batching via requestAnimationFrame prevents per-token setState freezing
-**Plans**: 5 plans
-
-Plans:
-- [x] 05-01-PLAN.md — Install Shiki v4, create singleton highlighter with warm Dark+ theme, build CodeBlock component, replace react-syntax-highlighter
-- [x] 05-02-PLAN.md — Build ThinkingDisclosure (Claude.ai-style) and ActivityIndicator (Claude CLI-style rotating phrases), replace AssistantThinkingIndicator
-- [x] 05-03-PLAN.md — Build TurnBlock component with collapsible turns, useTurnGrouping hook, expand/collapse toolbar
-- [x] 05-04-PLAN.md — Build ToolActionCard (compact cards with type tinting), ToolCallGroup (3+ grouping), update ToolRenderer
-- [x] 05-05-PLAN.md — Upgrade streaming to requestAnimationFrame, wire streaming into CodeBlock, memoization audit, visual checkpoint
-
-### Phase 6: Chat Message Polish
-**Goal**: The full chat message experience is complete — diffs, user messages, permission banners, usage summaries, system status messages, and layout all feel designed and intentional
-**Depends on**: Phase 5
-**Requirements**: CHAT-09, CHAT-10, CHAT-11, CHAT-12, CHAT-13, CHAT-14, CHAT-15, CHAT-16
-**Success Criteria** (what must be TRUE):
-  1. File edit tool calls render as colored unified diffs — green additions, red removals, gray context lines, file path header, and hunk markers — not as raw text output
-  2. User messages have a warm background tint that visually distinguishes them from AI messages, and each user message has a small copy button that captures the full prompt text
-  3. Permission prompt events render as highlighted inline banners within the message flow — showing tool name and action, not as modal dialogs
-  4. Token count and cost appear at the bottom of every AI response unconditionally — not collapsed, always visible
-  5. System status messages (info, warning, error) render inline with the correct muted color tier — gray info, amber warning, terracotta error — and do not look like regular chat messages
-  6. AI turn content flows as one continuous visual unit with tool calls, thinking, code, and prose inside one block separated by subtle dividers, with no gaps between message elements
-**Plans**: 5 plans
-
-Plans:
-- [ ] 06-01-PLAN.md — Install react-diff-viewer-continued, build warm theme, replace basic DiffViewer with unified diff + context lines + word-level highlighting
-- [ ] 06-02-PLAN.md — Restyle user messages with warm amber tint background, hover-reveal copy button outside message block
-- [ ] 06-03-PLAN.md — Restyle permission banners with warm theme + distinct left border, create 3-tier SystemStatusMessage component
-- [ ] 06-04-PLAN.md — Add TurnUsageFooter with pricing table, remove auto-collapse, enforce max-width 720px centered layout, continuous turn flow with thin dividers, wire system status into MessageComponent
-- [ ] 06-05-PLAN.md — Build verification + visual checkpoint for all 8 Phase 6 requirements
-
-### Phase 7: Streaming UX
-**Goal**: Streaming responses feel smooth and respect user control — token buffering prevents jank, scroll behavior never fights the user, indicators communicate AI state clearly
-**Depends on**: Phase 5
-**Requirements**: STRM-01, STRM-02, STRM-03, STRM-04, STRM-05, STRM-06
-**Success Criteria** (what must be TRUE):
-  1. During a long AI response, scrolling the chat up pauses auto-scroll immediately — the view stays wherever the user scrolled to without snapping back
-  2. When scrolled up during a response, a floating pill appears showing "N new messages" with an accurate count — clicking it scrolls to bottom and dismisses the pill
-  3. A pulsing typing indicator appears before the first token arrives, then transitions seamlessly into streaming content without a layout jump
-  4. The "Thinking..." pulsing indicator is visually distinct from the typing indicator — uses amber pulse color to signal extended thinking specifically
-  5. Skeleton shimmer bars replace content during reconnect scrollback load, fading to real content when parsed
-**Plans**: 5 plans
-
-Plans:
-- [ ] 07-01-PLAN.md — Aurora shimmer CSS foundation, streaming cursor CSS, CSS containment, global imports (STRM-01)
-- [ ] 07-02-PLAN.md — useScrollAnchor hook (IntersectionObserver sentinel), useNewTurnCounter hook, overflow-anchor CSS (STRM-02)
-- [ ] 07-03-PLAN.md — ScrollToBottomPill component, wire scroll anchor into ChatMessagesPane/ChatInterface, remove old scroll button (STRM-02, STRM-03)
-- [ ] 07-04-PLAN.md — PreTokenIndicator (aurora skeleton), ThinkingShimmer (aurora text), replace ActivityIndicator, wire into ChatMessagesPane (STRM-04, STRM-05)
-- [ ] 07-05-PLAN.md — ReconnectSkeletons, ConnectionStatusDot, WebSocket connectionState, visual verification checkpoint (STRM-06)
-
-### Phase 8: Error Handling and Status
-**Goal**: Errors are communicated clearly and non-disruptively, the AI's current activity is always visible, and the user can stop generation at any time
-**Depends on**: Phase 6, Phase 7
-**Requirements**: STRM-07, STRM-08, STRM-09, STRM-10
-**Success Criteria** (what must be TRUE):
-  1. Transient errors (reconnecting, temporary failures) appear as toast notifications that auto-dismiss — they do not block the interface or persist after recovery
-  2. Permanent errors (process crash, non-zero exit) appear as persistent inline red-accented banners within the message flow — visually distinct from toasts and from regular messages
-  3. The global status line at the bottom of the chat shows the current tool being executed in real time (e.g., "Running: Edit src/auth/login.ts") with a spinner on the active tool card
-  4. While the AI is responding, the send button is replaced by a stop button — clicking it aborts generation via WebSocket signal and the AI response ends cleanly
+  1. The terminal background matches the app charcoal base -- the terminal appears integrated, not an embedded black box -- and uses Catppuccin Mocha ANSI colors for command output
+  2. The terminal uses JetBrains Mono at 14px with a bar cursor and 1.2 line height
+  3. The CodeMirror file viewer uses a charcoal + rose dark theme consistent with the app palette -- no default dark theme artifacts
+  4. Syntax highlighting (Shiki) and diff viewer colors match the new palette -- no warm brown/amber color remnants from v1.0
+  5. Markdown prose content uses rose accent for links and correct heading hierarchy colors on charcoal backgrounds
 **Plans**: TBD
 
 Plans:
-- [ ] 08-01: Build toast notification system — transient errors, consistent position, auto-dismiss timing, warm palette
-- [ ] 08-02: Build inline error banner component — persistent, red-accented, distinct from toast, positioned within message flow
-- [ ] 08-03: Build global activity status line — reads current tool event from streaming, displays tool name + argument, spinner on active card
-- [ ] 08-04: Implement stop generation — replace send button with stop button during streaming, send abort signal via WebSocket, `AbortController` on backend request handler
+- [ ] 12-01: TBD
+- [ ] 12-02: TBD
+- [ ] 12-03: TBD
 
-### Phase 9: Sidebar and Global Polish
-**Goal**: Every surface of the app — sidebar, settings panel, modals, mobile nav — matches the warm earthy aesthetic with density improvements, completing the full-app transformation
-**Depends on**: Phase 2, Phase 8
-**Requirements**: SIDE-01, SIDE-02, SIDE-03, SIDE-04
+### Phase 13: Message Experience
+**Goal**: Chat messages feel crafted with intentional density, motion, and interaction patterns that match Claude.ai and ChatGPT quality
+**Depends on**: Phase 10 (palette tokens), Phase 12 (all surfaces consistent)
+**Requirements**: MESG-01, MESG-02, MESG-03, MESG-04, MESG-05, MESG-06
 **Success Criteria** (what must be TRUE):
-  1. The sidebar session and project list uses tighter spacing and smaller metadata fonts — more sessions are visible without scrolling compared to the pre-Loom baseline
-  2. The settings panel fully matches the warm dark theme — no blue, gray, or white surface artifacts remain
-  3. Mobile navigation and responsive breakpoints match the warm dark theme — the app feels consistent on narrow viewports
-  4. All modals and dialogs use warm palette with glassmorphism-style blur backgrounds — no default browser-chrome or light-theme overlay remnants
+  1. Message action buttons (copy, etc.) are invisible by default and smoothly fade in on hover -- reducing visual clutter in the message list
+  2. Assistant messages span full width with transparent background and a role label only -- no bubble wrapper or card container
+  3. 32px spacing separates different turns while messages within the same turn are tightly grouped -- the visual rhythm matches Claude.ai density
+  4. New messages animate in with a subtle slide-up + fade entrance that feels natural, not distracting -- and streaming tokens fade in during batch rendering
+  5. Interactive elements (buttons, links, expandables) show dusty rose hover glow and subtle press feedback
 **Plans**: TBD
 
 Plans:
-- [ ] 09-01: Restyle sidebar — tighter session list density, compact metadata fonts, warm earthy palette
-- [ ] 09-02: Restyle settings panel — warm dark theme, remove all gray/blue artifacts
-- [ ] 09-03: Restyle mobile navigation — warm theme, responsive consistency
-- [ ] 09-04: Restyle modals and dialogs — warm palette, glassmorphism blur backgrounds
+- [ ] 13-01: TBD
+- [ ] 13-02: TBD
+- [ ] 13-03: TBD
+
+### Phase 14: Toast & Overlay System
+**Goal**: The app has a formal layering system and non-disruptive notification infrastructure -- toasts for transient events, portals for overlays, glassmorphic blur for floating elements
+**Depends on**: Phase 10 (palette tokens)
+**Requirements**: TOST-01, TOST-02, TOST-03, TOST-04, TOST-05
+**Success Criteria** (what must be TRUE):
+  1. Toast notifications appear bottom-right with charcoal + rose theming, auto-dismiss after 2-4 seconds, and do not block the chat interface
+  2. A formal z-index scale exists as CSS custom properties and all layered elements (sticky headers, dropdowns, modals, toasts) respect the scale without conflicts
+  3. WebSocket disconnect shows a warning toast and reconnect shows a success toast -- connection state changes are always communicated
+  4. Modals, toasts, and dropdowns use glassmorphic blur styling, while scrolling content does not -- floating vs. inline elements are visually distinct
+  5. All overlay elements render via ReactDOM.createPortal to document.body -- no stacking context conflicts cause overlays to appear behind content
+**Plans**: TBD
+
+Plans:
+- [ ] 14-01: TBD
+- [ ] 14-02: TBD
+- [ ] 14-03: TBD
+
+### Phase 15: Tool Call Display
+**Goal**: Tool call invocations are compact, informative, and scannable -- running/complete/failed states are instantly distinguishable, and sequential calls group into manageable accordions
+**Depends on**: Phase 10 (palette tokens), Phase 14 (z-index scale for any overlays)
+**Requirements**: TOOL-01, TOOL-02, TOOL-03, TOOL-04, TOOL-05
+**Success Criteria** (what must be TRUE):
+  1. Tool calls display as compact action pills showing icon + tool name + semantic state color -- not as verbose text blocks
+  2. Running tool calls show a pulsing dusty rose indicator that is visually distinct from completed and failed states
+  3. Completed tool calls collapse to a minimal chip, failed tool calls expand with a muted red background showing the error message
+  4. Three or more sequential tool calls group into an accordion with a count badge -- expandable to show individual pills, collapsed by default
+**Plans**: TBD
+
+Plans:
+- [ ] 15-01: TBD
+- [ ] 15-02: TBD
+
+### Phase 16: Sidebar & Global Polish
+**Goal**: Every non-chat surface -- sidebar, settings, modals, mobile nav -- matches the charcoal + rose palette with density improvements and polished interactions
+**Depends on**: Phase 10 (palette tokens), Phase 14 (z-index scale, glassmorphic blur pattern)
+**Requirements**: SIDE-01, SIDE-02, SIDE-03, SIDE-04, SIDE-05, SIDE-06, SIDE-07
+**Success Criteria** (what must be TRUE):
+  1. The sidebar uses the charcoal palette with tighter spacing -- more sessions visible without scrolling than the pre-redesign baseline
+  2. Sessions are grouped by time categories (Today, Yesterday, Last 7 Days, Older) and the active session shows a 2px dusty rose left border with subtle background tint
+  3. The sidebar collapses to an icon-only strip that preserves session navigation
+  4. Settings panel, all modals, and all dialogs use charcoal palette with glassmorphic blur -- no gray/blue/white artifacts remain
+  5. Mobile navigation at 375px+ viewports matches the charcoal + rose theme with no layout or color inconsistencies
+**Plans**: TBD
+
+Plans:
+- [ ] 16-01: TBD
+- [ ] 16-02: TBD
+- [ ] 16-03: TBD
+
+### Phase 17: Streaming & Status
+**Goal**: Streaming responses feel smooth and communicative -- token buffering prevents jank, scroll behavior respects user control, the current AI activity is always visible, and the user can stop generation at any time
+**Depends on**: Phase 10 (palette tokens), Phase 13 (message animations established)
+**Requirements**: STRM-01, STRM-02, STRM-03, STRM-04, STRM-05, STRM-06, STRM-08, STRM-09, STRM-10, STRM-11, STRM-12
+**Success Criteria** (what must be TRUE):
+  1. During a long AI response, scrolling up pauses auto-scroll immediately and the view stays wherever the user scrolled -- no snapping back
+  2. When scrolled up during a response, a floating pill shows "N new messages" count -- clicking it scrolls to bottom smoothly
+  3. A typing indicator (pulsing dots or similar) appears before the first token, a "Thinking..." indicator appears during extended thinking, and both transition seamlessly into content without layout jumps
+  4. Skeleton shimmer bars appear during reconnect scrollback, fading to real content when parsed
+  5. The global status line shows semantic activity text ("Reading auth.ts...", "Writing server.ts...") parsed from tool events, with a spinner on the active tool card
+  6. The send button morphs to a stop button during streaming via CSS crossfade -- clicking stop aborts generation via WebSocket and the response ends cleanly
+  7. Permanent errors (process crash, exit code) display as persistent inline banners with red accent -- visually distinct from toasts and regular messages
+**Plans**: TBD
+
+Plans:
+- [ ] 17-01: TBD
+- [ ] 17-02: TBD
+- [ ] 17-03: TBD
+- [ ] 17-04: TBD
 
 ## Progress
 
 **Execution Order:**
-Functional first, then visual polish: 3 → 5 → 6 → 7 → 8 → 1 → 2 → 4 → 9
+Phases 10-12 are strictly sequential (design system -> color sweep -> specialty surfaces).
+Phases 13-17 are largely independent but Phase 14 (z-index scale) should precede overlay work in other phases.
+Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 
-Phase 1 (Design System) has partial work completed (CSS variables, dark mode removal) but is deferred as a group with the other visual phases.
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| **Functional phases** | | | |
-| 3. Structural Cleanup | 5/5 | Complete |  |
-| 5. Chat Message Architecture | 5/5 | Complete | 2026-03-02 |
-| 6. Chat Message Polish | 6/6 | Complete | 2026-03-02 |
-| 7. Streaming UX | 0/5 | Not started | - |
-| 8. Error Handling and Status | 0/4 | Not started | - |
-| **Visual phases** | | | |
-| 1. Design System Foundation | 0/4 | Partial (deferred) | - |
-| 2. Color Sweep | 0/4 | Not started | - |
-| 4. Terminal and Editor Theming | 0/3 | Not started | - |
-| 9. Sidebar and Global Polish | 0/4 | Not started | - |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 10. Design System Foundation | v1.1 | 0/TBD | Not started | - |
+| 11. Hardcoded Color Sweep | v1.1 | 0/TBD | Not started | - |
+| 12. Specialty Surfaces | v1.1 | 0/TBD | Not started | - |
+| 13. Message Experience | v1.1 | 0/TBD | Not started | - |
+| 14. Toast & Overlay System | v1.1 | 0/TBD | Not started | - |
+| 15. Tool Call Display | v1.1 | 0/TBD | Not started | - |
+| 16. Sidebar & Global Polish | v1.1 | 0/TBD | Not started | - |
+| 17. Streaming & Status | v1.1 | 0/TBD | Not started | - |
