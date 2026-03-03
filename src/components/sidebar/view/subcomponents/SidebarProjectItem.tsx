@@ -200,7 +200,7 @@ export default function SidebarProjectItem({
                       <Check className="w-4 h-4 text-white" />
                     </button>
                     <button
-                      className="w-8 h-8 rounded-lg bg-gray-500 bg-gray-600 flex items-center justify-center active:scale-90 transition-all duration-150 shadow-sm active:shadow-none"
+                      className="w-8 h-8 rounded-lg bg-surface-elevated flex items-center justify-center active:scale-90 transition-all duration-150 shadow-sm active:shadow-none"
                       onClick={(event) => {
                         event.stopPropagation();
                         onCancelEditingProject();
@@ -216,7 +216,7 @@ export default function SidebarProjectItem({
                         'w-8 h-8 rounded-lg flex items-center justify-center active:scale-90 transition-all duration-150 border',
                         isStarred
                           ? 'bg-yellow-500/10 bg-yellow-900/30 border-yellow-200 border-yellow-800'
-                          : 'bg-gray-500/10 bg-gray-900/30 border-gray-200 border-gray-800',
+                          : 'bg-muted/30 border-border/20',
                       )}
                       onClick={(event) => {
                         event.stopPropagation();
@@ -229,7 +229,7 @@ export default function SidebarProjectItem({
                           'w-4 h-4 transition-colors',
                           isStarred
                             ? 'text-yellow-600 text-yellow-400 fill-current'
-                            : 'text-gray-600 text-gray-400',
+                            : 'text-muted-foreground',
                         )}
                       />
                     </button>
@@ -340,7 +340,7 @@ export default function SidebarProjectItem({
                   <Check className="w-3 h-3" />
                 </div>
                 <div
-                  className="w-6 h-6 text-gray-500 hover:text-gray-700 hover:bg-gray-50 hover:bg-gray-800 flex items-center justify-center rounded cursor-pointer transition-colors"
+                  className="w-6 h-6 text-muted-foreground hover:text-foreground hover:bg-surface-elevated flex items-center justify-center rounded cursor-pointer transition-colors"
                   onClick={(event) => {
                     event.stopPropagation();
                     onCancelEditingProject();

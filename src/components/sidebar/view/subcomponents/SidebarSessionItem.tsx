@@ -186,28 +186,28 @@ export default function SidebarSessionItem({
                   <Check className="w-3 h-3 text-green-600 text-green-400" />
                 </button>
                 <button
-                  className="w-6 h-6 bg-gray-50 hover:bg-gray-100 bg-gray-900/20 hover:bg-gray-900/40 rounded flex items-center justify-center"
+                  className="w-6 h-6 bg-surface-raised hover:bg-surface-elevated rounded flex items-center justify-center"
                   onClick={(event) => {
                     event.stopPropagation();
                     onCancelEditingSession();
                   }}
                   title={"Cancel"}
                 >
-                  <X className="w-3 h-3 text-gray-600 text-gray-400" />
+                  <X className="w-3 h-3 text-muted-foreground" />
                 </button>
               </>
             ) : (
               <>
                 {!sessionView.isCodexSession && (
                   <button
-                    className="w-6 h-6 bg-gray-50 hover:bg-gray-100 bg-gray-900/20 hover:bg-gray-900/40 rounded flex items-center justify-center"
+                    className="w-6 h-6 bg-surface-raised hover:bg-surface-elevated rounded flex items-center justify-center"
                     onClick={(event) => {
                       event.stopPropagation();
                       onStartEditingSession(session.id, session.summary || 'New Session');
                     }}
                     title={"Manually edit session name"}
                   >
-                    <Edit2 className="w-3 h-3 text-gray-600 text-gray-400" />
+                    <Edit2 className="w-3 h-3 text-muted-foreground" />
                   </button>
                 )}
                 <button
