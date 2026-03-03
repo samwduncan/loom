@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import { TaskMasterProvider } from './contexts/TaskMasterContext';
 import { TasksSettingsProvider } from './contexts/TasksSettingsContext';
@@ -23,6 +24,13 @@ export default function App() {
           </TaskMasterProvider>
         </TasksSettingsProvider>
       </WebSocketProvider>
+      <Toaster
+        position="bottom-right"
+        duration={3000}
+        theme="dark"
+        visibleToasts={4}
+        offset={16}
+      />
     </AuthProvider>
   );
 }
