@@ -30,7 +30,7 @@ Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements
 
 **Sequential foundation (strict order):**
 - [x] **Phase 10: Design System Foundation** - Charcoal palette, surface elevation, rose accent tokens, borders, focus glow, scrollbars (completed 2026-03-03)
-- [ ] **Phase 11: Hardcoded Color Sweep** - Replace all 51+ hex refs and 371 gray/slate/zinc classes with semantic tokens
+- [x] **Phase 11: Hardcoded Color Sweep** - Replace all 51+ hex refs and 371 gray/slate/zinc classes with semantic tokens (completed 2026-03-03)
 - [ ] **Phase 12: Specialty Surfaces** - Terminal Catppuccin Mocha, CodeMirror theme, Shiki remap, diff viewer, typography
 
 **Independent component work (after foundation):**
@@ -189,7 +189,7 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 10. Design System Foundation | 3/3 | Complete    | 2026-03-03 | - |
-| 11. Hardcoded Color Sweep | 4/5 | In Progress|  | - |
+| 11. Hardcoded Color Sweep | 5/5 | Complete   | 2026-03-03 | - |
 | 12. Specialty Surfaces | v1.1 | 0/TBD | Not started | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
 | 14. Toast & Overlay System | v1.1 | 0/TBD | Not started | - |
