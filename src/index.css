@@ -61,6 +61,16 @@
   }
 }
 
+/* Tool call running state -- pulsing dusty rose left border */
+@keyframes tool-pulse {
+  0%, 100% {
+    border-left-color: transparent;
+  }
+  50% {
+    border-left-color: hsl(var(--rose-accent));
+  }
+}
+
 @layer base {
   :root {
     /* Surface hierarchy -- 3-tier depth model (charcoal + rose) */

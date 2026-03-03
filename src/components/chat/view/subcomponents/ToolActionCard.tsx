@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo, useCallback } from 'react';
+import React, { memo, useState, useEffect, useMemo, useCallback } from 'react';
 import {
   FileEdit,
   Search,
@@ -117,9 +117,10 @@ function formatToolInput(toolName: string, toolInput: unknown): string {
 }
 
 /**
- * Unified compact tool action card with expand/collapse.
+ * Compact pill-shaped tool action card with expand/collapse.
  *
- * Renders as a single-line card showing icon + tool name + key argument + status.
+ * Renders as a single-line pill showing icon + tool name + key argument + status.
+ * State-driven left border: pulsing dusty rose (running), green (success), red (error).
  * Clicking expands to reveal full input and result inline.
  * Uses CSS grid 0fr/1fr animation for smooth height transitions.
  */
@@ -137,6 +138,13 @@ export const ToolActionCard: React.FC<ToolActionCardProps> = memo(
   }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
+    // Auto-expand when a failed result arrives
+    useEffect(() => {
+      if (toolResult?.isError) {
+        setIsExpanded(true);
+      }
+    }, [toolResult?.isError]);
+
     const category = useMemo(() => getToolCategory(toolName), [toolName]);
     const IconComponent = categoryIcons[category] || categoryIcons.default;
     const bgTint = categoryBg[category] || categoryBg.default;
@@ -145,25 +153,32 @@ export const ToolActionCard: React.FC<ToolActionCardProps> = memo(
       [toolName, toolInput]
     );
 
+    const isRunning = toolResult == null;
     const isError = toolResult?.isError === true;
-    const hasResult = toolResult != null;
+    const isSuccess = toolResult != null && !isError;
 
     const handleToggle = useCallback(() => {
       setIsExpanded((prev) => !prev);
     }, []);
 
-    // Build error border class
-    const errorBorder = isError ? 'border-l-2 border-red-500' : '';
+    // State-driven left border: pulse (running), green (success), red (error)
+    const stateBorder = isRunning
+      ? 'border-l-2 border-transparent animate-[tool-pulse_1.5s_ease-in-out_infinite]'
+      : isError
+        ? 'border-l-2 border-red-500 transition-[border-color] duration-300'
+        : isSuccess
+          ? 'border-l-2 border-green-500/60 transition-[border-color] duration-300'
+          : '';
 
     return (
       <div
-        className={`rounded-md ${bgTint} ${errorBorder} my-0.5`}
+        className={`rounded-xl ${bgTint} ${stateBorder} my-0.5`}
       >
         {/* Compact header -- clickable single line */}
         <button
           type="button"
           onClick={handleToggle}
-          className="flex items-center gap-1.5 w-full px-2 py-1.5 text-left select-none group/card hover:bg-foreground/5 rounded-md transition-colors"
+          className="flex items-center gap-1.5 w-full px-2 py-1.5 text-left select-none group/card hover:bg-foreground/5 rounded-xl transition-colors"
           aria-expanded={isExpanded}
           aria-controls={toolId ? `tool-detail-${toolId}` : undefined}
         >
@@ -189,12 +204,12 @@ export const ToolActionCard: React.FC<ToolActionCardProps> = memo(
             </span>
           )}
 
-          {/* Status icon */}
+          {/* Status icon -- running: no icon (pulse is the indicator), success: green check, error: red X */}
           <span className="flex-shrink-0 ml-auto">
-            {hasResult && !isError && (
-              <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+            {isSuccess && (
+              <CheckCircle2 className="w-3.5 h-3.5 text-green-500/70" />
             )}
-            {hasResult && isError && (
+            {isError && (
               <XCircle className="w-3.5 h-3.5 text-red-500" />
             )}
           </span>
