@@ -15,9 +15,6 @@ interface ChatInputControlsProps {
   onToggleCommandMenu: () => void;
   hasInput: boolean;
   onClearInput: () => void;
-  isUserScrolledUp: boolean;
-  hasMessages: boolean;
-  onScrollToBottom: () => void;
   sessionCost?: number | null;
 }
 
@@ -32,9 +29,6 @@ export default function ChatInputControls({
   onToggleCommandMenu,
   hasInput,
   onClearInput,
-  isUserScrolledUp,
-  hasMessages,
-  onScrollToBottom,
   sessionCost,
 }: ChatInputControlsProps) {
   return (
@@ -133,17 +127,6 @@ export default function ChatInputControls({
         </button>
       )}
 
-      {isUserScrolledUp && hasMessages && (
-        <button
-          onClick={onScrollToBottom}
-          className="w-7 h-7 sm:w-8 sm:h-8 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-105"
-          title="Scroll to bottom"
-        >
-          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </button>
-      )}
     </div>
   );
 }

@@ -55,9 +55,6 @@ interface ChatComposerProps {
   onToggleCommandMenu: () => void;
   hasInput: boolean;
   onClearInput: () => void;
-  isUserScrolledUp: boolean;
-  hasMessages: boolean;
-  onScrollToBottom: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement> | TouchEvent<HTMLButtonElement>) => void;
   isDragActive: boolean;
   attachedImages: File[];
@@ -113,9 +110,6 @@ export default function ChatComposer({
   onToggleCommandMenu,
   hasInput,
   onClearInput,
-  isUserScrolledUp,
-  hasMessages,
-  onScrollToBottom,
   onSubmit,
   isDragActive,
   attachedImages,
@@ -201,9 +195,6 @@ export default function ChatComposer({
           onToggleCommandMenu={onToggleCommandMenu}
           hasInput={hasInput}
           onClearInput={onClearInput}
-          isUserScrolledUp={isUserScrolledUp}
-          hasMessages={hasMessages}
-          onScrollToBottom={onScrollToBottom}
           sessionCost={null}
         />}
       </div>
