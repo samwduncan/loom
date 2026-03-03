@@ -186,7 +186,7 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 10. Design System Foundation | v1.1 | 0/3 | Planned | - |
+| 10. Design System Foundation | 1/3 | In Progress|  | - |
 | 11. Hardcoded Color Sweep | v1.1 | 0/TBD | Not started | - |
 | 12. Specialty Surfaces | v1.1 | 0/TBD | Not started | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
