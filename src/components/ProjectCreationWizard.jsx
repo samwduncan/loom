@@ -258,20 +258,20 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
 
   return (
     <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-0 sm:p-4">
-      <div className="bg-white bg-gray-800 rounded-none sm:rounded-lg shadow-xl w-full h-full sm:h-auto sm:max-w-2xl border-0 sm:border border-gray-200 border-gray-700 overflow-y-auto">
+      <div className="bg-surface-raised rounded-none sm:rounded-lg shadow-xl w-full h-full sm:h-auto sm:max-w-2xl border-0 sm:border border-border/10 overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-border/10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-100 bg-blue-900/50 rounded-lg flex items-center justify-center">
-              <FolderPlus className="w-4 h-4 text-blue-600 text-blue-400" />
+            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+              <FolderPlus className="w-4 h-4 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               {'Create New Project'}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:text-gray-300 rounded-md hover:bg-gray-100 hover:bg-gray-700"
+            className="p-2 text-muted-foreground hover:text-foreground-secondary rounded-md hover:bg-surface-elevated"
             disabled={isCreating}
           >
             <X className="w-5 h-5" />
@@ -287,22 +287,22 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center font-medium text-sm ${
                       s < step
-                        ? 'bg-green-500 text-white'
+                        ? 'bg-status-connected text-white'
                         : s === step
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 bg-gray-700 text-gray-500'
+                        ? 'bg-primary text-white'
+                        : 'bg-surface-elevated text-muted-foreground'
                     }`}
                   >
                     {s < step ? <Check className="w-4 h-4" /> : s}
                   </div>
-                  <span className="text-sm font-medium text-gray-700 text-gray-300 hidden sm:inline">
+                  <span className="text-sm font-medium text-foreground-secondary hidden sm:inline">
                     {s === 1 ? 'Type' : s === 2 ? 'Configure' : 'Confirm'}
                   </span>
                 </div>
                 {s < 3 && (
                   <div
                     className={`flex-1 h-1 mx-2 rounded ${
-                      s < step ? 'bg-green-500' : 'bg-gray-200 bg-gray-700'
+                      s < step ? 'bg-status-connected' : 'bg-surface-elevated'
                     }`}
                   />
                 )}
@@ -315,10 +315,10 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
         <div className="p-6 space-y-6 min-h-[300px]">
           {/* Error Display */}
           {error && (
-            <div className="bg-red-50 bg-red-900/20 border border-red-200 border-red-800 rounded-lg p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 text-red-400 flex-shrink-0 mt-0.5" />
+            <div className="bg-status-error/10 border border-status-error/30 rounded-lg p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-status-error flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <p className="text-sm text-red-800 text-red-200">{error}</p>
+                <p className="text-sm text-status-error">{error}</p>
               </div>
             </div>
           )}
@@ -327,7 +327,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-medium text-gray-700 text-gray-300 mb-3">
+                <h4 className="text-sm font-medium text-foreground-secondary mb-3">
                   {'Do you already have a workspace, or would you like to create a new one?'}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -336,19 +336,19 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                     onClick={() => setWorkspaceType('existing')}
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       workspaceType === 'existing'
-                        ? 'border-blue-500 bg-blue-50 bg-blue-900/20'
-                        : 'border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border/10 hover:border-border/20'
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-green-100 bg-green-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FolderPlus className="w-5 h-5 text-green-600 text-green-400" />
+                      <div className="w-10 h-10 bg-status-connected/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <FolderPlus className="w-5 h-5 text-status-connected" />
                       </div>
                       <div className="flex-1">
-                        <h5 className="font-semibold text-gray-900 text-white mb-1">
+                        <h5 className="font-semibold text-foreground mb-1">
                           {'Existing Workspace'}
                         </h5>
-                        <p className="text-sm text-gray-600 text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {'I already have a workspace on my server and just need to add it to the project list'}
                         </p>
                       </div>
@@ -360,19 +360,19 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                     onClick={() => setWorkspaceType('new')}
                     className={`p-4 border-2 rounded-lg text-left transition-all ${
                       workspaceType === 'new'
-                        ? 'border-blue-500 bg-blue-50 bg-blue-900/20'
-                        : 'border-gray-200 border-gray-700 hover:border-gray-300 hover:border-gray-600'
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border/10 hover:border-border/20'
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-purple-100 bg-purple-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <GitBranch className="w-5 h-5 text-purple-600 text-purple-400" />
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <GitBranch className="w-5 h-5 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <h5 className="font-semibold text-gray-900 text-white mb-1">
+                        <h5 className="font-semibold text-foreground mb-1">
                           {'New Workspace'}
                         </h5>
-                        <p className="text-sm text-gray-600 text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {'Create a new workspace, optionally clone from a GitHub repository'}
                         </p>
                       </div>
@@ -388,7 +388,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
             <div className="space-y-4">
               {/* Workspace Path */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground-secondary mb-2">
                   {workspaceType === 'existing' ? 'Workspace Path' : 'Workspace Path'}
                 </label>
                 <div className="relative flex gap-2">
@@ -401,15 +401,15 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                       className="w-full"
                     />
                     {showPathDropdown && pathSuggestions.length > 0 && (
-                      <div className="absolute z-10 w-full mt-1 bg-white bg-gray-800 border border-gray-200 border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-surface-raised border border-border/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                         {pathSuggestions.map((suggestion, index) => (
                           <button
                             key={index}
                             onClick={() => selectPathSuggestion(suggestion)}
-                            className="w-full px-4 py-2 text-left hover:bg-gray-100 hover:bg-gray-700 text-sm"
+                            className="w-full px-4 py-2 text-left hover:bg-surface-elevated text-sm"
                           >
-                            <div className="font-medium text-gray-900 text-white">{suggestion.name}</div>
-                            <div className="text-xs text-gray-500 text-gray-400">{suggestion.path}</div>
+                            <div className="font-medium text-foreground">{suggestion.name}</div>
+                            <div className="text-xs text-muted-foreground">{suggestion.path}</div>
                           </button>
                         ))}
                       </div>
@@ -425,7 +425,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                     <FolderOpen className="w-4 h-4" />
                   </Button>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 text-gray-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {workspaceType === 'existing'
                     ? 'Full path to your existing workspace directory'
                     : 'Full path to your workspace directory'}
@@ -436,7 +436,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
               {workspaceType === 'new' && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground-secondary mb-2">
                       {'GitHub URL (Optional)'}
                     </label>
                     <Input
@@ -446,28 +446,28 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                       placeholder="https://github.com/username/repository"
                       className="w-full"
                     />
-                    <p className="mt-1 text-xs text-gray-500 text-gray-400">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {'Optional: provide a GitHub URL to clone a repository'}
                     </p>
                   </div>
 
                   {/* GitHub Token (only for HTTPS URLs - SSH uses SSH keys) */}
                   {githubUrl && !githubUrl.startsWith('git@') && !githubUrl.startsWith('ssh://') && (
-                    <div className="bg-gray-50 bg-gray-900/50 rounded-lg p-4 border border-gray-200 border-gray-700">
+                    <div className="bg-surface-elevated rounded-lg p-4 border border-border/10">
                       <div className="flex items-start gap-3 mb-4">
-                        <Key className="w-5 h-5 text-gray-600 text-gray-400 flex-shrink-0 mt-0.5" />
+                        <Key className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
                         <div className="flex-1">
-                          <h5 className="font-medium text-gray-900 text-white mb-1">
+                          <h5 className="font-medium text-foreground mb-1">
                             {'GitHub Authentication (Optional)'}
                           </h5>
-                          <p className="text-sm text-gray-600 text-gray-400">
+                          <p className="text-sm text-muted-foreground">
                             {'Only required for private repositories. Public repos can be cloned without authentication.'}
                           </p>
                         </div>
                       </div>
 
                       {loadingTokens ? (
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Loader2 className="w-4 h-4 animate-spin" />
                           {'Loading stored tokens...'}
                         </div>
@@ -479,8 +479,8 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                               onClick={() => setTokenMode('stored')}
                               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                                 tokenMode === 'stored'
-                                  ? 'bg-blue-500 text-white'
-                                  : 'bg-gray-200 bg-gray-700 text-gray-700 text-gray-300'
+                                  ? 'bg-primary text-white'
+                                  : 'bg-surface-raised text-foreground-secondary'
                               }`}
                             >
                               {'Stored Token'}
@@ -489,8 +489,8 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                               onClick={() => setTokenMode('new')}
                               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                                 tokenMode === 'new'
-                                  ? 'bg-blue-500 text-white'
-                                  : 'bg-gray-200 bg-gray-700 text-gray-700 text-gray-300'
+                                  ? 'bg-primary text-white'
+                                  : 'bg-surface-raised text-foreground-secondary'
                               }`}
                             >
                               {'New Token'}
@@ -503,8 +503,8 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                               }}
                               className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                                 tokenMode === 'none'
-                                  ? 'bg-green-500 text-white'
-                                  : 'bg-gray-200 bg-gray-700 text-gray-700 text-gray-300'
+                                  ? 'bg-status-connected text-white'
+                                  : 'bg-surface-raised text-foreground-secondary'
                               }`}
                             >
                               {'None (Public)'}
@@ -513,13 +513,13 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
 
                           {tokenMode === 'stored' ? (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                                 {'Select Token'}
                               </label>
                               <select
                                 value={selectedGithubToken}
                                 onChange={(e) => setSelectedGithubToken(e.target.value)}
-                                className="w-full px-3 py-2 bg-white bg-gray-800 border border-gray-300 border-gray-600 rounded-lg text-sm"
+                                className="w-full px-3 py-2 bg-surface-raised border border-border/10 rounded-lg text-sm text-foreground"
                               >
                                 <option value="">{'-- Select a token --'}</option>
                                 {availableTokens.map((token) => (
@@ -531,7 +531,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                             </div>
                           ) : tokenMode === 'new' ? (
                             <div>
-                              <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                                 {'New Token'}
                               </label>
                               <Input
@@ -541,7 +541,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                                 placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                                 className="w-full"
                               />
-                              <p className="mt-1 text-xs text-gray-500 text-gray-400">
+                              <p className="mt-1 text-xs text-muted-foreground">
                                 {'This token will be used only for this operation'}
                               </p>
                             </div>
@@ -549,14 +549,14 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                         </>
                       ) : (
                         <div className="space-y-4">
-                          <div className="bg-blue-50 bg-blue-900/20 rounded-lg p-3 border border-blue-200 border-blue-800">
-                            <p className="text-sm text-blue-800 text-blue-200">
+                          <div className="bg-status-info/10 rounded-lg p-3 border border-status-info/20">
+                            <p className="text-sm text-foreground-secondary">
                               {'Public repositories don\'t require authentication. You can skip providing a token if cloning a public repo.'}
                             </p>
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                            <label className="block text-sm font-medium text-foreground-secondary mb-2">
                               {'GitHub Token (Optional for Public Repos)'}
                             </label>
                             <Input
@@ -566,7 +566,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                               placeholder={'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx (leave empty for public repos)'}
                               className="w-full"
                             />
-                            <p className="mt-1 text-xs text-gray-500 text-gray-400">
+                            <p className="mt-1 text-xs text-muted-foreground">
                               {'No stored tokens available. You can add tokens in Settings → API Keys for easier reuse.'}
                             </p>
                           </div>
@@ -582,34 +582,34 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
           {/* Step 3: Confirm */}
           {step === 3 && (
             <div className="space-y-4">
-              <div className="bg-gray-50 bg-gray-900/50 rounded-lg p-4 border border-gray-200 border-gray-700">
-                <h4 className="text-sm font-semibold text-gray-900 text-white mb-3">
+              <div className="bg-surface-elevated rounded-lg p-4 border border-border/10">
+                <h4 className="text-sm font-semibold text-foreground mb-3">
                   {'Review Your Configuration'}
                 </h4>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 text-gray-400">{'Workspace Type:'}</span>
-                    <span className="font-medium text-gray-900 text-white">
+                    <span className="text-muted-foreground">{'Workspace Type:'}</span>
+                    <span className="font-medium text-foreground">
                       {workspaceType === 'existing' ? 'Existing Workspace' : 'New Workspace'}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600 text-gray-400">{'Path:'}</span>
-                    <span className="font-mono text-xs text-gray-900 text-white break-all">
+                    <span className="text-muted-foreground">{'Path:'}</span>
+                    <span className="font-mono text-xs text-foreground break-all">
                       {workspacePath}
                     </span>
                   </div>
                   {workspaceType === 'new' && githubUrl && (
                     <>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600 text-gray-400">{'Clone From:'}</span>
-                        <span className="font-mono text-xs text-gray-900 text-white break-all">
+                        <span className="text-muted-foreground">{'Clone From:'}</span>
+                        <span className="font-mono text-xs text-foreground break-all">
                           {githubUrl}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600 text-gray-400">{'Authentication:'}</span>
-                        <span className="text-xs text-gray-900 text-white">
+                        <span className="text-muted-foreground">{'Authentication:'}</span>
+                        <span className="text-xs text-foreground">
                           {tokenMode === 'stored' && selectedGithubToken
                             ? `${'Using stored token:'} ${availableTokens.find(t => t.id.toString() === selectedGithubToken)?.credential_name || 'Unknown'}`
                             : tokenMode === 'new' && newGithubToken
@@ -624,16 +624,16 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                 </div>
               </div>
 
-              <div className="bg-blue-50 bg-blue-900/20 rounded-lg p-4 border border-blue-200 border-blue-800">
+              <div className="bg-status-info/10 rounded-lg p-4 border border-status-info/20">
                 {isCreating && cloneProgress ? (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-blue-800 text-blue-200">{'Cloning repository...'}</p>
-                    <code className="block text-xs font-mono text-blue-700 text-blue-300 whitespace-pre-wrap break-all">
+                    <p className="text-sm font-medium text-foreground">{'Cloning repository...'}</p>
+                    <code className="block text-xs font-mono text-foreground-secondary whitespace-pre-wrap break-all">
                       {cloneProgress}
                     </code>
                   </div>
                 ) : (
-                  <p className="text-sm text-blue-800 text-blue-200">
+                  <p className="text-sm text-foreground-secondary">
                     {workspaceType === 'existing'
                       ? 'The workspace will be added to your project list and will be available for AI agent sessions.'
                       : githubUrl
@@ -647,7 +647,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between p-6 border-t border-gray-200 border-gray-700">
+        <div className="flex items-center justify-between p-6 border-t border-border/10">
           <Button
             variant="outline"
             onClick={step === 1 ? onClose : handleBack}
@@ -690,14 +690,14 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
       {/* Folder Browser Modal */}
       {showFolderBrowser && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
-          <div className="bg-white bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] border border-gray-200 border-gray-700 flex flex-col">
+          <div className="bg-surface-raised rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] border border-border/10 flex flex-col">
             {/* Browser Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 border-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-border/10">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-100 bg-blue-900/50 rounded-lg flex items-center justify-center">
-                  <FolderOpen className="w-4 h-4 text-blue-600 text-blue-400" />
+                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <FolderOpen className="w-4 h-4 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 text-white">
+                <h3 className="text-lg font-semibold text-foreground">
                   Select Folder
                 </h3>
               </div>
@@ -706,8 +706,8 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                   onClick={() => setShowHiddenFolders(!showHiddenFolders)}
                   className={`p-2 rounded-md transition-colors ${
                     showHiddenFolders
-                      ? 'text-blue-600 text-blue-400 bg-blue-50 bg-blue-900/30'
-                      : 'text-gray-400 hover:text-gray-600 hover:text-gray-300 hover:bg-gray-100 hover:bg-gray-700'
+                      ? 'text-primary bg-primary/10'
+                      : 'text-muted-foreground hover:text-foreground-secondary hover:bg-surface-elevated'
                   }`}
                   title={showHiddenFolders ? 'Hide hidden folders' : 'Show hidden folders'}
                 >
@@ -717,8 +717,8 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                   onClick={() => setShowNewFolderInput(!showNewFolderInput)}
                   className={`p-2 rounded-md transition-colors ${
                     showNewFolderInput
-                      ? 'text-blue-600 text-blue-400 bg-blue-50 bg-blue-900/30'
-                      : 'text-gray-400 hover:text-gray-600 hover:text-gray-300 hover:bg-gray-100 hover:bg-gray-700'
+                      ? 'text-primary bg-primary/10'
+                      : 'text-muted-foreground hover:text-foreground-secondary hover:bg-surface-elevated'
                   }`}
                   title="Create new folder"
                 >
@@ -726,7 +726,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                 </button>
                 <button
                   onClick={() => setShowFolderBrowser(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:text-gray-300 rounded-md hover:bg-gray-100 hover:bg-gray-700"
+                  className="p-2 text-muted-foreground hover:text-foreground-secondary rounded-md hover:bg-surface-elevated"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -735,7 +735,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
 
             {/* New Folder Input */}
             {showNewFolderInput && (
-              <div className="px-4 py-3 border-b border-gray-200 border-gray-700 bg-blue-50 bg-blue-900/20">
+              <div className="px-4 py-3 border-b border-border/10 bg-status-info/10">
                 <div className="flex items-center gap-2">
                   <Input
                     type="text"
@@ -777,7 +777,7 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
             <div className="flex-1 overflow-y-auto p-4">
               {loadingFolders ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
                 </div>
               ) : (
                 <div className="space-y-1">
@@ -796,16 +796,16 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                         }
                         navigateToFolder(parentPath);
                       }}
-                      className="w-full px-4 py-3 text-left hover:bg-gray-100 hover:bg-gray-700 rounded-lg flex items-center gap-3"
+                      className="w-full px-4 py-3 text-left hover:bg-surface-elevated rounded-lg flex items-center gap-3"
                     >
-                      <FolderOpen className="w-5 h-5 text-gray-400" />
-                      <span className="font-medium text-gray-700 text-gray-300">..</span>
+                      <FolderOpen className="w-5 h-5 text-muted-foreground" />
+                      <span className="font-medium text-foreground-secondary">..</span>
                     </button>
                   )}
 
                   {/* Folders */}
                   {browserFolders.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 text-gray-400">
+                    <div className="text-center py-8 text-muted-foreground">
                       No subfolders found
                     </div>
                   ) : (
@@ -816,10 +816,10 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
                       <div key={index} className="flex items-center gap-2">
                         <button
                           onClick={() => navigateToFolder(folder.path)}
-                          className="flex-1 px-4 py-3 text-left hover:bg-gray-100 hover:bg-gray-700 rounded-lg flex items-center gap-3"
+                          className="flex-1 px-4 py-3 text-left hover:bg-surface-elevated rounded-lg flex items-center gap-3"
                         >
-                          <FolderPlus className="w-5 h-5 text-blue-500" />
-                          <span className="font-medium text-gray-900 text-white">{folder.name}</span>
+                          <FolderPlus className="w-5 h-5 text-primary" />
+                          <span className="font-medium text-foreground">{folder.name}</span>
                         </button>
                         <Button
                           variant="ghost"
@@ -837,10 +837,10 @@ const ProjectCreationWizard = ({ onClose, onProjectCreated }) => {
             </div>
 
             {/* Browser Footer with Current Path */}
-            <div className="border-t border-gray-200 border-gray-700">
-              <div className="px-4 py-3 bg-gray-50 bg-gray-900/50 flex items-center gap-2">
-                <span className="text-sm text-gray-600 text-gray-400">Path:</span>
-                <code className="text-sm font-mono text-gray-900 text-white flex-1 truncate">
+            <div className="border-t border-border/10">
+              <div className="px-4 py-3 bg-surface-elevated flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Path:</span>
+                <code className="text-sm font-mono text-foreground flex-1 truncate">
                   {browserCurrentPath}
                 </code>
               </div>

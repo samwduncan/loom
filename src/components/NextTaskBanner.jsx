@@ -19,7 +19,7 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
   // Handler functions
   const handleInitializeTaskMaster = async () => {
     if (!currentProject) return;
-    
+
     setIsLoading(true);
     try {
       const response = await api.taskmaster.init(currentProject.name);
@@ -60,39 +60,39 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
   if ((!tasks || tasks.length === 0) && !projectTaskMaster?.hasTaskmaster) {
     bannerContent = (
       <div className={cn(
-        'bg-blue-50 bg-blue-950 border border-blue-200 border-blue-800 rounded-lg p-3 mb-4',
+        'bg-status-info/10 border border-status-info/20 rounded-lg p-3 mb-4',
         className
       )}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <List className="w-4 h-4 text-blue-600 text-blue-400" />
+            <List className="w-4 h-4 text-status-info" />
             <div>
-              <div className="text-sm font-medium text-gray-900 text-white">
+              <div className="text-sm font-medium text-foreground">
                 TaskMaster AI is not configured
               </div>
-              <div className="text-xs text-gray-600 text-gray-400 mt-0.5">
+              <div className="text-xs text-muted-foreground mt-0.5">
               </div>
             </div>
           </div>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setShowTaskOptions(!showTaskOptions)}
-              className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors flex items-center gap-1"
+              className="text-xs px-2 py-1 bg-primary hover:bg-primary/90 text-white rounded transition-colors flex items-center gap-1"
             >
               <Settings className="w-3 h-3" />
               Initialize TaskMaster AI
             </button>
           </div>
         </div>
-        
+
         {showTaskOptions && (
-          <div className="mt-3 pt-3 border-t border-blue-200 border-blue-800">
+          <div className="mt-3 pt-3 border-t border-status-info/20">
             {!projectTaskMaster?.hasTaskmaster && (
-              <div className="mb-3 p-3 bg-blue-50 bg-blue-900/50 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-900 text-blue-100 mb-2">
+              <div className="mb-3 p-3 bg-status-info/10 rounded-lg">
+                <h4 className="text-sm font-medium text-foreground mb-2">
                   🎯 What is TaskMaster?
                 </h4>
-                <div className="text-xs text-blue-800 text-blue-200 space-y-1">
+                <div className="text-xs text-foreground-secondary space-y-1">
                   <p>• <strong>AI-Powered Task Management:</strong> Break complex projects into manageable subtasks</p>
                   <p>• <strong>PRD Templates:</strong> Generate tasks from Product Requirements Documents</p>
                   <p>• <strong>Dependency Tracking:</strong> Understand task relationships and execution order</p>
@@ -104,7 +104,7 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
             <div className="flex flex-col gap-2">
               {!projectTaskMaster?.hasTaskmaster ? (
                 <button
-                  className="text-xs px-3 py-2 bg-slate-100 bg-slate-800 hover:bg-slate-200 hover:bg-slate-700 text-slate-800 text-slate-200 rounded transition-colors text-left flex items-center gap-2"
+                  className="text-xs px-3 py-2 bg-surface-raised hover:bg-surface-elevated text-foreground-secondary rounded transition-colors text-left flex items-center gap-2"
                   onClick={() => setShowCLI(true)}
                 >
                   <Terminal className="w-3 h-3" />
@@ -112,11 +112,11 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
                 </button>
               ) : (
                 <>
-                  <div className="mb-2 p-2 bg-green-50 bg-green-900/30 rounded text-xs text-green-800 text-green-200">
+                  <div className="mb-2 p-2 bg-status-connected/10 rounded text-xs text-status-connected">
                     <strong>Add more tasks:</strong> Create additional tasks manually or generate them from a PRD template
                   </div>
                   <button
-                    className="text-xs px-3 py-2 bg-green-100 bg-green-900 hover:bg-green-200 hover:bg-green-800 text-green-800 text-green-200 rounded transition-colors text-left flex items-center gap-2 disabled:opacity-50"
+                    className="text-xs px-3 py-2 bg-status-connected/10 hover:bg-status-connected/20 text-status-connected rounded transition-colors text-left flex items-center gap-2 disabled:opacity-50"
                     onClick={handleCreateManualTask}
                     disabled={isLoading}
                   >
@@ -124,7 +124,7 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
                     Create a new task manually
                   </button>
                   <button
-                    className="text-xs px-3 py-2 bg-purple-100 bg-purple-900 hover:bg-purple-200 hover:bg-purple-800 text-purple-800 text-purple-200 rounded transition-colors text-left flex items-center gap-2 disabled:opacity-50"
+                    className="text-xs px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded transition-colors text-left flex items-center gap-2 disabled:opacity-50"
                     onClick={handleParsePRD}
                     disabled={isLoading}
                   >
@@ -142,48 +142,48 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
     // Show next task if available
     bannerContent = (
       <div className={cn(
-        'bg-slate-50 bg-slate-900/30 border border-slate-200 border-slate-700 rounded-lg p-3 mb-4',
+        'bg-surface-raised border border-border/10 rounded-lg p-3 mb-4',
         className
       )}>
         <div className="flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-5 h-5 bg-blue-100 bg-blue-900/50 rounded-full flex items-center justify-center flex-shrink-0">
-                <Target className="w-3 h-3 text-blue-600 text-blue-400" />
+              <div className="w-5 h-5 bg-status-info/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <Target className="w-3 h-3 text-status-info" />
               </div>
-              <span className="text-xs text-slate-600 text-slate-400 font-medium">Task {nextTask.id}</span>
+              <span className="text-xs text-muted-foreground font-medium">Task {nextTask.id}</span>
               {nextTask.priority === 'high' && (
-                <div className="w-4 h-4 rounded bg-red-100 bg-red-900/50 flex items-center justify-center" title="High Priority">
-                  <Zap className="w-2.5 h-2.5 text-red-600 text-red-400" />
+                <div className="w-4 h-4 rounded bg-status-error/10 flex items-center justify-center" title="High Priority">
+                  <Zap className="w-2.5 h-2.5 text-status-error" />
                 </div>
               )}
               {nextTask.priority === 'medium' && (
-                <div className="w-4 h-4 rounded bg-amber-100 bg-amber-900/50 flex items-center justify-center" title="Medium Priority">
-                  <Flag className="w-2.5 h-2.5 text-amber-600 text-amber-400" />
+                <div className="w-4 h-4 rounded bg-status-reconnecting/10 flex items-center justify-center" title="Medium Priority">
+                  <Flag className="w-2.5 h-2.5 text-status-reconnecting" />
                 </div>
               )}
               {nextTask.priority === 'low' && (
-                <div className="w-4 h-4 rounded bg-gray-100 bg-gray-800 flex items-center justify-center" title="Low Priority">
-                  <Circle className="w-2.5 h-2.5 text-gray-400 text-gray-500" />
+                <div className="w-4 h-4 rounded bg-surface-elevated flex items-center justify-center" title="Low Priority">
+                  <Circle className="w-2.5 h-2.5 text-muted-foreground" />
                 </div>
               )}
             </div>
-            <p className="text-sm font-medium text-slate-900 text-slate-100 line-clamp-1">
+            <p className="text-sm font-medium text-foreground line-clamp-1">
               {nextTask.title}
             </p>
           </div>
-          
+
           <div className="flex items-center gap-1 flex-shrink-0">
             <button
               onClick={() => onStartTask?.()}
-              className="text-xs px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors shadow-sm flex items-center gap-1"
+              className="text-xs px-3 py-1.5 bg-primary hover:bg-primary/90 text-white rounded-md font-medium transition-colors shadow-sm flex items-center gap-1"
             >
               <Play className="w-3 h-3" />
               Start Task
             </button>
             <button
               onClick={() => setShowTaskDetail(true)}
-              className="text-xs px-2 py-1.5 border border-slate-300 border-slate-600 hover:bg-slate-100 hover:bg-slate-800 text-slate-600 text-slate-300 rounded-md transition-colors flex items-center gap-1"
+              className="text-xs px-2 py-1.5 border border-border/10 hover:bg-surface-elevated text-muted-foreground rounded-md transition-colors flex items-center gap-1"
               title="View task details"
             >
               <Eye className="w-3 h-3" />
@@ -191,7 +191,7 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
             {onShowAllTasks && (
               <button
                 onClick={onShowAllTasks}
-                className="text-xs px-2 py-1.5 border border-slate-300 border-slate-600 hover:bg-slate-100 hover:bg-slate-800 text-slate-600 text-slate-300 rounded-md transition-colors flex items-center gap-1"
+                className="text-xs px-2 py-1.5 border border-border/10 hover:bg-surface-elevated text-muted-foreground rounded-md transition-colors flex items-center gap-1"
                 title="View all tasks"
               >
                 <List className="w-3 h-3" />
@@ -199,33 +199,33 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
             )}
           </div>
         </div>
-        
+
       </div>
     );
   } else if (tasks && tasks.length > 0) {
     // Show completion message only if there are tasks and all are done
     const completedTasks = tasks.filter(task => task.status === 'done').length;
     const totalTasks = tasks.length;
-    
+
     bannerContent = (
     <div className={cn(
-      'bg-purple-50 bg-purple-950 border border-purple-200 border-purple-800 rounded-lg p-3 mb-4',
+      'bg-primary/10 border border-primary/20 rounded-lg p-3 mb-4',
       className
     )}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <CheckCircle className="w-4 h-4 text-purple-600 text-purple-400" />
-          <span className="text-sm font-medium text-gray-900 text-white">
+          <CheckCircle className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium text-foreground">
             {completedTasks === totalTasks ? "All done! 🎉" : "No pending tasks"}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-600 text-gray-400">
+          <span className="text-xs text-muted-foreground">
             {completedTasks}/{totalTasks}
           </span>
           <button
             onClick={onShowAllTasks}
-            className="text-xs px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
+            className="text-xs px-2 py-1 bg-primary hover:bg-primary/90 text-white rounded transition-colors"
           >
             Review
           </button>
@@ -241,7 +241,7 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
   return (
     <>
       {bannerContent}
-      
+
       {/* Create Task Modal */}
       {showCreateTaskModal && (
         <CreateTaskModal
@@ -253,7 +253,7 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
           }}
         />
       )}
-      
+
       {/* Template Selector Modal */}
       {showTemplateSelector && (
         <TemplateSelector
@@ -265,34 +265,34 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
           }}
         />
       )}
-      
+
       {/* TaskMaster CLI Setup Modal */}
       {showCLI && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white bg-gray-900 rounded-lg shadow-xl border border-gray-200 border-gray-700 w-full max-w-4xl h-[600px] flex flex-col">
+          <div className="bg-surface-base rounded-lg shadow-xl border border-border/10 w-full max-w-4xl h-[600px] flex flex-col">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 border-gray-700">
+            <div className="flex items-center justify-between p-4 border-b border-border/10">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-100 bg-blue-900/50 rounded-lg flex items-center justify-center">
-                  <Terminal className="w-4 h-4 text-blue-600 text-blue-400" />
+                <div className="w-8 h-8 bg-status-info/10 rounded-lg flex items-center justify-center">
+                  <Terminal className="w-4 h-4 text-status-info" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900 text-white">TaskMaster Setup</h2>
-                  <p className="text-sm text-gray-500 text-gray-400">Interactive CLI for {currentProject?.displayName}</p>
+                  <h2 className="text-lg font-semibold text-foreground">TaskMaster Setup</h2>
+                  <p className="text-sm text-muted-foreground">Interactive CLI for {currentProject?.displayName}</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowCLI(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:text-gray-300 rounded-md hover:bg-gray-100 hover:bg-gray-800"
+                className="p-2 text-muted-foreground hover:text-foreground rounded-md hover:bg-surface-raised"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             {/* Terminal Container */}
             <div className="flex-1 p-4">
               <div className="h-full bg-black rounded-lg overflow-hidden">
-                <Shell 
+                <Shell
                   selectedProject={currentProject}
                   selectedSession={null}
                   isActive={true}
@@ -301,16 +301,16 @@ const NextTaskBanner = ({ onShowAllTasks, onStartTask, className = '' }) => {
                 />
               </div>
             </div>
-            
+
             {/* Modal Footer */}
-            <div className="p-4 border-t border-gray-200 border-gray-700 bg-gray-50 bg-gray-800/50">
+            <div className="p-4 border-t border-border/10 bg-surface-raised">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600 text-gray-400">
+                <div className="text-sm text-muted-foreground">
                   TaskMaster initialization will start automatically
                 </div>
                 <button
                   onClick={() => setShowCLI(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 text-gray-300 bg-white bg-gray-700 border border-gray-300 border-gray-600 rounded-md hover:bg-gray-50 hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-foreground-secondary bg-surface-elevated border border-border/10 rounded-md hover:bg-muted transition-colors"
                 >
                   Close
                 </button>
@@ -351,12 +351,12 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
 
     setIsSubmitting(true);
     try {
-      const taskData = formData.useAI 
+      const taskData = formData.useAI
         ? { prompt: formData.prompt, priority: formData.priority }
         : { title: formData.title, description: formData.description, priority: formData.priority };
 
       const response = await api.taskmaster.addTask(currentProject.name, taskData);
-      
+
       if (response.ok) {
         onTaskCreated();
       } else {
@@ -373,13 +373,13 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white bg-gray-800 rounded-lg p-6 w-full max-w-md">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-surface-raised rounded-lg p-6 w-full max-w-md">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 text-white">Create New Task</h3>
+          <h3 className="text-lg font-semibold text-foreground">Create New Task</h3>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-200 hover:bg-gray-700 rounded"
+            className="p-1 hover:bg-surface-elevated rounded"
           >
             <X className="w-4 h-4" />
           </button>
@@ -387,7 +387,7 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 text-gray-300 mb-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-foreground-secondary mb-2">
               <input
                 type="checkbox"
                 checked={formData.useAI}
@@ -399,13 +399,13 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
 
           {formData.useAI ? (
             <div>
-              <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 Task Description (AI will generate details)
               </label>
               <textarea
                 value={formData.prompt}
                 onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
-                className="w-full p-2 border border-gray-300 border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+                className="w-full p-2 border border-border/10 rounded focus:ring-2 focus:ring-primary focus:border-primary bg-surface-elevated text-foreground"
                 rows="3"
                 placeholder="Describe what you want to accomplish..."
                 required
@@ -414,27 +414,27 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
           ) : (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground-secondary mb-2">
                   Task Title
                 </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  className="w-full p-2 border border-gray-300 border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+                  className="w-full p-2 border border-border/10 rounded focus:ring-2 focus:ring-primary focus:border-primary bg-surface-elevated text-foreground"
                   placeholder="Enter task title..."
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground-secondary mb-2">
                   Description
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full p-2 border border-gray-300 border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+                  className="w-full p-2 border border-border/10 rounded focus:ring-2 focus:ring-primary focus:border-primary bg-surface-elevated text-foreground"
                   rows="3"
                   placeholder="Describe the task..."
                   required
@@ -444,13 +444,13 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-foreground-secondary mb-2">
               Priority
             </label>
             <select
               value={formData.priority}
               onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value }))}
-              className="w-full p-2 border border-gray-300 border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+              className="w-full p-2 border border-border/10 rounded focus:ring-2 focus:ring-primary focus:border-primary bg-surface-elevated text-foreground"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -462,14 +462,14 @@ const CreateTaskModal = ({ currentProject, onClose, onTaskCreated }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 border-gray-600 rounded hover:bg-gray-50 hover:bg-gray-700 text-gray-700 text-gray-300"
+              className="flex-1 px-4 py-2 border border-border/10 rounded hover:bg-surface-elevated text-foreground-secondary"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded disabled:opacity-50"
               disabled={isSubmitting || (formData.useAI && !formData.prompt.trim()) || (!formData.useAI && (!formData.title.trim() || !formData.description.trim()))}
             >
               {isSubmitting ? 'Creating...' : 'Create Task'}
@@ -505,7 +505,7 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
         setIsLoading(false);
       }
     };
-    
+
     loadTemplates();
   }, []);
 
@@ -514,12 +514,12 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
     // Find placeholders in template content
     const placeholders = template.content.match(/\[([^\]]+)\]/g) || [];
     const uniquePlaceholders = [...new Set(placeholders.map(p => p.slice(1, -1)))];
-    
+
     const initialCustomizations = {};
     uniquePlaceholders.forEach(placeholder => {
       initialCustomizations[placeholder] = '';
     });
-    
+
     setCustomizations(initialCustomizations);
     setStep('customize');
   };
@@ -566,11 +566,11 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white bg-gray-800 rounded-lg p-6 w-full max-w-md">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-surface-raised rounded-lg p-6 w-full max-w-md">
           <div className="flex items-center gap-3">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="text-gray-900 text-white">Loading templates...</span>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            <span className="text-foreground">Loading templates...</span>
           </div>
         </div>
       </div>
@@ -578,17 +578,17 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-surface-raised rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 text-white">
-            {step === 'select' ? 'Select PRD Template' : 
-             step === 'customize' ? 'Customize Template' : 
+          <h3 className="text-lg font-semibold text-foreground">
+            {step === 'select' ? 'Select PRD Template' :
+             step === 'customize' ? 'Customize Template' :
              'Generating Tasks'}
           </h3>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-200 hover:bg-gray-700 rounded"
+            className="p-1 hover:bg-surface-elevated rounded"
           >
             <X className="w-4 h-4" />
           </button>
@@ -599,18 +599,18 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
             {templates.map((template) => (
               <div
                 key={template.id}
-                className="p-4 border border-gray-200 border-gray-600 rounded-lg hover:bg-gray-50 hover:bg-gray-700 cursor-pointer transition-colors"
+                className="p-4 border border-border/10 rounded-lg hover:bg-surface-elevated cursor-pointer transition-colors"
                 onClick={() => handleSelectTemplate(template)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 text-white">{template.name}</h4>
-                    <p className="text-sm text-gray-600 text-gray-400 mt-1">{template.description}</p>
-                    <span className="inline-block text-xs bg-blue-100 bg-blue-900 text-blue-800 text-blue-200 px-2 py-1 rounded mt-2">
+                    <h4 className="font-medium text-foreground">{template.name}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{template.description}</p>
+                    <span className="inline-block text-xs bg-status-info/10 text-status-info px-2 py-1 rounded mt-2">
                       {template.category}
                     </span>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400 mt-1" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground mt-1" />
                 </div>
               </div>
             ))}
@@ -620,34 +620,34 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
         {step === 'customize' && selectedTemplate && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-foreground-secondary mb-2">
                 File Name
               </label>
               <input
                 type="text"
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
-                className="w-full p-2 border border-gray-300 border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+                className="w-full p-2 border border-border/10 rounded focus:ring-2 focus:ring-primary focus:border-primary bg-surface-elevated text-foreground"
                 placeholder="prd.txt"
               />
             </div>
 
             {Object.keys(customizations).length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground-secondary mb-2">
                   Customize Template
                 </label>
                 <div className="space-y-3">
                   {Object.entries(customizations).map(([key, value]) => (
                     <div key={key}>
-                      <label className="block text-xs text-gray-600 text-gray-400 mb-1">
+                      <label className="block text-xs text-muted-foreground mb-1">
                         {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                       </label>
                       <input
                         type="text"
                         value={value}
                         onChange={(e) => setCustomizations(prev => ({ ...prev, [key]: e.target.value }))}
-                        className="w-full p-2 border border-gray-300 border-gray-600 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+                        className="w-full p-2 border border-border/10 rounded text-sm focus:ring-2 focus:ring-primary focus:border-primary bg-surface-elevated text-foreground"
                         placeholder={`Enter ${key.toLowerCase()}`}
                       />
                     </div>
@@ -659,13 +659,13 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
             <div className="flex gap-2 pt-4">
               <button
                 onClick={() => setStep('select')}
-                className="flex-1 px-4 py-2 border border-gray-300 border-gray-600 rounded hover:bg-gray-50 hover:bg-gray-700 text-gray-700 text-gray-300"
+                className="flex-1 px-4 py-2 border border-border/10 rounded hover:bg-surface-elevated text-foreground-secondary"
               >
                 Back
               </button>
               <button
                 onClick={handleApplyTemplate}
-                className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded disabled:opacity-50"
                 disabled={isApplying}
               >
                 {isApplying ? 'Applying...' : 'Apply & Generate Tasks'}
@@ -676,13 +676,13 @@ const TemplateSelector = ({ currentProject, onClose, onTemplateApplied }) => {
 
         {step === 'generate' && (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-100 bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600 text-green-400" />
+            <div className="w-16 h-16 bg-status-connected/10 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-status-connected" />
             </div>
-            <h4 className="text-lg font-medium text-gray-900 text-white mb-2">
+            <h4 className="text-lg font-medium text-foreground mb-2">
               Template Applied Successfully!
             </h4>
-            <p className="text-gray-600 text-gray-400">
+            <p className="text-muted-foreground">
               Your PRD has been created and tasks are being generated...
             </p>
           </div>
