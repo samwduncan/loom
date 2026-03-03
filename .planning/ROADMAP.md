@@ -29,7 +29,7 @@ Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements
 - Decimal phases (12.1, 12.2): Urgent insertions (marked with INSERTED)
 
 **Sequential foundation (strict order):**
-- [ ] **Phase 10: Design System Foundation** - Charcoal palette, surface elevation, rose accent tokens, borders, focus glow, scrollbars
+- [x] **Phase 10: Design System Foundation** - Charcoal palette, surface elevation, rose accent tokens, borders, focus glow, scrollbars (completed 2026-03-03)
 - [ ] **Phase 11: Hardcoded Color Sweep** - Replace all 51+ hex refs and 371 gray/slate/zinc classes with semantic tokens
 - [ ] **Phase 12: Specialty Surfaces** - Terminal Catppuccin Mocha, CodeMirror theme, Shiki remap, diff viewer, typography
 
@@ -186,7 +186,7 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 10. Design System Foundation | 2/3 | In Progress|  | - |
+| 10. Design System Foundation | 3/3 | Complete   | 2026-03-03 | - |
 | 11. Hardcoded Color Sweep | v1.1 | 0/TBD | Not started | - |
 | 12. Specialty Surfaces | v1.1 | 0/TBD | Not started | - |
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
