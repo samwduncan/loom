@@ -151,6 +151,16 @@
     padding: 0;
   }
 
+  ::selection {
+    background-color: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
+  }
+
+  ::-moz-selection {
+    background-color: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
+  }
+
   html, body {
     height: 100%;
     margin: 0;
@@ -232,13 +242,20 @@
     transition-duration: 50ms;
   }
 
-  /* Focus transitions */
-  button:focus-visible,
-  a:focus-visible,
+  /* Focus glow ring -- dusty rose at 15% opacity (DSGN-12) */
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    transition: outline-offset 150ms ease-out, box-shadow 150ms ease-out;
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--background)),
+                0 0 0 4px hsl(var(--ring) / 0.15);
+  }
+
+  button:focus-visible,
+  a:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--background)),
+                0 0 0 4px hsl(var(--ring) / 0.15);
   }
 
   /* Sidebar transitions */
@@ -303,7 +320,7 @@
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: hsl(34.5 35.9% 63.9% / 0.3) transparent;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -316,12 +333,12 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: hsl(34.5 35.9% 63.9% / 0.3);
+    background-color: hsl(var(--muted-foreground) / 0.2);
     border-radius: 3px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(34.5 35.9% 63.9% / 0.5);
+    background-color: hsl(var(--muted-foreground) / 0.35);
   }
 
   /* Ensure checkbox styling uses warm palette */
@@ -588,7 +605,7 @@
   .chat-input-placeholder {
     display: block !important;
     scrollbar-width: thin;
-    scrollbar-color: hsl(34.5 35.9% 63.9% / 0.3) transparent;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
   }
 
   /* Ensure container fits textarea tightly */
@@ -606,13 +623,13 @@
   }
 
   .chat-input-placeholder::-webkit-scrollbar-thumb {
-    background-color: hsl(34.5 35.9% 63.9% / 0.3);
+    background-color: hsl(var(--muted-foreground) / 0.2);
     border-radius: 3px;
     transition: background-color 0.2s;
   }
 
   .chat-input-placeholder::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(34.5 35.9% 63.9% / 0.5);
+    background-color: hsl(var(--muted-foreground) / 0.35);
   }
 
   /* Enhanced box shadow when textarea expands */
