@@ -163,7 +163,7 @@ export const ToolActionCard: React.FC<ToolActionCardProps> = memo(
         <button
           type="button"
           onClick={handleToggle}
-          className="flex items-center gap-1.5 w-full px-2 py-1.5 text-left select-none group/card hover:bg-white/5 rounded-md transition-colors"
+          className="flex items-center gap-1.5 w-full px-2 py-1.5 text-left select-none group/card hover:bg-foreground/5 rounded-md transition-colors"
           aria-expanded={isExpanded}
           aria-controls={toolId ? `tool-detail-${toolId}` : undefined}
         >

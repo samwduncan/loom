@@ -82,7 +82,7 @@ export const ToolCallGroup: React.FC<ToolCallGroupProps> = memo(
         <button
           type="button"
           onClick={handleToggle}
-          className="flex items-center gap-1.5 w-full px-2 py-1.5 text-left select-none hover:bg-white/5 rounded-md transition-colors"
+          className="flex items-center gap-1.5 w-full px-2 py-1.5 text-left select-none hover:bg-foreground/5 rounded-md transition-colors"
           aria-expanded={isExpanded}
         >
           <ChevronRight
