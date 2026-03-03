@@ -42,7 +42,7 @@ function MobileNav({ activeTab, setActiveTab, isInputFocused }) {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 px-3 pb-[max(8px,env(safe-area-inset-bottom))] transform transition-transform duration-300 ease-in-out ${
+      className={`fixed bottom-0 left-0 right-0 z-[var(--z-sticky)] px-3 pb-[max(8px,env(safe-area-inset-bottom))] transform transition-transform duration-300 ease-in-out ${
         isInputFocused ? 'translate-y-full' : 'translate-y-0'
       }`}
     >

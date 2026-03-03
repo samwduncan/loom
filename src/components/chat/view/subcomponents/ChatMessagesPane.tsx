@@ -331,7 +331,7 @@ export default function ChatMessagesPane({
 
           {/* Floating "Load all messages" overlay */}
           {(showLoadAllOverlay || isLoadingAllMessages || loadAllJustFinished) && (
-            <div className="sticky top-2 z-20 flex justify-center pointer-events-none">
+            <div className="sticky top-2 z-[var(--z-sticky)] flex justify-center pointer-events-none">
               {loadAllJustFinished ? (
                 <div className="px-4 py-1.5 text-xs font-medium text-foreground bg-status-connected rounded-full shadow-lg flex items-center space-x-2">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

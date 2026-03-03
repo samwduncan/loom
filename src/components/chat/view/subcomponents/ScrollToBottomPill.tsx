@@ -21,7 +21,7 @@ export default function ScrollToBottomPill({
       `}</style>
       <button
         onClick={onScrollToBottom}
-        className="absolute bottom-4 right-4 z-30 flex items-center gap-2 px-3 py-1.5 bg-surface-raised border border-muted-foreground/30 rounded-full shadow-lg text-sm text-foreground hover:bg-surface-elevated transition-all duration-200"
+        className="absolute bottom-4 right-4 z-[var(--z-scroll-pill)] flex items-center gap-2 px-3 py-1.5 bg-surface-raised border border-muted-foreground/30 rounded-full shadow-lg text-sm text-foreground hover:bg-surface-elevated transition-all duration-200"
         style={{ animation: 'pill-enter 200ms ease-out' }}
       >
         <svg

@@ -620,7 +620,7 @@ const TaskList = ({
                     </button>
 
                     {showPRDDropdown && (
-                      <div className="absolute right-0 top-full mt-2 w-56 bg-surface-raised border border-border/10 rounded-lg shadow-xl z-30">
+                      <div className="absolute right-0 top-full mt-2 w-56 bg-surface-raised border border-border/10 rounded-lg shadow-xl z-[var(--z-dropdown)]">
                         <div className="p-2">
                           <button
                             onClick={() => {

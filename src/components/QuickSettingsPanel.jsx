@@ -207,7 +207,7 @@ const QuickSettingsPanel = () => {
         }}
         className={`fixed ${
           isOpen ? 'right-64' : 'right-0'
-        } z-50 ${isDragging ? '' : 'transition-all duration-150 ease-out'} bg-surface-raised border ${
+        } z-[var(--z-modal)] ${isDragging ? '' : 'transition-all duration-150 ease-out'} bg-surface-raised border ${
           isDragging ? 'border-primary' : 'border-border/10'
         } rounded-l-md p-2 hover:bg-surface-elevated transition-colors shadow-lg ${
           isDragging ? 'cursor-grabbing' : 'cursor-pointer'
@@ -227,7 +227,7 @@ const QuickSettingsPanel = () => {
 
       {/* Panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-background border-l border-border shadow-xl transform transition-transform duration-150 ease-out z-40 ${
+        className={`fixed top-0 right-0 h-full w-64 bg-background border-l border-border shadow-xl transform transition-transform duration-150 ease-out z-[var(--z-overlay)] ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         } ${isMobile ? 'h-screen' : ''}`}
       >
@@ -409,7 +409,7 @@ const QuickSettingsPanel = () => {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 transition-opacity duration-150 ease-out"
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[var(--z-overlay)] transition-opacity duration-150 ease-out"
           onClick={handleToggle}
         />
       )}

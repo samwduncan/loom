@@ -66,7 +66,7 @@ export default function ComposerProviderPicker({
 
       {/* Popup above the button */}
       {isOpen && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border/50 rounded-xl shadow-lg z-50 p-1.5">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-card border border-border/50 rounded-xl shadow-lg z-[var(--z-dropdown)] p-1.5">
           <div className="flex gap-1">
             {PROVIDERS.map((p) => {
               const isActive = provider === p.id;

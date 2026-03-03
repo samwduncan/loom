@@ -10,7 +10,7 @@ export function TurnToolbar({ turnCount, onExpandAll, onCollapseAll }: TurnToolb
   if (turnCount < 2) return null;
 
   return (
-    <div className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-4 py-1 text-xs text-muted-foreground bg-surface-base/80 backdrop-blur-sm border-b border-border/10">
+    <div className="sticky top-0 z-[var(--z-sticky)] flex items-center justify-between px-3 sm:px-4 py-1 text-xs text-muted-foreground bg-surface-base/80 backdrop-blur-sm border-b border-border/10">
       <span className="font-medium">
         {turnCount} turn{turnCount !== 1 ? 's' : ''}
       </span>

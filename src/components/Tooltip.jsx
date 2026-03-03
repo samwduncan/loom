@@ -70,7 +70,7 @@ const Tooltip = ({
 
       {isVisible && (
         <div className={cn(
-          'absolute z-50 px-2 py-1 text-xs font-medium text-foreground bg-surface-base rounded shadow-lg whitespace-nowrap pointer-events-none',
+          'absolute z-[var(--z-dropdown)] px-2 py-1 text-xs font-medium text-foreground bg-surface-base rounded shadow-lg whitespace-nowrap pointer-events-none',
           'animate-in fade-in-0 zoom-in-95 duration-200',
           getPositionClasses(),
           className
