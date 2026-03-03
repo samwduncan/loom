@@ -1,76 +1,95 @@
 # Requirements: Loom
 
-**Defined:** 2026-03-01
+**Defined:** 2026-03-03
 **Core Value:** The chat interface must feel designed, not generated — every interaction, animation, and pixel serves the developer experience.
 
-## v1 Requirements
+## v1.1 Requirements
 
-Requirements for initial release. Each maps to roadmap phases.
+Requirements for the Design Overhaul milestone. Charcoal + dusty rose palette, A+ craft quality, complete experience.
 
-### Design System
+### Design System (DSGN)
 
-- [x] **DSGN-01**: App uses warm earthy CSS palette — deep chocolate brown (#1c1210) base, warm surfaces (#2a1f1a, #3d2e25), cream/beige text (#f5e6d3, #c4a882), amber/copper/terracotta accents (#d4a574, #c17f59, #b85c3a)
-- [x] **DSGN-02**: All CSS variables use correct HSL `<alpha-value>` contract so Tailwind opacity modifiers work correctly (e.g., `bg-primary/50`)
-- [x] **DSGN-03**: Typography uses JetBrains Mono as primary monospace font with fallback chain (Fira Code, Cascadia Code, monospace)
-- [x] **DSGN-04**: Layout follows dense 4-8px grid spacing — compact padding, tight line heights, maximum information per screen
-- [x] **DSGN-05**: Scrollbar styling matches warm dark theme (subtle, thin, warm-tinted track and thumb)
-- [ ] **DSGN-06**: All 86+ files with hardcoded Tailwind color classes (bg-blue-500, text-gray-*, etc.) replaced with semantic aliases from CSS variable system
-- [x] **DSGN-07**: Status colors are warm-tinted — connected (#6bbf59), reconnecting (#d4a574), disconnected (#c15a4a), error accents use terracotta
-- [x] **DSGN-08**: Borders use subtle rgba transparency (rgba(196, 168, 130, 0.15)) for warm-tinted separation lines
+- [ ] **DSGN-09**: App uses charcoal base palette with 3-4 tier surface elevation — base (#1a1a1a), cards, elevated, overlays — using background lightness steps, not drop shadows
+- [ ] **DSGN-10**: Dusty rose accent (~#D4736C range) applied sparingly (≤5% of surface area) with a lighter WCAG AA-compliant variant for text use on charcoal backgrounds
+- [ ] **DSGN-11**: All hard borders replaced with subtle white at 6-10% opacity — invisible borders are the defining "premium vs generic" signal
+- [ ] **DSGN-12**: Input fields show dusty rose focus glow ring (box-shadow with accent at 15% opacity)
+- [ ] **DSGN-13**: Custom text selection color using dusty rose at 25% opacity
+- [ ] **DSGN-14**: Scrollbars themed for charcoal palette — thin, subtle, matching dark surfaces
+- [ ] **DSGN-15**: Global `transition: none` reset in index.css resolved so Tailwind transition utilities work correctly throughout app
 
-### Chat Rendering
+### Color Migration (COLR)
 
-- [x] **CHAT-01**: Code blocks use Shiki v4 with VS Code Dark+ theme for syntax highlighting — 99% VS Code token parity
-- [x] **CHAT-02**: Code blocks display language label in header, copy-to-clipboard button with success state feedback
-- [x] **CHAT-03**: Completed AI turns are collapsible — first line of response text + count badge (e.g., "I'll fix the auth... [+12 tool calls]"), click to expand full turn
-- [x] **CHAT-04**: Tool call invocations render as compact inline action cards — single-line showing tool name + key argument (e.g., "Read — src/auth/login.ts"), expandable to show full arguments and nested result
-- [x] **CHAT-05**: 3+ consecutive tool calls grouped under a typed summary header (e.g., "3 tool calls: 2 Read, 1 Edit") — expandable to show each card individually
-- [x] **CHAT-06**: Tool cards with errors display red left border or red-tinted background with error message inline in expanded card
-- [x] **CHAT-07**: Bash tool calls render in terminal-styled dark mini-blocks — command shown monospace, output as pre-formatted text
-- [x] **CHAT-08**: Thinking blocks render as collapsed disclosure widgets — clickable "Thinking..." bar, collapsed by default, expandable to show full reasoning with muted styling
-- [x] **CHAT-09**: Diff events render as colored unified diffs — green additions, red removals, gray context lines, file path header, hunk headers
-- [x] **CHAT-10**: User messages have subtle warm background tint to visually differentiate from AI messages
-- [x] **CHAT-11**: User messages have a small copy button to grab previous prompts
-- [x] **CHAT-12**: Permission prompts render as highlighted inline banners within message flow showing tool name and action
-- [x] **CHAT-13**: Usage summaries (token counts, cost) always visible at the end of each AI response, not collapsed
-- [x] **CHAT-14**: System status messages render muted and inline — gray for info, amber for warnings, red for errors
-- [x] **CHAT-15**: Messages use full-width blocks (not left/right bubbles), role label only ("You" / "Claude" / "Gemini"), max-width ~720px centered
-- [x] **CHAT-16**: AI turns flow as continuous blocks — tool calls, thinking, code, prose within one visual unit with subtle dividers, no gaps
+- [ ] **COLR-01**: All 51+ hardcoded hex values in Tailwind arbitrary classes (bg-[#hex], text-[#hex]) replaced with semantic CSS variable references
+- [ ] **COLR-02**: All 371+ generic gray/slate/zinc/neutral Tailwind utility classes replaced with Loom semantic palette aliases
+- [ ] **COLR-03**: Grep audit for hardcoded color references returns zero matches across entire codebase — 100% palette consistency
 
-### Streaming & Status UX
+### Specialty Surfaces (SURF)
 
-- [ ] **STRM-01**: AI responses stream token-by-token using requestAnimationFrame buffer (50-100ms batching) to prevent per-token setState freezing
-- [ ] **STRM-02**: Smart auto-scroll — auto-scroll while user is at bottom (within 10px threshold); stop if user scrolls up; use CSS overflow-anchor for position preservation
-- [ ] **STRM-03**: Floating scroll-to-bottom pill appears when user is scrolled away — shows "N new messages" count, disappears when user reaches bottom
-- [ ] **STRM-04**: Typing indicator (pulsing dots or similar) shown before text starts streaming, transitions seamlessly into streaming content
-- [ ] **STRM-05**: Pulsing "Thinking..." indicator during extended thinking phases — transitions into collapsed thinking block disclosure when complete
-- [ ] **STRM-06**: Skeleton shimmer placeholder bars shown during reconnect scrollback load — fades to real content when parsed
-- [ ] **STRM-07**: Toast notifications for transient errors (reconnecting, temporary failures) — positioned consistently, auto-dismiss
-- [ ] **STRM-08**: Inline banner for permanent errors (process crash, exit code) — persistent, distinct from toast, red-accented
-- [ ] **STRM-09**: Global status line at bottom showing current activity (e.g., "Running: Edit src/auth/login.ts"), spinner on active tool card
-- [ ] **STRM-10**: Stop generation button replaces send button while AI is responding — sends abort signal through WebSocket to backend
+- [ ] **SURF-01**: xterm.js terminal uses Catppuccin Mocha ANSI palette on charcoal base — terminal background matches app, not an embedded black box
+- [ ] **SURF-02**: Terminal uses JetBrains Mono font, bar cursor, 14px font size, 1.2 line height
+- [ ] **SURF-03**: CodeMirror file viewer uses charcoal + rose dark theme consistent with app palette
+- [ ] **SURF-04**: Shiki syntax highlighting color replacement map updated for charcoal palette
+- [ ] **SURF-05**: Diff viewer (react-diff-viewer-continued) theme updated with charcoal + rose colors
+- [ ] **SURF-06**: Markdown prose content (Tailwind Typography) uses rose accent for links and correct heading colors on charcoal
 
-### Cleanup & Fork Governance
+### Message Experience (MESG)
 
-- [x] **FORK-01**: i18n stripped from all 43 components — `useTranslation` calls replaced with English string literals
-- [x] **FORK-02**: Cursor CLI backend integration removed — all Cursor-specific code, routes, and UI elements deleted
-- [x] **FORK-03**: Codex KEPT — three providers remain (Claude, Codex, Gemini). Provider UX features added: default-to-Claude, header dropdown, composer picker, welcome screen, per-provider model memory
-- [x] **FORK-04**: Upstream-sync branch established and documented — strategy for cherry-picking security/bug fixes from upstream CloudCLI without conflicts
-- [x] **FORK-05**: GPL-3.0 license maintained with proper attribution — LICENSE file updated with fork notice, NOTICE file if required
+- [ ] **MESG-01**: Message action buttons (copy, etc.) hidden by default, appear on hover with smooth opacity transition
+- [ ] **MESG-02**: Full-width assistant messages with transparent background — no bubble wrapper, role label only
+- [ ] **MESG-03**: 32px inter-turn spacing between messages, tight spacing within turns for visual grouping
+- [ ] **MESG-04**: Messages animate in with subtle slide-up + fade entrance (translateY(8px) + opacity, ~250ms, CSS spring bezier)
+- [ ] **MESG-05**: Interactive elements show dusty rose hover glow and subtle active:scale press feedback
+- [ ] **MESG-06**: Streaming tokens fade in with opacity transition during batch rendering
 
-### Terminal & Editor
+### Toast & Overlay System (TOST)
 
-- [ ] **TERM-01**: xterm.js terminal uses Catppuccin Mocha ANSI palette — all 16 colors configured via ITheme JavaScript object (not CSS)
-- [ ] **TERM-02**: Terminal background (#1c1210) matches app background — terminal blends into app, not a black box embedded in it
-- [ ] **TERM-03**: Terminal uses JetBrains Mono font, cursor bar style, 14px font size, 1.2 line height
-- [ ] **TERM-04**: CodeMirror file viewer uses warm dark theme matching the overall palette — consistent with chat code blocks
+- [ ] **TOST-01**: Toast notifications (Sonner) for transient events — consistently positioned bottom-right, auto-dismiss after 2-4s, charcoal + rose theme
+- [ ] **TOST-02**: Formal z-index scale established via CSS custom properties — consistent layering from sticky elements through critical overlays
+- [ ] **TOST-03**: WebSocket disconnect shown as warning toast, reconnect shown as success toast
+- [ ] **TOST-04**: Floating elements (modals, toasts, dropdowns) use glassmorphic blur styling — NOT on scrolling content
+- [ ] **TOST-05**: All overlay elements use ReactDOM.createPortal to document.body — no stacking context conflicts
 
-### Sidebar & Global UI
+### Tool Call Display (TOOL)
 
-- [ ] **SIDE-01**: Sidebar uses warm earthy palette with density improvements — tighter spacing, smaller fonts for metadata, compact project/session list
-- [ ] **SIDE-02**: Settings panel restyled to match warm dark theme
-- [ ] **SIDE-03**: Mobile navigation restyled to match warm dark theme
-- [ ] **SIDE-04**: All modals, dialogs, and overlays use warm palette with glassmorphism-style blur effects
+- [ ] **TOOL-01**: Tool call invocations display as compact action pills — icon + tool name + semantic state color
+- [ ] **TOOL-02**: Running tool calls show pulsing dusty rose indicator
+- [ ] **TOOL-03**: Completed tool calls collapse to minimal chip with success state
+- [ ] **TOOL-04**: Failed tool calls expand with muted red background and error message visible
+- [ ] **TOOL-05**: 3+ sequential tool calls group into accordion with count badge, expandable to show individual pills
+
+### Sidebar & Global (SIDE)
+
+- [ ] **SIDE-01**: Sidebar fully restyled with charcoal palette, density improvements, and tighter spacing
+- [ ] **SIDE-02**: Settings panel fully matches charcoal + rose theme — no gray/blue/white artifacts
+- [ ] **SIDE-03**: Mobile navigation matches charcoal + rose theme at 375px+ viewports
+- [ ] **SIDE-04**: All modals and dialogs use charcoal palette with glassmorphic blur backgrounds
+- [ ] **SIDE-05**: Session list grouped by time categories (Today, Yesterday, Last 7 Days, Older)
+- [ ] **SIDE-06**: Active session shows 2px dusty rose left border with subtle bg-accent tinted background
+- [ ] **SIDE-07**: Sidebar collapses to icon-only strip with session icons
+
+### Streaming & Status (STRM)
+
+- [ ] **STRM-01**: Token streaming uses requestAnimationFrame buffer (50-100ms batching) — no per-token setState freezing
+- [ ] **STRM-02**: Smart auto-scroll — auto-scroll at bottom (10px threshold), stops when user scrolls up, CSS overflow-anchor for position preservation
+- [ ] **STRM-03**: Floating scroll-to-bottom pill with "N new messages" count — appears when scrolled away, click scrolls to bottom
+- [ ] **STRM-04**: Typing indicator (pulsing dots or similar) before first token, transitions seamlessly into streaming content
+- [ ] **STRM-05**: Pulsing "Thinking..." indicator during extended thinking — transitions into collapsed thinking block when complete
+- [ ] **STRM-06**: Skeleton shimmer placeholder bars during reconnect scrollback — fades to real content when parsed
+- [ ] **STRM-08**: Inline banner for permanent errors (process crash, exit code) — persistent, red-accented, distinct from toast
+- [ ] **STRM-09**: Global status line showing current activity — tool name + argument with spinner on active card
+- [ ] **STRM-10**: Stop generation button replaces send button during streaming — sends abort via WebSocket
+- [ ] **STRM-11**: Semantic activity text in status line — "Reading auth.ts...", "Writing server.ts..." parsed from tool events
+- [ ] **STRM-12**: Send-to-stop button morph uses CSS crossfade transition — no layout jump when switching
+
+## v1.0 Requirements (Validated)
+
+Shipped in milestone v1.0 and confirmed working.
+
+- ✓ **DSGN-01** through **DSGN-05**, **DSGN-07**, **DSGN-08** — CSS variable system, typography, density, scrollbars, status colors, borders (Phase 1)
+- ✓ **CHAT-01** through **CHAT-16** — Full chat rendering: Shiki highlighting, collapsible turns, tool cards, thinking disclosures, diffs, user messages, permissions, usage, system status, layout (Phases 5, 6)
+- ✓ **FORK-01** through **FORK-05** — i18n stripped, Cursor removed, Codex kept, upstream-sync, GPL-3.0 attribution (Phases 1, 3)
+
+**Note:** v1.0 DSGN-06 (color sweep for warm earthy palette) superseded by v1.1 COLR-01/02/03 (charcoal palette). v1.0 TERM-01 through TERM-04 superseded by v1.1 SURF-01 through SURF-03. v1.0 SIDE-01 through SIDE-04 rewritten for v1.1 charcoal palette. v1.0 STRM-07 (transient error toasts) absorbed into TOST-01.
 
 ## v2 Requirements
 
@@ -89,20 +108,26 @@ Deferred to future release. Tracked but not in current roadmap.
 - **ADV-03**: Split-pane view (terminal + chat side by side)
 - **ADV-04**: Custom theme editor (user-configurable color palette)
 - **ADV-05**: Plugin/extension system for custom chat renderers
+- **ADV-06**: Context window gauge visualization
+- **ADV-07**: UI density toggle (compact/comfortable/spacious)
+- **ADV-08**: Command palette (Cmd+K)
+- **ADV-09**: Font customization
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Additional AI providers beyond Claude/Codex/Gemini (e.g., Cursor) | Focused scope — three providers cover needs |
-| Dark/light mode toggle | Single warm dark theme is the brand identity — toggle dilutes it |
+| Light mode / theme switching | Single dark theme is the brand identity |
+| Warm earthy palette | Superseded by charcoal + dusty rose in v1.1 |
+| Additional AI providers beyond Claude/Codex/Gemini | Focused scope |
 | Mobile-native app | Web PWA is sufficient |
 | Video/voice features | Text-first tool |
 | Self-hosted auth complexity (OAuth, SSO) | JWT is sufficient for self-hosted |
-| Character-by-character typewriter effect | Anti-pattern — jarring, slow, outdated |
+| Typewriter effect | Anti-pattern — jarring, slow, outdated |
 | Modal permission dialogs | Anti-pattern — breaks flow; inline banners instead |
-| Infinite scroll for session history | Anti-pattern — paginated or search-based is more usable |
-| i18n / multi-language | English only — reduces complexity |
+| Conversation branching / tree view | Wrong mental model for coding assistant |
+| Right-side artifact panel | Conflicts with 720px centered rail layout |
+| Model comparison side-by-side | Unnecessary for 2-model product |
 
 ## Traceability
 
@@ -110,59 +135,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DSGN-01 | Phase 1 | Complete |
-| DSGN-02 | Phase 1 | Complete |
-| DSGN-03 | Phase 1 | Complete |
-| DSGN-04 | Phase 1 | Complete |
-| DSGN-05 | Phase 1 | Complete |
-| DSGN-06 | Phase 2 | Pending |
-| DSGN-07 | Phase 1 | Complete |
-| DSGN-08 | Phase 1 | Complete |
-| CHAT-01 | Phase 5 | Complete |
-| CHAT-02 | Phase 5 | Complete |
-| CHAT-03 | Phase 5 | Complete |
-| CHAT-04 | Phase 5 | Complete |
-| CHAT-05 | Phase 5 | Complete |
-| CHAT-06 | Phase 5 | Complete |
-| CHAT-07 | Phase 5 | Complete |
-| CHAT-08 | Phase 5 | Complete |
-| CHAT-09 | Phase 6 | Complete |
-| CHAT-10 | Phase 6 | Complete |
-| CHAT-11 | Phase 6 | Complete |
-| CHAT-12 | Phase 6 | Complete |
-| CHAT-13 | Phase 6 | Complete |
-| CHAT-14 | Phase 6 | Complete |
-| CHAT-15 | Phase 6 | Complete |
-| CHAT-16 | Phase 6 | Complete |
-| STRM-01 | Phase 7 | Pending |
-| STRM-02 | Phase 7 | Pending |
-| STRM-03 | Phase 7 | Pending |
-| STRM-04 | Phase 7 | Pending |
-| STRM-05 | Phase 7 | Pending |
-| STRM-06 | Phase 7 | Pending |
-| STRM-07 | Phase 8 | Pending |
-| STRM-08 | Phase 8 | Pending |
-| STRM-09 | Phase 8 | Pending |
-| STRM-10 | Phase 8 | Pending |
-| FORK-01 | Phase 3 | Complete |
-| FORK-02 | Phase 3 | Complete |
-| FORK-03 | Phase 3 | Complete |
-| FORK-04 | Phase 1 | Complete |
-| FORK-05 | Phase 1 | Complete |
-| TERM-01 | Phase 4 | Pending |
-| TERM-02 | Phase 4 | Pending |
-| TERM-03 | Phase 4 | Pending |
-| TERM-04 | Phase 4 | Pending |
-| SIDE-01 | Phase 9 | Pending |
-| SIDE-02 | Phase 9 | Pending |
-| SIDE-03 | Phase 9 | Pending |
-| SIDE-04 | Phase 9 | Pending |
+| (Populated by roadmapper) | | |
 
 **Coverage:**
-- v1 requirements: 44 total
-- Mapped to phases: 44
-- Unmapped: 0
+- v1.1 requirements: 50 total
+- Mapped to phases: 0
+- Unmapped: 50
 
 ---
-*Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after roadmap creation — traceability populated*
+*Requirements defined: 2026-03-03*
+*Last updated: 2026-03-03 after v1.1 milestone definition*
