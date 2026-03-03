@@ -17,10 +17,12 @@
 }
 
 /*
- * .streaming-cursor::after — Solid amber blinking caret.
+ * .streaming-cursor — Solid amber blinking caret.
  *
- * Appended via ::after so it appears inline at the end of
- * whatever text the element contains.
+ * We target the last block-level child's ::after so the caret appears
+ * inline at the end of the last text, not on a separate line.
+ * When the container is empty (pre-first-token), the container's own
+ * ::after shows the cursor.
  */
 .streaming-cursor::after {
   content: "|";
@@ -28,6 +30,20 @@
   font-weight: bold;
   animation: cursor-blink 1s step-end infinite;
   margin-left: 1px;
+}
+
+/* When the container has block children, hide the container-level cursor
+   and instead show it on the last child so it sits inline with text. */
+.streaming-cursor > :last-child::after {
+  content: "|";
+  color: #d4a574;
+  font-weight: bold;
+  animation: cursor-blink 1s step-end infinite;
+  margin-left: 1px;
+}
+
+.streaming-cursor:has(> *)::after {
+  display: none;
 }
 
 /*
@@ -48,7 +64,8 @@
 
 /* Respect reduced motion: disable cursor blink */
 @media (prefers-reduced-motion: reduce) {
-  .streaming-cursor::after {
+  .streaming-cursor::after,
+  .streaming-cursor > :last-child::after {
     animation: none;
     opacity: 1;
   }

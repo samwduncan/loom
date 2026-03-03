@@ -5,6 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { normalizeInlineCodeFences } from '../../utils/chatFormatting';
 import { ShikiCodeBlock } from './CodeBlock';
+import '../../styles/streaming-cursor.css';
 
 type MarkdownProps = {
   children: React.ReactNode;
@@ -87,7 +88,7 @@ export function Markdown({ children, className, isStreaming = false }: MarkdownP
   );
 
   return (
-    <div className={className}>
+    <div className={`${className || ''}${isStreaming ? ' streaming-cursor message-streaming' : ''}`}>
       <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components as any}>
         {content}
       </ReactMarkdown>
