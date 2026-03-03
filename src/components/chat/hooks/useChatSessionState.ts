@@ -95,6 +95,17 @@ export function useChatSessionState({
 
   const createDiff = useMemo<DiffCalculator>(() => createCachedDiffCalculator(), []);
 
+  // Apply overflow-anchor: auto so Chrome/Firefox maintain scroll position
+  // when content above the viewport changes (e.g. older messages loaded).
+  // Safari doesn't support this, but the existing useLayoutEffect scroll
+  // restore handles the Safari fallback.
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.style.overflowAnchor = 'auto';
+    }
+  }, []);
+
   const loadSessionMessages = useCallback(
     async (projectName: string, sessionId: string, loadMore = false, provider: Provider | string = 'claude') => {
       if (!projectName || !sessionId) {
