@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '../../../ui/button';
 import { Input } from '../../../ui/input';
+import { OverlayPortal } from '../../../ui/overlay-portal';
 import { DEFAULT_CODEX_MCP_FORM } from '../../constants/constants';
 import type { CodexMcpFormState, McpServer } from '../../types/types';
 
@@ -67,7 +68,8 @@ export default function CodexMcpFormModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[110] p-4">
+    <OverlayPortal>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
       <div className="bg-background border border-border rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h3 className="text-lg font-medium text-foreground">
@@ -172,5 +174,6 @@ export default function CodexMcpFormModal({
         </form>
       </div>
     </div>
+    </OverlayPortal>
   );
 }

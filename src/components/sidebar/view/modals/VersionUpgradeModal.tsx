@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { authenticatedFetch } from "../../../../utils/api";
 import { ReleaseInfo } from "../../../../types/sharedTypes";
 import { copyTextToClipboard } from "../../../../utils/clipboard";
+import { OverlayPortal } from "../../../ui/overlay-portal";
 import type { InstallMode } from "../../../../hooks/useVersionCheck";
 
 interface VersionUpgradeModalProps {
@@ -60,10 +61,11 @@ export default function VersionUpgradeModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <OverlayPortal>
+        <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center">
             {/* Backdrop */}
             <button
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm"
                 onClick={onClose}
                 aria-label={"Close version upgrade modal"}
             />
@@ -199,6 +201,7 @@ export default function VersionUpgradeModal({
                 </div>
             </div>
         </div>
+        </OverlayPortal>
     );
 };
 

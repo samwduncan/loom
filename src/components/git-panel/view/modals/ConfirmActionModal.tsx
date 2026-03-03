@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Check, Download, Trash2, Upload } from 'lucide-react';
+import { OverlayPortal } from '../../../ui/overlay-portal';
 import {
   CONFIRMATION_ACTION_LABELS,
   CONFIRMATION_BUTTON_CLASSES,
@@ -55,7 +56,8 @@ export default function ConfirmActionModal({ action, onCancel, onConfirm }: Conf
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <OverlayPortal>
+    <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
       <div
         className="relative bg-card border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden"
@@ -93,5 +95,6 @@ export default function ConfirmActionModal({ action, onCancel, onConfirm }: Conf
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 }

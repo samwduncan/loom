@@ -1,5 +1,6 @@
 import { Plus, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { OverlayPortal } from '../../../ui/overlay-portal';
 
 type NewBranchModalProps = {
   isOpen: boolean;
@@ -48,7 +49,8 @@ export default function NewBranchModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <OverlayPortal>
+    <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
         className="relative bg-card border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden"
@@ -120,5 +122,6 @@ export default function NewBranchModal({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 }

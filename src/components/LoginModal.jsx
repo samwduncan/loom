@@ -1,4 +1,5 @@
 import { X, ExternalLink, KeyRound } from 'lucide-react';
+import { OverlayPortal } from './ui/overlay-portal';
 import StandaloneShell from './standalone-shell/view/StandaloneShell';
 import { IS_PLATFORM } from '../constants/config';
 
@@ -63,7 +64,8 @@ function LoginModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] max-md:items-stretch max-md:justify-stretch">
+    <OverlayPortal>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-critical)] max-md:items-stretch max-md:justify-stretch">
       <div className="bg-surface-raised rounded-lg shadow-xl w-full max-w-4xl h-3/4 flex flex-col md:max-w-4xl md:h-3/4 md:rounded-lg md:m-4 max-md:max-w-none max-md:h-full max-md:rounded-none max-md:m-0">
         <div className="flex items-center justify-between p-4 border-b border-border/10">
           <h3 className="text-lg font-semibold text-foreground">
@@ -143,6 +145,7 @@ function LoginModal({
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 }
 

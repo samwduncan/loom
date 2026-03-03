@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import ReactDOM from 'react-dom';
 import { AlertTriangle, Trash2 } from 'lucide-react';
 import { Button } from '../../../ui/button';
+import { OverlayPortal } from '../../../ui/overlay-portal';
 import ProjectCreationWizard from '../../../ProjectCreationWizard';
 import Settings from '../../../settings/view/Settings';
 import VersionUpgradeModal from '../modals/VersionUpgradeModal';
@@ -75,29 +75,29 @@ export default function SidebarModals({
 
   return (
     <>
-      {showNewProject &&
-        ReactDOM.createPortal(
+      {showNewProject && (
+        <OverlayPortal>
           <ProjectCreationWizard
             onClose={onCloseNewProject}
             onProjectCreated={onProjectCreated}
-          />,
-          document.body,
-        )}
+          />
+        </OverlayPortal>
+      )}
 
-      {showSettings &&
-        ReactDOM.createPortal(
+      {showSettings && (
+        <OverlayPortal>
           <TypedSettings
             isOpen={showSettings}
             onClose={onCloseSettings}
             projects={settingsProjects}
             initialTab={settingsInitialTab}
-          />,
-          document.body,
-        )}
+          />
+        </OverlayPortal>
+      )}
 
-      {deleteConfirmation &&
-        ReactDOM.createPortal(
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      {deleteConfirmation && (
+        <OverlayPortal>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
             <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
               <div className="p-6">
                 <div className="flex items-start gap-4">
@@ -145,13 +145,13 @@ export default function SidebarModals({
                 </Button>
               </div>
             </div>
-          </div>,
-          document.body,
-        )}
+          </div>
+        </OverlayPortal>
+      )}
 
-      {sessionDeleteConfirmation &&
-        ReactDOM.createPortal(
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      {sessionDeleteConfirmation && (
+        <OverlayPortal>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)] p-4">
             <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
               <div className="p-6">
                 <div className="flex items-start gap-4">
@@ -189,9 +189,9 @@ export default function SidebarModals({
                 </Button>
               </div>
             </div>
-          </div>,
-          document.body,
-        )}
+          </div>
+        </OverlayPortal>
+      )}
 
       <VersionUpgradeModal
         isOpen={showVersionModal}

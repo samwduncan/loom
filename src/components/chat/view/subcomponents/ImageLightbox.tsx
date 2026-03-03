@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useCallback } from 'react';
 import { X } from 'lucide-react';
+import { OverlayPortal } from '../../../ui/overlay-portal';
 
 interface ImageLightboxProps {
   src: string;
@@ -22,8 +23,9 @@ export const ImageLightbox = memo(function ImageLightbox({ src, alt, onClose }: 
   }, [handleKeyDown]);
 
   return (
+    <OverlayPortal>
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center bg-black/80 backdrop-blur-sm"
       onClick={onClose}
     >
       <button
@@ -41,5 +43,6 @@ export const ImageLightbox = memo(function ImageLightbox({ src, alt, onClose }: 
         onClick={(e) => e.stopPropagation()}
       />
     </div>
+    </OverlayPortal>
   );
 });

@@ -1,6 +1,7 @@
 import { Settings as SettingsIcon, X } from 'lucide-react';
 import LoginModal from '../../LoginModal';
 import { Button } from '../../ui/button';
+import { OverlayPortal } from '../../ui/overlay-portal';
 import ClaudeMcpFormModal from '../view/modals/ClaudeMcpFormModal';
 import CodexMcpFormModal from '../view/modals/CodexMcpFormModal';
 import SettingsMainTabs from '../view/SettingsMainTabs';
@@ -87,7 +88,8 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
         : false;
 
   return (
-    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[9999] md:p-4 bg-background/95">
+    <OverlayPortal>
+    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[var(--z-modal)] md:p-4 bg-background/95">
       <div className="bg-background border border-border md:rounded-lg shadow-xl w-full md:max-w-4xl h-full md:h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3">
@@ -237,6 +239,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
         onSubmit={submitCodexMcpForm}
       />
     </div>
+    </OverlayPortal>
   );
 }
 

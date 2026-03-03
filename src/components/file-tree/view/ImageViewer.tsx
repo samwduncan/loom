@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '../../ui/button';
+import { OverlayPortal } from '../../ui/overlay-portal';
 import { authenticatedFetch } from '../../../utils/api';
 import type { FileTreeImageSelection } from '../types/types';
 
@@ -58,7 +59,8 @@ export default function ImageViewer({ file, onClose }: ImageViewerProps) {
   }, [imagePath]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <OverlayPortal>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[var(--z-modal)]">
       <div className="bg-surface-raised rounded-lg shadow-xl max-w-4xl max-h-[90vh] w-full mx-4 overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-border/10">
           <h3 className="text-lg font-semibold text-foreground">{file.name}</h3>
@@ -93,5 +95,6 @@ export default function ImageViewer({ file, onClose }: ImageViewerProps) {
         </div>
       </div>
     </div>
+    </OverlayPortal>
   );
 }
