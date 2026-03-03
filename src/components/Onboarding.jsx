@@ -215,8 +215,8 @@ const Onboarding = ({ onComplete }) => {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-blue-100 bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <GitBranch className="w-8 h-8 text-blue-600 text-blue-400" />
+              <div className="w-16 h-16 bg-status-info/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GitBranch className="w-8 h-8 text-status-info" />
               </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Git Configuration</h2>
               <p className="text-muted-foreground">
@@ -228,14 +228,14 @@ const Onboarding = ({ onComplete }) => {
               <div>
                 <label htmlFor="gitName" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
                   <User className="w-4 h-4" />
-                  Git Name <span className="text-red-500">*</span>
+                  Git Name <span className="text-status-error">*</span>
                 </label>
                 <input
                   type="text"
                   id="gitName"
                   value={gitName}
                   onChange={(e) => setGitName(e.target.value)}
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="John Doe"
                   required
                   disabled={isSubmitting}
@@ -248,14 +248,14 @@ const Onboarding = ({ onComplete }) => {
               <div>
                 <label htmlFor="gitEmail" className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
                   <Mail className="w-4 h-4" />
-                  Git Email <span className="text-red-500">*</span>
+                  Git Email <span className="text-status-error">*</span>
                 </label>
                 <input
                   type="email"
                   id="gitEmail"
                   value={gitEmail}
                   onChange={(e) => setGitEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="john@example.com"
                   required
                   disabled={isSubmitting}
@@ -282,18 +282,18 @@ const Onboarding = ({ onComplete }) => {
             <div className="space-y-3">
               {/* Claude */}
               <div className={`border rounded-lg p-4 transition-colors ${claudeAuthStatus.authenticated
-                ? 'bg-blue-50 bg-blue-900/20 border-blue-200 border-blue-800'
+                ? 'bg-status-info/10 border-primary'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-status-info/10 rounded-full flex items-center justify-center">
                       <SessionProviderLogo provider="claude" className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="font-medium text-foreground flex items-center gap-2">
                         Claude Code
-                        {claudeAuthStatus.authenticated && <Check className="w-4 h-4 text-green-500" />}
+                        {claudeAuthStatus.authenticated && <Check className="w-4 h-4 text-status-connected" />}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {claudeAuthStatus.loading ? 'Checking...' :
@@ -304,7 +304,7 @@ const Onboarding = ({ onComplete }) => {
                   {!claudeAuthStatus.authenticated && !claudeAuthStatus.loading && (
                     <button
                       onClick={handleClaudeLogin}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="bg-primary hover:bg-primary/90 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       Login
                     </button>
@@ -314,18 +314,18 @@ const Onboarding = ({ onComplete }) => {
 
               {/* Codex */}
               <div className={`border rounded-lg p-4 transition-colors ${codexAuthStatus.authenticated
-                ? 'bg-gray-100 bg-gray-800/50 border-gray-300 border-gray-600'
+                ? 'bg-surface-elevated border-border/10'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-100 bg-gray-800 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-surface-elevated rounded-full flex items-center justify-center">
                       <SessionProviderLogo provider="codex" className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="font-medium text-foreground flex items-center gap-2">
                         OpenAI Codex
-                        {codexAuthStatus.authenticated && <Check className="w-4 h-4 text-green-500" />}
+                        {codexAuthStatus.authenticated && <Check className="w-4 h-4 text-status-connected" />}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {codexAuthStatus.loading ? 'Checking...' :
@@ -336,7 +336,7 @@ const Onboarding = ({ onComplete }) => {
                   {!codexAuthStatus.authenticated && !codexAuthStatus.loading && (
                     <button
                       onClick={handleCodexLogin}
-                      className="bg-gray-800 hover:bg-gray-900 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors"
+                      className="bg-surface-elevated hover:bg-muted text-foreground text-sm font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       Login
                     </button>
@@ -346,18 +346,18 @@ const Onboarding = ({ onComplete }) => {
 
               {/* Gemini */}
               <div className={`border rounded-lg p-4 transition-colors ${geminiAuthStatus.authenticated
-                ? 'bg-teal-50 bg-teal-900/20 border-teal-200 border-teal-800'
+                ? 'bg-teal-900/20 border-teal-800'
                 : 'border-border bg-card'
                 }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-teal-100 bg-teal-900/30 rounded-full flex items-center justify-center">
-                      <SessionProviderLogo provider="gemini" className="w-5 h-5 text-teal-600 text-teal-400" />
+                    <div className="w-10 h-10 bg-teal-900/30 rounded-full flex items-center justify-center">
+                      <SessionProviderLogo provider="gemini" className="w-5 h-5 text-teal-400" />
                     </div>
                     <div>
                       <div className="font-medium text-foreground flex items-center gap-2">
                         Gemini
-                        {geminiAuthStatus.authenticated && <Check className="w-4 h-4 text-green-500" />}
+                        {geminiAuthStatus.authenticated && <Check className="w-4 h-4 text-status-connected" />}
                       </div>
                       <div className="text-xs text-muted-foreground">
                         {geminiAuthStatus.loading ? 'Checking...' :
@@ -409,8 +409,8 @@ const Onboarding = ({ onComplete }) => {
               {steps.map((step, index) => (
                 <React.Fragment key={index}>
                   <div className="flex flex-col items-center flex-1">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-colors duration-200 ${index < currentStep ? 'bg-green-500 border-green-500 text-white' :
-                      index === currentStep ? 'bg-blue-600 border-blue-600 text-white' :
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-colors duration-200 ${index < currentStep ? 'bg-status-connected border-status-connected text-white' :
+                      index === currentStep ? 'bg-primary border-primary text-white' :
                         'bg-background border-border text-muted-foreground'
                       }`}>
                       {index < currentStep ? (
@@ -427,12 +427,12 @@ const Onboarding = ({ onComplete }) => {
                         {step.title}
                       </p>
                       {step.required && (
-                        <span className="text-xs text-red-500">Required</span>
+                        <span className="text-xs text-status-error">Required</span>
                       )}
                     </div>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`flex-1 h-0.5 mx-2 transition-colors duration-200 ${index < currentStep ? 'bg-green-500' : 'bg-border'
+                    <div className={`flex-1 h-0.5 mx-2 transition-colors duration-200 ${index < currentStep ? 'bg-status-connected' : 'bg-border'
                       }`} />
                   )}
                 </React.Fragment>
@@ -446,8 +446,8 @@ const Onboarding = ({ onComplete }) => {
 
             {/* Error Message */}
             {error && (
-              <div className="mt-6 p-4 bg-red-100 bg-red-900/20 border border-red-300 border-red-800 rounded-lg">
-                <p className="text-sm text-red-700 text-red-400">{error}</p>
+              <div className="mt-6 p-4 bg-status-error/10 border border-status-error rounded-lg">
+                <p className="text-sm text-status-error">{error}</p>
               </div>
             )}
 
@@ -467,7 +467,7 @@ const Onboarding = ({ onComplete }) => {
                   <button
                     onClick={handleNextStep}
                     disabled={!isStepValid() || isSubmitting}
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors duration-200"
+                    className="flex items-center gap-2 px-6 py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors duration-200"
                   >
                     {isSubmitting ? (
                       <>
@@ -485,7 +485,7 @@ const Onboarding = ({ onComplete }) => {
                   <button
                     onClick={handleFinish}
                     disabled={isSubmitting}
-                    className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors duration-200"
+                    className="flex items-center gap-2 px-6 py-3 bg-status-connected hover:bg-status-connected/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors duration-200"
                   >
                     {isSubmitting ? (
                       <>

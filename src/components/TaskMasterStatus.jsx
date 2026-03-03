@@ -3,19 +3,19 @@ import { useTaskMaster } from '../contexts/TaskMasterContext';
 import TaskIndicator from './TaskIndicator';
 
 const TaskMasterStatus = () => {
-  const { 
-    currentProject, 
-    projectTaskMaster, 
+  const {
+    currentProject,
+    projectTaskMaster,
     mcpServerStatus,
     isLoading,
     isLoadingMCP,
-    error 
+    error
   } = useTaskMaster();
 
   if (isLoading || isLoadingMCP) {
     return (
-      <div className="flex items-center text-sm text-gray-500 text-gray-400">
-        <div className="animate-spin w-3 h-3 border border-gray-300 border-t-blue-500 rounded-full mr-2"></div>
+      <div className="flex items-center text-sm text-muted-foreground">
+        <div className="animate-spin w-3 h-3 border border-border/10 border-t-primary rounded-full mr-2"></div>
         Loading TaskMaster status...
       </div>
     );
@@ -23,8 +23,8 @@ const TaskMasterStatus = () => {
 
   if (error) {
     return (
-      <div className="flex items-center text-sm text-red-500 text-red-400">
-        <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+      <div className="flex items-center text-sm text-status-error">
+        <span className="w-2 h-2 bg-status-error rounded-full mr-2"></span>
         TaskMaster Error
       </div>
     );
@@ -32,7 +32,7 @@ const TaskMasterStatus = () => {
 
   // Show MCP server status
   const mcpConfigured = mcpServerStatus?.hasMCPServer && mcpServerStatus?.isConfigured;
-  
+
   // Show project TaskMaster status
   const projectConfigured = currentProject?.taskmaster?.hasTaskmaster;
   const taskCount = currentProject?.taskmaster?.metadata?.taskCount || 0;
@@ -40,8 +40,8 @@ const TaskMasterStatus = () => {
 
   if (!currentProject) {
     return (
-      <div className="flex items-center text-sm text-gray-500 text-gray-400">
-        <span className="w-2 h-2 bg-gray-400 rounded-full mr-2"></span>
+      <div className="flex items-center text-sm text-muted-foreground">
+        <span className="w-2 h-2 bg-muted rounded-full mr-2"></span>
         No project selected
       </div>
     );
@@ -60,15 +60,15 @@ const TaskMasterStatus = () => {
   return (
     <div className="flex items-center gap-3">
       {/* TaskMaster Status Indicator */}
-      <TaskIndicator 
-        status={overallStatus} 
+      <TaskIndicator
+        status={overallStatus}
         size="md"
         showLabel={true}
       />
 
       {/* Task Progress Info */}
       {projectConfigured && (
-        <div className="text-xs text-gray-600 text-gray-400">
+        <div className="text-xs text-muted-foreground">
           <span className="font-medium">
             {completedCount}/{taskCount} tasks
           </span>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { cn } from '../lib/utils';
 
-const Tooltip = ({ 
-  children, 
-  content, 
+const Tooltip = ({
+  children,
+  content,
   position = 'top',
   className = '',
   delay = 500
@@ -44,15 +44,15 @@ const Tooltip = ({
   const getArrowClasses = () => {
     switch (position) {
       case 'top':
-        return 'top-full left-1/2 transform -translate-x-1/2 border-t-gray-900 border-t-gray-100';
+        return 'top-full left-1/2 transform -translate-x-1/2 border-t-surface-base';
       case 'bottom':
-        return 'bottom-full left-1/2 transform -translate-x-1/2 border-b-gray-900 border-b-gray-100';
+        return 'bottom-full left-1/2 transform -translate-x-1/2 border-b-surface-base';
       case 'left':
-        return 'left-full top-1/2 transform -translate-y-1/2 border-l-gray-900 border-l-gray-100';
+        return 'left-full top-1/2 transform -translate-y-1/2 border-l-surface-base';
       case 'right':
-        return 'right-full top-1/2 transform -translate-y-1/2 border-r-gray-900 border-r-gray-100';
+        return 'right-full top-1/2 transform -translate-y-1/2 border-r-surface-base';
       default:
-        return 'top-full left-1/2 transform -translate-x-1/2 border-t-gray-900 border-t-gray-100';
+        return 'top-full left-1/2 transform -translate-x-1/2 border-t-surface-base';
     }
   };
 
@@ -61,22 +61,22 @@ const Tooltip = ({
   }
 
   return (
-    <div 
+    <div
       className="relative inline-block"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {children}
-      
+
       {isVisible && (
         <div className={cn(
-          'absolute z-50 px-2 py-1 text-xs font-medium text-white bg-gray-900 bg-gray-100 text-gray-900 rounded shadow-lg whitespace-nowrap pointer-events-none',
+          'absolute z-50 px-2 py-1 text-xs font-medium text-foreground bg-surface-base rounded shadow-lg whitespace-nowrap pointer-events-none',
           'animate-in fade-in-0 zoom-in-95 duration-200',
           getPositionClasses(),
           className
         )}>
           {content}
-          
+
           {/* Arrow */}
           <div className={cn(
             'absolute w-0 h-0 border-4 border-transparent',
