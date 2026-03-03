@@ -7,15 +7,15 @@ interface ConnectionStatusDotProps {
 /**
  * Small colored circle indicating WebSocket connection status.
  *
- * - Green (#6bbf59) when connected
- * - Amber (#d4a574) with pulse animation when reconnecting
- * - Red (#c15a4a) when disconnected
+ * - Green (status-connected) when connected
+ * - Amber (status-reconnecting) with pulse animation when reconnecting
+ * - Red (status-disconnected) when disconnected
  */
 export default function ConnectionStatusDot({ state }: ConnectionStatusDotProps) {
   const colors: Record<ConnectionState, string> = {
-    connected: 'bg-[#6bbf59]',
-    reconnecting: 'bg-[#d4a574]',
-    disconnected: 'bg-[#c15a4a]',
+    connected: 'bg-status-connected',
+    reconnecting: 'bg-status-reconnecting',
+    disconnected: 'bg-status-disconnected',
   };
 
   const pulseClass = state === 'reconnecting' ? 'animate-pulse' : '';

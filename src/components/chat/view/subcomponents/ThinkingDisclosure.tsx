@@ -72,7 +72,7 @@ export const ThinkingDisclosure = memo(function ThinkingDisclosure({
         <button
           type="button"
           onClick={handleToggle}
-          className="flex items-center gap-1.5 py-1 text-[#c4a882]/50 hover:text-[#c4a882]/70 transition-colors"
+          className="flex items-center gap-1.5 py-1 text-muted-foreground/50 hover:text-muted-foreground/70 transition-colors"
           aria-expanded={showContent}
           aria-controls={contentId}
         >
@@ -92,7 +92,7 @@ export const ThinkingDisclosure = memo(function ThinkingDisclosure({
               d="M9 5l7 7-7 7"
             />
           </svg>
-          <span className="text-sm font-medium text-[#c4a882]/50">
+          <span className="text-sm font-medium text-muted-foreground/50">
             Thinking{!showContent && charCount > 0 ? `... (${formattedCount} chars)` : ''}
           </span>
         </button>
@@ -102,7 +102,7 @@ export const ThinkingDisclosure = memo(function ThinkingDisclosure({
           <button
             type="button"
             onClick={handleEyeToggle}
-            className="p-1 text-[#c4a882]/50 hover:text-[#c4a882]/70 transition-colors"
+            className="p-1 text-muted-foreground/50 hover:text-muted-foreground/70 transition-colors"
             title={eyeToggle ? 'Hide live thinking' : 'Show live thinking'}
             aria-label={eyeToggle ? 'Hide live thinking' : 'Show live thinking'}
           >
@@ -128,14 +128,14 @@ export const ThinkingDisclosure = memo(function ThinkingDisclosure({
         <div className="overflow-hidden">
           <div
             ref={contentRef}
-            className="pl-4 border-l-2 border-[#3d2e25]/40 mt-1 max-h-96 overflow-y-auto"
+            className="pl-4 border-l-2 border-border/10 mt-1 max-h-96 overflow-y-auto"
           >
             {isEmpty ? (
-              <p className="text-sm text-[#c4a882]/30 italic py-1">
+              <p className="text-sm text-muted-foreground/30 italic py-1">
                 No reasoning available
               </p>
             ) : (
-              <pre className="text-sm text-[#c4a882]/40 whitespace-pre-wrap break-words font-sans py-1">
+              <pre className="text-sm text-muted-foreground/40 whitespace-pre-wrap break-words font-sans py-1">
                 {content}
               </pre>
             )}

@@ -73,15 +73,15 @@ export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isS
   const displayLang = language && language !== 'text' ? language : '';
 
   return (
-    <div className="relative group my-2 rounded-lg overflow-hidden border border-[#3d2e25]/40">
+    <div className="relative group my-2 rounded-lg overflow-hidden border border-border/10">
       {/* ---- Header bar ---- */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-[#241a14] text-xs text-[#c4a882] select-none">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-surface-raised text-xs text-muted-foreground select-none">
         <span className="uppercase font-medium tracking-wide">
           {displayLang}
         </span>
 
         {filename && (
-          <span className="text-[#a08a6e] truncate max-w-[50%] text-center">
+          <span className="text-muted-foreground truncate max-w-[50%] text-center">
             {filename}
           </span>
         )}
@@ -89,7 +89,7 @@ export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isS
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors hover:bg-[#3d2e25]/60 text-[#c4a882] hover:text-[#f5e6d3]"
+          className="flex items-center gap-1 px-1.5 py-0.5 rounded transition-colors hover:bg-surface-elevated/60 text-muted-foreground hover:text-foreground"
           title={copied ? 'Copied' : 'Copy code'}
           aria-label={copied ? 'Copied' : 'Copy code'}
         >
@@ -111,7 +111,7 @@ export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isS
       {isStreaming || html === null ? (
         /* Streaming / loading fallback: raw monospace */
         <pre
-          className="bg-[#1c1210] text-[#f5e6d3] text-sm font-mono p-4 overflow-x-auto"
+          className="bg-surface-base text-foreground text-sm font-mono p-4 overflow-x-auto"
           style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
         >
           <code>{shouldTruncate ? lines.slice(0, TRUNCATED_VISIBLE).join('\n') : code}</code>
@@ -119,7 +119,7 @@ export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isS
       ) : (
         /* Highlighted HTML from Shiki */
         <div
-          className="shiki-code-block text-sm overflow-x-auto [&_pre]:!bg-[#1c1210] [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:!rounded-none [&_code]:!whitespace-pre-wrap [&_code]:!break-words [&_pre]:!overflow-x-auto"
+          className="shiki-code-block text-sm overflow-x-auto [&_pre]:!bg-surface-base [&_pre]:!p-4 [&_pre]:!m-0 [&_pre]:!rounded-none [&_code]:!whitespace-pre-wrap [&_code]:!break-words [&_pre]:!overflow-x-auto"
           dangerouslySetInnerHTML={{
             __html: shouldTruncate
               ? truncateShikiHtml(html, TRUNCATED_VISIBLE)
@@ -133,7 +133,7 @@ export const ShikiCodeBlock = memo(function ShikiCodeBlock({ code, language, isS
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="w-full py-2 text-xs text-center text-[#c4a882] bg-[#241a14] hover:bg-[#3d2e25]/60 transition-colors border-t border-[#3d2e25]/40"
+          className="w-full py-2 text-xs text-center text-muted-foreground bg-surface-raised hover:bg-surface-elevated/60 transition-colors border-t border-border/10"
         >
           Show {hiddenCount} more line{hiddenCount === 1 ? '' : 's'}
         </button>

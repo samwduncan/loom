@@ -5,21 +5,21 @@ export type StatusTier = 'info' | 'warning' | 'error';
 
 const tierConfig = {
   info: {
-    bg: 'bg-[#c4a882]/5',
-    border: 'border-l-2 border-[#c4a882]/30',
-    text: 'text-[#c4a882]/60',
+    bg: 'bg-muted-foreground/5',
+    border: 'border-l-2 border-muted-foreground/30',
+    text: 'text-muted-foreground/60',
     Icon: Info,
   },
   warning: {
-    bg: 'bg-amber-500/[0.08]',
-    border: 'border-l-2 border-amber-500/40',
-    text: 'text-amber-300/80',
+    bg: 'bg-status-reconnecting/[0.08]',
+    border: 'border-l-2 border-status-reconnecting/40',
+    text: 'text-status-reconnecting/80',
     Icon: AlertTriangle,
   },
   error: {
-    bg: 'bg-[#b85c3a]/10',
-    border: 'border-l-2 border-[#b85c3a]/40',
-    text: 'text-[#dab8b8]',
+    bg: 'bg-status-error/8',
+    border: 'border-l-2 border-status-error/40',
+    text: 'text-foreground',
     Icon: XCircle,
   },
 };
@@ -42,7 +42,7 @@ export const SystemStatusMessage = memo(function SystemStatusMessage({
       <Icon className={`w-3.5 h-3.5 ${config.text} flex-shrink-0`} />
       <span className={`text-xs ${config.text} flex-1`}>{content}</span>
       {timestamp && (
-        <span className="text-[10px] text-[#c4a882]/30 ml-auto flex-shrink-0">
+        <span className="text-[10px] text-muted-foreground/30 ml-auto flex-shrink-0">
           {timestamp}
         </span>
       )}

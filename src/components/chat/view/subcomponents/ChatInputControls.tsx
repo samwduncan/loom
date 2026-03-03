@@ -40,9 +40,9 @@ export default function ChatInputControls({
           permissionMode === 'default'
             ? 'bg-muted/50 text-muted-foreground border-border/60 hover:bg-muted'
             : permissionMode === 'acceptEdits'
-              ? 'bg-green-50 bg-green-900/15 text-green-700 text-green-300 border-green-300/60 border-green-600/40 hover:bg-green-100 hover:bg-green-900/25'
+              ? 'bg-green-900/15 text-green-300 border-green-600/40 hover:bg-green-900/25'
               : permissionMode === 'bypassPermissions'
-                ? 'bg-orange-50 bg-orange-900/15 text-orange-700 text-orange-300 border-orange-300/60 border-orange-600/40 hover:bg-orange-100 hover:bg-orange-900/25'
+                ? 'bg-orange-900/15 text-orange-300 border-orange-600/40 hover:bg-orange-900/25'
                 : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary/10'
         }`}
         title="Click to change permission mode (or press Tab in input)"
@@ -75,12 +75,12 @@ export default function ChatInputControls({
       <div className="flex items-center gap-1.5">
         <TokenUsagePie used={tokenBudget?.used || 0} total={tokenBudget?.total || parseInt(import.meta.env.VITE_CONTEXT_WINDOW) || 160000} />
         {tokenBudget?.used ? (
-          <span className="text-[10px] text-[#c4a882]/50 font-mono whitespace-nowrap">
+          <span className="text-[10px] text-muted-foreground/50 font-mono whitespace-nowrap">
             {formatTokenCount(tokenBudget.used)} used
           </span>
         ) : null}
         {sessionCost != null && sessionCost > 0 && (
-          <span className="text-[10px] text-[#c4a882]/40 font-mono">
+          <span className="text-[10px] text-muted-foreground/40 font-mono">
             &middot; ${sessionCost.toFixed(4)}
           </span>
         )}

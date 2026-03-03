@@ -85,14 +85,14 @@ const TurnBlock = memo(function TurnBlock({
         type="button"
         onClick={handleToggle}
         className={`w-full flex items-center gap-2 px-3 sm:px-0 py-1.5 text-left group ${
-          canCollapse ? 'cursor-pointer hover:bg-gray-100/50 hover:bg-gray-800/30 rounded' : 'cursor-default'
+          canCollapse ? 'cursor-pointer hover:bg-surface-raised/30 rounded' : 'cursor-default'
         }`}
         aria-expanded={isExpanded}
         disabled={!canCollapse}
       >
         {/* Chevron */}
         <svg
-          className={`w-3 h-3 text-gray-500 transition-transform duration-200 flex-shrink-0 ${
+          className={`w-3 h-3 text-muted-foreground transition-transform duration-200 flex-shrink-0 ${
             isExpanded ? 'rotate-90' : ''
           }`}
           fill="none"
@@ -113,7 +113,7 @@ const TurnBlock = memo(function TurnBlock({
         </div>
 
         {/* First line of prose */}
-        <span className="text-sm text-gray-700 text-gray-300 truncate flex-1 min-w-0">
+        <span className="text-sm text-foreground-secondary truncate flex-1 min-w-0">
           {turn.firstProseContent}
         </span>
 
@@ -122,14 +122,14 @@ const TurnBlock = memo(function TurnBlock({
           <span
             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
               turn.failedToolCount > 0
-                ? 'bg-red-100/80 bg-red-900/30 text-red-700 text-red-300'
-                : 'bg-gray-100 bg-gray-800 text-gray-600 text-gray-400'
+                ? 'bg-status-error/30 text-status-error'
+                : 'bg-surface-raised text-muted-foreground'
             }`}
           >
             {turn.failedToolCount > 0 ? (
               <>
                 <span>{turn.toolCallCount} tools</span>
-                <span className="text-red-500"> - {turn.failedToolCount} failed</span>
+                <span className="text-status-error"> - {turn.failedToolCount} failed</span>
               </>
             ) : (
               <span>+{turn.toolCallCount} tool{turn.toolCallCount !== 1 ? 's' : ''}</span>
@@ -139,7 +139,7 @@ const TurnBlock = memo(function TurnBlock({
 
         {/* Duration */}
         {!turn.isStreaming && turn.durationMs != null && turn.durationMs > 0 && (
-          <span className="text-xs text-gray-400 text-gray-500 flex-shrink-0">
+          <span className="text-xs text-muted-foreground flex-shrink-0">
             took {formatDuration(turn.durationMs)}
           </span>
         )}
@@ -165,7 +165,7 @@ const TurnBlock = memo(function TurnBlock({
                 return (
                   <React.Fragment key={groupKey}>
                     {index > 0 && (
-                      <div className="border-t border-[#3d2e25]/20 mx-3" />
+                      <div className="border-t border-border/8 mx-3" />
                     )}
                     <ToolCallGroup
                       messages={item}
@@ -188,7 +188,7 @@ const TurnBlock = memo(function TurnBlock({
               return (
                 <React.Fragment key={getMessageKey(message)}>
                   {index > 0 && (
-                    <div className="border-t border-[#3d2e25]/20 mx-3" />
+                    <div className="border-t border-border/8 mx-3" />
                   )}
                   <MessageComponent
                     message={message}

@@ -91,8 +91,8 @@ export const DiffViewer: React.FC<DiffViewerProps> = memo(({
   badgeColor = 'gray',
 }) => {
   const badgeClasses = badgeColor === 'green'
-    ? 'bg-green-900/30 text-green-400'
-    : 'bg-[#241a14] text-[#c4a882]';
+    ? 'bg-status-connected/30 text-status-connected'
+    : 'bg-surface-raised text-muted-foreground';
 
   const language = useMemo(() => detectLanguage(filePath), [filePath]);
 
@@ -104,18 +104,18 @@ export const DiffViewer: React.FC<DiffViewerProps> = memo(({
   const styles = useMemo(() => warmDiffStyles, []);
 
   return (
-    <div className="rounded-lg overflow-hidden border border-[#3d2e25]/40 my-2">
+    <div className="rounded-lg overflow-hidden border border-border/10 my-2">
       {/* File path header */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-[#241a14] border-b border-[#3d2e25]/40">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-surface-raised border-b border-border/10">
         {onFileClick ? (
           <button
             onClick={onFileClick}
-            className="font-mono text-[11px] text-[#6bacce] hover:text-[#a0ccde] truncate transition-colors cursor-pointer"
+            className="font-mono text-[11px] text-status-info hover:text-status-info truncate transition-colors cursor-pointer"
           >
             {filePath}
           </button>
         ) : (
-          <span className="font-mono text-[11px] text-[#c4a882] truncate">
+          <span className="font-mono text-[11px] text-muted-foreground truncate">
             {filePath}
           </span>
         )}
