@@ -27,7 +27,7 @@ export default function CodeEditorSurface({
   if (markdownPreview && isMarkdownFile) {
     return (
       <div className="h-full overflow-y-auto bg-surface-base">
-        <div className="max-w-4xl mx-auto px-8 py-6 prose prose-sm prose-invert prose-headings:font-semibold prose-a:text-primary prose-code:text-sm prose-pre:bg-surface-raised prose-img:rounded-lg max-w-none">
+        <div className="max-w-4xl mx-auto px-8 py-6 prose prose-sm prose-invert prose-headings:font-semibold prose-headings:text-foreground prose-a:text-primary prose-code:text-sm prose-code:bg-[#191817] prose-pre:bg-surface-raised prose-blockquote:border-primary prose-img:rounded-lg max-w-none">
           <MarkdownPreview content={content} />
         </div>
       </div>

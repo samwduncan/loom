@@ -69,9 +69,21 @@ type CodeBlockProps = {
 /** Static markdown sub-components (no streaming dependency) */
 const staticComponents = {
   blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="border-l-4 border-border/10 pl-4 italic text-muted-foreground my-2">
+    <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-2">
       {children}
     </blockquote>
+  ),
+  h1: ({ children }: { children?: React.ReactNode }) => (
+    <h1 className="text-2xl font-bold text-foreground mt-6 mb-3 first:mt-0">{children}</h1>
+  ),
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <h2 className="text-xl font-semibold text-foreground mt-5 mb-2">{children}</h2>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <h3 className="text-lg font-semibold text-foreground mt-4 mb-2">{children}</h3>
+  ),
+  h4: ({ children }: { children?: React.ReactNode }) => (
+    <h4 className="text-base font-semibold text-foreground mt-3 mb-1">{children}</h4>
   ),
   a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
     <a href={href} className="text-status-info hover:underline" target="_blank" rel="noopener noreferrer">
@@ -103,7 +115,7 @@ function makeCodeComponent(isStreaming: boolean) {
     if (shouldInline) {
       return (
         <code
-          className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-surface-raised/60 text-foreground border border-border/10 whitespace-pre-wrap break-words ${className || ''
+          className={`font-mono text-[0.9em] px-1.5 py-0.5 rounded-md bg-[#191817] text-foreground border border-border/10 whitespace-pre-wrap break-words ${className || ''
             }`}
           {...props}
         >

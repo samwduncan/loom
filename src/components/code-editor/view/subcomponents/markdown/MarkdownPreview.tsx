@@ -13,7 +13,7 @@ type MarkdownPreviewProps = {
 const markdownPreviewComponents: Components = {
   code: MarkdownCodeBlock,
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-border/20 pl-4 italic text-muted-foreground my-2">
+    <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-2">
       {children}
     </blockquote>
   ),
