@@ -1,5 +1,5 @@
 import CodeMirror from '@uiw/react-codemirror';
-import { oneDark } from '@codemirror/theme-one-dark';
+import { loomDarkTheme } from '../../themes/loom-dark';
 import type { Extension } from '@codemirror/state';
 import MarkdownPreview from './markdown/MarkdownPreview';
 
@@ -39,7 +39,7 @@ export default function CodeEditorSurface({
       value={content}
       onChange={onChange}
       extensions={extensions}
-      theme={isDarkMode ? oneDark : undefined}
+      theme={isDarkMode ? loomDarkTheme : undefined}
       height="100%"
       style={{
         fontSize: `${fontSize}px`,
