@@ -171,13 +171,13 @@ Plans:
   5. The global status line shows semantic activity text ("Reading auth.ts...", "Writing server.ts...") parsed from tool events, with a spinner on the active tool card
   6. The send button morphs to a stop button during streaming via CSS crossfade -- clicking stop aborts generation via WebSocket and the response ends cleanly
   7. Permanent errors (process crash, exit code) display as persistent inline banners with red accent -- visually distinct from toasts and regular messages
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 17-01: TBD
-- [ ] 17-02: TBD
-- [ ] 17-03: TBD
-- [ ] 17-04: TBD
+- [ ] 17-01-PLAN.md -- Scroll rewrite (event-based), message-counting pill, rAF buffer tuning (STRM-01, STRM-02, STRM-03)
+- [ ] 17-02-PLAN.md -- Atmospheric aurora indicators, thinking transitions, reconnect skeletons (STRM-04, STRM-05, STRM-06)
+- [ ] 17-03-PLAN.md -- Status line below composer, activity hook, send/stop morph (STRM-09, STRM-10, STRM-11, STRM-12)
+- [ ] 17-04-PLAN.md -- Error banners, active tool card border glow (STRM-08)
 
 ## Progress
 
@@ -195,4 +195,4 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 | 14. Toast & Overlay System | v1.1 | 3/3 | Complete | 2026-03-03 |
 | 15. Tool Call Display | 2/2 | Complete   | 2026-03-03 | - |
 | 16. Sidebar & Global Polish | v1.1 | 3/3 | Complete | 2026-03-04 |
-| 17. Streaming & Status | v1.1 | 0/TBD | Not started | - |
+| 17. Streaming & Status | v1.1 | 0/4 | Planned | - |
