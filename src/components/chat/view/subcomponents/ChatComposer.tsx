@@ -1,5 +1,4 @@
 import CommandMenu from './CommandMenu';
-import ClaudeStatus from './ClaudeStatus';
 import StatusLine from './StatusLine';
 import MicButton from '../../../mic-button/view/MicButton';
 import ImageAttachment from './ImageAttachment';
@@ -171,17 +170,6 @@ export default function ChatComposer({
 
   return (
     <div className={`p-2 sm:p-4 md:p-4 flex-shrink-0 pb-2 sm:pb-4 md:pb-6 ${mobileFloatingClass}`}>
-      {!hasQuestionPanel && (
-        <div className="flex-1">
-          <ClaudeStatus
-            status={claudeStatus}
-            isLoading={isLoading}
-            onAbort={onAbortSession}
-            provider={provider}
-          />
-        </div>
-      )}
-
       <div className="max-w-4xl mx-auto mb-3">
         <PermissionRequestsBanner
           pendingPermissionRequests={pendingPermissionRequests}
@@ -195,12 +183,10 @@ export default function ChatComposer({
           provider={provider}
           thinkingMode={thinkingMode}
           setThinkingMode={setThinkingMode}
-          tokenBudget={tokenBudget}
           slashCommandsCount={slashCommandsCount}
           onToggleCommandMenu={onToggleCommandMenu}
           hasInput={hasInput}
           onClearInput={onClearInput}
-          sessionCost={null}
         />}
       </div>
 
@@ -336,20 +322,41 @@ export default function ChatComposer({
             )}
 
             <button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              onMouseDown={(event) => {
+              type={isLoading ? 'button' : 'submit'}
+              disabled={!isLoading && !input.trim()}
+              onClick={isLoading ? onAbortSession : undefined}
+              onMouseDown={isLoading ? undefined : (event) => {
                 event.preventDefault();
                 onSubmit(event);
               }}
-              onTouchStart={(event) => {
+              onTouchStart={isLoading ? undefined : (event) => {
                 event.preventDefault();
                 onSubmit(event);
               }}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed rounded-xl flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-1 focus:ring-offset-background"
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-background ${
+                isLoading
+                  ? 'bg-destructive hover:bg-destructive/90 focus:ring-destructive/30'
+                  : 'bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed focus:ring-primary/30'
+              }`}
             >
-              <svg className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-primary-foreground transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {/* Send icon (arrow) — fades out when loading */}
+              <svg
+                className="absolute w-4 h-4 sm:w-[18px] sm:h-[18px] text-primary-foreground transform rotate-90 transition-opacity duration-200"
+                style={{ opacity: isLoading ? 0 : 1 }}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              {/* Stop icon (square) — fades in when loading */}
+              <svg
+                className="absolute w-3.5 h-3.5 sm:w-4 sm:h-4 text-destructive-foreground transition-opacity duration-200"
+                style={{ opacity: isLoading ? 1 : 0 }}
+                viewBox="0 0 10 10"
+                fill="currentColor"
+              >
+                <rect x="1" y="1" width="8" height="8" rx="1" />
               </svg>
             </button>
 

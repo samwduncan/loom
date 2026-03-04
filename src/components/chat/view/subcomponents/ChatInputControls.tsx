@@ -1,7 +1,5 @@
 import React from 'react';
 import ThinkingModeSelector from './ThinkingModeSelector';
-import TokenUsagePie from './TokenUsagePie';
-import { formatTokenCount } from '../../utils/pricing';
 import type { PermissionMode, Provider } from '../../types/types';
 
 interface ChatInputControlsProps {
@@ -10,12 +8,10 @@ interface ChatInputControlsProps {
   provider: Provider | string;
   thinkingMode: string;
   setThinkingMode: React.Dispatch<React.SetStateAction<string>>;
-  tokenBudget: { used?: number; total?: number } | null;
   slashCommandsCount: number;
   onToggleCommandMenu: () => void;
   hasInput: boolean;
   onClearInput: () => void;
-  sessionCost?: number | null;
 }
 
 export default function ChatInputControls({
@@ -24,12 +20,10 @@ export default function ChatInputControls({
   provider,
   thinkingMode,
   setThinkingMode,
-  tokenBudget,
   slashCommandsCount,
   onToggleCommandMenu,
   hasInput,
   onClearInput,
-  sessionCost,
 }: ChatInputControlsProps) {
   return (
     <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
@@ -71,20 +65,6 @@ export default function ChatInputControls({
       {provider === 'claude' && (
         <ThinkingModeSelector selectedMode={thinkingMode} onModeChange={setThinkingMode} onClose={() => {}} className="" />
       )}
-
-      <div className="flex items-center gap-1.5">
-        <TokenUsagePie used={tokenBudget?.used || 0} total={tokenBudget?.total || parseInt(import.meta.env.VITE_CONTEXT_WINDOW) || 160000} />
-        {tokenBudget?.used ? (
-          <span className="text-[10px] text-muted-foreground/50 font-mono whitespace-nowrap">
-            {formatTokenCount(tokenBudget.used)} used
-          </span>
-        ) : null}
-        {sessionCost != null && sessionCost > 0 && (
-          <span className="text-[10px] text-muted-foreground/40 font-mono">
-            &middot; ${sessionCost.toFixed(4)}
-          </span>
-        )}
-      </div>
 
       <button
         type="button"
