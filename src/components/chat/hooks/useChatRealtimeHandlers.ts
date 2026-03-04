@@ -115,6 +115,9 @@ export function useChatRealtimeHandlers({
   onNavigateToSession,
 }: UseChatRealtimeHandlersArgs) {
   const lastProcessedMessageRef = useRef<LatestChatMessage | null>(null);
+  // STRM-01: Track last flush time for ~60ms accumulation window.
+  // Reset to 0 on stream start so we don't carry stale timestamps between responses.
+  const lastFlushTimeRef = useRef(0);
 
   useEffect(() => {
     if (!latestMessage) {
@@ -251,15 +254,37 @@ export function useChatRealtimeHandlers({
         if (messageData && typeof messageData === 'object' && messageData.type) {
           if (messageData.type === 'content_block_delta' && messageData.delta?.text) {
             const decodedText = decodeHtmlEntities(messageData.delta.text);
-            // STRM-01: Buffer flush every animation frame (~16ms).
-            // Chunks accumulate in streamBufferRef between frames, then flush on next rAF.
+            // STRM-01: Buffer flush with ~60ms accumulation window.
+            // Chunks accumulate in streamBufferRef; flush only when >= 60ms since last flush.
             streamBufferRef.current += decodedText;
             if (!streamTimerRef.current) {
+              // Reset flush timer on first chunk of a new stream.
+              if (lastFlushTimeRef.current === 0) {
+                lastFlushTimeRef.current = Date.now();
+              }
               streamTimerRef.current = requestAnimationFrame(() => {
-                const chunk = streamBufferRef.current;
-                streamBufferRef.current = '';
                 streamTimerRef.current = null;
-                appendStreamingChunk(setChatMessages, chunk, false);
+                const now = Date.now();
+                if (now - lastFlushTimeRef.current >= 60) {
+                  const chunk = streamBufferRef.current;
+                  streamBufferRef.current = '';
+                  lastFlushTimeRef.current = now;
+                  appendStreamingChunk(setChatMessages, chunk, false);
+                } else {
+                  // Not enough time elapsed -- re-schedule without flushing.
+                  streamTimerRef.current = requestAnimationFrame(function reSchedule() {
+                    streamTimerRef.current = null;
+                    const t = Date.now();
+                    if (t - lastFlushTimeRef.current >= 60) {
+                      const chunk = streamBufferRef.current;
+                      streamBufferRef.current = '';
+                      lastFlushTimeRef.current = t;
+                      appendStreamingChunk(setChatMessages, chunk, false);
+                    } else if (streamBufferRef.current) {
+                      streamTimerRef.current = requestAnimationFrame(reSchedule) as unknown as number;
+                    }
+                  }) as unknown as number;
+                }
               }) as unknown as number;
             }
             return;
@@ -272,6 +297,7 @@ export function useChatRealtimeHandlers({
             }
             const chunk = streamBufferRef.current;
             streamBufferRef.current = '';
+            lastFlushTimeRef.current = 0; // Reset for next stream
             appendStreamingChunk(setChatMessages, chunk, false);
             finalizeStreamingMessage(setChatMessages);
             return;
@@ -461,15 +487,34 @@ export function useChatRealtimeHandlers({
       case 'claude-output': {
         const cleaned = String(latestMessage.data || '');
         if (cleaned.trim()) {
-          // STRM-01: Buffer flush every animation frame (~16ms).
-          // Chunks accumulate in streamBufferRef between frames, then flush on next rAF.
+          // STRM-01: Buffer flush with ~60ms accumulation window.
           streamBufferRef.current += streamBufferRef.current ? `\n${cleaned}` : cleaned;
           if (!streamTimerRef.current) {
+            if (lastFlushTimeRef.current === 0) {
+              lastFlushTimeRef.current = Date.now();
+            }
             streamTimerRef.current = requestAnimationFrame(() => {
-              const chunk = streamBufferRef.current;
-              streamBufferRef.current = '';
               streamTimerRef.current = null;
-              appendStreamingChunk(setChatMessages, chunk, true);
+              const now = Date.now();
+              if (now - lastFlushTimeRef.current >= 60) {
+                const chunk = streamBufferRef.current;
+                streamBufferRef.current = '';
+                lastFlushTimeRef.current = now;
+                appendStreamingChunk(setChatMessages, chunk, true);
+              } else {
+                streamTimerRef.current = requestAnimationFrame(function reSchedule() {
+                  streamTimerRef.current = null;
+                  const t = Date.now();
+                  if (t - lastFlushTimeRef.current >= 60) {
+                    const chunk = streamBufferRef.current;
+                    streamBufferRef.current = '';
+                    lastFlushTimeRef.current = t;
+                    appendStreamingChunk(setChatMessages, chunk, true);
+                  } else if (streamBufferRef.current) {
+                    streamTimerRef.current = requestAnimationFrame(reSchedule) as unknown as number;
+                  }
+                }) as unknown as number;
+              }
             }) as unknown as number;
           }
         }
@@ -552,6 +597,7 @@ export function useChatRealtimeHandlers({
 
 
       case 'claude-complete': {
+        lastFlushTimeRef.current = 0; // Reset for next stream
         const pendingSessionId = sessionStorage.getItem('pendingSessionId');
         const completedSessionId =
           latestMessage.sessionId || currentSessionId || pendingSessionId;
@@ -771,21 +817,44 @@ export function useChatRealtimeHandlers({
             }
             const chunk = streamBufferRef.current;
             streamBufferRef.current = '';
+            lastFlushTimeRef.current = 0; // Reset for next stream
 
             if (chunk) {
               appendStreamingChunk(setChatMessages, chunk, true);
             }
             finalizeStreamingMessage(setChatMessages);
           } else if (!streamTimerRef.current && streamBufferRef.current) {
-            // STRM-01: Buffer flush every animation frame (~16ms).
-            // Chunks accumulate in streamBufferRef between frames, then flush on next rAF.
+            // STRM-01: Buffer flush with ~60ms accumulation window.
+            if (lastFlushTimeRef.current === 0) {
+              lastFlushTimeRef.current = Date.now();
+            }
             streamTimerRef.current = requestAnimationFrame(() => {
-              const chunk = streamBufferRef.current;
-              streamBufferRef.current = '';
               streamTimerRef.current = null;
+              const now = Date.now();
+              if (now - lastFlushTimeRef.current >= 60) {
+                const chunk = streamBufferRef.current;
+                streamBufferRef.current = '';
+                lastFlushTimeRef.current = now;
 
-              if (chunk) {
-                appendStreamingChunk(setChatMessages, chunk, true);
+                if (chunk) {
+                  appendStreamingChunk(setChatMessages, chunk, true);
+                }
+              } else if (streamBufferRef.current) {
+                streamTimerRef.current = requestAnimationFrame(function reSchedule() {
+                  streamTimerRef.current = null;
+                  const t = Date.now();
+                  if (t - lastFlushTimeRef.current >= 60) {
+                    const chunk = streamBufferRef.current;
+                    streamBufferRef.current = '';
+                    lastFlushTimeRef.current = t;
+
+                    if (chunk) {
+                      appendStreamingChunk(setChatMessages, chunk, true);
+                    }
+                  } else if (streamBufferRef.current) {
+                    streamTimerRef.current = requestAnimationFrame(reSchedule) as unknown as number;
+                  }
+                }) as unknown as number;
               }
             }) as unknown as number;
           }

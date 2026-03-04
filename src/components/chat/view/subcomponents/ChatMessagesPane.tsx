@@ -151,8 +151,8 @@ export default function ChatMessagesPane({
   // Turn grouping
   const { items, turnCount } = useTurnGrouping(visibleMessages);
 
-  // Scroll anchor — IntersectionObserver-based bottom detection
-  const { sentinelRef, isAtBottom, isUserScrolledUp: scrollAnchorUserScrolledUp, handleUserScroll, scrollToBottom: scrollAnchorScrollToBottom } = useScrollAnchor(scrollContainerRef);
+  // Scroll anchor — scroll-event based bottom detection
+  const { isAtBottom, isUserScrolledUp: scrollAnchorUserScrolledUp, handleScroll, scrollToBottom: scrollAnchorScrollToBottom } = useScrollAnchor(scrollContainerRef);
   const { newTurnCount } = useNewTurnCounter(turnCount, scrollAnchorUserScrolledUp);
 
   // Auto-scroll to bottom when new content arrives and user is at bottom
@@ -276,8 +276,7 @@ export default function ChatMessagesPane({
     <div className="flex-1 relative overflow-hidden">
       <div
         ref={scrollContainerRef}
-        onWheel={handleUserScroll}
-        onTouchMove={handleUserScroll}
+        onScroll={handleScroll}
         className="h-full overflow-y-auto overflow-x-hidden px-0 py-3 sm:p-4 space-y-3 sm:space-y-4 relative"
       >
       {isLoadingSessionMessages && chatMessages.length === 0 ? (
@@ -448,8 +447,7 @@ export default function ChatMessagesPane({
         <ReconnectSkeletons count={3} isLoading={isLoadingSessionMessages} />
       )}
 
-      {/* Sentinel div for IntersectionObserver-based bottom detection */}
-      <div ref={sentinelRef} style={{ height: '1px', width: '100%' }} aria-hidden="true" />
+      {/* Bottom anchor -- scroll tracking is now event-based (useScrollAnchor) */}
       </div>
 
       <ScrollToBottomPill
