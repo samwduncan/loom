@@ -65,7 +65,7 @@ export default function VersionUpgradeModal({
         <div className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center">
             {/* Backdrop */}
             <button
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+                className="fixed inset-0 bg-background/60 backdrop-blur-xl"
                 onClick={onClose}
                 aria-label={"Close version upgrade modal"}
             />

@@ -89,11 +89,11 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
 
   return (
     <OverlayPortal>
-    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[var(--z-modal)] md:p-4 bg-background/95">
+    <div className="modal-backdrop fixed inset-0 flex items-center justify-center z-[var(--z-modal)] md:p-4 bg-background/60 backdrop-blur-xl">
       <div className="bg-background border border-border md:rounded-lg shadow-xl w-full md:max-w-4xl h-full md:h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-border flex-shrink-0">
           <div className="flex items-center gap-3">
-            <SettingsIcon className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
+            <SettingsIcon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
             <h2 className="text-lg md:text-xl font-semibold text-foreground">{"Settings"}</h2>
           </div>
           <Button
@@ -171,7 +171,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 md:p-6 border-t border-border flex-shrink-0 gap-3 pb-safe-area-inset-bottom">
           <div className="flex items-center justify-center sm:justify-start gap-2 order-2 sm:order-1">
             {saveStatus === 'success' && (
-              <div className="text-green-600 text-green-400 text-sm flex items-center gap-1">
+              <div className="text-emerald-400 text-sm flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
@@ -179,7 +179,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
               </div>
             )}
             {saveStatus === 'error' && (
-              <div className="text-red-600 text-red-400 text-sm flex items-center gap-1">
+              <div className="text-destructive text-sm flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -199,7 +199,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
             <Button
               onClick={saveSettings}
               disabled={isSaving}
-              className="flex-1 sm:flex-none h-10 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
+              className="flex-1 sm:flex-none h-10 bg-primary hover:bg-primary/90 disabled:opacity-50 touch-manipulation"
             >
               {isSaving ? (
                 <div className="flex items-center gap-2">

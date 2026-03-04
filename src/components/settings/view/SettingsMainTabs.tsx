@@ -36,7 +36,7 @@ export default function SettingsMainTabs({ activeTab, onChange }: SettingsMainTa
               onClick={() => onChange(tab.id)}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 isActive
-                  ? 'border-blue-600 text-blue-600 text-blue-400'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
