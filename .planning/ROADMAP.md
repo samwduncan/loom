@@ -37,7 +37,7 @@ Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements
 - [ ] **Phase 13: Message Experience** - Hidden-hover actions, full-width messages, spacing, entrance animations, streaming fade
 - [x] **Phase 14: Toast & Overlay System** - Z-index scale, Sonner toasts, WebSocket status toasts, glassmorphic blur, portals (completed 2026-03-03)
 - [x] **Phase 15: Tool Call Display** - Action pills, pulsing indicators, collapse states, error expansion, accordion grouping (completed 2026-03-03)
-- [ ] **Phase 16: Sidebar & Global Polish** - Sidebar restyle, settings, mobile nav, modals, session grouping, collapse mode
+- [x] **Phase 16: Sidebar & Global Polish** - Sidebar restyle, settings, mobile nav, modals, session grouping, collapse mode (completed 2026-03-04)
 - [ ] **Phase 17: Streaming & Status** - RAF buffer, smart auto-scroll, scroll pill, typing/thinking indicators, status line, stop button
 
 ## Phase Details
@@ -152,12 +152,12 @@ Plans:
   3. The sidebar collapses to an icon-only strip that preserves session navigation
   4. Settings panel, all modals, and all dialogs use charcoal palette with glassmorphic blur -- no gray/blue/white artifacts remain
   5. Mobile navigation at 375px+ viewports matches the charcoal + rose theme with no layout or color inconsistencies
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 16-01: TBD
-- [ ] 16-02: TBD
-- [ ] 16-03: TBD
+- [x] 16-01-PLAN.md -- Time-grouped session list, compact density, rose active indicator (SIDE-01, SIDE-05, SIDE-06)
+- [x] 16-02-PLAN.md -- Charcoal+rose settings panel, glassmorphic modal backdrops (SIDE-02, SIDE-04)
+- [x] 16-03-PLAN.md -- Rose pill mobile nav, expanded collapsed sidebar strip (SIDE-03, SIDE-07)
 
 ### Phase 17: Streaming & Status
 **Goal**: Streaming responses feel smooth and communicative -- token buffering prevents jank, scroll behavior respects user control, the current AI activity is always visible, and the user can stop generation at any time
@@ -194,5 +194,5 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 | 13. Message Experience | v1.1 | 0/TBD | Not started | - |
 | 14. Toast & Overlay System | v1.1 | 3/3 | Complete | 2026-03-03 |
 | 15. Tool Call Display | 2/2 | Complete   | 2026-03-03 | - |
-| 16. Sidebar & Global Polish | v1.1 | 0/TBD | Not started | - |
+| 16. Sidebar & Global Polish | v1.1 | 3/3 | Complete | 2026-03-04 |
 | 17. Streaming & Status | v1.1 | 0/TBD | Not started | - |

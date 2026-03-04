@@ -59,13 +59,13 @@ Requirements for the Design Overhaul milestone. Charcoal + dusty rose palette, A
 
 ### Sidebar & Global (SIDE)
 
-- [ ] **SIDE-01**: Sidebar fully restyled with charcoal palette, density improvements, and tighter spacing
-- [ ] **SIDE-02**: Settings panel fully matches charcoal + rose theme -- no gray/blue/white artifacts
-- [ ] **SIDE-03**: Mobile navigation matches charcoal + rose theme at 375px+ viewports
-- [ ] **SIDE-04**: All modals and dialogs use charcoal palette with glassmorphic blur backgrounds
-- [ ] **SIDE-05**: Session list grouped by time categories (Today, Yesterday, Last 7 Days, Older)
-- [ ] **SIDE-06**: Active session shows 2px dusty rose left border with subtle bg-accent tinted background
-- [ ] **SIDE-07**: Sidebar collapses to icon-only strip with session icons
+- [x] **SIDE-01**: Sidebar fully restyled with charcoal palette, density improvements, and tighter spacing
+- [x] **SIDE-02**: Settings panel fully matches charcoal + rose theme -- no gray/blue/white artifacts
+- [x] **SIDE-03**: Mobile navigation matches charcoal + rose theme at 375px+ viewports
+- [x] **SIDE-04**: All modals and dialogs use charcoal palette with glassmorphic blur backgrounds
+- [x] **SIDE-05**: Session list grouped by time categories (Today, Yesterday, Last 7 Days, Older)
+- [x] **SIDE-06**: Active session shows 2px dusty rose left border with subtle bg-accent tinted background
+- [x] **SIDE-07**: Sidebar collapses to icon-only strip with session icons
 
 ### Streaming & Status (STRM)
 
@@ -167,13 +167,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOOL-03 | Phase 15 | Complete |
 | TOOL-04 | Phase 15 | Complete |
 | TOOL-05 | Phase 15 | Complete |
-| SIDE-01 | Phase 16 | Pending |
-| SIDE-02 | Phase 16 | Pending |
-| SIDE-03 | Phase 16 | Pending |
-| SIDE-04 | Phase 16 | Pending |
-| SIDE-05 | Phase 16 | Pending |
-| SIDE-06 | Phase 16 | Pending |
-| SIDE-07 | Phase 16 | Pending |
+| SIDE-01 | Phase 16 | Complete |
+| SIDE-02 | Phase 16 | Complete |
+| SIDE-03 | Phase 16 | Complete |
+| SIDE-04 | Phase 16 | Complete |
+| SIDE-05 | Phase 16 | Complete |
+| SIDE-06 | Phase 16 | Complete |
+| SIDE-07 | Phase 16 | Complete |
 | STRM-01 | Phase 17 | Pending |
 | STRM-02 | Phase 17 | Pending |
 | STRM-03 | Phase 17 | Pending |
