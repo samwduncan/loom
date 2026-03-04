@@ -1,206 +1,288 @@
 # Project Research Summary
 
-**Project:** Loom v1.1 -- Visual Redesign (charcoal + dusty rose)
-**Domain:** Brownfield visual redesign of a React 18 streaming AI chat interface
-**Researched:** 2026-03-03
+**Project:** Loom V2 — Premium AI Coding Agent Interface (Greenfield Frontend Rewrite)
+**Domain:** Streaming React SPA consuming Node.js/WebSocket backend — multi-provider AI coding agent interface
+**Researched:** 2026-03-04
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Loom v1.1 is a visual redesign of a complete, functional AI chat product. The features are built; the work is replacing the warm earthy palette (#1c1210 chocolate, #d4a574 amber) with charcoal + dusty rose (#1a1a1a, #D4736C) and elevating the visual experience to the standard set by Claude.ai, ChatGPT, Perplexity, and Open WebUI. The recommended approach is conservative and surgical: swap CSS variable values first, then audit and eliminate the 86+ hardcoded color references that bypass the variable system, then add new systems (toast notifications, animation utilities) as additive layers. The v1.0 architecture was explicitly designed for this kind of palette migration -- the `hsl(var(--token) / <alpha-value>)` contract in tailwind.config.js means that changing `:root` values in index.css instantly updates every semantic-class component. The complexity lies entirely in the hardcoded hex references scattered across 13 files.
+Loom V2 is a greenfield rewrite of a premium AI coding agent interface that connects to a preserved Node.js/Express/WebSocket backend (CloudCLI). The core engineering challenge is building a React 18 frontend that handles 100 tokens/second streaming without frame drops, while delivering a visual experience that makes AI agent work beautiful and transparent. Research across six reference products (Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat) plus the V1 post-mortem confirms that premium quality in this domain comes from invisible engineering: the app must feel effortless precisely because the streaming infrastructure is deeply engineered beneath the surface.
 
-The recommended premium identity follows the **Claude.ai playbook** adapted with Loom's distinctive warmth: invisible borders at 6-10% opacity, hidden-until-hover message actions, full-width assistant messages, generous 32px inter-turn spacing, and the dusty rose accent applied sparingly (5% of surface area maximum). The only new dependencies justified are Sonner for toast notifications (~3KB gzipped) and tailwindcss-animate as a CSS-only Tailwind plugin (0KB JS runtime). Motion/Framer Motion is explicitly rejected: its 34-55KB JS cost is not warranted when CSS grid-rows tricks and the existing isExiting pattern (used in 46+ components) cover all exit animation needs. The codebase already has 281 CSS transition/animation instances across 77 files -- the pattern is established and working.
+The recommended approach centers on three architectural pillars proven by V1 failure modes: a 4-store Zustand topology with selector-only subscriptions to prevent streaming re-render cascades; a useRef + requestAnimationFrame bypass for token accumulation that completely skips React's reconciler during streaming; and a strictly enforced design token system with ESLint guards from day one to prevent the hardcoded-color proliferation that consumed an entire V1 cleanup phase. The six-phase build order (App Shell → WebSocket Bridge → Streaming Engine → Message Rendering → Composer/Input → Navigation) is derived from strict dependency analysis and must not be violated — each phase produces prerequisites for all subsequent ones.
 
-The critical risk is the "hardcoded color hydra": 51 arbitrary hex values in chat components alone plus 371 Tailwind gray/slate/neutral/zinc classes inherited from CloudCLI, all bypassing the CSS variable system. Skipping this audit before changing `:root` values produces a visually inconsistent half-migrated UI with warm brown adjacent to charcoal. A second risk is animation-induced scroll regression: CSS transitions that animate height during streaming break the IntersectionObserver sentinel, causing scroll pill flicker and auto-scroll failure. The mitigation is precise -- animate only opacity and transform (layout-safe), never height, during or near streaming.
+The key risk is foundation rot: V1 failed because each phase introduced small violations (hardcoded colors, whole-store Zustand subscriptions, inline provider branching) that accumulated until a dedicated cleanup phase was required at Phase 11, and the accumulated debt forced the current V2 rewrite. V2 must enforce all architectural conventions from commit #1 via automated ESLint rules, never relying on human review alone. The V2 Constitution's enforceable conventions are the primary mitigation — every gate report must verify Constitution compliance as a BLOCKER, not a warning.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The existing stack requires minimal additions. React 18, TypeScript, Vite 7, Tailwind CSS 3.4, Shiki v4, react-markdown, CodeMirror 6, @xterm/xterm, lucide-react, and the `hsl(var(--token) / <alpha-value>)` CSS variable architecture are all inherited without change. The only new runtime dependency is Sonner for toast notifications. The only new dev dependency is tailwindcss-animate as a Tailwind plugin.
+The V2 stack is largely a continuation and consolidation of the V1 stack, with targeted additions driven by the streaming performance requirements. React 18 + Vite 7 + TypeScript 5.9 carry over unchanged; their Concurrent Mode features (`useTransition`, `useDeferredValue`) are essential, not optional. Tailwind CSS v3.4 (not v4) is locked because the `hsl(var(--token) / <alpha-value>)` runtime theming pattern breaks in v4's compile-time `@theme`. The two key additions are Zustand ^5.0.11 for state management (replacing React Context which re-renders all consumers at 100 tokens/sec) and Vitest ^4.0.18 for testing (native Vite integration, zero config).
+
+See `.planning/research/STACK.md` for complete version-locked dependency list and installation commands per phase.
 
 **Core technologies:**
-- `sonner ^2.0.7`: Toast notifications -- dark theme native, promise toasts, 3KB gzipped, maps directly to Loom's CSS variables via `[data-sonner-toast]` selectors. Zero dependencies.
-- `tailwindcss-animate ^1.0.7`: Animation utilities -- provides composable `animate-in`, `fade-in`, `slide-in-from-bottom-2` etc. as pure Tailwind CSS classes; 0KB JS runtime impact.
-- CSS variable value swap (no new library): The `:root` block in index.css changes HSL values but not variable names or the Tailwind config structure; every semantic-class component updates automatically.
-
-**Total new JS bundle impact:** ~3KB gzipped (Sonner only).
-
-**Rejected additions (documented rationale):**
-- `motion` (Framer Motion): 34-55KB gzipped JS; CSS grid-rows trick + tailwindcss-animate + isExiting pattern covers all v1.1 animation needs at 0KB JS cost
-- Any virtualization library: Chat sessions rarely exceed 100 turns; premature
-- Light mode / theme switching: Single dark theme is the brand identity; would require a complete second design system
+- **React 18 + Vite 7**: UI runtime and build — Concurrent Mode is mandatory for streaming performance; `useDeferredValue` prevents markdown parser from blocking input
+- **TypeScript 5.9 (strict)**: Discriminated union WebSocket message schema is the primary type-safety payload; `noUncheckedIndexedAccess` enforced
+- **Zustand ^5.0.11**: 4-store topology (timeline, stream, ui, connection) with selector-only subscriptions — prevents full-tree re-renders during streaming
+- **Tailwind CSS ^3.4.17 + CSS custom properties**: Runtime OKLCH token system; v3.4 locked (not v4) for opacity modifier compatibility
+- **motion ^12.35.0 (LazyMotion subset only)**: ~5KB for spring physics on tool call state machines and AnimatePresence; full 34KB bundle is banned
+- **Shiki ^4.0.1**: Lazy grammar loading per-language; never bundled upfront; deferred to post-stream (raw monospace during streaming)
+- **Vitest ^4.0.18 + @testing-library/react ^16.3.2**: Native Vite integration; per-phase test focus defined in STACK.md
+- **react-markdown ^10.1.0 + remark-gfm + rehype-raw**: Streaming-safe markdown with debounced parsing (not per-token); `useDeferredValue` on parsed AST
 
 ### Expected Features
 
-Analysis of six reference products (Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat) produced a clear priority ranking. The dependency chain is firm: the design system (CSS variables, palette, typography) is the prerequisite for all other visual work.
+The feature landscape is well-defined, cross-verified across 6 reference products plus a 106-requirement standards document. The key strategic distinction: Loom is purpose-built for AI coding agent work, not a general-purpose chat UI. Every feature decision filters through "does this make agent work more visible, beautiful, and controllable?"
 
-**Must have (table stakes):**
-- 3-4 tier surface elevation: base (#1a1a1a) -> cards (#222222) -> elevated (#2a2a2a) -> overlays. Use background lightness steps, NOT drop shadows.
-- Subtle borders at 6-10% white opacity -- single most impactful "premium" signal. Replace all hard borders with `hsl(var(--border) / 0.08-0.12)`.
-- Hidden-until-hover action buttons on messages -- single biggest clutter reducer. `opacity-0 group-hover:opacity-100 transition-opacity duration-200`.
-- Full-width assistant messages with transparent background (no bubble wrapper)
-- Generous 32-48px inter-turn spacing, tight spacing within turns
-- Toast notifications (glassmorphic style, bottom-right position, 2-4s auto-dismiss)
-- Chronological sidebar grouping with tracked time-group labels (Today, Yesterday, Last 7 Days)
-- Monospace code blocks with hover-reveal copy button (already built; verify new palette)
-- Semantic error states: gray=info, amber=warning, muted red=error
-- Dusty rose input focus glow: `box-shadow: 0 0 0 2px hsl(var(--accent)/0.15)` on focus
+See `.planning/research/FEATURES.md` for complete competitive pattern matrix, anti-features list, and 8-phase feature roadmap.
 
-**Should have (competitive differentiators):**
-- Tool call action card restyle: compact pill, icon + name + semantic state (pulsing rose = running, collapsed chip = success, expanded muted red = error)
+**Must have (table stakes) — core chat experience:**
+- Smooth streaming text (batch rendering, never character-by-character typewriter)
+- Send/Stop button morphing with instant response and square stop icon
+- Syntax-highlighted code blocks (Shiki, lazy) with hover-reveal copy button
+- Collapsible thinking/reasoning blocks (auto-collapsed when output begins, pulsing border while active)
+- Sticky auto-scroll with manual override and "jump to bottom" pill
+- Session management (create, switch, rename, delete, sidebar with time-grouped history)
+- 3-tier error boundaries (app / panel / message level)
+- Dark mode as first-class citizen (no flash of light theme on load)
+- OKLCH color token system (perceptually uniform; not HSL)
+
+**Should have (differentiators) — Loom-original:**
+- Semantic streaming states: ActivityStatusLine above input showing "Reading auth.ts...", "Writing server.ts..."
+- Tool call state machine animations: pending → running (pulsing rose indicator) → success (collapsed chip) → error (expanded muted red)
 - Execution chain grouping: 3+ sequential tool calls collapse into accordion with count badge
-- Semantic streaming states: "Reading auth.ts..." text status above ChatComposer via ActivityStatusLine component
-- Spring-physics message entrance: translateY(8px) + opacity 0->1, 250ms, `cubic-bezier(0.22, 1, 0.36, 1)` (CSS only)
-- Slim sidebar collapse to icon-only strip
-- Active session indicator: 2px dusty rose left border + `bg-accent/0.08` background tint
-- Token/cost display per response (muted footer text, session total in sidebar)
-- Custom text selection: `::selection { background-color: hsl(var(--accent)/0.25); }`
-- Glassmorphic overlays for floating elements only (modals, toasts, dropdowns -- NOT scrolling content)
+- Aurora ambient overlay during generation: Loom-original CSS-only shimmer, GPU-layer-capped
+- Tabbed multi-provider workspaces (Claude | Gemini | Codex) with independent session contexts
+- MCP server management UI with connection status indicators
+- GSD visual dashboard for phase pipeline and agent assignment
+- Animated pixel-art companion system (8 species, 14 animation states)
 
-**Defer to v2+:**
-- Context window gauge (after token display works)
-- Density toggle (after base density is correct)
-- Command palette (significant scope)
-- Font customization
-- Conversation branching / tree view (wrong mental model)
-- Light mode (dilutes brand)
-- Model comparison side-by-side (unnecessary for 2-model product)
-- Right-side artifact panel (conflicts with 720px centered rail)
+**Defer (post-V2 core):**
+- Cross-tab context sharing (validate tabbing works first)
+- Full phase handoff automation in GSD dashboard
+- Nextcloud file browser (file attachment works first)
+- Companion system if feasibility gate fails (Lottie fallback)
+- Light mode (single dark brand identity; OLED variant instead)
+- Conversation branching / tree view
+- Full IDE replacement (Monaco)
+
+**Anti-features (explicitly rejected):**
+- Character-by-character typewriter rendering
+- Right-side artifact panel (inline in chat stream instead)
+- Custom Mermaid/LaTeX rendering (code blocks suffice)
+- Per-tab WebSocket connections (single shared connection required by backend session model)
+- Glassmorphism on scrolling content (overlays only)
+- Heavy drop shadows on messages (OKLCH tonal elevation instead)
 
 ### Architecture Approach
 
-The architecture strategy is "change values, not structures." Five integration layers handle the full redesign without touching any business logic or streaming performance boundaries. Every new overlay element must use ReactDOM.createPortal to document.body to escape stacking contexts and overflow clipping. The streaming performance boundaries (requestAnimationFrame buffer, `contain: content` on `.message-streaming`, IntersectionObserver scroll anchor, React.memo + custom comparators on TurnBlock) are protected and must not be modified.
+Loom V2 uses the Headless Backend Hybrid pattern: CloudCLI is preserved entirely, and the React frontend is a pure rendering and interaction layer that owns zero business logic. The structural pattern is a multi-zone CSS Grid shell (sidebar | content | artifact) controlled by CSS custom property variables, with tab isolation achieved via React key-based unmount/remount (zero shared component state between tabs). The streaming hot path is isolated into a single `ActiveMessage` component that bypasses React's reconciler entirely via useRef + direct DOM text mutation; all past `TurnBlock` components are frozen behind `React.memo` with custom comparators and receive zero re-renders during streaming. A 6-phase dependency chain (App Shell → WebSocket Bridge → Streaming Engine → Message Rendering → Composer/Input → Navigation) must be followed strictly — each phase unblocks the next.
 
-**Five integration layers:**
-1. **CSS Variable Values** (`index.css :root`): 22 existing variables get new HSL channel values; 7 new tokens added (--toast-bg, --code-bg, --diff-bg, --streaming-cursor, scrollbar tokens). Variable names and Tailwind config structure stay identical.
-2. **Hardcoded Color References** (13 component files): 51 arbitrary hex values in Tailwind arbitrary syntax + 371 gray/slate/neutral/zinc classes. All must be replaced with semantic aliases. This is the largest single body of work.
-3. **Specialty Surface Themes**: xterm.js `TERMINAL_OPTIONS.theme` JS object (20 hex values -> Catppuccin Mocha), Shiki `WARM_COLOR_REPLACEMENTS` map (12 mappings), `warmDiffStyles` object in DiffViewer (25+ hex values), Tailwind Typography plugin overrides.
-4. **New Component Systems** (additive, no existing code changes): `ToastProvider` + `ToastContainer` (portal to document.body, subscribes to WebSocketContext connection state), `ActivityStatusLine` (CSS Grid 0fr/1fr reveal above ChatComposer).
-5. **Component Visual Polish**: hover states, micro-interactions, message spacing, message entrance animations -- CSS className additions only.
+See `.planning/research/ARCHITECTURE.md` for complete component boundary table, data flow diagrams, and all 7 named patterns with code examples.
+
+**Major components (three-layer model):**
+1. **Shell Layer** (AppShell, WorkspaceLayout, SidebarShell, ContentZone) — CSS Grid structure, no data fetching, no store subscriptions
+2. **Feature Panel Layer** (ChatWorkspace, SidebarNav, OmniBar, SettingsModal, MCPManager, GSDDashboard) — feature state ownership, independently error-bounded
+3. **Leaf Layer** (TurnBlock, ActiveMessage, ToolActionCard, ThinkingDisclosure, ChatComposer, CodeBlock, ActivityStatusLine) — pure render via props; `ActiveMessage` is the sole exception, directly subscribing to stream store for performance
+
+**Key patterns:**
+- Active Message Isolation: streaming response in separate `ActiveMessage` component, completely isolated from the `TurnBlock` list
+- Tool Call State Machine: `invoked → awaiting → resolving → resolved / rejected` discriminated union rendered differently per phase
+- CSS Grid Shell with CSS variable width control: sidebar collapse via CSS var mutation, no React re-renders
+- Content-visibility before react-virtual: browser handles off-screen rendering cost; pivot to `@tanstack/react-virtual` only at 2000+ messages
+- Single WebSocket shared across all tabs: tabs distinguished by sessionId, not by connection instance
 
 ### Critical Pitfalls
 
-1. **The Hardcoded Color Hydra** (CRITICAL): 51 arbitrary hex values (`bg-[#1c1210]`, `text-[#c4a882]`) + 371 gray/slate/zinc classes across 13 files bypass CSS variables entirely. Changing `:root` leaves 40% of the app in the old palette. Run the full grep audit and create a token map (old hex -> semantic class) BEFORE touching `:root` values. The migration plan must sequence audit first, then variables.
+Ten critical pitfalls are identified with V1 post-mortem evidence. The top five demand the highest attention during planning and gate verification.
 
-2. **HSL Alpha-Value Contract Breakage** (CRITICAL): The Tailwind config stores `hsl(var(--X) / <alpha-value>)`. CSS variables MUST contain bare HSL channels (`0 0% 10%`), never `hsl(0 0% 10%)` or comma-separated (`0, 0%, 10%`). Adding the `hsl()` wrapper produces nested `hsl(hsl(...) / 0.5)` which browsers silently ignore, breaking ALL opacity modifiers. Create an opacity test page immediately after variable changes and verify before proceeding.
+See `.planning/research/PITFALLS.md` for complete mitigation strategies, warning signs, phase-specific warnings, and integration gotchas.
 
-3. **Animation Jank During Streaming** (HIGH): `transition: all 150ms` on buttons/inputs triggers layout recalculation during streaming token arrival. Multiple aurora gradient elements (thinking + skeleton + aura = 3-5) create GPU compositing layers that exceed the AMD Radeon 780M iGPU budget (~8-10 layers), dropping frame rate. Replace `transition: all` with specific property transitions; add `.is-streaming` CSS guard class to disable non-critical animations; cap concurrent GPU layers.
+1. **Dual Color System Proliferation** — V1 accumulated 144+ hardcoded hex references across 15 files requiring a dedicated Phase 11 cleanup. Prevention: ESLint `no-restricted-syntax` banning `bg-[#`, `text-[#`, `border-[#` patterns as build-time errors from Phase 1, day 1. Zero tolerance from commit #1.
 
-4. **Scroll Behavior Regression from Animations** (HIGH): CSS transitions that animate height change `scrollHeight` over time, causing the IntersectionObserver sentinel to fire incorrectly (scroll pill flicker, auto-scroll failure, scroll position jumps after expand). Only animate `opacity` and `transform` -- these are layout-safe and don't affect `scrollHeight`. Use the CSS Grid 0fr/1fr pattern (already established in TurnBlock/ToolActionCard) for any expand/collapse near scroll containers.
+2. **setState for Streaming Tokens** — At 100 tokens/sec, React's reconciler is fatally overloaded. Prevention: `tokenRef.current += token` + direct DOM text mutation via `textContent` in the rAF loop; flush to Zustand only on stream completion. Verify with React DevTools Profiler: zero re-renders on past messages during streaming.
 
-5. **Z-Index Wars** (HIGH): Current codebase has unmanaged z-indexes spanning z-10 to z-[9999] across 20+ components. Adding toast notifications requires a formal z-index scale (sticky=10, floating=20, dropdown=30, overlay=40, modal=50, toast=60, critical=70) and portal-to-body strategy for ALL overlays. Must be established before adding any new overlay element.
+3. **Whole-Store Zustand Subscriptions** — `const store = useXxxStore()` without a selector subscribes to every store change, causing 100 re-renders/sec across all consumers. Prevention: ESLint rule banning no-selector subscriptions; only `useStreamStore(state => state.specificField)` or `useShallow` multi-field patterns are legal.
 
-6. **Contrast Ratio Failures on Charcoal** (HIGH): Dusty rose `#D4736C` on charcoal `#1a1a1a` = 4.2:1 contrast ratio, failing WCAG AA for small text (requires 4.5:1). Muted text at reduced opacity (`/30`) falls to 2:1 or below. Every text/background pair must be audited; opacity floor raised to `/40` minimum for readable text; a lighter rose variant added for text-use cases vs. decorative accent use.
+4. **Animation Jank During Streaming / GPU Layer Explosion** — V1 confirmed this on AMD Radeon 780M iGPU: aurora gradient elements exceeding 8-10 GPU layers trigger CPU fallback; `transition: all` fires layout-triggering transitions during streaming. Prevention: always specify exact transition properties; `.is-streaming` class disables non-critical animations; cap aurora elements at 2-3.
+
+5. **AI-Assisted Constitution Erosion** — V1's primary documented failure mode: each Claude Code session has partial Constitution context; violations accumulate phase by phase until a greenfield rewrite is required. Prevention: all ESLint rules wired in Phase 1 before any feature work; Constitution compliance is a BLOCKER in every gate report; "banned patterns quick reference" loaded with every session context.
+
+**Additional critical pitfalls (summarized):**
+- **Orphaned Components**: V1 confirmed — `ToolCallGroup.tsx` fully implemented but never imported; wiring verification is a mandatory gate check for every file created
+- **Multi-Provider WebSocket Message Type Explosion**: V1's handler grew to 1050 lines; normalize to discriminated union at WebSocket layer before stores see data
+- **Z-Index Wars**: V1 ended with values ranging z-10 to z-[9999]; z-index dictionary in CSS tokens + ESLint enforcement + portal requirement for all overlays from Phase 1
+- **Session State Race Conditions**: stream store must clear completely before any session switch; provider identity stored on session objects, not derived from ambient state
+- **Scroll Behavior Regression from Animations**: entry animations must use only `opacity` and `transform: translateY`; IntersectionObserver sentinel debounced by 150ms
 
 ## Implications for Roadmap
 
-The architecture's five integration layers map directly to a natural phase order. The dependency chain is unambiguous: nothing can be visually correct until the design system is in place, and the design system requires the hardcoded color audit to be complete before variables are changed.
+The dependency chain from ARCHITECTURE.md is strict and cross-validated by FEATURES.md's "Dependency Critical Path" and PITFALLS.md's phase-specific warnings. The roadmap must follow this order exactly — phases cannot be parallelized without breaking prerequisites.
 
-### Phase 1: Design System Foundation
-**Rationale:** CSS variable values are the prerequisite for everything else. Once variables are correct, every semantic-class component updates automatically. This must complete before any component work is judged visually.
-**Delivers:** Global palette switch (charcoal + dusty rose), 3-tier surface elevation, opacity modifiers verified working, WCAG contrast compliance checked, new token vocabulary (surface hierarchy, rose scale, scrollbar tokens, streaming cursor token), input focus glow, text selection color.
-**Addresses:** CSS variable value swap, border opacity standardization, warm text hierarchy, scrollbar tokenization, select dropdown arrow SVG update.
-**Avoids:** HSL alpha contract breakage (#2), contrast ratio failures (#6). Requires completing the hardcoded color audit grep BEFORE changing `:root` values -- the audit informs the token map needed for Phase 2.
-**Research flag:** Skip -- well-documented CSS variable migration pattern with fully specified target values.
+### Phase 1: App Shell + Design System Foundation
 
-### Phase 2: Hardcoded Color Sweep
-**Rationale:** The 51+ arbitrary hex values and 371 gray/slate/zinc classes are the exact blocker preventing design system propagation. This is mechanical but critical: without it, 40% of the app stays warm brown after Phase 1.
-**Delivers:** 100% palette consistency across all chat components; grep audit for `[#` returns zero matches; all warm brown/amber/terracotta eliminated; semantic token coverage complete.
-**Addresses:** MessageComponent.tsx (17 hex refs), CodeBlock.tsx (7), SystemStatusMessage.tsx (7), ThinkingDisclosure.tsx (6), ScrollToBottomPill.tsx (full hardcode), streaming-cursor.css (#d4a574 cursor), ConnectionStatusDot.tsx (3 status hex), gray/slate/zinc class migration.
-**Avoids:** Component cascade at panel junctions (#7), hardcoded color hydra (#1).
-**Research flag:** Skip -- mechanical find-and-replace using the token map created during Phase 1 audit.
+**Rationale:** Every subsequent phase depends on the CSS token system and ESLint enforcement infrastructure. Constitution violations accumulate from the first commit if guards are not in place. This phase has no visible user value but is the prerequisite for everything that follows.
+**Delivers:** AppShell (CSS Grid skeleton, 100dvh, overflow hidden), OKLCH CSS custom property token map, z-index dictionary (--z-base through --z-toast), typography system (Inter + Instrument Serif + JetBrains Mono), 3-tier Error Boundary hierarchy (app/panel/message), Zustand 4-store skeletons with selector-only pattern wired, Vitest + ESLint configured with all Constitution rules, LazyMotion provider setup.
+**Addresses:** OKLCH design token system, surface elevation hierarchy, typography, spring physics tokens, ESLint custom rules enforcement, 3-tier error boundaries
+**Avoids:** Pitfall 1 (dual color system), Pitfall 3 (whole-store subscriptions), Pitfall 7 (Constitution erosion), Pitfall 9 (z-index wars) — all must be locked in before any component work begins
+**Research flag:** SKIP — well-documented patterns (Tailwind tokens, Zustand setup, Vitest config). One pre-execution check: verify OKLCH values in CSS `:root` custom properties work correctly with Tailwind v3.4's `hsl(var(--token) / <alpha-value>)` opacity modifier syntax. Quick empirical test sufficient.
 
-### Phase 3: Specialty Surface Rethemes
-**Rationale:** Third-party components (xterm.js, Shiki, DiffViewer, Tailwind Typography) have independent color systems that don't read from CSS variables. They require individual configuration updates with explicit hex values.
-**Delivers:** Terminal background matches charcoal; syntax highlighting matches new palette; diff viewer palette correct; markdown prose content uses rose accent for links and correct heading colors.
-**Addresses:** xterm.js TERMINAL_OPTIONS.theme (20 hex values -> Catppuccin Mocha charcoal variant), useShikiHighlighter WARM_COLOR_REPLACEMENTS (12 mappings), warmDiffStyles object (25+ colors), tailwind.config.js typography prose overrides (`--tw-prose-body`, `--tw-prose-code`, etc.).
-**Avoids:** Dark mode consistency / third-party color leakage (#8), prose typography plugin leakage (#11).
-**Research flag:** Skip -- direct file updates with known target values. Catppuccin Mocha is a published palette with documented hex values.
+### Phase 2: WebSocket Bridge + State Contract
 
-### Phase 4: Message Experience and Micro-Interactions
-**Rationale:** With the palette fully consistent across all surfaces, message-level visual polish is the highest-impact next step. Hidden-until-hover actions alone transform the perceived density of the interface.
-**Delivers:** Hidden-until-hover message actions, full-width assistant messages confirmed, 32px inter-turn spacing, message entrance animation (translateY(8px) + opacity, CSS only, cubic-bezier spring approximation), streaming batch opacity fade-in, button hover glows, active:scale-[0.98] press feedback, `::selection` dusty rose.
-**Uses:** tailwindcss-animate for `animate-in fade-in-0 slide-in-from-bottom-2` utilities, CSS Grid 0fr/1fr for expand/collapse, Tailwind semantic tokens.
-**Avoids:** Animation jank during streaming (#3 -- only opacity/transform used), scroll behavior regression (#4 -- no height animations during streaming), bundle size creep (#10 -- CSS only, no animation JS library), global `transition: none` override (#15 -- must account for this before writing animation CSS).
-**Research flag:** Skip -- established CSS animation patterns; tailwindcss-animate well-documented.
+**Rationale:** All chat features depend on real streaming data. The discriminated union WebSocket message schema and 4-store state contract must be finalized before any UI component touches live data. The InputStub (hardcoded prompt sender) enables downstream phase testing without a complete UI.
+**Delivers:** WebSocketProvider, typed `WSMessage` discriminated union, provider-specific normalizers (`parseClaudeMessage.ts`, `parseCodexMessage.ts`, `parseGeminiMessage.ts`), 4 Zustand stores fully populated with actions, useRef token buffer with rAF loop, REST API client layer, InputStub component for testing.
+**Uses:** Zustand ^5.0.11, native WebSocket (no library), TypeScript discriminated unions with exhaustive switch
+**Implements:** Connection store, stream store (semantic state only — token text never in Zustand), token buffer bypass pattern
+**Avoids:** Pitfall 2 (setState for tokens), Pitfall 3 (whole-store subscriptions), Pitfall 8 (provider-specific branching in stores), Pitfall 10 (session race conditions — session guard designed in from the start)
+**Research flag:** NEEDS RESEARCH — exact WebSocket message shapes from CloudCLI backend for all three providers (Claude protocol: content_block_start/delta/stop; Codex: item-based; Gemini: separate tool events). FEATURES.md marks this HIGH priority. Without this, the discriminated union is speculative.
 
-### Phase 5: Toast Notifications and Z-Index System
-**Rationale:** Toast system requires establishing the z-index scale first. The current z-index landscape spans z-10 to z-[9999] with no formal system -- adding any new overlay layer without a scale creates conflicts.
-**Delivers:** Formal z-index CSS custom property scale (--z-sticky through --z-critical), Sonner Toaster installed and themed to charcoal+rose via CSS variable overrides, WebSocket connection state toasts (warning on disconnect, success on reconnect), session error toasts, portal strategy documented.
-**Uses:** `sonner ^2.0.7`, ReactDOM.createPortal, WebSocketContext connection state (ToastProvider wraps inside WebSocketProvider).
-**Avoids:** Z-index wars (#6), toast inside scroll container (anti-pattern 3 from ARCHITECTURE.md), backdrop contrast failure on charcoal (#14 -- increase `bg-black/50` to `bg-black/70`).
-**Research flag:** Skip -- Sonner API is documented; portal pattern is standard React.
+### Phase 3: Streaming Engine + Scroll Physics
 
-### Phase 6: Tool Call Display and Sidebar Polish
-**Rationale:** Tool calls are central to Loom's coding workflow. Once the palette foundation is established and toast system provides the z-index framework, tool call action cards and the sidebar are the next highest-impact component areas.
-**Delivers:** Tool call action pills (compact, icon + name + semantic state colors), pulsing rose indicator for running state, collapsed chip for success, expanded muted red background for errors, execution chain grouping (3+ calls -> accordion with count badge), sidebar time groups with tracked labels, active session 2px rose border + bg tint, slim sidebar icon-only collapse mode.
-**Avoids:** Component cascade at panel junctions (#7 -- sidebar edge cases require checking sidebar/chat boundary), mobile breakpoint regression (#9 -- sidebar collapse must work at 375px).
-**Research flag:** Low confidence needed. If exact visual parity with ChatGPT action pill pattern is required, a brief research pass on pill CSS specifics would reduce design iteration. Otherwise, the FEATURES.md competitive matrix has sufficient detail.
+**Rationale:** The scroll anchor system and rAF token buffer are the performance foundation for the entire chat experience. Implementing these correctly before building message rendering prevents the V1 failure mode of retrofitting scroll physics after animations are already added.
+**Delivers:** ChatViewport (scroll container), ActiveMessage (ref-based DOM mutation, isolated hot path), useScrollAnchor (IntersectionObserver sentinel pattern), ScrollToBottomPill, rAF token buffer with 50ms render throttle, content-visibility:auto on past messages with contain-intrinsic-size.
+**Implements:** Active Message Isolation pattern, Content-visibility pattern
+**Avoids:** Pitfall 4 (animation jank during streaming — streaming performance baseline established before any animation is added), Pitfall 5 (scroll behavior regression — build scroll correctly before adding any CSS transitions)
+**Gate:** 2000-token stream, scroll locks to bottom, 1px scroll up detaches auto-scroll, no jank visible, FPS stays above 55 under streaming load
+**Research flag:** SKIP — scroll physics patterns confirmed by V1 research and PITFALLS.md; IntersectionObserver sentinel approach documented in V1 Phase 7 RESEARCH.md.
 
-### Phase 7: Activity Status and Streaming States
-**Rationale:** Semantic streaming states ("Reading auth.ts...", "Writing server.ts...") are a meaningful differentiator but require reading tool event data from the stream. Depends on solid animation foundation from Phase 4 and palette from Phases 1-3.
-**Delivers:** ActivityStatusLine component (CSS Grid 0fr/1fr reveal above ChatComposer, shows during streaming), semantic status text parsed from useChatRealtimeHandlers tool events, send-to-stop icon morph (CSS opacity crossfade), streaming cursor color updated to hsl(var(--primary)).
-**Uses:** CSS Grid expand/collapse, useChatRealtimeHandlers tool event subscription, CSS transition crossfade for send/stop swap.
-**Avoids:** Animation jank during streaming (#3), scroll regression (#4). The ActivityStatusLine must use the CSS Grid 0fr/1fr pattern (not max-height) and must not trigger scroll height changes.
-**Research flag:** Skip for CSS/animation work. If backend stream tool event format is undocumented or complex, a brief audit of actual WebSocket message shapes before planning will reduce mid-phase surprises.
+### Phase 4: Message Rendering + Tool Cards
+
+**Rationale:** With scroll physics proven under load, build the content layer. Tool cards require a working scroll container because they affect message heights. Shiki loading must remain deferred (post-stream only) as established in Phase 3.
+**Delivers:** TurnBlock (React.memo with custom comparator preventing streaming re-renders), ToolActionCard (4-state machine: invoked/awaiting/resolving/resolved/rejected), ThinkingDisclosure (collapsible with pulsing border), react-markdown with streaming-safe debounced parsing, Shiki lazy-loaded per language, CodeBlock (copy button, language header, max-height scroll), DiffViewer.
+**Addresses:** Syntax-highlighted code blocks, collapsible thinking blocks, tool call state machine animations, inline tool result rendering (diffs, syntax highlight)
+**Avoids:** Pitfall 5 (scroll regression from animations — entry animations use opacity + transform only, never height), Pitfall 4 (Shiki deferred to post-stream; raw monospace container during streaming prevents layout shift)
+**Research flag:** SKIP for core rendering patterns. Sub-flag: validate streaming markdown debounce strategy (parse on newlines/sentence-end vs 50ms idle window) against live CloudCLI output during execution to confirm approach.
+
+### Phase 5: Composer + Input + Activity Status
+
+**Rationale:** The input system requires a working message rendering pipeline for visual review. ActivityStatusLine requires the stream store's activityText field established in Phase 2. This phase completes the full conversation loop.
+**Delivers:** ChatComposer (shadow-div auto-resize, Shift+Enter vs Enter, focus trapping), ActivityStatusLine (parses stream store activityText into human-readable status), send/stop morphing, file attachment chips, drag-and-drop zone, permission request inline UI, draft preservation (localStorage per session), context window gauge.
+**Addresses:** Auto-growing textarea, send/stop button morphing, semantic streaming states (ActivityStatusLine), context window gauge, optimistic UI, no duplicate submissions, draft preservation
+**Avoids:** Pitfall 5 (scroll regression from composer height changes — shadow-div resize pattern must not affect scroll math)
+**Research flag:** NEEDS RESEARCH (MEDIUM) — which CloudCLI WebSocket event fields map to "Reading file X" vs "Writing file Y" vs "Running terminal command" for ActivityStatusLine parsing. FEATURES.md marks this MEDIUM priority.
+
+### Phase 6: Navigation + Session Management + Sidebar
+
+**Rationale:** Full E2E usability requires navigation. Session switching, tab management, and the command palette are built last in the core sequence because they depend on a working chat loop (Phases 1-5) to test against. This phase delivers a fully usable product.
+**Delivers:** SidebarNav (chronological groups: Today/Yesterday/Older, provider badge per session), OmniBar (Cmd+K, fuzzy search), tab bar + WorkspaceTab management (React key isolation, provider identity on session object), session switching with pending guard, SettingsModal (glassmorphic portal), multi-provider tab creation, keyboard navigation throughout.
+**Implements:** Multi-Tab Provider Isolation pattern (React key = tabId, visibility:hidden for background tabs preserving scroll/input state)
+**Addresses:** Session management (create/switch/rename/delete), tabbed multi-provider workspaces, OmniBar command palette, settings panel
+**Avoids:** Pitfall 10 (session state race conditions — pending guard, stream store clear on session switch), Pitfall 9 (z-index wars — all modals portalled to document.body)
+**Gate:** App is fully usable E2E, keyboard-navigable, sessions switch without streaming bleed between providers
+**Research flag:** SKIP for core session management patterns. Sub-flag: tab persistence across page refresh approach needs brief investigation during planning (FEATURES.md flags this MEDIUM priority).
+
+### Phase 7: Streaming UX Polish
+
+**Rationale:** Polish phases build on proven infrastructure. Aurora overlay, execution chain grouping, and token/cost display are additive features that must not regress streaming FPS established in Phase 3.
+**Delivers:** Aurora ambient overlay (CSS-only, .is-streaming guard, GPU-layer-capped at 2-3 elements), execution chain grouping (3+ calls → accordion with count badge), token/cost display per response (compact footer: "450 in / 120 out"), message entrance spring animations (LazyMotion LazyMotion subset, opacity + translateY only), streaming cursor (rose pulsing vertical bar brand moment), MCP server source labels on tool cards.
+**Addresses:** Aurora overlay, execution chain grouping, streaming cursor identity, token/cost display, message entrance spring animations
+**Avoids:** Pitfall 4 (GPU layer explosion — cap aurora elements at 2-3, verify Chrome DevTools Layers panel after each addition shows < 10 compositor layers), Pitfall 5 (scroll regression — every animation addition includes scroll regression gate check)
+**Research flag:** SKIP — patterns well-established from V1 aurora research and PITFALLS.md phase warnings.
+
+### Phase 8: MCP Management + Plugin System
+
+**Rationale:** Agent capability management is independent of the core chat loop and can be built cleanly after navigation is solid. REST API contract for MCP endpoints established in Phase 2.
+**Delivers:** MCP server management UI (list, enable/disable, connection status: green/amber/orange), active connections panel in composer area, Claude Code plugin/skill management, approval flow for write-heavy MCP actions (configurable, off by default with inline approve/decline).
+**Addresses:** MCP server management UI, active MCP connections panel, approval flow for write-heavy actions, MCP server source labeling on tool cards
+**Research flag:** SKIP — REST API contract established; UI patterns from LibreChat/LobeChat reference analysis well-understood.
+
+### Phase 9: GSD Visual Dashboard
+
+**Rationale:** Native GSD orchestration from the UI is a Loom-original feature with no reference product to validate against. It requires the complete navigation and session infrastructure from Phase 6 and has a backend dependency that needs verification.
+**Delivers:** Phase pipeline visualization (phase cards with status: pending/active/complete/failed), agent assignment indicators (Claude vs Gemini per phase), GATE-REPORT inline viewing, basic phase execution from UI (/gsd:execute-phase N).
+**Addresses:** GSD visual dashboard, agent assignment visibility, native GSD orchestration
+**Research flag:** NEEDS RESEARCH — verify CloudCLI exposes /api/taskmaster/* endpoint and confirm GATE-REPORT format and file system access model. If the endpoint does not exist, Phase 9 requires backend work as a prerequisite. FEATURES.md marks this as backend-dependent with uncertain integration path.
+
+### Phase 10: Nextcloud Integration
+
+**Rationale:** File management is backend-dependent on Nextcloud API architecture and is independent of the core chat loop. Defer until core is proven. This phase has the highest architectural uncertainty of all phases.
+**Delivers:** File picker for Nextcloud attachment to messages, Nextcloud file browser (navigate, preview text files), screenshot upload pipeline (watch folder, auto-attach offer), file operation diff display in tool cards.
+**Addresses:** File attachment to chat, Nextcloud file browser, screenshot upload pipeline, agent file operation visibility
+**Research flag:** NEEDS RESEARCH (HIGH) — Nextcloud integration architecture is explicitly LOW confidence: direct WebDAV from browser vs CloudCLI backend proxy has significant implications for CORS, auth token handling, and streaming behavior for file operations. Must be verified during planning before this phase begins.
+
+### Phase 11: Companion System
+
+**Rationale:** Companion system is gated on a feasibility assessment. itch.io license compatibility, canvas vs CSS sprite animation approach, and iGPU performance on AMD Radeon 780M must be validated before committing to this phase. If feasibility fails, Lottie animation or CSS-only loader serves as fallback for "alive" empty state.
+**Delivers:** Sprite sheet rendering (CSS animation from 512x896 sprite sheets, 64x64 tiles), animation state machine (idle → type, celebrate → idle transitions), event binding (tool success → celebrate, error → alarmed), companion selection in settings (8 companions: Spool/Shiba, Bobbin/Cat, Shuttle/RedPanda, Weft/Fox, Spindle/Hamster, Thimble/Panda, Lacing/Bunny, Warp/Owl), placement and hide toggle.
+**Addresses:** Animated pixel-art companion system, reactive animation states, companion selection, emotional warmth in empty state
+**Research flag:** NEEDS RESEARCH (HIGH PRIORITY GATE) — feasibility assessment must complete before committing to this phase scope: itch.io license compatibility for commercial/private use, CSS sprite animation vs @napi-rs/canvas performance on Radeon 780M iGPU, whether 14 animation states are feasible via CSS sprite sheets alone. FEATURES.md: "must complete before committing to Phase 8 [companion]."
 
 ### Phase Ordering Rationale
 
-- Phases 1-3 are strictly sequential: CSS variables -> component hardcodes -> third-party systems. None can be reordered.
-- Phases 4-7 are largely independent but Phase 5 (z-index scale) should precede any work adding new overlay elements to avoid rework.
-- Every phase must include mobile regression testing at 375px. The mobile-specific CSS in index.css (lines 351-436) has critical fixed-position and safe-area dependencies that break silently on desktop.
-- Scroll behavior must be regression-tested at the end of Phases 4 and 7 (the phases adding CSS transitions and new animated components).
-- The hardcoded color audit grep should be run as the first action of Phase 1, before changing any values, to inform the token replacement map used in Phase 2.
+The ordering follows strict technical dependency: App Shell tokens must exist before any component uses them (prevents Pitfall 1); WebSocket types must be defined before any state code references them (prevents Pitfall 8); streaming physics must be proven under load before adding animation on top (prevents Pitfalls 4 and 5); the full chat loop must work before building navigation that wraps it (prevents testing against a broken baseline). This mirrors the V2 Rewrite Playbook ordering and was validated against ARCHITECT_SYNC.md consensus.
+
+Feature groupings follow architecture boundaries: streaming infrastructure phases (1-3) are hermetically sealed from content rendering phases (4-5); navigation/session management (6) is isolated to avoid contaminating the streaming hot path during development; polish phases (7-8) are additive on proven infrastructure; independent backend integrations (9-11) are deferred to avoid blocking core delivery.
+
+The pitfall-avoidance pattern: Pitfalls 1/3/7/9 (foundation issues) must be resolved in Phase 1 exclusively; Pitfalls 2/8 (streaming architecture issues) must be resolved in Phase 2 exclusively; Pitfalls 4/5 (animation-streaming interference) are ongoing concerns that every subsequent phase with animation additions must gate against.
 
 ### Research Flags
 
-Phases needing deeper research during planning:
-- **Phase 6 (tool call display):** If tight visual fidelity to ChatGPT's action pill pattern is a goal, a focused research pass on the CSS/component structure would reduce design iteration time. The FEATURES.md competitive matrix provides sufficient guidance for a competent implementation.
-- **Phase 7 (semantic streaming states):** A brief audit of actual WebSocket message shapes from useChatRealtimeHandlers (what fields are available when a tool call starts/completes) before planning will prevent scope surprises.
+**Needs phase-specific research during planning:**
+- **Phase 2 (WebSocket Bridge):** Exact CloudCLI WebSocket message shapes for all three providers — HIGH priority, must complete before Phase 2 execution begins
+- **Phase 5 (Composer/Activity):** Which WebSocket event fields map to specific ActivityStatusLine text strings — MEDIUM priority
+- **Phase 6 (Navigation):** Tab persistence across page refresh approach — MEDIUM priority, handle during planning
+- **Phase 9 (GSD Dashboard):** Backend endpoint availability for planning file access — verify before committing to phase scope
+- **Phase 10 (Nextcloud):** Direct WebDAV vs backend proxy architecture — HIGH priority (LOW confidence currently); determines CORS, auth, and streaming approach
+- **Phase 11 (Companion):** Feasibility gate (itch.io licenses, canvas vs CSS sprite, iGPU performance) — HIGH priority gate; phase must not be scoped until gate passes
 
-Phases with well-documented patterns (skip research):
-- **Phase 1:** CSS variable migration is a solved pattern; all target values and the two-pass strategy are fully specified in ARCHITECTURE.md.
-- **Phase 2:** Mechanical grep-and-replace with a known token map. The audit commands are in PITFALLS.md Pitfall 1.
-- **Phase 3:** Direct config file updates with known targets. Catppuccin Mocha hex values are a published palette.
-- **Phase 4:** tailwindcss-animate utilities are documented; CSS-only animation pattern is established in 281 existing instances.
-- **Phase 5:** Sonner API is documented; portal pattern is standard React.
+**Standard patterns — skip phase research:**
+- **Phase 1 (App Shell/Design System):** Tailwind config, Vitest setup, Zustand initialization are all well-documented; one quick empirical OKLCH-in-Tailwind-v3.4 verification
+- **Phase 3 (Streaming/Scroll):** IntersectionObserver sentinel pattern confirmed by V1 research; content-visibility:auto MDN-documented with clear browser support matrix
+- **Phase 4 (Message Rendering):** react-markdown pipeline established and working in V1; Shiki lazy loading documented
+- **Phase 7 (Streaming Polish):** Aurora and animation patterns established from V1 research and PITFALLS.md analysis
+- **Phase 8 (MCP Management):** REST API contract established in Phase 2; UI patterns from reference app analysis
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Verified via npm registry (actual package sizes measured 2026-03-03), direct codebase audit (bundle size 1.38MB measured), peer dependency compatibility confirmed, Tailwind 3.4.17 install verified. |
-| Features | HIGH | Cross-verified across 6 reference products via Gemini research. Competitive matrix covers palette, message styling, tool call display, streaming indicators, and sidebar design. Some ChatGPT post-GPT5 details MEDIUM (may reflect unreleased features). |
-| Architecture | HIGH | Based on direct analysis of the built v1.0 codebase. All file paths, line numbers, class names, and component counts verified against actual source. The 86 hardcoded hex count and 13-file distribution are audited facts, not estimates. |
-| Pitfalls | HIGH | All critical pitfalls verified against actual codebase. The 51 arbitrary hex count, z-index value distribution (z-10 to z-[9999]), and streaming performance boundary locations are direct grep results. WCAG contrast ratios are calculated against actual planned hex values. |
+| Stack | HIGH | All versions verified on npm registry 2026-03-04; peer dependency matrix validated; V1 codebase confirms working packages; ARCHITECT_SYNC.md consensus validates architecture-level choices |
+| Features | HIGH | Cross-verified from 6 reference product analyses + 106-requirement standards document + PROJECT.md constraints; anti-features explicitly documented; competitive pattern matrix covers all major dimensions |
+| Architecture | HIGH | Based on BACKEND_API_CONTRACT.md + ARCHITECT_SYNC.md co-architect consensus + direct V1 codebase analysis; 7 named patterns with code examples; component boundary table with 20+ components |
+| Pitfalls | HIGH | Every pitfall grounded in V1 post-mortem evidence (gate reports, audit files); not theoretical — documented failures with known consequences, file-level evidence, and grep-verified counts |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Exact charcoal HSL values need visual calibration:** ARCHITECTURE.md notes the target HSL values are "illustrative." The approach is correct, but specific lightness levels for --card, --secondary, --muted-foreground need visual verification during Phase 1 execution. A slightly lighter rose may be required to clear WCAG AA for small text.
-- **Dusty rose WCAG AA boundary:** `#D4736C` on `#1a1a1a` = 4.2:1, failing WCAG AA for small text (4.5:1 required). A lighter rose variant for text-use cases (e.g., `--accent-text: 5 35% 75%`) may need to be added to the token vocabulary in Phase 1.
-- **Backend stream event shapes for Phase 7:** The ActivityStatusLine depends on tool event data from useChatRealtimeHandlers. A brief audit of actual WebSocket message fields before Phase 7 planning will prevent scope changes mid-phase.
-- **Mobile safe-area final verification:** `env(safe-area-inset-bottom)` only works correctly in standalone/PWA mode. DevTools responsive mode cannot fully simulate this. Real device or iOS simulator testing is required, particularly after Phase 1 changes padding/spacing.
+- **CloudCLI WebSocket protocol (Phase 2 blocker):** The `WSMessage` discriminated union in STACK.md is illustrative ("finalize after backend audit"). Before Phase 2 execution, audit `server/index.js` and actual WebSocket output to confirm exact message shapes for all three providers. Getting this wrong requires rewriting the entire message pipeline — it is the highest-stakes gap in the research.
+
+- **OKLCH in Tailwind v3.4 (Phase 1 pre-check):** STACK.md locks Tailwind at v3.4 for `hsl(var(--token) / <alpha-value>)` compatibility, but token definitions use OKLCH color values. Verify that OKLCH values in CSS `:root` custom properties work correctly with Tailwind v3.4's opacity modifier syntax before Phase 1 begins. Quick empirical test in isolation sufficient.
+
+- **GSD Dashboard backend integration (Phase 9 gate):** The /api/taskmaster/* endpoint is referenced in ARCHITECTURE.md component boundary table but its existence in the current CloudCLI server needs verification. If this endpoint does not exist, Phase 9 requires backend work as a prerequisite and the phase scope must be revised.
+
+- **Nextcloud integration architecture (Phase 10 gate):** FEATURES.md explicitly rates this LOW confidence. The choice between direct WebDAV from the browser vs proxying through CloudCLI affects CORS headers, auth token handling, and streaming behavior for file operations. Verify during Phase 10 planning before any implementation begins.
+
+- **Companion system feasibility (Phase 11 gate):** Phase 11 is explicitly conditional. The feasibility gate must verify itch.io license compatibility for private/commercial use, CSS sprite vs canvas performance on AMD Radeon 780M iGPU (no discrete GPU, no ROCm), and whether 14 animation states are achievable via CSS sprite sheets alone before Phase 11 is committed to scope.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Direct codebase audit of `/home/swd/loom/src/` (v1.0 built) -- hardcoded hex counts, z-index values, file paths, animation inventories, bundle size, Tailwind version
-- npm registry (verified 2026-03-03) -- sonner@2.0.7 (3KB gzipped), tailwindcss-animate@1.0.7 (0KB JS), motion@12.34.4 (34-55KB gzipped), react-hot-toast@2.6.0, @radix-ui/react-toast@1.2.15
-- Tailwind CSS documentation -- HSL `<alpha-value>` contract, tailwindcss-animate peer dep compatibility (>=3.0.0)
-- WCAG 2.1 Level AA -- 4.5:1 contrast ratio requirement for normal text, 3:1 for large text
+- `.planning/BACKEND_API_CONTRACT.md` — Full WebSocket + REST protocol specification for CloudCLI
+- `.planning/ARCHITECT_SYNC.md` — Claude + Gemini co-architect consensus on all 10 architectural concerns (2026-03-04)
+- `.planning/audit/UI_COMPONENT_ARCHITECTURE.md` — Streaming render pattern analysis (Gemini)
+- `.planning/audit/EXHAUSTIVE_UX_KNOWLEDGE_BASE.md` — Reference app teardowns: Claude.ai, ChatGPT Canvas, Linear, Perplexity, Open WebUI
+- `.planning/audit/WEBSOCKET_SCHEMA.md` — Discriminated union of WebSocket message types
+- `.planning/audit/UX_ARCHITECTURE_DEEP_DIVE.md` — Scroll physics, tool call display, input ergonomics deep dive
+- `.planning/chat-interface-standards.md` — 106 requirements across 16 categories, cross-verified across 6 products
+- `.planning/reference-app-analysis.md` — 6-product breakdown verified via Gemini research 2026-03-03
+- `.planning/PROJECT.md` — V2 requirements, constraints, key architectural decisions, explicit out-of-scope items
+- npm registry (2026-03-04) — All package versions and peer dependency matrices verified
+- V1 Phase Gate Reports (Phases 5, 7, 10, 11) — Post-mortem evidence for all pitfalls
+- V2_CONSTITUTION.md — Enforceable conventions; each rule traces to a specific V1 violation
+- Direct analysis of `/home/swd/loom/src/` V1 codebase — component boundaries, performance patterns, accumulated debt lessons
 
-### Secondary (MEDIUM-HIGH confidence)
-- Gemini research (2026-03-03) -- Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat interface analysis; competitive pattern matrix across palette, message styling, tool calls, streaming indicators, sidebar design
-- MDN documentation -- CSS `contain`, `content-visibility: auto`, CSS Grid `grid-template-rows` animation, IntersectionObserver spec
-- Chrome DevTools documentation -- Layers panel, GPU compositing layer analysis, performance profiling during streaming
+### Secondary (MEDIUM confidence)
+- motion official docs (motionjs.com) — LazyMotion + domAnimation bundle size (~5KB vs ~34KB full); exact KB needs Phase 1 bundle analysis verification
+- MDN — `content-visibility: auto` browser support (Chrome 85+, Firefox 125+, Safari 18+), `contain-intrinsic-size`, CSS `grid-template-rows` animation
+- `.planning/audit/V2_REWRITE_PLAYBOOK.md` — Initial 6-phase roadmap from Gemini architect (superseded by Claude architect review but phase ordering validated)
 
-### Tertiary (MEDIUM confidence)
-- ChatGPT post-GPT5 interface specifics -- some details may reflect speculative analysis about features not yet publicly released; core patterns (action pills, batch streaming, aggressive tool grouping) are established
-- LobeChat spring physics specifics (stiffness: 100, damping: 20) -- community documentation quality varies; spring approximation via `cubic-bezier(0.22, 1, 0.36, 1)` is the CSS-based safe substitute
+### Tertiary (LOW confidence, needs phase validation)
+- Nextcloud integration architecture (direct WebDAV vs backend proxy) — needs empirical verification during Phase 10 planning
+- Companion sprite feasibility (itch.io licensing, iGPU performance on Radeon 780M) — needs feasibility gate before Phase 11 commitment
+- OKLCH in Tailwind v3.4 interaction — needs quick empirical test before Phase 1 execution
 
 ---
-*Research completed: 2026-03-03*
+*Research completed: 2026-03-04*
 *Ready for roadmap: yes*

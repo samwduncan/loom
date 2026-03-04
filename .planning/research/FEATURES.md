@@ -1,350 +1,433 @@
-# Feature Landscape: Visual Redesign of AI Chat Interface
+# Feature Landscape: Loom V2 — Premium AI Coding Agent Interface
 
-**Domain:** Premium dark-mode AI chat interface (visual redesign)
-**Researched:** 2026-03-03
-**Confidence:** HIGH (cross-verified across 6 reference products via Gemini research, official docs, direct analysis)
+**Domain:** Premium web interface for AI coding agents (Claude Code, Gemini, Codex)
+**Researched:** 2026-03-04
+**Overall confidence:** HIGH (cross-verified from 6 reference product analyses, 106-requirement standards doc, PROJECT.md, and domain expertise)
 
 ---
 
 ## Context
 
-This research answers: "What visual and interaction patterns do the best AI chat interfaces use, and which should Loom adopt for its v1.1 design overhaul?"
+Loom V2 is a **greenfield frontend rewrite** targeting 10/10 quality. The existing CloudCLI backend stays unchanged. The question is: what should the frontend build, and in what priority order?
 
-Six reference products were analyzed: **Claude.ai**, **ChatGPT** (post-GPT5), **Perplexity**, **Open WebUI**, **LobeChat**, and **LibreChat**. The focus is on visual implementation patterns — not functional features (those are already built in Loom). The question is how to make existing features *look and feel* premium.
+This document covers the full feature landscape across all domains: streaming UX, tool call display, multi-agent orchestration, file management, terminal integration, command palettes, theming, accessibility, companion system, Nextcloud integration, and the GSD visual dashboard. It supersedes the v1.1 visual redesign feature research.
 
-Loom's constraints: React 18 + Tailwind CSS + CSS Variables (HSL), single dark theme, charcoal base (#1a1a1a-#222222) with dusty rose accent, 720px max-width centered layout.
+**Reference products analyzed:** Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat, Cursor, Windsurf (from existing analysis docs)
+
+**Loom's unique positioning:** Unlike general-purpose chat UIs, Loom is purpose-built for AI coding agent work. Every tool call, every file write, every MCP interaction should be a *satisfying visual experience* that makes the agent's work visible and beautiful.
 
 ---
 
 ## Table Stakes
 
-Features every premium AI chat interface ships. Missing any of these makes the product feel unfinished or amateur.
+Features users expect in any premium AI interface. Missing any of these causes abandonment or "feels unfinished" perception.
+
+### Core Chat Experience
 
 | Feature | Why Expected | Complexity | Reference Products | Notes |
 |---------|--------------|------------|-------------------|-------|
-| **Off-black base (not pure black)** | Pure #000000 causes OLED smearing and text halation; every premium product uses #0A0A0A to #121212 | LOW | Claude (#0D0D0D), ChatGPT (#0D0D0D), Perplexity (#050505), Open WebUI (#0B0B0B) | Loom's #1a1a1a is actually slightly lighter than industry standard — acceptable for "warm charcoal" identity but verify contrast ratios |
-| **3-4 tier surface elevation** | Flat UIs feel like prototypes; layered surfaces create spatial hierarchy and depth | LOW | Claude (3 levels), ChatGPT (4 levels), Open WebUI (5 levels) | Each tier increases lightness by 2-5%. Base -> Sidebar/Cards -> Overlays -> Modals. Use background color steps, NOT drop shadows |
-| **Subtle borders (white at 6-10% opacity)** | Heavy borders feel like wireframes; invisible borders lose hierarchy | LOW | Claude (`rgba(255,255,255,0.08)`), ChatGPT (1px solid low-opacity), Perplexity (10% white borders) | Single most impactful "premium" signal. Replace all hard borders with `border-color: hsl(var(--border) / 0.1)` |
-| **Full-width assistant messages (no bubbles)** | Bubbles waste horizontal space and make long-form AI output feel like text messages; blocks feel like documents | LOW | Claude (full-width transparent), ChatGPT (full-width blocks), LibreChat (flat against canvas) | User messages CAN be in subtle bubbles for distinction. Assistant messages must be full-width or near-full-width |
-| **Centered reading rail (720-896px max-width)** | Ultrawide text is unreadable; constrained width creates professional document feel | LOW | Claude (~800px), ChatGPT (768px), Perplexity (generous), LibreChat (768-896px) | Loom already has 720px — on the narrow end. Consider 768px to match industry standard |
-| **Hidden-until-hover action buttons** | Visible Copy/Retry/Edit buttons on every message create overwhelming visual noise | LOW | Claude (opacity:0 -> opacity:1 on hover, 200ms), ChatGPT (hover reveal), LobeChat ("floating action bar" bottom-right on hover) | THE single biggest clutter reducer. Set message actions to opacity:0 by default, transition on parent hover |
-| **Generous inter-turn spacing (32-48px)** | Cramped turns blur together; generous spacing lets the eye rest between conversation turns | LOW | Claude (2-3rem/32-48px between turns), ChatGPT (similar), Perplexity (32-48px between sections) | Current Loom "dense" spacing may need recalibration. Dense ≠ cramped. Tight line-heights within messages, generous spacing BETWEEN turns |
-| **Collapsible thinking/reasoning blocks** | Extended thinking output clutters the UI; auto-collapsed with pulsing border when active | MEDIUM | Claude (pulsing border animation, auto-collapse when output begins), ChatGPT ("Thought" bubble), LibreChat ("Thinking" accordion) | Already built in Loom. Verify styling matches new palette — subtle pulsing glow on active, muted when collapsed |
-| **Streaming text with batch rendering** | Character-by-character typewriter causes eye strain; batch rendering (2-5 word chunks) feels natural | LOW | Claude (token chunks), ChatGPT ("liquid streaming" with opacity fade-in), Perplexity (word-level fade-in) | Render tokens in 50-100ms batches. Add subtle CSS `opacity` fade-in on new content rather than hard appearance |
-| **Stop generation button replacing send** | Users need to interrupt; dedicated visible stop control during streaming | LOW | Claude (square stop icon), ChatGPT (stop replaces send), Open WebUI (same pattern) | Already planned. Square icon, same position as send button, instant visual swap |
-| **Sticky-bottom auto-scroll with manual break** | Without it, reading while streaming is impossible; any upward scroll (10px+) breaks lock | LOW | All 6 products use this pattern | Already planned. Add jump-to-bottom pill with "new content" badge |
-| **Toast notifications for transient status** | Silent failures feel broken; aggressive alerts feel hostile | LOW | Claude (glassmorphic pill toasts, bottom-center, 2-3s fade), ChatGPT (similar), Open WebUI (toast system) | Glassmorphic style: `backdrop-filter: blur(8px); background: rgba(30,30,30,0.8)`. Bottom-center position. 2-3 second auto-dismiss |
-| **Chronological sidebar grouping** | Flat session lists are unreadable; time-based groups (Today, Yesterday, Last 7 Days) provide orientation | LOW | Claude (uppercase tracked section headers), ChatGPT (time groups + Projects), LibreChat (folders + time groups) | Small uppercase tracked labels: `font-size: 0.75rem; letter-spacing: 0.05em; color: muted` |
-| **Monospace code blocks with copy button** | Developers compare code blocks to their IDE; generic rendering feels wrong | LOW | All products. Open WebUI uses JetBrains Mono, Claude uses monospace with hover-reveal copy | Already built (Shiki). Ensure copy button appears on hover only, not persistently |
-| **Error states with semantic color** | Users need to instantly distinguish info/warning/error | LOW | Claude (muted coral `#E57373` on 10% red background), ChatGPT (amber for self-correction, red for failures) | Three tiers: gray=info, amber/gold=warning, muted red=error. Never bright saturated red — use muted/warm tones |
+| **Smooth streaming text** | Any stutter or jank signals poor engineering; users have been trained by ChatGPT and Claude.ai | LOW | All 6 products | Batch rendering in 2-5 word chunks with CSS opacity fade-in. NEVER character-by-character typewriter. Tokens in React Refs, visible State at 30-60ms intervals. |
+| **Send/Stop button morphing** | Must be able to abort generation; if stop is missing or slow, trust collapses | LOW | All 6 products | Instant visual swap. Square icon. Same position. Stop must work even during heavy rendering — this is a Critical requirement. |
+| **Collapsible thinking/reasoning blocks** | Extended thinking clutters the UI; auto-collapsed is universal expectation | MEDIUM | Claude.ai, ChatGPT, LibreChat | Pulsing border while active. Auto-collapsed when output begins. Expand/collapse with smooth height animation via grid-template-rows trick. |
+| **Syntax-highlighted code blocks** | Developers compare code blocks to their IDE; generic is unacceptable | LOW | All 6 products | Shiki (already in stack). Hover-reveal copy button. Language label. Max height with scroll. Never flicker between plain text and highlighted states during streaming. |
+| **Copy button on code blocks** | Industry-wide expectation; feels broken without it | LOW | All 6 products | On hover only (not persistent). Show "Copied!" feedback with icon swap. |
+| **Markdown rendering** | AI responses use markdown; raw markdown is illegible | LOW | All 6 products | Headers, bold/italic, lists, tables, blockquotes, inline code. Tables scroll horizontally in container. |
+| **Auto-growing textarea** | Fixed-height inputs feel wrong; textarea that grows with content is universal | LOW | All 6 products | Grow up to max height (~200px), then scroll internally. |
+| **Sticky auto-scroll with manual override** | Without smart scroll lock, reading while streaming is impossible | MEDIUM | All 6 products | Auto-scroll when at bottom. Stop scrolling if user scrolls up 10+ pixels. "Jump to bottom" pill with new-content indicator. |
+| **Session management (create, switch, browse)** | Multi-session work is the default; no session management = no daily use | MEDIUM | All 6 products | Create new, switch, rename, delete. Sidebar with time-grouped history (Today, Yesterday, Last 7 Days). |
+| **Error states with recovery** | Silent failures feel broken; aggressive alerts feel hostile | LOW | All 6 products | Inline retry for failed messages. Toast notifications for connection events. Partial responses preserved on failure. |
+| **Dark mode as first-class citizen** | Expected in developer tools; an afterthought dark mode signals poor craft | LOW | All 6 products | Applied before first paint (no flash of light theme). Every element themed including scrollbars, inputs, third-party embeds. |
+| **Asymmetric message styling** | Instant user/assistant distinction is table stakes | LOW | All 6 products | User: right-aligned or bubbled. Assistant: full-width, no heavy bubble, reads like a document. |
+| **Hover-revealed message actions** | Permanent action buttons on every message create overwhelming noise | LOW | All 6 products | Copy, Retry, Edit — opacity:0 by default, opacity:1 on parent hover. Zero layout shift. |
+| **Professional font choices** | Raw system defaults signal "prototype"; premium font = premium product | LOW | Claude (Serif), ChatGPT (Söhne), LobeChat (HarmonyOS Sans) | Inter (UI), Instrument Serif (editorial accents), JetBrains Mono (code). Already decided in PROJECT.md. |
+| **Settings panel** | Must control appearance, model, API config | MEDIUM | All 6 products | Appearance, agents, API keys, MCP config. Modal or slide-over panel. |
+| **3-tier surface elevation** | Flat UI with no depth feels like prototype; layered surfaces = spatial hierarchy | LOW | All 6 products | Background → Cards → Overlays. Use background lightness steps (OKLCH), NOT drop shadows. |
+| **Semantic border opacity** | Hard borders feel like wireframes; invisible borders feel floating | LOW | Claude, ChatGPT, Perplexity | `border-color: hsl(var(--border) / 0.08-0.12)`. Single biggest "premium" signal. |
+
+### Connection & State
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| **Connection status indicator** | WebSocket drop is silent without it; users think app is broken | LOW | Subtle but visible "reconnecting..." state. Auto-reconnect. |
+| **Optimistic UI** | User message must appear instantly before server confirm | LOW | Standard pattern; feels wrong without it. |
+| **No duplicate submissions** | Phantom submits destroy trust | MEDIUM | Idempotency required; Enter never fires twice. |
+| **Draft preservation** | Losing unsent text on refresh = frustration | LOW | localStorage draft per session. |
 
 ---
 
 ## Differentiators
 
-Features that separate "designed" from "generic." Not universally expected, but create meaningful competitive separation. These are where Loom should invest for its "designed, not generated" thesis.
+Features that set Loom apart from generic chat UIs. These are where the "make agent work visible and beautiful" thesis manifests.
+
+### Streaming UX Differentiators
 
 | Feature | Value Proposition | Complexity | Reference Inspiration | Notes |
 |---------|-------------------|------------|----------------------|-------|
-| **Dusty rose accent identity** | Every major product uses blue or green accents. Dusty rose (#D4736C) is distinctive and memorable — no one else does this | LOW (design) | None — this IS the differentiator. Claude has terracotta (#D97757) but Loom's rose is softer and more distinctive | Apply to: focus rings, active states, primary buttons, selection highlight (`::selection`), accent borders. Use sparingly — 5% of surface area max |
-| **Progressive disclosure via opacity layers** | Reveals complexity only when needed; creates visual calm by default | MEDIUM | Claude (message actions at opacity:0, tool calls collapsed, thinking auto-collapsed) | Apply to: message actions, tool call details, thinking block content, metadata (tokens, timestamps). Default state = minimal; hover/click = full detail |
-| **Warm text hierarchy (cream, not white)** | Pure white (#FFFFFF) on dark backgrounds causes halation. Cream/warm off-white feels deliberate and premium | LOW | Claude (#E6E6E6 "soft linen"), LobeChat (#E0E0E0), Perplexity (#FFFFFF primary but with line-height compensation) | Use #F5E6D3 (warm cream) for primary, #C4A882 (muted gold) for secondary, #8B7355 for tertiary. Already in Loom's variables but needs consistent application |
-| **Tool call "action cards" with semantic states** | Tool calls are core to Loom's coding workflow — they need to feel informative, not noisy | HIGH | ChatGPT (action pills with micro-status), Claude (collapsible analysis blocks), Cursor (terminal-style with live diffs), Open WebUI (neon-bordered collapsible blocks) | Adopt the ChatGPT "action pill" pattern: compact horizontal card showing icon + tool name + status. Success = collapsed chip. Error = expanded with red accent. Running = pulsing indicator. Group 3+ sequential calls into "N tool calls" accordion |
-| **Execution chain grouping** | When AI runs grep -> read -> write, flat list overwhelms; grouped "chain" preserves signal | MEDIUM | ChatGPT (aggressive grouping, 5 calls -> single accordion), Claude (stacked chips), Cursor (vertical timeline) | Group by "intent": reading files = one group, writing files = another. Show count badge. Expand to see individual calls. Error calls always expanded |
-| **Glassmorphic overlays (blur + transparency)** | Creates depth and "physical presence" for floating elements; the defining aesthetic of 2025-2026 premium UIs | MEDIUM | Claude (`backdrop-filter: blur(12px)` on artifact sidebar), ChatGPT (`blur(20px)` with iridescent borders), Perplexity (navigation blur), LobeChat ("Glassmorphism 2.0") | Apply to: modals, toasts, command palette, dropdown menus. Use `backdrop-filter: blur(12px); background: hsl(var(--background) / 0.8)`. NOT on main content areas — only floating/overlay elements |
-| **Spring-physics message entrance** | Messages that slide in with physics-based easing feel weighted and real; hard-cut appearance feels like a loading bug | MEDIUM | LobeChat (spring physics: stiffness 100, damping 20), Claude (250ms organic entrance), ChatGPT (opacity + blur fade-in) | Use `cubic-bezier(0.22, 1, 0.36, 1)` for message entrance (CSS spring approximation). 200-300ms duration. Subtle translateY(8px) -> translateY(0) with opacity 0 -> 1 |
-| **Semantic streaming states** | "Thinking..." vs "Reading files..." vs "Writing code..." — users want to know WHAT the AI is doing, not just that it's busy | MEDIUM | Cursor (checklist planning view), Open WebUI (real-time t/s stats), Claude (pulsing thinking block with streaming monologue) | Parse Claude Code backend JSON for human-readable status. Show as text below the assistant avatar area: "Reading auth.ts..." or "Running terminal command..." |
-| **Dense sidebar with slim/icon-only collapse** | Maximizes chat area; power users want sidebar out of the way | LOW | Open WebUI (slim icon-only mode), Claude (collapsible, airy layout), ChatGPT (collapsible with Cmd+B) | Two states: expanded (session list with time groups) and collapsed (icon strip: new chat, search, settings). Toggle with keyboard shortcut |
-| **Active session indicator with accent** | Current chat needs instant visual identification in sidebar | LOW | Claude (subtle background `rgba(255,255,255,0.1)` + left accent border sliver) | Left border: 2px dusty rose. Background: `hsl(var(--accent) / 0.08)`. Clean, not heavy |
-| **Token/cost display per response** | Self-hosters actively manage usage; visible costs build trust and awareness | MEDIUM | Cursor (usage dashboard), Open WebUI (t/s display), Claude (CLI JSON logs only) | Compact footer below each assistant message: "450 in / 120 out / $0.008". Muted secondary text. Expandable for model details. Session total in sidebar footer |
-| **Smooth expand/collapse with height animation** | Abrupt show/hide feels like rendering bugs; smooth height transitions feel intentional | MEDIUM | Claude (500ms with `cubic-bezier(0.22, 1, 0.36, 1)` for sidebar), LobeChat (spring physics for all accordions) | Use `grid-template-rows: 0fr -> 1fr` trick for smooth height animation (no fixed heights needed). 200-300ms with ease-out curve |
-| **Context window gauge** | Prevents "context full" surprises; visual progress bar near input | MEDIUM | ChatGPT (usage gauge in sidebar), Open WebUI (model context display) | Thin bar (2px height) above or below input area. Color: green -> amber -> red as context fills. Tooltip shows exact token count |
-| **Input field with focus glow** | Focused input should feel "activated" — draws the eye to where action happens | LOW | Claude (`box-shadow: 0 0 0 2px rgba(217,119,87,0.2)` on focus), ChatGPT (subtle border brightening) | Use dusty rose glow: `box-shadow: 0 0 0 2px hsl(var(--accent) / 0.15)` on focus. Transition from invisible to visible over 200ms |
-| **Custom text selection color** | Ties brand identity into the deepest interaction level | LOW | Claude (`::selection { background-color: rgba(217,119,87,0.25) }`) | `::selection { background-color: hsl(var(--accent) / 0.25); color: inherit; }` — dusty rose selection throughout the app |
+| **Semantic streaming states** | "Reading auth.ts..." vs "Writing server.ts..." vs "Running tests..." — users know exactly what the agent is doing | MEDIUM | Cursor (checklist view), Open WebUI (real-time stats) | Parse CloudCLI backend WebSocket tool events. ActivityStatusLine component above the input composer: compact text line that appears during streaming, collapses when done. |
+| **Aurora ambient overlay during generation** | Loom-original: streaming creates beautiful ambient glow effect — makes waiting feel premium and alive | MEDIUM | Loom v1 has this; V2 should preserve and polish it | CSS-only aurora shimmer. Must be GPU-layer-capped (max 8-10 compositor layers on AMD Radeon 780M). `.is-streaming` guard class to enable/disable. |
+| **Tool call state machine animations** | Tool calls are Loom's core differentiator vs generic chat — they should be satisfying to watch | HIGH | ChatGPT (action pills), Claude (analysis blocks), Cursor (vertical timeline) | State machine: pending → running (pulsing rose indicator) → success (collapsed chip) → error (expanded muted red). Spring physics on state transitions. |
+| **Streaming cursor identity** | The blinking cursor during generation is a micro-brand moment | LOW | Claude (pulsing bar), ChatGPT (sliding bar) | Rose-colored pulsing vertical bar. Brand moment. CSS custom property so it updates with theme. |
+| **Performance that doesn't degrade** | Long coding sessions with 200+ tool calls must stay smooth | HIGH | — | useRef + DOM mutation for streaming tokens (bypass React reconciler). React.memo + custom comparators on TurnBlock. content-visibility: auto on off-screen messages. |
+
+### Tool Call Display Differentiators
+
+| Feature | Value Proposition | Complexity | Reference Inspiration | Notes |
+|---------|-------------------|------------|----------------------|-------|
+| **Execution chain grouping** | When agent runs grep → read → write → test (7 calls), flat list is overwhelming; grouped "chains" preserve signal | MEDIUM | ChatGPT (aggressive: 5 calls = 1 accordion), Cursor (vertical timeline) | Group by semantic intent: file reading group, file writing group, terminal group. Show count badge. Expand to see individual calls. Error calls always expanded (never collapsed). |
+| **Expandable request/response JSON** | Developers want to see exactly what was sent and what came back | MEDIUM | Claude (expandable JSON), LibreChat (debug mode toggle) | Default: collapsed. Click to expand. Syntax highlighted. Copyable. |
+| **MCP server source labeling** | "From: Filesystem MCP" — which server provided this tool matters for debugging | LOW | LibreChat | Show source server name on tool cards. MCP connection status indicator. |
+| **Approval flow for write-heavy actions** | Optional "Approve/Decline" for destructive MCP actions builds trust | MEDIUM | LibreChat, Claude.ai (permission pill) | Configurable. Off by default. When enabled: inline approve/decline buttons before executing write/delete/exec tools. |
+| **Tool result inline rendering** | File contents, diffs, search results should render formatted, not raw | HIGH | Claude (code blocks in tool results), LibreChat (collapsible) | File reads → syntax highlighted code block. Diffs → react-diff-viewer. Search results → formatted list. Terminal output → monospace. |
+| **Token/cost display per response** | Self-hosters managing usage want visibility; builds trust and awareness | MEDIUM | Cursor (usage dashboard), Open WebUI (t/s stats) | Compact footer below each assistant message: "450 in / 120 out / $0.008". Session total in sidebar footer. |
+
+### Multi-Agent / Tabbed Workspaces Differentiators
+
+| Feature | Value Proposition | Complexity | Reference Inspiration | Notes |
+|---------|-------------------|------------|----------------------|-------|
+| **Tabbed multi-provider workspaces** | Work with Claude in one tab, Gemini in another, simultaneously — no context switching | HIGH | Loom-original concept | Tab bar: Claude | Gemini | Codex. Each tab = independent WebSocket connection. Background tasks continue when tab inactive. |
+| **Background task notifications** | Tab completes while not focused — notification appears | MEDIUM | Open WebUI (tab title updates), browser notifications | Tab title update with indicator. Optional browser notification on completion. Toast when switching back to a completed tab. |
+| **Cross-tab context sharing** | Gemini tab can see Claude conversation context for parallel exploration | HIGH | Loom-original concept | Opt-in: "Share context with Gemini" button. Passes conversation transcript to other tab's context. Complex — defer until core tabbing works. |
+| **Real-time agent activity per tab** | See what each agent is doing from a glance at the tab bar | MEDIUM | Loom-original | Subtle animated indicator in tab when agent is running. No activity = static. Running = pulsing rose dot. |
+
+### GSD Visual Dashboard Differentiators
+
+| Feature | Value Proposition | Complexity | Reference Inspiration | Notes |
+|---------|-------------------|------------|----------------------|-------|
+| **Visual build pipeline** | GSD phases, progress, task status — the roadmap made visible in real time | HIGH | Loom-original | Phase cards showing phase number, name, status (pending/active/complete/failed). Collapsible task list per phase. Progress bar. |
+| **Agent assignment visibility** | Which AI owns which phase/task — no black box | MEDIUM | Loom-original | Claude icon on Claude phases. Gemini icon on Gemini phases. Phase handoff UI. |
+| **Native GSD orchestration** | Start phases, run gate checks, view GATE-REPORT — from the UI, not CLI | HIGH | Loom-original | Run `/gsd:execute-phase N` from UI. View gate report inline. Stop/retry phases. |
+| **Phase handoff UI** | Smooth handoff between Claude and Gemini based on task type | HIGH | Loom-original | When Gemini phase starts, Gemini tab activates. Progress tracked. |
+
+### File Management & Nextcloud Integration Differentiators
+
+| Feature | Value Proposition | Complexity | Reference Inspiration | Notes |
+|---------|-------------------|------------|----------------------|-------|
+| **File attachment to chat** | Attach Nextcloud files to messages — give agent context | MEDIUM | Open WebUI (Google Drive, OneDrive), Claude.ai (paperclip) | File picker opens Nextcloud browser. Files appear as chips above input. |
+| **Screenshot upload from phone** | Photo → Nextcloud → Loom chat pipeline for visual debugging | MEDIUM | Loom-original | Watch Nextcloud folder. New image → auto-attach offer. Or manual "browse Nextcloud" picker. |
+| **Nextcloud file browser** | Browse project files without leaving the UI | HIGH | LibreChat (file search), Open WebUI (knowledge bases) | Sidebar panel or modal. Navigate folders. Preview text files. |
+| **Agent file operation visibility** | When agent writes a file, show what changed | MEDIUM | Cursor (live diffs), LibreChat (artifact panel) | Tool results for file writes show before/after diff via react-diff-viewer. |
+
+### MCP & Plugin Management Differentiators
+
+| Feature | Value Proposition | Complexity | Reference Inspiration | Notes |
+|---------|-------------------|------------|----------------------|-------|
+| **MCP server management UI** | Enable, disable, configure MCP servers without editing config files | MEDIUM | LibreChat (MCP marketplace admin), LobeChat (plugin marketplace) | List of installed servers. Toggle enable/disable. Status indicators: green (active), amber (auth needed), orange (connection failed). |
+| **Active MCP connections panel** | See which tools are available right now | LOW | LibreChat (wrench icon dropdown), Open WebUI (tool toggles) | Indicator in composer area. Click to see active servers and their tools. |
+| **Plugin/skill management** | UI for Claude Code plugins and skills | MEDIUM | Loom-original (CloudCLI has plugin system) | List installed plugins. Enable/disable per session. |
+
+### Design System & Visual Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| **OKLCH color space** | Perceptually uniform — colors look right; hue rotation doesn't shift perceived brightness | LOW | Token system uses OKLCH. No HSL. Same approach as Open WebUI v4. |
+| **Spring physics animations** | Messages that slide in with physics-based easing feel weighted and real | MEDIUM | cubic-bezier(0.22, 1, 0.36, 1) for message entrance. LazyMotion for complex animations. Full Framer Motion never loaded on initial page. |
+| **Glassmorphic overlays** | Modals, toasts, command palette feel like they float above the content | MEDIUM | Apply ONLY to floating elements. Never on scrolling message content (GPU cost). backdrop-filter: blur(12px) + hsl(var(--background) / 0.85). |
+| **Context window gauge** | Prevents "context full" surprises; visual progress bar | MEDIUM | Thin bar (2px) above input. Green → amber → red as context fills. Tooltip shows exact count. |
+| **Custom text selection color** | Brand identity at the deepest interaction level | LOW | ::selection { background-color: hsl(var(--accent) / 0.25); } |
+| **Empty state is inviting** | Blank void = no confidence; warm welcome = psychological safety | LOW | Animated companion character + suggested prompts grid + "What are you building today?" |
+
+### Companion System Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| **Animated pixel-art companions** | Emotional warmth; makes the tool feel like a workspace partner, not a CLI | HIGH | 8 companion species, 14 animation states. Pre-sourced from itch.io (NOT AI-generated). Sprite sheet: 512x896px, 64x64 tiles. |
+| **Reactive animation states** | Companion reacts to system events — thinking, success, error, idle | HIGH | States: idle, walk, float, sleep, read, binoculars, type, alarmed, celebrate, pet, stretch, play, enter, wake. Must map to chat events. |
+| **Companion selection** | User picks their companion; creates personal attachment | LOW | Settings panel. 8 options (Spool/Shiba, Bobbin/Cat, Shuttle/RedPanda, etc.). Stored in preferences. |
+| **Companion placement** | Corner widget, not intrusive | LOW | Fixed position, lower-right or lower-left. Configurable. Can be hidden. |
 
 ---
 
 ## Anti-Features
 
-Features that seem appealing but create technical debt, UX friction, or scope creep. Explicitly do NOT build these.
+Features that seem appealing but create technical debt, UX friction, or scope creep for Loom V2.
 
 | Anti-Feature | Why Tempting | Why Problematic | What to Do Instead |
 |--------------|-------------|-----------------|-------------------|
-| **Character-by-character typewriter effect** | Feels "alive" and "AI-like" | Eye strain on long responses; artificial latency; masks real streaming progress; ChatGPT and Claude have both moved AWAY from this toward batch rendering | Render in 2-5 word token chunks with subtle CSS opacity fade-in (50-100ms per batch) |
-| **Pure black (#000000) background** | "True dark mode" | OLED smearing, text halation, inability to create depth via surface elevation. No premium product uses it as primary background | Off-black charcoal (#1a1a1a). Reserve pure black only for embedded terminal output |
-| **Heavy drop shadows on messages** | Creates "depth" | In dark mode, dark shadows on dark backgrounds are invisible or create muddy halos. Every premium product has abandoned message shadows | Use 1px borders at 6-10% white opacity and background lightness steps for elevation |
-| **Conversation branching / tree view** | Power feature from LibreChat | Massive implementation complexity; confusing mental model; most users never need it; breaks linear conversation flow | "New chat" is the branch mechanism. Keep conversations linear |
-| **Light mode / theme switching** | User expectation from generic apps | Loom's identity IS the dark theme; a light mode requires a complete second design system and dilutes brand identity. Claude.ai, Perplexity, and ChatGPT all have strong dark-mode-first identities | Offer density customization and font customization instead. Single dark theme is the brand |
-| **Agent/bot avatars with personality** | LobeChat does this with "agent marketplace" | Adds visual noise; personification conflicts with "tool" identity; implementation complexity for avatar rendering, marketplace, profiles | Use subtle role indicators (small icon or text label) not character avatars |
-| **Glassmorphism on EVERYTHING** | The aesthetic is trendy | `backdrop-filter: blur()` is GPU-expensive; applying to scrolling content causes jank on low-end hardware; overuse makes hierarchy unclear | Glassmorphism ONLY on floating elements: modals, toasts, dropdown menus, command palette. Never on scrolling message content |
-| **Iridescent / rainbow gradients** | ChatGPT does this for GPT-5 "thinking" state | Requires complex `oklch` gradient animation; conflicts with Loom's warm/muted palette; looks gimmicky if not perfectly executed; high GPU cost | Use single-color dusty rose pulsing glow for active states. Simpler, cheaper, more on-brand |
-| **Side-by-side model comparison** | Open WebUI's signature feature | Loom is Claude Code + Gemini only; comparison mode adds massive layout complexity for a 2-model product | Provider switching dropdown is sufficient. No split-pane comparison needed |
-| **Plugin/MCP micro-apps (iframe rendering)** | LobeChat renders plugin UIs as embedded components | Massive security surface (iframe sandboxing); high complexity; Loom's MCP tools return text/JSON, not rendered UI | Display MCP results as formatted text/JSON in collapsible action cards |
-| **Custom-rendered Mermaid/LaTeX in chat** | LibreChat does this natively | High complexity; niche usage in coding chat context; each renderer adds bundle size | Render as code blocks with syntax highlighting. If demand emerges, add as opt-in later |
-| **Animated background gradients during "thinking"** | ChatGPT uses "Sora-generated" background pulses | GPU-expensive; distracting during actual work; conflicts with "tool" identity; very difficult to make not-cheesy | Subtle pulsing border on the thinking block is sufficient. Keep the background static |
-| **Right-side panel for artifacts/context** | Claude.ai and LibreChat use this | Requires responsive layout overhaul; conflicts with 720px centered reading rail; adds significant complexity for a feature Loom may not need (it's not generating artifacts) | Keep everything in the main chat stream. Tool outputs expand inline |
+| **Character-by-character typewriter** | Feels "alive" and "AI-like" | Eye strain on long responses; artificial latency; masks real streaming; Claude and ChatGPT both moved AWAY from this | Batch rendering in 50-100ms intervals with CSS opacity fade-in per chunk |
+| **Conversation branching / tree view** | LibreChat signature feature; power users love it | Massive complexity; confusing mental model; most coding sessions are linear; breaks auto-scroll assumptions | "New chat" is the branch mechanism. Keep conversations linear. |
+| **Light mode** | User expectation from generic apps | Requires a complete second design system; dilutes brand identity; Loom's identity IS the dark theme | Offer OLED mode (pure black), density toggle, font size scale instead. Single dark theme is the brand. |
+| **Side-by-side model comparison** | Open WebUI signature feature | Loom is Claude + Gemini + Codex via tabs, not a comparison product; split-pane comparison is wrong mental model for coding agent work | Tabbed workspaces provide parallel work without the visual complexity of split-pane |
+| **Plugin micro-apps (iframe rendering)** | LobeChat renders plugin UIs as embedded iframes | Massive security surface; iframe sandboxing complexity; CloudCLI MCP tools return JSON/text, not rendered UI | Display MCP results as formatted text/JSON/diffs in expandable tool cards |
+| **Right-side artifact panel** | Claude.ai and LibreChat use this for live previews | Loom is a CODING AGENT tool, not a document generator; artifacts panel is for HTML/React generation, not file editing; conflicts with centered reading rail | All content inline in main chat stream. Diff viewer inline in tool cards. |
+| **Custom Mermaid/LaTeX rendering** | LibreChat and Open WebUI support this | Niche for coding agent usage; each renderer adds significant bundle; Mermaid diagrams rarely appear in Claude Code output | Render as code blocks with syntax highlighting. Ship when demand evidence exists. |
+| **Animated background mesh during streaming** | ChatGPT does "Sora-generated" background pulses during o3 reasoning | GPU-expensive at sustained 60fps; distracting during actual work; conflicts with "focus" identity of developer tool; very hard to make not-cheesy | Aurora overlay (Loom-original) is better: subtle, ambient, not distracting. |
+| **Multi-user / team features** | Multi-user admin is a product expansion | PROJECT.md explicitly out of scope: single-user tool. RBAC, SCIM, LDAP add backend complexity without benefit for the solo developer. | Auth is already single-user JWT. Keep it that way. |
+| **Mobile-native app (React Native/Expo)** | Mobile AI tools are a real market | PROJECT.md explicitly out of scope. Web-first, responsive design handles mobile access adequately for occasional use. | Responsive CSS for 375px+ viewports handles mobile. Not a native app. |
+| **AI model training/fine-tuning UI** | Advanced ML users might want this | PROJECT.md explicitly out of scope. Loom consumes models, doesn't train them. Massive scope expansion. | Defer indefinitely. |
+| **Full IDE replacement (Monaco editor)** | Cursor did it; could be table stakes | PROJECT.md explicitly out of scope. "Not trying to replace VS Code/Cursor, complementing them." Monaco adds 500KB+ to bundle. | JetBrains Mono in code blocks. CodeMirror 6 if inline editing ever needed (already in stack). |
+| **Arbitrary LLM provider support** | Open WebUI is the model for this | CloudCLI backend supports Claude, Gemini, Codex only. Provider-agnostic architecture is a backend rewrite, not a frontend feature. | Three-provider tab bar is the right abstraction. |
+| **Agent/companion avatars as personality chatbots** | LobeChat does "agent marketplace" with personas | Adds visual noise; personification conflicts with "developer tool" identity; confuses role of companion (ambient widget) with AI agent (the actual LLM) | Companions are ambient pixel-art widgets. They react to system events. They don't roleplay. |
+| **Iridescent/rainbow gradients** | ChatGPT's GPT-5 gradient is iconic | Requires complex OKLCH gradient animation; conflicts with Loom's warm/muted palette; high GPU cost; very hard to execute well | Aurora overlay handles "alive during generation." Single-color pulsing rose glow for active states. |
+| **Glassmorphism on scrolling content** | Trendy aesthetic | backdrop-filter: blur() on scrolling content causes major jank on integrated GPU; kills frame rate | Glassmorphism ONLY on floating/overlay elements: modals, toasts, command palette, dropdowns. |
+| **Heavy drop shadows on messages** | Creates "depth" | In dark mode, dark shadows on dark backgrounds are invisible or create muddy halos; no premium product uses this | Background lightness steps (OKLCH tonal elevation) + subtle 1px borders at 8% opacity |
 
 ---
 
 ## Feature Dependencies
 
 ```
-[Design System (CSS variables, palette, typography)]
-    |-- required-by --> [Surface elevation tiers]
-    |-- required-by --> [Warm text hierarchy]
-    |-- required-by --> [Dusty rose accent application]
-    |-- required-by --> [Border opacity standardization]
-    |-- required-by --> [ALL other visual features]
+[Design System (OKLCH tokens, typography, animation system)]
+    |-- required-by --> [Surface elevation hierarchy]
+    |-- required-by --> [All component visual polish]
+    |-- required-by --> [Theming system (OLED mode, density toggle)]
 
-[Surface elevation tiers]
-    |-- required-by --> [Glassmorphic overlays]
-    |-- required-by --> [Sidebar visual polish]
+[Streaming infrastructure (WebSocket, Zustand stores, useRef rendering)]
+    |-- required-by --> [Smooth streaming UX]
+    |-- required-by --> [Tool call state machine]
+    |-- required-by --> [Semantic streaming states (ActivityStatusLine)]
+    |-- required-by --> [Aurora overlay (knows when streaming is active)]
+    |-- required-by --> [Auto-scroll with scroll lock]
 
-[Hidden-until-hover action buttons]
-    |-- required-by --> [Progressive disclosure system]
-    |-- enhances --> [Message visual cleanliness]
-
-[Collapsible tool call cards]
+[Tool call state machine]
     |-- required-by --> [Execution chain grouping]
-    |-- required-by --> [Semantic tool states (running/success/error)]
+    |-- required-by --> [Inline tool result rendering (diffs, code)]
+    |-- required-by --> [Approval flow for write-heavy actions]
+    |-- required-by --> [MCP server source labeling]
 
-[Streaming batch rendering]
-    |-- required-by --> [Streaming text fade-in animation]
-    |-- required-by --> [Semantic streaming states]
-    |-- required-by --> [Auto-scroll logic]
+[Session management (Zustand session store)]
+    |-- required-by --> [Tabbed workspaces]
+    |-- required-by --> [Sidebar session history]
+    |-- required-by --> [Background task notifications]
 
-[Spring-physics message entrance]
-    |-- requires --> [Expand/collapse height animation]
-    |-- enhances --> [Overall "premium feel"]
+[Tabbed workspaces]
+    |-- required-by --> [Multi-provider tab bar]
+    |-- required-by --> [Background task notifications]
+    |-- required-by --> [Cross-tab context sharing (Phase 2+ of this feature)]
 
-[Token/cost display]
-    |-- enhances --> [Context window gauge]
-    |-- enhances --> [Session usage summary]
+[MCP management UI]
+    |-- required-by --> [Active MCP connections panel]
+    |-- required-by --> [Approval flow for write-heavy actions]
+
+[Nextcloud integration]
+    |-- required-by --> [File attachment to chat]
+    |-- required-by --> [Screenshot upload pipeline]
+    |-- required-by --> [Nextcloud file browser]
+    |-- depends-on --> [Backend already has Nextcloud API config]
+
+[Companion system]
+    |-- requires --> [Sprite sheets from itch.io]
+    |-- requires --> [Feasibility assessment (PROJECT.md flags this as pending)]
+    |-- requires --> [Canvas rendering or CSS sprite animation]
+    |-- enhances --> [Empty state experience]
+
+[GSD Visual Dashboard]
+    |-- requires --> [Backend GATE-REPORT parsing]
+    |-- requires --> [Planning file reading API (or file system access)]
+    |-- requires --> [Tabbed workspaces (agent assignment visibility)]
 ```
 
-### Dependency Notes
+### Dependency Critical Path
 
-- **Design system is the hard prerequisite for everything.** CSS variables for the new palette must be in place before any visual work proceeds. This is Phase 1, day 1.
-- **Hidden-until-hover actions are the highest-impact single change.** Every reference product does this. It can be applied globally with a single CSS rule on message containers.
-- **Tool call display depends on existing tool call architecture.** Loom already renders tool action cards — the work is restyling, not rebuilding.
-- **Animations can be added incrementally.** Start with `transition` properties on existing elements (200ms ease-out), then add entrance animations for new messages.
+The V2 foundation must be established in this strict order:
+
+1. **Design system** (OKLCH tokens, typography, spring physics tokens) — prerequisite for all visual work
+2. **Streaming infrastructure** (Zustand stores, WebSocket, useRef rendering) — prerequisite for all chat features
+3. **Core chat experience** (message display, tool cards, thinking blocks, markdown) — prerequisite for differentiated features
+4. **Session management + sidebar** — prerequisite for tabbed workspaces
+5. **Everything else** (GSD dashboard, Nextcloud, companion, MCP management) — can be phased independently after core is solid
 
 ---
 
 ## MVP Recommendation
 
-### Phase 1: Foundation (the palette sweep)
+### Phase 1: Foundation (Weeks 1-2)
+Establish the design system and infrastructure that everything else builds on.
 
-Prioritize the changes that affect EVERY surface:
+**Must ship:**
+1. OKLCH design token system (CSS custom properties)
+2. Surface hierarchy (3-tier elevation via OKLCH lightness steps)
+3. Typography system (Inter + Instrument Serif + JetBrains Mono)
+4. Spring physics animation tokens (easing, duration, LazyMotion setup)
+5. Zustand store architecture (4 stores: chat, session, ui, settings)
+6. Vitest + ESLint + TypeScript strict configuration
+7. ESLint custom rules enforcing design conventions (no hardcoded hex, no z-index outside dictionary)
 
-1. **CSS variable palette swap** — charcoal base, cream text, dusty rose accent, 3-tier elevation
-2. **Border opacity standardization** — replace all hard borders with `hsl(var(--border) / 0.08-0.12)`
-3. **Warm text hierarchy** — primary cream, secondary muted gold, tertiary dim
-4. **Text selection color** — `::selection` with dusty rose
-5. **Input focus glow** — dusty rose ring on focus
+### Phase 2: Core Chat (Weeks 3-5)
+The chat experience that makes daily use possible.
 
-### Phase 2: Message experience
+**Must ship:**
+8. Message display (user/assistant distinction, full-width assistant, markdown, code blocks)
+9. Streaming infrastructure (useRef for tokens, Zustand state at 30-60ms intervals)
+10. Tool call cards (state machine: pending → running → success → error, spring animations)
+11. Thinking/reasoning disclosure (collapsible, pulsing border when active)
+12. Send/Stop morphing with instant response
+13. Sticky auto-scroll with scroll lock and "jump to bottom" pill
+14. Session management (create, switch, rename, delete, sidebar history)
+15. Settings panel (appearance, API config)
+16. Error handling (3-tier error boundaries, toast notifications, reconnection)
 
-6. **Hidden-until-hover action buttons** — single biggest visual cleanup
-7. **Full-width assistant messages** — remove any bubble wrapper on assistant turns
-8. **Inter-turn spacing increase** — 32-48px between turns, tight within turns
-9. **Message entrance animation** — translateY(8px) + opacity fade, 250ms
-10. **Streaming text batch fade-in** — subtle opacity transition on new content
+### Phase 3: Streaming UX Polish (Weeks 6-7)
+Make the streaming experience visually distinctive.
 
-### Phase 3: Tool calls and status
+**Must ship:**
+17. Semantic streaming states (ActivityStatusLine: "Reading auth.ts...", "Writing server.ts...")
+18. Execution chain grouping (3+ sequential tool calls → accordion with count badge)
+19. Aurora ambient overlay during generation
+20. Message entrance spring animations (translateY + opacity, CSS spring cubic-bezier)
+21. Tool result inline rendering (diffs for file writes, syntax highlight for reads)
+22. Token/cost display per response
+23. Context window gauge
 
-11. **Tool call action card restyle** — compact pills with icon + name + semantic color states
-12. **Execution chain grouping** — group 3+ sequential calls
-13. **Semantic streaming states** — "Reading files..." text status
-14. **Toast notification system** — glassmorphic bottom-center toasts
-15. **Error state semantic colors** — gray/amber/red tiers
+### Phase 4: Multi-Provider Tabs (Weeks 8-9)
+The multi-agent workspace.
 
-### Phase 4: Sidebar and polish
+**Must ship:**
+24. Tabbed workspace UI (Claude | Gemini | Codex tab bar)
+25. Independent WebSocket connections per tab
+26. Background task continuation when tab not active
+27. Background completion notifications (tab title + badge + toast on re-focus)
+28. Per-tab agent activity indicator
 
-16. **Sidebar restyle** — time-grouped sections, active indicator with rose accent
-17. **Slim sidebar collapse** — icon-only mode
-18. **Glassmorphic overlays** — modals, toasts, dropdowns
-19. **Smooth expand/collapse animations** — grid-template-rows trick, 200-300ms
-20. **Token/cost display** — per-message footer, session total
+**Defer within this phase:**
+- Cross-tab context sharing (complex; validate tabbing first)
 
-### Defer
+### Phase 5: Plugin & MCP Management (Weeks 10-11)
+Make the agent's capabilities manageable.
 
-- **Context window gauge** — after token display works
-- **Density toggle** — after base density is right
-- **Command palette** — significant scope, Phase 2+ milestone
-- **Font customization** — low priority
+**Must ship:**
+29. MCP server management UI (list, enable/disable, connection status)
+30. Active connections panel in composer area
+31. Claude Code plugin/skill management
+32. Approval flow for write-heavy MCP actions (configurable)
+
+### Phase 6: GSD Visual Dashboard (Weeks 12-13)
+Native GSD orchestration from the UI.
+
+**Must ship:**
+33. Phase pipeline visualization (phase cards, status, progress)
+34. Agent assignment indicators (Claude vs Gemini per phase)
+35. GATE-REPORT inline viewing
+36. Basic phase execution from UI (run `/gsd:execute-phase N`)
+
+**Defer:**
+- Full phase handoff automation (manual trigger for V2)
+
+### Phase 7: Nextcloud Integration (Weeks 14-15)
+File management and mobile screenshot pipeline.
+
+**Must ship:**
+37. File picker for Nextcloud attachment to messages
+38. Nextcloud file browser (navigate, preview text files)
+39. Screenshot upload pipeline (watch folder, auto-attach offer)
+
+### Phase 8: Companion System (Weeks 16+)
+Subject to feasibility assessment passing.
+
+**Must ship (if feasibility passes):**
+40. Sprite sheet rendering (CSS animation from 512x896 sprite sheets)
+41. Animation state machine (idle → type, celebrate → idle, etc.)
+42. Event binding (tool success → celebrate, error → alarmed, etc.)
+43. Companion selection in settings (8 companions)
+44. Placement and hide toggle
+
+**Defer if feasibility fails:**
+- Use Lottie animation or CSS-only loader as fallback for "alive" empty state
 
 ---
 
 ## Competitive Pattern Matrix
 
-How each reference product handles each dimension, with Loom's recommended approach.
+How each reference product handles Loom's key differentiating dimensions.
 
-### Dark Mode Palette
+### Streaming UX
 
-| Product | Base Background | Surface 1 | Surface 2 | Primary Text | Accent | Strategy |
-|---------|----------------|-----------|-----------|-------------|--------|----------|
-| Claude.ai | #0D0D0D | #171717 | #212121-#262626 | #E6E6E6 (soft linen) | #D97757 (terracotta) | Warm tonal layering, no shadows |
-| ChatGPT | #0D0D0D | #1A1A1A-#212121 | #2A2A2A | #ECECEC | #6EA8FF (atmosphere blue) | Flat depth with 1px borders |
-| Perplexity | #050505-#091717 | #121212-#1A1A1A | #252525 | #FFFFFF | #20808D (turquoise) | Glassmorphic navigation |
-| Open WebUI | #0B0B0B | #171717 | #252525 | #ECECEC | #3B82F6 (blue) | Standard drop shadows |
-| LobeChat | #121212 | +5% white overlay | +11% white overlay | #E0E0E0 | Desaturated blue/purple | Tonal elevation overlays |
-| LibreChat | slate-950 | slate-800 | zinc-800 | #ECECEC | Green or blue | Tailwind slate scale |
-| **Loom** | **#1A1A1A** | **#222222** | **#2A2A2A** | **#F5E6D3 (cream)** | **#D4736C (dusty rose)** | **Warm charcoal + tonal layering** |
-
-### Chat Message Styling
-
-| Product | User Messages | Assistant Messages | Spacing Between Turns | Max Width |
-|---------|--------------|-------------------|----------------------|-----------|
-| Claude.ai | Subtle bubble (bg #262626, radius 24px) | Full-width, transparent bg | 32-48px | ~800px |
-| ChatGPT | No container or right-aligned block | Full-width, subtle bg wash #151515 | 24-32px | 768px |
-| Perplexity | Full-width query block | Structured vertical sections | 32-48px | Generous |
-| Open WebUI | Right-aligned or bg shift | Full-width, borderless | 24-32px | ~800px |
-| LobeChat | Bubble (radius 18px, right-aligned) | Full-width structured block | 16-24px | Flexible |
-| LibreChat | Subtle bg elevation | Flat against canvas | 24-32px | 768-896px |
-| **Loom** | **Subtle warm bubble (bg card, radius 12px)** | **Full-width, transparent** | **32px** | **768px** |
+| Product | Token Rendering | Thinking State | Streaming Indicator | Completion Signal |
+|---------|----------------|---------------|---------------------|-------------------|
+| Claude.ai | Smooth chunk reveal + pulsing bar | Pulsing border on thinking block, auto-collapses | Continuous reveal | Cursor disappears, actions fade in |
+| ChatGPT | Words fade 200-250ms ("smooth bleed") | "Emotive Point" pulsing disc | Sliding 8px cursor | Point settles, action bar appears |
+| Open WebUI | Shimmer gradient on text | 3-dot pulse + optional thought process | Fade-in streaming | t/s stats pill finalizes |
+| LobeChat | Shiny text shimmer sweep | "Jelly dot" organic border-radius morphing | Sinusoidal breathing pulse | Dot dissolves, action bar appears |
+| **Loom V2** | **Batch chunks, CSS opacity fade-in** | **Pulsing rose glow on thinking block** | **Rose cursor + ActivityStatusLine** | **Actions fade in (200ms), aurora fades** |
 
 ### Tool Call Display
 
-| Product | Pending State | Running State | Success State | Error State | Grouping |
-|---------|--------------|---------------|---------------|-------------|----------|
-| Claude.ai | "Analysis" block with tool icon | Streaming monologue or progress | Collapsed chip with icon | Inline red text | Stacked chips at message bottom |
-| ChatGPT | "Action" pill (e.g., "Using Python...") | Pulsing status with NL description | Hidden/collapsed, badge only | Amber pill + "Show Details" | Aggressive — 5 calls = 1 accordion |
-| Cursor | Terminal-style lines | Spinner + real-time diff | Summary ("Read 4 files") | IDE "Problems" tab integration | Individual vertical timeline |
-| Open WebUI | Status bubble with icon | Pulsing + optional log stream | Checkmark, rendered result | Toast + expanded JSON | Horizontal chips row |
-| LobeChat | "Inspector" block | Expanding animation | Collapsible with result | Red-tinted inspector | Individual with expand |
-| LibreChat | Status badge | Collapsible narrow bar | Collapsed horizontal bar + chevron | Expanded with error detail | Individual with collapse |
-| **Loom** | **Compact pill: icon + name** | **Pulsing rose indicator** | **Collapsed chip, 1 line** | **Expanded, muted red bg** | **3+ calls = accordion** |
+| Product | Running State | Success State | Error State | Grouping |
+|---------|--------------|---------------|-------------|----------|
+| Claude.ai | Streaming monologue or progress | Collapsed chip with icon | Inline red text | Stacked chips |
+| ChatGPT | Pulsing action pill with NL description | Hidden/badge only | Amber pill + "Show Details" | Aggressive — 5 calls = 1 accordion |
+| Cursor | Terminal-style lines + spinner | Summary ("Read 4 files") | IDE "Problems" tab | Individual vertical timeline |
+| LibreChat | Status badge → collapsible bar | Collapsed bar + chevron | Expanded red accent | Individual with collapse |
+| **Loom V2** | **Pulsing rose dot + "Calling [tool]..."** | **Collapsed chip, 1 line, checkmark** | **Expanded, muted red bg** | **3+ calls = accordion with count badge** |
 
-### Streaming Indicators
+### Multi-Agent Approach
 
-| Product | Thinking State | Generating State | Completion Signal |
-|---------|---------------|-----------------|-------------------|
-| Claude.ai | Pulsing border on thinking block (2s infinite) | Solid rectangular blinking cursor | Cursor disappears, actions fade in |
-| ChatGPT | "Emotive Point" — iridescent pulsing disc | "Liquid streaming" — opacity+blur fade-in per batch | Point settles, actions appear |
-| Perplexity | Checklist of search steps (progressive disclosure) | Word-level fade-in ("comet pulse") | Sources grid + follow-ups appear |
-| Open WebUI | 3-dot pulse + optional "Thought" process | Fade-in streaming + t/s stats pill | Stats pill finalizes |
-| LobeChat | "Jelly dot" — organic border-radius morphing | Sinusoidal breathing pulse | Dot dissolves, action bar appears |
-| **Loom** | **Pulsing rose glow on thinking block** | **Batch token rendering with opacity fade** | **Actions fade in (200ms)** |
+| Product | Pattern | Complexity |
+|---------|---------|-----------|
+| Open WebUI | Side-by-side model comparison with merge | HIGH — requires layout split |
+| LobeChat | Agent Groups with shared context, switchable | HIGH — agent framework required |
+| LibreChat | Mid-conversation provider switching | MEDIUM — context preserved across switch |
+| **Loom V2** | **Tabbed workspaces (Claude/Gemini/Codex tabs)** | **MEDIUM — independent WebSockets per tab** |
 
-### Sidebar Design
+### Session Sidebar
 
-| Product | Organization | Active Indicator | Collapsed Mode | Density |
-|---------|-------------|-----------------|---------------|---------|
-| Claude.ai | Time groups (uppercase tracked headers) | bg rgba(255,255,255,0.1) + left accent border | Not icon-only | Airy (8px 12px padding) |
-| ChatGPT | Projects + time groups | Highlighted background | Collapsible | Professional, tight |
-| Perplexity | Slim vertical icon rail + expanded thread list | Turquoise accent | Icon-only rail default | Compact |
-| Open WebUI | Time groups (Today, Yesterday, 30 Days) | Background highlight | Icon-only "Slim" mode | Dense, grouped |
-| LobeChat | Session list + Agent Marketplace + right context panel | Background + border | Collapsible | Medium |
-| LibreChat | Folders + search + time groups | Background highlight | Collapsible | Power-user dense |
-| **Loom** | **Time groups with tracked labels** | **Left 2px rose border + bg tint** | **Icon-only strip** | **Dense but breathable** |
+| Product | Organization | Active Indicator | Collapsed Mode |
+|---------|-------------|-----------------|---------------|
+| Claude.ai | Time groups, Projects | Subtle bg + left accent | Collapsible (not icon-only) |
+| ChatGPT | Projects + time groups | Highlighted bg | Collapsible + Cmd+B |
+| Open WebUI | Time groups + Channels + Folders | Background highlight | Icon-only "Slim" mode |
+| LobeChat | Session list + 58px icon rail | Background + border | 58px icon rail always visible |
+| **Loom V2** | **Time groups, provider badge per session** | **2px accent border + bg tint** | **Icon-only strip (Cmd+B)** |
 
 ---
 
-## What Makes Each Product Feel "Premium" (Synthesis)
+## Phase-Specific Research Flags
 
-### Claude.ai: Restraint
-- Near-invisible borders (`rgba(255,255,255,0.06)`)
-- Off-black base simulating "expensive dark matte paper"
-- Serif + sans-serif typography pairing (editorial print design influence)
-- Very soft, large drop shadows on floating elements only
-- Progressive disclosure — nothing visible that doesn't need to be
-
-### ChatGPT: Polish and Motion
-- Custom typeface (OpenAI Sans) with ink traps — feels bespoke
-- Physics-based micro-interactions (20ms button depress, inertia on elements)
-- Glassmorphic overlays with iridescent borders
-- Dense 4px/8px grid system
-- Unified "emotive point" as interaction focus
-
-### Perplexity: Information Density
-- "Invisible UI" — almost no shadows, minimal borders, every line has a purpose
-- No bot avatar — presents as "knowledge engine" not chatbot persona
-- Citation-forward design (sources as first-class citizens)
-- Turquoise accent used with extreme restraint
-- "Scandinavian subway" aesthetic — utility first
-
-### Open WebUI: Configurability
-- OLED mode (pure black option)
-- Model comparison side-by-side
-- Real-time performance stats (tokens/second)
-- Extensive theming via CSS variables
-- "Workspace" approach rather than simple chat list
-
-### LobeChat: Visual Flair
-- Spring physics animations on everything (stiffness: 100, damping: 20)
-- "Tactile maximalism" — squishy button depress (`scale(0.95)`)
-- OLED-optimized dark mode (#121212)
-- Tonal elevation (white overlay percentages instead of fixed colors)
-- Agent marketplace as first-class UI concept
-
-### LibreChat: Power Features
-- Conversation branching / forking (killer feature for researchers)
-- Multi-model side-by-side
-- Artifacts sidebar (Claude-like)
-- Folders + search for conversation management
-- Mermaid + LaTeX rendering
+| Phase | Topic | Research Needed | Priority |
+|-------|-------|-----------------|----------|
+| Phase 1 | OKLCH vs OKLCH-A, Tailwind v4 color system | Tailwind v4 (not v3) uses OKLCH natively — verify token format and CSS custom property behavior | HIGH |
+| Phase 2 | WebSocket message format from CloudCLI | Exact WebSocket message shapes from backend for tool calls, thinking blocks, session events | HIGH |
+| Phase 3 | ActivityStatusLine: which backend events to parse | Which WS event fields indicate "reading file X" vs "writing file Y" vs "running terminal command" | MEDIUM |
+| Phase 4 | Tab persistence across refreshes | How to restore tab state on page reload without losing ongoing sessions | MEDIUM |
+| Phase 7 | Nextcloud WebDAV API | CloudCLI's Nextcloud integration — does it go through backend or direct WebDAV from frontend? | HIGH |
+| Phase 8 | Companion sprite feasibility | itch.io license compatibility, canvas vs CSS sprite approach, @napi-rs/canvas for Node | HIGH — must complete before committing to Phase 8 |
 
 ---
 
-## Loom's Premium Identity: The Recommendation
+## Complexity Estimates
 
-Based on analysis of all six products, Loom's "premium" should come from the **Claude.ai playbook** (restraint, typography, invisible borders, progressive disclosure) adapted with **Loom's distinctive warmth** (dusty rose accent, cream text, warm charcoal).
-
-**Adopt from Claude.ai:**
-- Invisible borders (6-10% opacity)
-- Hidden-until-hover message actions
-- Full-width assistant messages
-- Generous inter-turn spacing with tight intra-turn spacing
-- Progressive disclosure as the default pattern
-- Soft focus glows on interactive elements
-
-**Adopt from ChatGPT:**
-- Dense grid system (4-8px increments)
-- Action pills for tool calls (compact, semantic)
-- Aggressive tool call grouping
-- Batch streaming with opacity fade-in
-
-**Adopt from Perplexity:**
-- "Invisible UI" ethos — every element must justify its existence
-- No chatbot personification (Loom is a developer tool, not a persona)
-- Extreme restraint on accent color usage
-
-**Adopt from Open WebUI:**
-- Slim sidebar collapse to icon strip
-- Real-time status display during operations
-- Time-grouped session organization
-
-**Skip (unique to others, wrong for Loom):**
-- LobeChat's "tactile maximalism" — too playful for a developer tool
-- ChatGPT's iridescent/rainbow gradients — conflicts with warm palette
-- LibreChat's conversation branching — too complex, wrong mental model
-- Open WebUI's model comparison — unnecessary for 2-model product
+| Complexity | Features | Effort per Feature |
+|-----------|----------|-------------------|
+| **LOW** (CSS/config only) | Typography, surface elevation, semantic borders, selection color, streaming cursor, copy button, dark mode integrity | 1-2 days |
+| **MEDIUM** (CSS + React component) | Thinking disclosure, tool card animations, auto-scroll, session sidebar, settings panel, streaming states, aurora overlay, toast system, tab bar, MCP status panel, companion selection | 3-7 days |
+| **HIGH** (architecture + multiple components) | Streaming infrastructure (useRef/Zustand pattern), tool result inline rendering, execution chain grouping, tabbed workspaces (multi-WebSocket), GSD dashboard, Nextcloud file browser, companion animation state machine | 1-3 weeks |
 
 ---
 
-## Implementation Complexity Summary
+## What Makes Loom Premium (Synthesis)
 
-| Complexity | Features | Estimated Effort |
-|-----------|----------|-----------------|
-| **LOW** (CSS-only) | Palette swap, border opacity, text hierarchy, selection color, focus glow, hidden-hover actions, inter-turn spacing, full-width assistant messages | 1-2 days each |
-| **MEDIUM** (CSS + minor JS) | Message entrance animation, streaming fade-in, expand/collapse animation, glassmorphic overlays, toast system, sidebar restyle, active session indicator, tool card restyle | 2-4 days each |
-| **HIGH** (significant JS/architecture) | Execution chain grouping, semantic streaming states, token/cost display, context window gauge, slim sidebar collapse | 3-7 days each |
+Loom's "premium" comes from a specific combination that no competitor offers:
+
+1. **Claude.ai's restraint** — invisible borders, progressive disclosure, full-width assistant messages, generous whitespace
+2. **ChatGPT's motion quality** — batch streaming with fade-in, action pill tool cards, aggressive grouping of tool calls
+3. **Loom-original tool visibility** — execution chains, semantic streaming states, approval flows, MCP source labels
+4. **Loom-original multi-agent** — tabbed workspaces, background tasks, cross-provider context sharing
+5. **Loom-original character** — aurora ambient overlay, pixel-art companion, warm OKLCH palette (not clinical blue/white)
+
+The design thesis is: **make AI agent work visible, beautiful, and controllable**. Every feature decision should be evaluated against this thesis. Features that obscure (heavy decorative animations during work), confuse (complex branching), or bloat (full IDE replacement) are rejected. Features that illuminate (tool chains, semantic states, agent dashboards), delight (aurora, companions, spring physics), and empower (approval flows, MCP management, tabbed workspaces) are prioritized.
 
 ---
 
 ## Sources
 
-- Claude.ai interface — Gemini research analysis cross-referenced with direct product knowledge (HIGH confidence)
-- ChatGPT post-GPT5 interface — Gemini research analysis of 2026 updates (MEDIUM confidence — some details may be speculative about unreleased features)
-- Perplexity interface — Gemini research analysis (HIGH confidence)
-- Open WebUI — Gemini research analysis of v0.5-0.8 (HIGH confidence)
-- LobeChat — Gemini research analysis of Lobe UI system (MEDIUM-HIGH confidence)
-- LibreChat — Gemini research analysis of current GitHub main (HIGH confidence)
-- Cross-product comparison of surface layering, typography, animation timing (HIGH confidence — patterns verified across multiple sources)
-- Tool call display patterns comparison (HIGH confidence — well-documented patterns)
+**HIGH confidence (direct product analysis):**
+- `.planning/reference-app-analysis.md` — 6-product breakdown of Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat (verified via Gemini research 2026-03-03)
+- `.planning/chat-interface-standards.md` — 106 requirements across 16 categories, cross-verified across all 6 products
+- `.planning/PROJECT.md` — V2 requirements, constraints, out-of-scope decisions, key architecture decisions
+- `.planning/research/SUMMARY.md` — v1.1 research including tool call patterns, streaming UX, surface hierarchy
+- `.planning/research/FEATURES.md` — v1.1 visual redesign feature landscape (superseded by this document for V2 scope)
+
+**MEDIUM confidence (architecture decisions pending validation):**
+- Companion system feasibility: `MEMORY.md` notes v1 AI-generated sprites failed; itch.io pre-made sprites are the plan; Phase 8 commitment depends on feasibility gate
+- Cross-tab context sharing: Loom-original concept with no reference product to validate against; complexity likely higher than estimated
+- GSD dashboard backend integration: Depends on CloudCLI's GATE-REPORT format and file system access model
+
+**LOW confidence (needs phase-specific research):**
+- Nextcloud integration architecture: Whether to go direct WebDAV from frontend or through CloudCLI backend proxy — needs verification during Nextcloud phase
+- OKLCH in Tailwind v4: V2 uses Tailwind v4 (OKLCH native) vs v3 (HSL). Token format and CSS custom property behavior in v4 needs verification before Phase 1.
 
 ---
 
-*Feature research for: Loom v1.1 Visual Redesign*
-*Researched: 2026-03-03*
+*Feature research for: Loom V2 — Premium AI Coding Agent Interface*
+*Researched: 2026-03-04*
+*Scope: Full V2 greenfield rewrite (not v1.1 patch)*
+*Supersedes: Previous FEATURES.md (v1.1 visual redesign scope only)*
