@@ -1,6 +1,4 @@
-import { Badge } from '../../../ui/badge';
-import { Button } from '../../../ui/button';
-import { Check, Clock, Edit2, Trash2, X } from 'lucide-react';
+import { Check, Edit2, Trash2, X } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { formatTimeAgo } from '../../../../utils/dateUtils';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
@@ -64,20 +62,17 @@ export default function SidebarSessionItem({
 
   return (
     <div className="group relative">
-      {sessionView.isActive && (
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-        </div>
-      )}
-
+      {/* Mobile variant — card style with rose indicators */}
       <div className="md:hidden">
         <div
           className={cn(
             'p-2 mx-3 my-0.5 rounded-md bg-card border active:scale-[0.98] transition-all duration-150 relative',
-            isSelected ? 'bg-primary/5 border-primary/20' : '',
-            !isSelected && sessionView.isActive
-              ? 'border-green-500/30 bg-green-50/5 bg-green-900/5'
+            isSelected
+              ? 'border-l-2 border-primary bg-accent/10 border-t-border/30 border-r-border/30 border-b-border/30'
               : 'border-border/30',
+            !isSelected && sessionView.isActive
+              ? 'border-l-2 border-l-primary/50 bg-accent/5'
+              : '',
           )}
           onClick={selectMobileSession}
         >
@@ -94,68 +89,46 @@ export default function SidebarSessionItem({
             <div className="min-w-0 flex-1">
               <div className="text-xs font-medium truncate text-foreground">{sessionView.sessionName}</div>
               <div className="flex items-center gap-1 mt-0.5">
-                <Clock className="w-2.5 h-2.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground">
                   {formatTimeAgo(sessionView.sessionTime, currentTime)}
                 </span>
-                {sessionView.messageCount > 0 && (
-                  <Badge variant="secondary" className="text-xs px-1 py-0 ml-auto">
-                    {sessionView.messageCount}
-                  </Badge>
-                )}
-                <span className="ml-1 opacity-70">
+                <span className="ml-auto opacity-70">
                   <SessionProviderLogo provider={session.__provider} className="w-3 h-3" />
                 </span>
               </div>
             </div>
 
             <button
-              className="w-5 h-5 rounded-md bg-red-50 bg-red-900/20 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
+              className="w-5 h-5 rounded-md bg-destructive/10 flex items-center justify-center active:scale-95 transition-transform opacity-70 ml-1"
               onClick={(event) => {
                 event.stopPropagation();
                 requestDeleteSession();
               }}
             >
-              <Trash2 className="w-2.5 h-2.5 text-red-600 text-red-400" />
+              <Trash2 className="w-2.5 h-2.5 text-destructive" />
             </button>
           </div>
         </div>
       </div>
 
+      {/* Desktop variant — compact single-line with rose left border */}
       <div className="hidden md:block">
-        <Button
-          variant="ghost"
+        <div
           className={cn(
-            'w-full justify-start p-2 h-auto font-normal text-left hover:bg-accent/50 transition-colors duration-200',
-            isSelected && 'bg-accent text-accent-foreground',
+            'w-full flex items-center gap-2 px-2 py-1 rounded-md cursor-pointer hover:bg-accent/50 transition-colors duration-150',
+            isSelected && 'border-l-2 border-primary bg-accent/10',
+            !isSelected && 'border-l-2 border-transparent',
           )}
           onClick={() => onSessionSelect(session, project.name)}
         >
-          <div className="flex items-start gap-2 min-w-0 w-full">
-            <SessionProviderLogo provider={session.__provider} className="w-3 h-3 mt-0.5 flex-shrink-0" />
-            <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium truncate text-foreground">{sessionView.sessionName}</div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <Clock className="w-2.5 h-2.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">
-                  {formatTimeAgo(sessionView.sessionTime, currentTime)}
-                </span>
-                {sessionView.messageCount > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="text-xs px-1 py-0 ml-auto group-hover:opacity-0 transition-opacity"
-                  >
-                    {sessionView.messageCount}
-                  </Badge>
-                )}
-                <span className="ml-1 opacity-70 group-hover:opacity-0 transition-opacity">
-                  <SessionProviderLogo provider={session.__provider} className="w-3 h-3" />
-                </span>
-              </div>
-            </div>
-          </div>
-        </Button>
+          <SessionProviderLogo provider={session.__provider} className="w-3 h-3 flex-shrink-0" />
+          <span className="text-xs font-medium truncate flex-1 text-foreground">{sessionView.sessionName}</span>
+          <span className="text-[10px] text-muted-foreground/60 flex-shrink-0 tabular-nums group-hover:opacity-0 transition-opacity">
+            {formatTimeAgo(sessionView.sessionTime, currentTime)}
+          </span>
+        </div>
 
+        {/* Hover action buttons */}
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
           {editingSession === session.id && !sessionView.isCodexSession ? (
               <>
@@ -176,14 +149,14 @@ export default function SidebarSessionItem({
                   autoFocus
                 />
                 <button
-                  className="w-6 h-6 bg-green-50 hover:bg-green-100 bg-green-900/20 hover:bg-green-900/40 rounded flex items-center justify-center"
+                  className="w-6 h-6 bg-emerald-900/20 hover:bg-emerald-900/40 rounded flex items-center justify-center"
                   onClick={(event) => {
                     event.stopPropagation();
                     saveEditedSession();
                   }}
                   title={"Save"}
                 >
-                  <Check className="w-3 h-3 text-green-600 text-green-400" />
+                  <Check className="w-3 h-3 text-emerald-400" />
                 </button>
                 <button
                   className="w-6 h-6 bg-surface-raised hover:bg-surface-elevated rounded flex items-center justify-center"
@@ -211,14 +184,14 @@ export default function SidebarSessionItem({
                   </button>
                 )}
                 <button
-                  className="w-6 h-6 bg-red-50 hover:bg-red-100 bg-red-900/20 hover:bg-red-900/40 rounded flex items-center justify-center"
+                  className="w-6 h-6 bg-destructive/10 hover:bg-destructive/20 rounded flex items-center justify-center"
                   onClick={(event) => {
                     event.stopPropagation();
                     requestDeleteSession();
                   }}
                   title={"Delete this session permanently"}
                 >
-                  <Trash2 className="w-3 h-3 text-red-600 text-red-400" />
+                  <Trash2 className="w-3 h-3 text-destructive" />
                 </button>
               </>
             )}

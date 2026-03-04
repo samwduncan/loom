@@ -1,3 +1,43 @@
+export type TimeCategory = 'Today' | 'Yesterday' | 'Last 7 Days' | 'Older';
+
+export function getTimeCategory(dateString: string, now: Date): TimeCategory {
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Older';
+
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const weekAgo = new Date(today);
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  if (date >= today) return 'Today';
+  if (date >= yesterday) return 'Yesterday';
+  if (date >= weekAgo) return 'Last 7 Days';
+  return 'Older';
+}
+
+export function groupSessionsByTime<T>(
+  sessions: T[],
+  now: Date,
+  getDate: (item: T) => string,
+): Map<TimeCategory, T[]> {
+  const order: TimeCategory[] = ['Today', 'Yesterday', 'Last 7 Days', 'Older'];
+  const groups = new Map<TimeCategory, T[]>(order.map(cat => [cat, []]));
+
+  for (const session of sessions) {
+    const dateStr = getDate(session);
+    const category = getTimeCategory(dateStr, now);
+    groups.get(category)!.push(session);
+  }
+
+  // Remove empty groups
+  for (const [key, value] of groups) {
+    if (value.length === 0) groups.delete(key);
+  }
+
+  return groups;
+}
+
 export const formatTimeAgo = (dateString: string, currentTime: Date) => {
   const date = new Date(dateString);
   const now = currentTime;

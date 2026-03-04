@@ -1,5 +1,9 @@
-import { ChevronDown, Plus } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '../../../ui/button';
+import { cn } from '../../../../lib/utils';
+import { groupSessionsByTime } from '../../../../utils/dateUtils';
+import { getSessionTime } from '../../utils/utils';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
 import type { SessionWithProvider, TouchHandlerFactory } from '../../types/types';
 import SidebarSessionItem from './SidebarSessionItem';
@@ -70,6 +74,25 @@ export default function SidebarProjectSessions({
   onNewSession,
   touchHandlerFactory,
 }: SidebarProjectSessionsProps) {
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+
+  const toggleGroup = (category: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
+
+  const groupedSessions = useMemo(
+    () => groupSessionsByTime(sessions, currentTime, (s) => getSessionTime(s)),
+    [sessions, currentTime],
+  );
+
   if (!isExpanded) {
     return null;
   }
@@ -78,7 +101,7 @@ export default function SidebarProjectSessions({
   const hasMoreSessions = project.sessionMeta?.hasMore === true;
 
   return (
-    <div className="ml-3 space-y-1 border-l border-border pl-3">
+    <div className="ml-3 space-y-0.5 border-l border-border pl-3">
       {!initialSessionsLoaded ? (
         <SessionListSkeleton />
       ) : !hasSessions && !isLoadingSessions ? (
@@ -86,25 +109,49 @@ export default function SidebarProjectSessions({
           <p className="text-xs text-muted-foreground">{"No sessions yet"}</p>
         </div>
       ) : (
-        sessions.map((session) => (
-          <SidebarSessionItem
-            key={session.id}
-            project={project}
-            session={session}
-            selectedSession={selectedSession}
-            currentTime={currentTime}
-            editingSession={editingSession}
-            editingSessionName={editingSessionName}
-            onEditingSessionNameChange={onEditingSessionNameChange}
-            onStartEditingSession={onStartEditingSession}
-            onCancelEditingSession={onCancelEditingSession}
-            onSaveEditingSession={onSaveEditingSession}
-            onProjectSelect={onProjectSelect}
-            onSessionSelect={onSessionSelect}
-            onDeleteSession={onDeleteSession}
-            touchHandlerFactory={touchHandlerFactory}
-          />
-        ))
+        Array.from(groupedSessions.entries()).map(([category, groupSessions]) => {
+          const isCollapsed = collapsedGroups.has(category);
+          return (
+            <div key={category}>
+              {/* Group header */}
+              <button
+                onClick={() => toggleGroup(category)}
+                className="flex items-center gap-1.5 px-2 py-1 w-full text-left group/header"
+              >
+                <ChevronRight className={cn(
+                  'w-3 h-3 text-muted-foreground/60 transition-transform duration-150',
+                  !isCollapsed && 'rotate-90'
+                )} />
+                <span className="text-[11px] font-medium text-muted-foreground/70 uppercase tracking-wider">
+                  {category}
+                </span>
+                <span className="text-[10px] text-muted-foreground/40 ml-auto tabular-nums">
+                  {groupSessions.length}
+                </span>
+              </button>
+              {/* Group sessions */}
+              {!isCollapsed && groupSessions.map((session) => (
+                <SidebarSessionItem
+                  key={session.id}
+                  project={project}
+                  session={session}
+                  selectedSession={selectedSession}
+                  currentTime={currentTime}
+                  editingSession={editingSession}
+                  editingSessionName={editingSessionName}
+                  onEditingSessionNameChange={onEditingSessionNameChange}
+                  onStartEditingSession={onStartEditingSession}
+                  onCancelEditingSession={onCancelEditingSession}
+                  onSaveEditingSession={onSaveEditingSession}
+                  onProjectSelect={onProjectSelect}
+                  onSessionSelect={onSessionSelect}
+                  onDeleteSession={onDeleteSession}
+                  touchHandlerFactory={touchHandlerFactory}
+                />
+              ))}
+            </div>
+          );
+        })
       )}
 
       {hasSessions && hasMoreSessions && (
