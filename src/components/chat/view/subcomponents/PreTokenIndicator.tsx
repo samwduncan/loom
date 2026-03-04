@@ -6,11 +6,12 @@ interface PreTokenIndicatorProps {
 }
 
 /**
- * Pre-token aurora aura indicator.
+ * Pre-token atmospheric aurora indicator.
  *
- * Renders a soft, pulsing rainbow glow bar (Gemini-style) beneath where
- * AI content will appear. When isVisible transitions to false, the aura
- * collapses upward using a CSS Grid 1fr->0fr animation before unmounting.
+ * Renders a diffused, layered aurora glow field beneath where AI content will
+ * appear -- evoking aurora lights shining down. When isVisible transitions to
+ * false, the field fades upward and dissolves (no grid collapse, no layout
+ * jump). Uses compositor-thread animation via @property --aurora-angle.
  */
 export default function PreTokenIndicator({ isVisible }: PreTokenIndicatorProps) {
   const [exiting, setExiting] = useState(false);
@@ -44,28 +45,7 @@ export default function PreTokenIndicator({ isVisible }: PreTokenIndicatorProps)
 
   return (
     <div
-      style={{
-        display: 'grid',
-        gridTemplateRows: exiting ? '0fr' : '1fr',
-        transition: 'grid-template-rows 300ms ease-out',
-      }}
-    >
-      <div style={{ overflow: 'hidden' }}>
-        <div className="py-4 px-4">
-          <div className="relative" style={{ height: '16px' }}>
-            {/* Diffused glow layer */}
-            <div
-              className="aurora-aura absolute inset-x-0"
-              style={{ top: '6px' }}
-            />
-            {/* Bright core line on top */}
-            <div
-              className="aurora-aura-core absolute inset-x-0"
-              style={{ top: '7px' }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+      className={`aurora-atmosphere${exiting ? ' aurora-atmosphere-exit' : ''}`}
+    />
   );
 }
