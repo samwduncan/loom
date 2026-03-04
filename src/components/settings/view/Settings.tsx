@@ -199,7 +199,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
             <Button
               onClick={saveSettings}
               disabled={isSaving}
-              className="flex-1 sm:flex-none h-10 bg-primary hover:bg-primary/90 disabled:opacity-50 touch-manipulation"
+              className="flex-1 sm:flex-none h-10 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 touch-manipulation"
             >
               {isSaving ? (
                 <div className="flex items-center gap-2">

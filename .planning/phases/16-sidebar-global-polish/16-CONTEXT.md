@@ -24,14 +24,14 @@ Every non-chat surface -- sidebar, settings, modals, mobile nav -- matches the c
 - Collapsed strip shows navigation icons only: expand, new session, settings, update indicator
 - Smooth width animation from 48px to 288px (w-72) over ~200ms with content fade-in after width settles
 - Collapsed strip width stays at current 48px
-- No keyboard shortcut for toggle -- deferred to ADV-01
+- Keyboard shortcut Cmd/Ctrl+B to toggle sidebar
 
 ### Settings & Modal Styling
 - Settings keeps full-screen overlay pattern, restyled with charcoal surfaces and rose accents
 - Replace blue-600 settings icon and save button with dusty rose primary color
 - All modal/dialog backdrops use glassmorphic blur: backdrop-blur-xl with bg-background/60
 - Confirmation dialogs (delete session, delete project) get both palette swap AND layout refresh -- better spacing, icon treatment, button positioning
-- Dusty rose as primary action color across all modals/settings (replacing blue-600)
+- Keep blue-600 for primary action buttons (Save, Submit) -- blue stands out as "do something" against charcoal. Rose is for ambient theming (icons, borders, highlights), not actions
 
 ### Mobile Navigation
 - Keep floating glassmorphic bottom bar style -- just apply charcoal+rose palette treatment
