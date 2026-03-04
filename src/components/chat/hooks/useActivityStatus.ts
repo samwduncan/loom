@@ -53,6 +53,8 @@ interface ClaudeStatusLike {
   text?: string;
   tokens?: number;
   can_interrupt?: boolean;
+  toolName?: string;
+  toolInput?: Record<string, unknown> | string;
 }
 
 interface ActivityStatus {
@@ -95,8 +97,11 @@ export function useActivityStatus(
     };
   }, [isLoading]);
 
-  // Derive activity text from claudeStatus
-  const activityText = claudeStatus?.text || 'Processing...';
+  // Derive activity text: use semantic parsing when tool info is available,
+  // otherwise fall back to the raw status text
+  const activityText = claudeStatus?.toolName
+    ? parseActivityText(claudeStatus.toolName, claudeStatus.toolInput)
+    : (claudeStatus?.text || 'Processing...');
   const tokenCount = claudeStatus?.tokens ?? 0;
 
   return { activityText, elapsedSeconds, tokenCount };

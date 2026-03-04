@@ -36,7 +36,7 @@ interface UseChatRealtimeHandlersArgs {
   setChatMessages: Dispatch<SetStateAction<ChatMessage[]>>;
   setIsLoading: (loading: boolean) => void;
   setCanAbortSession: (canAbort: boolean) => void;
-  setClaudeStatus: (status: { text: string; tokens: number; can_interrupt: boolean } | null) => void;
+  setClaudeStatus: (status: { text: string; tokens: number; can_interrupt: boolean; toolName?: string; toolInput?: Record<string, unknown> | string } | null) => void;
   setTokenBudget: (budget: Record<string, unknown> | null) => void;
   setIsSystemSessionChange: (isSystemSessionChange: boolean) => void;
   setPendingPermissionRequests: Dispatch<SetStateAction<PendingPermissionRequest[]>>;
@@ -372,6 +372,15 @@ export function useChatRealtimeHandlers({
                     return message;
                   }),
                 );
+
+                // Update claudeStatus with subtask tool info for semantic activity text
+                setClaudeStatus({
+                  text: 'Working...',
+                  tokens: 0,
+                  can_interrupt: true,
+                  toolName: part.name,
+                  toolInput: part.input,
+                });
                 return;
               }
 
@@ -395,6 +404,15 @@ export function useChatRealtimeHandlers({
                     : undefined,
                 },
               ]);
+
+              // Update claudeStatus with tool info for semantic activity text
+              setClaudeStatus({
+                text: 'Working...',
+                tokens: 0,
+                can_interrupt: true,
+                toolName: part.name,
+                toolInput: part.input,
+              });
               return;
             }
 
@@ -976,7 +994,7 @@ export function useChatRealtimeHandlers({
           break;
         }
 
-        const statusInfo: { text: string; tokens: number; can_interrupt: boolean } = {
+        const statusInfo: { text: string; tokens: number; can_interrupt: boolean; toolName?: string; toolInput?: Record<string, unknown> | string } = {
           text: 'Working...',
           tokens: 0,
           can_interrupt: true,

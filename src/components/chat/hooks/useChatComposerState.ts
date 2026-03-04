@@ -57,7 +57,7 @@ interface UseChatComposerStateArgs {
   setSessionMessages?: Dispatch<SetStateAction<any[]>>;
   setIsLoading: (loading: boolean) => void;
   setCanAbortSession: (canAbort: boolean) => void;
-  setClaudeStatus: (status: { text: string; tokens: number; can_interrupt: boolean } | null) => void;
+  setClaudeStatus: (status: { text: string; tokens: number; can_interrupt: boolean; toolName?: string; toolInput?: Record<string, unknown> | string } | null) => void;
   setIsUserScrolledUp: (isScrolledUp: boolean) => void;
   setPendingPermissionRequests: Dispatch<SetStateAction<PendingPermissionRequest[]>>;
 }

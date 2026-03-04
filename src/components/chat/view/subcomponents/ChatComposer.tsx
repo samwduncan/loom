@@ -42,7 +42,7 @@ interface ChatComposerProps {
     decision: { allow?: boolean; message?: string; rememberEntry?: string | null; updatedInput?: unknown },
   ) => void;
   handleGrantToolPermission: (suggestion: { entry: string; toolName: string }) => { success: boolean };
-  claudeStatus: { text: string; tokens: number; can_interrupt: boolean } | null;
+  claudeStatus: { text: string; tokens: number; can_interrupt: boolean; toolName?: string; toolInput?: Record<string, unknown> | string } | null;
   isLoading: boolean;
   onAbortSession: () => void;
   provider: Provider | string;

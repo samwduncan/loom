@@ -75,7 +75,7 @@ export function useChatSessionState({
   const [isUserScrolledUp, setIsUserScrolledUp] = useState(false);
   const [tokenBudget, setTokenBudget] = useState<Record<string, unknown> | null>(null);
   const [visibleMessageCount, setVisibleMessageCount] = useState(INITIAL_VISIBLE_MESSAGES);
-  const [claudeStatus, setClaudeStatus] = useState<{ text: string; tokens: number; can_interrupt: boolean } | null>(null);
+  const [claudeStatus, setClaudeStatus] = useState<{ text: string; tokens: number; can_interrupt: boolean; toolName?: string; toolInput?: Record<string, unknown> | string } | null>(null);
   const [allMessagesLoaded, setAllMessagesLoaded] = useState(false);
   const [isLoadingAllMessages, setIsLoadingAllMessages] = useState(false);
   const [loadAllJustFinished, setLoadAllJustFinished] = useState(false);

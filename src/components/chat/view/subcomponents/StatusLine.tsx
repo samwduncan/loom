@@ -3,7 +3,7 @@ import { useActivityStatus } from '../../hooks/useActivityStatus';
 import { formatTokenCount } from '../../utils/pricing';
 
 interface StatusLineProps {
-  claudeStatus: { text?: string; tokens?: number; can_interrupt?: boolean } | null;
+  claudeStatus: { text?: string; tokens?: number; can_interrupt?: boolean; toolName?: string; toolInput?: Record<string, unknown> | string } | null;
   isLoading: boolean;
   onAbort: () => void;
   provider: string;
