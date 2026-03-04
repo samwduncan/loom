@@ -195,4 +195,4 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 | 14. Toast & Overlay System | v1.1 | 3/3 | Complete | 2026-03-03 |
 | 15. Tool Call Display | 2/2 | Complete   | 2026-03-03 | - |
 | 16. Sidebar & Global Polish | v1.1 | 3/3 | Complete | 2026-03-04 |
-| 17. Streaming & Status | v1.1 | 0/4 | Planned | - |
+| 17. Streaming & Status | 2/4 | In Progress|  | - |
