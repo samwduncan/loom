@@ -1,18 +1,13 @@
 {
   "mode": "yolo",
-  "depth": "comprehensive",
+  "granularity": "fine",
   "parallelization": true,
   "commit_docs": true,
   "model_profile": "quality",
   "workflow": {
     "research": true,
     "plan_check": true,
-    "verifier": true
-  },
-  "tooling": {
-    "lint": null,
-    "typecheck": "npm run typecheck",
-    "build": "npm run build",
-    "test": null
+    "verifier": true,
+    "nyquist_validation": true
   }
 }
