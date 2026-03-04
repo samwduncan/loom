@@ -170,9 +170,17 @@ export const ToolActionCard: React.FC<ToolActionCardProps> = memo(
           ? 'border-l-2 border-green-500/60 transition-[border-color] duration-300'
           : '';
 
+    // Running glow: box-shadow pulse (no layout shift, compositor-friendly)
+    const glowStyle = isRunning
+      ? {
+          animation: 'tool-card-glow 1.5s ease-in-out infinite',
+        }
+      : undefined;
+
     return (
       <div
         className={`rounded-xl ${bgTint} ${stateBorder} my-0.5`}
+        style={glowStyle}
       >
         {/* Compact header -- clickable single line */}
         <button

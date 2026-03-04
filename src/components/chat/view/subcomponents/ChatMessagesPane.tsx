@@ -6,6 +6,7 @@ import TurnBlock from './TurnBlock';
 import { TurnToolbar } from './TurnToolbar';
 import ProviderSelectionEmptyState from './ProviderSelectionEmptyState';
 import ScrollToBottomPill from './ScrollToBottomPill';
+import ErrorBanner from './ErrorBanner';
 import type { ChatMessage, Turn } from '../../types/types';
 import type { Project, ProjectSession, SessionProvider } from '../../../../types/app';
 import AssistantThinkingIndicator from './AssistantThinkingIndicator';
@@ -125,6 +126,61 @@ export default function ChatMessagesPane({
     messageKeyMapRef.current.set(message, candidateKey);
     return candidateKey;
   }, []);
+
+  // Permanent error banner state -- tracks dismissed error IDs so they don't reappear
+  const [permanentError, setPermanentError] = useState<{ message: string; type: 'crash' | 'exit' | 'error'; errorKey: string } | null>(null);
+  const dismissedErrorsRef = useRef<Set<string>>(new Set());
+
+  // Detect permanent errors from the last messages in the conversation
+  useEffect(() => {
+    if (chatMessages.length === 0 || isLoading) {
+      return;
+    }
+
+    // Scan last few messages for error indicators
+    const lastMessages = chatMessages.slice(-5);
+    for (let i = lastMessages.length - 1; i >= 0; i--) {
+      const msg = lastMessages[i];
+
+      // Check for error-type messages (process crashes, fatal errors)
+      if (msg.type === 'error' && msg.content) {
+        const content = String(msg.content);
+        const errorKey = `error-${msg.timestamp}-${content.slice(0, 50)}`;
+
+        if (dismissedErrorsRef.current.has(errorKey)) {
+          continue;
+        }
+
+        // Determine error subtype
+        const isCrash = /crash|killed|signal|segfault|SIGTERM|SIGKILL/i.test(content);
+        const isExit = /exit\s*code|non-zero|failed/i.test(content);
+        const errorType: 'crash' | 'exit' | 'error' = isCrash ? 'crash' : isExit ? 'exit' : 'error';
+
+        setPermanentError({ message: content, type: errorType, errorKey });
+        return;
+      }
+
+      // Check for tool results with non-zero exit codes
+      if (msg.isToolUse && msg.toolName === 'Bash' && msg.exitCode != null && msg.exitCode !== 0) {
+        const content = `Process exited with code ${msg.exitCode}`;
+        const errorKey = `exit-${msg.timestamp}-${msg.exitCode}`;
+
+        if (dismissedErrorsRef.current.has(errorKey)) {
+          continue;
+        }
+
+        setPermanentError({ message: content, type: 'exit', errorKey });
+        return;
+      }
+    }
+  }, [chatMessages, isLoading]);
+
+  const handleDismissError = useCallback(() => {
+    if (permanentError) {
+      dismissedErrorsRef.current.add(permanentError.errorKey);
+    }
+    setPermanentError(null);
+  }, [permanentError]);
 
   // Indicator collapse lifecycle: keep mounted for exit animation
   const [showIndicator, setShowIndicator] = useState(false);
@@ -439,6 +495,17 @@ export default function ChatMessagesPane({
             })}
           </div>
         </>
+      )}
+
+      {/* Permanent error banner -- renders inline after last message */}
+      {permanentError && (
+        <div className="max-w-[720px] mx-auto w-full px-0 sm:px-0 mt-3">
+          <ErrorBanner
+            message={permanentError.message}
+            type={permanentError.type}
+            onDismiss={handleDismissError}
+          />
+        </div>
       )}
 
       {showIndicator && <AssistantThinkingIndicator selectedProvider={provider} isVisible={isLoading} />}
