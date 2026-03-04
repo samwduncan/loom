@@ -38,7 +38,7 @@ Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements
 - [x] **Phase 14: Toast & Overlay System** - Z-index scale, Sonner toasts, WebSocket status toasts, glassmorphic blur, portals (completed 2026-03-03)
 - [x] **Phase 15: Tool Call Display** - Action pills, pulsing indicators, collapse states, error expansion, accordion grouping (completed 2026-03-03)
 - [x] **Phase 16: Sidebar & Global Polish** - Sidebar restyle, settings, mobile nav, modals, session grouping, collapse mode (completed 2026-03-04)
-- [ ] **Phase 17: Streaming & Status** - RAF buffer, smart auto-scroll, scroll pill, typing/thinking indicators, status line, stop button
+- [x] **Phase 17: Streaming & Status** - RAF buffer, smart auto-scroll, scroll pill, typing/thinking indicators, status line, stop button (completed 2026-03-04)
 
 ## Phase Details
 
@@ -195,4 +195,4 @@ Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
 | 14. Toast & Overlay System | v1.1 | 3/3 | Complete | 2026-03-03 |
 | 15. Tool Call Display | 2/2 | Complete   | 2026-03-03 | - |
 | 16. Sidebar & Global Polish | v1.1 | 3/3 | Complete | 2026-03-04 |
-| 17. Streaming & Status | 3/4 | In Progress|  | - |
+| 17. Streaming & Status | 4/4 | Complete   | 2026-03-04 | - |
