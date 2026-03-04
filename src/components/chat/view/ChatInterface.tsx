@@ -412,6 +412,8 @@ function ChatInterface({
           sendByCtrlEnter={sendByCtrlEnter}
           onTranscript={handleTranscript}
           onProviderChange={(next) => setProvider(next as Provider)}
+          modelLabel={currentModelLabel}
+          sessionCost={null}
         />
       </div>
 

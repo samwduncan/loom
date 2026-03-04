@@ -1,5 +1,6 @@
 import CommandMenu from './CommandMenu';
 import ClaudeStatus from './ClaudeStatus';
+import StatusLine from './StatusLine';
 import MicButton from '../../../mic-button/view/MicButton';
 import ImageAttachment from './ImageAttachment';
 import PermissionRequestsBanner from './PermissionRequestsBanner';
@@ -91,6 +92,8 @@ interface ChatComposerProps {
   sendByCtrlEnter?: boolean;
   onTranscript: (text: string) => void;
   onProviderChange?: (provider: SessionProvider) => void;
+  modelLabel?: string;
+  sessionCost?: number | null;
 }
 
 export default function ChatComposer({
@@ -146,6 +149,8 @@ export default function ChatComposer({
   sendByCtrlEnter,
   onTranscript,
   onProviderChange,
+  modelLabel,
+  sessionCost,
 }: ChatComposerProps) {
   const textareaRect = textareaRef.current?.getBoundingClientRect();
   const commandMenuPosition = {
@@ -358,6 +363,17 @@ export default function ChatComposer({
           </div>
         </div>
       </form>}
+
+      {/* Always-visible status line below the composer */}
+      <StatusLine
+        claudeStatus={claudeStatus}
+        isLoading={isLoading}
+        onAbort={onAbortSession}
+        provider={typeof provider === 'string' ? provider : String(provider)}
+        modelLabel={modelLabel || ''}
+        sessionCost={sessionCost}
+        tokenBudget={tokenBudget}
+      />
     </div>
   );
 }
