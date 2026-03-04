@@ -1,15 +1,15 @@
 interface ScrollToBottomPillProps {
-  newTurnCount: number;
+  newMessageCount: number;
   onScrollToBottom: () => void;
   visible: boolean;
 }
 
 export default function ScrollToBottomPill({
-  newTurnCount,
+  newMessageCount,
   onScrollToBottom,
   visible,
 }: ScrollToBottomPillProps) {
-  if (!visible || newTurnCount <= 0) return null;
+  if (!visible || newMessageCount <= 0) return null;
 
   return (
     <>
@@ -37,7 +37,7 @@ export default function ScrollToBottomPill({
             d="M19 14l-7 7m0 0l-7-7m7 7V3"
           />
         </svg>
-        {newTurnCount} new turn{newTurnCount !== 1 ? 's' : ''}
+        {newMessageCount} new message{newMessageCount !== 1 ? 's' : ''}
       </button>
     </>
   );

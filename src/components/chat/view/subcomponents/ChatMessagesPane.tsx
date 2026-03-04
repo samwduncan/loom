@@ -12,7 +12,7 @@ import AssistantThinkingIndicator from './AssistantThinkingIndicator';
 import ReconnectSkeletons from './ReconnectSkeletons';
 import { useTurnGrouping } from '../../hooks/useTurnGrouping';
 import { useScrollAnchor } from '../../hooks/useScrollAnchor';
-import { useNewTurnCounter } from '../../hooks/useNewTurnCounter';
+import { useNewMessageCounter } from '../../hooks/useNewMessageCounter';
 import { getIntrinsicMessageKey } from '../../utils/messageKeys';
 
 interface ChatMessagesPaneProps {
@@ -153,7 +153,7 @@ export default function ChatMessagesPane({
 
   // Scroll anchor — scroll-event based bottom detection
   const { isAtBottom, isUserScrolledUp: scrollAnchorUserScrolledUp, handleScroll, scrollToBottom: scrollAnchorScrollToBottom } = useScrollAnchor(scrollContainerRef);
-  const { newTurnCount } = useNewTurnCounter(turnCount, scrollAnchorUserScrolledUp);
+  const { newMessageCount } = useNewMessageCounter(visibleMessages.length, scrollAnchorUserScrolledUp);
 
   // Auto-scroll to bottom when new content arrives and user is at bottom
   useEffect(() => {
@@ -278,6 +278,7 @@ export default function ChatMessagesPane({
         ref={scrollContainerRef}
         onScroll={handleScroll}
         className="h-full overflow-y-auto overflow-x-hidden px-0 py-3 sm:p-4 space-y-3 sm:space-y-4 relative"
+        style={{ overflowAnchor: 'auto' }}
       >
       {isLoadingSessionMessages && chatMessages.length === 0 ? (
         <div className="text-center text-muted-foreground mt-8">
@@ -451,7 +452,7 @@ export default function ChatMessagesPane({
       </div>
 
       <ScrollToBottomPill
-        newTurnCount={newTurnCount}
+        newMessageCount={newMessageCount}
         onScrollToBottom={scrollAnchorScrollToBottom}
         visible={scrollAnchorUserScrolledUp}
       />
