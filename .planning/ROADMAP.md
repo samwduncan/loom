@@ -1,198 +1,162 @@
-# Roadmap: Loom
+# Roadmap: Loom V2 — Milestone 1: "The Skeleton"
 
-## Milestones
+## Overview
 
-- v1.0 Functional Foundation (Phases 1-9) -- shipped 2026-03-02
-- v1.1 Design Overhaul (Phases 10-17) -- in progress
+Milestone 1 builds the architectural skeleton for the entire Loom V2 frontend and proves it works with a real vertical slice: a streamed AI response with thinking blocks rendering in the browser. The build order follows a strict dependency chain — design tokens and enforcement first (preventing the foundation rot that killed V1), then state and streaming infrastructure, then the proof-of-life vertical slice, and finally navigation to make it usable. Every phase produces prerequisites for all subsequent phases. No phase can be parallelized without breaking the chain.
 
 ## Phases
 
-<details>
-<summary>v1.0 Functional Foundation (Phases 1-9) -- SHIPPED 2026-03-02</summary>
-
-- [x] **Phase 3: Structural Cleanup** - Strip i18n, Cursor backend from codebase; build provider UX
-- [x] **Phase 5: Chat Message Architecture** - Shiki, TurnBlock, tool call cards, thinking disclosures
-- [x] **Phase 6: Chat Message Polish** - Diffs, user messages, permissions, usage, layout
-- [x] **Phase 7: Streaming UX** - Aurora shimmer, scroll anchor, scroll pill, typing indicators, reconnect skeletons
-- [x] **Phase 8: Error Handling and Status** - Phase context captured, folded into v1.1 scope
-
-Phases 1, 2, 4, 9 were deferred visual phases -- superseded by v1.1 requirements.
-
-</details>
-
-### v1.1 Design Overhaul
-
-**Milestone Goal:** Transform every surface with a charcoal + dusty rose palette, complete remaining functional features (streaming status, error handling), and achieve A+ craft quality across density, animations, typography, and spacing.
-
 **Phase Numbering:**
-- Integer phases (10, 11, 12...): Planned milestone work
-- Decimal phases (12.1, 12.2): Urgent insertions (marked with INSERTED)
+- Integer phases (1, 2, 3): Planned milestone work
+- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-**Sequential foundation (strict order):**
-- [x] **Phase 10: Design System Foundation** - Charcoal palette, surface elevation, rose accent tokens, borders, focus glow, scrollbars (completed 2026-03-03)
-- [x] **Phase 11: Hardcoded Color Sweep** - Replace all 51+ hex refs and 371 gray/slate/zinc classes with semantic tokens (completed 2026-03-03)
-- [x] **Phase 12: Specialty Surfaces** - Terminal Catppuccin Mocha, CodeMirror theme, Shiki remap, diff viewer, typography (completed 2026-03-03)
+Decimal phases appear between their surrounding integers in numeric order.
 
-**Independent component work (after foundation):**
-- [ ] **Phase 13: Message Experience** - Hidden-hover actions, full-width messages, spacing, entrance animations, streaming fade
-- [x] **Phase 14: Toast & Overlay System** - Z-index scale, Sonner toasts, WebSocket status toasts, glassmorphic blur, portals (completed 2026-03-03)
-- [x] **Phase 15: Tool Call Display** - Action pills, pulsing indicators, collapse states, error expansion, accordion grouping (completed 2026-03-03)
-- [x] **Phase 16: Sidebar & Global Polish** - Sidebar restyle, settings, mobile nav, modals, session grouping, collapse mode (completed 2026-03-04)
-- [x] **Phase 17: Streaming & Status** - RAF buffer, smart auto-scroll, scroll pill, typing/thinking indicators, status line, stop button (completed 2026-03-04)
+- [ ] **Phase 1: Design Token System** - OKLCH color tokens, motion tokens, spacing scale, z-index dictionary, typography, and surface hierarchy in CSS custom properties
+- [ ] **Phase 2: Enforcement + Testing Infrastructure** - ESLint Constitution rules, TypeScript strict mode, Vitest setup, and pre-commit gates that block violations from commit #1
+- [ ] **Phase 3: App Shell + Error Boundaries** - CSS Grid layout, 100dvh viewport lock, route structure, and 3-tier error boundary hierarchy
+- [ ] **Phase 4: State Architecture** - Four Zustand stores (timeline, stream, ui, connection) with full TypeScript interfaces, selector-only enforcement, and persistence
+- [ ] **Phase 5: WebSocket Bridge + Stream Multiplexer** - WebSocket client with reconnection, typed message discrimination, and channel routing for content/thinking/tool streams
+- [ ] **Phase 6: Streaming Engine + Scroll Anchor** - useRef + rAF token buffer bypassing React reconciler, ActiveMessage component, and IntersectionObserver scroll anchoring
+- [ ] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end
+- [ ] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing
 
 ## Phase Details
 
-### Phase 10: Design System Foundation
-**Goal**: The app renders with a charcoal base palette, dusty rose accent, and a complete CSS variable token system that all subsequent phases build on
-**Depends on**: v1.0 complete
-**Requirements**: DSGN-09, DSGN-10, DSGN-11, DSGN-12, DSGN-13, DSGN-14, DSGN-15
+### Phase 1: Design Token System
+**Goal**: Every visual value used anywhere in the application is defined as a CSS custom property — colors, motion, spacing, z-index, and typography — so no component ever needs a hardcoded value
+**Depends on**: Nothing (first phase)
+**Requirements**: DS-01, DS-02, DS-03, DS-04, DS-05, DS-06
 **Success Criteria** (what must be TRUE):
-  1. Opening the app shows charcoal base (#1a1a1a) with 3-4 tier surface elevation (base, cards, elevated, overlays) -- not the previous warm brown palette
-  2. Dusty rose accent appears sparingly on interactive elements (buttons, links, active states) and a lighter WCAG AA-compliant variant renders legibly as text on charcoal backgrounds
-  3. All borders throughout the app are subtle white at 6-10% opacity -- no hard solid borders visible anywhere
-  4. Input fields show a dusty rose focus glow ring on focus, text selection uses rose at 25% opacity, and scrollbars are thin/subtle matching the charcoal surfaces
-  5. Tailwind transition utilities work correctly throughout the app -- the global `transition: none` reset is resolved
-**Plans**: 3 plans
-
-Plans:
-- [ ] 10-01-PLAN.md -- Token palette swap + Tailwind config + transition fix
-- [ ] 10-02-PLAN.md -- Focus glow, text selection, scrollbar restyle, ambient gradient, hardcoded color fixes
-- [ ] 10-03-PLAN.md -- Visual verification checkpoint
-
-### Phase 11: Hardcoded Color Sweep
-**Goal**: Every color reference in the codebase uses semantic CSS variable aliases -- zero hardcoded hex values or generic Tailwind color utilities remain
-**Depends on**: Phase 10
-**Requirements**: COLR-01, COLR-02, COLR-03
-**Success Criteria** (what must be TRUE):
-  1. A grep for arbitrary hex values in Tailwind classes (`bg-[#`, `text-[#`, `border-[#`) returns zero matches across the entire codebase
-  2. A grep for generic gray/slate/zinc/neutral Tailwind utilities returns zero matches -- all replaced with Loom semantic palette aliases
-  3. Every visible surface -- chat, sidebar, file explorer, git panel, settings, terminal wrapper -- displays the charcoal + rose palette with no warm brown, blue, or gray artifacts
-**Plans**: 5 plans
-
-Plans:
-- [ ] 11-01-PLAN.md -- Token additions (foreground-secondary, status-info, diff-added/removed) + Tailwind config
-- [ ] 11-02-PLAN.md -- Hardcoded hex sweep + gray utilities in chat/ and shell/ components (~38 files)
-- [ ] 11-03-PLAN.md -- Gray utilities in settings/, code-editor/, sidebar/, file-tree/ components (~21 files)
-- [ ] 11-04-PLAN.md -- Gray + blue/red/green/amber sweep in TaskMaster JSX files (~16 files)
-- [ ] 11-05-PLAN.md -- COLR-03 verification audit, straggler fixes, human visual verification
-
-### Phase 12: Specialty Surfaces
-**Goal**: Third-party embedded surfaces (terminal, code editor, syntax highlighting, diffs, markdown prose) all match the charcoal + rose palette -- no visual seams between app and embedded content
-**Depends on**: Phase 11
-**Requirements**: SURF-01, SURF-02, SURF-03, SURF-04, SURF-05, SURF-06
-**Success Criteria** (what must be TRUE):
-  1. The terminal background matches the app charcoal base -- the terminal appears integrated, not an embedded black box -- and uses Catppuccin Mocha ANSI colors for command output
-  2. The terminal uses JetBrains Mono at 14px with a bar cursor and 1.2 line height
-  3. The CodeMirror file viewer uses a charcoal + rose dark theme consistent with the app palette -- no default dark theme artifacts
-  4. Syntax highlighting (Shiki) and diff viewer colors match the new palette -- no warm brown/amber color remnants from v1.0
-  5. Markdown prose content uses rose accent for links and correct heading hierarchy colors on charcoal backgrounds
+  1. A single `tokens.css` file contains all OKLCH color tokens, motion tokens, spacing scale, z-index dictionary, and typography definitions as CSS custom properties on `:root`
+  2. Three visually distinct surface levels (base, raised, overlay) are perceptible — surface hierarchy achieved through lightness steps only, with no `box-shadow` for elevation
+  3. Inter Variable, Instrument Serif, and JetBrains Mono load via `@font-face` with `font-display: swap`, and Tailwind's `font-sans`/`font-serif`/`font-mono` classes map to them
+  4. Spring physics configs exist as JS constants in `src/lib/motion.ts` (SPRING_GENTLE, SPRING_SNAPPY, SPRING_BOUNCY) alongside CSS easing tokens
+  5. A test HTML page or Storybook-style preview renders all token values visually for verification
 **Plans**: TBD
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
-- [ ] 12-03: TBD
+- [ ] 01-01: Project scaffolding + Vite + React 18 + TypeScript + Tailwind configuration
+- [ ] 01-02: Color tokens, surface hierarchy, and status/accent/FX tokens in OKLCH
+- [ ] 01-03: Motion tokens, spacing scale, z-index dictionary, typography system, and base styles
 
-### Phase 13: Message Experience
-**Goal**: Chat messages feel crafted with intentional density, motion, and interaction patterns that match Claude.ai and ChatGPT quality
-**Depends on**: Phase 10 (palette tokens), Phase 12 (all surfaces consistent)
-**Requirements**: MESG-01, MESG-02, MESG-03, MESG-04, MESG-05, MESG-06
+### Phase 2: Enforcement + Testing Infrastructure
+**Goal**: Automated guards block every banned pattern from the V2 Constitution at build time — no hardcoded colors, no whole-store subscriptions, no `any` types, no raw z-index — so violations cannot accumulate
+**Depends on**: Phase 1 (tokens must exist for ESLint rules to enforce their usage)
+**Requirements**: ENF-01, ENF-02, ENF-03, ENF-04
 **Success Criteria** (what must be TRUE):
-  1. Message action buttons (copy, etc.) are invisible by default and smoothly fade in on hover -- reducing visual clutter in the message list
-  2. Assistant messages span full width with transparent background and a role label only -- no bubble wrapper or card container
-  3. 32px spacing separates different turns while messages within the same turn are tightly grouped -- the visual rhythm matches Claude.ai density
-  4. New messages animate in with a subtle slide-up + fade entrance that feels natural, not distracting -- and streaming tokens fade in during batch rendering
-  5. Interactive elements (buttons, links, expandables) show dusty rose hover glow and subtle press feedback
+  1. Running `npx eslint src/` produces zero errors on the Phase 1 codebase, and adding `bg-gray-800` to any component file produces an ESLint error
+  2. Running `tsc --noEmit` passes with zero errors under strict mode with `noUncheckedIndexedAccess` enabled
+  3. Running `npm run test` executes Vitest with jsdom environment and produces a coverage report
+  4. Attempting to `git commit` a file containing a banned pattern (hardcoded color, `any` type, raw z-index) is rejected by the pre-commit hook
 **Plans**: TBD
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
-- [ ] 13-03: TBD
+- [ ] 02-01: ESLint configuration with all Constitution enforcement rules
+- [ ] 02-02: TypeScript strict config + Vitest setup with coverage
+- [ ] 02-03: Pre-commit hooks (lint-staged + husky) blocking violations on commit
 
-### Phase 14: Toast & Overlay System
-**Goal**: The app has a formal layering system and non-disruptive notification infrastructure -- toasts for transient events, portals for overlays, glassmorphic blur for floating elements
-**Depends on**: Phase 10 (palette tokens)
-**Requirements**: TOST-01, TOST-02, TOST-03, TOST-04, TOST-05
+### Phase 3: App Shell + Error Boundaries
+**Goal**: The application has a CSS Grid skeleton that provides the spatial structure for all future content — sidebar, main content, and a reserved artifact column — with error containment at every level
+**Depends on**: Phase 2 (enforcement must be active before any component code)
+**Requirements**: SHELL-01, SHELL-02, SHELL-03, SHELL-04
 **Success Criteria** (what must be TRUE):
-  1. Toast notifications appear bottom-right with charcoal + rose theming, auto-dismiss after 2-4 seconds, and do not block the chat interface
-  2. A formal z-index scale exists as CSS custom properties and all layered elements (sticky headers, dropdowns, modals, toasts) respect the scale without conflicts
-  3. WebSocket disconnect shows a warning toast and reconnect shows a success toast -- connection state changes are always communicated
-  4. Modals, toasts, and dropdowns use glassmorphic blur styling, while scrolling content does not -- floating vs. inline elements are visually distinct
-  5. All overlay elements render via ReactDOM.createPortal to document.body -- no stacking context conflicts cause overlays to appear behind content
-**Plans**: 3 plans
+  1. The app renders a 3-column CSS Grid (`sidebar | content | artifact-at-0px`) that fills `100dvh` with no document-level scrollbar at any viewport size
+  2. React Router serves `/chat/:sessionId?`, `/dashboard` (placeholder), and `/settings` (placeholder) — all rendering inside the content grid area
+  3. Throwing an error inside a message-level component shows "Failed to render" for only that message — sidebar, other messages, and shell remain functional
+  4. Each of the three error boundary tiers (App, Panel, Message) logs the error with a component stack trace
+**Plans**: TBD
 
 Plans:
-- [x] 14-01-PLAN.md -- Z-index scale, Sonner & portal infrastructure (7-tier CSS variable scale, toast provider, OverlayPortal, 16-file migration)
-- [x] 14-02-PLAN.md -- Modal portal migration (18 modals to OverlayPortal + formal z-index + backdrop standardization)
-- [x] 14-03-PLAN.md -- WebSocket toasts & glassmorphic dropdowns (useWebSocketToasts hook, 7 dropdown glass treatments)
+- [ ] 03-01: AppShell CSS Grid layout + viewport lock + base routing
+- [ ] 03-02: Three-tier error boundary hierarchy (App, Panel, Message)
 
-### Phase 15: Tool Call Display
-**Goal**: Tool call invocations are compact, informative, and scannable -- running/complete/failed states are instantly distinguishable, and sequential calls group into manageable accordions
-**Depends on**: Phase 10 (palette tokens), Phase 14 (z-index scale for any overlays)
-**Requirements**: TOOL-01, TOOL-02, TOOL-03, TOOL-04, TOOL-05
+### Phase 4: State Architecture
+**Goal**: Four Zustand stores define the complete data contract for the entire V2 vision — with full TypeScript interfaces ready for M4 multi-provider without type changes — and every store access uses selectors
+**Depends on**: Phase 3 (shell must exist to wire stores into components)
+**Requirements**: STATE-01, STATE-02, STATE-03, STATE-04, STATE-05
 **Success Criteria** (what must be TRUE):
-  1. Tool calls display as compact action pills showing icon + tool name + semantic state color -- not as verbose text blocks
-  2. Running tool calls show a pulsing dusty rose indicator that is visually distinct from completed and failed states
-  3. Completed tool calls collapse to a minimal chip, failed tool calls expand with a muted red background showing the error message
-  4. Three or more sequential tool calls group into an accordion with a count badge -- expandable to show individual pills, collapsed by default
-**Plans**: 2 plans
+  1. Four store files exist (`timeline.ts`, `stream.ts`, `ui.ts`, `connection.ts`) with full TypeScript interfaces matching the cross-milestone schema from MILESTONES.md, and each has a passing test file
+  2. The `Message` type includes `metadata: MessageMetadata` and `providerContext: ProviderContext` fields; the `Session` type includes `metadata: SessionMetadata` — all with `ProviderId` union type defaulting to `'claude'`
+  3. Grepping the codebase for store hook usage without selectors finds zero matches — either enforced by ESLint rule or documented pattern test
+  4. The timeline store persists its sessions list to localStorage via Zustand `persist` middleware, and `src/stores/README.md` documents which slices persist vs which are ephemeral
+**Plans**: TBD
 
 Plans:
-- [ ] 15-01-PLAN.md -- ToolActionCard pill shape, state-driven borders, pulse animation, auto-expand errors
-- [ ] 15-02-PLAN.md -- ToolCallGroup pill header, count badges, state-aware auto-expand/collapse
+- [ ] 04-01: Four Zustand stores with full TypeScript interfaces and actions
+- [ ] 04-02: Selector enforcement, persistence middleware, and store documentation
 
-### Phase 16: Sidebar & Global Polish
-**Goal**: Every non-chat surface -- sidebar, settings, modals, mobile nav -- matches the charcoal + rose palette with density improvements and polished interactions
-**Depends on**: Phase 10 (palette tokens), Phase 14 (z-index scale, glassmorphic blur pattern)
-**Requirements**: SIDE-01, SIDE-02, SIDE-03, SIDE-04, SIDE-05, SIDE-06, SIDE-07
+### Phase 5: WebSocket Bridge + Stream Multiplexer
+**Goal**: The frontend establishes a typed WebSocket connection to the CloudCLI backend, parses every incoming message into a discriminated union, and routes content/thinking/tool streams into separate channels feeding the correct stores
+**Depends on**: Phase 4 (stores must exist to receive routed messages)
+**Requirements**: STRM-01, STRM-02
+**Research flag**: NEEDS RESEARCH -- exact WebSocket message shapes from CloudCLI backend for all three providers must be audited from `server/index.js` before execution begins
 **Success Criteria** (what must be TRUE):
-  1. The sidebar uses the charcoal palette with tighter spacing -- more sessions visible without scrolling than the pre-redesign baseline
-  2. Sessions are grouped by time categories (Today, Yesterday, Last 7 Days, Older) and the active session shows a 2px dusty rose left border with subtle background tint
-  3. The sidebar collapses to an icon-only strip that preserves session navigation
-  4. Settings panel, all modals, and all dialogs use charcoal palette with glassmorphic blur -- no gray/blue/white artifacts remain
-  5. Mobile navigation at 375px+ viewports matches the charcoal + rose theme with no layout or color inconsistencies
-**Plans**: 3 plans
+  1. The WebSocket client connects to `ws://<host>:<port>/ws?token=<jwt>`, auto-reconnects with exponential backoff (1s/2s/4s/8s/max 30s), and updates the connection store on every state change
+  2. Sending a hardcoded prompt via WebSocket produces a streaming response where all incoming message types (`claude-response`, `claude-complete`, `claude-error`, etc.) are parsed and logged correctly
+  3. The stream multiplexer routes content tokens to a `useRef` buffer (not React state), thinking content to the stream store's `thinkingState`, and tool events to the stream store's `activeToolCalls`
+**Plans**: TBD
 
 Plans:
-- [x] 16-01-PLAN.md -- Time-grouped session list, compact density, rose active indicator (SIDE-01, SIDE-05, SIDE-06)
-- [x] 16-02-PLAN.md -- Charcoal+rose settings panel, glassmorphic modal backdrops (SIDE-02, SIDE-04)
-- [x] 16-03-PLAN.md -- Rose pill mobile nav, expanded collapsed sidebar strip (SIDE-03, SIDE-07)
+- [ ] 05-01: WebSocket client with typed message parsing, reconnection, and connection store integration
+- [ ] 05-02: Stream multiplexer routing content/thinking/tool channels to stores and ref buffer
 
-### Phase 17: Streaming & Status
-**Goal**: Streaming responses feel smooth and communicative -- token buffering prevents jank, scroll behavior respects user control, the current AI activity is always visible, and the user can stop generation at any time
-**Depends on**: Phase 10 (palette tokens), Phase 13 (message animations established)
-**Requirements**: STRM-01, STRM-02, STRM-03, STRM-04, STRM-05, STRM-06, STRM-08, STRM-09, STRM-10, STRM-11, STRM-12
+### Phase 6: Streaming Engine + Scroll Anchor
+**Goal**: Streaming tokens render in the browser at 60fps via direct DOM mutation (bypassing React's reconciler), with scroll that locks to bottom during streaming and instantly disengages on any user scroll
+**Depends on**: Phase 5 (WebSocket must deliver tokens for the stream buffer to consume)
+**Requirements**: STRM-03, COMP-02, COMP-03
 **Success Criteria** (what must be TRUE):
-  1. During a long AI response, scrolling up pauses auto-scroll immediately and the view stays wherever the user scrolled -- no snapping back
-  2. When scrolled up during a response, a floating pill shows "N new messages" count -- clicking it scrolls to bottom smoothly
-  3. A typing indicator (pulsing dots or similar) appears before the first token, a "Thinking..." indicator appears during extended thinking, and both transition seamlessly into content without layout jumps
-  4. Skeleton shimmer bars appear during reconnect scrollback, fading to real content when parsed
-  5. The global status line shows semantic activity text ("Reading auth.ts...", "Writing server.ts...") parsed from tool events, with a spinner on the active tool card
-  6. The send button morphs to a stop button during streaming via CSS crossfade -- clicking stop aborts generation via WebSocket and the response ends cleanly
-  7. Permanent errors (process crash, exit code) display as persistent inline banners with red accent -- visually distinct from toasts and regular messages
-**Plans**: 4 plans
+  1. During a 2000-token streaming response, React DevTools Profiler shows zero re-renders on the ActiveMessage component — all text updates happen via rAF DOM mutation on a ref
+  2. The ActiveMessage component displays streamed text with a blinking cursor, and when streaming completes, the accumulated text flushes to the timeline store as a finalized message
+  3. During streaming, scrolling up by any amount immediately disengages auto-scroll and shows a "Scroll to bottom" pill; clicking the pill re-engages auto-scroll; starting a new stream re-engages auto-scroll
+**Plans**: TBD
 
 Plans:
-- [ ] 17-01-PLAN.md -- Scroll rewrite (event-based), message-counting pill, rAF buffer tuning (STRM-01, STRM-02, STRM-03)
-- [ ] 17-02-PLAN.md -- Atmospheric aurora indicators, thinking transitions, reconnect skeletons (STRM-04, STRM-05, STRM-06)
-- [ ] 17-03-PLAN.md -- Status line below composer, activity hook, send/stop morph (STRM-09, STRM-10, STRM-11, STRM-12)
-- [ ] 17-04-PLAN.md -- Error banners, active tool card border glow (STRM-08)
+- [ ] 06-01: useStreamBuffer hook with useRef + rAF token accumulation and flush
+- [ ] 06-02: ActiveMessage component with memo isolation and blinking cursor
+- [ ] 06-03: useScrollAnchor hook with IntersectionObserver sentinel and scroll-to-bottom pill
+
+### Phase 7: Tool Registry + Proof of Life
+**Goal**: A pluggable tool registry handles any tool name gracefully, and a proof-of-life page demonstrates the entire pipeline working end-to-end — WebSocket connection, streaming tokens, thinking blocks, and connection status all visible in the browser
+**Depends on**: Phase 6 (streaming engine must work for proof-of-life to render streamed content)
+**Requirements**: COMP-01, STRM-04
+**Success Criteria** (what must be TRUE):
+  1. Calling `getToolConfig('Bash')` returns a registered config with display name, icon, and renderers; calling `getToolConfig('UnknownTool')` returns a graceful default config without crashing
+  2. The proof-of-life page connects to the backend WebSocket, sends a hardcoded prompt, and renders the streaming response in real-time using the rAF buffer
+  3. Thinking blocks display in a separate section from the main response (proving the multiplexer routes channels independently), and connection status is visible on the page
+**Plans**: TBD
+
+Plans:
+- [ ] 07-01: Tool-call component registry with pluggable registration and default fallback
+- [ ] 07-02: Proof-of-life vertical slice page proving end-to-end pipeline
+
+### Phase 8: Navigation + Session Management
+**Goal**: Users can browse their chat sessions in a sidebar, click to switch sessions with message loading, and navigate via URL — completing M1 as a usable (if minimal) application
+**Depends on**: Phase 7 (proof-of-life validates the pipeline that navigation wraps)
+**Requirements**: NAV-01, NAV-02
+**Success Criteria** (what must be TRUE):
+  1. The sidebar renders in the first grid column with `--surface-raised` background, showing sessions grouped by "Today" / "Yesterday" / "Previous 7 Days" / "Older", each with title, date, and provider icon
+  2. Clicking a session updates the URL to `/chat/:sessionId`, triggers a message fetch, shows a loading skeleton during the fetch, and displays loaded messages in the content area
+  3. The "New Chat" button creates a new session and navigates to it
+  4. The sidebar has `role="complementary"` and `aria-label="Chat sessions"` for accessibility
+**Plans**: TBD
+
+Plans:
+- [ ] 08-01: Sidebar component with session list, date grouping, and new chat button
+- [ ] 08-02: Session switching with message loading, skeleton state, and URL sync
 
 ## Progress
 
 **Execution Order:**
-Phases 10-12 are strictly sequential (design system -> color sweep -> specialty surfaces).
-Phases 13-17 are largely independent but Phase 14 (z-index scale) should precede overlay work in other phases.
-Recommended order: 10 -> 11 -> 12 -> 14 -> 13 -> 15 -> 16 -> 17
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
-| Phase | Milestone | Plans Complete | Status | Completed |
-|-------|-----------|----------------|--------|-----------|
-| 10. Design System Foundation | 3/3 | Complete    | 2026-03-03 | - |
-| 11. Hardcoded Color Sweep | 5/5 | Complete   | 2026-03-03 | - |
-| 12. Specialty Surfaces | 4/4 | Complete    | 2026-03-03 | - |
-| 13. Message Experience | v1.1 | 0/TBD | Not started | - |
-| 14. Toast & Overlay System | v1.1 | 3/3 | Complete | 2026-03-03 |
-| 15. Tool Call Display | 2/2 | Complete   | 2026-03-03 | - |
-| 16. Sidebar & Global Polish | v1.1 | 3/3 | Complete | 2026-03-04 |
-| 17. Streaming & Status | 4/4 | Complete    | 2026-03-04 | - |
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Design Token System | 0/3 | Not started | - |
+| 2. Enforcement + Testing | 0/3 | Not started | - |
+| 3. App Shell + Error Boundaries | 0/2 | Not started | - |
+| 4. State Architecture | 0/2 | Not started | - |
+| 5. WebSocket Bridge + Multiplexer | 0/2 | Not started | - |
+| 6. Streaming Engine + Scroll | 0/3 | Not started | - |
+| 7. Tool Registry + Proof of Life | 0/2 | Not started | - |
+| 8. Navigation + Sessions | 0/2 | Not started | - |

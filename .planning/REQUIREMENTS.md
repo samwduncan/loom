@@ -205,40 +205,40 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DS-01 | TBD | Pending |
-| DS-02 | TBD | Pending |
-| DS-03 | TBD | Pending |
-| DS-04 | TBD | Pending |
-| DS-05 | TBD | Pending |
-| DS-06 | TBD | Pending |
-| ENF-01 | TBD | Pending |
-| ENF-02 | TBD | Pending |
-| ENF-03 | TBD | Pending |
-| ENF-04 | TBD | Pending |
-| SHELL-01 | TBD | Pending |
-| SHELL-02 | TBD | Pending |
-| SHELL-03 | TBD | Pending |
-| SHELL-04 | TBD | Pending |
-| STATE-01 | TBD | Pending |
-| STATE-02 | TBD | Pending |
-| STATE-03 | TBD | Pending |
-| STATE-04 | TBD | Pending |
-| STATE-05 | TBD | Pending |
-| STRM-01 | TBD | Pending |
-| STRM-02 | TBD | Pending |
-| STRM-03 | TBD | Pending |
-| STRM-04 | TBD | Pending |
-| COMP-01 | TBD | Pending |
-| COMP-02 | TBD | Pending |
-| COMP-03 | TBD | Pending |
-| NAV-01 | TBD | Pending |
-| NAV-02 | TBD | Pending |
+| DS-01 | Phase 1: Design Token System | Pending |
+| DS-02 | Phase 1: Design Token System | Pending |
+| DS-03 | Phase 1: Design Token System | Pending |
+| DS-04 | Phase 1: Design Token System | Pending |
+| DS-05 | Phase 1: Design Token System | Pending |
+| DS-06 | Phase 1: Design Token System | Pending |
+| ENF-01 | Phase 2: Enforcement + Testing | Pending |
+| ENF-02 | Phase 2: Enforcement + Testing | Pending |
+| ENF-03 | Phase 2: Enforcement + Testing | Pending |
+| ENF-04 | Phase 2: Enforcement + Testing | Pending |
+| SHELL-01 | Phase 3: App Shell + Error Boundaries | Pending |
+| SHELL-02 | Phase 3: App Shell + Error Boundaries | Pending |
+| SHELL-03 | Phase 3: App Shell + Error Boundaries | Pending |
+| SHELL-04 | Phase 3: App Shell + Error Boundaries | Pending |
+| STATE-01 | Phase 4: State Architecture | Pending |
+| STATE-02 | Phase 4: State Architecture | Pending |
+| STATE-03 | Phase 4: State Architecture | Pending |
+| STATE-04 | Phase 4: State Architecture | Pending |
+| STATE-05 | Phase 4: State Architecture | Pending |
+| STRM-01 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
+| STRM-02 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
+| STRM-03 | Phase 6: Streaming Engine + Scroll | Pending |
+| COMP-02 | Phase 6: Streaming Engine + Scroll | Pending |
+| COMP-03 | Phase 6: Streaming Engine + Scroll | Pending |
+| COMP-01 | Phase 7: Tool Registry + Proof of Life | Pending |
+| STRM-04 | Phase 7: Tool Registry + Proof of Life | Pending |
+| NAV-01 | Phase 8: Navigation + Sessions | Pending |
+| NAV-02 | Phase 8: Navigation + Sessions | Pending |
 
 **Coverage:**
 - v1 requirements: 28 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 28
+- Mapped to phases: 28/28
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-04*
-*Last updated: 2026-03-04 after detailed specification pass*
+*Last updated: 2026-03-04 after roadmap phase assignment*
