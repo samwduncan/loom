@@ -203,6 +203,12 @@ function Sidebar({
         <SidebarCollapsed
           onExpand={handleExpandSidebar}
           onShowSettings={onShowSettings}
+          onNewSession={() => {
+            if (projects.length > 0) {
+              const target = selectedProject || projects[0];
+              onNewSession(target);
+            }
+          }}
           updateAvailable={updateAvailable}
           onShowVersionModal={() => setShowVersionModal(true)}
         />

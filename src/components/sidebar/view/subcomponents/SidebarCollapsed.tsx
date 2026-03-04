@@ -1,8 +1,9 @@
-import { Settings, Sparkles, PanelLeftOpen } from 'lucide-react';
+import { Settings, Sparkles, PanelLeftOpen, Plus } from 'lucide-react';
 
 type SidebarCollapsedProps = {
   onExpand: () => void;
   onShowSettings: () => void;
+  onNewSession: () => void;
   updateAvailable: boolean;
   onShowVersionModal: () => void;
 };
@@ -10,6 +11,7 @@ type SidebarCollapsedProps = {
 export default function SidebarCollapsed({
   onExpand,
   onShowSettings,
+  onNewSession,
   updateAvailable,
   onShowVersionModal,
 }: SidebarCollapsedProps) {
@@ -23,6 +25,16 @@ export default function SidebarCollapsed({
         title={"Show sidebar"}
       >
         <PanelLeftOpen className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+      </button>
+
+      {/* New session button */}
+      <button
+        onClick={onNewSession}
+        className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-accent/80 transition-colors group"
+        aria-label={"New session"}
+        title={"New session"}
+      >
+        <Plus className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
       </button>
 
       <div className="nav-divider w-6 my-1" />
@@ -45,8 +57,8 @@ export default function SidebarCollapsed({
           aria-label={"Update available"}
           title={"Update available"}
         >
-          <Sparkles className="w-4 h-4 text-blue-500" />
-          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
         </button>
       )}
     </div>
