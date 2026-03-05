@@ -12,7 +12,7 @@ Milestone 1 builds the architectural skeleton for the entire Loom V2 frontend an
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Design Token System** - OKLCH color tokens, motion tokens, spacing scale, z-index dictionary, typography, and surface hierarchy in CSS custom properties
+- [x] **Phase 1: Design Token System** - OKLCH color tokens, motion tokens, spacing scale, z-index dictionary, typography, and surface hierarchy in CSS custom properties
 - [ ] **Phase 2: Enforcement + Testing Infrastructure** - ESLint Constitution rules, TypeScript strict mode, Vitest setup, and pre-commit gates that block violations from commit #1
 - [ ] **Phase 3: App Shell + Error Boundaries** - CSS Grid layout, 100dvh viewport lock, route structure, and 3-tier error boundary hierarchy
 - [ ] **Phase 4: State Architecture** - Four Zustand stores (timeline, stream, ui, connection) with full TypeScript interfaces, selector-only enforcement, and persistence
@@ -36,9 +36,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — V2 project scaffolding (Vite + React 18 + TS + Tailwind v4), font loading, CSS entry point
-- [ ] 01-02-PLAN.md — Complete token system (OKLCH colors, surfaces, motion, spacing, z-index, FX) + spring physics module
-- [ ] 01-03-PLAN.md — Comprehensive token preview page at /dev/tokens + visual verification checkpoint
+- [x] 01-01-PLAN.md — V2 project scaffolding (Vite + React 18 + TS + Tailwind v4), font loading, CSS entry point
+- [x] 01-02-PLAN.md — Complete token system (OKLCH colors, surfaces, motion, spacing, z-index, FX) + spring physics module
+- [x] 01-03-PLAN.md — Comprehensive token preview page at /dev/tokens + visual verification checkpoint
 
 ### Phase 2: Enforcement + Testing Infrastructure
 **Goal**: Automated guards block every banned pattern from the V2 Constitution at build time — no hardcoded colors, no whole-store subscriptions, no `any` types, no raw z-index — so violations cannot accumulate
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design Token System | 0/3 | Planned | - |
+| 1. Design Token System | 3/3 | Complete | 2026-03-05 |
 | 2. Enforcement + Testing | 0/3 | Not started | - |
 | 3. App Shell + Error Boundaries | 0/2 | Not started | - |
 | 4. State Architecture | 0/2 | Not started | - |
