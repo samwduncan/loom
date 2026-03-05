@@ -47,7 +47,7 @@
 
 - [x] **SHELL-03**: Configure React Router (or equivalent) with route slots for: `/chat/:sessionId?` (main chat view), `/dashboard` (future GSD dashboard — renders placeholder), `/settings` (future settings — renders placeholder). Route structure must support future additions without restructuring. All routes render inside the AppShell's content grid area.
 
-- [ ] **SHELL-04**: Create three error boundary components:
+- [x] **SHELL-04**: Create three error boundary components:
   - `AppErrorBoundary` (wraps entire app): catches catastrophic failures, renders full-screen "Something went wrong" with reload button
   - `PanelErrorBoundary` (wraps each grid area — sidebar, content, artifact): catches panel-specific crashes, renders inline error message, other panels continue working
   - `MessageErrorBoundary` (wraps individual messages): catches rendering errors in a single message, renders "Failed to render message" placeholder, other messages unaffected
@@ -218,7 +218,7 @@
 | SHELL-01 | Phase 3: App Shell + Error Boundaries | Complete |
 | SHELL-02 | Phase 3: App Shell + Error Boundaries | Complete |
 | SHELL-03 | Phase 3: App Shell + Error Boundaries | Complete |
-| SHELL-04 | Phase 3: App Shell + Error Boundaries | Pending |
+| SHELL-04 | Phase 3: App Shell + Error Boundaries | Complete |
 | STATE-01 | Phase 4: State Architecture | Pending |
 | STATE-02 | Phase 4: State Architecture | Pending |
 | STATE-03 | Phase 4: State Architecture | Pending |
