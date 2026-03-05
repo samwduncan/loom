@@ -1,28 +1,114 @@
 /**
- * UI Store — Minimal stub for Phase 3.
+ * UI Store — Layout state, modals, theme, and companion configuration.
  *
- * Manages sidebar open/closed state and derived sidebarState.
- * Phase 4 (STATE-01) will expand this store with the full UIStore schema.
+ * Expanded from the Phase 3 stub to include full MILESTONES.md schema.
+ * Preserves backward-compatible sidebarState and toggleSidebar behavior
+ * for AppShell and Sidebar consumers.
+ *
+ * Uses Persist middleware for theme and sidebar preference only.
+ * All modal, command palette, and companion state is ephemeral.
  *
  * Constitution: Selector-only access (4.2), named actions (4.5), no default export (2.2).
  */
 
 import { create } from 'zustand';
-
-type SidebarState = 'expanded' | 'collapsed-hidden';
+import { persist } from 'zustand/middleware';
+import type {
+  CompanionState,
+  ModalState,
+  SidebarState,
+  TabId,
+  ThemeConfig,
+} from '@/types/ui';
 
 interface UIState {
+  // Data
   sidebarOpen: boolean;
+  sidebarCollapsed: boolean;
   sidebarState: SidebarState;
+  activeTab: TabId;
+  modalState: ModalState | null;
+  commandPaletteOpen: boolean;
+  companionState: CompanionState | null;
+  theme: ThemeConfig;
+
+  // Actions
   toggleSidebar: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  setActiveTab: (tab: TabId) => void;
+  openModal: (modal: ModalState) => void;
+  closeModal: () => void;
+  toggleCommandPalette: () => void;
+  setTheme: (theme: Partial<ThemeConfig>) => void;
+  reset: () => void;
 }
 
-export const useUIStore = create<UIState>((set) => ({
+const INITIAL_UI_STATE = {
   sidebarOpen: true,
-  sidebarState: 'expanded',
-  toggleSidebar: () =>
-    set((state) => ({
-      sidebarOpen: !state.sidebarOpen,
-      sidebarState: !state.sidebarOpen ? 'expanded' : 'collapsed-hidden',
-    })),
-}));
+  sidebarCollapsed: false,
+  sidebarState: 'expanded' as SidebarState,
+  activeTab: 'chat' as TabId,
+  modalState: null as ModalState | null,
+  commandPaletteOpen: false,
+  companionState: null as CompanionState | null,
+  theme: { fontSize: 14, density: 'comfortable' } as ThemeConfig,
+};
+
+export const useUIStore = create<UIState>()(
+  persist(
+    (set) => ({
+      ...INITIAL_UI_STATE,
+
+      toggleSidebar: () => {
+        set((state) => ({
+          sidebarOpen: !state.sidebarOpen,
+          sidebarState: !state.sidebarOpen
+            ? 'expanded'
+            : ('collapsed-hidden' as SidebarState),
+        }));
+      },
+
+      setSidebarCollapsed: (collapsed: boolean) => {
+        set({ sidebarCollapsed: collapsed });
+      },
+
+      setActiveTab: (tab: TabId) => {
+        set({ activeTab: tab });
+      },
+
+      openModal: (modal: ModalState) => {
+        set({ modalState: modal });
+      },
+
+      closeModal: () => {
+        set({ modalState: null });
+      },
+
+      toggleCommandPalette: () => {
+        set((state) => ({ commandPaletteOpen: !state.commandPaletteOpen }));
+      },
+
+      setTheme: (themeUpdate: Partial<ThemeConfig>) => {
+        set((state) => ({
+          theme: { ...state.theme, ...themeUpdate },
+        }));
+      },
+
+      reset: () => {
+        set({ ...INITIAL_UI_STATE });
+      },
+    }),
+    {
+      name: 'loom-ui',
+      version: 1,
+      partialize: (state) => ({
+        theme: state.theme,
+        sidebarCollapsed: state.sidebarCollapsed,
+      }),
+      migrate: (persistedState: unknown, _version: number) => {
+        // Version 1: initial schema, no migration needed
+        return persistedState as { theme: ThemeConfig; sidebarCollapsed: boolean };
+      },
+    },
+  ),
+);
