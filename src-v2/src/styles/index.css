@@ -1,0 +1,46 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./base.css";
+
+/* Static theme values — generate utility classes directly */
+@theme {
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+  --color-white: oklch(1 0 0);
+  --color-black: oklch(0 0 0);
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+}
+
+/* Semantic tokens referencing :root variables — @theme inline */
+@theme inline {
+  --color-surface-base: var(--surface-base);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
+  --color-background: var(--surface-base);
+  --color-foreground: var(--text-primary);
+  --color-primary: var(--accent-primary);
+  --color-primary-hover: var(--accent-primary-hover);
+  --color-primary-muted: var(--accent-primary-muted);
+  --color-primary-foreground: var(--accent-primary-fg);
+  --color-secondary: var(--accent-secondary);
+  --color-muted: var(--text-muted);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--accent-primary);
+  --color-destructive: var(--status-error);
+  --color-success: var(--status-success);
+  --color-warning: var(--status-warning);
+  --color-info: var(--status-info);
+  --color-border: var(--border-subtle);
+  --color-border-interactive: var(--border-interactive);
+  --color-ring: var(--accent-primary);
+  --color-code-surface: var(--code-surface);
+  --color-code-inline: var(--code-inline-bg);
+}
+
+/* Spacing base for Tailwind v4 (p-1 = 4px, p-2 = 8px, etc.) */
+@theme {
+  --spacing: 0.25rem;
+}
