@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const tokensPath = resolve(__dirname, 'tokens.css');
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const tokensPath = resolve(currentDir, 'tokens.css');
 const tokensContent = readFileSync(tokensPath, 'utf-8');
 
 describe('tokens.css design token file', () => {
