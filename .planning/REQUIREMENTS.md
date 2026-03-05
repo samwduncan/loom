@@ -15,7 +15,7 @@
 
 - [ ] **DS-04**: Define z-index dictionary in `src/styles/tokens.css` with exactly 8 named tiers: `--z-base` (0), `--z-sticky` (10), `--z-dropdown` (20), `--z-scroll-pill` (30), `--z-overlay` (40), `--z-modal` (50), `--z-toast` (60), `--z-critical` (9999). All z-index usage in component code MUST reference these variables — verified by ESLint rule banning raw numeric z-index values.
 
-- [ ] **DS-05**: Configure three font families in `src/styles/base.css`: Inter Variable (UI text, loaded via `@font-face` with `font-display: swap`), Instrument Serif (editorial headings, loaded via `@font-face`), JetBrains Mono (code blocks, loaded via `@font-face`). Define CSS custom properties: `--font-ui`, `--font-serif`, `--font-mono`. Tailwind `font-sans`, `font-serif`, `font-mono` classes map to these. Monospace must NOT be the default body font (this was a V1 bug).
+- [x] **DS-05**: Configure three font families in `src/styles/base.css`: Inter Variable (UI text, loaded via `@font-face` with `font-display: swap`), Instrument Serif (editorial headings, loaded via `@font-face`), JetBrains Mono (code blocks, loaded via `@font-face`). Define CSS custom properties: `--font-ui`, `--font-serif`, `--font-mono`. Tailwind `font-sans`, `font-serif`, `font-mono` classes map to these. Monospace must NOT be the default body font (this was a V1 bug).
 
 - [ ] **DS-06**: Implement surface hierarchy using lightness steps only (no `box-shadow` for elevation). `--surface-base` is the darkest (app background), `--surface-raised` is slightly lighter (cards, sidebar), `--surface-overlay` is lightest (modals, dropdowns). Borders between surfaces use `border-[var(--border-subtle)]` at 6-10% opacity. Verify: three visually distinct surface levels are perceptible on a calibrated monitor.
 
@@ -209,7 +209,7 @@
 | DS-02 | Phase 1: Design Token System | Pending |
 | DS-03 | Phase 1: Design Token System | Pending |
 | DS-04 | Phase 1: Design Token System | Pending |
-| DS-05 | Phase 1: Design Token System | Pending |
+| DS-05 | Phase 1: Design Token System | Complete |
 | DS-06 | Phase 1: Design Token System | Pending |
 | ENF-01 | Phase 2: Enforcement + Testing | Pending |
 | ENF-02 | Phase 2: Enforcement + Testing | Pending |
