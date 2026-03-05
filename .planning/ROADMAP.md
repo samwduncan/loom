@@ -49,11 +49,11 @@ Plans:
   2. Running `tsc --noEmit` passes with zero errors under strict mode with `noUncheckedIndexedAccess` enabled
   3. Running `npm run test` executes Vitest with jsdom environment and produces a coverage report
   4. Attempting to `git commit` a file containing a banned pattern (hardcoded color, `any` type, raw z-index) is rejected by the pre-commit hook
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
-- [ ] 02-01-PLAN.md — Local ESLint plugin with 9 custom Constitution enforcement rules
-- [ ] 02-02-PLAN.md — Vitest setup with coverage thresholds + Phase 1 test suite + TypeScript strict verification
+- [x] 02-01-PLAN.md — Local ESLint plugin with 9 custom Constitution enforcement rules
+- [x] 02-02-PLAN.md — Vitest setup with coverage thresholds + Phase 1 test suite + TypeScript strict verification
 - [ ] 02-03-PLAN.md — Husky + lint-staged pre-commit hook blocking banned patterns on commit
 
 ### Phase 3: App Shell + Error Boundaries
@@ -153,7 +153,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Design Token System | 3/3 | Complete | 2026-03-05 |
-| 2. Enforcement + Testing | 1/3 | In Progress|  |
+| 2. Enforcement + Testing | 2/3 | In Progress |  |
 | 3. App Shell + Error Boundaries | 0/2 | Not started | - |
 | 4. State Architecture | 0/2 | Not started | - |
 | 5. WebSocket Bridge + Multiplexer | 0/2 | Not started | - |

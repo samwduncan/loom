@@ -70,6 +70,10 @@ Recent decisions affecting current work:
 - 01-03: TokenPreview uses fixed inset-0 positioning (not min-h-dvh) to work with overflow:hidden body
 - 01-03: Dev server port moved from 5173 to 5184 to avoid V1 collision
 - 01-03: Spring Lab uses CSS cubic-bezier approximation -- full LazyMotion in M3
+- 02-01: File-level eslint-disable for TokenPreview no-banned-inline-style (dev visualization tool needs dynamic styles)
+- 02-01: z-10 Tailwind utility replaced with var(--z-sticky) token in TokenPreview
+- 02-01: @typescript-eslint/no-unused-vars upgraded from warn to error
+- 02-01: eslint-rules/ directory added to ESLint ignores (plain JS, not linted as app code)
 - 02-02: App.tsx excluded from coverage (routing shell, not application logic)
 - 02-02: Node types added to tsconfig.app.json for test file Node.js API access
 - 02-02: Test files colocated with source files (*.test.ts beside *.ts)
@@ -86,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T02:11:17Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-05T02:14:08Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: .planning/phases/02-enforcement-testing-infrastructure/02-03-PLAN.md

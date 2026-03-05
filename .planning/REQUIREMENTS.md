@@ -21,7 +21,7 @@
 
 ### Enforcement
 
-- [ ] **ENF-01**: Install and configure ESLint with custom rules that enforce EVERY banned pattern from the V2 Constitution. Specific rules required:
+- [x] **ENF-01**: Install and configure ESLint with custom rules that enforce EVERY banned pattern from the V2 Constitution. Specific rules required:
   - Ban all Tailwind color utilities containing a color name + number (`bg-gray-800`, `text-red-500`, etc.) — regex pattern matching
   - Ban hardcoded hex values in className strings (`bg-[#1a1a1a]`)
   - Ban `z-[number]` patterns outside the z-index dictionary
