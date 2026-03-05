@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-05T23:27:47Z"
-last_activity: "2026-03-05 — Completed Plan 04-01: Type System + Zustand Stores"
+stopped_at: Completed 04-02-PLAN.md (Phase 4 complete)
+last_updated: "2026-03-05T23:37:00Z"
+last_activity: "2026-03-05 — Completed Plan 04-02: Store Tests + Persistence Documentation"
 progress:
   total_phases: 8
-  completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
-  percent: 56
+  completed_phases: 4
+  total_plans: 10
+  completed_plans: 10
+  percent: 62
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 4 in progress — State Architecture
+**Current focus:** Phase 4 complete — Phase 5 next (WebSocket Bridge)
 
 ## Current Position
 
-Phase: 4 of 8 (State Architecture)
-Plan: 1 of 2 in current phase (1 complete)
-Status: Plan 04-01 complete, Plan 04-02 next (store tests + persistence docs)
-Last activity: 2026-03-05 — Completed Plan 04-01: Type System + Zustand Stores
+Phase: 4 of 8 (State Architecture) - COMPLETE
+Plan: 2 of 2 in current phase (2 complete)
+Status: Phase 4 complete. Phase 5 (WebSocket Bridge + Multiplexer) next — needs discuss-phase.
+Last activity: 2026-03-05 — Completed Plan 04-02: Store Tests + Persistence Documentation
 
-Progress: [█████░░░░░] 56% (M1 plan 9 of 16)
+Progress: [██████░░░░] 62% (M1 plan 10 of 16)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 5 min
-- Total execution time: 0.77 hours
+- Total execution time: 0.83 hours
 
 **By Phase:**
 
@@ -46,16 +46,17 @@ Progress: [█████░░░░░] 56% (M1 plan 9 of 16)
 | 01 | 3 | 22 min | 7 min |
 | 02 | 3 | 10 min | 3 min |
 | 03 | 2 | 10 min | 5 min |
-| 04 | 1 | 4 min | 4 min |
+| 04 | 2 | 8 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 5m, 5m, 4m, 6m, 4m
+- Last 5 plans: 5m, 4m, 6m, 4m, 4m
 - Trend: stable
 
 *Updated after each plan completion*
 | Phase 03 P01 | 4 | 2 tasks | 13 files |
 | Phase 03 P02 | 6 | 2 tasks | 6 files |
 | Phase 04 P01 | 4 | 3 tasks | 10 files |
+| Phase 04 P02 | 4 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,8 @@ Recent decisions affecting current work:
 - 04-01: PersistedTimelineState interface avoids circular reference in migrate function (typeof store self-reference causes TS7022)
 - 04-01: Timeline persist merge rehydrates sessions with empty messages arrays since messages are never persisted
 - 04-01: Connection store initializes all three providers at default disconnected state from M1
+- 04-02: Test persistence via useTimelineStore.persist.getOptions().partialize — calls partialize directly to verify messages excluded
+- 04-02: Cross-store import ban uses no-restricted-imports scoped to store files (test files excluded)
 
 ### Pending Todos
 
@@ -111,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T23:27:47Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-05T23:37:00Z
+Stopped at: Completed 04-02-PLAN.md (Phase 4 complete)
 Resume file: None

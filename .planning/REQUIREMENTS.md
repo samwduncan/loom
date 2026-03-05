@@ -66,9 +66,9 @@
 
 - [x] **STATE-03**: All provider-related types include `providerId: ProviderId` where `type ProviderId = 'claude' | 'codex' | 'gemini'`. In M1, all instances default to `'claude'`. The type union is ready for M4 multi-provider without any type changes.
 
-- [ ] **STATE-04**: Create a custom ESLint rule OR a documented pattern test that detects whole-store subscriptions. Every store hook usage in component code MUST use a selector: `useTimelineStore(state => state.messages)` not `useTimelineStore()`. Multi-field selections use `useShallow`. Verify: grep the codebase for store hook usage without selectors — zero matches.
+- [x] **STATE-04**: Create a custom ESLint rule OR a documented pattern test that detects whole-store subscriptions. Every store hook usage in component code MUST use a selector: `useTimelineStore(state => state.messages)` not `useTimelineStore()`. Multi-field selections use `useShallow`. Verify: grep the codebase for store hook usage without selectors — zero matches.
 
-- [ ] **STATE-05**: Document persistence strategy in `src/stores/README.md`: which store slices persist to localStorage (timeline sessions list, ui theme preference, connection provider configs) vs which are ephemeral (stream state, ui modal state, connection live status). Implement persistence for the timeline store using Zustand's `persist` middleware with a documented storage key and version number.
+- [x] **STATE-05**: Document persistence strategy in `src/stores/README.md`: which store slices persist to localStorage (timeline sessions list, ui theme preference, connection provider configs) vs which are ephemeral (stream state, ui modal state, connection live status). Implement persistence for the timeline store using Zustand's `persist` middleware with a documented storage key and version number.
 
 ### Streaming Infrastructure
 
@@ -222,8 +222,8 @@
 | STATE-01 | Phase 4: State Architecture | Complete |
 | STATE-02 | Phase 4: State Architecture | Complete |
 | STATE-03 | Phase 4: State Architecture | Complete |
-| STATE-04 | Phase 4: State Architecture | Pending |
-| STATE-05 | Phase 4: State Architecture | Pending |
+| STATE-04 | Phase 4: State Architecture | Complete |
+| STATE-05 | Phase 4: State Architecture | Complete |
 | STRM-01 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
 | STRM-02 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
 | STRM-03 | Phase 6: Streaming Engine + Scroll | Pending |
