@@ -41,6 +41,8 @@ const ALLOWED_PROPERTIES = new Set([
   'flexBasis',
   'gridColumn',
   'gridRow',
+  'gridTemplateColumns',
+  'gridTemplateRows',
   'gap',
   'overflow',
 ]);

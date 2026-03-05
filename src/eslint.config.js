@@ -58,4 +58,11 @@ export default tseslint.config(
       'no-restricted-syntax': 'off',
     },
   },
+  // Override: Allow setState/getState in test files (Zustand testing requires direct store access)
+  {
+    files: ['src/**/*.test.{ts,tsx}'],
+    rules: {
+      'loom/no-external-store-mutation': 'off',
+    },
+  },
 );
