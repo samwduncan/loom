@@ -65,11 +65,11 @@ Plans:
   2. React Router serves `/chat/:sessionId?`, `/dashboard` (placeholder), and `/settings` (placeholder) — all rendering inside the content grid area
   3. Throwing an error inside a message-level component shows "Failed to render" for only that message — sidebar, other messages, and shell remain functional
   4. Each of the three error boundary tiers (App, Panel, Message) logs the error with a component stack trace
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 03-01: AppShell CSS Grid layout + viewport lock + base routing
-- [ ] 03-02: Three-tier error boundary hierarchy (App, Panel, Message)
+- [ ] 03-01-PLAN.md — AppShell CSS Grid layout + sidebar with collapse toggle + React Router route placeholders + minimal UI store stub
+- [ ] 03-02-PLAN.md — Three-tier error boundary hierarchy (App, Panel, Message) with fallback UIs + wiring into AppShell
 
 ### Phase 4: State Architecture
 **Goal**: Four Zustand stores define the complete data contract for the entire V2 vision — with full TypeScript interfaces ready for M4 multi-provider without type changes — and every store access uses selectors
