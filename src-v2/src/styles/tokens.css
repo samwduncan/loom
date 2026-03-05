@@ -1,22 +1,144 @@
-/* Design Tokens — placeholder until Plan 01-02 */
+/*
+ * Loom V2 Design Tokens
+ * Single source of truth for all visual values (Constitution 7.14)
+ * ALL colors are OKLCH — zero hex, zero HSL
+ */
 :root {
-  --surface-base: oklch(0.15 0.01 260);
-  --surface-raised: oklch(0.2 0.01 260);
-  --surface-overlay: oklch(0.25 0.01 260);
-  --text-primary: oklch(0.93 0.01 260);
-  --text-muted: oklch(0.6 0.01 260);
-  --accent-primary: oklch(0.7 0.15 250);
-  --accent-primary-hover: oklch(0.75 0.15 250);
-  --accent-primary-muted: oklch(0.4 0.08 250);
-  --accent-primary-fg: oklch(1 0 0);
-  --accent-secondary: oklch(0.7 0.1 160);
-  --border-subtle: oklch(0.3 0.01 260);
-  --border-interactive: oklch(0.5 0.05 250);
-  --status-error: oklch(0.65 0.2 25);
-  --status-success: oklch(0.7 0.18 145);
-  --status-warning: oklch(0.75 0.15 80);
-  --status-info: oklch(0.7 0.12 250);
-  --code-surface: oklch(0.18 0.01 260);
-  --code-inline-bg: oklch(0.22 0.01 260);
+  /* ─── Surface Hierarchy (DS-06) ───────────────────────────────────
+   * Warm charcoal with hue ~32. Lightness steps of ~0.03–0.04.
+   * Chroma decreases at higher lightness to preserve warmth.
+   * No box-shadow for elevation — distinction via lightness only.
+   */
+  --surface-base: oklch(0.20 0.010 32);
+  --surface-raised: oklch(0.23 0.008 32);
+  --surface-overlay: oklch(0.27 0.007 32);
+
+  /* ─── Text Hierarchy ──────────────────────────────────────────────
+   * Warm-tinted text with hue ~30 (amber)
+   */
+  --text-primary: oklch(0.90 0.02 30);
+  --text-secondary: oklch(0.76 0.01 30);
+  --text-muted: oklch(0.60 0.008 30);
+
+  /* ─── Accent — Dusty Rose (DS-01) ─────────────────────────────────
+   * Hue ~20 (red-orange). Punches against charcoal without overwhelming.
+   */
+  --accent-primary: oklch(0.63 0.14 20);
+  --accent-primary-hover: oklch(0.68 0.15 20);
+  --accent-primary-muted: oklch(0.63 0.14 20 / 0.15);
+  --accent-primary-fg: oklch(0.20 0.01 32);
+
+  /* ─── Secondary Accent — Amber/Gold ───────────────────────────────
+   * Hue ~70 for warm complementary accent
+   */
+  --accent-secondary: oklch(0.72 0.14 70);
+
+  /* ─── Status Colors (DS-01) ───────────────────────────────────────
+   * Warm-tinted, high readability against dark surfaces
+   */
+  --status-success: oklch(0.65 0.15 145);
+  --status-error: oklch(0.58 0.18 25);
+  --status-warning: oklch(0.72 0.14 70);
+  --status-info: oklch(0.65 0.12 240);
+
+  /* ─── Borders ─────────────────────────────────────────────────────
+   * Two tiers: subtle (content separations) and interactive (cards, inputs)
+   */
+  --border-subtle: oklch(1 0 0 / 0.07);
+  --border-interactive: oklch(1 0 0 / 0.15);
+
+  /* ─── Motion Tokens (DS-02) ───────────────────────────────────────
+   * CSS easing curves and durations. Spring physics in motion.ts.
+   */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 400ms;
+  --duration-spring: 500ms;
+
+  /* ─── Z-Index Dictionary (DS-04) ──────────────────────────────────
+   * Exactly 8 named tiers. No raw z-index values in components.
+   */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-dropdown: 20;
+  --z-scroll-pill: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-critical: 9999;
+
+  /* ─── Spacing (DS-03) ─────────────────────────────────────────────
+   * 4px grid for non-Tailwind usage. 10 stops: 1–6, 8, 10, 12, 16.
+   */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ─── Typography Scale ────────────────────────────────────────────
+   * Bold scale: 14→18→24→32. Greater dynamic range for visual authority.
+   */
+  --text-body: 0.875rem;
+  --text-h3: 1.125rem;
+  --text-h2: 1.5rem;
+  --text-h1: 2rem;
   --font-ui: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* ─── Density Tokens ──────────────────────────────────────────────
+   * Adaptive density per CONTEXT.md
+   */
+  --density-compact: 8px;
+  --density-comfortable: 12px;
+
+  /* ─── FX Tokens — Aurora, Gradients, Ambient ──────────────────────
+   * Visual effects for the aurora shimmer and ambient lighting
+   */
+  --fx-gradient-rose: oklch(0.65 0.12 0);
+  --fx-gradient-violet: oklch(0.60 0.10 270);
+  --fx-gradient-teal: oklch(0.60 0.09 180);
+  --fx-gradient-amber: oklch(0.65 0.12 70);
+  --fx-ambient-speed: 45s;
+  --fx-ambient-opacity: 0.04;
+  --fx-aurora-speed: 4s;
+  --fx-aurora-blur: 6px;
+  --fx-aurora-pulse-min: 0.3;
+  --fx-aurora-pulse-max: 0.6;
+
+  /* ─── Glass Tokens ────────────────────────────────────────────────
+   * Frosted glass effects for overlays and modals
+   */
+  --glass-blur: 16px;
+  --glass-saturate: 1.4;
+  --glass-bg-opacity: 0.7;
+
+  /* ─── Rose Accent Variants ────────────────────────────────────────
+   * Extended rose palette for focus, selection, and text accents
+   */
+  --rose-accent: oklch(0.63 0.14 20);
+  --rose-text: oklch(0.75 0.10 350);
+  --rose-focus-glow: oklch(0.63 0.14 20);
+  --rose-selection: oklch(0.63 0.14 20);
+
+  /* ─── Diff Colors ─────────────────────────────────────────────────
+   * Code diff backgrounds with warm tinting
+   */
+  --diff-added-bg: oklch(0.25 0.06 145);
+  --diff-removed-bg: oklch(0.25 0.06 25);
+
+  /* ─── Code Surface ────────────────────────────────────────────────
+   * Slightly darker than base for code blocks
+   */
+  --code-surface: oklch(0.18 0.008 32);
+  --code-inline-bg: oklch(1 0 0 / 0.06);
 }

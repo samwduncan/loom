@@ -16,28 +16,48 @@
 
 /* Semantic tokens referencing :root variables — @theme inline */
 @theme inline {
+  /* Surface utilities: bg-surface-base, bg-surface-raised, bg-surface-overlay */
   --color-surface-base: var(--surface-base);
   --color-surface-raised: var(--surface-raised);
   --color-surface-overlay: var(--surface-overlay);
   --color-background: var(--surface-base);
+
+  /* Text utilities: text-foreground, text-secondary, text-muted, text-muted-foreground */
   --color-foreground: var(--text-primary);
+  --color-secondary-foreground: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-muted-foreground: var(--text-muted);
+
+  /* Accent utilities: bg-primary, text-primary, bg-secondary */
   --color-primary: var(--accent-primary);
   --color-primary-hover: var(--accent-primary-hover);
   --color-primary-muted: var(--accent-primary-muted);
   --color-primary-foreground: var(--accent-primary-fg);
   --color-secondary: var(--accent-secondary);
-  --color-muted: var(--text-muted);
-  --color-muted-foreground: var(--text-muted);
   --color-accent: var(--accent-primary);
+
+  /* Status utilities: bg-success, text-success, bg-destructive, etc. */
   --color-destructive: var(--status-error);
   --color-success: var(--status-success);
   --color-warning: var(--status-warning);
   --color-info: var(--status-info);
+
+  /* Border utilities: border-border, border-border-interactive */
   --color-border: var(--border-subtle);
   --color-border-interactive: var(--border-interactive);
   --color-ring: var(--accent-primary);
+
+  /* Code utilities: bg-code-surface, bg-code-inline */
   --color-code-surface: var(--code-surface);
   --color-code-inline: var(--code-inline-bg);
+
+  /* Diff utilities: bg-diff-added, bg-diff-removed */
+  --color-diff-added: var(--diff-added-bg);
+  --color-diff-removed: var(--diff-removed-bg);
+
+  /* Rose accent utilities */
+  --color-rose: var(--rose-accent);
+  --color-rose-text: var(--rose-text);
 }
 
 /* Spacing base for Tailwind v4 (p-1 = 4px, p-2 = 8px, etc.) */
