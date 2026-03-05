@@ -45,7 +45,7 @@ The project runs Zustand 5.0.11 on React 19.2 with TypeScript strict mode. Immer
 
 | ID | Description | Research Support |
 |----|-------------|-----------------|
-| STATE-01 | Create 4 Zustand stores with full TypeScript interfaces and test files | Zustand v5 curried create syntax verified, middleware stacking order confirmed (immer -> persist -> create), all 4 store hook names match existing ESLint rule, test patterns established from Phase 2-3 |
+| STATE-01 | Create 4 Zustand stores with full TypeScript interfaces and test files | Zustand v5 curried create syntax verified, middleware stacking order confirmed (persist -> immer -> create, per official v5 TS guide), all 4 store hook names match existing ESLint rule, test patterns established from Phase 2-3 |
 | STATE-02 | Message type includes metadata + providerContext; Session type includes metadata | Cross-milestone schema from MILESTONES.md provides the interface skeletons; BACKEND_API_CONTRACT.md provides token-usage response shape for MessageMetadata/SessionMetadata fields |
 | STATE-03 | ProviderId union type ('claude' \| 'codex' \| 'gemini') used throughout, defaulting to 'claude' | Three providers confirmed in backend routes and WebSocket protocol; ProviderId used in ConnectionStore providers record, Session.providerId, Message.providerContext.providerId |
 | STATE-04 | Selector enforcement -- no whole-store subscriptions | Existing ESLint rule `no-whole-store-subscription` already covers all 4 hook names with ERROR level; useShallow available from `zustand/react/shallow`; README documentation completes this requirement |
@@ -127,13 +127,18 @@ interface TimelineState {
   // ... actions
 }
 
+// INITIAL_TIMELINE_STATE constant for deterministic reset
+const INITIAL_TIMELINE_STATE = {
+  sessions: [],
+  activeSessionId: null,
+  activeProviderId: 'claude' as ProviderId,
+};
+
 export const useTimelineStore = create<TimelineState>()(
-  immer(
-    persist(
+  persist(
+    immer(
       (set, get) => ({
-        sessions: [],
-        activeSessionId: null,
-        activeProviderId: 'claude',
+        ...INITIAL_TIMELINE_STATE,
         // actions use Immer draft syntax
         addMessage: (sessionId, message) =>
           set((state) => {
@@ -142,34 +147,30 @@ export const useTimelineStore = create<TimelineState>()(
               session.messages.push(message);
             }
           }),
-        reset: () => set(() => ({
-          sessions: [],
-          activeSessionId: null,
-          activeProviderId: 'claude',
-        })),
+        reset: () => set(() => ({ ...INITIAL_TIMELINE_STATE })),
       }),
-      {
-        name: 'loom-timeline',
-        version: 1,
-        partialize: (state) => ({
-          sessions: state.sessions.map((s) => ({
-            id: s.id,
-            title: s.title,
-            providerId: s.providerId,
-            createdAt: s.createdAt,
-            updatedAt: s.updatedAt,
-            metadata: s.metadata,
-            // messages EXCLUDED -- never persisted
-          })),
-          activeSessionId: state.activeSessionId,
-          activeProviderId: state.activeProviderId,
-        }),
-        migrate: (persistedState, version) => {
-          // Version 1: initial schema, no migration needed
-          return persistedState as TimelineState;
-        },
-      },
     ),
+    {
+      name: 'loom-timeline',
+      version: 1,
+      partialize: (state) => ({
+        sessions: state.sessions.map((s) => ({
+          id: s.id,
+          title: s.title,
+          providerId: s.providerId,
+          createdAt: s.createdAt,
+          updatedAt: s.updatedAt,
+          metadata: s.metadata,
+          // messages EXCLUDED -- never persisted
+        })),
+        activeSessionId: state.activeSessionId,
+        activeProviderId: state.activeProviderId,
+      }),
+      migrate: (persistedState, version) => {
+        // Version 1: initial schema, no migration needed
+        return persistedState as TimelineState;
+      },
+    },
   ),
 );
 ```
@@ -334,7 +335,7 @@ describe('TimelineStore', () => {
 ### Pitfall 4: persist + immer middleware stacking order
 **What goes wrong:** Wrong middleware order causes type errors or persistence not working.
 **Why it happens:** Zustand middleware is applied inside-out. The innermost middleware wraps the state creator first.
-**How to avoid:** Correct order: `create<T>()(immer(persist(...)))`. Immer wraps persist which wraps the state creator. This means Immer's draft mutation is available inside the persist initializer.
+**How to avoid:** Correct order: `create<T>()(persist(immer(...)))`. Per the official Zustand v5 TypeScript guide, Immer is innermost (closest to state creator). Persist wraps immer. This ensures `set()` supports draft mutations natively.
 **Warning signs:** Type errors about set() not accepting draft callbacks, or persisted state not having expected shape.
 
 ### Pitfall 5: Forgetting to handle persist rehydration
@@ -490,17 +491,17 @@ export interface ThinkingState {
 
 ```typescript
 // CORRECT stacking order for timeline store:
-// Outermost to innermost: create -> immer -> persist -> state creator
+// Outermost to innermost: create -> persist -> immer -> state creator (per official v5 TS guide)
 // The state creator function receives set/get that support Immer draft mutations
 export const useTimelineStore = create<TimelineState>()(
-  immer(            // Outermost: enables draft mutations in set()
-    persist(        // Middle: handles serialization/deserialization
+  persist(          // Outermost: handles serialization/deserialization
+    immer(          // Innermost: enables draft mutations in set()
       (set, get) => ({
-        // Innermost: state creator with actions
+        // State creator with actions
         // set() here accepts Immer draft callbacks thanks to immer middleware
       }),
-      { name: 'loom-timeline', version: 1, partialize: ... },
     ),
+    { name: 'loom-timeline', version: 1, partialize: ... },
   ),
 );
 
