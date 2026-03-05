@@ -13,7 +13,7 @@ Milestone 1 builds the architectural skeleton for the entire Loom V2 frontend an
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Design Token System** - OKLCH color tokens, motion tokens, spacing scale, z-index dictionary, typography, and surface hierarchy in CSS custom properties
-- [ ] **Phase 2: Enforcement + Testing Infrastructure** - ESLint Constitution rules, TypeScript strict mode, Vitest setup, and pre-commit gates that block violations from commit #1
+- [x] **Phase 2: Enforcement + Testing Infrastructure** - ESLint Constitution rules, TypeScript strict mode, Vitest setup, and pre-commit gates that block violations from commit #1
 - [ ] **Phase 3: App Shell + Error Boundaries** - CSS Grid layout, 100dvh viewport lock, route structure, and 3-tier error boundary hierarchy
 - [ ] **Phase 4: State Architecture** - Four Zustand stores (timeline, stream, ui, connection) with full TypeScript interfaces, selector-only enforcement, and persistence
 - [ ] **Phase 5: WebSocket Bridge + Stream Multiplexer** - WebSocket client with reconnection, typed message discrimination, and channel routing for content/thinking/tool streams
@@ -49,12 +49,12 @@ Plans:
   2. Running `tsc --noEmit` passes with zero errors under strict mode with `noUncheckedIndexedAccess` enabled
   3. Running `npm run test` executes Vitest with jsdom environment and produces a coverage report
   4. Attempting to `git commit` a file containing a banned pattern (hardcoded color, `any` type, raw z-index) is rejected by the pre-commit hook
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans executed
 
 Plans:
 - [x] 02-01-PLAN.md — Local ESLint plugin with 9 custom Constitution enforcement rules
 - [x] 02-02-PLAN.md — Vitest setup with coverage thresholds + Phase 1 test suite + TypeScript strict verification
-- [ ] 02-03-PLAN.md — Husky + lint-staged pre-commit hook blocking banned patterns on commit
+- [x] 02-03-PLAN.md — Husky + lint-staged pre-commit hook blocking banned patterns on commit
 
 ### Phase 3: App Shell + Error Boundaries
 **Goal**: The application has a CSS Grid skeleton that provides the spatial structure for all future content — sidebar, main content, and a reserved artifact column — with error containment at every level
@@ -153,7 +153,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Design Token System | 3/3 | Complete | 2026-03-05 |
-| 2. Enforcement + Testing | 2/3 | In Progress |  |
+| 2. Enforcement + Testing | 3/3 | Complete | 2026-03-05 |
 | 3. App Shell + Error Boundaries | 0/2 | Not started | - |
 | 4. State Architecture | 0/2 | Not started | - |
 | 5. WebSocket Bridge + Multiplexer | 0/2 | Not started | - |
