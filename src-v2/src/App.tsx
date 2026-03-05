@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { TokenPreview } from '@/components/dev/TokenPreview';
 
 function HomePage() {
   return (
@@ -20,21 +21,12 @@ function HomePage() {
   );
 }
 
-function TokensDevPage() {
-  return (
-    <div className="p-8">
-      <h1 className="text-xl font-semibold">Design Tokens (dev)</h1>
-      <p className="text-sm text-muted mt-2">Token preview page — coming in Plan 01-03</p>
-    </div>
-  );
-}
-
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/dev/tokens" element={<TokensDevPage />} />
+        <Route path="/dev/tokens" element={<TokenPreview />} />
       </Routes>
     </BrowserRouter>
   );
