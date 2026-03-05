@@ -65,4 +65,17 @@ export default tseslint.config(
       'loom/no-external-store-mutation': 'off',
     },
   },
+  // Override: Prevent cross-store imports (Constitution 4.5 — no store-to-store dependencies)
+  {
+    files: ['src/stores/*.ts'],
+    ignores: ['src/stores/*.test.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['./*', '@/stores/*'],
+          message: 'Store files must not import from other store files (Constitution 4.5). Cross-store orchestration belongs in hooks or event handlers.',
+        }],
+      }],
+    },
+  },
 );
