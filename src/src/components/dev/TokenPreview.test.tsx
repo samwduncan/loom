@@ -100,7 +100,7 @@ describe('TokenPreview component', () => {
     act(() => { vi.advanceTimersByTime(700); });
 
     // Non-triggering key should not animate
-    act(() => { fireEvent.keyDown(buttons[0]!, { key: 'a' }); });
+    act(() => { fireEvent.keyDown(buttons[0]!, { key: 'a' }); }); // ASSERT: button at index 0 verified by previous assertions
 
     vi.useRealTimers();
   });
@@ -125,7 +125,7 @@ describe('TokenPreview component', () => {
     act(() => { vi.advanceTimersByTime(700); });
 
     // Non-triggering key
-    act(() => { fireEvent.keyDown(buttons[3]!, { key: 'Tab' }); });
+    act(() => { fireEvent.keyDown(buttons[3]!, { key: 'Tab' }); }); // ASSERT: button at index 3 verified by previous assertions
 
     vi.useRealTimers();
   });
@@ -151,7 +151,7 @@ describe('TokenPreview component', () => {
     act(() => { vi.advanceTimersByTime(3000); });
 
     // Non-triggering key on spring box
-    act(() => { fireEvent.keyDown(buttons[6]!, { key: 'Escape' }); });
+    act(() => { fireEvent.keyDown(buttons[6]!, { key: 'Escape' }); }); // ASSERT: spring box at index 6 verified by previous assertions
 
     vi.useRealTimers();
   });
@@ -164,7 +164,7 @@ describe('TokenPreview component', () => {
     // Click spring box to start animation
     act(() => { fireEvent.click(buttons[6]!); }); // ASSERT: spring box at index 6 exists
     // Click again immediately while animating (hits animatingRef guard)
-    act(() => { fireEvent.click(buttons[6]!); });
+    act(() => { fireEvent.click(buttons[6]!); }); // ASSERT: spring box at index 6 still exists from prior render
     // Let animation complete
     act(() => { vi.advanceTimersByTime(5000); });
 

@@ -33,9 +33,9 @@
   - Ban inline `style={{}}` for colors, fonts, spacing, borders (allow for dynamic dimensions/transforms)
   - All rules must produce ERROR level (not warning) — zero tolerance.
 
-- [ ] **ENF-02**: Configure `tsconfig.json` with `"strict": true`, `"noUncheckedIndexedAccess": true`, `"noUnusedLocals": true`, `"noUnusedParameters": true`. Zero `any` types in production code. Verify: `tsc --noEmit` passes with zero errors on the entire codebase.
+- [x] **ENF-02**: Configure `tsconfig.json` with `"strict": true`, `"noUncheckedIndexedAccess": true`, `"noUnusedLocals": true`, `"noUnusedParameters": true`. Zero `any` types in production code. Verify: `tsc --noEmit` passes with zero errors on the entire codebase.
 
-- [ ] **ENF-03**: Install Vitest 4.x and React Testing Library 16.x. Configure `vitest.config.ts` with jsdom environment, path aliases matching `tsconfig.json`, coverage reporter. Create at least one passing test per store file and one per component in M1 scope. Verify: `npm run test` passes, coverage report generates.
+- [x] **ENF-03**: Install Vitest 4.x and React Testing Library 16.x. Configure `vitest.config.ts` with jsdom environment, path aliases matching `tsconfig.json`, coverage reporter. Create at least one passing test per store file and one per component in M1 scope. Verify: `npm run test` passes, coverage report generates.
 
 - [ ] **ENF-04**: Configure a pre-commit check (via `lint-staged` + `husky` or equivalent) that runs on every commit: (1) ESLint on staged `.ts`/`.tsx` files, (2) TypeScript type check (`tsc --noEmit`), (3) Vitest on affected test files. Commit MUST be blocked if any check fails. Verify: attempt to commit a file with `bg-gray-800` — commit is rejected.
 
@@ -212,8 +212,8 @@
 | DS-05 | Phase 1: Design Token System | Complete |
 | DS-06 | Phase 1: Design Token System | Complete |
 | ENF-01 | Phase 2: Enforcement + Testing | Pending |
-| ENF-02 | Phase 2: Enforcement + Testing | Pending |
-| ENF-03 | Phase 2: Enforcement + Testing | Pending |
+| ENF-02 | Phase 2: Enforcement + Testing | Complete |
+| ENF-03 | Phase 2: Enforcement + Testing | Complete |
 | ENF-04 | Phase 2: Enforcement + Testing | Pending |
 | SHELL-01 | Phase 3: App Shell + Error Boundaries | Pending |
 | SHELL-02 | Phase 3: App Shell + Error Boundaries | Pending |

@@ -7,7 +7,9 @@ describe('cn() className composition utility', () => {
   });
 
   it('handles conditional classes (false, undefined, null)', () => {
-    expect(cn('base', false && 'hidden', true && 'visible')).toBe(
+    const isHidden = false;
+    const isVisible = true;
+    expect(cn('base', isHidden && 'hidden', isVisible && 'visible')).toBe(
       'base visible',
     );
     expect(cn('base', undefined, null, 'end')).toBe('base end');
