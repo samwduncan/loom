@@ -83,7 +83,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Complete type system (5 type files) + all 4 Zustand stores with Immer/Persist middleware and full M1-M5 interfaces
+- [x] 04-01-PLAN.md — Complete type system (5 type files) + all 4 Zustand stores with Immer/Persist middleware and full M1-M5 interfaces
 - [ ] 04-02-PLAN.md — Comprehensive store test suites (4 test files) + persistence documentation + selector enforcement verification
 
 ### Phase 5: WebSocket Bridge + Stream Multiplexer
@@ -155,7 +155,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 1. Design Token System | 3/3 | Complete | 2026-03-05 |
 | 2. Enforcement + Testing | 3/3 | Complete | 2026-03-05 |
 | 3. App Shell + Error Boundaries | 2/2 | Complete | 2026-03-05 |
-| 4. State Architecture | 0/2 | Not started | - |
+| 4. State Architecture | 1/2 | In progress | - |
 | 5. WebSocket Bridge + Multiplexer | 0/2 | Not started | - |
 | 6. Streaming Engine + Scroll | 0/3 | Not started | - |
 | 7. Tool Registry + Proof of Life | 0/2 | Not started | - |

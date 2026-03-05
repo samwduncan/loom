@@ -55,16 +55,16 @@
 
 ### State Architecture
 
-- [ ] **STATE-01**: Create 4 Zustand stores in `src/stores/`:
+- [x] **STATE-01**: Create 4 Zustand stores in `src/stores/`:
   - `timeline.ts`: `TimelineStore` — sessions array, activeSessionId, message operations (addMessage, updateMessage, clearSession). Full TypeScript interface defined per MILESTONES.md cross-milestone schema.
   - `stream.ts`: `StreamStore` — isStreaming, activeToolCalls (ToolCallState[]), thinkingState, activityText, stream lifecycle actions (startStream, endStream, addToolCall, updateToolCall).
   - `ui.ts`: `UIStore` — sidebarOpen, sidebarCollapsed, activeTab (TabId), modalState, commandPaletteOpen, companionState (null initially), theme config.
   - `connection.ts`: `ConnectionStore` — providers record (keyed by ProviderId), connection lifecycle actions (connect, disconnect, updateStatus).
   - Every store has a corresponding `.test.ts` file testing all actions.
 
-- [ ] **STATE-02**: `Message` type includes `metadata: MessageMetadata` (with fields: `timestamp`, `tokenCount`, `cost`, `duration`) and `providerContext: ProviderContext` (with fields: `providerId`, `modelId`, `agentName`). `Session` type includes `metadata: SessionMetadata` (with fields: `tokenBudget`, `contextWindowUsed`, `totalCost`). These fields exist from M1 even if populated with defaults/nulls.
+- [x] **STATE-02**: `Message` type includes `metadata: MessageMetadata` (with fields: `timestamp`, `tokenCount`, `cost`, `duration`) and `providerContext: ProviderContext` (with fields: `providerId`, `modelId`, `agentName`). `Session` type includes `metadata: SessionMetadata` (with fields: `tokenBudget`, `contextWindowUsed`, `totalCost`). These fields exist from M1 even if populated with defaults/nulls.
 
-- [ ] **STATE-03**: All provider-related types include `providerId: ProviderId` where `type ProviderId = 'claude' | 'codex' | 'gemini'`. In M1, all instances default to `'claude'`. The type union is ready for M4 multi-provider without any type changes.
+- [x] **STATE-03**: All provider-related types include `providerId: ProviderId` where `type ProviderId = 'claude' | 'codex' | 'gemini'`. In M1, all instances default to `'claude'`. The type union is ready for M4 multi-provider without any type changes.
 
 - [ ] **STATE-04**: Create a custom ESLint rule OR a documented pattern test that detects whole-store subscriptions. Every store hook usage in component code MUST use a selector: `useTimelineStore(state => state.messages)` not `useTimelineStore()`. Multi-field selections use `useShallow`. Verify: grep the codebase for store hook usage without selectors — zero matches.
 
@@ -219,9 +219,9 @@
 | SHELL-02 | Phase 3: App Shell + Error Boundaries | Complete |
 | SHELL-03 | Phase 3: App Shell + Error Boundaries | Complete |
 | SHELL-04 | Phase 3: App Shell + Error Boundaries | Complete |
-| STATE-01 | Phase 4: State Architecture | Pending |
-| STATE-02 | Phase 4: State Architecture | Pending |
-| STATE-03 | Phase 4: State Architecture | Pending |
+| STATE-01 | Phase 4: State Architecture | Complete |
+| STATE-02 | Phase 4: State Architecture | Complete |
+| STATE-03 | Phase 4: State Architecture | Complete |
 | STATE-04 | Phase 4: State Architecture | Pending |
 | STATE-05 | Phase 4: State Architecture | Pending |
 | STRM-01 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
