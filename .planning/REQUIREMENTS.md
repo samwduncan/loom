@@ -7,17 +7,17 @@
 
 ### Design System
 
-- [ ] **DS-01**: Create `src/styles/tokens.css` defining ALL color tokens as CSS custom properties using OKLCH color space. Minimum tokens: `--surface-base`, `--surface-raised`, `--surface-overlay`, `--text-primary`, `--text-secondary`, `--text-muted`, `--accent-primary` (dusty rose), `--accent-primary-hover`, `--accent-primary-muted`, `--status-success`, `--status-error`, `--status-warning`, `--status-info`, `--border-default`, `--border-subtle`. No hardcoded hex or HSL values anywhere in component code — verified by ESLint rule.
+- [x] **DS-01**: Create `src/styles/tokens.css` defining ALL color tokens as CSS custom properties using OKLCH color space. Minimum tokens: `--surface-base`, `--surface-raised`, `--surface-overlay`, `--text-primary`, `--text-secondary`, `--text-muted`, `--accent-primary` (dusty rose), `--accent-primary-hover`, `--accent-primary-muted`, `--status-success`, `--status-error`, `--status-warning`, `--status-info`, `--border-default`, `--border-subtle`. No hardcoded hex or HSL values anywhere in component code — verified by ESLint rule.
 
-- [ ] **DS-02**: Define motion tokens in `src/styles/tokens.css`: `--ease-spring` (`cubic-bezier(0.34, 1.56, 0.64, 1)`), `--ease-out` (`cubic-bezier(0.16, 1, 0.3, 1)`), `--ease-in-out` (`cubic-bezier(0.65, 0, 0.35, 1)`), `--duration-fast` (100ms), `--duration-normal` (200ms), `--duration-slow` (400ms), `--duration-spring` (500ms). Also define spring physics configs as JS constants in `src/lib/motion.ts`: `SPRING_GENTLE` (stiffness: 120, damping: 14), `SPRING_SNAPPY` (stiffness: 300, damping: 20), `SPRING_BOUNCY` (stiffness: 180, damping: 12).
+- [x] **DS-02**: Define motion tokens in `src/styles/tokens.css`: `--ease-spring` (`cubic-bezier(0.34, 1.56, 0.64, 1)`), `--ease-out` (`cubic-bezier(0.16, 1, 0.3, 1)`), `--ease-in-out` (`cubic-bezier(0.65, 0, 0.35, 1)`), `--duration-fast` (100ms), `--duration-normal` (200ms), `--duration-slow` (400ms), `--duration-spring` (500ms). Also define spring physics configs as JS constants in `src/lib/motion.ts`: `SPRING_GENTLE` (stiffness: 120, damping: 14), `SPRING_SNAPPY` (stiffness: 300, damping: 20), `SPRING_BOUNCY` (stiffness: 180, damping: 12).
 
-- [ ] **DS-03**: Define spacing scale in `src/styles/tokens.css` as CSS custom properties on the 4px grid: `--space-1` (4px) through `--space-16` (64px). Tailwind utilities (`p-1` through `p-16`) map to this scale. Arbitrary spacing values (`p-[13px]`, `mt-[7px]`) are banned by ESLint except with a `// SPACING: [reason]` exception comment.
+- [x] **DS-03**: Define spacing scale in `src/styles/tokens.css` as CSS custom properties on the 4px grid: `--space-1` (4px) through `--space-16` (64px). Tailwind utilities (`p-1` through `p-16`) map to this scale. Arbitrary spacing values (`p-[13px]`, `mt-[7px]`) are banned by ESLint except with a `// SPACING: [reason]` exception comment.
 
-- [ ] **DS-04**: Define z-index dictionary in `src/styles/tokens.css` with exactly 8 named tiers: `--z-base` (0), `--z-sticky` (10), `--z-dropdown` (20), `--z-scroll-pill` (30), `--z-overlay` (40), `--z-modal` (50), `--z-toast` (60), `--z-critical` (9999). All z-index usage in component code MUST reference these variables — verified by ESLint rule banning raw numeric z-index values.
+- [x] **DS-04**: Define z-index dictionary in `src/styles/tokens.css` with exactly 8 named tiers: `--z-base` (0), `--z-sticky` (10), `--z-dropdown` (20), `--z-scroll-pill` (30), `--z-overlay` (40), `--z-modal` (50), `--z-toast` (60), `--z-critical` (9999). All z-index usage in component code MUST reference these variables — verified by ESLint rule banning raw numeric z-index values.
 
 - [x] **DS-05**: Configure three font families in `src/styles/base.css`: Inter Variable (UI text, loaded via `@font-face` with `font-display: swap`), Instrument Serif (editorial headings, loaded via `@font-face`), JetBrains Mono (code blocks, loaded via `@font-face`). Define CSS custom properties: `--font-ui`, `--font-serif`, `--font-mono`. Tailwind `font-sans`, `font-serif`, `font-mono` classes map to these. Monospace must NOT be the default body font (this was a V1 bug).
 
-- [ ] **DS-06**: Implement surface hierarchy using lightness steps only (no `box-shadow` for elevation). `--surface-base` is the darkest (app background), `--surface-raised` is slightly lighter (cards, sidebar), `--surface-overlay` is lightest (modals, dropdowns). Borders between surfaces use `border-[var(--border-subtle)]` at 6-10% opacity. Verify: three visually distinct surface levels are perceptible on a calibrated monitor.
+- [x] **DS-06**: Implement surface hierarchy using lightness steps only (no `box-shadow` for elevation). `--surface-base` is the darkest (app background), `--surface-raised` is slightly lighter (cards, sidebar), `--surface-overlay` is lightest (modals, dropdowns). Borders between surfaces use `border-[var(--border-subtle)]` at 6-10% opacity. Verify: three visually distinct surface levels are perceptible on a calibrated monitor.
 
 ### Enforcement
 
@@ -205,12 +205,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DS-01 | Phase 1: Design Token System | Pending |
-| DS-02 | Phase 1: Design Token System | Pending |
-| DS-03 | Phase 1: Design Token System | Pending |
-| DS-04 | Phase 1: Design Token System | Pending |
+| DS-01 | Phase 1: Design Token System | Complete |
+| DS-02 | Phase 1: Design Token System | Complete |
+| DS-03 | Phase 1: Design Token System | Complete |
+| DS-04 | Phase 1: Design Token System | Complete |
 | DS-05 | Phase 1: Design Token System | Complete |
-| DS-06 | Phase 1: Design Token System | Pending |
+| DS-06 | Phase 1: Design Token System | Complete |
 | ENF-01 | Phase 2: Enforcement + Testing | Pending |
 | ENF-02 | Phase 2: Enforcement + Testing | Pending |
 | ENF-03 | Phase 2: Enforcement + Testing | Pending |

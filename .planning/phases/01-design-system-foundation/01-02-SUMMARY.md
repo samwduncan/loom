@@ -1,74 +1,81 @@
 ---
 phase: 01-design-system-foundation
 plan: 02
-subsystem: infra
-tags: [git, fork-governance, gpl-3.0, attribution, upstream-sync]
+subsystem: ui
+tags: [oklch, css-custom-properties, design-tokens, spring-physics, tailwind-v4, motion]
 
 # Dependency graph
-requires: []
+requires:
+  - phase: 01-01
+    provides: V2 scaffold with Vite + React + Tailwind v4, placeholder tokens.css, CSS entry point
 provides:
-  - upstream remote configured for CloudCLI cherry-picking
-  - upstream-sync branch for tracking upstream changes
-  - fork-baseline tag marking Loom divergence point
-  - ATTRIBUTION file for GPL-3.0 compliance
-affects: [03-fork-cleanup]
+  - Complete OKLCH design token system in tokens.css (colors, surfaces, motion, spacing, z-index, FX, glass, diff, code)
+  - Spring physics TypeScript module (SPRING_GENTLE, SPRING_SNAPPY, SPRING_BOUNCY)
+  - Semantic Tailwind utility mappings via @theme inline
+affects: [enforcement, app-shell, components, streaming, tool-registry]
 
 # Tech tracking
 tech-stack:
   added: []
-  patterns:
-    - "upstream-sync branch workflow: fetch upstream, merge to upstream-sync, cherry-pick to main"
+  patterns: [oklch-only-colors, css-custom-properties-tokens, spring-physics-constants, theme-inline-semantic-mapping]
 
 key-files:
   created:
-    - ATTRIBUTION
-  modified: []
+    - src-v2/src/lib/motion.ts
+  modified:
+    - src-v2/src/styles/tokens.css
+    - src-v2/src/styles/index.css
 
 key-decisions:
-  - "Added upstream as separate remote (kept origin as-is) rather than renaming origin"
-  - "upstream-sync branch starts at current HEAD (same as main) for clean divergence tracking"
+  - "All OKLCH values used exactly as specified in plan — warm charcoal surfaces at hue 32, dusty rose accent at hue 20"
+  - "Added diff, rose, and secondary-foreground semantic utility mappings beyond original @theme inline set for complete coverage"
 
 patterns-established:
-  - "Cherry-pick workflow: git checkout upstream-sync && git fetch upstream && git merge upstream/main, then cherry-pick specific commits to main"
+  - "OKLCH-only colors: Every color token uses oklch() — no hex, no HSL, no rgb anywhere in the token system"
+  - "Single :root block: All tokens in one :root declaration per Constitution 7.14"
+  - "Dual motion system: CSS easing/duration in tokens.css, spring physics in TypeScript motion.ts"
+  - "@theme inline semantic mapping: Tailwind utilities resolve to CSS variable references for runtime theming"
 
-requirements-completed: [FORK-04, FORK-05]
+requirements-completed: [DS-01, DS-02, DS-03, DS-04, DS-06]
 
 # Metrics
-duration: 2min
-completed: 2026-03-01
+duration: 3min
+completed: 2026-03-05
 ---
 
-# Phase 1 Plan 2: Fork Governance Summary
+# Phase 1 Plan 02: Design Token System Summary
 
-**Upstream-sync branch, fork-baseline tag, and GPL-3.0 ATTRIBUTION file establishing CloudCLI fork governance**
+**Complete OKLCH design token system with 29 color tokens, 8 z-index tiers, 10 spacing stops, motion easing/duration, and TypeScript spring physics constants**
 
 ## Performance
 
-- **Duration:** 2 min
-- **Started:** 2026-03-01T20:00:10Z
-- **Completed:** 2026-03-01T20:01:57Z
+- **Duration:** 3 min
+- **Started:** 2026-03-05T00:50:13Z
+- **Completed:** 2026-03-05T00:53:11Z
 - **Tasks:** 2
-- **Files modified:** 1
+- **Files modified:** 3
 
 ## Accomplishments
-- Configured `upstream` git remote pointing to CloudCLI repository for future security/bug fix cherry-picking
-- Created `upstream-sync` branch at current HEAD for clean tracking of upstream changes
-- Applied `fork-baseline` annotated tag marking the exact commit where Loom diverged from CloudCLI
-- Created `ATTRIBUTION` file crediting CloudCLI UI Contributors with GPL-3.0 compliance
+- Replaced placeholder tokens.css with complete 120+ line token system covering all visual values
+- 29 OKLCH color tokens across surfaces, text, accent, status, borders, FX, glass, rose, diff, and code categories
+- Spring physics module with three named configs (gentle/snappy/bouncy) and mirrored CSS easing/duration constants
+- Extended @theme inline with 30+ semantic Tailwind utility mappings for complete coverage
 
 ## Task Commits
 
 Each task was committed atomically:
 
-1. **Task 1: Configure upstream remote, create upstream-sync branch, and tag fork baseline** - `703938c` (chore)
-2. **Task 2: Create ATTRIBUTION file for GPL-3.0 compliance** - `bd4808b` (docs)
+1. **Task 1: Create complete tokens.css and update @theme inline mappings** - `60203eb` (feat)
+2. **Task 2: Create motion.ts with spring physics constants** - `d4d8842` (feat)
 
 ## Files Created/Modified
-- `ATTRIBUTION` - GPL-3.0 fork attribution crediting CloudCLI UI as the original project
+- `src-v2/src/styles/tokens.css` - Complete design token system: OKLCH colors, motion, z-index, spacing, typography, density, FX, glass, rose, diff, code tokens
+- `src-v2/src/styles/index.css` - Updated @theme inline with full semantic utility mappings including diff, rose, secondary-foreground
+- `src-v2/src/lib/motion.ts` - Spring physics constants (SPRING_GENTLE/SNAPPY/BOUNCY) + EASING + DURATION TypeScript exports
 
 ## Decisions Made
-- Added `upstream` as a separate remote rather than renaming `origin`, preserving existing remote configuration
-- Used an empty commit for Task 1 since git remote/branch/tag operations don't produce file changes but need traceability
+- Used exact OKLCH values from plan specification — warm charcoal surfaces at hue 32, dusty rose accent at hue 20
+- Added diff-added/diff-removed, rose/rose-text, and secondary-foreground utility mappings to @theme inline beyond the original set, for complete component coverage
 
 ## Deviations from Plan
 
@@ -81,19 +88,11 @@ None
 None - no external service configuration required.
 
 ## Next Phase Readiness
-- Fork governance infrastructure is fully in place
-- Cherry-picking workflow documented and ready for use when upstream security patches land
-- GPL-3.0 compliance satisfied; ATTRIBUTION file can be extended as fork modifications grow
-
-## Self-Check: PASSED
-
-- ATTRIBUTION file: FOUND
-- 01-02-SUMMARY.md: FOUND
-- Commit 703938c: FOUND
-- Commit bd4808b: FOUND
-- upstream-sync branch: FOUND
-- fork-baseline tag: FOUND
+- Complete token system is ready for Plan 01-03 (token preview page)
+- All tokens available for Phase 2 ESLint enforcement rules
+- Surface hierarchy, accent colors, and motion tokens ready for Phase 3 app shell components
+- No blockers for next plan
 
 ---
 *Phase: 01-design-system-foundation*
-*Completed: 2026-03-01*
+*Completed: 2026-03-05*
