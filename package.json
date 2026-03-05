@@ -24,16 +24,12 @@
     "url": "https://github.com/siteboon/claudecodeui/issues"
   },
   "scripts": {
-    "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
+    "dev": "node server/index.js",
     "server": "node server/index.js",
-    "client": "vite --host",
-    "build": "vite build",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "start": "npm run build && npm run server",
+    "start": "node server/index.js",
     "release": "./release.sh",
-    "prepublishOnly": "npm run build",
-    "postinstall": "node scripts/fix-node-pty.js"
+    "postinstall": "node scripts/fix-node-pty.js",
+    "prepare": "husky"
   },
   "keywords": [
     "claude code",
@@ -109,6 +105,7 @@
     "auto-changelog": "^2.5.0",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.2",
+    "husky": "^9.1.7",
     "node-gyp": "^10.0.0",
     "postcss": "^8.4.32",
     "release-it": "^19.0.5",

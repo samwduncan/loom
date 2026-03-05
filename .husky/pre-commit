@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+
+# Only run frontend checks if src/ files are staged
+STAGED_SRC=$(git diff --cached --name-only --diff-filter=ACMR | grep '^src/' || true)
+
+if [ -z "$STAGED_SRC" ]; then
+  echo "No src/ files staged -- skipping frontend checks"
+  exit 0
+fi
+
+echo "=== Pre-commit: Frontend checks ==="
+
+# Step 1: lint-staged (auto-fixes fixable issues and re-stages)
+echo "[1/3] Running lint-staged..."
+cd src
+npx lint-staged --concurrent false
+LINT_EXIT=$?
+if [ $LINT_EXIT -ne 0 ]; then
+  echo "FAILED: lint-staged found unfixable errors"
+  exit 1
+fi
+
+# Step 2: Full project typecheck (catches cross-file breakage)
+echo "[2/3] Running typecheck..."
+npx tsc -b --noEmit
+TSC_EXIT=$?
+if [ $TSC_EXIT -ne 0 ]; then
+  echo "FAILED: TypeScript errors found"
+  exit 1
+fi
+
+# Step 3: Affected tests only (no coverage -- coverage is for CI/gate checks)
+# Uses `vitest related --run` to only run tests affected by staged files.
+# This keeps the hook fast (<30s) as the test suite grows.
+# Full coverage check: use `npm run test:coverage` or CI pipeline.
+STAGED_TS=$(echo "$STAGED_SRC" | grep '\.tsx\?$' | sed 's|^src/||')
+if [ -z "$STAGED_TS" ]; then
+  echo "[3/3] No .ts/.tsx files staged -- skipping tests"
+else
+  echo "[3/3] Running affected tests..."
+  npx vitest related --run $STAGED_TS
+  TEST_EXIT=$?
+  if [ $TEST_EXIT -ne 0 ]; then
+    echo "FAILED: Tests failed"
+    exit 1
+  fi
+fi
+
+echo "=== All checks passed ==="
