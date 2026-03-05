@@ -14,6 +14,7 @@ import { Outlet } from 'react-router-dom';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import { Sidebar } from '@/components/sidebar/Sidebar';
+import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 export const AppShell = memo(function AppShell() {
   const sidebarState = useUIStore((state) => state.sidebarState);
@@ -30,11 +31,15 @@ export const AppShell = memo(function AppShell() {
       }}
     >
       <div className="overflow-hidden min-w-0">
-        <Sidebar />
+        <PanelErrorBoundary panelName="sidebar">
+          <Sidebar />
+        </PanelErrorBoundary>
       </div>
 
       <main role="main" className="overflow-hidden min-w-0">
-        <Outlet />
+        <PanelErrorBoundary panelName="content">
+          <Outlet />
+        </PanelErrorBoundary>
       </main>
 
       {/* Artifact column: 0px width, reserved for future phases */}

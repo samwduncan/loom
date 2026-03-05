@@ -11,6 +11,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-
 import { TokenPreview } from '@/components/dev/TokenPreview';
 import { AppShell } from '@/components/app-shell/AppShell';
 import { PlaceholderView } from '@/components/shared/PlaceholderView';
+import { AppErrorBoundary } from '@/components/shared/ErrorBoundary';
 
 function ChatPlaceholder() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -47,8 +48,10 @@ export function AppRoutes() {
 
 export function App() {
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <AppErrorBoundary>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AppErrorBoundary>
   );
 }
