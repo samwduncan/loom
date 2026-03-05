@@ -80,11 +80,11 @@ Plans:
   2. The `Message` type includes `metadata: MessageMetadata` and `providerContext: ProviderContext` fields; the `Session` type includes `metadata: SessionMetadata` — all with `ProviderId` union type defaulting to `'claude'`
   3. Grepping the codebase for store hook usage without selectors finds zero matches — either enforced by ESLint rule or documented pattern test
   4. The timeline store persists its sessions list to localStorage via Zustand `persist` middleware, and `src/stores/README.md` documents which slices persist vs which are ephemeral
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 04-01: Four Zustand stores with full TypeScript interfaces and actions
-- [ ] 04-02: Selector enforcement, persistence middleware, and store documentation
+- [ ] 04-01-PLAN.md — Complete type system (5 type files) + all 4 Zustand stores with Immer/Persist middleware and full M1-M5 interfaces
+- [ ] 04-02-PLAN.md — Comprehensive store test suites (4 test files) + persistence documentation + selector enforcement verification
 
 ### Phase 5: WebSocket Bridge + Stream Multiplexer
 **Goal**: The frontend establishes a typed WebSocket connection to the CloudCLI backend, parses every incoming message into a discriminated union, and routes content/thinking/tool streams into separate channels feeding the correct stores
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 |-------|----------------|--------|-----------|
 | 1. Design Token System | 3/3 | Complete | 2026-03-05 |
 | 2. Enforcement + Testing | 3/3 | Complete | 2026-03-05 |
-| 3. App Shell + Error Boundaries | 1/2 | In Progress|  |
+| 3. App Shell + Error Boundaries | 2/2 | Complete | 2026-03-05 |
 | 4. State Architecture | 0/2 | Not started | - |
 | 5. WebSocket Bridge + Multiplexer | 0/2 | Not started | - |
 | 6. Streaming Engine + Scroll | 0/3 | Not started | - |
