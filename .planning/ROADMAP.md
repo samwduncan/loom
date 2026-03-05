@@ -49,12 +49,12 @@ Plans:
   2. Running `tsc --noEmit` passes with zero errors under strict mode with `noUncheckedIndexedAccess` enabled
   3. Running `npm run test` executes Vitest with jsdom environment and produces a coverage report
   4. Attempting to `git commit` a file containing a banned pattern (hardcoded color, `any` type, raw z-index) is rejected by the pre-commit hook
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: ESLint configuration with all Constitution enforcement rules
-- [ ] 02-02: TypeScript strict config + Vitest setup with coverage
-- [ ] 02-03: Pre-commit hooks (lint-staged + husky) blocking violations on commit
+- [ ] 02-01-PLAN.md — Local ESLint plugin with 9 custom Constitution enforcement rules
+- [ ] 02-02-PLAN.md — Vitest setup with coverage thresholds + Phase 1 test suite + TypeScript strict verification
+- [ ] 02-03-PLAN.md — Husky + lint-staged pre-commit hook blocking banned patterns on commit
 
 ### Phase 3: App Shell + Error Boundaries
 **Goal**: The application has a CSS Grid skeleton that provides the spatial structure for all future content — sidebar, main content, and a reserved artifact column — with error containment at every level
@@ -109,7 +109,7 @@ Plans:
   1. During a 2000-token streaming response, React DevTools Profiler shows zero re-renders on the ActiveMessage component — all text updates happen via rAF DOM mutation on a ref
   2. The ActiveMessage component displays streamed text with a blinking cursor, and when streaming completes, the accumulated text flushes to the timeline store as a finalized message
   3. During streaming, scrolling up by any amount immediately disengages auto-scroll and shows a "Scroll to bottom" pill; clicking the pill re-engages auto-scroll; starting a new stream re-engages auto-scroll
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
 - [ ] 06-01: useStreamBuffer hook with useRef + rAF token accumulation and flush
