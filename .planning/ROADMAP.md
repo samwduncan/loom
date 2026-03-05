@@ -33,12 +33,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Inter Variable, Instrument Serif, and JetBrains Mono load via `@font-face` with `font-display: swap`, and Tailwind's `font-sans`/`font-serif`/`font-mono` classes map to them
   4. Spring physics configs exist as JS constants in `src/lib/motion.ts` (SPRING_GENTLE, SPRING_SNAPPY, SPRING_BOUNCY) alongside CSS easing tokens
   5. A test HTML page or Storybook-style preview renders all token values visually for verification
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: Project scaffolding + Vite + React 18 + TypeScript + Tailwind configuration
-- [ ] 01-02: Color tokens, surface hierarchy, and status/accent/FX tokens in OKLCH
-- [ ] 01-03: Motion tokens, spacing scale, z-index dictionary, typography system, and base styles
+- [ ] 01-01-PLAN.md — V2 project scaffolding (Vite + React 18 + TS + Tailwind v4), font loading, CSS entry point
+- [ ] 01-02-PLAN.md — Complete token system (OKLCH colors, surfaces, motion, spacing, z-index, FX) + spring physics module
+- [ ] 01-03-PLAN.md — Comprehensive token preview page at /dev/tokens + visual verification checkpoint
 
 ### Phase 2: Enforcement + Testing Infrastructure
 **Goal**: Automated guards block every banned pattern from the V2 Constitution at build time — no hardcoded colors, no whole-store subscriptions, no `any` types, no raw z-index — so violations cannot accumulate
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Design Token System | 0/3 | Not started | - |
+| 1. Design Token System | 0/3 | Planned | - |
 | 2. Enforcement + Testing | 0/3 | Not started | - |
 | 3. App Shell + Error Boundaries | 0/2 | Not started | - |
 | 4. State Architecture | 0/2 | Not started | - |
