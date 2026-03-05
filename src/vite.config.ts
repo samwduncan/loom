@@ -44,6 +44,7 @@ export default defineConfig({
         '**/vitest-setup.ts',
         'src/vite-env.d.ts',
         'src/main.tsx',
+        'src/App.tsx',
       ],
       reporter: ['text', 'text-summary', 'lcov'],
       thresholds: {
