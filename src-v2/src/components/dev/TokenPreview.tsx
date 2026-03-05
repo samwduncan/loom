@@ -811,7 +811,7 @@ function GlassFxTokens() {
 
 export function TokenPreview() {
   return (
-    <div className="min-h-dvh overflow-y-auto bg-surface-base p-6 md:p-10">
+    <div className="fixed inset-0 overflow-y-auto bg-surface-base p-6 md:p-10">
       <header className="mb-8">
         <h1 className="font-serif text-[length:var(--text-h1)] text-foreground">
           Design Token Preview
