@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 3 context gathered
-last_updated: "2026-03-05T12:40:47.245Z"
-last_activity: "2026-03-05 — Completed Plan 02-03: Husky pre-commit hook (Phase 2 complete)"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-05T13:16:22.981Z"
+last_activity: "2026-03-05 — Completed Plan 03-01: AppShell CSS Grid + Sidebar + Routes"
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_plans: 8
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 2 complete — Phase 3 next (App Shell + Error Boundaries)
+**Current focus:** Phase 3 in progress — App Shell + Error Boundaries
 
 ## Current Position
 
-Phase: 2 of 8 (Enforcement + Testing Infrastructure) -- COMPLETE
-Plan: 3 of 3 in current phase (all complete)
-Status: Phase 2 complete, ready for Phase 3
-Last activity: 2026-03-05 — Completed Plan 02-03: Husky pre-commit hook (Phase 2 complete)
+Phase: 3 of 8 (App Shell + Error Boundaries)
+Plan: 1 of 2 in current phase (1 complete)
+Status: Plan 03-01 complete, Plan 03-02 next (error boundaries)
+Last activity: 2026-03-05 — Completed Plan 03-01: AppShell CSS Grid + Sidebar + Routes
 
-Progress: [████████████████████] 100% (M1 phases 1-2 of 8)
+Progress: [█████████░] 88% (M1 plan 7 of 8)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 6 min
-- Total execution time: 0.53 hours
+- Total execution time: 0.60 hours
 
 **By Phase:**
 
@@ -45,12 +45,14 @@ Progress: [████████████████████] 100% (M
 |-------|-------|-------|----------|
 | 01 | 3 | 22 min | 7 min |
 | 02 | 3 | 10 min | 3 min |
+| 03 | 1 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 3m, 12m, 0m, 5m, 5m
+- Last 5 plans: 12m, 0m, 5m, 5m, 4m
 - Trend: stable
 
 *Updated after each plan completion*
+| Phase 03 P01 | 4 | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -80,6 +82,14 @@ Recent decisions affecting current work:
 - 02-02: import.meta.url + fileURLToPath used instead of __dirname for ESM compat
 - 02-03: vitest related --run (affected tests only) in pre-commit instead of full vitest run --coverage for <30s hook
 - 02-03: lint-staged config runs only eslint --fix; tests run as separate hook step to avoid re-staging race condition
+- 03-01: gridTemplateColumns/gridTemplateRows added to ESLint inline-style allowlist (Constitution 3.2 explicitly permits dynamic grid values)
+- 03-01: Test files exempted from no-external-store-mutation ESLint rule (Zustand testing requires setState/getState)
+- 03-01: Expand trigger uses z-[var(--z-overlay)] (40), above sticky headers but below modals
+- 03-01: AppRoutes exported separately from App for MemoryRouter testing
+- 03-01: --sidebar-expanded-width token added to tokens.css for parameterized sidebar width
+- [Phase 03]: gridTemplateColumns/Rows added to ESLint inline-style allowlist per Constitution 3.2
+- [Phase 03]: Test files exempted from no-external-store-mutation ESLint rule for Zustand testing
+- [Phase 03]: Expand trigger z-index at --z-overlay (40) per Architect review
 
 ### Pending Todos
 
@@ -92,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-05T12:40:47.243Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-app-shell-error-boundaries/03-CONTEXT.md
+Last session: 2026-03-05T13:16:10.835Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None

@@ -65,7 +65,7 @@ Plans:
   2. React Router serves `/chat/:sessionId?`, `/dashboard` (placeholder), and `/settings` (placeholder) — all rendering inside the content grid area
   3. Throwing an error inside a message-level component shows "Failed to render" for only that message — sidebar, other messages, and shell remain functional
   4. Each of the three error boundary tiers (App, Panel, Message) logs the error with a component stack trace
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 03-01-PLAN.md — AppShell CSS Grid layout + sidebar with collapse toggle + React Router route placeholders + minimal UI store stub
@@ -154,7 +154,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 |-------|----------------|--------|-----------|
 | 1. Design Token System | 3/3 | Complete | 2026-03-05 |
 | 2. Enforcement + Testing | 3/3 | Complete | 2026-03-05 |
-| 3. App Shell + Error Boundaries | 0/2 | Not started | - |
+| 3. App Shell + Error Boundaries | 1/2 | In Progress|  |
 | 4. State Architecture | 0/2 | Not started | - |
 | 5. WebSocket Bridge + Multiplexer | 0/2 | Not started | - |
 | 6. Streaming Engine + Scroll | 0/3 | Not started | - |

@@ -41,11 +41,11 @@
 
 ### App Shell
 
-- [ ] **SHELL-01**: Create `src/components/app-shell/AppShell.tsx` using CSS Grid: `grid-template-columns: var(--sidebar-width, 280px) 1fr var(--artifact-width, 0px)`. The third column exists at `0px` width for future artifact panel (M3+). Grid rows: `grid-template-rows: 1fr` (no header row in M1 — header can be added later without restructuring). The component must accept children for each grid area via named slots or composition.
+- [x] **SHELL-01**: Create `src/components/app-shell/AppShell.tsx` using CSS Grid: `grid-template-columns: var(--sidebar-width, 280px) 1fr var(--artifact-width, 0px)`. The third column exists at `0px` width for future artifact panel (M3+). Grid rows: `grid-template-rows: 1fr` (no header row in M1 — header can be added later without restructuring). The component must accept children for each grid area via named slots or composition.
 
-- [ ] **SHELL-02**: Root HTML element has `height: 100dvh` and `overflow: hidden`. The body has `margin: 0`, `overflow: hidden`. No scrollbar appears on the root document under any circumstance. All scrolling happens inside the chat content area. Verify: resize browser to any viewport size — no body scroll appears.
+- [x] **SHELL-02**: Root HTML element has `height: 100dvh` and `overflow: hidden`. The body has `margin: 0`, `overflow: hidden`. No scrollbar appears on the root document under any circumstance. All scrolling happens inside the chat content area. Verify: resize browser to any viewport size — no body scroll appears.
 
-- [ ] **SHELL-03**: Configure React Router (or equivalent) with route slots for: `/chat/:sessionId?` (main chat view), `/dashboard` (future GSD dashboard — renders placeholder), `/settings` (future settings — renders placeholder). Route structure must support future additions without restructuring. All routes render inside the AppShell's content grid area.
+- [x] **SHELL-03**: Configure React Router (or equivalent) with route slots for: `/chat/:sessionId?` (main chat view), `/dashboard` (future GSD dashboard — renders placeholder), `/settings` (future settings — renders placeholder). Route structure must support future additions without restructuring. All routes render inside the AppShell's content grid area.
 
 - [ ] **SHELL-04**: Create three error boundary components:
   - `AppErrorBoundary` (wraps entire app): catches catastrophic failures, renders full-screen "Something went wrong" with reload button
@@ -215,9 +215,9 @@
 | ENF-02 | Phase 2: Enforcement + Testing | Complete |
 | ENF-03 | Phase 2: Enforcement + Testing | Complete |
 | ENF-04 | Phase 2: Enforcement + Testing | Complete |
-| SHELL-01 | Phase 3: App Shell + Error Boundaries | Pending |
-| SHELL-02 | Phase 3: App Shell + Error Boundaries | Pending |
-| SHELL-03 | Phase 3: App Shell + Error Boundaries | Pending |
+| SHELL-01 | Phase 3: App Shell + Error Boundaries | Complete |
+| SHELL-02 | Phase 3: App Shell + Error Boundaries | Complete |
+| SHELL-03 | Phase 3: App Shell + Error Boundaries | Complete |
 | SHELL-04 | Phase 3: App Shell + Error Boundaries | Pending |
 | STATE-01 | Phase 4: State Architecture | Pending |
 | STATE-02 | Phase 4: State Architecture | Pending |
