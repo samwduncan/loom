@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Streaming Engine + Scroll Anchor** - useRef + rAF token buffer bypassing React reconciler, ActiveMessage component, and IntersectionObserver scroll anchoring
 - [x] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end (completed 2026-03-06)
 - [x] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing (completed 2026-03-06)
-- [ ] **Phase 9: E2E Integration Wiring + Playwright Verification** - Wire WebSocket init into production route, fix sidebar navigation, Playwright E2E tests for all human-verification gaps
+- [x] **Phase 9: E2E Integration Wiring + Playwright Verification** - Wire WebSocket init into production route, fix sidebar navigation, Playwright E2E tests for all human-verification gaps (completed 2026-03-06)
 - [ ] **Phase 10: Pre-Archive Cleanup** - Remove orphaned exports, fix inline styles, correct stale traceability
 
 ## Phase Details
@@ -161,7 +161,7 @@ Plans:
 
 Plans:
 - [x] 09-01-PLAN.md — Integration fixes (WebSocket init, SessionList navigation, projects_updated wiring, optimistic stub sessions) (completed 2026-03-06)
-- [ ] 09-02-PLAN.md — Playwright E2E test suite (streaming, session switching, scroll, tool calls, CLS verification)
+- [x] 09-02-PLAN.md — Playwright E2E test suite (streaming, session switching, scroll, tool calls, CLS verification) (completed 2026-03-06)
 
 ### Phase 10: Pre-Archive Cleanup
 **Goal**: Remove orphaned code, fix stale traceability, and eliminate Constitution violations before archiving M1
@@ -193,5 +193,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 6. Streaming Engine + Scroll | 2/2 | Complete | 2026-03-06 |
 | 7. Tool Registry + Proof of Life | 2/2 | Complete   | 2026-03-06 |
 | 8. Navigation + Sessions | 2/2 | Complete   | 2026-03-06 |
-| 9. E2E Integration + Playwright | 1/2 | In Progress | - |
+| 9. E2E Integration + Playwright | 2/2 | Complete | 2026-03-06 |
 | 10. Pre-Archive Cleanup | 0/1 | Pending | - |
