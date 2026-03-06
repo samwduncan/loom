@@ -16,6 +16,7 @@ import type { MultiplexerCallbacks } from '@/lib/stream-multiplexer';
 import { bootstrapAuth } from '@/lib/auth';
 import { useConnectionStore } from '@/stores/connection';
 import { useStreamStore } from '@/stores/stream';
+import { useTimelineStore } from '@/stores/timeline';
 import type { ServerMessage } from '@/types/websocket';
 
 /** Double-init guard — prevents multiple connections from React strict mode or re-mounts */
@@ -77,6 +78,22 @@ export async function initializeWebSocket(): Promise<void> {
 
     onSessionCreated: (sid) => {
       streamStore().setActiveSessionId(sid);
+      // Phase 8: Also add session to timeline store for sidebar display
+      const timelineStore = useTimelineStore.getState;
+      const sessions = timelineStore().sessions;
+      if (!sessions.some((s) => s.id === sid)) {
+        timelineStore().addSession({
+          id: sid,
+          title: 'New Chat',
+          messages: [],
+          providerId: 'claude',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+        });
+      }
+      // Also set as active session in timeline
+      timelineStore().setActiveSession(sid);
     },
 
     onSessionAborted: (_sessionId, _provider, _success) => {

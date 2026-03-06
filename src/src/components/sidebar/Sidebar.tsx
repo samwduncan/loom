@@ -1,8 +1,10 @@
 /**
- * Sidebar — Branded header with Loom wordmark and collapse/expand toggle.
+ * Sidebar -- Branded header with Loom wordmark, collapse/expand toggle,
+ * New Chat button, and session list with date grouping.
  *
- * Expanded: aside with role="complementary", Loom in Instrument Serif italic,
- * collapse chevron. Rest of sidebar empty (Phase 3 placeholder).
+ * Expanded: aside with role="complementary", aria-label="Chat sessions",
+ * Loom wordmark in Instrument Serif italic, collapse chevron,
+ * NewChatButton, SessionList.
  * Collapsed: Fixed-position expand trigger at left edge.
  *
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6),
@@ -12,6 +14,8 @@
 import { memo } from 'react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
+import { NewChatButton } from './NewChatButton';
+import { SessionList } from './SessionList';
 
 export const Sidebar = memo(function Sidebar() {
   const isSidebarOpen = useUIStore((state) => state.sidebarOpen);
@@ -52,7 +56,7 @@ export const Sidebar = memo(function Sidebar() {
   return (
     <aside
       role="complementary"
-      aria-label="Navigation"
+      aria-label="Chat sessions"
       className={cn(
         'bg-surface-raised border-r border-border',
         'overflow-hidden flex flex-col h-full',
@@ -86,7 +90,10 @@ export const Sidebar = memo(function Sidebar() {
           </svg>
         </button>
       </header>
-      {/* Rest of sidebar empty in Phase 3 */}
+      <div className="px-2 py-2 border-b border-border">
+        <NewChatButton />
+      </div>
+      <SessionList />
     </aside>
   );
 });
