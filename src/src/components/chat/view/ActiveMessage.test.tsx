@@ -62,6 +62,12 @@ function sendToken(token: string): void {
   }
 }
 
+function dispatchTransitionEnd(element: Element): void {
+  const event = new Event('transitionend', { bubbles: true });
+  Object.defineProperty(event, 'propertyName', { value: 'background-color' });
+  element.dispatchEvent(event);
+}
+
 // ─── Tests ──────────────────────────────────────────────────────────────────
 
 describe('ActiveMessage', () => {
@@ -157,7 +163,7 @@ describe('ActiveMessage', () => {
     expect(container).toHaveAttribute('data-phase', 'finalizing');
   });
 
-  it('onFinalizationComplete callback fires after 200ms delay', () => {
+  it('onFinalizationComplete fires after CSS transition ends', () => {
     const onFinalizationComplete = vi.fn();
     render(<ActiveMessage sessionId="test-session" onFinalizationComplete={onFinalizationComplete} />);
 
@@ -171,9 +177,31 @@ describe('ActiveMessage', () => {
     // Not yet called
     expect(onFinalizationComplete).not.toHaveBeenCalled();
 
-    // Advance by 200ms
+    // Simulate CSS background-color transition completing
+    const container = screen.getByTestId('active-message');
     act(() => {
-      vi.advanceTimersByTime(200);
+      dispatchTransitionEnd(container);
+    });
+
+    expect(onFinalizationComplete).toHaveBeenCalledOnce();
+  });
+
+  it('onFinalizationComplete fires via safety fallback if transitionend does not fire', () => {
+    const onFinalizationComplete = vi.fn();
+    render(<ActiveMessage sessionId="test-session" onFinalizationComplete={onFinalizationComplete} />);
+
+    sendToken('Fallback text');
+    flushRaf();
+
+    act(() => {
+      useStreamStore.getState().endStream();
+    });
+
+    expect(onFinalizationComplete).not.toHaveBeenCalled();
+
+    // Don't dispatch transitionend — rely on 500ms safety fallback
+    act(() => {
+      vi.advanceTimersByTime(500);
     });
 
     expect(onFinalizationComplete).toHaveBeenCalledOnce();
@@ -221,9 +249,9 @@ describe('ActiveMessage', () => {
     expect(container).toBeInTheDocument();
     expect(container.textContent).toContain('Still here');
 
-    // Only after 200ms does onFinalizationComplete fire
+    // Only after transition completes does onFinalizationComplete fire
     act(() => {
-      vi.advanceTimersByTime(200);
+      dispatchTransitionEnd(container);
     });
     expect(onFinalizationComplete).toHaveBeenCalledOnce();
   });
@@ -239,8 +267,10 @@ describe('ActiveMessage', () => {
     mockGetState.mockReturnValue('disconnected');
     mockGetIsStreamActive.mockReturnValue(false);
 
-    // Trigger the paint loop to detect disconnect
-    flushRaf();
+    // Trigger the paint loop to detect disconnect — wrapped in act for React state updates
+    act(() => {
+      flushRaf();
+    });
 
     const container = screen.getByTestId('active-message');
     expect(container.textContent).toContain('Connection lost during response.');

@@ -80,28 +80,46 @@ export function useScrollAnchor(
     return () => observer.disconnect();
   }, [sentinelNode, scrollContainerRef]);
 
-  // User scroll detection: wheel/touchmove on scroll container disengages auto-scroll.
+  // User scroll detection: comprehensive coverage for all input methods.
+  // - wheel/touchmove: immediate disengage for the most common gestures
+  // - scroll event: catches scrollbar drag, keyboard (PgUp/Home/arrows), and any other source
   // The IntersectionObserver alone can't distinguish user scroll from content growth,
-  // so we listen for explicit user gestures to break the auto-scroll lock.
+  // so we listen for explicit user gestures and scroll direction to break the auto-scroll lock.
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    const handleUserScroll = (): void => {
+    let lastScrollTop = container.scrollTop;
+
+    // Scroll event catches ALL scroll sources. Detect upward scroll during auto-scroll
+    // to handle scrollbar drag and keyboard scrolling that wheel/touchmove miss.
+    const handleScroll = (): void => {
+      const currentScrollTop = container.scrollTop;
+      if (isAutoScrollingRef.current && currentScrollTop < lastScrollTop) {
+        isAutoScrollingRef.current = false;
+        setIsAtBottom(false);
+      }
+      lastScrollTop = currentScrollTop;
+    };
+
+    // Wheel/touchmove fire before scroll events — faster disengage for common gestures
+    const handleUserGesture = (): void => {
       if (isAutoScrollingRef.current) {
         isAutoScrollingRef.current = false;
         setIsAtBottom(false);
       }
     };
 
-    container.addEventListener('wheel', handleUserScroll, { passive: true });
-    container.addEventListener('touchmove', handleUserScroll, {
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    container.addEventListener('wheel', handleUserGesture, { passive: true });
+    container.addEventListener('touchmove', handleUserGesture, {
       passive: true,
     });
 
     return () => {
-      container.removeEventListener('wheel', handleUserScroll);
-      container.removeEventListener('touchmove', handleUserScroll);
+      container.removeEventListener('scroll', handleScroll);
+      container.removeEventListener('wheel', handleUserGesture);
+      container.removeEventListener('touchmove', handleUserGesture);
     };
   }, [scrollContainerRef]);
 

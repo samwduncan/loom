@@ -283,6 +283,45 @@ describe('useScrollAnchor', () => {
     expect(result.current.showPill).toBe(false);
   });
 
+  it('scroll event moving upward during auto-scroll disengages (catches scrollbar drag)', () => {
+    const { result, scrollContainer } = setupHook(true);
+
+    // Auto-scroll is active, flush a frame to confirm
+    act(() => {
+      flushOneRaf();
+    });
+
+    // Simulate auto-scroll having positioned us at scrollTop=100
+    Object.defineProperty(scrollContainer, 'scrollTop', {
+      value: 100,
+      writable: true,
+      configurable: true,
+    });
+
+    // First scroll event establishes the lastScrollTop baseline
+    act(() => {
+      scrollContainer.dispatchEvent(new Event('scroll'));
+    });
+
+    // Still at bottom (scrollTop didn't decrease)
+    expect(result.current.isAtBottom).toBe(true);
+
+    // Simulate scrollbar drag upward — scrollTop decreases
+    Object.defineProperty(scrollContainer, 'scrollTop', {
+      value: 50,
+      writable: true,
+      configurable: true,
+    });
+
+    act(() => {
+      scrollContainer.dispatchEvent(new Event('scroll'));
+    });
+
+    // Should disengage — user is fighting auto-scroll
+    expect(result.current.isAtBottom).toBe(false);
+    expect(result.current.showPill).toBe(true);
+  });
+
   it('observer cleans up on unmount', () => {
     const { unmount } = setupHook();
 
