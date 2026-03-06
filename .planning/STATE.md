@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 6 context gathered
-last_updated: "2026-03-06T01:57:32.948Z"
-last_activity: "2026-03-06 — Completed Plan 05-02: Stream Multiplexer + Init Wiring"
+stopped_at: Completed 06-02 Scroll Anchor + Bottom Pill
+last_updated: "2026-03-06T14:57:03.000Z"
+last_activity: "2026-03-06 — Completed Plan 06-02: Scroll Anchor + Bottom Pill"
 progress:
   total_phases: 8
-  completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
-  percent: 75
+  completed_phases: 6
+  total_plans: 14
+  completed_plans: 14
+  percent: 87
 ---
 
 # Project State
@@ -25,19 +25,19 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 
 ## Current Position
 
-Phase: 6 of 8 — next up
-Plan: 0 of ? in current phase (phase 5 complete, 2/2 plans done)
-Status: Phase 5 complete (WS types + auth + client + multiplexer + init wiring). Phase 6 next (Streaming UI).
-Last activity: 2026-03-06 — Completed Plan 05-02: Stream Multiplexer + Init Wiring
+Phase: 6 of 8
+Plan: 2 of 2 in current phase (scroll anchor + bottom pill complete)
+Status: Phase 6 complete (useStreamBuffer + ActiveMessage + useScrollAnchor + ScrollToBottomPill). Phase 7 next.
+Last activity: 2026-03-06 — Completed Plan 06-02: Scroll Anchor + Bottom Pill
 
-Progress: [███████▌░░] 75% (M1 plan 12 of 16)
+Progress: [████████▌░] 87% (M1 plan 14 of 16)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 14
 - Average duration: 5 min
-- Total execution time: 1.03 hours
+- Total execution time: 1.2 hours
 
 **By Phase:**
 
@@ -48,10 +48,11 @@ Progress: [███████▌░░] 75% (M1 plan 12 of 16)
 | 03 | 2 | 10 min | 5 min |
 | 04 | 2 | 8 min | 4 min |
 | 05 | 2 | 12 min | 6 min |
+| 06 | 2 | 20 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 6m, 4m, 4m, 6m, 6m
-- Trend: stable
+- Last 5 plans: 4m, 6m, 6m, 10m, 10m
+- Trend: slightly increasing (more complex TDD tasks)
 
 *Updated after each plan completion*
 | Phase 03 P01 | 4 | 2 tasks | 13 files |
@@ -60,6 +61,8 @@ Progress: [███████▌░░] 75% (M1 plan 12 of 16)
 | Phase 04 P02 | 4 | 2 tasks | 6 files |
 | Phase 05 P01 | 6 | 2 tasks | 5 files |
 | Phase 05 P02 | 6 | 2 tasks | 5 files |
+| Phase 06 P01 | 10 | 2 tasks | 5 files |
+| Phase 06 P02 | 10 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -114,6 +117,10 @@ Recent decisions affecting current work:
 - 05-02: ESLint override for websocket-init.ts allows getState() in infrastructure wiring module (not a component)
 - 05-02: Mid-stream disconnect preserves partial content by not calling endStream, only setting error message
 - 05-02: Stream lifecycle tracked via closure boolean in websocket-init, not in multiplexer (stateless)
+- 06-02: Callback ref (useState+useCallback) instead of useRef for sentinel -- ensures IntersectionObserver setup effect fires on DOM attachment
+- 06-02: Wheel/touchmove event listener for user scroll detection during auto-scroll -- IntersectionObserver alone can't distinguish user scroll from content growth
+- 06-02: Anti-oscillation guard (isAutoScrollingRef) prevents observer "not intersecting" from flashing pill during rAF auto-scroll
+- 06-02: Separate CSS file for scroll pill frosted glass (color-mix, vendor prefixes) -- avoids ESLint inline style ban
 
 ### Pending Todos
 
@@ -126,6 +133,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T01:57:32.946Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-streaming-engine-scroll-anchor/06-CONTEXT.md
+Last session: 2026-03-06T14:57:03.000Z
+Stopped at: Completed 06-02 Scroll Anchor + Bottom Pill
+Resume file: .planning/phases/06-streaming-engine-scroll-anchor/06-02-SUMMARY.md

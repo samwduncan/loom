@@ -119,7 +119,7 @@
   - Has a container div with `content-visibility: visible` (always rendered, never offscreened)
   - Verify: component renders streamed text, cursor blinks, React DevTools shows zero re-renders during streaming.
 
-- [ ] **COMP-03**: Create `src/hooks/useScrollAnchor.ts` implementing basic scroll anchoring:
+- [x] **COMP-03**: Create `src/hooks/useScrollAnchor.ts` implementing basic scroll anchoring:
   - When `isStreaming` is true AND user has NOT scrolled up: auto-scroll to bottom on every rAF frame
   - When user scrolls up by any amount (even 1px of manual scroll): immediately disengage auto-scroll
   - Track disengage via `IntersectionObserver` on a sentinel element at the bottom of the scroll container
@@ -228,7 +228,7 @@
 | STRM-02 | Phase 5: WebSocket Bridge + Multiplexer | Complete |
 | STRM-03 | Phase 6: Streaming Engine + Scroll | Pending |
 | COMP-02 | Phase 6: Streaming Engine + Scroll | Pending |
-| COMP-03 | Phase 6: Streaming Engine + Scroll | Pending |
+| COMP-03 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-01 | Phase 7: Tool Registry + Proof of Life | Pending |
 | STRM-04 | Phase 7: Tool Registry + Proof of Life | Pending |
 | NAV-01 | Phase 8: Navigation + Sessions | Pending |
