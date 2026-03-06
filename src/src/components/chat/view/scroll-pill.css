@@ -1,0 +1,16 @@
+/*
+ * ScrollToBottomPill styles
+ *
+ * Uses CSS custom properties that can't be expressed as Tailwind utilities:
+ * - color-mix() for frosted glass background
+ * - -webkit-backdrop-filter for Safari compatibility
+ * - Token-backed transition timing
+ */
+
+.scroll-pill {
+  background-color: color-mix(in oklch, var(--surface-overlay) 70%, transparent);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition-property: opacity, transform;
+  transition-duration: var(--duration-normal);
+  transition-timing-function: var(--ease-spring);
+}
