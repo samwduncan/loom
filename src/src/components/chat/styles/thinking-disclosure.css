@@ -1,0 +1,82 @@
+/*
+ * ThinkingDisclosure styles.
+ * Uses CSS grid-template-rows for smooth expand/collapse animation.
+ * All values from design tokens -- no hardcoded colors.
+ * Constitution: No hex/HSL (7.14), no raw z-index (7.6).
+ */
+
+/* ─── Container ──────────────────────────────────────────────────────── */
+
+.thinking-disclosure {
+  margin-bottom: var(--space-2);
+  border-radius: 8px;
+  background: color-mix(in oklch, var(--text-muted) 5%, transparent);
+  padding: var(--space-1) var(--space-2);
+}
+
+/* ─── Trigger Button ─────────────────────────────────────────────────── */
+
+.thinking-disclosure-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ─── Disclosure Arrow ───────────────────────────────────────────────── */
+
+.thinking-disclosure-arrow {
+  display: inline-block;
+  transition: transform var(--duration-fast) var(--ease-out);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.thinking-disclosure-arrow[data-expanded="true"] {
+  transform: rotate(90deg);
+}
+
+/* ─── Content (grid-template-rows transition) ────────────────────────── */
+
+.thinking-disclosure-content {
+  display: grid;
+  transition: grid-template-rows var(--duration-normal) var(--ease-out);
+}
+
+.thinking-disclosure-content > div {
+  overflow: hidden;
+}
+
+.thinking-disclosure-content p {
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: var(--space-1) 0;
+}
+
+/* ─── Thinking Pulse Animation ───────────────────────────────────────── */
+
+@keyframes thinking-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.thinking-pulse {
+  animation: thinking-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .thinking-pulse {
+    animation: none;
+  }
+}
