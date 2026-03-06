@@ -11,6 +11,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect, type KeyboardEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/utils/cn';
 import { wsClient } from '@/lib/websocket-client';
 import { useStreamStore } from '@/stores/stream';
@@ -24,6 +25,7 @@ interface ChatComposerProps {
 }
 
 export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
+  const navigate = useNavigate();
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const pendingTitleRef = useRef<string | null>(null);
@@ -31,6 +33,7 @@ export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
   const isStreaming = useStreamStore((state) => state.isStreaming);
   const streamSessionId = useStreamStore((state) => state.activeSessionId);
   const addMessage = useTimelineStore((state) => state.addMessage);
+  const addSession = useTimelineStore((state) => state.addSession);
   const updateSessionTitle = useTimelineStore((state) => state.updateSessionTitle);
 
   // When a new chat session is created (streamSessionId transitions to non-null
@@ -46,13 +49,34 @@ export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
     const trimmed = input.trim();
     if (!trimmed || isStreaming) return;
 
-    // Build options -- omit sessionId when null (new chat)
+    // Determine the effective session ID for the optimistic message.
+    // For new chats (sessionId is null), create a stub session immediately.
+    let effectiveSessionId = sessionId;
+
+    if (!sessionId) {
+      // Create a stub session so user sees their message immediately
+      const stubId = 'stub-' + Math.random().toString(36).slice(2, 10);
+      addSession({
+        id: stubId,
+        title: trimmed.slice(0, 50),
+        messages: [],
+        providerId: 'claude',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+      });
+      effectiveSessionId = stubId;
+      navigate(`/chat/${stubId}`);
+    }
+
+    // Build options -- omit sessionId when null (new chat).
+    // Send the ORIGINAL sessionId to backend (null for new chat), NOT the stub ID.
     const options: Record<string, string> = { projectPath: projectName };
     if (sessionId) {
       options.sessionId = sessionId;
     }
 
-    // Store pending title for new chats — will be applied when session-created fires
+    // Store pending title for new chats -- will be applied when session-created fires
     if (!sessionId) {
       pendingTitleRef.current = trimmed.slice(0, 50);
     }
@@ -64,7 +88,7 @@ export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
     });
 
     // Optimistic user message -- add to timeline store immediately
-    if (sessionId) {
+    if (effectiveSessionId) {
       const userMessage: Message = {
         id: Math.random().toString(36).slice(2, 10),
         role: 'user',
@@ -81,7 +105,7 @@ export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
           agentName: null,
         },
       };
-      addMessage(sessionId, userMessage);
+      addMessage(effectiveSessionId, userMessage);
     }
 
     setInput('');
@@ -89,7 +113,7 @@ export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
     requestAnimationFrame(() => {
       inputRef.current?.focus();
     });
-  }, [input, isStreaming, projectName, sessionId, addMessage]);
+  }, [input, isStreaming, projectName, sessionId, addMessage, addSession, navigate]);
 
   const handleStop = useCallback(() => {
     if (streamSessionId) {

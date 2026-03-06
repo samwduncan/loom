@@ -78,21 +78,55 @@ export async function initializeWebSocket(): Promise<void> {
 
     onSessionCreated: (sid) => {
       streamStore().setActiveSessionId(sid);
-      // Phase 8: Also add session to timeline store for sidebar display
       const timelineStore = useTimelineStore.getState;
       const sessions = timelineStore().sessions;
-      if (!sessions.some((s) => s.id === sid)) {
-        timelineStore().addSession({
-          id: sid,
-          title: 'New Chat',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        });
+
+      // Check if there's a stub session to reconcile
+      const stubSession = sessions.find((s) => s.id.startsWith('stub-'));
+      if (stubSession) {
+        // Copy stub's messages to the real session
+        const stubMessages = stubSession.messages;
+        const stubTitle = stubSession.title;
+
+        // Add real session with copied data
+        if (!sessions.some((s) => s.id === sid)) {
+          timelineStore().addSession({
+            id: sid,
+            title: stubTitle,
+            messages: [],
+            providerId: 'claude',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+          });
+        }
+
+        // Copy messages from stub to real session
+        for (const msg of stubMessages) {
+          timelineStore().addMessage(sid, msg);
+        }
+
+        // Remove the stub session
+        timelineStore().removeSession(stubSession.id);
+
+        // Update URL without triggering React Router navigation (avoids double-fetch)
+        window.history.replaceState(null, '', `/chat/${sid}`);
+      } else {
+        // No stub -- add session normally (Phase 8 behavior)
+        if (!sessions.some((s) => s.id === sid)) {
+          timelineStore().addSession({
+            id: sid,
+            title: 'New Chat',
+            messages: [],
+            providerId: 'claude',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+          });
+        }
       }
-      // Also set as active session in timeline
+
+      // Set as active session in timeline
       timelineStore().setActiveSession(sid);
     },
 

@@ -38,6 +38,7 @@ const mockAddToolCall = vi.fn();
 const mockUpdateToolCall = vi.fn();
 const mockSetThinkingState = vi.fn();
 const mockSetActivityText = vi.fn();
+const mockSetActiveSessionId = vi.fn();
 
 vi.mock('@/stores/stream', () => ({
   useStreamStore: {
@@ -48,6 +49,7 @@ vi.mock('@/stores/stream', () => ({
       updateToolCall: mockUpdateToolCall,
       setThinkingState: mockSetThinkingState,
       setActivityText: mockSetActivityText,
+      setActiveSessionId: mockSetActiveSessionId,
       thinkingState: null,
     }),
   },
@@ -87,7 +89,20 @@ vi.mock('@/lib/stream-multiplexer', () => ({
 const mockAddSession = vi.fn();
 const mockRemoveSession = vi.fn();
 const mockSetActiveSession = vi.fn();
-const mockTimelineSessions: Array<{ id: string; title: string; messages: Array<{ id: string; role: string; content: string }>; providerId: string; createdAt: string; updatedAt: string; metadata: Record<string, unknown> }> = [];
+const mockAddMessage = vi.fn();
+const mockUpdateSessionTitle = vi.fn();
+
+interface MockSession {
+  id: string;
+  title: string;
+  messages: Array<{ id: string; role: string; content: string }>;
+  providerId: string;
+  createdAt: string;
+  updatedAt: string;
+  metadata: Record<string, unknown>;
+}
+
+let mockTimelineSessions: MockSession[] = [];
 
 vi.mock('@/stores/timeline', () => ({
   useTimelineStore: {
@@ -96,6 +111,8 @@ vi.mock('@/stores/timeline', () => ({
       addSession: mockAddSession,
       removeSession: mockRemoveSession,
       setActiveSession: mockSetActiveSession,
+      addMessage: mockAddMessage,
+      updateSessionTitle: mockUpdateSessionTitle,
     }),
   },
 }));
@@ -106,6 +123,7 @@ describe('initializeWebSocket', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockBootstrapAuth.mockResolvedValue('test-token');
+    mockTimelineSessions = [];
     _resetInitForTesting();
   });
 
@@ -310,6 +328,64 @@ describe('initializeWebSocket', () => {
       );
 
       dispatchSpy.mockRestore();
+    });
+  });
+
+  describe('stub session reconciliation', () => {
+    it('reconciles stub session with real session on session-created', async () => {
+      const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
+
+      await initializeWebSocket();
+
+      // Extract the callbacks from routeServerMessage mock
+      // First, trigger a message to capture callbacks
+      const configCall = mockConfigure.mock.calls[0] as [{ onMessage: (msg: ServerMessage) => void; onStateChange: (state: ConnectionState) => void }];
+      const onMessage = configCall[0].onMessage;
+
+      // Send a dummy message to capture the callbacks object
+      const dummyMsg: ServerMessage = { type: 'error', error: 'test' };
+      onMessage(dummyMsg);
+
+      const callArgs = mockRouteServerMessage.mock.calls[0] as [unknown, {
+        onSessionCreated: (sid: string) => void;
+      }, unknown];
+      const callbacks = callArgs[1];
+
+      // Set up a stub session in the mock timeline
+      mockTimelineSessions.push({
+        id: 'stub-abc123',
+        title: 'Hello world',
+        messages: [{ id: 'msg-1', role: 'user', content: 'Hello world' }],
+        providerId: 'claude',
+        createdAt: '2026-01-01',
+        updatedAt: '2026-01-01',
+        metadata: {},
+      });
+
+      // Fire onSessionCreated with a real session ID
+      callbacks.onSessionCreated('real-session-id');
+
+      // Verify: real session was added
+      expect(mockAddSession).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'real-session-id', title: 'Hello world' }),
+      );
+
+      // Verify: stub messages were copied to real session
+      expect(mockAddMessage).toHaveBeenCalledWith(
+        'real-session-id',
+        expect.objectContaining({ id: 'msg-1', role: 'user', content: 'Hello world' }),
+      );
+
+      // Verify: stub session was removed
+      expect(mockRemoveSession).toHaveBeenCalledWith('stub-abc123');
+
+      // Verify: URL was updated via replaceState (not navigate)
+      expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/chat/real-session-id');
+
+      // Verify: active session set to real ID
+      expect(mockSetActiveSession).toHaveBeenCalledWith('real-session-id');
+
+      replaceStateSpy.mockRestore();
     });
   });
 
