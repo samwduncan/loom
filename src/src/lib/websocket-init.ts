@@ -115,6 +115,10 @@ export async function initializeWebSocket(): Promise<void> {
     onPermissionRequest: (_requestId, _toolName, _input, _sessionId) => {
       // M2 permission UI
     },
+
+    onProjectsUpdated: () => {
+      window.dispatchEvent(new CustomEvent('loom:projects-updated'));
+    },
   };
 
   // Track streaming state to call onStreamStart once per stream

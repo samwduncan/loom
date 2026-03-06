@@ -3,10 +3,18 @@
  */
 
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { SessionList } from './SessionList';
 import { useTimelineStore } from '@/stores/timeline';
+
+// Track navigate calls
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
+  return { ...actual, useNavigate: () => mockNavigate };
+});
 
 // Mock the useSessionList hook to control loading state directly
 vi.mock('@/hooks/useSessionList', () => ({
@@ -34,6 +42,7 @@ function renderSessionList() {
 
 describe('SessionList', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     useTimelineStore.setState({
       sessions: [],
       activeSessionId: null,
@@ -111,5 +120,31 @@ describe('SessionList', () => {
     renderSessionList();
     const option = screen.getByRole('option');
     expect(option).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('navigates to /chat/:sessionId when session is clicked', async () => {
+    const user = userEvent.setup();
+    useTimelineStore.setState({
+      sessions: [
+        {
+          id: 'sess-nav',
+          title: 'Navigate Session',
+          messages: [],
+          providerId: 'claude',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+        },
+      ],
+      activeSessionId: null,
+      activeProviderId: 'claude',
+    });
+
+    renderSessionList();
+    const option = screen.getByRole('option');
+    await user.click(option);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/chat/sess-nav');
+    expect(useTimelineStore.getState().activeSessionId).toBe('sess-nav');
   });
 });

@@ -39,6 +39,7 @@ function createMockCallbacks(): MultiplexerCallbacks {
     onActiveSessions: vi.fn(),
     onTokenBudget: vi.fn(),
     onPermissionRequest: vi.fn(),
+    onProjectsUpdated: vi.fn(),
   };
 }
 
@@ -458,6 +459,21 @@ describe('routeServerMessage', () => {
     routeServerMessage(msg, cbs, sendFn);
 
     expect(cbs.onSessionStatus).toHaveBeenCalledWith('s1', 'claude', true);
+  });
+
+  it('routes projects_updated to onProjectsUpdated callback', () => {
+    const msg: ServerMessage = {
+      type: 'projects_updated',
+      projects: [],
+      timestamp: '2026-01-01T00:00:00Z',
+      changeType: 'update',
+      changedFile: 'test.ts',
+      watchProvider: 'fs',
+    };
+
+    routeServerMessage(msg, cbs, sendFn);
+
+    expect(cbs.onProjectsUpdated).toHaveBeenCalledOnce();
   });
 });
 

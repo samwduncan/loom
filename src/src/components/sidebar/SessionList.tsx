@@ -13,6 +13,7 @@
  */
 
 import { useState, useCallback, type MouseEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@/utils/cn';
 import { useTimelineStore } from '@/stores/timeline';
 import { useSessionList } from '@/hooks/useSessionList';
@@ -32,6 +33,7 @@ interface ContextMenuState {
 }
 
 export function SessionList() {
+  const navigate = useNavigate();
   const sessions = useTimelineStore((s) => s.sessions);
   const activeSessionId = useTimelineStore((s) => s.activeSessionId);
   const setActiveSession = useTimelineStore((s) => s.setActiveSession);
@@ -48,8 +50,9 @@ export function SessionList() {
   const handleSessionClick = useCallback(
     (sessionId: string) => {
       setActiveSession(sessionId);
+      navigate(`/chat/${sessionId}`);
     },
-    [setActiveSession],
+    [setActiveSession, navigate],
   );
 
   const handleContextMenu = useCallback(

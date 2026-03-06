@@ -10,7 +10,7 @@
  * Constitution: Named export (2.2), selector-only store access (4.2), no default export.
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { apiFetch } from '@/lib/api-client';
 import { transformBackendSession } from '@/lib/transformMessages';
 import type { BackendSessionData } from '@/lib/transformMessages';
@@ -43,6 +43,18 @@ export function useSessionList(): { isLoading: boolean; error: string | null } {
     sessionsRef.current = sessions;
   }, [sessions]);
 
+  // Refs for stable access from event listener (avoids setState in event-driven effect)
+  const projectNameRef = useRef(projectName);
+  useEffect(() => {
+    projectNameRef.current = projectName;
+  }, [projectName]);
+
+  const addSessionRef = useRef(addSession);
+  useEffect(() => {
+    addSessionRef.current = addSession;
+  }, [addSession]);
+
+  // Initial mount fetch -- inline async to satisfy react-hooks/set-state-in-effect
   useEffect(() => {
     if (projectLoading || !projectName) return;
 
@@ -78,6 +90,42 @@ export function useSessionList(): { isLoading: boolean; error: string | null } {
     void fetchSessions();
     return () => { cancelled = true; };
   }, [projectName, projectLoading, addSession]);
+
+  // Stable refetch function for event listener -- uses refs to avoid closure staling,
+  // does not call setState (background refresh, no loading/error UI state changes).
+  const refetchSessions = useCallback(async () => {
+    const name = projectNameRef.current;
+    if (!name) return;
+
+    try {
+      const data = await apiFetch<BackendSessionsResponse>(
+        `/api/projects/${encodeURIComponent(name)}/sessions?limit=999`,
+      );
+
+      const existingIds = new Set(sessionsRef.current.map((s) => s.id));
+
+      for (const backendSession of data.sessions) {
+        if (!existingIds.has(backendSession.id)) {
+          const session = transformBackendSession(backendSession);
+          addSessionRef.current(session);
+        }
+      }
+    } catch (err) {
+      console.error('useSessionList: refetch error:', err);
+    }
+  }, []);
+
+  // Listen for projects_updated WebSocket events to refetch session list
+  useEffect(() => {
+    const handleProjectsUpdated = () => {
+      void refetchSessions();
+    };
+
+    window.addEventListener('loom:projects-updated', handleProjectsUpdated);
+    return () => {
+      window.removeEventListener('loom:projects-updated', handleProjectsUpdated);
+    };
+  }, [refetchSessions]);
 
   return { isLoading, error };
 }

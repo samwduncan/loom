@@ -63,6 +63,7 @@ export interface MultiplexerCallbacks {
     input: unknown,
     sessionId: string | null,
   ) => void;
+  onProjectsUpdated: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -280,7 +281,7 @@ export function routeServerMessage(
       );
       break;
     case 'projects_updated':
-      // No-op in M1
+      callbacks.onProjectsUpdated();
       break;
     case 'loading_progress':
       // No-op in M1

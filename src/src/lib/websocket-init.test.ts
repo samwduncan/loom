@@ -78,8 +78,26 @@ vi.mock('@/lib/auth', () => ({
 }));
 
 // Mock multiplexer (we test multiplexer separately -- here we test wiring)
+const mockRouteServerMessage = vi.fn();
 vi.mock('@/lib/stream-multiplexer', () => ({
-  routeServerMessage: vi.fn(),
+  routeServerMessage: (...args: unknown[]) => mockRouteServerMessage(...args),
+}));
+
+// Mock timeline store for stub session reconciliation tests
+const mockAddSession = vi.fn();
+const mockRemoveSession = vi.fn();
+const mockSetActiveSession = vi.fn();
+const mockTimelineSessions: Array<{ id: string; title: string; messages: Array<{ id: string; role: string; content: string }>; providerId: string; createdAt: string; updatedAt: string; metadata: Record<string, unknown> }> = [];
+
+vi.mock('@/stores/timeline', () => ({
+  useTimelineStore: {
+    getState: () => ({
+      sessions: mockTimelineSessions,
+      addSession: mockAddSession,
+      removeSession: mockRemoveSession,
+      setActiveSession: mockSetActiveSession,
+    }),
+  },
 }));
 
 import { initializeWebSocket, _resetInitForTesting } from '@/lib/websocket-init';
@@ -253,6 +271,45 @@ describe('initializeWebSocket', () => {
       // Next response should trigger startStream again
       onMessage(responseMsg);
       expect(mockStartStream).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('projects_updated callback wiring', () => {
+    let onMessage: (msg: ServerMessage) => void;
+
+    beforeEach(async () => {
+      await initializeWebSocket();
+      const configCall = mockConfigure.mock.calls[0] as [{ onMessage: (msg: ServerMessage) => void; onStateChange: (state: ConnectionState) => void }];
+      onMessage = configCall[0].onMessage;
+    });
+
+    it('dispatches loom:projects-updated CustomEvent when projects_updated callback fires', () => {
+      const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+
+      // Send a non-claude-response message so routeServerMessage is called
+      const msg: ServerMessage = {
+        type: 'projects_updated',
+        projects: [],
+        timestamp: '2026-01-01T00:00:00Z',
+        changeType: 'update',
+        changedFile: 'test.ts',
+        watchProvider: 'fs',
+      };
+      onMessage(msg);
+
+      // routeServerMessage was called with the callbacks object
+      expect(mockRouteServerMessage).toHaveBeenCalled();
+      // Extract the callbacks argument (2nd arg to routeServerMessage)
+      const callArgs = mockRouteServerMessage.mock.calls[0] as [unknown, { onProjectsUpdated: () => void }, unknown];
+      const callbacks = callArgs[1];
+
+      // Manually invoke the callback to verify its wiring
+      callbacks.onProjectsUpdated();
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'loom:projects-updated' }),
+      );
+
+      dispatchSpy.mockRestore();
     });
   });
 
