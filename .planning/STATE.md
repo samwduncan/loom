@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 5 context gathered
-last_updated: "2026-03-06T00:17:28.825Z"
-last_activity: "2026-03-05 — Completed Plan 04-02: Store Tests + Persistence Documentation"
+status: in_progress
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-06T00:52:42Z"
+last_activity: "2026-03-06 — Completed Plan 05-01: WebSocket Type System + Client"
 progress:
   total_phases: 8
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
-  percent: 62
+  total_plans: 16
+  completed_plans: 11
+  percent: 69
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 4 complete — Phase 5 next (WebSocket Bridge)
+**Current focus:** Phase 5 in progress — WebSocket Bridge + Stream Multiplexer
 
 ## Current Position
 
-Phase: 4 of 8 (State Architecture) - COMPLETE
-Plan: 2 of 2 in current phase (2 complete)
-Status: Phase 4 complete. Phase 5 (WebSocket Bridge + Multiplexer) next — needs discuss-phase.
-Last activity: 2026-03-05 — Completed Plan 04-02: Store Tests + Persistence Documentation
+Phase: 5 of 8 (WebSocket Bridge + Stream Multiplexer) - IN PROGRESS
+Plan: 1 of 2 in current phase (1 complete)
+Status: Plan 05-01 complete (types + auth + WS client). Plan 05-02 next (multiplexer + init wiring).
+Last activity: 2026-03-06 — Completed Plan 05-01: WebSocket Type System + Client
 
-Progress: [██████░░░░] 62% (M1 plan 10 of 16)
+Progress: [██████▉░░░] 69% (M1 plan 11 of 16)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 5 min
-- Total execution time: 0.83 hours
+- Total execution time: 0.93 hours
 
 **By Phase:**
 
@@ -47,9 +47,10 @@ Progress: [██████░░░░] 62% (M1 plan 10 of 16)
 | 02 | 3 | 10 min | 3 min |
 | 03 | 2 | 10 min | 5 min |
 | 04 | 2 | 8 min | 4 min |
+| 05 | 1 | 6 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 5m, 4m, 6m, 4m, 4m
+- Last 5 plans: 4m, 6m, 4m, 4m, 6m
 - Trend: stable
 
 *Updated after each plan completion*
@@ -57,6 +58,7 @@ Progress: [██████░░░░] 62% (M1 plan 10 of 16)
 | Phase 03 P02 | 6 | 2 tasks | 6 files |
 | Phase 04 P01 | 4 | 3 tasks | 10 files |
 | Phase 04 P02 | 4 | 2 tasks | 6 files |
+| Phase 05 P01 | 6 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -102,6 +104,11 @@ Recent decisions affecting current work:
 - 04-01: Connection store initializes all three providers at default disconnected state from M1
 - 04-02: Test persistence via useTimelineStore.persist.getOptions().partialize — calls partialize directly to verify messages excluded
 - 04-02: Cross-store import ban uses no-restricted-imports scoped to store files (test files excluded)
+- 05-01: WebSocketClient uses callback injection (configure method) instead of direct store imports -- keeps network layer decoupled from React/Zustand
+- 05-01: handleClose reconnects from any non-disconnected state (not just connected/reconnecting) for robustness during reconnection failures
+- 05-01: disconnect() clears stored token to prevent phantom reconnects after explicit disconnect
+- 05-01: Content stream uses Set-based listener pattern with stream backlog buffer for late subscribers
+- 05-01: Exponential backoff increments before calculating delay: first retry at 2s (1000*2^1), not 1s
 
 ### Pending Todos
 
@@ -109,11 +116,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- Phase 5 research dependency: CloudCLI WebSocket message shapes for all three providers need auditing from server/index.js before Phase 5 planning
-- Phase 1 pre-check: Verify OKLCH values in CSS custom properties work with Tailwind v3.4 opacity modifier syntax
+- (RESOLVED) Phase 5 research dependency: CloudCLI WebSocket message shapes audited, types defined in websocket.ts
+- (RESOLVED) Phase 1 pre-check: OKLCH values verified working with Tailwind v4
 
 ## Session Continuity
 
-Last session: 2026-03-06T00:17:28.823Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-websocket-bridge-stream-multiplexer/05-CONTEXT.md
+Last session: 2026-03-06T00:52:42Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: .planning/phases/05-websocket-bridge-stream-multiplexer/05-01-SUMMARY.md

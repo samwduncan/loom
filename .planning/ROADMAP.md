@@ -98,7 +98,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — WebSocket type system (ServerMessage/ClientMessage unions), auth module (JWT auto-auth), WebSocket client singleton with reconnection state machine
+- [x] 05-01-PLAN.md — WebSocket type system (ServerMessage/ClientMessage unions), auth module (JWT auto-auth), WebSocket client singleton with reconnection state machine
 - [ ] 05-02-PLAN.md — Stream multiplexer pure functions + WS init wiring to Zustand stores
 
 ### Phase 6: Streaming Engine + Scroll Anchor
@@ -155,8 +155,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 1. Design Token System | 3/3 | Complete | 2026-03-05 |
 | 2. Enforcement + Testing | 3/3 | Complete | 2026-03-05 |
 | 3. App Shell + Error Boundaries | 2/2 | Complete | 2026-03-05 |
-| 4. State Architecture | 1/2 | In progress | - |
-| 5. WebSocket Bridge + Multiplexer | 0/2 | Not started | - |
+| 4. State Architecture | 2/2 | Complete | 2026-03-05 |
+| 5. WebSocket Bridge + Multiplexer | 1/2 | In progress | - |
 | 6. Streaming Engine + Scroll | 0/3 | Not started | - |
 | 7. Tool Registry + Proof of Life | 0/2 | Not started | - |
 | 8. Navigation + Sessions | 0/2 | Not started | - |

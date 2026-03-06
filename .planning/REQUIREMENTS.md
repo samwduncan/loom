@@ -72,7 +72,7 @@
 
 ### Streaming Infrastructure
 
-- [ ] **STRM-01**: Create `src/lib/websocket-client.ts` that establishes a WebSocket connection to `ws://<host>:<port>/ws?token=<jwt>`. The client must:
+- [x] **STRM-01**: Create `src/lib/websocket-client.ts` that establishes a WebSocket connection to `ws://<host>:<port>/ws?token=<jwt>`. The client must:
   - Handle connection lifecycle (connecting, connected, disconnected, reconnecting)
   - Auto-reconnect with exponential backoff (1s, 2s, 4s, 8s, max 30s)
   - Parse incoming messages as the discriminated union from BACKEND_API_CONTRACT.md (types: `claude-response`, `claude-complete`, `claude-error`, `claude-permission-request`, `claude-permission-cancelled`, `session-created`, `session-aborted`, `session-status`, `active-sessions`, `token-budget`, `projects_updated`)
@@ -224,7 +224,7 @@
 | STATE-03 | Phase 4: State Architecture | Complete |
 | STATE-04 | Phase 4: State Architecture | Complete |
 | STATE-05 | Phase 4: State Architecture | Complete |
-| STRM-01 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
+| STRM-01 | Phase 5: WebSocket Bridge + Multiplexer | Complete |
 | STRM-02 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
 | STRM-03 | Phase 6: Streaming Engine + Scroll | Pending |
 | COMP-02 | Phase 6: Streaming Engine + Scroll | Pending |
