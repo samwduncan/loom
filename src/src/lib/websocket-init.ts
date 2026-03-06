@@ -18,6 +18,14 @@ import { useConnectionStore } from '@/stores/connection';
 import { useStreamStore } from '@/stores/stream';
 import type { ServerMessage } from '@/types/websocket';
 
+/** Double-init guard — prevents multiple connections from React strict mode or re-mounts */
+let isInitialized = false;
+
+/** Reset the init guard — for tests only. */
+export function _resetInitForTesting(): void {
+  isInitialized = false;
+}
+
 /**
  * Initialize the WebSocket pipeline:
  * 1. Build multiplexer callbacks wired to stores
@@ -25,6 +33,8 @@ import type { ServerMessage } from '@/types/websocket';
  * 3. Bootstrap auth and connect
  */
 export async function initializeWebSocket(): Promise<void> {
+  if (isInitialized) return;
+  isInitialized = true;
   // Get store references outside React (getState pattern)
   const connectionStore = useConnectionStore.getState;
   const streamStore = useStreamStore.getState;

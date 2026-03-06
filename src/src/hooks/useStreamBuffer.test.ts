@@ -279,4 +279,106 @@ describe('useStreamBuffer', () => {
 
     expect(result.current.getText()).toBe('test');
   });
+
+  it('after checkpoint(), new text only paints characters received after the checkpoint', () => {
+    const textNode = document.createElement('span');
+    const textNodeRef = { current: textNode };
+    const onFlush = vi.fn();
+
+    const { result } = renderHook(() => useStreamBuffer({ textNodeRef, onFlush }));
+
+    const onToken = getTokenListener();
+    onToken('Before checkpoint');
+    flushRaf();
+
+    expect(textNode.textContent).toBe('Before checkpoint');
+
+    // Checkpoint -- new text should only show post-checkpoint characters
+    result.current.checkpoint();
+
+    onToken(' After checkpoint');
+    flushRaf();
+
+    expect(textNode.textContent).toBe(' After checkpoint');
+    // Full buffer still intact
+    expect(result.current.getText()).toBe('Before checkpoint After checkpoint');
+  });
+
+  it('multiple checkpoints work (simulating multiple tool call insertions)', () => {
+    const textNode1 = document.createElement('span');
+    const textNode2 = document.createElement('span');
+    const textNode3 = document.createElement('span');
+    const textNodeRef = { current: textNode1 };
+    const onFlush = vi.fn();
+
+    const { result } = renderHook(() => useStreamBuffer({ textNodeRef, onFlush }));
+
+    const onToken = getTokenListener();
+
+    // First span: "Hello "
+    onToken('Hello ');
+    flushRaf();
+    expect(textNode1.textContent).toBe('Hello ');
+
+    // Checkpoint, switch ref to second span
+    result.current.checkpoint();
+    textNodeRef.current = textNode2;
+
+    // Second span: "World "
+    onToken('World ');
+    flushRaf();
+    expect(textNode2.textContent).toBe('World ');
+    // First span should NOT have been overwritten
+    expect(textNode1.textContent).toBe('Hello ');
+
+    // Second checkpoint, switch ref to third span
+    result.current.checkpoint();
+    textNodeRef.current = textNode3;
+
+    // Third span: "!"
+    onToken('!');
+    flushRaf();
+    expect(textNode3.textContent).toBe('!');
+
+    // Full buffer is everything
+    expect(result.current.getText()).toBe('Hello World !');
+  });
+
+  it('getText returns full buffer after checkpoint (not sliced)', () => {
+    const textNode = document.createElement('span');
+    const textNodeRef = { current: textNode };
+    const onFlush = vi.fn();
+
+    const { result } = renderHook(() => useStreamBuffer({ textNodeRef, onFlush }));
+
+    const onToken = getTokenListener();
+    onToken('All text');
+    result.current.checkpoint();
+    onToken(' more text');
+
+    expect(result.current.getText()).toBe('All text more text');
+  });
+
+  it('onFlush still receives full buffer text after checkpoints', () => {
+    const textNode = document.createElement('span');
+    const textNodeRef = { current: textNode };
+    const onFlush = vi.fn();
+
+    const { rerender } = renderHook(() => useStreamBuffer({ textNodeRef, onFlush }));
+
+    const onToken = getTokenListener();
+    onToken('Part1');
+    flushRaf();
+
+    // Checkpoint
+    renderHook(() => useStreamBuffer({ textNodeRef, onFlush }));
+    onToken(' Part2');
+    flushRaf();
+
+    // Stream completes
+    isStreamingValue = false;
+    rerender();
+
+    expect(onFlush).toHaveBeenCalledWith('Part1 Part2');
+  });
 });

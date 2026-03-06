@@ -82,12 +82,13 @@ vi.mock('@/lib/stream-multiplexer', () => ({
   routeServerMessage: vi.fn(),
 }));
 
-import { initializeWebSocket } from '@/lib/websocket-init';
+import { initializeWebSocket, _resetInitForTesting } from '@/lib/websocket-init';
 
 describe('initializeWebSocket', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockBootstrapAuth.mockResolvedValue('test-token');
+    _resetInitForTesting();
   });
 
   it('calls bootstrapAuth then wsClient.connect with token', async () => {

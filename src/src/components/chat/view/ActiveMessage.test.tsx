@@ -2,7 +2,8 @@
  * ActiveMessage — Component tests for streaming message display.
  *
  * Tests the finalization lifecycle: streaming -> finalizing -> unmount,
- * timeline store flush, and mid-stream disconnect error display.
+ * timeline store flush, mid-stream disconnect error display, ThinkingDisclosure
+ * rendering, and multi-span tool call segment interleaving.
  *
  * Uses real Zustand stores (setState for setup, getState for assertions)
  * to avoid Zustand v5 useSyncExternalStore mock compatibility issues.
@@ -87,7 +88,7 @@ describe('ActiveMessage', () => {
 
     // Reset stores to known state using real Zustand stores
     act(() => {
-      useStreamStore.setState({ isStreaming: true });
+      useStreamStore.setState({ isStreaming: true, activeToolCalls: [], thinkingState: null });
       useTimelineStore.setState({
         sessions: [{
           id: 'test-session',
@@ -281,5 +282,58 @@ describe('ActiveMessage', () => {
       vi.advanceTimersByTime(500);
     });
     expect(onFinalizationComplete).not.toHaveBeenCalled();
+  });
+
+  it('ThinkingDisclosure renders when thinkingState is present', () => {
+    const onFinalizationComplete = vi.fn();
+
+    act(() => {
+      useStreamStore.setState({
+        thinkingState: {
+          isThinking: true,
+          blocks: [{ id: 'tb-1', text: 'Considering options...', isComplete: false }],
+        },
+      });
+    });
+
+    render(<ActiveMessage sessionId="test-session" onFinalizationComplete={onFinalizationComplete} />);
+
+    // ThinkingDisclosure should be visible
+    expect(screen.getByText('Thinking...')).toBeInTheDocument();
+    expect(screen.getByText('Considering options...')).toBeInTheDocument();
+  });
+
+  it('ThinkingDisclosure does not render when thinkingState is null', () => {
+    const onFinalizationComplete = vi.fn();
+    render(<ActiveMessage sessionId="test-session" onFinalizationComplete={onFinalizationComplete} />);
+
+    // No thinking elements should be in the DOM
+    expect(screen.queryByText('Thinking...')).not.toBeInTheDocument();
+  });
+
+  it('tool call segments appear when activeToolCalls are added to the store', () => {
+    const onFinalizationComplete = vi.fn();
+    render(<ActiveMessage sessionId="test-session" onFinalizationComplete={onFinalizationComplete} />);
+
+    sendToken('Before tool');
+    flushRaf();
+
+    // Add a tool call to the stream store
+    act(() => {
+      useStreamStore.getState().addToolCall({
+        id: 'tc-1',
+        toolName: 'Bash',
+        status: 'invoked',
+        input: { command: 'ls -la' },
+        output: null,
+        isError: false,
+        startedAt: '2026-01-01T00:00:00Z',
+        completedAt: null,
+      });
+    });
+
+    // ToolChip should be rendered for the tool call
+    const container = screen.getByTestId('active-message');
+    expect(container.textContent).toContain('Bash');
   });
 });

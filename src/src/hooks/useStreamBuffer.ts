@@ -27,12 +27,15 @@ export interface UseStreamBufferOptions {
 export interface UseStreamBufferReturn {
   /** Current accumulated text (read-only snapshot) */
   getText: () => string;
+  /** Checkpoint the buffer offset — new text paints only characters after this point */
+  checkpoint: () => void;
 }
 
 export function useStreamBuffer(options: UseStreamBufferOptions): UseStreamBufferReturn {
   const { textNodeRef, onFlush, onDisconnect } = options;
 
   const bufferRef = useRef('');
+  const bufferOffsetRef = useRef(0);
   const isActiveRef = useRef(false);
   const rafIdRef = useRef<number>(0);
   const disconnectFiredRef = useRef(false);
@@ -64,8 +67,8 @@ export function useStreamBuffer(options: UseStreamBufferOptions): UseStreamBuffe
 
     const paint = (): void => {
       const node = textNodeRefRef.current.current;
-      if (node && bufferRef.current) {
-        node.textContent = bufferRef.current;
+      if (node && bufferRef.current.length > bufferOffsetRef.current) {
+        node.textContent = bufferRef.current.slice(bufferOffsetRef.current);
       }
 
       // Check for disconnect: wsClient no longer streaming and disconnected
@@ -110,5 +113,9 @@ export function useStreamBuffer(options: UseStreamBufferOptions): UseStreamBuffe
 
   const getText = useCallback(() => bufferRef.current, []);
 
-  return { getText };
+  const checkpoint = useCallback(() => {
+    bufferOffsetRef.current = bufferRef.current.length;
+  }, []);
+
+  return { getText, checkpoint };
 }

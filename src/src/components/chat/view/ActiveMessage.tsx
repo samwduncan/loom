@@ -1,10 +1,12 @@
 /**
- * ActiveMessage — Streaming message display component.
+ * ActiveMessage — Multi-span streaming message display component.
  *
- * Uses useStreamBuffer for rAF-based token rendering. Manages a three-phase
- * lifecycle: streaming -> finalizing -> unmount signal. During finalization,
- * accumulated text flushes to the timeline store and the cursor + tint fade
- * out over the CSS transition duration before signaling the parent to unmount.
+ * Renders a segment array: text spans interleaved with ToolChip components.
+ * The rAF loop paints to the current active text span via useStreamBuffer.
+ * When a new tool call appears, the buffer is checkpointed and a new text
+ * span is appended after the tool chip.
+ *
+ * ThinkingDisclosure renders above the content segments.
  *
  * Constitution: Named export (2.2), contain:content (10.3), React.memo (perf).
  */
@@ -12,7 +14,11 @@
 import { memo, useRef, useCallback, useEffect, useState } from 'react';
 import { useStreamBuffer } from '@/hooks/useStreamBuffer';
 import { useTimelineStore } from '@/stores/timeline';
+import { useStreamStore } from '@/stores/stream';
+import { ToolChip } from '@/components/chat/tools/ToolChip';
+import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
 import type { Message } from '@/types/message';
+import type { ToolCallState } from '@/types/stream';
 import '../styles/streaming-cursor.css';
 
 export interface ActiveMessageProps {
@@ -22,21 +28,38 @@ export interface ActiveMessageProps {
   onFinalizationComplete: () => void;
 }
 
+type Segment =
+  | { type: 'text'; id: string }
+  | { type: 'tool'; toolCallId: string };
+
+let segmentCounter = 0;
+function nextSegmentId(): string {
+  return `seg-${++segmentCounter}`;
+}
+
 export const ActiveMessage = memo(function ActiveMessage(
   props: ActiveMessageProps,
 ): React.JSX.Element {
   const { sessionId, onFinalizationComplete } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLSpanElement>(null);
+  const currentTextRef = useRef<HTMLSpanElement | null>(null);
   const finalizationFiredRef = useRef(false);
+  const knownToolCountRef = useRef(0);
 
+  const [segments, setSegments] = useState<Segment[]>(() => [
+    { type: 'text', id: nextSegmentId() },
+  ]);
   const [phase, setPhase] = useState<'streaming' | 'finalizing'>('streaming');
   const [disconnected, setDisconnected] = useState(false);
 
   // Store actions via selectors — functions are referentially stable (Constitution 4.2)
   const addMessage = useTimelineStore((state) => state.addMessage);
   const addSession = useTimelineStore((state) => state.addSession);
+
+  // Stream store subscriptions
+  const thinkingState = useStreamStore((state) => state.thinkingState);
+  const toolCallCount = useStreamStore((state) => state.activeToolCalls.length);
 
   // Stable callback refs — synced via useEffect (react-hooks/refs compliance)
   const onFinalizationCompleteRef = useRef(onFinalizationComplete);
@@ -45,6 +68,15 @@ export const ActiveMessage = memo(function ActiveMessage(
   useEffect(() => {
     onFinalizationCompleteRef.current = onFinalizationComplete;
     sessionIdRef.current = sessionId;
+  });
+
+  // Mutable ref for textNodeRef that useStreamBuffer reads — we swap this
+  // to point at the latest text span when segments change
+  const textNodeRef = useRef<HTMLSpanElement | null>(null);
+
+  // Sync textNodeRef with currentTextRef in an effect (react-hooks/refs compliance)
+  useEffect(() => {
+    textNodeRef.current = currentTextRef.current;
   });
 
   const handleFlush = useCallback((text: string) => {
@@ -126,11 +158,61 @@ export const ActiveMessage = memo(function ActiveMessage(
     // Do NOT call onFinalizationComplete — component stays mounted with partial text
   }, []);
 
-  useStreamBuffer({
-    textNodeRef: textRef,
+  const { checkpoint } = useStreamBuffer({
+    textNodeRef,
     onFlush: handleFlush,
     onDisconnect: handleDisconnect,
   });
+
+  // Ref for checkpoint function to call from render body without stale closure
+  const checkpointRef = useRef(checkpoint);
+  useEffect(() => {
+    checkpointRef.current = checkpoint;
+  });
+
+  // Detect new tool calls in render body (React "adjusting state during rendering" pattern).
+  // This avoids the set-state-in-effect ESLint rule. React explicitly supports calling
+  // setState during render as long as it's guarded by a condition that prevents infinite loops.
+  if (toolCallCount > knownToolCountRef.current) {
+    // eslint-disable-next-line loom/no-external-store-mutation -- one-time read during render, not mutation
+    const allToolCalls = useStreamStore.getState().activeToolCalls;
+    const newToolCalls = allToolCalls.slice(knownToolCountRef.current);
+
+    // Checkpoint the buffer so the new span only gets new text
+    checkpointRef.current();
+
+    // Null out the text ref to signal span switch
+    currentTextRef.current = null;
+    textNodeRef.current = null;
+
+    // Build new segments
+    const newSegments: Segment[] = [];
+    for (const tc of newToolCalls) {
+      newSegments.push({ type: 'tool', toolCallId: tc.id });
+      newSegments.push({ type: 'text', id: nextSegmentId() });
+    }
+
+    setSegments((prev) => [...prev, ...newSegments]);
+    knownToolCountRef.current = toolCallCount;
+  }
+
+  // Ref callback for text spans — the LAST text span sets currentTextRef
+  const makeTextRefCallback = useCallback(
+    (segmentId: string) => (node: HTMLSpanElement | null) => {
+      // We need to check if this is the last text segment.
+      // Since ref callbacks fire on mount, we use a simple heuristic:
+      // store the node and its segment id, then always update currentTextRef.
+      // The last-rendered text span will be the latest to call this.
+      if (node) {
+        currentTextRef.current = node;
+        textNodeRef.current = node;
+      }
+      // When segmentId is referenced here, it keeps the callback unique per segment.
+      // This prevents React from reusing ref callbacks across spans.
+      void segmentId;
+    },
+    [],
+  );
 
   return (
     <div
@@ -139,7 +221,13 @@ export const ActiveMessage = memo(function ActiveMessage(
       data-phase={phase}
       data-testid="active-message"
     >
-      <span ref={textRef} />
+      <ThinkingDisclosure thinkingState={thinkingState} />
+      {segments.map((seg) => {
+        if (seg.type === 'text') {
+          return <span key={seg.id} ref={makeTextRefCallback(seg.id)} />;
+        }
+        return <ToolChipFromStore key={seg.toolCallId} toolCallId={seg.toolCallId} />;
+      })}
       <span className="streaming-cursor" data-testid="streaming-cursor" />
       {disconnected && (
         <div className="active-message-disconnect">
@@ -149,3 +237,16 @@ export const ActiveMessage = memo(function ActiveMessage(
     </div>
   );
 });
+
+/**
+ * ToolChipFromStore — looks up a tool call by ID from the stream store.
+ * Separated to isolate the store subscription per tool call.
+ */
+function ToolChipFromStore({ toolCallId }: { toolCallId: string }) {
+  const toolCall = useStreamStore((state) =>
+    state.activeToolCalls.find((tc: ToolCallState) => tc.id === toolCallId),
+  );
+
+  if (!toolCall) return null;
+  return <ToolChip toolCall={toolCall} />;
+}
