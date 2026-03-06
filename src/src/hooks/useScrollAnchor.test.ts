@@ -1,51 +1,70 @@
 /**
- * useScrollAnchor tests — IntersectionObserver sentinel-based scroll anchoring.
+ * useScrollAnchor tests -- IntersectionObserver sentinel-based scroll anchoring.
  *
  * Mocks: IntersectionObserver, requestAnimationFrame, useStreamStore.
  * Tests verify auto-scroll, disengage, re-engage, pill visibility, anti-oscillation.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import type { RefObject } from 'react';
 import { useScrollAnchor } from './useScrollAnchor';
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
 
-// Mock useStreamStore — module-level mock
+// Mock useStreamStore -- module-level mock
 let mockIsStreaming = false;
 vi.mock('@/stores/stream', () => ({
   useStreamStore: (selector: (state: { isStreaming: boolean }) => boolean) =>
     selector({ isStreaming: mockIsStreaming }),
 }));
 
-// IntersectionObserver mock
-let observerCallback: IntersectionObserverCallback;
-const mockObserve = vi.fn();
-const mockDisconnect = vi.fn();
+// IntersectionObserver mock -- capture callback per-instance
+type ObserverInstance = {
+  callback: IntersectionObserverCallback;
+  observe: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  unobserve: ReturnType<typeof vi.fn>;
+};
+let lastObserver: ObserverInstance | null = null;
 
+// Must use a constructor function so `new IntersectionObserver(...)` works
 vi.stubGlobal(
   'IntersectionObserver',
-  vi.fn().mockImplementation((cb: IntersectionObserverCallback) => {
-    observerCallback = cb;
-    return { observe: mockObserve, disconnect: mockDisconnect };
+  vi.fn(function MockIntersectionObserver(
+    this: ObserverInstance,
+    cb: IntersectionObserverCallback,
+  ) {
+    this.callback = cb;
+    this.observe = vi.fn();
+    this.disconnect = vi.fn();
+    this.unobserve = vi.fn();
+    // eslint-disable-next-line @typescript-eslint/no-this-alias -- constructor function pattern, `this` is the mock instance
+    lastObserver = this;
   }),
 );
 
-// rAF mock — collect callbacks for manual flushing
+// rAF mock -- collect callbacks for manual flushing
 let rafCallbacks: Array<{ id: number; cb: FrameRequestCallback }> = [];
 let rafIdCounter = 1;
 
-vi.stubGlobal('requestAnimationFrame', vi.fn((cb: FrameRequestCallback) => {
-  const id = rafIdCounter++;
-  rafCallbacks.push({ id, cb });
-  return id;
-}));
+vi.stubGlobal(
+  'requestAnimationFrame',
+  vi.fn((cb: FrameRequestCallback) => {
+    const id = rafIdCounter++;
+    rafCallbacks.push({ id, cb });
+    return id;
+  }),
+);
 
-vi.stubGlobal('cancelAnimationFrame', vi.fn((id: number) => {
-  rafCallbacks = rafCallbacks.filter((entry) => entry.id !== id);
-}));
+vi.stubGlobal(
+  'cancelAnimationFrame',
+  vi.fn((id: number) => {
+    rafCallbacks = rafCallbacks.filter((entry) => entry.id !== id);
+  }),
+);
 
 function flushOneRaf(): void {
   const entry = rafCallbacks.shift();
@@ -56,29 +75,41 @@ function flushOneRaf(): void {
 
 // Sentinel mock with scrollIntoView
 const mockScrollIntoView = vi.fn();
-const mockSentinel = {
-  scrollIntoView: mockScrollIntoView,
-} as unknown as HTMLDivElement;
-
-// Scroll container mock
-const mockScrollContainer = document.createElement('div');
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function createScrollContainerRef() {
-  return { current: mockScrollContainer };
+/**
+ * Creates a scroll container ref and a sentinel element, then calls the
+ * callback ref to wire up the sentinel -- triggering the observer effect.
+ */
+function setupHook(streaming = false) {
+  mockIsStreaming = streaming;
+
+  const scrollContainer = document.createElement('div');
+  const scrollContainerRef = {
+    current: scrollContainer,
+  } as RefObject<HTMLElement | null>;
+
+  const hookResult = renderHook(() => useScrollAnchor(scrollContainerRef));
+
+  // Create sentinel element and call the callback ref to wire it up
+  const sentinel = document.createElement('div');
+  sentinel.scrollIntoView = mockScrollIntoView;
+
+  // Call the callback ref to attach the sentinel -- triggers observer setup
+  act(() => {
+    hookResult.result.current.sentinelRef(sentinel);
+  });
+
+  return { ...hookResult, sentinel, scrollContainer, scrollContainerRef };
 }
 
 function triggerObserver(isIntersecting: boolean): void {
+  if (!lastObserver) throw new Error('No IntersectionObserver created');
   const entry = { isIntersecting } as IntersectionObserverEntry;
-  // We need to get the observer instance for the second arg
-  const observer = {
-    observe: mockObserve,
-    disconnect: mockDisconnect,
-  } as unknown as IntersectionObserver;
-  observerCallback([entry], observer);
+  lastObserver.callback([entry], {} as unknown as IntersectionObserver);
 }
 
 // ---------------------------------------------------------------------------
@@ -88,40 +119,33 @@ function triggerObserver(isIntersecting: boolean): void {
 describe('useScrollAnchor', () => {
   beforeEach(() => {
     mockIsStreaming = false;
+    lastObserver = null;
     rafCallbacks = [];
     rafIdCounter = 1;
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('provides a sentinelRef for attaching to bottom of scroll container', () => {
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
+  it('provides a sentinelRef callback for attaching to scroll container', () => {
+    const scrollContainerRef = {
+      current: document.createElement('div'),
+    } as RefObject<HTMLElement | null>;
+    const { result } = renderHook(() => useScrollAnchor(scrollContainerRef));
     expect(result.current.sentinelRef).toBeDefined();
-    expect(result.current.sentinelRef.current).toBeNull(); // initially unattached
+    expect(typeof result.current.sentinelRef).toBe('function');
   });
 
   it('isAtBottom is true initially (sentinel assumed visible)', () => {
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
+    const scrollContainerRef = {
+      current: document.createElement('div'),
+    } as RefObject<HTMLElement | null>;
+    const { result } = renderHook(() => useScrollAnchor(scrollContainerRef));
     expect(result.current.isAtBottom).toBe(true);
   });
 
   it('isAtBottom becomes false when observer reports sentinel not intersecting', () => {
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
+    const { result } = setupHook();
 
-    // Attach sentinel to DOM mock
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
+    expect(lastObserver).not.toBeNull();
 
     act(() => {
       triggerObserver(false);
@@ -131,14 +155,7 @@ describe('useScrollAnchor', () => {
   });
 
   it('isAtBottom becomes true when observer reports sentinel intersecting', () => {
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
-
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
+    const { result } = setupHook();
 
     act(() => {
       triggerObserver(false);
@@ -152,33 +169,18 @@ describe('useScrollAnchor', () => {
   });
 
   it('showPill is true when isAtBottom is false AND isStreaming is true', () => {
-    mockIsStreaming = true;
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
+    const { result, scrollContainer } = setupHook(true);
 
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
-
+    // User scrolls up via wheel event -- disengages auto-scroll
     act(() => {
-      triggerObserver(false);
+      scrollContainer.dispatchEvent(new Event('wheel'));
     });
 
     expect(result.current.showPill).toBe(true);
   });
 
   it('showPill is false when not streaming (even if scrolled up)', () => {
-    mockIsStreaming = false;
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
-
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
+    const { result } = setupHook(false);
 
     act(() => {
       triggerObserver(false);
@@ -188,14 +190,7 @@ describe('useScrollAnchor', () => {
   });
 
   it('scrollToBottom calls scrollIntoView on sentinel with smooth behavior', () => {
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
-
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
+    const { result } = setupHook();
 
     act(() => {
       result.current.scrollToBottom();
@@ -208,14 +203,7 @@ describe('useScrollAnchor', () => {
   });
 
   it('scrollToBottom sets isAtBottom to true (re-engages auto-scroll)', () => {
-    const { result } = renderHook(() =>
-      useScrollAnchor(createScrollContainerRef()),
-    );
-
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
+    const { result } = setupHook();
 
     // Scroll away first
     act(() => {
@@ -231,20 +219,12 @@ describe('useScrollAnchor', () => {
   });
 
   it('auto-scroll rAF loop runs when isStreaming AND isAtBottom', () => {
-    mockIsStreaming = true;
-
-    const ref = createScrollContainerRef();
-    const { result } = renderHook(() => useScrollAnchor(ref));
-
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
+    setupHook(true);
 
     // rAF should have been scheduled (auto-scroll active)
     expect(rafCallbacks.length).toBeGreaterThan(0);
 
-    // Flush one frame — sentinel.scrollIntoView should be called
+    // Flush one frame -- sentinel.scrollIntoView should be called
     act(() => {
       flushOneRaf();
     });
@@ -252,41 +232,27 @@ describe('useScrollAnchor', () => {
     expect(mockScrollIntoView).toHaveBeenCalledWith({ block: 'end' });
   });
 
-  it('auto-scroll rAF loop stops when isAtBottom becomes false (user scrolled up)', () => {
-    mockIsStreaming = true;
+  it('auto-scroll rAF loop stops when user scrolls up via wheel event', () => {
+    const { result, scrollContainer } = setupHook(true);
 
-    const ref = createScrollContainerRef();
-    const { result } = renderHook(() => useScrollAnchor(ref));
-
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
-
-    // Simulate user scroll up — disengage
+    // User scrolls up via wheel event -- disengages auto-scroll
     act(() => {
-      triggerObserver(false);
+      scrollContainer.dispatchEvent(new Event('wheel'));
     });
+    expect(result.current.isAtBottom).toBe(false);
 
-    // Clear any pending rAF callbacks from before disengage
+    // Clear any previous state
     mockScrollIntoView.mockClear();
     rafCallbacks = [];
 
-    // No new rAF should be scheduled for auto-scroll
+    // No new rAF should be scheduled for auto-scroll after disengage
     expect(rafCallbacks.length).toBe(0);
   });
 
   it('when isStreaming transitions to true, isAtBottom resets to true', () => {
-    mockIsStreaming = false;
-    const ref = createScrollContainerRef();
-    const { result, rerender } = renderHook(() => useScrollAnchor(ref));
+    // Start not streaming, scroll away
+    const { result, rerender } = setupHook(false);
 
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
-
-    // Scroll away
     act(() => {
       triggerObserver(false);
     });
@@ -300,16 +266,9 @@ describe('useScrollAnchor', () => {
   });
 
   it('observer does NOT set isAtBottom=false during auto-scroll (anti-oscillation guard)', () => {
-    mockIsStreaming = true;
-    const ref = createScrollContainerRef();
-    const { result } = renderHook(() => useScrollAnchor(ref));
+    const { result } = setupHook(true);
 
-    Object.defineProperty(result.current.sentinelRef, 'current', {
-      value: mockSentinel,
-      writable: true,
-    });
-
-    // Auto-scroll is active (isStreaming && isAtBottom). Flush a frame to enter active state.
+    // Auto-scroll is active (isStreaming && isAtBottom). Flush a frame to confirm.
     act(() => {
       flushOneRaf();
     });
@@ -325,11 +284,11 @@ describe('useScrollAnchor', () => {
   });
 
   it('observer cleans up on unmount', () => {
-    const ref = createScrollContainerRef();
-    const { unmount } = renderHook(() => useScrollAnchor(ref));
+    const { unmount } = setupHook();
 
+    expect(lastObserver).not.toBeNull();
     unmount();
 
-    expect(mockDisconnect).toHaveBeenCalled();
+    expect(lastObserver!.disconnect).toHaveBeenCalled(); // ASSERT: lastObserver verified not-null by expect().not.toBeNull() above
   });
 });
