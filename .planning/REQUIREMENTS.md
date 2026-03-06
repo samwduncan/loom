@@ -80,7 +80,7 @@
   - Update the `connection` Zustand store on every state change
   - Verify: connect to backend, send a hardcoded prompt, receive streaming response — all message types logged correctly.
 
-- [ ] **STRM-02**: Implement Stream Multiplexer in the WebSocket client that routes incoming `claude-response` messages into separate channels:
+- [x] **STRM-02**: Implement Stream Multiplexer in the WebSocket client that routes incoming `claude-response` messages into separate channels:
   - Content channel: text tokens for the response body
   - Thinking channel: thinking/reasoning block content
   - Tool channel: tool use and tool result events
@@ -225,7 +225,7 @@
 | STATE-04 | Phase 4: State Architecture | Complete |
 | STATE-05 | Phase 4: State Architecture | Complete |
 | STRM-01 | Phase 5: WebSocket Bridge + Multiplexer | Complete |
-| STRM-02 | Phase 5: WebSocket Bridge + Multiplexer | Pending |
+| STRM-02 | Phase 5: WebSocket Bridge + Multiplexer | Complete |
 | STRM-03 | Phase 6: Streaming Engine + Scroll | Pending |
 | COMP-02 | Phase 6: Streaming Engine + Scroll | Pending |
 | COMP-03 | Phase 6: Streaming Engine + Scroll | Pending |

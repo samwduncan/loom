@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Enforcement + Testing Infrastructure** - ESLint Constitution rules, TypeScript strict mode, Vitest setup, and pre-commit gates that block violations from commit #1
 - [ ] **Phase 3: App Shell + Error Boundaries** - CSS Grid layout, 100dvh viewport lock, route structure, and 3-tier error boundary hierarchy
 - [ ] **Phase 4: State Architecture** - Four Zustand stores (timeline, stream, ui, connection) with full TypeScript interfaces, selector-only enforcement, and persistence
-- [ ] **Phase 5: WebSocket Bridge + Stream Multiplexer** - WebSocket client with reconnection, typed message discrimination, and channel routing for content/thinking/tool streams
+- [x] **Phase 5: WebSocket Bridge + Stream Multiplexer** - WebSocket client with reconnection, typed message discrimination, and channel routing for content/thinking/tool streams (completed 2026-03-06)
 - [ ] **Phase 6: Streaming Engine + Scroll Anchor** - useRef + rAF token buffer bypassing React reconciler, ActiveMessage component, and IntersectionObserver scroll anchoring
 - [ ] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end
 - [ ] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing
@@ -95,7 +95,7 @@ Plans:
   1. The WebSocket client connects to `ws://<host>:<port>/ws?token=<jwt>`, auto-reconnects with exponential backoff (1s/2s/4s/8s/max 30s), and updates the connection store on every state change
   2. Sending a hardcoded prompt via WebSocket produces a streaming response where all incoming message types (`claude-response`, `claude-complete`, `claude-error`, etc.) are parsed and logged correctly
   3. The stream multiplexer routes content tokens to a `useRef` buffer (not React state), thinking content to the stream store's `thinkingState`, and tool events to the stream store's `activeToolCalls`
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 05-01-PLAN.md — WebSocket type system (ServerMessage/ClientMessage unions), auth module (JWT auto-auth), WebSocket client singleton with reconnection state machine
@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 2. Enforcement + Testing | 3/3 | Complete | 2026-03-05 |
 | 3. App Shell + Error Boundaries | 2/2 | Complete | 2026-03-05 |
 | 4. State Architecture | 2/2 | Complete | 2026-03-05 |
-| 5. WebSocket Bridge + Multiplexer | 1/2 | In progress | - |
+| 5. WebSocket Bridge + Multiplexer | 2/2 | Complete   | 2026-03-06 |
 | 6. Streaming Engine + Scroll | 0/3 | Not started | - |
 | 7. Tool Registry + Proof of Life | 0/2 | Not started | - |
 | 8. Navigation + Sessions | 0/2 | Not started | - |

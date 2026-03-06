@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in_progress
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-06T00:52:42Z"
-last_activity: "2026-03-06 — Completed Plan 05-01: WebSocket Type System + Client"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-06T01:02:38Z"
+last_activity: "2026-03-06 — Completed Plan 05-02: Stream Multiplexer + Init Wiring"
 progress:
   total_phases: 8
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 16
-  completed_plans: 11
-  percent: 69
+  completed_plans: 12
+  percent: 75
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 5 in progress — WebSocket Bridge + Stream Multiplexer
+**Current focus:** Phase 5 complete — WebSocket Bridge + Stream Multiplexer. Phase 6 next.
 
 ## Current Position
 
-Phase: 5 of 8 (WebSocket Bridge + Stream Multiplexer) - IN PROGRESS
-Plan: 1 of 2 in current phase (1 complete)
-Status: Plan 05-01 complete (types + auth + WS client). Plan 05-02 next (multiplexer + init wiring).
-Last activity: 2026-03-06 — Completed Plan 05-01: WebSocket Type System + Client
+Phase: 6 of 8 — next up
+Plan: 0 of ? in current phase (phase 5 complete, 2/2 plans done)
+Status: Phase 5 complete (WS types + auth + client + multiplexer + init wiring). Phase 6 next (Streaming UI).
+Last activity: 2026-03-06 — Completed Plan 05-02: Stream Multiplexer + Init Wiring
 
-Progress: [██████▉░░░] 69% (M1 plan 11 of 16)
+Progress: [███████▌░░] 75% (M1 plan 12 of 16)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 5 min
-- Total execution time: 0.93 hours
+- Total execution time: 1.03 hours
 
 **By Phase:**
 
@@ -47,10 +47,10 @@ Progress: [██████▉░░░] 69% (M1 plan 11 of 16)
 | 02 | 3 | 10 min | 3 min |
 | 03 | 2 | 10 min | 5 min |
 | 04 | 2 | 8 min | 4 min |
-| 05 | 1 | 6 min | 6 min |
+| 05 | 2 | 12 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 4m, 6m, 4m, 4m, 6m
+- Last 5 plans: 6m, 4m, 4m, 6m, 6m
 - Trend: stable
 
 *Updated after each plan completion*
@@ -59,6 +59,7 @@ Progress: [██████▉░░░] 69% (M1 plan 11 of 16)
 | Phase 04 P01 | 4 | 3 tasks | 10 files |
 | Phase 04 P02 | 4 | 2 tasks | 6 files |
 | Phase 05 P01 | 6 | 2 tasks | 5 files |
+| Phase 05 P02 | 6 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,10 @@ Recent decisions affecting current work:
 - 05-01: disconnect() clears stored token to prevent phantom reconnects after explicit disconnect
 - 05-01: Content stream uses Set-based listener pattern with stream backlog buffer for late subscribers
 - 05-01: Exponential backoff increments before calculating delay: first retry at 2s (1000*2^1), not 1s
+- 05-02: Multiplexer is pure functions with zero store/React imports -- fully testable with mock callbacks
+- 05-02: ESLint override for websocket-init.ts allows getState() in infrastructure wiring module (not a component)
+- 05-02: Mid-stream disconnect preserves partial content by not calling endStream, only setting error message
+- 05-02: Stream lifecycle tracked via closure boolean in websocket-init, not in multiplexer (stateless)
 
 ### Pending Todos
 
@@ -121,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T00:52:42Z
-Stopped at: Completed 05-01-PLAN.md
-Resume file: .planning/phases/05-websocket-bridge-stream-multiplexer/05-01-SUMMARY.md
+Last session: 2026-03-06T01:02:38Z
+Stopped at: Completed 05-02-PLAN.md
+Resume file: .planning/phases/05-websocket-bridge-stream-multiplexer/05-02-SUMMARY.md
