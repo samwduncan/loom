@@ -17,7 +17,7 @@ Sidebar with grouped session list, session switching with message loading, URL-d
 - **Layout:** 2-line compact rows. Line 1: session title (truncated to 1 line). Line 2: relative timestamp ("2m ago", "1h ago") + small provider logo
 - **Active session:** 3px left border in `--accent-primary` (dusty rose). No background tint on active -- the border is the only indicator
 - **Hover state:** Subtle background shift via `color-mix(in oklch, var(--text-muted) 5%, var(--surface-raised))`. Transition: `background-color var(--duration-fast) var(--ease-out)`. Cursor: pointer
-- **Provider icon:** Small SVG logos for each provider (Claude, Gemini, Codex). Can use Unicode/emoji placeholders in initial implementation and swap for real logos later
+- **Provider icon:** Small inline SVG logos for each provider (Claude, Gemini, Codex). NO emoji/Unicode placeholders -- hardcoded SVG paths from the start (Architect mandate: emoji rots visual authority)
 - **Context menu:** Right-click opens context menu with "Rename" and "Delete" options. Backend supports `DELETE /api/projects/:project/sessions/:id`
 - **Title truncation:** Single line, CSS `text-overflow: ellipsis`
 
@@ -46,7 +46,8 @@ Sidebar with grouped session list, session switching with message loading, URL-d
 - **Tool calls from history:** Rendered as collapsed ToolChip components using Phase 7 registry
 - **User messages:** Right-aligned bubble with `--accent-primary-muted` background. Compact, chat-style
 - **Assistant messages:** Left-aligned, full-width, no background bubble. Document-style reading
-- **Loading state (message fetch):** 3-4 shimmer skeleton rectangles mimicking message shapes. Left-to-right gradient sweep animation. Uses `--surface-overlay` on `--surface-base`
+- **CRITICAL: Unified message container:** Historical `AssistantMessage` and streaming `ActiveMessage` MUST share the exact same CSS layout wrapper (padding, line-height, spacing tokens). Any pixel difference causes scroll jitter during the finalization handshake (COMP-03). Use a shared `MessageContainer` component or shared CSS class.
+- **Loading state (message fetch):** 3-4 shimmer skeleton rectangles mimicking message shapes. Left-to-right gradient sweep animation. Uses `--surface-overlay` on `--surface-base`. Skeletons MUST use the same `--space-*` tokens as real messages to prevent CLS (Constitution 10.2)
 
 ### Session list fetching
 - **Strategy:** Load all sessions for the current project on sidebar mount (`GET /api/projects/:proj/sessions?limit=999`). No pagination complexity in M1
@@ -58,6 +59,7 @@ Sidebar with grouped session list, session switching with message loading, URL-d
 - **Abort-and-switch:** If streaming, send abort signal, reset stream store, then switch
 - **Memory caching:** Messages kept in memory across session switches. Switching back is instant (no re-fetch). Memory cleared on page reload
 - **Coordination:** `useSessionSwitch` hook coordinates `stream.reset()` + `timeline.setActiveSession()` + message loading. Stores stay independent
+- **Race condition protection:** `useSessionSwitch` MUST use `AbortController` to cancel pending message fetches when switching sessions rapidly. Prevents "wrong session data" race condition where a slow fetch for session A resolves after session B is already active
 
 ### Claude's Discretion
 - Shimmer skeleton CSS animation implementation details
@@ -68,6 +70,13 @@ Sidebar with grouped session list, session switching with message loading, URL-d
 - Whether to add a `loadMessages` action to timeline store or keep it in the hook
 - How to wire the composer to the existing WebSocket pipeline (reuse proof-of-life pattern or abstract further)
 - Exact skeleton shimmer count, widths, and spacing
+
+### Architect Mandates (non-negotiable)
+- Sidebar MUST be split into subcomponents: `SessionList`, `SessionItem`, `DateGroupHeader` (Constitution 2.4 -- current Sidebar.tsx is 92 lines, adding all features would exceed 200-line limit)
+- SVG provider logos, not emoji (quality bar)
+- Unified CSS container for streaming + historical assistant messages (scroll jitter prevention)
+- AbortController on session switch fetches (race condition protection)
+- Skeleton spacing tokens must match real message tokens (CLS prevention)
 
 </decisions>
 
