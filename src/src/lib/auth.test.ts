@@ -33,11 +33,15 @@ const mockFetch = vi.fn<(input: string | URL | Request, init?: RequestInit) => P
 beforeEach(() => {
   vi.stubGlobal('localStorage', localStorageMock);
   vi.stubGlobal('fetch', mockFetch);
+  import.meta.env.VITE_AUTH_USERNAME = 'admin';
+  import.meta.env.VITE_AUTH_PASSWORD = 'admin123';
   mockStorage.clear();
   vi.clearAllMocks();
 });
 
 afterEach(() => {
+  delete import.meta.env.VITE_AUTH_USERNAME;
+  delete import.meta.env.VITE_AUTH_PASSWORD;
   vi.unstubAllGlobals();
 });
 
@@ -120,6 +124,16 @@ describe('bootstrapAuth', () => {
     // Verify login was called
     const loginCall = mockFetch.mock.calls[1];
     expect(loginCall?.[0]).toBe('/api/auth/login');
+  });
+
+  it('throws when env credentials are missing', async () => {
+    delete import.meta.env.VITE_AUTH_USERNAME;
+    delete import.meta.env.VITE_AUTH_PASSWORD;
+
+    await expect(bootstrapAuth()).rejects.toThrow(
+      'VITE_AUTH_USERNAME and VITE_AUTH_PASSWORD must be set',
+    );
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it('throws on failed login', async () => {

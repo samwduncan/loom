@@ -35,8 +35,14 @@ export async function bootstrapAuth(): Promise<string> {
   const existing = getToken();
   if (existing) return existing;
 
-  const username = import.meta.env.VITE_AUTH_USERNAME ?? 'admin';
-  const password = import.meta.env.VITE_AUTH_PASSWORD ?? 'admin123';
+  const username = import.meta.env.VITE_AUTH_USERNAME;
+  const password = import.meta.env.VITE_AUTH_PASSWORD;
+
+  if (!username || !password) {
+    throw new Error(
+      'VITE_AUTH_USERNAME and VITE_AUTH_PASSWORD must be set in environment',
+    );
+  }
 
   const statusRes = await fetch('/api/auth/status');
   const status = (await statusRes.json()) as { needsSetup: boolean };

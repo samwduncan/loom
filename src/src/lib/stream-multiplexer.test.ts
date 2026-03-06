@@ -521,4 +521,10 @@ describe('getToolActivityText', () => {
     expect(getToolActivityText('Bash', {})).toBe('Running...');
     expect(getToolActivityText('Grep', {})).toBe('Searching...');
   });
+
+  it('strips ANSI escape codes from Bash commands', () => {
+    expect(
+      getToolActivityText('Bash', { command: '\x1b[32mnpm test\x1b[0m' }),
+    ).toBe('Running npm test...');
+  });
 });

@@ -167,23 +167,23 @@ describe('auto-reconnect', () => {
     client.connect('test-token');
     getLastWS().simulateOpen();
 
-    // First abnormal close: attempts 0->1, delay = 1000 * 2^1 = 2000ms
+    // First abnormal close: delay = 1000 * 2^0 = 1000ms, then attempts 0->1
     getLastWS().simulateClose(1006);
 
     expect(MockWebSocket.instances).toHaveLength(1); // no reconnect yet
-    vi.advanceTimersByTime(1999);
+    vi.advanceTimersByTime(999);
     expect(MockWebSocket.instances).toHaveLength(1); // still waiting
     vi.advanceTimersByTime(1);
-    expect(MockWebSocket.instances).toHaveLength(2); // reconnected at 2000ms
+    expect(MockWebSocket.instances).toHaveLength(2); // reconnected at 1000ms
 
     // Don't open -- simulate another close immediately (attempts still climbing)
     // The reconnect creates a new WS. Close it without opening.
-    getLastWS().simulateClose(1006); // attempts 1->2, delay = 1000 * 2^2 = 4000ms
+    getLastWS().simulateClose(1006); // delay = 1000 * 2^1 = 2000ms, then attempts 1->2
 
-    vi.advanceTimersByTime(3999);
+    vi.advanceTimersByTime(1999);
     expect(MockWebSocket.instances).toHaveLength(2); // not yet
     vi.advanceTimersByTime(1);
-    expect(MockWebSocket.instances).toHaveLength(3); // reconnected at 4000ms
+    expect(MockWebSocket.instances).toHaveLength(3); // reconnected at 2000ms
   });
 
   it('caps reconnect delay at 30 seconds', () => {
@@ -192,16 +192,18 @@ describe('auto-reconnect', () => {
 
     // Simulate many failed reconnection cycles (close without opening)
     // to push attempts past the 30s cap threshold.
-    // attempts: 0->1 (2s), 1->2 (4s), 2->3 (8s), 3->4 (16s), 4->5 (32s->capped at 30s)
-    getLastWS().simulateClose(1006); // attempt 1: 2s
+    // delay sequence: 1s, 2s, 4s, 8s, 16s, 32s->capped at 30s
+    getLastWS().simulateClose(1006); // delay 1s
+    vi.advanceTimersByTime(1000);
+    getLastWS().simulateClose(1006); // delay 2s
     vi.advanceTimersByTime(2000);
-    getLastWS().simulateClose(1006); // attempt 2: 4s
+    getLastWS().simulateClose(1006); // delay 4s
     vi.advanceTimersByTime(4000);
-    getLastWS().simulateClose(1006); // attempt 3: 8s
+    getLastWS().simulateClose(1006); // delay 8s
     vi.advanceTimersByTime(8000);
-    getLastWS().simulateClose(1006); // attempt 4: 16s
+    getLastWS().simulateClose(1006); // delay 16s
     vi.advanceTimersByTime(16_000);
-    getLastWS().simulateClose(1006); // attempt 5: 32s -> capped at 30s
+    getLastWS().simulateClose(1006); // delay 32s -> capped at 30s
 
     const countBefore = MockWebSocket.instances.length;
     vi.advanceTimersByTime(29_999);
@@ -216,12 +218,12 @@ describe('auto-reconnect', () => {
 
     // Trigger reconnect cycle
     getLastWS().simulateClose(1006);
-    vi.advanceTimersByTime(2000); // first reconnect at 2s
+    vi.advanceTimersByTime(1000); // first reconnect at 1s
     getLastWS().simulateOpen();
 
-    // After a successful connect, next close should use initial backoff (2s, not 4s)
+    // After a successful connect, next close should use initial backoff (1s, not 2s)
     getLastWS().simulateClose(1006);
-    vi.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(1000);
     expect(MockWebSocket.instances.length).toBeGreaterThanOrEqual(3);
   });
 });
@@ -444,7 +446,7 @@ describe('onStateChange callback', () => {
     getLastWS().simulateClose(1006);
     expect(onStateChange).toHaveBeenCalledWith('reconnecting');
 
-    vi.advanceTimersByTime(2000);
+    vi.advanceTimersByTime(1000);
     expect(onStateChange).toHaveBeenCalledWith('connecting');
 
     getLastWS().simulateOpen();

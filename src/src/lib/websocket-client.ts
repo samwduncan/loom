@@ -219,12 +219,12 @@ export class WebSocketClient {
 
   private scheduleReconnect(): void {
     this.setState('reconnecting');
-    this.reconnectAttempts++;
 
     const delay = Math.min(
       1000 * Math.pow(2, this.reconnectAttempts),
       this.maxReconnectDelay,
     );
+    this.reconnectAttempts++;
 
     this.reconnectTimer = setTimeout(() => {
       this.reconnect();

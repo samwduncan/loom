@@ -83,6 +83,14 @@ const READ_ONLY_TOOLS = new Set([
 // ---------------------------------------------------------------------------
 
 /**
+ * Strip ANSI escape codes from a string (terminal colors, cursor moves, etc.).
+ */
+function stripAnsi(str: string): string {
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+}
+
+/**
  * Generate semantic activity text from a tool name and its input.
  * Input fields may be missing -- handles gracefully with fallback.
  */
@@ -93,7 +101,7 @@ export function getToolActivityText(
   const filePath =
     typeof input.file_path === 'string' ? input.file_path : undefined;
   const command =
-    typeof input.command === 'string' ? input.command : undefined;
+    typeof input.command === 'string' ? stripAnsi(input.command) : undefined;
   const pattern =
     typeof input.pattern === 'string' ? input.pattern : undefined;
   const url = typeof input.url === 'string' ? input.url : undefined;
