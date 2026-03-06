@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: WebSocket Bridge + Stream Multiplexer** - WebSocket client with reconnection, typed message discrimination, and channel routing for content/thinking/tool streams (completed 2026-03-06)
 - [ ] **Phase 6: Streaming Engine + Scroll Anchor** - useRef + rAF token buffer bypassing React reconciler, ActiveMessage component, and IntersectionObserver scroll anchoring
 - [x] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end (completed 2026-03-06)
-- [ ] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing
+- [x] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing (completed 2026-03-06)
 
 ## Phase Details
 
@@ -138,7 +138,7 @@ Plans:
   2. Clicking a session updates the URL to `/chat/:sessionId`, triggers a message fetch, shows a loading skeleton during the fetch, and displays loaded messages in the content area
   3. The "New Chat" button creates a new session and navigates to it
   4. The sidebar has `role="complementary"` and `aria-label="Chat sessions"` for accessibility
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 08-01-PLAN.md — Sidebar session list, date grouping, provider logos, shared infrastructure (API client, transforms, MessageContainer)
@@ -158,4 +158,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. WebSocket Bridge + Multiplexer | 2/2 | Complete   | 2026-03-06 |
 | 6. Streaming Engine + Scroll | 2/2 | Complete | 2026-03-06 |
 | 7. Tool Registry + Proof of Life | 2/2 | Complete   | 2026-03-06 |
-| 8. Navigation + Sessions | 0/2 | Not started | - |
+| 8. Navigation + Sessions | 2/2 | Complete   | 2026-03-06 |

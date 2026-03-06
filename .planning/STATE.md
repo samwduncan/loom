@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 8 of 8
-Plan: 1 of 2 in current phase
-Status: Phase 8 in progress. Plan 01 (Sidebar Session List + Shared Infrastructure) complete.
-Last activity: 2026-03-06 — Completed Plan 08-01: Sidebar Session List + Shared Infrastructure
+Plan: 2 of 2 in current phase
+Status: Phase 8 COMPLETE. All M1 plans delivered.
+Last activity: 2026-03-06 — Completed Plan 08-02: Chat Content Area + Session Switching
 
-Progress: [██████████] 100% (M1 plan 17 of 18)
+Progress: [██████████] 100% (M1 plan 18 of 18)
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [██████████] 100% (M1 plan 17 of 18)
 | Phase 07 P01 | 7 | 3 tasks | 9 files |
 | Phase 07 P02 | 49 | 3 tasks | 12 files |
 | Phase 08 P01 | 8 | 2 tasks | 23 files |
+| Phase 08 P02 | 7 | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -142,6 +143,11 @@ Recent decisions affecting current work:
 - 08-01: Context menu portaled to document.body to avoid overflow:auto clipping (Architect mandate)
 - 08-01: Module-level singleton for project name resolution (prevents redundant /api/projects fetches)
 - 08-01: SessionItem receives data as props, not subscribing to store (prevents per-item re-renders)
+- 08-02: ActiveMessage padding removed in favor of MessageContainer wrapping (CLS prevention)
+- 08-02: EMPTY_MESSAGES module-level constant for Zustand v5 selector reference stability
+- 08-02: Optimistic user message add on send (before WebSocket response arrives)
+- 08-02: useSessionSwitch uses getState() pattern (infrastructure hook, not component)
+- 08-02: App.test.tsx assertions updated from ChatPlaceholder text to ChatView data-testids
 
 ### Pending Todos
 
@@ -154,6 +160,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T20:12:00.000Z
-Stopped at: Completed 08-01-PLAN.md
-Resume file: .planning/phases/08-navigation-session-management/08-02-PLAN.md
+Last session: 2026-03-06T20:22:26.000Z
+Stopped at: Completed 08-02-PLAN.md (Phase 8 complete, M1 complete)
+Resume file: Ready for /gsd:verify-work 8

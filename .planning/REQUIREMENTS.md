@@ -140,7 +140,7 @@
   - Background color uses `--surface-raised` (visually distinct from main content area)
   - Verify: sidebar renders with grouped sessions, clicking a session updates the URL/route.
 
-- [ ] **NAV-02**: Clicking a session in the sidebar:
+- [x] **NAV-02**: Clicking a session in the sidebar:
   - Updates `activeSessionId` in the `timeline` Zustand store
   - Triggers `GET /api/projects/:projectName/sessions/:sessionId/messages` to load messages
   - Displays loaded messages in the chat content area
@@ -232,7 +232,7 @@
 | COMP-01 | Phase 7: Tool Registry + Proof of Life | Complete |
 | STRM-04 | Phase 7: Tool Registry + Proof of Life | Complete |
 | NAV-01 | Phase 8: Navigation + Sessions | Complete |
-| NAV-02 | Phase 8: Navigation + Sessions | Pending |
+| NAV-02 | Phase 8: Navigation + Sessions | Complete |
 
 **Coverage:**
 - v1 requirements: 28 total
