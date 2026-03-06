@@ -21,8 +21,9 @@ Streaming tokens render in the browser at 60fps via direct DOM mutation (bypassi
 - **Implementation:** Pure CSS animation on a `::after` pseudo-element or inline span. No JS animation loop for the cursor itself -- rAF handles text, CSS handles cursor.
 
 ### Stream-to-final transition
-- **Strategy:** Seamless replace -- ActiveMessage stays mounted until React paints the finalized `Message` in the timeline store at the same scroll position, then ActiveMessage unmounts. Zero visual flicker because both render the same plain text content.
-- **Sequence:** (1) Stream ends, cursor fade begins. (2) Flush accumulated text to timeline store via `addMessage()`. (3) React renders finalized Message component. (4) ActiveMessage unmounts. User sees continuous text with cursor fading out.
+- **Strategy:** Seamless replace with **finalizing state**. ActiveMessage tracks its own lifecycle: `streaming` → `finalizing` → unmounted. It does NOT unmount the instant `isStreaming` goes false.
+- **Finalization handshake:** (1) `claude-complete` fires → `isStreaming` becomes false in stream store. (2) ActiveMessage detects this and enters `finalizing` state internally (local state or ref). (3) In `finalizing`: cursor + tint begin 200ms fade-out, AND accumulated text flushes to timeline store via `addMessage()`. (4) React renders the finalized Message in the timeline. (5) After fade completes (~200ms), ActiveMessage signals unmount (e.g., calls a parent callback or sets a ref). (6) Parent removes ActiveMessage from the tree. User sees continuous text with cursor/tint fading, then a seamless handoff to the React-rendered message.
+- **Critical:** ActiveMessage must remain mounted during the entire fade-out. The parent component gates unmount on a "finalization complete" signal, NOT on `isStreaming === false`.
 - **Text rendering:** Plain text during streaming AND for finalized messages in M1. No markdown parsing. Full markdown rendering comes in M2 (CHAT-04). This eliminates any layout shift risk on swap since both render identically.
 - **Mid-stream disconnect:** Keep partial text visible. Append a muted error line below: "Connection lost during response." using `--text-muted` color. Consistent with Phase 5 decision to preserve partial content and not call `endStream`.
 
@@ -36,17 +37,23 @@ Streaming tokens render in the browser at 60fps via direct DOM mutation (bypassi
 - **Click behavior:** Smooth-scroll to bottom + re-engage auto-scroll
 
 ### ActiveMessage container styling
-- **Background tint:** Very subtle dusty rose wash at ~3-5% opacity (`oklch(var(--accent-primary) / 0.04)` or similar). Warm, barely visible, signals "this message is live"
+- **CSS containment:** `contain: content` is REQUIRED per Constitution 10.3. Prevents token-by-token DOM mutations from triggering ancestor layout recalculations.
+- **Background tint:** Very subtle dusty rose wash at ~3-5% opacity. Use `color-mix(in oklch, var(--accent-primary) 4%, transparent)` since `--accent-primary` is a full `oklch()` value (not decomposed components). Alternatively, define a new token `--accent-primary-wash` in tokens.css. Do NOT use `oklch(var(--accent-primary) / 0.04)` -- this is invalid CSS because `--accent-primary` is already a complete `oklch(0.63 0.14 20)` string.
 - **Border radius:** 8px rounded corners -- soft card-like feel without being a full card
 - **On finalization:** Background tint fades to transparent over `--duration-normal` (200ms), synced with cursor fade-out. Both disappear together as a clean "finalization moment"
 - **No additional borders or shadows** -- the tint alone provides distinction. Constitution prohibits box-shadow for elevation.
+
+### Backlog drainage on mount
+- `useStreamBuffer` MUST consume `wsClient`'s stream backlog on mount. The `subscribeContent()` API already replays backlog to late subscribers automatically (Phase 5 implementation). The hook should handle this burst of replayed tokens correctly -- append all to the ref and schedule a single rAF paint, not one paint per replayed token.
+- This handles HMR, tab switches, or any scenario where ActiveMessage mounts mid-stream.
 
 ### Claude's Discretion
 - Scroll pill surface treatment choice (overlay vs frosted glass)
 - Whether finalized messages in M1 get basic markdown or stay plain text (leaning plain text for seamless swap, but Claude can pull forward basic markdown if the swap still works cleanly)
 - Exact rAF loop implementation details (batch size, timing)
 - IntersectionObserver threshold and root margin values
-- How to coordinate ActiveMessage unmount timing with React paint of finalized message (useLayoutEffect, flushSync, or other mechanism)
+- Finalization handshake mechanism details (local state vs ref, parent callback vs render prop)
+- Whether to define `--accent-primary-wash` as a new token or use `color-mix()` inline
 - Error line styling details for mid-disconnect partial content
 - Test strategy for zero-rerender verification
 
@@ -109,3 +116,4 @@ Streaming tokens render in the browser at 60fps via direct DOM mutation (bypassi
 
 *Phase: 06-streaming-engine-scroll-anchor*
 *Context gathered: 2026-03-06*
+*Gemini architect review: Approved with corrections applied (contain: content per Constitution 10.3, finalization handshake lifecycle, OKLCH syntax fix, backlog drainage mandate)*
