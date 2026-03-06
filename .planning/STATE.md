@@ -25,19 +25,19 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 
 ## Current Position
 
-Phase: 6 of 8
-Plan: 2 of 2 in current phase (scroll anchor + bottom pill complete)
-Status: Phase 6 complete (useStreamBuffer + ActiveMessage + useScrollAnchor + ScrollToBottomPill). Phase 7 next.
-Last activity: 2026-03-06 — Completed Plan 06-02: Scroll Anchor + Bottom Pill
+Phase: 7 of 8
+Plan: 1 of 2 in current phase (tool registry + display components complete)
+Status: Plan 07-01 complete (tool registry, ToolChip, ToolCard, ThinkingDisclosure). Plan 07-02 next.
+Last activity: 2026-03-06 — Completed Plan 07-01: Tool Registry + Display Components
 
-Progress: [████████▌░] 87% (M1 plan 14 of 16)
+Progress: [█████████░] 93% (M1 plan 15 of 16)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 5 min
-- Total execution time: 1.2 hours
+- Total execution time: 1.3 hours
 
 **By Phase:**
 
@@ -51,8 +51,8 @@ Progress: [████████▌░] 87% (M1 plan 14 of 16)
 | 06 | 2 | 20 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: 4m, 6m, 6m, 10m, 10m
-- Trend: slightly increasing (more complex TDD tasks)
+- Last 5 plans: 6m, 6m, 10m, 10m, 7m
+- Trend: stabilized around 7-10m for complex TDD tasks
 
 *Updated after each plan completion*
 | Phase 03 P01 | 4 | 2 tasks | 13 files |
@@ -63,6 +63,7 @@ Progress: [████████▌░] 87% (M1 plan 14 of 16)
 | Phase 05 P02 | 6 | 2 tasks | 5 files |
 | Phase 06 P01 | 10 | 2 tasks | 5 files |
 | Phase 06 P02 | 10 | 2 tasks | 6 files |
+| Phase 07 P01 | 7 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -126,6 +127,9 @@ Recent decisions affecting current work:
 - 06-02: Wheel/touchmove event listener for user scroll detection during auto-scroll -- IntersectionObserver alone can't distinguish user scroll from content growth
 - 06-02: Anti-oscillation guard (isAutoScrollingRef) prevents observer "not intersecting" from flashing pill during rAF auto-scroll
 - 06-02: Separate CSS file for scroll pill frosted glass (color-mix, vendor prefixes) -- avoids ESLint inline style ban
+- 07-01: createElement instead of JSX in tool-registry.ts to keep .ts extension (test files reference .ts)
+- 07-01: pre element styles moved to CSS class (.tool-card pre) to satisfy no-banned-inline-style ESLint rule
+- 07-01: ThinkingDisclosure uses ref-based prev-value tracking + derived state instead of useEffect+setState to satisfy React 19 set-state-in-effect ESLint rule
 
 ### Pending Todos
 
@@ -138,6 +142,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T16:26:32.346Z
-Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-tool-registry-proof-of-life/07-CONTEXT.md
+Last session: 2026-03-06T17:07:00Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-tool-registry-proof-of-life/07-02-PLAN.md

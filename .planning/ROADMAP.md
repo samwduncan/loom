@@ -126,7 +126,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Tool registry module + ToolChip/ToolCard components + ThinkingDisclosure with CSS styling
+- [x] 07-01-PLAN.md — Tool registry module + ToolChip/ToolCard components + ThinkingDisclosure with CSS styling
 - [ ] 07-02-PLAN.md — ActiveMessage multi-span refactor + proof-of-life page wiring entire M1 pipeline end-to-end
 
 ### Phase 8: Navigation + Session Management
@@ -156,6 +156,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. App Shell + Error Boundaries | 2/2 | Complete | 2026-03-05 |
 | 4. State Architecture | 2/2 | Complete | 2026-03-05 |
 | 5. WebSocket Bridge + Multiplexer | 2/2 | Complete   | 2026-03-06 |
-| 6. Streaming Engine + Scroll | 1/2 | In progress | - |
-| 7. Tool Registry + Proof of Life | 0/2 | Not started | - |
+| 6. Streaming Engine + Scroll | 2/2 | Complete | 2026-03-06 |
+| 7. Tool Registry + Proof of Life | 1/2 | In progress | - |
 | 8. Navigation + Sessions | 0/2 | Not started | - |

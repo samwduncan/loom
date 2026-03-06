@@ -104,7 +104,7 @@
 
 ### Component Infrastructure
 
-- [ ] **COMP-01**: Create `src/lib/tool-registry.ts` implementing a pluggable Tool-Call Component Registry:
+- [x] **COMP-01**: Create `src/lib/tool-registry.ts` implementing a pluggable Tool-Call Component Registry:
   - `registerTool(toolName: string, config: ToolConfig)` — registers a tool display configuration
   - `getToolConfig(toolName: string): ToolConfig | DefaultToolConfig` — returns registered config or default fallback
   - `ToolConfig` includes: `displayName`, `icon` (React component), `renderCard` (React component for expanded view), `renderChip` (React component for collapsed view), `stateColors` (running/success/error color tokens)
@@ -229,7 +229,7 @@
 | STRM-03 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-02 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-03 | Phase 6: Streaming Engine + Scroll | Complete |
-| COMP-01 | Phase 7: Tool Registry + Proof of Life | Pending |
+| COMP-01 | Phase 7: Tool Registry + Proof of Life | Complete |
 | STRM-04 | Phase 7: Tool Registry + Proof of Life | Pending |
 | NAV-01 | Phase 8: Navigation + Sessions | Pending |
 | NAV-02 | Phase 8: Navigation + Sessions | Pending |
