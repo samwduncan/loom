@@ -398,7 +398,7 @@ describe('routeServerMessage', () => {
 
     const codexMsg: ServerMessage = {
       type: 'codex-response',
-      data: {},
+      data: { type: 'item', itemType: 'agent_message', message: { role: 'assistant', content: 'test' } },
       sessionId: null,
     };
     routeServerMessage(codexMsg, cbs, sendFn);

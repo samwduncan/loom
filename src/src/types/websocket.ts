@@ -86,6 +86,47 @@ export type ClaudeSDKData =
   | SDKUserMessage;
 
 // ---------------------------------------------------------------------------
+// Codex SDK data types (M4 — typed from backend source)
+// ---------------------------------------------------------------------------
+
+export interface CodexItemMessage {
+  type: 'item';
+  itemType: 'agent_message' | 'reasoning' | 'command_execution' | 'file_change' | 'mcp_tool_call' | 'web_search' | 'todo_list' | 'error';
+  message?: { role: string; content: string; isReasoning?: boolean };
+  command?: string;
+  output?: string;
+  exitCode?: number;
+  status?: string;
+  changes?: unknown[];
+  server?: string;
+  tool?: string;
+  arguments?: Record<string, unknown>;
+  result?: unknown;
+  error?: string;
+  query?: string;
+  items?: unknown[];
+}
+
+export interface CodexRawEvent {
+  type: string;
+  item?: unknown;
+}
+
+export type CodexSDKData = CodexItemMessage | CodexRawEvent;
+
+// ---------------------------------------------------------------------------
+// Gemini SDK data types (M4 — typed from backend source)
+// ---------------------------------------------------------------------------
+
+export interface GeminiMessageData {
+  type: 'message';
+  content: string;
+  isPartial?: boolean;
+}
+
+export type GeminiSDKData = GeminiMessageData;
+
+// ---------------------------------------------------------------------------
 // Server -> Client messages (discriminated union)
 // ---------------------------------------------------------------------------
 
@@ -110,12 +151,12 @@ export type ServerMessage =
   | { type: 'loading_progress'; [key: string]: unknown }
   // Generic error
   | { type: 'error'; error: string }
-  // Codex (M4 stubs)
-  | { type: 'codex-response'; data: unknown; sessionId: string | null }
+  // Codex (M4 — types locked from backend source)
+  | { type: 'codex-response'; data: CodexSDKData; sessionId: string | null }
   | { type: 'codex-complete'; sessionId: string }
   | { type: 'codex-error'; error: string; sessionId: string | null }
-  // Gemini (M4 stubs)
-  | { type: 'gemini-response'; data: unknown; sessionId: string | null }
+  // Gemini (M4 — types locked from backend source)
+  | { type: 'gemini-response'; data: GeminiSDKData; sessionId: string | null }
   | { type: 'gemini-complete'; sessionId: string }
   | { type: 'gemini-error'; error: string; sessionId: string | null };
 

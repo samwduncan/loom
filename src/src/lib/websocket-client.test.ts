@@ -407,17 +407,35 @@ describe('stream backlog', () => {
     expect(listener).not.toHaveBeenCalled();
   });
 
-  it('goes direct to listeners when listeners exist (no buffering)', () => {
+  it('delivers to listeners immediately and buffers during active stream', () => {
     const listener = vi.fn();
     client.subscribeContent(listener);
 
+    client.startContentStream();
     client.emitContent('direct-token');
 
     expect(listener).toHaveBeenCalledWith('direct-token');
-    // Unsubscribe and resubscribe -- should not get replayed
-    client.subscribeContent(vi.fn()); // second listener
-    // The original listener should have been called once
     expect(listener).toHaveBeenCalledTimes(1);
+
+    // Late subscriber joins mid-stream — gets replay of buffered tokens
+    const lateListener = vi.fn();
+    client.subscribeContent(lateListener);
+    expect(lateListener).toHaveBeenCalledWith('direct-token');
+  });
+
+  it('does not buffer when stream is not active', () => {
+    const listener = vi.fn();
+    client.subscribeContent(listener);
+
+    // No startContentStream — emit outside of a stream
+    client.emitContent('unbuffered-token');
+
+    expect(listener).toHaveBeenCalledWith('unbuffered-token');
+
+    // Late subscriber gets no replay (not buffered outside stream)
+    const lateListener = vi.fn();
+    client.subscribeContent(lateListener);
+    expect(lateListener).not.toHaveBeenCalled();
   });
 
   it('keeps buffer after endContentStream for late subscribers', () => {

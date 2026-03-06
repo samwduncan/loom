@@ -129,16 +129,16 @@ export class WebSocketClient {
   }
 
   /**
-   * Emit a content token. If listeners exist, deliver directly.
-   * If no listeners, buffer for late subscribers.
+   * Emit a content token. Always buffers during active stream (for late
+   * subscribers to replay). Delivers to current listeners immediately.
    */
   emitContent(token: string): void {
-    if (this.contentListeners.size > 0) {
-      for (const listener of this.contentListeners) {
-        listener(token);
-      }
-    } else {
+    if (this.isStreamActive) {
       this.streamBuffer.push(token);
+    }
+
+    for (const listener of this.contentListeners) {
+      listener(token);
     }
   }
 
