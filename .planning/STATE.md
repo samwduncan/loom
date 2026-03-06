@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 06-02 Scroll Anchor + Bottom Pill
-last_updated: "2026-03-06T14:57:03.000Z"
+stopped_at: Completed 06-01 useStreamBuffer + ActiveMessage (re-execution)
+last_updated: "2026-03-06T15:11:35.545Z"
 last_activity: "2026-03-06 — Completed Plan 06-02: Scroll Anchor + Bottom Pill"
 progress:
   total_phases: 8
