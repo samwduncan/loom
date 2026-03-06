@@ -13,7 +13,7 @@
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
@@ -50,6 +50,28 @@ export function MessageList({ messages, sessionId, onStreamFinalized }: MessageL
   }, [onStreamFinalized]);
 
   const { sentinelRef, showPill, scrollToBottom } = useScrollAnchor(scrollContainerRef);
+
+  // Scroll to bottom on session load -- track previous message count so we detect
+  // the 0 → N transition (messages just loaded for this session). Also triggers on
+  // sessionId change (switching between cached sessions).
+  const prevMsgCountRef = useRef(messages.length);
+  const prevSessionIdRef = useRef(sessionId);
+  useEffect(() => {
+    const justLoaded = prevMsgCountRef.current === 0 && messages.length > 0;
+    const sessionChanged = sessionId !== prevSessionIdRef.current;
+    prevMsgCountRef.current = messages.length;
+    prevSessionIdRef.current = sessionId;
+
+    if ((justLoaded || sessionChanged) && messages.length > 0) {
+      // Use setTimeout(0) — runs after browser layout/paint, ensuring
+      // scrollHeight reflects the newly rendered messages.
+      const timer = setTimeout(() => {
+        const el = scrollContainerRef.current;
+        if (el) el.scrollTop = el.scrollHeight;
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [sessionId, messages.length]);
 
   return (
     <div
