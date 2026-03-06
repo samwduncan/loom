@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 7 context gathered
-last_updated: "2026-03-06T16:26:32.348Z"
-last_activity: "2026-03-06 — Completed Plan 06-02: Scroll Anchor + Bottom Pill"
+stopped_at: Completed 07-02-PLAN.md — Phase 7 complete, all M1 subsystems proven end-to-end
+last_updated: "2026-03-06T18:01:29.627Z"
+last_activity: "2026-03-06 — Completed Plan 07-02: ActiveMessage Multi-Span Refactor + Proof-of-Life"
 progress:
   total_phases: 8
-  completed_phases: 6
-  total_plans: 14
-  completed_plans: 14
-  percent: 87
+  completed_phases: 7
+  total_plans: 16
+  completed_plans: 16
+  percent: 93
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 5 complete — WebSocket Bridge + Stream Multiplexer. Phase 6 next.
+**Current focus:** Phase 7 complete — Tool Registry + Proof of Life. Phase 8 (Navigation + Sessions) next.
 
 ## Current Position
 
-Phase: 7 of 8
-Plan: 1 of 2 in current phase (tool registry + display components complete)
-Status: Plan 07-01 complete (tool registry, ToolChip, ToolCard, ThinkingDisclosure). Plan 07-02 next.
-Last activity: 2026-03-06 — Completed Plan 07-01: Tool Registry + Display Components
+Phase: 8 of 8
+Plan: 0 of 2 in current phase
+Status: Phase 7 complete. Phase 8 (Navigation + Session Management) not started.
+Last activity: 2026-03-06 — Completed Plan 07-02: ActiveMessage Multi-Span Refactor + Proof-of-Life
 
-Progress: [█████████░] 93% (M1 plan 15 of 16)
+Progress: [██████████] 100% (M1 plan 16 of 16)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 5 min
-- Total execution time: 1.3 hours
+- Total plans completed: 16
+- Average duration: 7 min
+- Total execution time: 2.2 hours
 
 **By Phase:**
 
@@ -49,10 +49,11 @@ Progress: [█████████░] 93% (M1 plan 15 of 16)
 | 04 | 2 | 8 min | 4 min |
 | 05 | 2 | 12 min | 6 min |
 | 06 | 2 | 20 min | 10 min |
+| 07 | 2 | 56 min | 28 min |
 
 **Recent Trend:**
-- Last 5 plans: 6m, 6m, 10m, 10m, 7m
-- Trend: stabilized around 7-10m for complex TDD tasks
+- Last 5 plans: 10m, 10m, 7m, 7m, 49m
+- Trend: proof-of-life plan took longest due to end-to-end integration + post-checkpoint bug fixes
 
 *Updated after each plan completion*
 | Phase 03 P01 | 4 | 2 tasks | 13 files |
@@ -64,6 +65,7 @@ Progress: [█████████░] 93% (M1 plan 15 of 16)
 | Phase 06 P01 | 10 | 2 tasks | 5 files |
 | Phase 06 P02 | 10 | 2 tasks | 6 files |
 | Phase 07 P01 | 7 | 3 tasks | 9 files |
+| Phase 07 P02 | 49 | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -130,6 +132,9 @@ Recent decisions affecting current work:
 - 07-01: createElement instead of JSX in tool-registry.ts to keep .ts extension (test files reference .ts)
 - 07-01: pre element styles moved to CSS class (.tool-card pre) to satisfy no-banned-inline-style ESLint rule
 - 07-01: ThinkingDisclosure uses ref-based prev-value tracking + derived state instead of useEffect+setState to satisfy React 19 set-state-in-effect ESLint rule
+- [Phase 07]: Segment array architecture: ActiveMessage renders interleaved text spans + ToolChip components with rAF painting to current active span
+- [Phase 07]: Buffer checkpoint/offset pattern: useStreamBuffer.checkpoint() advances offset so new spans only show post-checkpoint characters; getText() returns full buffer for flush
+- [Phase 07]: activeSessionId in stream store tracks backend-assigned session IDs separately from local timeline IDs for correct resume behavior
 
 ### Pending Todos
 
@@ -142,6 +147,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T17:07:00Z
-Stopped at: Completed 07-01-PLAN.md
-Resume file: .planning/phases/07-tool-registry-proof-of-life/07-02-PLAN.md
+Last session: 2026-03-06T18:01:29.625Z
+Stopped at: Completed 07-02-PLAN.md — Phase 7 complete, all M1 subsystems proven end-to-end
+Resume file: None

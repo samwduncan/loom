@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 4: State Architecture** - Four Zustand stores (timeline, stream, ui, connection) with full TypeScript interfaces, selector-only enforcement, and persistence
 - [x] **Phase 5: WebSocket Bridge + Stream Multiplexer** - WebSocket client with reconnection, typed message discrimination, and channel routing for content/thinking/tool streams (completed 2026-03-06)
 - [ ] **Phase 6: Streaming Engine + Scroll Anchor** - useRef + rAF token buffer bypassing React reconciler, ActiveMessage component, and IntersectionObserver scroll anchoring
-- [ ] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end
+- [x] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end (completed 2026-03-06)
 - [ ] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing
 
 ## Phase Details
@@ -123,7 +123,7 @@ Plans:
   1. Calling `getToolConfig('Bash')` returns a registered config with display name, icon, and renderers; calling `getToolConfig('UnknownTool')` returns a graceful default config without crashing
   2. The proof-of-life page connects to the backend WebSocket, sends a hardcoded prompt, and renders the streaming response in real-time using the rAF buffer
   3. Thinking blocks display in a separate section from the main response (proving the multiplexer routes channels independently), and connection status is visible on the page
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 07-01-PLAN.md — Tool registry module + ToolChip/ToolCard components + ThinkingDisclosure with CSS styling
@@ -157,5 +157,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. State Architecture | 2/2 | Complete | 2026-03-05 |
 | 5. WebSocket Bridge + Multiplexer | 2/2 | Complete   | 2026-03-06 |
 | 6. Streaming Engine + Scroll | 2/2 | Complete | 2026-03-06 |
-| 7. Tool Registry + Proof of Life | 1/2 | In progress | - |
+| 7. Tool Registry + Proof of Life | 2/2 | Complete   | 2026-03-06 |
 | 8. Navigation + Sessions | 0/2 | Not started | - |

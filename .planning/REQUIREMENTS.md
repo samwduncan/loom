@@ -94,7 +94,7 @@
   - During streaming, React re-renders are ZERO for the active message text (only the rAF loop updates the DOM)
   - Verify: stream a 2000-token response while monitoring React DevTools Profiler — zero re-renders on the ActiveMessage component during streaming.
 
-- [ ] **STRM-04**: Create a proof-of-life page that:
+- [x] **STRM-04**: Create a proof-of-life page that:
   - Connects to the backend WebSocket
   - Sends a hardcoded prompt (e.g., "Write a haiku about coding")
   - Renders the streaming response in real-time using the rAF buffer
@@ -230,7 +230,7 @@
 | COMP-02 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-03 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-01 | Phase 7: Tool Registry + Proof of Life | Complete |
-| STRM-04 | Phase 7: Tool Registry + Proof of Life | Pending |
+| STRM-04 | Phase 7: Tool Registry + Proof of Life | Complete |
 | NAV-01 | Phase 8: Navigation + Sessions | Pending |
 | NAV-02 | Phase 8: Navigation + Sessions | Pending |
 
