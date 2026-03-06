@@ -75,8 +75,8 @@ export async function initializeWebSocket(): Promise<void> {
       connectionStore().setProviderError('claude', error);
     },
 
-    onSessionCreated: (_sessionId) => {
-      // Phase 8 will handle session creation in timeline store
+    onSessionCreated: (sid) => {
+      streamStore().setActiveSessionId(sid);
     },
 
     onSessionAborted: (_sessionId, _provider, _success) => {

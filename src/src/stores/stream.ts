@@ -14,6 +14,7 @@ import type { ThinkingState, ToolCallState } from '@/types/stream';
 interface StreamState {
   // Data
   isStreaming: boolean;
+  activeSessionId: string | null;
   activeToolCalls: ToolCallState[];
   thinkingState: ThinkingState | null;
   activityText: string;
@@ -21,6 +22,7 @@ interface StreamState {
   // Actions
   startStream: () => void;
   endStream: () => void;
+  setActiveSessionId: (sessionId: string) => void;
   addToolCall: (toolCall: ToolCallState) => void;
   updateToolCall: (
     toolCallId: string,
@@ -33,6 +35,7 @@ interface StreamState {
 
 const INITIAL_STREAM_STATE = {
   isStreaming: false,
+  activeSessionId: null as string | null,
   activeToolCalls: [] as ToolCallState[],
   thinkingState: null as ThinkingState | null,
   activityText: '',
@@ -43,6 +46,10 @@ export const useStreamStore = create<StreamState>()((set) => ({
 
   startStream: () => {
     set({ isStreaming: true });
+  },
+
+  setActiveSessionId: (sessionId: string) => {
+    set({ activeSessionId: sessionId });
   },
 
   endStream: () => {

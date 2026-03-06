@@ -29,19 +29,22 @@ export function ProofOfLife() {
   const [showActiveMessage, setShowActiveMessage] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Session ID — stable for the lifetime of this page
-  const [sessionId] = useState(() => 'proof-of-life-' + Math.random().toString(36).slice(2, 10));
+  // Session ID — null until backend creates one, then stable for conversation
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  // Local ID for timeline store (always available)
+  const [localId] = useState(() => 'proof-of-life-' + Math.random().toString(36).slice(2, 10));
 
   // Store selectors
   const connectionStatus = useConnectionStore((s) => s.providers.claude.status);
   const connectionError = useConnectionStore((s) => s.providers.claude.error);
   const isStreaming = useStreamStore((s) => s.isStreaming);
+  const activeSessionId = useStreamStore((s) => s.activeSessionId);
 
   // Timeline store: find our session's messages.
   // Return stable EMPTY_MESSAGES reference when no session found to avoid
   // infinite re-render loop (Zustand v5 useSyncExternalStore requires cached getSnapshot).
   const messages = useTimelineStore((s) => {
-    const session = s.sessions.find((sess) => sess.id === sessionId);
+    const session = s.sessions.find((sess) => sess.id === localId);
     return session?.messages ?? EMPTY_MESSAGES;
   });
 
@@ -57,14 +60,21 @@ export function ProofOfLife() {
     void initializeWebSocket();
   }, []);
 
-  // Create stub session on mount
+  // Capture backend session ID for resume on subsequent messages.
+  // "Adjust state during rendering" pattern — React supports this when guarded
+  // by a condition that prevents infinite loops (same pattern as ActiveMessage).
+  if (activeSessionId && !sessionId) {
+    setSessionId(activeSessionId);
+  }
+
+  // Create stub session on mount using localId
   useEffect(() => {
     // eslint-disable-next-line loom/no-external-store-mutation -- one-time read in effect for session check
     const sessions = useTimelineStore.getState().sessions;
-    const exists = sessions.some((s) => s.id === sessionId);
+    const exists = sessions.some((s) => s.id === localId);
     if (!exists) {
       addSession({
-        id: sessionId,
+        id: localId,
         title: 'Proof of Life',
         messages: [],
         providerId: 'claude',
@@ -73,7 +83,7 @@ export function ProofOfLife() {
         metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
       });
     }
-  }, [sessionId, addSession]);
+  }, [localId, addSession]);
 
   // Handle send
   const handleSend = useCallback(() => {
@@ -98,25 +108,31 @@ export function ProofOfLife() {
       },
     };
 
-    addMessage(sessionId, userMessage);
+    addMessage(localId, userMessage);
     setInputValue('');
     setShowActiveMessage(true);
 
-    // Send via WebSocket
+    // Send via WebSocket — only pass sessionId for resume (second+ messages)
+    const options: Record<string, unknown> = { projectPath: '/home/swd/loom' };
+    if (sessionId) {
+      options.sessionId = sessionId;
+    }
     wsClient.send({
       type: 'claude-command',
       command: prompt,
-      options: { projectPath: '/home/swd/loom', sessionId },
+      options,
     });
-  }, [inputValue, isStreaming, sessionId, addMessage]);
+  }, [inputValue, isStreaming, sessionId, localId, addMessage]);
 
   // Handle stop
   const handleStop = useCallback(() => {
-    wsClient.send({
-      type: 'abort-session',
-      sessionId,
-      provider: 'claude',
-    });
+    if (sessionId) {
+      wsClient.send({
+        type: 'abort-session',
+        sessionId,
+        provider: 'claude',
+      });
+    }
   }, [sessionId]);
 
   // Handle finalization complete — ActiveMessage has flushed to timeline
@@ -191,10 +207,10 @@ export function ProofOfLife() {
           </div>
         )}
 
-        {/* Active streaming message */}
-        {showActiveMessage && isStreaming && (
+        {/* Active streaming message — keep mounted during finalization fade */}
+        {showActiveMessage && (
           <ActiveMessage
-            sessionId={sessionId}
+            sessionId={localId}
             onFinalizationComplete={handleFinalizationComplete}
           />
         )}
