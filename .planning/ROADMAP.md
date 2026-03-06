@@ -20,6 +20,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Streaming Engine + Scroll Anchor** - useRef + rAF token buffer bypassing React reconciler, ActiveMessage component, and IntersectionObserver scroll anchoring
 - [x] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end (completed 2026-03-06)
 - [x] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing (completed 2026-03-06)
+- [ ] **Phase 9: E2E Integration Wiring + Playwright Verification** - Wire WebSocket init into production route, fix sidebar navigation, Playwright E2E tests for all human-verification gaps
+- [ ] **Phase 10: Pre-Archive Cleanup** - Remove orphaned exports, fix inline styles, correct stale traceability
 
 ## Phase Details
 
@@ -144,6 +146,38 @@ Plans:
 - [ ] 08-01-PLAN.md — Sidebar session list, date grouping, provider logos, shared infrastructure (API client, transforms, MessageContainer)
 - [ ] 08-02-PLAN.md — ChatView with message display, composer, session switching with AbortController, URL sync
 
+### Phase 9: E2E Integration Wiring + Playwright Verification
+**Goal**: Wire the disconnected integration points so the production `/chat` route actually works end-to-end, then prove it with Playwright E2E tests covering every human-verification gap from earlier phases
+**Depends on**: Phase 8 (all components must exist to wire together)
+**Requirements**: STRM-01, STRM-02, STRM-03, NAV-01, NAV-02 (integration verification)
+**Gap Closure**: Closes INT-01, INT-02 from v1.0 audit + 6 human verification items from Phase 7
+**Success Criteria** (what must be TRUE):
+  1. Navigating to `/chat` establishes a WebSocket connection (connection store shows `connected`) without visiting any dev page first
+  2. Clicking a session in the sidebar updates the URL to `/chat/:sessionId`, triggers message fetch, and displays loaded messages
+  3. Playwright E2E tests pass for: streaming on `/chat`, session switching, new chat, tool call display, thinking blocks, scroll anchor behavior
+  4. Zero layout shift (CLS) during the streaming-to-finalized message handoff
+  5. `projects_updated` WebSocket event triggers session list refetch
+**Plans:** TBD
+
+Plans:
+- [ ] 09-01-PLAN.md — Integration fixes (WebSocket init, SessionList navigation, projects_updated wiring)
+- [ ] 09-02-PLAN.md — Playwright E2E test suite (streaming, session switching, scroll, tool calls, CLS verification)
+
+### Phase 10: Pre-Archive Cleanup
+**Goal**: Remove orphaned code, fix stale traceability, and eliminate Constitution violations before archiving M1
+**Depends on**: Phase 9 (integration must be verified before cleanup)
+**Requirements**: ENF-01 (traceability fix)
+**Gap Closure**: Closes tech debt items from v1.0 audit
+**Success Criteria** (what must be TRUE):
+  1. ToolCard.tsx is either removed or properly imported (no orphaned exports)
+  2. tool-registry.ts has zero inline styles (uses CSS classes with design tokens)
+  3. ENF-01 traceability table shows "Complete" (matching its checkbox status)
+  4. No unused test-only exports in production code
+**Plans:** TBD
+
+Plans:
+- [ ] 10-01-PLAN.md — Orphan removal, inline style cleanup, traceability fix
+
 ## Progress
 
 **Execution Order:**
@@ -159,3 +193,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 6. Streaming Engine + Scroll | 2/2 | Complete | 2026-03-06 |
 | 7. Tool Registry + Proof of Life | 2/2 | Complete   | 2026-03-06 |
 | 8. Navigation + Sessions | 2/2 | Complete   | 2026-03-06 |
+| 9. E2E Integration + Playwright | 0/2 | Pending | - |
+| 10. Pre-Archive Cleanup | 0/1 | Pending | - |
