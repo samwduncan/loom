@@ -1,0 +1,11 @@
+/**
+ * Chat view styles -- composer border, focus states, message list scroll.
+ * All colors via design tokens.
+ *
+ * Shimmer animation is imported from sidebar.css (shared @keyframes shimmer).
+ */
+
+/* Composer container */
+.chat-composer {
+  background-color: var(--surface-base);
+}
