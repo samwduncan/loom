@@ -11,10 +11,10 @@
   border-radius: 8px;
   background-color: color-mix(in oklch, var(--accent-primary) 4%, transparent);
   transition: background-color var(--duration-normal) var(--ease-out);
-  padding: var(--space-4);
   position: relative;
   white-space: pre-wrap;
   word-break: break-word;
+  /* No padding here -- MessageContainer provides it for CLS-free finalization */
 }
 
 .active-message[data-phase="finalizing"] {

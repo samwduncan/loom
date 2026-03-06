@@ -7,22 +7,13 @@
  * Constitution: Named exports only (2.2).
  */
 
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TokenPreview } from '@/components/dev/TokenPreview';
 import { ProofOfLife } from '@/components/dev/ProofOfLife';
 import { AppShell } from '@/components/app-shell/AppShell';
 import { PlaceholderView } from '@/components/shared/PlaceholderView';
 import { AppErrorBoundary } from '@/components/shared/ErrorBoundary';
-
-function ChatPlaceholder() {
-  const { sessionId } = useParams<{ sessionId: string }>();
-
-  if (sessionId) {
-    return <PlaceholderView title="Chat" message={sessionId} />;
-  }
-
-  return <PlaceholderView title="Start a conversation" />;
-}
+import { ChatView } from '@/components/chat/view/ChatView';
 
 function DashboardPlaceholder() {
   return <PlaceholderView title="Dashboard" />;
@@ -38,7 +29,7 @@ export function AppRoutes() {
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/chat" replace />} />
-        <Route path="/chat/:sessionId?" element={<ChatPlaceholder />} />
+        <Route path="/chat/:sessionId?" element={<ChatView />} />
         <Route path="/dashboard" element={<DashboardPlaceholder />} />
         <Route path="/settings" element={<SettingsPlaceholder />} />
       </Route>

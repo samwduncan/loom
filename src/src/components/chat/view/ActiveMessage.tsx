@@ -17,6 +17,7 @@ import { useTimelineStore } from '@/stores/timeline';
 import { useStreamStore } from '@/stores/stream';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
+import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
 import '../styles/streaming-cursor.css';
@@ -215,26 +216,28 @@ export const ActiveMessage = memo(function ActiveMessage(
   );
 
   return (
-    <div
-      ref={containerRef}
-      className="active-message"
-      data-phase={phase}
-      data-testid="active-message"
-    >
-      <ThinkingDisclosure thinkingState={thinkingState} />
-      {segments.map((seg) => {
-        if (seg.type === 'text') {
-          return <span key={seg.id} ref={makeTextRefCallback(seg.id)} />;
-        }
-        return <ToolChipFromStore key={seg.toolCallId} toolCallId={seg.toolCallId} />;
-      })}
-      <span className="streaming-cursor" data-testid="streaming-cursor" />
-      {disconnected && (
-        <div className="active-message-disconnect">
-          Connection lost during response.
-        </div>
-      )}
-    </div>
+    <MessageContainer role="assistant">
+      <div
+        ref={containerRef}
+        className="active-message"
+        data-phase={phase}
+        data-testid="active-message"
+      >
+        <ThinkingDisclosure thinkingState={thinkingState} />
+        {segments.map((seg) => {
+          if (seg.type === 'text') {
+            return <span key={seg.id} ref={makeTextRefCallback(seg.id)} />;
+          }
+          return <ToolChipFromStore key={seg.toolCallId} toolCallId={seg.toolCallId} />;
+        })}
+        <span className="streaming-cursor" data-testid="streaming-cursor" />
+        {disconnected && (
+          <div className="active-message-disconnect">
+            Connection lost during response.
+          </div>
+        )}
+      </div>
+    </MessageContainer>
   );
 });
 
