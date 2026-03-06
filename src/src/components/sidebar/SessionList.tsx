@@ -36,7 +36,6 @@ export function SessionList() {
   const navigate = useNavigate();
   const sessions = useTimelineStore((s) => s.sessions);
   const activeSessionId = useTimelineStore((s) => s.activeSessionId);
-  const setActiveSession = useTimelineStore((s) => s.setActiveSession);
   const removeSession = useTimelineStore((s) => s.removeSession);
   const { isLoading, error } = useSessionList();
   const { projectName } = useProjectContext();
@@ -49,10 +48,9 @@ export function SessionList() {
 
   const handleSessionClick = useCallback(
     (sessionId: string) => {
-      setActiveSession(sessionId);
       navigate(`/chat/${sessionId}`);
     },
-    [setActiveSession, navigate],
+    [navigate],
   );
 
   const handleContextMenu = useCallback(

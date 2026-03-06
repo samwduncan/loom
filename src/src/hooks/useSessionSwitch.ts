@@ -68,7 +68,23 @@ export function useSessionSwitch() {
       navigate(`/chat/${sessionId}`);
       setIsLoadingMessages(true);
 
-      // 5. Fetch messages with abort signal
+      // 5. Ensure session exists in store before fetching messages.
+      // On reload or deep-link, persistence rehydrates without this session.
+      // eslint-disable-next-line loom/no-external-store-mutation -- infrastructure hook ensures session exists
+      const storeBeforeFetch = useTimelineStore.getState();
+      if (!storeBeforeFetch.sessions.find((s) => s.id === sessionId)) {
+        storeBeforeFetch.addSession({
+          id: sessionId,
+          title: 'Loading…',
+          messages: [],
+          providerId: 'claude',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+        });
+      }
+
+      // 6. Fetch messages with abort signal
       try {
         const data = await apiFetch<MessagesResponse>(
           `/api/projects/${projectName}/sessions/${sessionId}/messages`,

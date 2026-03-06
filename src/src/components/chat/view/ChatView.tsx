@@ -33,19 +33,23 @@ export function ChatView() {
   const { switchSession, isLoadingMessages } = useSessionSwitch();
 
   const activeSessionId = useTimelineStore((state) => state.activeSessionId);
+  // Use URL sessionId as the source of truth for which messages to display.
+  // Falls back to activeSessionId for streaming-created sessions (no URL yet).
+  const displaySessionId = sessionId ?? activeSessionId;
   const messages = useTimelineStore((state) => {
-    if (!state.activeSessionId) return EMPTY_MESSAGES;
-    const session = state.sessions.find((s) => s.id === state.activeSessionId);
+    if (!displaySessionId) return EMPTY_MESSAGES;
+    const session = state.sessions.find((s) => s.id === displaySessionId);
     return session?.messages ?? EMPTY_MESSAGES;
   });
   // URL sync: when sessionId param changes (direct nav, back/forward, sidebar click).
   // Skip stub sessions — they are optimistic placeholders that will be reconciled
   // to real session IDs by onSessionCreated in websocket-init.ts.
+  // Trigger fetch whenever URL points to a session with no loaded messages.
   useEffect(() => {
-    if (sessionId && sessionId !== activeSessionId && projectName && !sessionId.startsWith('stub-')) {
+    if (sessionId && projectName && !sessionId.startsWith('stub-') && messages.length === 0) {
       switchSession(projectName, sessionId);
     }
-  }, [sessionId, activeSessionId, projectName, switchSession]);
+  }, [sessionId, projectName, messages.length, switchSession]);
 
   // Stream finalization callback -- no-op since the finalized message is already
   // in the store via ActiveMessage's handleFlush. The streaming state is managed

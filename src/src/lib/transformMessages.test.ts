@@ -3,13 +3,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { transformBackendMessages, transformBackendSession } from './transformMessages';
+import { transformBackendMessages, transformBackendSession, type BackendEntry } from './transformMessages';
 
 describe('transformBackendMessages', () => {
   it('handles string content (plain text messages)', () => {
     const entries = [
       {
-        type: 'message',
+        type: 'user',
         message: { role: 'user' as const, content: 'Hello, Claude' },
         sessionId: 'sess-1',
         timestamp: '2026-03-06T12:00:00Z',
@@ -29,8 +29,9 @@ describe('transformBackendMessages', () => {
   it('handles array content blocks (text + tool_use extraction)', () => {
     const entries = [
       {
-        type: 'message',
+        type: 'assistant',
         message: {
+          id: 'api-msg-1',
           role: 'assistant' as const,
           content: [
             { type: 'text' as const, text: 'Let me check that file.' },
@@ -58,11 +59,12 @@ describe('transformBackendMessages', () => {
     expect(messages[0]?.toolCalls?.[0]?.isError).toBe(false);
   });
 
-  it('skips entries without message.role', () => {
+  it('skips non-chat entry types (system, progress, queue-operation)', () => {
     const entries = [
       { type: 'system', sessionId: 'sess-1' },
+      { type: 'progress', sessionId: 'sess-1' },
       {
-        type: 'message',
+        type: 'user',
         message: { role: 'user' as const, content: 'Valid message' },
         sessionId: 'sess-1',
         uuid: 'msg-3',
@@ -77,7 +79,7 @@ describe('transformBackendMessages', () => {
   it('uses Math.random() ID fallback when entry has no uuid', () => {
     const entries = [
       {
-        type: 'message',
+        type: 'user',
         message: { role: 'user' as const, content: 'No UUID' },
         sessionId: 'sess-1',
       },
@@ -94,11 +96,94 @@ describe('transformBackendMessages', () => {
     expect(messages).toHaveLength(0);
   });
 
+  it('merges consecutive assistant entries with same message.id into one turn', () => {
+    const entries = [
+      {
+        type: 'assistant',
+        message: {
+          id: 'msg-turn-1',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'Let me read that.' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'uuid-a',
+      },
+      {
+        type: 'assistant',
+        message: {
+          id: 'msg-turn-1',
+          role: 'assistant' as const,
+          content: [
+            { type: 'tool_use' as const, id: 'tool-1', name: 'Read', input: { file_path: '/x' } },
+          ],
+        },
+        sessionId: 'sess-1',
+        uuid: 'uuid-b',
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.content).toBe('Let me read that.');
+    expect(messages[0]?.toolCalls).toHaveLength(1);
+  });
+
+  it('filters out pure tool_result entries (role: user but only tool_result blocks)', () => {
+    // tool_result blocks don't match ContentBlock type — cast to exercise runtime filter
+    const entries = [
+      {
+        type: 'user',
+        message: {
+          role: 'user' as const,
+          content: [{ type: 'tool_result', tool_use_id: 'tool-1', content: 'file contents' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'uuid-tr',
+      },
+      {
+        type: 'assistant',
+        message: {
+          id: 'msg-resp',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'Got it.' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'uuid-resp',
+      },
+    ] as unknown as BackendEntry[];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.role).toBe('assistant');
+  });
+
+  it('filters out blank user messages', () => {
+    const entries = [
+      {
+        type: 'user',
+        message: { role: 'user' as const, content: '' },
+        sessionId: 'sess-1',
+        uuid: 'uuid-blank',
+      },
+      {
+        type: 'user',
+        message: { role: 'user' as const, content: 'Real message' },
+        sessionId: 'sess-1',
+        uuid: 'uuid-real',
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.content).toBe('Real message');
+  });
+
   it('omits toolCalls when no tool_use blocks exist', () => {
     const entries = [
       {
-        type: 'message',
+        type: 'assistant',
         message: {
+          id: 'api-msg-2',
           role: 'assistant' as const,
           content: [{ type: 'text' as const, text: 'Just text.' }],
         },

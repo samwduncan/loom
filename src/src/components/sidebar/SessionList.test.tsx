@@ -145,6 +145,6 @@ describe('SessionList', () => {
     await user.click(option);
 
     expect(mockNavigate).toHaveBeenCalledWith('/chat/sess-nav');
-    expect(useTimelineStore.getState().activeSessionId).toBe('sess-nav');
+    // SessionList only navigates — ChatView coordinates session switching via URL
   });
 });
