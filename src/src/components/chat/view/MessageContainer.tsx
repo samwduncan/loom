@@ -28,6 +28,7 @@ export function MessageContainer({ children, role }: MessageContainerProps) {
         role === 'user' && 'flex justify-end',
       )}
       data-role={role}
+      data-testid="message-container"
     >
       {role === 'user' ? (
         <div

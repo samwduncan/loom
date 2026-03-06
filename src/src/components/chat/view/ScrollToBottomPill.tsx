@@ -24,6 +24,7 @@ export function ScrollToBottomPill({
       type="button"
       onClick={onClick}
       aria-label="Scroll to bottom"
+      data-testid="scroll-to-bottom-pill"
       className={cn(
         'scroll-pill',
         'absolute bottom-4 left-1/2 -translate-x-1/2',

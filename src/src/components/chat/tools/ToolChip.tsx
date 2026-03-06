@@ -25,7 +25,7 @@ export const ToolChip = memo(function ToolChip({ toolCall }: ToolChipProps) {
   const CardComponent = config.renderCard;
 
   return (
-    <div className="tool-chip-container">
+    <div className="tool-chip-container" data-testid="tool-chip">
       <button
         type="button"
         className={cn('tool-chip', `tool-chip--${toolCall.status}`)}

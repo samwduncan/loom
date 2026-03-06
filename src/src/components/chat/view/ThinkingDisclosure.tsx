@@ -43,7 +43,7 @@ export function ThinkingDisclosure({ thinkingState }: ThinkingDisclosureProps) {
   const blockWord = blockCount === 1 ? 'block' : 'blocks';
 
   return (
-    <div className="thinking-disclosure">
+    <div className="thinking-disclosure" data-testid="thinking-disclosure">
       <button
         type="button"
         className="thinking-disclosure-trigger"

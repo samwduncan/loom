@@ -38,9 +38,11 @@ export function ChatView() {
     const session = state.sessions.find((s) => s.id === state.activeSessionId);
     return session?.messages ?? EMPTY_MESSAGES;
   });
-  // URL sync: when sessionId param changes (direct nav, back/forward, sidebar click)
+  // URL sync: when sessionId param changes (direct nav, back/forward, sidebar click).
+  // Skip stub sessions — they are optimistic placeholders that will be reconciled
+  // to real session IDs by onSessionCreated in websocket-init.ts.
   useEffect(() => {
-    if (sessionId && sessionId !== activeSessionId && projectName) {
+    if (sessionId && sessionId !== activeSessionId && projectName && !sessionId.startsWith('stub-')) {
       switchSession(projectName, sessionId);
     }
   }, [sessionId, activeSessionId, projectName, switchSession]);
@@ -52,9 +54,11 @@ export function ChatView() {
     // Message already added to store by ActiveMessage.handleFlush
   }, []);
 
-  // Determine content state
+  // Determine content state.
+  // Prefer activeSessionId over stub session IDs from URL — stubs are optimistic
+  // placeholders that get reconciled to real IDs by onSessionCreated.
   const hasSession = Boolean(sessionId || activeSessionId);
-  const effectiveSessionId = sessionId ?? activeSessionId;
+  const effectiveSessionId = (sessionId?.startsWith('stub-') ? activeSessionId : sessionId) ?? activeSessionId;
 
   return (
     <div className="flex h-full flex-col" data-testid="chat-view">

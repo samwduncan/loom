@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 import loomRules from './eslint-rules/index.js';
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'eslint-rules/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'eslint-rules/**', 'e2e/**', 'playwright.config.ts', 'test-results/**', 'playwright-report/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

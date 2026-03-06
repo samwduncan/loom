@@ -5,6 +5,9 @@
  * stores in a module-level variable (singleton -- project doesn't change
  * during session). Returns { projectName, isLoading }.
  *
+ * Retries up to 3 times with exponential backoff if the initial fetch fails
+ * (handles race with bootstrapAuth() which may not have stored the JWT yet).
+ *
  * Uses "adjust state during rendering" pattern to satisfy React 19
  * set-state-in-effect ESLint rule.
  *
@@ -15,10 +18,12 @@ import { useState, useEffect, useRef } from 'react';
 import { apiFetch } from '@/lib/api-client';
 
 const PROJECT_STORAGE_KEY = 'loom-project-name';
+const MAX_RETRIES = 3;
+const RETRY_BASE_MS = 500;
 
-interface ProjectsResponse {
-  projects: Array<{ name: string; path: string; sessions: number }>;
-}
+/** Backend returns either a raw array or { projects: [...] } depending on version */
+type ProjectEntry = { name: string; path: string; sessions?: unknown };
+type ProjectsResponse = ProjectEntry[] | { projects: ProjectEntry[] };
 
 /** Module-level singleton -- resolved once, reused on subsequent hook calls */
 let resolvedProjectName: string | null = null;
@@ -33,20 +38,31 @@ export function _resetProjectContextForTesting(): void {
 async function resolveProject(): Promise<string> {
   if (resolvedProjectName) return resolvedProjectName;
 
-  try {
-    const data = await apiFetch<ProjectsResponse>('/api/projects');
-    const firstName = data.projects[0]?.name ?? '';
-    resolvedProjectName = firstName;
-    if (firstName) {
-      localStorage.setItem(PROJECT_STORAGE_KEY, firstName);
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const data = await apiFetch<ProjectsResponse>('/api/projects');
+      const projects = Array.isArray(data) ? data : data.projects;
+      const firstName = projects[0]?.name ?? '';
+      resolvedProjectName = firstName;
+      if (firstName) {
+        localStorage.setItem(PROJECT_STORAGE_KEY, firstName);
+      }
+      return firstName;
+    } catch {
+      if (attempt < MAX_RETRIES) {
+        // Wait before retrying -- auth token may not be stored yet
+        await new Promise((r) => setTimeout(r, RETRY_BASE_MS * Math.pow(2, attempt)));
+        continue;
+      }
+      // All retries exhausted -- fallback to localStorage
+      const stored = localStorage.getItem(PROJECT_STORAGE_KEY);
+      resolvedProjectName = stored ?? '';
+      return resolvedProjectName;
     }
-    return firstName;
-  } catch {
-    // Fallback to localStorage if backend unavailable
-    const stored = localStorage.getItem(PROJECT_STORAGE_KEY);
-    resolvedProjectName = stored ?? '';
-    return resolvedProjectName;
   }
+
+  // TypeScript exhaustiveness -- unreachable
+  return '';
 }
 
 export function useProjectContext(): { projectName: string; isLoading: boolean } {

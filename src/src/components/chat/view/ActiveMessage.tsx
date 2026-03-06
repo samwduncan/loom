@@ -87,7 +87,12 @@ export const ActiveMessage = memo(function ActiveMessage(
     // Enter finalizing phase — React state drives data-phase attribute, CSS drives the fade
     setPhase('finalizing');
 
-    const currentSessionId = sessionIdRef.current;
+    // Prefer stream store's activeSessionId — it's updated during stub reconciliation
+    // when the backend assigns a real session ID. The prop sessionId may still point
+    // to a removed stub if replaceState hasn't triggered a React Router re-render yet.
+    // eslint-disable-next-line loom/no-external-store-mutation -- one-time read in callback, not mutation
+    const streamActiveId = useStreamStore.getState().activeSessionId;
+    const currentSessionId = streamActiveId ?? sessionIdRef.current;
 
     // M1 workaround: create stub session if needed. getState() is intentional here —
     // subscribing to sessions would cause re-renders during streaming for no benefit.
