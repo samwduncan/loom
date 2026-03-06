@@ -9,6 +9,7 @@
 
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { TokenPreview } from '@/components/dev/TokenPreview';
+import { ProofOfLife } from '@/components/dev/ProofOfLife';
 import { AppShell } from '@/components/app-shell/AppShell';
 import { PlaceholderView } from '@/components/shared/PlaceholderView';
 import { AppErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -42,6 +43,7 @@ export function AppRoutes() {
         <Route path="/settings" element={<SettingsPlaceholder />} />
       </Route>
       <Route path="/dev/tokens" element={<TokenPreview />} />
+      <Route path="/dev/proof-of-life" element={<ProofOfLife />} />
     </Routes>
   );
 }
