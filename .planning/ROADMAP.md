@@ -138,11 +138,11 @@ Plans:
   2. Clicking a session updates the URL to `/chat/:sessionId`, triggers a message fetch, shows a loading skeleton during the fetch, and displays loaded messages in the content area
   3. The "New Chat" button creates a new session and navigates to it
   4. The sidebar has `role="complementary"` and `aria-label="Chat sessions"` for accessibility
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 08-01: Sidebar component with session list, date grouping, and new chat button
-- [ ] 08-02: Session switching with message loading, skeleton state, and URL sync
+- [ ] 08-01-PLAN.md — Sidebar session list, date grouping, provider logos, shared infrastructure (API client, transforms, MessageContainer)
+- [ ] 08-02-PLAN.md — ChatView with message display, composer, session switching with AbortController, URL sync
 
 ## Progress
 
