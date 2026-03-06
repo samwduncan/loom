@@ -157,7 +157,7 @@ Plans:
   3. Playwright E2E tests pass for: streaming on `/chat`, session switching, new chat, tool call display, thinking blocks, scroll anchor behavior
   4. Zero layout shift (CLS) during the streaming-to-finalized message handoff
   5. `projects_updated` WebSocket event triggers session list refetch
-**Plans:** TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 09-01-PLAN.md — Integration fixes (WebSocket init, SessionList navigation, projects_updated wiring)
