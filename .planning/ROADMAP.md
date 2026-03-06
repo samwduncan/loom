@@ -123,11 +123,11 @@ Plans:
   1. Calling `getToolConfig('Bash')` returns a registered config with display name, icon, and renderers; calling `getToolConfig('UnknownTool')` returns a graceful default config without crashing
   2. The proof-of-life page connects to the backend WebSocket, sends a hardcoded prompt, and renders the streaming response in real-time using the rAF buffer
   3. Thinking blocks display in a separate section from the main response (proving the multiplexer routes channels independently), and connection status is visible on the page
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 07-01: Tool-call component registry with pluggable registration and default fallback
-- [ ] 07-02: Proof-of-life vertical slice page proving end-to-end pipeline
+- [ ] 07-01-PLAN.md — Tool registry module + ToolChip/ToolCard components + ThinkingDisclosure with CSS styling
+- [ ] 07-02-PLAN.md — ActiveMessage multi-span refactor + proof-of-life page wiring entire M1 pipeline end-to-end
 
 ### Phase 8: Navigation + Session Management
 **Goal**: Users can browse their chat sessions in a sidebar, click to switch sessions with message loading, and navigate via URL — completing M1 as a usable (if minimal) application
