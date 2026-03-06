@@ -1,0 +1,56 @@
+/**
+ * ActiveMessage streaming styles — cursor blink, tint, and finalization.
+ *
+ * Constitution 10.3: contain: content is REQUIRED on .active-message.
+ * Uses color-mix() with --accent-primary for background tint.
+ * CSS-only cursor animation (no JS animation loop).
+ */
+
+.active-message {
+  contain: content;
+  border-radius: 8px;
+  background-color: color-mix(in oklch, var(--accent-primary) 4%, transparent);
+  transition: background-color var(--duration-normal) var(--ease-out);
+  padding: var(--space-4);
+  position: relative;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.active-message[data-phase="finalizing"] {
+  background-color: transparent;
+}
+
+.streaming-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  vertical-align: text-bottom;
+  background-color: var(--accent-primary);
+  animation: cursor-blink 1.06s step-end infinite;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.active-message[data-phase="finalizing"] .streaming-cursor {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Muted error line for mid-stream disconnect */
+.active-message-disconnect {
+  color: var(--text-muted);
+  font-size: var(--text-body);
+  margin-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streaming-cursor {
+    animation: none;
+    opacity: 1;
+  }
+}
