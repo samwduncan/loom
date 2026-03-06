@@ -35,11 +35,13 @@ A pluggable tool registry handles any tool name gracefully, and a proof-of-life 
 - **Mechanism:** ActiveMessage subscribes to `useStreamStore(s => s.activeToolCalls)`. When a new tool call appears mid-stream, the current text span "closes" and a ToolChip component renders after it. A new text span ref is created for subsequent text tokens. The rAF loop always writes to the latest text span.
 - **Text:** Still bypasses React reconciler via rAF (zero re-renders for text). Tool chips use normal React rendering (append-only, minimal re-render cost).
 - **Implication:** ActiveMessage needs refactoring from Phase 6's single-span design to support an array of segments (text spans and tool chips). The useStreamBuffer hook needs to support switching its target text node ref.
+- **Race condition mitigation:** The rAF loop must buffer tokens internally when the target ref is null (during React's commit phase for a new span). Tokens accumulate in the buffer and flush on the next frame when the ref is available. No data loss, at most ~16ms visual delay during span switch. Do NOT use `flushSync` -- that defeats the purpose of bypassing React for text.
+- **Re-render scope:** Container-level re-renders when tool chips insert are expected and acceptable. STRM-03 "zero re-renders" applies to text content updates, not structural changes from tool insertion.
 
 ### Registry architecture
 - **File:** `src/src/lib/tool-registry.ts`
 - **API:** `registerTool(toolName, config)`, `getToolConfig(toolName)` returning `ToolConfig | DefaultToolConfig`
-- **ToolConfig fields:** `displayName`, `icon` (string -- Unicode/emoji for M1), `getChipLabel(input)` (extracts key input field per tool), `stateColors` (optional override, defaults provided), `renderCard` (React component for expanded view -- shared stub in M1)
+- **ToolConfig fields:** `displayName`, `icon` (`React.ComponentType` -- M1 implementations return a span with Unicode emoji, M2 swaps for SVG), `getChipLabel(input)` (extracts key input field per tool), `stateColors` (optional override, defaults provided), `renderCard` (React component for expanded view -- shared stub in M1)
 - **Registered tools (M1):** Bash, Read, Edit, Write, Glob, Grep -- each with smart `getChipLabel` extracting key input field
 - **Default fallback:** Unknown tools get generic `⚙️` icon, raw tool name as displayName, raw input JSON in chip label. No crash, no visual jarring.
 - **Icons:** Unicode/emoji for M1 -- `▶` Bash, `📄` Read, `✏️` Edit, `📝` Write, `🔍` Glob, `🔎` Grep, `⚙️` default
@@ -47,7 +49,7 @@ A pluggable tool registry handles any tool name gracefully, and a proof-of-life 
 
 ### Thinking block display
 - **Container:** Collapsible disclosure section above the response text
-- **During active thinking:** Expanded with pulsing "Thinking..." label (opacity pulse CSS animation). Thinking text visible below label in `--text-muted` color.
+- **During active thinking:** Expanded with pulsing "Thinking..." label (opacity pulse CSS animation). Thinking text visible below label in `--text-muted` color. Thinking content reads from `useStreamStore(s => s.thinkingState)` -- no local state for thinking text.
 - **After thinking completes:** Collapses automatically. Shows "Thinking (N blocks)" with disclosure triangle. Click to expand and read.
 - **Surface:** Distinct subtle tint -- `color-mix(in oklch, var(--text-muted) 5%, transparent)` background, `border-radius: 8px`. NOT dusty rose (that's for ActiveMessage). Visually distinct from tool chips (which use `--surface-raised`).
 - **Typography:** Proportional font (`--font-ui` / Inter) at `0.875rem` (14px), `--text-muted` color. Thinking is natural language, not code.
