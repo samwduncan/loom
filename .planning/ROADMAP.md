@@ -112,7 +112,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — useStreamBuffer hook + ActiveMessage component with rAF token buffer, cursor, and finalization lifecycle
+- [x] 06-01-PLAN.md — useStreamBuffer hook + ActiveMessage component with rAF token buffer, cursor, and finalization lifecycle
 - [ ] 06-02-PLAN.md — useScrollAnchor hook with IntersectionObserver sentinel + ScrollToBottomPill component
 
 ### Phase 7: Tool Registry + Proof of Life
@@ -156,6 +156,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. App Shell + Error Boundaries | 2/2 | Complete | 2026-03-05 |
 | 4. State Architecture | 2/2 | Complete | 2026-03-05 |
 | 5. WebSocket Bridge + Multiplexer | 2/2 | Complete   | 2026-03-06 |
-| 6. Streaming Engine + Scroll | 0/2 | Not started | - |
+| 6. Streaming Engine + Scroll | 1/2 | In progress | - |
 | 7. Tool Registry + Proof of Life | 0/2 | Not started | - |
 | 8. Navigation + Sessions | 0/2 | Not started | - |

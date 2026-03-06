@@ -87,7 +87,7 @@
   - The multiplexer updates the `stream` Zustand store with tool call states and thinking state, while routing content tokens to a `useRef` buffer (not React state).
   - Verify: send a prompt that triggers thinking + tool calls + text response — all three channels populate independently and correctly.
 
-- [ ] **STRM-03**: Create `src/hooks/useStreamBuffer.ts` implementing the `useRef` + `requestAnimationFrame` token accumulation pattern:
+- [x] **STRM-03**: Create `src/hooks/useStreamBuffer.ts` implementing the `useRef` + `requestAnimationFrame` token accumulation pattern:
   - Incoming content tokens append to a `ref.current` string (NOT React state)
   - A `requestAnimationFrame` loop reads the ref and updates a DOM node's `textContent` directly (bypassing React reconciler)
   - When streaming completes (`claude-complete` message), flush the accumulated text to the `timeline` Zustand store as a finalized message
@@ -112,7 +112,7 @@
   - `DefaultToolConfig` handles any unregistered tool name gracefully
   - Verify: call `getToolConfig('Bash')` — returns registered config. Call `getToolConfig('UnknownTool')` — returns default config, no crash.
 
-- [ ] **COMP-02**: Create `src/components/chat/ActiveMessage.tsx` — the component that displays the currently-streaming message:
+- [x] **COMP-02**: Create `src/components/chat/ActiveMessage.tsx` — the component that displays the currently-streaming message:
   - Uses the `useStreamBuffer` hook (STRM-03) for token rendering
   - Wrapped in `React.memo` — but since it reads from a ref, not state, it should NOT re-render during streaming
   - Displays a blinking cursor indicator at the end of streamed text
@@ -226,8 +226,8 @@
 | STATE-05 | Phase 4: State Architecture | Complete |
 | STRM-01 | Phase 5: WebSocket Bridge + Multiplexer | Complete |
 | STRM-02 | Phase 5: WebSocket Bridge + Multiplexer | Complete |
-| STRM-03 | Phase 6: Streaming Engine + Scroll | Pending |
-| COMP-02 | Phase 6: Streaming Engine + Scroll | Pending |
+| STRM-03 | Phase 6: Streaming Engine + Scroll | Complete |
+| COMP-02 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-03 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-01 | Phase 7: Tool Registry + Proof of Life | Pending |
 | STRM-04 | Phase 7: Tool Registry + Proof of Life | Pending |

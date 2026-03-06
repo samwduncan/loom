@@ -117,6 +117,11 @@ Recent decisions affecting current work:
 - 05-02: ESLint override for websocket-init.ts allows getState() in infrastructure wiring module (not a component)
 - 05-02: Mid-stream disconnect preserves partial content by not calling endStream, only setting error message
 - 05-02: Stream lifecycle tracked via closure boolean in websocket-init, not in multiplexer (stateless)
+- 06-01: Ref callback sync via useEffect (not render body) to satisfy React 19 react-hooks/refs ESLint rule
+- 06-01: Paint function defined inside useEffect closure instead of useCallback to avoid recursive self-reference issue
+- 06-01: Real Zustand stores in ActiveMessage tests instead of mocks — Zustand v5 useSyncExternalStore incompatible with plain function mocks
+- 06-01: color-mix(in oklch) inline in CSS for ActiveMessage background tint — single-use value, no new token needed
+- 06-01: Store actions accessed via selectors then stored in refs — avoids getState() ESLint violation in component files
 - 06-02: Callback ref (useState+useCallback) instead of useRef for sentinel -- ensures IntersectionObserver setup effect fires on DOM attachment
 - 06-02: Wheel/touchmove event listener for user scroll detection during auto-scroll -- IntersectionObserver alone can't distinguish user scroll from content growth
 - 06-02: Anti-oscillation guard (isAutoScrollingRef) prevents observer "not intersecting" from flashing pill during rAF auto-scroll
@@ -133,6 +138,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T14:57:03.000Z
-Stopped at: Completed 06-02 Scroll Anchor + Bottom Pill
-Resume file: .planning/phases/06-streaming-engine-scroll-anchor/06-02-SUMMARY.md
+Last session: 2026-03-06T14:58:31Z
+Stopped at: Completed 06-01 useStreamBuffer + ActiveMessage (re-execution)
+Resume file: .planning/phases/06-streaming-engine-scroll-anchor/06-01-SUMMARY.md
