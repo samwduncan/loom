@@ -95,11 +95,11 @@ Plans:
   1. The WebSocket client connects to `ws://<host>:<port>/ws?token=<jwt>`, auto-reconnects with exponential backoff (1s/2s/4s/8s/max 30s), and updates the connection store on every state change
   2. Sending a hardcoded prompt via WebSocket produces a streaming response where all incoming message types (`claude-response`, `claude-complete`, `claude-error`, etc.) are parsed and logged correctly
   3. The stream multiplexer routes content tokens to a `useRef` buffer (not React state), thinking content to the stream store's `thinkingState`, and tool events to the stream store's `activeToolCalls`
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 05-01: WebSocket client with typed message parsing, reconnection, and connection store integration
-- [ ] 05-02: Stream multiplexer routing content/thinking/tool channels to stores and ref buffer
+- [ ] 05-01-PLAN.md — WebSocket type system (ServerMessage/ClientMessage unions), auth module (JWT auto-auth), WebSocket client singleton with reconnection state machine
+- [ ] 05-02-PLAN.md — Stream multiplexer pure functions + WS init wiring to Zustand stores
 
 ### Phase 6: Streaming Engine + Scroll Anchor
 **Goal**: Streaming tokens render in the browser at 60fps via direct DOM mutation (bypassing React's reconciler), with scroll that locks to bottom during streaming and instantly disengages on any user scroll
