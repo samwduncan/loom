@@ -109,12 +109,11 @@ Plans:
   1. During a 2000-token streaming response, React DevTools Profiler shows zero re-renders on the ActiveMessage component — all text updates happen via rAF DOM mutation on a ref
   2. The ActiveMessage component displays streamed text with a blinking cursor, and when streaming completes, the accumulated text flushes to the timeline store as a finalized message
   3. During streaming, scrolling up by any amount immediately disengages auto-scroll and shows a "Scroll to bottom" pill; clicking the pill re-engages auto-scroll; starting a new stream re-engages auto-scroll
-**Plans:** 3 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] 06-01: useStreamBuffer hook with useRef + rAF token accumulation and flush
-- [ ] 06-02: ActiveMessage component with memo isolation and blinking cursor
-- [ ] 06-03: useScrollAnchor hook with IntersectionObserver sentinel and scroll-to-bottom pill
+- [ ] 06-01-PLAN.md — useStreamBuffer hook + ActiveMessage component with rAF token buffer, cursor, and finalization lifecycle
+- [ ] 06-02-PLAN.md — useScrollAnchor hook with IntersectionObserver sentinel + ScrollToBottomPill component
 
 ### Phase 7: Tool Registry + Proof of Life
 **Goal**: A pluggable tool registry handles any tool name gracefully, and a proof-of-life page demonstrates the entire pipeline working end-to-end — WebSocket connection, streaming tokens, thinking blocks, and connection status all visible in the browser
@@ -157,6 +156,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. App Shell + Error Boundaries | 2/2 | Complete | 2026-03-05 |
 | 4. State Architecture | 2/2 | Complete | 2026-03-05 |
 | 5. WebSocket Bridge + Multiplexer | 2/2 | Complete   | 2026-03-06 |
-| 6. Streaming Engine + Scroll | 0/3 | Not started | - |
+| 6. Streaming Engine + Scroll | 0/2 | Not started | - |
 | 7. Tool Registry + Proof of Life | 0/2 | Not started | - |
 | 8. Navigation + Sessions | 0/2 | Not started | - |
