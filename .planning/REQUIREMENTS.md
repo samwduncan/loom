@@ -130,7 +130,7 @@
 
 ### Navigation
 
-- [ ] **NAV-01**: Create `src/components/sidebar/Sidebar.tsx` that:
+- [x] **NAV-01**: Create `src/components/sidebar/Sidebar.tsx` that:
   - Renders in the first column of the CSS Grid (width: `var(--sidebar-width, 280px)`)
   - Has `role="complementary"` and `aria-label="Chat sessions"`
   - Fetches session list from `GET /api/projects/:projectName/sessions` (or uses mock data if backend is unavailable)
@@ -231,7 +231,7 @@
 | COMP-03 | Phase 6: Streaming Engine + Scroll | Complete |
 | COMP-01 | Phase 7: Tool Registry + Proof of Life | Complete |
 | STRM-04 | Phase 7: Tool Registry + Proof of Life | Complete |
-| NAV-01 | Phase 8: Navigation + Sessions | Pending |
+| NAV-01 | Phase 8: Navigation + Sessions | Complete |
 | NAV-02 | Phase 8: Navigation + Sessions | Pending |
 
 **Coverage:**

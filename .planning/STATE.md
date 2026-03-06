@@ -26,18 +26,18 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 ## Current Position
 
 Phase: 8 of 8
-Plan: 0 of 2 in current phase
-Status: Phase 7 complete. Phase 8 (Navigation + Session Management) not started.
-Last activity: 2026-03-06 — Completed Plan 07-02: ActiveMessage Multi-Span Refactor + Proof-of-Life
+Plan: 1 of 2 in current phase
+Status: Phase 8 in progress. Plan 01 (Sidebar Session List + Shared Infrastructure) complete.
+Last activity: 2026-03-06 — Completed Plan 08-01: Sidebar Session List + Shared Infrastructure
 
-Progress: [██████████] 100% (M1 plan 16 of 16)
+Progress: [██████████] 100% (M1 plan 17 of 18)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 7 min
-- Total execution time: 2.2 hours
+- Total execution time: 2.3 hours
 
 **By Phase:**
 
@@ -66,6 +66,7 @@ Progress: [██████████] 100% (M1 plan 16 of 16)
 | Phase 06 P02 | 10 | 2 tasks | 6 files |
 | Phase 07 P01 | 7 | 3 tasks | 9 files |
 | Phase 07 P02 | 49 | 3 tasks | 12 files |
+| Phase 08 P01 | 8 | 2 tasks | 23 files |
 
 ## Accumulated Context
 
@@ -135,6 +136,12 @@ Recent decisions affecting current work:
 - [Phase 07]: Segment array architecture: ActiveMessage renders interleaved text spans + ToolChip components with rAF painting to current active span
 - [Phase 07]: Buffer checkpoint/offset pattern: useStreamBuffer.checkpoint() advances offset so new spans only show post-checkpoint characters; getText() returns full buffer for flush
 - [Phase 07]: activeSessionId in stream store tracks backend-assigned session IDs separately from local timeline IDs for correct resume behavior
+- 08-01: apiFetch wrapper with getToken() injection for all REST API calls (centralized auth)
+- 08-01: Ref sync via useEffect (not render body) for React 19 ESLint refs rule compliance
+- 08-01: Adjust-during-render pattern for useProjectContext hook (React 19 set-state-in-effect rule)
+- 08-01: Context menu portaled to document.body to avoid overflow:auto clipping (Architect mandate)
+- 08-01: Module-level singleton for project name resolution (prevents redundant /api/projects fetches)
+- 08-01: SessionItem receives data as props, not subscribing to store (prevents per-item re-renders)
 
 ### Pending Todos
 
@@ -147,6 +154,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T19:21:42.673Z
-Stopped at: Phase 8 context gathered
-Resume file: .planning/phases/08-navigation-session-management/08-CONTEXT.md
+Last session: 2026-03-06T20:12:00.000Z
+Stopped at: Completed 08-01-PLAN.md
+Resume file: .planning/phases/08-navigation-session-management/08-02-PLAN.md
