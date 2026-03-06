@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 08-02-PLAN.md (Phase 8 complete, M1 complete)
-last_updated: "2026-03-06T20:28:29.191Z"
-last_activity: "2026-03-06 — Completed Plan 08-02: Chat Content Area + Session Switching"
+status: executing
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-03-06T21:51:39.000Z"
+last_activity: "2026-03-06 — Completed Plan 09-01: E2E Integration Wiring (4 integration fixes)"
 progress:
-  total_phases: 8
+  total_phases: 10
   completed_phases: 8
-  total_plans: 18
-  completed_plans: 18
-  percent: 100
+  total_plans: 22
+  completed_plans: 19
+  percent: 86
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 7 complete — Tool Registry + Proof of Life. Phase 8 (Navigation + Sessions) next.
+**Current focus:** Phase 9 Plan 01 complete — E2E Integration Wiring. Plan 02 (Playwright E2E verification) next.
 
 ## Current Position
 
-Phase: 8 of 8
-Plan: 2 of 2 in current phase
-Status: Phase 8 COMPLETE. All M1 plans delivered.
-Last activity: 2026-03-06 — Completed Plan 08-02: Chat Content Area + Session Switching
+Phase: 9 of 10
+Plan: 1 of 2 in current phase
+Status: Plan 09-01 complete. 09-02 (Playwright E2E verification) next.
+Last activity: 2026-03-06 — Completed Plan 09-01: E2E Integration Wiring (4 integration fixes)
 
-Progress: [██████████] 100% (M1 plan 18 of 18)
+Progress: [████████░░] 86% (plan 19 of 22)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 19
 - Average duration: 7 min
-- Total execution time: 2.3 hours
+- Total execution time: 2.4 hours
 
 **By Phase:**
 
@@ -50,10 +50,12 @@ Progress: [██████████] 100% (M1 plan 18 of 18)
 | 05 | 2 | 12 min | 6 min |
 | 06 | 2 | 20 min | 10 min |
 | 07 | 2 | 56 min | 28 min |
+| 08 | 2 | 15 min | 8 min |
+| 09 | 1/2 | 8 min | 8 min |
 
 **Recent Trend:**
-- Last 5 plans: 10m, 10m, 7m, 7m, 49m
-- Trend: proof-of-life plan took longest due to end-to-end integration + post-checkpoint bug fixes
+- Last 5 plans: 7m, 7m, 49m, 8m, 8m
+- Trend: integration wiring plans execute quickly (small surgical changes)
 
 *Updated after each plan completion*
 | Phase 03 P01 | 4 | 2 tasks | 13 files |
@@ -68,6 +70,7 @@ Progress: [██████████] 100% (M1 plan 18 of 18)
 | Phase 07 P02 | 49 | 3 tasks | 12 files |
 | Phase 08 P01 | 8 | 2 tasks | 23 files |
 | Phase 08 P02 | 7 | 2 tasks | 16 files |
+| Phase 09 P01 | 8 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -148,6 +151,9 @@ Recent decisions affecting current work:
 - 08-02: Optimistic user message add on send (before WebSocket response arrives)
 - 08-02: useSessionSwitch uses getState() pattern (infrastructure hook, not component)
 - 08-02: App.test.tsx assertions updated from ChatPlaceholder text to ChatView data-testids
+- 09-01: useSessionList refetch uses ref-based callbacks (no setState) to satisfy react-hooks/set-state-in-effect ESLint rule
+- 09-01: Stub session reconciliation uses window.history.replaceState instead of navigate() to avoid ChatView URL effect double-fetch
+- 09-01: onProjectsUpdated wired through window CustomEvent bridge to decouple WebSocket infra from React hooks
 
 ### Pending Todos
 
@@ -160,6 +166,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T20:22:26.000Z
-Stopped at: Completed 08-02-PLAN.md (Phase 8 complete, M1 complete)
-Resume file: Ready for /gsd:verify-work 8
+Last session: 2026-03-06T21:51:39.000Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: Ready for /gsd:execute-phase 09 (plan 02)

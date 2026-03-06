@@ -160,7 +160,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Integration fixes (WebSocket init, SessionList navigation, projects_updated wiring)
+- [x] 09-01-PLAN.md — Integration fixes (WebSocket init, SessionList navigation, projects_updated wiring, optimistic stub sessions) (completed 2026-03-06)
 - [ ] 09-02-PLAN.md — Playwright E2E test suite (streaming, session switching, scroll, tool calls, CLS verification)
 
 ### Phase 10: Pre-Archive Cleanup
@@ -193,5 +193,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 6. Streaming Engine + Scroll | 2/2 | Complete | 2026-03-06 |
 | 7. Tool Registry + Proof of Life | 2/2 | Complete   | 2026-03-06 |
 | 8. Navigation + Sessions | 2/2 | Complete   | 2026-03-06 |
-| 9. E2E Integration + Playwright | 0/2 | Pending | - |
+| 9. E2E Integration + Playwright | 1/2 | In Progress | - |
 | 10. Pre-Archive Cleanup | 0/1 | Pending | - |
