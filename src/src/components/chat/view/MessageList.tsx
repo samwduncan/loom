@@ -6,10 +6,14 @@
  * During streaming, renders ActiveMessage at the end.
  * Includes scroll anchor sentinel and ScrollToBottomPill.
  *
+ * ActiveMessage stays mounted through finalization to complete the 200ms
+ * fade-out before unmounting. showActiveMessage is driven by
+ * onFinalizationComplete, NOT by isStreaming going false.
+ *
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useRef } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
@@ -29,6 +33,22 @@ export function MessageList({ messages, sessionId, onStreamFinalized }: MessageL
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isStreaming = useStreamStore((state) => state.isStreaming);
 
+  // ActiveMessage must stay mounted through finalization fade (200ms).
+  // showActiveMessage turns ON when streaming starts, OFF only when
+  // onFinalizationComplete fires — NOT when isStreaming flips to false.
+  // Uses React "adjust state during rendering" pattern (not useEffect)
+  // to avoid the set-state-in-effect ESLint rule.
+  const [showActiveMessage, setShowActiveMessage] = useState(false);
+
+  if (isStreaming && !showActiveMessage) {
+    setShowActiveMessage(true);
+  }
+
+  const handleFinalized = useCallback(() => {
+    setShowActiveMessage(false);
+    onStreamFinalized();
+  }, [onStreamFinalized]);
+
   const { sentinelRef, showPill, scrollToBottom } = useScrollAnchor(scrollContainerRef);
 
   return (
@@ -47,10 +67,10 @@ export function MessageList({ messages, sessionId, onStreamFinalized }: MessageL
             )}
           </MessageErrorBoundary>
         ))}
-        {isStreaming && (
+        {showActiveMessage && (
           <ActiveMessage
             sessionId={sessionId}
-            onFinalizationComplete={onStreamFinalized}
+            onFinalizationComplete={handleFinalized}
           />
         )}
       </div>

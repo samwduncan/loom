@@ -10,7 +10,7 @@
  * Constitution: Named exports (2.2), selector-only store access (4.2), cn() (3.6).
  */
 
-import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
+import { useState, useRef, useCallback, useEffect, type KeyboardEvent } from 'react';
 import { cn } from '@/utils/cn';
 import { wsClient } from '@/lib/websocket-client';
 import { useStreamStore } from '@/stores/stream';
@@ -26,10 +26,21 @@ interface ChatComposerProps {
 export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const pendingTitleRef = useRef<string | null>(null);
 
   const isStreaming = useStreamStore((state) => state.isStreaming);
   const streamSessionId = useStreamStore((state) => state.activeSessionId);
   const addMessage = useTimelineStore((state) => state.addMessage);
+  const updateSessionTitle = useTimelineStore((state) => state.updateSessionTitle);
+
+  // When a new chat session is created (streamSessionId transitions to non-null
+  // while we have a pending title), update the sidebar title optimistically
+  useEffect(() => {
+    if (streamSessionId && pendingTitleRef.current) {
+      updateSessionTitle(streamSessionId, pendingTitleRef.current);
+      pendingTitleRef.current = null;
+    }
+  }, [streamSessionId, updateSessionTitle]);
 
   const handleSend = useCallback(() => {
     const trimmed = input.trim();
@@ -39,6 +50,11 @@ export function ChatComposer({ projectName, sessionId }: ChatComposerProps) {
     const options: Record<string, string> = { projectPath: projectName };
     if (sessionId) {
       options.sessionId = sessionId;
+    }
+
+    // Store pending title for new chats — will be applied when session-created fires
+    if (!sessionId) {
+      pendingTitleRef.current = trimmed.slice(0, 50);
     }
 
     wsClient.send({
