@@ -108,7 +108,7 @@ export const ActiveMessage = memo(function ActiveMessage(
     }
 
     const message: Message = {
-      id: crypto.randomUUID(),
+      id: Math.random().toString(36).slice(2, 10),
       role: 'assistant',
       content: text,
       metadata: {

@@ -167,7 +167,7 @@ export function routeClaudeResponse(
             break;
           case 'thinking':
             callbacks.onThinkingBlock(
-              crypto.randomUUID(),
+              Math.random().toString(36).slice(2, 10),
               block.thinking,
               true,
             );

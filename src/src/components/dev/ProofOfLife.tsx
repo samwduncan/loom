@@ -30,7 +30,7 @@ export function ProofOfLife() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Session ID — stable for the lifetime of this page
-  const [sessionId] = useState(() => 'proof-of-life-' + crypto.randomUUID().slice(0, 8));
+  const [sessionId] = useState(() => 'proof-of-life-' + Math.random().toString(36).slice(2, 10));
 
   // Store selectors
   const connectionStatus = useConnectionStore((s) => s.providers.claude.status);
@@ -82,7 +82,7 @@ export function ProofOfLife() {
 
     // Add user message to timeline
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: Math.random().toString(36).slice(2, 10),
       role: 'user',
       content: prompt,
       metadata: {
