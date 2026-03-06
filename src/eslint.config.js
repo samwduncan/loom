@@ -65,6 +65,13 @@ export default tseslint.config(
       'loom/no-external-store-mutation': 'off',
     },
   },
+  // Override: Allow getState in init/wiring modules (infrastructure, not components)
+  {
+    files: ['src/lib/websocket-init.ts'],
+    rules: {
+      'loom/no-external-store-mutation': 'off',
+    },
+  },
   // Override: Prevent cross-store imports (Constitution 4.5 — no store-to-store dependencies)
   {
     files: ['src/stores/*.ts'],
