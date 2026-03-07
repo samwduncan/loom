@@ -137,4 +137,15 @@ describe('MarkdownRenderer', () => {
     expect(container.querySelector('details')).toBeTruthy();
     expect(container.querySelector('summary')).toBeTruthy();
   });
+
+  it('renders markdown image with cursor-pointer class and correct src', () => {
+    render(
+      <MarkdownRenderer content="![screenshot](https://example.com/img.png)" />,
+    );
+    const img = screen.getByAltText('screenshot');
+    expect(img.tagName).toBe('IMG');
+    expect(img.getAttribute('src')).toBe('https://example.com/img.png');
+    expect(img.className).toContain('cursor-pointer');
+    expect(img.className).toContain('rounded-lg');
+  });
 });
