@@ -1,14 +1,20 @@
 /**
  * ToolChip -- compact inline pill component for tool calls.
  *
- * Renders a status dot, icon, tool name, and chip label. Click toggles
- * inline expansion showing ToolCard (pushes content below, no popover).
+ * Renders a status dot, icon, tool name, elapsed time, and chip label.
+ * Click toggles inline expansion showing ToolCard via ToolCardShell
+ * (pushes content below, no popover).
+ *
+ * Error tool calls auto-expand on first render and on transition to rejected
+ * using "adjust state during rendering" pattern.
  *
  * Constitution: Named exports only (2.2), cn() for classNames, memo() wrapped.
  */
 
 import { memo, useState } from 'react';
 import { getToolConfig } from '@/lib/tool-registry';
+import { useElapsedTime } from '@/hooks/useElapsedTime';
+import { ToolCardShell } from './ToolCardShell';
 import { cn } from '@/utils/cn';
 import type { ToolCallState } from '@/types/stream';
 import './tool-chip.css';
@@ -18,11 +24,23 @@ export interface ToolChipProps {
 }
 
 export const ToolChip = memo(function ToolChip({ toolCall }: ToolChipProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(
+    toolCall.isError && toolCall.status === 'rejected',
+  );
   const config = getToolConfig(toolCall.toolName);
   const chipLabel = config.getChipLabel(toolCall.input);
   const Icon = config.icon;
   const CardComponent = config.renderCard;
+  const elapsed = useElapsedTime(toolCall.startedAt, toolCall.completedAt);
+
+  // "Adjust state during rendering" pattern: auto-expand on transition to rejected
+  const [prevStatus, setPrevStatus] = useState(toolCall.status);
+  if (toolCall.status !== prevStatus) {
+    setPrevStatus(toolCall.status);
+    if (toolCall.status === 'rejected') {
+      setIsExpanded(true);
+    }
+  }
 
   return (
     <div className="tool-chip-container" data-testid="tool-chip">
@@ -40,9 +58,20 @@ export const ToolChip = memo(function ToolChip({ toolCall }: ToolChipProps) {
         />
         <Icon />
         <span className="tool-chip-name">{config.displayName}</span>
+        {elapsed && (
+          <>
+            <span className="tool-chip-separator">&middot;</span>
+            <span className="tool-chip-elapsed">{elapsed}</span>
+          </>
+        )}
         <span className="tool-chip-label">{chipLabel}</span>
       </button>
-      {isExpanded && (
+      <ToolCardShell
+        toolCall={toolCall}
+        config={config}
+        isExpanded={isExpanded}
+        onToggle={() => setIsExpanded((prev) => !prev)}
+      >
         <CardComponent
           toolName={toolCall.toolName}
           input={toolCall.input}
@@ -50,7 +79,7 @@ export const ToolChip = memo(function ToolChip({ toolCall }: ToolChipProps) {
           isError={toolCall.isError}
           status={toolCall.status}
         />
-      )}
+      </ToolCardShell>
     </div>
   );
 });

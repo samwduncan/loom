@@ -1,12 +1,21 @@
 /**
- * ToolChip component tests — covers COMP-01 chip rendering requirement.
- * Tests status dot colors, icon/label rendering, expand/collapse, and memo.
+ * ToolChip component tests -- covers COMP-01 chip rendering requirement.
+ * Tests status dot colors, icon/label rendering, expand/collapse via ToolCardShell,
+ * elapsed time display, error force-expand, and adjust-state-during-rendering.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import type { ToolCallState, ToolCallStatus } from '@/types/stream';
+
+// Mock useElapsedTime to control elapsed display
+vi.mock('@/hooks/useElapsedTime', () => ({
+  useElapsedTime: vi.fn(() => ''),
+}));
+
+import { useElapsedTime } from '@/hooks/useElapsedTime';
+const mockUseElapsedTime = vi.mocked(useElapsedTime);
 
 function makeToolCall(overrides: Partial<ToolCallState> = {}): ToolCallState {
   return {
@@ -23,11 +32,15 @@ function makeToolCall(overrides: Partial<ToolCallState> = {}): ToolCallState {
 }
 
 describe('ToolChip', () => {
+  beforeEach(() => {
+    mockUseElapsedTime.mockReturnValue('');
+  });
+
   it('renders status dot with correct CSS class for each status', () => {
     const statuses: ToolCallStatus[] = ['invoked', 'executing', 'resolved', 'rejected'];
     for (const status of statuses) {
       const { container, unmount } = render(
-        <ToolChip toolCall={makeToolCall({ status })} />,
+        <ToolChip toolCall={makeToolCall({ status, isError: status === 'rejected' })} />,
       );
       const dot = container.querySelector('.tool-chip-dot');
       expect(dot).not.toBeNull();
@@ -44,9 +57,11 @@ describe('ToolChip', () => {
     expect(icon).not.toBeNull();
   });
 
-  it('renders tool display name', () => {
-    render(<ToolChip toolCall={makeToolCall()} />);
-    expect(screen.getByText('Bash')).toBeInTheDocument();
+  it('renders tool display name on chip button', () => {
+    const { container } = render(<ToolChip toolCall={makeToolCall()} />);
+    const chipName = container.querySelector('button.tool-chip .tool-chip-name');
+    expect(chipName).not.toBeNull();
+    expect(chipName?.textContent).toBe('Bash');
   });
 
   it('renders chip label from getChipLabel', () => {
@@ -54,7 +69,7 @@ describe('ToolChip', () => {
     expect(screen.getByText('echo hello')).toBeInTheDocument();
   });
 
-  it('click toggles expanded state and renders ToolCard inline', () => {
+  it('click toggles ToolCardShell expanded state', () => {
     const { container } = render(
       <ToolChip toolCall={makeToolCall({ output: 'hello world', status: 'resolved' })} />,
     );
@@ -63,17 +78,18 @@ describe('ToolChip', () => {
 
     // Initially collapsed
     expect(button?.getAttribute('aria-expanded')).toBe('false');
-    expect(container.querySelector('.tool-card')).toBeNull();
+    const shell = container.querySelector('[data-testid="tool-card-shell"]');
+    expect(shell?.getAttribute('data-expanded')).toBe('false');
 
     // Click to expand
     fireEvent.click(button!); // ASSERT: button confirmed non-null by expect above
     expect(button?.getAttribute('aria-expanded')).toBe('true');
-    expect(container.querySelector('.tool-card')).not.toBeNull();
+    expect(shell?.getAttribute('data-expanded')).toBe('true');
 
     // Click to collapse
     fireEvent.click(button!); // ASSERT: button confirmed non-null by expect above
     expect(button?.getAttribute('aria-expanded')).toBe('false');
-    expect(container.querySelector('.tool-card')).toBeNull();
+    expect(shell?.getAttribute('data-expanded')).toBe('false');
   });
 
   it('has aria-expanded attribute reflecting expansion state', () => {
@@ -89,12 +105,11 @@ describe('ToolChip', () => {
       <ToolChip toolCall={makeToolCall({ input: { command: 'npm test' } })} />,
     );
     const button = container.querySelector('button.tool-chip');
-    fireEvent.click(button!); // ASSERT: button exists since ToolChip always renders a button
+    fireEvent.click(button!); // ASSERT: ToolChip always renders a button element
 
-    const card = container.querySelector('.tool-card');
-    expect(card).not.toBeNull();
-    // Input should be visible in the card
-    expect(card?.textContent).toContain('npm test');
+    const shell = container.querySelector('[data-testid="tool-card-shell"]');
+    expect(shell).not.toBeNull();
+    expect(shell?.textContent).toContain('npm test');
   });
 
   it('ToolCard shows output when present', () => {
@@ -107,10 +122,10 @@ describe('ToolChip', () => {
       />,
     );
     const button = container.querySelector('button.tool-chip');
-    fireEvent.click(button!); // ASSERT: button exists since ToolChip always renders a button
+    fireEvent.click(button!); // ASSERT: ToolChip always renders a button element
 
-    const card = container.querySelector('.tool-card');
-    expect(card?.textContent).toContain('test output here');
+    const shell = container.querySelector('[data-testid="tool-card-shell"]');
+    expect(shell?.textContent).toContain('test output here');
   });
 
   it('ToolCard shows error output with error class when isError is true', () => {
@@ -123,9 +138,7 @@ describe('ToolChip', () => {
         })}
       />,
     );
-    const button = container.querySelector('button.tool-chip');
-    fireEvent.click(button!); // ASSERT: button exists since ToolChip always renders a button
-
+    // Error tools start expanded, so no need to click
     const errorOutput = container.querySelector('.tool-card-output--error');
     expect(errorOutput).not.toBeNull();
     expect(errorOutput?.textContent).toContain('error message');
@@ -135,8 +148,89 @@ describe('ToolChip', () => {
     const { container } = render(
       <ToolChip toolCall={makeToolCall({ toolName: 'CustomTool', input: { foo: 'bar' } })} />,
     );
-    expect(screen.getByText('CustomTool')).toBeInTheDocument();
+    const chipName = container.querySelector('button.tool-chip .tool-chip-name');
+    expect(chipName?.textContent).toBe('CustomTool');
     const icon = container.querySelector('.tool-chip-icon');
     expect(icon).not.toBeNull();
+  });
+
+  // --- New tests for Plan 02 ---
+
+  it('error tool call starts expanded', () => {
+    const { container } = render(
+      <ToolChip
+        toolCall={makeToolCall({
+          status: 'rejected',
+          isError: true,
+          output: 'failed',
+        })}
+      />,
+    );
+    const button = container.querySelector('button.tool-chip');
+    expect(button?.getAttribute('aria-expanded')).toBe('true');
+    const shell = container.querySelector('[data-testid="tool-card-shell"]');
+    expect(shell?.getAttribute('data-expanded')).toBe('true');
+  });
+
+  it('auto-expands when tool transitions to rejected status', () => {
+    const toolCall = makeToolCall({ status: 'executing' });
+    const { container, rerender } = render(<ToolChip toolCall={toolCall} />);
+
+    // Initially collapsed
+    const button = container.querySelector('button.tool-chip');
+    expect(button?.getAttribute('aria-expanded')).toBe('false');
+
+    // Rerender with rejected status
+    rerender(
+      <ToolChip
+        toolCall={makeToolCall({ status: 'rejected', isError: true, output: 'err' })}
+      />,
+    );
+    expect(button?.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('displays elapsed time with middle dot separator', () => {
+    mockUseElapsedTime.mockReturnValue('2.3s');
+    const { container } = render(
+      <ToolChip toolCall={makeToolCall({ status: 'executing' })} />,
+    );
+    const separator = container.querySelector('.tool-chip-separator');
+    expect(separator).not.toBeNull();
+    expect(separator?.textContent).toBe('\u00B7');
+
+    const elapsedEl = container.querySelector('.tool-chip-elapsed');
+    expect(elapsedEl).not.toBeNull();
+    expect(elapsedEl?.textContent).toBe('2.3s');
+  });
+
+  it('does not display elapsed time when hook returns empty string', () => {
+    mockUseElapsedTime.mockReturnValue('');
+    const { container } = render(
+      <ToolChip toolCall={makeToolCall()} />,
+    );
+    const separator = container.querySelector('.tool-chip-separator');
+    expect(separator).toBeNull();
+    const elapsedEl = container.querySelector('.tool-chip-elapsed');
+    expect(elapsedEl).toBeNull();
+  });
+
+  it('rejected chip has tool-chip--rejected class', () => {
+    const { container } = render(
+      <ToolChip
+        toolCall={makeToolCall({ status: 'rejected', isError: true })}
+      />,
+    );
+    const button = container.querySelector('button.tool-chip');
+    expect(button?.classList.contains('tool-chip--rejected')).toBe(true);
+  });
+
+  it('ToolCardShell is always mounted (not conditionally rendered)', () => {
+    const { container } = render(
+      <ToolChip toolCall={makeToolCall()} />,
+    );
+    // Shell is always in DOM, even when collapsed
+    const shell = container.querySelector('[data-testid="tool-card-shell"]');
+    expect(shell).not.toBeNull();
+    expect(shell?.getAttribute('data-expanded')).toBe('false');
   });
 });

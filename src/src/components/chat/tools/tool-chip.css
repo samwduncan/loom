@@ -118,6 +118,25 @@
   word-break: break-all;
 }
 
+/* ─── Chip: Elapsed Time + Separator ─────────────────────────────────── */
+
+.tool-chip-separator {
+  color: var(--text-muted);
+  margin: 0 2px;
+}
+
+.tool-chip-elapsed {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.75rem;
+}
+
+/* ─── Chip: Rejected Border Tint ─────────────────────────────────────── */
+
+.tool-chip--rejected {
+  border-color: oklch(from var(--status-error) l c h / 0.3);
+}
+
 /* ─── Reduced Motion ─────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
