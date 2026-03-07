@@ -10,9 +10,9 @@
 
 - [ ] **DEP-01**: Install react-markdown ^10.1.0, remark-gfm ^4.0.1, rehype-raw ^7.0.0 in `src/` workspace
 - [ ] **DEP-02**: Install shiki ^4.0.1 in `src/` workspace
-- [ ] **DEP-03**: Create Shiki singleton module (`shiki-highlighter.ts`) using JavaScript RegExp engine (no WASM), empty initial language set, `css-variables` theme
-- [ ] **DEP-04**: Pre-load 7 common language grammars at app startup: JavaScript, TypeScript, Python, Bash, JSON, CSS, HTML. All other languages load on first encounter.
-- [ ] **DEP-05**: Create Shiki OKLCH theme mapping file (`shiki-theme.ts`) that maps `--shiki-token-*` CSS custom properties to design tokens in `tokens.css`. Use Constitution Section 3.1 exception pattern for third-party theme objects.
+- [x] **DEP-03**: Create Shiki singleton module (`shiki-highlighter.ts`) using JavaScript RegExp engine (no WASM), empty initial language set, `css-variables` theme
+- [x] **DEP-04**: Pre-load 7 common language grammars at app startup: JavaScript, TypeScript, Python, Bash, JSON, CSS, HTML. All other languages load on first encounter.
+- [x] **DEP-05**: Create Shiki OKLCH theme mapping file (`shiki-theme.ts`) that maps `--shiki-token-*` CSS custom properties to design tokens in `tokens.css`. Use Constitution Section 3.1 exception pattern for third-party theme objects.
 - [ ] **DEP-06**: Install tailwindcss-animate for message entrance animations (Constitution Tier 2 motion)
 
 ### Markdown Rendering — Finalized Messages
@@ -35,15 +35,15 @@
 
 ### Code Blocks (Shiki)
 
-- [ ] **CODE-01**: Fenced code blocks render with Shiki syntax highlighting using the `css-variables` theme (colors from CSS custom properties, not inline styles)
-- [ ] **CODE-02**: Code block UI: language label top-right, copy-to-clipboard button top-right (shows "Copied!" for 2s after click, then reverts), dark surface background (`bg-surface-0`)
-- [ ] **CODE-03**: Code blocks display line numbers for blocks > 3 lines
-- [ ] **CODE-04**: Code blocks cap at `max-height: 400px` with `overflow-y: auto` inner scroll. Full height for blocks ≤ 20 lines.
-- [ ] **CODE-05**: Code blocks reserve `min-height` based on line count estimate immediately to prevent layout shift during async grammar loading (CLS = 0)
-- [ ] **CODE-06**: Shiki grammar loading is async — plain monospace text renders immediately as fallback, highlighted version swaps in via `useDeferredValue` (no blocking, no flash of unstyled code)
-- [ ] **CODE-07**: Highlighted results cached per language+code combination. Subsequent identical blocks highlight instantly.
-- [ ] **CODE-08**: Code blocks use `overflow-x: auto` for long lines (no wrapping by default). Lines that exceed container width get horizontal scroll.
-- [ ] **CODE-09**: ESLint exceptions for Shiki theme configuration use `// eslint-disable-next-line` with SAFETY explanation comment, per Constitution Section 3.1
+- [x] **CODE-01**: Fenced code blocks render with Shiki syntax highlighting using the `css-variables` theme (colors from CSS custom properties, not inline styles)
+- [x] **CODE-02**: Code block UI: language label top-right, copy-to-clipboard button top-right (shows "Copied!" for 2s after click, then reverts), dark surface background (`bg-surface-0`)
+- [x] **CODE-03**: Code blocks display line numbers for blocks > 3 lines
+- [x] **CODE-04**: Code blocks cap at `max-height: 400px` with `overflow-y: auto` inner scroll. Full height for blocks ≤ 20 lines.
+- [x] **CODE-05**: Code blocks reserve `min-height` based on line count estimate immediately to prevent layout shift during async grammar loading (CLS = 0)
+- [x] **CODE-06**: Shiki grammar loading is async — plain monospace text renders immediately as fallback, highlighted version swaps in via `useDeferredValue` (no blocking, no flash of unstyled code)
+- [x] **CODE-07**: Highlighted results cached per language+code combination. Subsequent identical blocks highlight instantly.
+- [x] **CODE-08**: Code blocks use `overflow-x: auto` for long lines (no wrapping by default). Lines that exceed container width get horizontal scroll.
+- [x] **CODE-09**: ESLint exceptions for Shiki theme configuration use `// eslint-disable-next-line` with SAFETY explanation comment, per Constitution Section 3.1
 
 ### Composer
 
@@ -185,9 +185,9 @@ Updated during roadmap creation (2026-03-07).
 |-------------|-------|--------|
 | DEP-01 | Phase 11 | Pending |
 | DEP-02 | Phase 11 | Pending |
-| DEP-03 | Phase 11 | Pending |
-| DEP-04 | Phase 11 | Pending |
-| DEP-05 | Phase 11 | Pending |
+| DEP-03 | Phase 11 | Complete |
+| DEP-04 | Phase 11 | Complete |
+| DEP-05 | Phase 11 | Complete |
 | DEP-06 | Phase 18 | Pending |
 | MD-01 | Phase 11 | Pending |
 | MD-02 | Phase 11 | Pending |
@@ -201,15 +201,15 @@ Updated during roadmap creation (2026-03-07).
 | MD-13 | Phase 12 | Pending |
 | MD-14 | Phase 12 | Pending |
 | MD-15 | Phase 12 | Pending |
-| CODE-01 | Phase 11 | Pending |
-| CODE-02 | Phase 11 | Pending |
-| CODE-03 | Phase 11 | Pending |
-| CODE-04 | Phase 11 | Pending |
-| CODE-05 | Phase 11 | Pending |
-| CODE-06 | Phase 11 | Pending |
-| CODE-07 | Phase 11 | Pending |
-| CODE-08 | Phase 11 | Pending |
-| CODE-09 | Phase 11 | Pending |
+| CODE-01 | Phase 11 | Complete |
+| CODE-02 | Phase 11 | Complete |
+| CODE-03 | Phase 11 | Complete |
+| CODE-04 | Phase 11 | Complete |
+| CODE-05 | Phase 11 | Complete |
+| CODE-06 | Phase 11 | Complete |
+| CODE-07 | Phase 11 | Complete |
+| CODE-08 | Phase 11 | Complete |
+| CODE-09 | Phase 11 | Complete |
 | CMP-01 | Phase 13 | Pending |
 | CMP-02 | Phase 13 | Pending |
 | CMP-03 | Phase 13 | Pending |
