@@ -108,9 +108,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
-- [ ] 14-03: TBD
+- [ ] 14-01-PLAN.md -- MessageContainer expansion + Error/System/TaskNotification components + 5-way dispatch
+- [ ] 14-02-PLAN.md -- ThinkingDisclosure refactor + provider logos + global thinking toggle + AssistantMessage wiring
+- [ ] 14-03-PLAN.md -- UserMessage enhancements + ImageThumbnailGrid + ImageLightbox + MarkdownRenderer img override
 
 ### Phase 15: Tool Card Shell + State Machine
 **Goal**: Tool calls display with state machine animations and consistent card wrapper
@@ -212,7 +212,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 11. Markdown + Code Blocks | 3/3 | Complete    | 2026-03-07 | - |
 | 12. Streaming Markdown + Marker Interleaving | 3/3 | Complete    | 2026-03-07 | - |
 | 13. Composer | v1.1 | Complete    | 2026-03-07 | 2026-03-07 |
-| 14. Message Types | v1.1 | 0/? | Not started | - |
+| 14. Message Types | v1.1 | 0/3 | Not started | - |
 | 15. Tool Card Shell + Interleaving | v1.1 | 0/? | Not started | - |
 | 16. Per-Tool Cards | v1.1 | 0/? | Not started | - |
 | 17. Tool Grouping + Permissions | v1.1 | 0/? | Not started | - |
