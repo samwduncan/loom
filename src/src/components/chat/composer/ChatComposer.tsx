@@ -26,8 +26,12 @@ import { useTimelineStore } from '@/stores/timeline';
 import { useAutoResize } from './useAutoResize';
 import { useComposerState } from './useComposerState';
 import { useDraftPersistence } from './useDraftPersistence';
+import { useImageAttachments } from './useImageAttachments';
 import { ComposerKeyboardHints } from './ComposerKeyboardHints';
+import { ImagePreviewRow } from './ImagePreviewRow';
+import { DragOverlay } from './DragOverlay';
 import type { Message } from '@/types/message';
+import type { ClaudeCommandOptions } from '@/types/websocket';
 import './composer.css';
 
 interface ChatComposerProps {
@@ -61,6 +65,20 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
   // FSM
   const { state: composerState, dispatch, canSend, canStop } = useComposerState();
+
+  // Image attachments
+  const {
+    attachments,
+    removeImage,
+    clearAll: clearImages,
+    getBase64ForSend,
+    addFromClipboard,
+    addFromDrop,
+  } = useImageAttachments();
+
+  // Drag-and-drop overlay state (dragCounter pattern prevents flicker)
+  const [isDragOver, setIsDragOver] = useState(false);
+  const dragCounterRef = useRef(0);
 
   // Populate input from suggestion chip click
   useEffect(() => {
@@ -154,17 +172,23 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canStop, streamSessionId]);
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    const hasImages = attachments.length > 0;
+    if (!trimmed && !hasImages) return;
 
     // Message queuing during streaming: send immediately, add optimistic with queued flag
     if (isStreaming) {
       const effectiveId = sessionId ?? streamSessionId;
       if (!effectiveId) return;
 
-      const options: Record<string, string> = { projectPath: projectName };
+      const options: ClaudeCommandOptions = { projectPath: projectName };
       options.sessionId = effectiveId;
+
+      // Include images if attached (convert to base64)
+      if (hasImages) {
+        options.images = await getBase64ForSend();
+      }
 
       wsClient.send({
         type: 'claude-command',
@@ -192,6 +216,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       addMessage(effectiveId, queuedMessage);
       setInput('');
       clearDraft(effectiveId);
+      if (hasImages) clearImages();
       requestAnimationFrame(() => textareaRef.current?.focus());
       return;
     }
@@ -199,7 +224,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     // Normal send: must be in idle state
     if (!canSend) return;
 
-    // Dispatch SEND to FSM (enters 'sending' state)
+    // Dispatch SEND to FSM synchronously (enters 'sending' state, prevents double-send)
     dispatch({ type: 'SEND' });
 
     // Determine effective session ID
@@ -222,9 +247,14 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     }
 
     // Build options -- omit sessionId for new chat
-    const options: Record<string, string> = { projectPath: projectName };
+    const options: ClaudeCommandOptions = { projectPath: projectName };
     if (sessionId) {
       options.sessionId = sessionId;
+    }
+
+    // Convert images to base64 for WebSocket transport (async)
+    if (hasImages) {
+      options.images = await getBase64ForSend();
     }
 
     // Store pending title for new chats
@@ -262,8 +292,9 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     hasMessageSentRef.current = true;
     setInput('');
     if (effectiveSessionId) clearDraft(effectiveSessionId);
+    if (hasImages) clearImages();
     requestAnimationFrame(() => textareaRef.current?.focus());
-  }, [input, isStreaming, canSend, projectName, sessionId, streamSessionId, addMessage, addSession, navigate, dispatch, clearDraft]);
+  }, [input, attachments, isStreaming, canSend, projectName, sessionId, streamSessionId, addMessage, addSession, navigate, dispatch, clearDraft, getBase64ForSend, clearImages]);
 
   const handleStop = useCallback(() => {
     if (!canStop) return;
@@ -298,14 +329,34 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
   const isStreamingState = composerState === 'active' || composerState === 'aborting';
 
+  const hasContent = input.trim() || attachments.length > 0;
+
   return (
     <div className="max-w-3xl mx-auto w-full px-4 pb-4 pt-2">
       <div
-        className="composer-pill p-3"
+        className="composer-pill relative p-3"
         data-streaming={isStreamingState}
         data-testid="chat-composer"
+        onDragEnter={(e) => {
+          e.preventDefault();
+          dragCounterRef.current++;
+          if (dragCounterRef.current === 1) setIsDragOver(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          dragCounterRef.current--;
+          if (dragCounterRef.current === 0) setIsDragOver(false);
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          dragCounterRef.current = 0;
+          setIsDragOver(false);
+          addFromDrop(e);
+        }}
       >
-        {/* Image preview row slot -- Plan 02 adds content */}
+        {/* Image preview row */}
+        <ImagePreviewRow attachments={attachments} onRemove={removeImage} />
 
         <textarea
           ref={textareaRef}
@@ -315,6 +366,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
             if (sessionId) saveDraft(sessionId, e.target.value);
           }}
           onKeyDown={handleKeyDown}
+          onPaste={addFromClipboard}
           placeholder="Send a message..."
           aria-label="Message input"
           rows={1}
@@ -336,7 +388,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
             <button
               type="button"
               onClick={handleSend}
-              disabled={!canSend || !input.trim()}
+              disabled={!canSend || !hasContent}
               aria-label="Send message"
               data-visible={canSend && !isStreamingState ? 'true' : 'false'}
               className={cn(
@@ -371,6 +423,9 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
             </button>
           </div>
         </div>
+
+        {/* Drag-and-drop overlay */}
+        <DragOverlay isDragOver={isDragOver} />
       </div>
     </div>
   );
