@@ -78,11 +78,11 @@
 
 ### Tool Cards — State Machine & Shell
 
-- [ ] **TOOL-01**: Tool state machine: `invoked` → `executing` → `resolved` | `error`. Visual transitions via CSS `data-status` attribute. GPU-only animations during streaming (opacity, transform only — no height/width per Constitution 11.4).
+- [x] **TOOL-01**: Tool state machine: `invoked` → `executing` → `resolved` | `error`. Visual transitions via CSS `data-status` attribute. GPU-only animations during streaming (opacity, transform only — no height/width per Constitution 11.4).
 - [ ] **TOOL-02**: ToolChip (inline compact pill): shows tool name, status dot (pulsing during `executing`, static green for `resolved`, static red for `error`). Click expands to ToolCard.
-- [ ] **TOOL-03**: ToolCard (expanded view): shows via ToolCardShell wrapper with consistent header (tool name, status, elapsed time), body (tool-specific content), footer (collapse button). Expansion deferred until streaming ends.
-- [ ] **TOOL-04**: Elapsed time counter on executing tools: updates every 100ms using `startedAt` timestamp from `ToolCallState`. Displays as "1.2s", "5.4s", etc. Timer cleaned up (clearInterval) on resolve/error/unmount.
-- [ ] **TOOL-05**: Error state: expanded card with `border-error/30` accent, `bg-error/5` tint, error message text displayed. Always force-expanded (never auto-collapsed).
+- [x] **TOOL-03**: ToolCard (expanded view): shows via ToolCardShell wrapper with consistent header (tool name, status, elapsed time), body (tool-specific content), footer (collapse button). Expansion deferred until streaming ends.
+- [x] **TOOL-04**: Elapsed time counter on executing tools: updates every 100ms using `startedAt` timestamp from `ToolCallState`. Displays as "1.2s", "5.4s", etc. Timer cleaned up (clearInterval) on resolve/error/unmount.
+- [x] **TOOL-05**: Error state: expanded card with `border-error/30` accent, `bg-error/5` tint, error message text displayed. Always force-expanded (never auto-collapsed).
 - [ ] **TOOL-06**: All rich tool cards register via existing `registerTool()` API. ToolCardShell shared wrapper provides consistent header/footer/expand behavior. DefaultToolCard remains as fallback for unregistered tools.
 
 ### Tool Cards — Per-Tool Implementations
@@ -235,11 +235,11 @@ Updated during roadmap creation (2026-03-07).
 | MSG-09 | Phase 14 | Complete |
 | MSG-10 | Phase 14 | Complete |
 | MSG-11 | Phase 14 | Complete |
-| TOOL-01 | Phase 15 | Pending |
+| TOOL-01 | Phase 15 | Complete |
 | TOOL-02 | Phase 15 | Pending |
-| TOOL-03 | Phase 15 | Pending |
-| TOOL-04 | Phase 15 | Pending |
-| TOOL-05 | Phase 15 | Pending |
+| TOOL-03 | Phase 15 | Complete |
+| TOOL-04 | Phase 15 | Complete |
+| TOOL-05 | Phase 15 | Complete |
 | TOOL-06 | Phase 15 | Pending |
 | TOOL-10 | Phase 16 | Pending |
 | TOOL-11 | Phase 16 | Pending |

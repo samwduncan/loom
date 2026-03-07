@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
-status: completed
-stopped_at: Phase 15 context gathered
-last_updated: "2026-03-07T21:19:18.773Z"
-last_activity: 2026-03-07 -- Phase 14 Plan 03 complete (UserMessage enhancements + ImageLightbox + MarkdownRenderer img override)
+status: in-progress
+stopped_at: Phase 15 Plan 01 complete
+last_updated: "2026-03-07T21:37:25Z"
+last_activity: 2026-03-07 -- Phase 15 Plan 01 complete (ToolCardShell + formatElapsed + useElapsedTime)
 progress:
   total_phases: 9
   completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
-  percent: 100
+  total_plans: 14
+  completed_plans: 13
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 14 - Message Types
+**Current focus:** Phase 15 - Tool Card Shell + State Machine
 
 ## Current Position
 
-Phase: 14 of 19 (Message Types) -- COMPLETE
-Plan: 3 of 3
-Status: phase-complete
-Last activity: 2026-03-07 -- Phase 14 Plan 03 complete (UserMessage enhancements + ImageLightbox + MarkdownRenderer img override)
+Phase: 15 of 19 (Tool Card Shell + State Machine)
+Plan: 1 of 2 -- COMPLETE
+Status: in-progress
+Last activity: 2026-03-07 -- Phase 15 Plan 01 complete (ToolCardShell + formatElapsed + useElapsedTime)
 
-Progress: [##########] 100%
+Progress: [#########-] 93%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [##########] 100%
 | 11    | 01   | 7min     | 2     | 13    |
 | Phase 14 P01 | 9min | 2 tasks | 11 files |
 | Phase 14 P03 | 3min | 2 tasks | 7 files |
+| 15    | 01   | 3min     | 2     | 6     |
 
 ## Accumulated Context
 
@@ -92,6 +93,10 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - [Phase 14]: ImageAttachment type added to Message interface early (prepares Plan 03)
 - [Phase 14]: Dialog primitive composition for ImageLightbox (bypass DialogContent for custom bg-black/80 overlay)
 - [Phase 14]: Per-instance lightbox state in MarkdownRenderer (Dialog portals prevent nesting issues)
+- Phase 15-01: Adjust-state-during-rendering for completedAt transitions (avoids setState-in-effect ESLint rule)
+- Phase 15-01: useEffect ref sync for completedAtRef (react-hooks/refs compliance)
+- Phase 15-01: Status labels Starting/Running/Done/Failed for tool card header
+- Phase 15-01: onToggle callback prop on ToolCardShell for parent-controlled expand state
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -110,6 +115,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-07T21:19:18.771Z
-Stopped at: Phase 15 context gathered
-Resume: Continue with Phase 14 Plan 03
+Last session: 2026-03-07T21:37:25Z
+Stopped at: Completed 15-01-PLAN.md
+Resume: Continue with Phase 15 Plan 02
