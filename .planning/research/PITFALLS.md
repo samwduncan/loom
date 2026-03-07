@@ -1,371 +1,298 @@
-# Domain Pitfalls
+# Domain Pitfalls: M2 "The Chat" Integration
 
-**Domain:** Premium AI coding agent web interface — greenfield React 18 frontend with streaming chat, multi-provider WebSocket integration, design token system, and complex animation pipeline
-**Project:** Loom V2 (greenfield rewrite)
-**Researched:** 2026-03-04
-**Confidence:** HIGH — grounded in V1 post-mortem evidence, V1 gate report failures, Gemini architecture audits, and Constitution design decisions
+**Domain:** Adding streaming Markdown, syntax highlighting, composer UX, tool animations, and activity status to existing M1 React chat skeleton
+**Researched:** 2026-03-07
+**Focus:** Integration pitfalls with existing rAF streaming, segment architecture, OKLCH tokens, and Constitution rules
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites, multi-week debugging sessions, or user-visible regressions across the entire app. V1 evidence indicates these are the failure modes that forced the greenfield rewrite.
+Mistakes that cause rewrites, performance death, or architecture conflicts with the existing M1 skeleton.
 
 ---
 
-### Pitfall 1: Dual Color System Proliferation
+### Pitfall 1: react-markdown Re-parses Entire Content on Every Token
 
-**What goes wrong:**
-CSS token system exists in `:root` and Tailwind config, but components use hardcoded Tailwind arbitrary values (`bg-[#1c1210]`, `text-[#c4a882]`, `border-[#3d2e25]/40`) in parallel. V1 audit found 51 hardcoded hex instances in chat components alone, 144+ across the full codebase across 15 files. After 17 phases of V1 development, a dedicated Phase 11 was required exclusively for hardcoded color removal — a full phase of technical debt remediation.
+**What goes wrong:** The existing `useStreamBuffer` paints raw text to a DOM node via `textContent`. If you naively switch to `react-markdown` for that same text, every rAF frame re-parses the full accumulated markdown string. At 100 tokens/sec with a 2000-word response, that's 100 full remark/rehype AST traversals per second. The main thread locks up, scroll anchoring breaks, and the UI freezes.
 
-**Why it happens:**
-- AI-assisted development produces "quick fixes" using arbitrary values when the correct token name is unknown
-- New components copied from older examples that used hardcoded values
-- No automated enforcement — ESLint didn't block `bg-[#...]` patterns
-- Each phase added new violations while previous ones were being cleaned up
+**Why it happens:** react-markdown was designed for static content. It has no concept of incremental parsing. The entire markdown string is re-parsed from scratch on every render. The existing `useStreamBuffer` bypasses React entirely via `textContent` -- introducing react-markdown means re-entering React's reconciler for every frame.
 
-**How to avoid:**
-1. Wire ESLint `no-restricted-syntax` to ban `bg-\[#`, `text-\[#`, `border-\[#` patterns as build-time errors from Phase 1, day 1
-2. Define token names before writing components — the token map must exist before any component work begins
-3. Use semantic token names, not descriptive ones: `bg-card` not `bg-dark-surface`
-4. Create a quick-reference cheat sheet of semantic token names to paste into every Claude Code session context
+**Consequences:**
+- FPS drops from 60 to <10 during streaming
+- Scroll anchoring stutters because layout recalculates on every parse
+- The entire M1 streaming architecture (rAF buffer + useRef bypass) is undermined
+- Users see markdown "flickering" as the parser toggles between valid/invalid states
 
-**Warning signs:**
-- `grep -rn '\[#[0-9a-fA-F]' src/` returns any results
-- A component works visually but shows wrong color after `:root` token change
-- PR review shows `bg-[#` or `text-[#` in diff
+**Prevention:**
+1. **Keep the rAF textContent path during active streaming.** Only parse markdown AFTER the stream completes (on flush). The raw text during streaming is displayed as plain text in a `<pre>` or styled `<span>` -- no markdown rendering until the message is finalized.
+2. **Alternative: Debounced incremental parsing.** Parse markdown only on newline boundaries or after 100ms idle. Use `useDeferredValue` to keep the raw text responsive while the parsed version catches up. This is harder to get right but gives live markdown preview.
+3. **Alternative: Use Streamdown (Vercel).** Purpose-built for streaming markdown from AI models -- handles unclosed blocks, incremental parsing, and token buffering. Evaluate as a react-markdown replacement for streaming contexts only.
+4. **Whichever approach: never call react-markdown inside the rAF loop.** The rAF loop must remain DOM-direct. Markdown parsing happens in React state, deferred or debounced.
 
-**Phase to address:**
-Phase 1 (design system foundation). ESLint rule must be enforced before any component is written. Zero tolerance from commit #1.
+**Detection:** FPS counter during streaming drops below 30. React DevTools Profiler shows `ReactMarkdown` renders taking >16ms. Users report "choppy" streaming.
+
+**Phase assignment:** Phase 1 of M2 (Markdown rendering). This is the foundational decision -- everything else depends on it.
 
 ---
 
-### Pitfall 2: React State for Streaming Tokens — Per-Token setState Jank
+### Pitfall 2: Shiki Async Highlighting Causes Layout Shifts and Flash of Unstyled Code
 
-**What goes wrong:**
-Streaming tokens arrive at 50-100/sec from WebSocket. Each token triggers a React setState call. At that frequency, React's reconciler batches some updates but cannot keep up — the main thread is saturated with VDOM diffs, causing visible stutter, frozen input, and dropped frames. V1 initially used a 100ms setTimeout buffer (better than nothing), then upgraded to requestAnimationFrame (correct approach) mid-development. A V2 rewrite that regresses to naive setState-per-token will fail immediately on any non-trivial response.
+**What goes wrong:** Shiki loads language grammars lazily (correct for bundle size). But the first time a Python code block appears, there's a 50-200ms delay while the grammar loads. During that window, the code block either: (a) renders as raw text without highlighting, then suddenly re-renders with colors (flash), or (b) renders nothing then pops in (layout shift). Both break scroll anchoring because the element height changes.
 
-**Why it happens:**
-- The naive implementation is obvious: `useEffect` + `setState` on each WebSocket message
-- React 18's automatic batching helps but does not eliminate reconciler cost at 100/sec
-- AI code assistants often suggest the naive pattern because it's the simplest
+**Why it happens:** Shiki's `codeToHtml` / `codeToTokens` is async. React renders the code block synchronously with a loading state, then re-renders when highlighting is ready. If the code block is near the scroll anchor, the height change pushes content and the auto-scroll fires incorrectly.
 
-**How to avoid:**
-1. The `stream` store accumulates tokens into a `useRef` buffer — NOT React state
-2. A `requestAnimationFrame` loop reads the ref buffer and mutates the DOM directly via ref
-3. State flush happens ONLY on stream completion (transitions from streaming to static)
-4. The streaming component is the ONLY subscriber to the token buffer; all past messages are `React.memo` wrapped and receive no updates during streaming
-5. Verify with React DevTools Profiler: zero re-renders on past messages during active streaming
+**Consequences:**
+- Layout Cumulative Shift on every new code block during streaming
+- Scroll position jumps when code blocks re-render with highlighting
+- In virtual lists (future M3), Shiki async highlighting causes severe flickering (documented issue: code blocks re-highlight every time they scroll into/out of view)
 
-**Warning signs:**
-- Any `setState` call inside the WebSocket message handler for token data
-- Past TurnBlock components re-rendering during streaming (visible in React DevTools)
-- CPU usage spikes above 40% during streaming of a 1000-token response
-- Input field becomes unresponsive while streaming
+**Prevention:**
+1. **Reserve height for code blocks immediately.** When the markdown parser detects a code fence opening (triple backtick), render a container with `min-height` based on line count estimate. This prevents layout shift when highlighting fills in.
+2. **Use `react-shiki` with throttling.** The react-shiki library handles streaming code highlighting with optional throttle. It also uses the JavaScript RegExp engine (smaller bundle, faster startup) which is better for client-side use.
+3. **Cache highlighted results.** Once a language grammar is loaded and a code block is highlighted, cache the result. Subsequent code blocks in the same language highlight instantly.
+4. **Pre-load common languages.** Load JavaScript, TypeScript, Python, Bash, JSON, CSS, HTML grammars at app startup (lazy but eager for these 7). Less common languages load on demand.
+5. **Existing architecture concern:** The ToolChip segment architecture inserts tool chips between text spans. If markdown parsing happens at the full-message level (not per-span), tool chips will be inside the markdown tree and cause rendering conflicts. Parse markdown per text segment, not across segment boundaries.
 
-**Phase to address:**
-Phase 2 (streaming foundation / WebSocket integration). Must be the correct architecture from the first streaming implementation. Retrofitting this later requires rewriting the entire message pipeline.
+**Detection:** Chrome DevTools Layout Shift score > 0.1 during streaming. Visible "flash" when code blocks appear. Scroll jumps during code-heavy responses.
+
+**Phase assignment:** Phase 1-2 of M2 (Markdown + code highlighting). Must be solved alongside the markdown rendering approach.
 
 ---
 
-### Pitfall 3: Whole-Store Zustand Subscriptions Causing Streaming Re-Render Cascades
+### Pitfall 3: Markdown Parsing Breaks the Segment Architecture
 
-**What goes wrong:**
-`const store = useStreamStore()` subscribes the component to EVERY change in the stream store. During streaming, the stream store updates 50-100 times/sec. Every component that subscribes to the whole store re-renders 50-100 times/sec — including the sidebar, the header, the settings button, and every past TurnBlock. The app becomes a visual blur and CPU/GPU max out.
+**What goes wrong:** The existing `ActiveMessage` uses a segment array (`text | tool`) where text spans receive raw tokens via `textContent`. Markdown rendering needs to process the full text to understand block structure (headers, lists, code fences span multiple lines). But tool chips split the text into separate spans. If you parse each span independently, you get broken markdown (a code fence that starts in span 1 and ends in span 3 is never recognized). If you parse the full concatenated text, tool chip positions are lost.
 
-**Why it happens:**
-- Whole-store subscription is the default pattern many developers know
-- The store works fine for low-frequency updates; the bug only manifests at streaming speeds
-- AI-generated code often subscribes to the whole store for convenience
+**Why it happens:** The segment architecture was designed for raw text display. Markdown is a block-level format that needs the full document to parse correctly. These two models are fundamentally incompatible.
 
-**How to avoid:**
-- ESLint rule or code review gate: `const store = useXxxStore()` (no selector) is always banned in production code
-- Always use `useStreamStore(state => state.specificField)` or `useShallow` for multiple fields
-- Only the active streaming message component subscribes to streaming token data
-- The `timeline` store (past messages) updates at most once per turn completion — keep streaming state entirely in the `stream` store to prevent cross-contamination
+**Consequences:**
+- Code fences that span across tool calls render incorrectly
+- List items interrupted by tool calls break list rendering
+- Headers split by tool calls don't render as headers
+- The segment interleaving that works perfectly for raw text becomes a liability
 
-**Warning signs:**
-- `useStore()` without a selector in any component
-- React DevTools shows header/sidebar/past messages re-rendering during streaming
-- Profiler "commit" time spike visible in waterfall during streaming phases
+**Prevention:**
+1. **Two-phase rendering model.** During streaming: raw text in segments (current behavior). On flush: re-render the full message with markdown parsing, placing tool chips at their correct positions using marker tokens or position tracking.
+2. **Marker-based approach.** Instead of physical text segments, accumulate ALL text in a single buffer. Insert unique marker strings (e.g., `\x00TOOL:id\x00`) at tool call positions. After markdown parsing, walk the rendered AST and replace markers with ToolChip components. This keeps the full document parseable while preserving tool positions.
+3. **Hybrid: parse only finalized segments.** Text segments that are "sealed" (a new tool call started, so the previous text span is complete) can be independently parsed. Only the final active span stays as raw text. This works if tool calls only appear between complete markdown blocks (which they typically do -- Claude doesn't start a code fence and then make a tool call mid-fence).
+4. **The Constitution Section 12.1 already mandates this:** "Custom remark plugins detect unclosed code blocks during streaming and inject closing tags." This implies full-document parsing with fixup, which conflicts with per-segment rendering. Resolve this conflict explicitly.
 
-**Phase to address:**
-Phase 1 (store architecture setup). The four-store architecture and selector-only pattern must be established before any feature components are written. Add the store subscription rule to ESLint and gate reports.
+**Detection:** Code blocks rendering incorrectly in messages with tool calls. Tool chips disappearing after markdown parsing. Broken lists/headers in tool-heavy responses.
+
+**Phase assignment:** Phase 1 of M2. This is the hardest architectural decision in the entire milestone. Get it wrong and you rewrite the rendering layer.
 
 ---
 
-### Pitfall 4: Animation Jank During Streaming — GPU Layer Explosion
+### Pitfall 4: Composer Auto-Resize Fights the CSS Grid Shell
 
-**What goes wrong:**
-After adding micro-interactions (hover transitions, expand/collapse animations, message entry animations, aurora shimmer effects), the streaming experience degrades. Token arrival causes visible stutter in running animations. The aurora shimmer hitches. Scroll becomes janky. On the AMD Radeon 780M iGPU (the target server), GPU compositing layer budgets are tight.
+**What goes wrong:** The existing app shell uses `CSS Grid` with `100dvh` and `overflow: hidden` on html/body. The composer textarea needs to grow with content. If the composer height changes, the CSS Grid row for the chat content area must shrink correspondingly. Without coordination, the composer either overflows the grid cell, pushes the message area offscreen, or causes the scroll container's height to change (breaking scroll anchoring).
 
-Three forces collide:
-1. Global `transition: all` on buttons fires layout-triggering transitions during streaming
-2. Multiple simultaneous aurora gradient elements each claim a GPU compositing layer; exceeding ~8-10 layers triggers CPU fallback
-3. Animating `height`, `width`, or `margin` during streaming triggers ancestor layout recalculation that competes with the rAF token buffer
+**Why it happens:** `overflow: hidden` on body prevents page scroll (correct), but the grid template must accommodate a variable-height composer. The naive `height: auto` on a textarea inside a fixed grid row creates a conflict: the grid cell has a fixed computed height, but the textarea wants to grow beyond it.
 
-V1 explicitly hit this in Phase 7 research (confirmed via aurora shimmer GPU layer analysis in the streaming UX research document).
+**Consequences:**
+- Composer grows but pushes messages below the fold
+- Scroll position jumps when composer height changes (the scroll container's height decreases)
+- On mobile, virtual keyboard + growing textarea = content pushed entirely offscreen
+- Max-height cap creates inner scroll on the textarea that feels bad
 
-**Why it happens:**
-- Micro-interactions are added incrementally across phases; each phase adds 1-2 new animations that seem harmless in isolation
-- `will-change: transform` is applied liberally without tracking GPU layer count
-- `transition: all` is the lazy default; it catches layout-triggering properties
+**Prevention:**
+1. **Grid template: `grid-template-rows: 1fr auto`.** The chat messages area gets `1fr` (flex), the composer area gets `auto` (intrinsic size). As the composer grows, the messages area shrinks. This is the correct CSS Grid approach.
+2. **Cap composer height with `max-height` and inner scroll.** Limit to ~200px (configurable). Beyond that, the textarea scrolls internally. This prevents the messages area from shrinking to nothing.
+3. **Use `useLayoutEffect` for height recalculation.** The height reset trick (`height = 0; height = scrollHeight`) must happen in `useLayoutEffect` to avoid a visible flash. `useEffect` will show a frame at the wrong height. (M1 already learned this lesson with scroll-to-bottom.)
+4. **Stabilize scroll position on resize.** When the composer grows, the messages scroll container shrinks. Capture `scrollTop + scrollHeight` before resize, restore after. The existing scroll anchor logic may need adjustment to handle container height changes.
+5. **Test with `contain: layout` on the composer area.** Prevents the textarea's layout recalculation from propagating to the entire grid.
 
-**How to avoid:**
-1. Never use `transition: all` — always specify exact properties: `transition: background-color 150ms, color 150ms, opacity 150ms`
-2. Banned in the Constitution: animating `height`, `width`, `top`, `left`, `margin` during streaming — use CSS Grid `grid-template-rows` trick for expand/collapse
-3. Add `.is-streaming` class to chat container; use it to disable non-critical animations during active token delivery
-4. Cap concurrent aurora gradient elements at 2-3; remove skeleton/aura overlays immediately when first token arrives
-5. After each phase that adds animations, run Chrome DevTools Layers panel during streaming — if layer count > 10, reduce `will-change` usage
-6. Use `contain: content` on the actively streaming message element to prevent layout recalculation cascade
+**Detection:** Messages jumping when typing in composer. Visible layout flash on each line wrap. Scroll position lost when composer grows/shrinks.
 
-**Warning signs:**
-- Chrome DevTools Performance shows "Long Animation Frame" entries during streaming
-- FPS drops below 30 during streaming (visible with FPS overlay)
-- Aurora shimmer visibly pauses when tokens arrive
-- GPU memory usage climbs > 200MB during streaming on the Radeon 780M
-
-**Phase to address:**
-Streaming foundation phase AND every subsequent phase that adds animations. The streaming performance gate must include an FPS measurement under streaming load.
+**Phase assignment:** Phase 2-3 of M2 (Composer). Build the composer early so all other phases can test with it.
 
 ---
 
-### Pitfall 5: Scroll Behavior Regression from Animations
+### Pitfall 5: Tool State Machine Animations Trigger Layout During Streaming
 
-**What goes wrong:**
-After adding message entry animations (fade-in, slide-up) or expand/collapse transitions on tool calls, the auto-scroll system breaks. The IntersectionObserver sentinel fires incorrectly because animated elements change height during transition, briefly pushing the sentinel in and out of the viewport. The scroll pill flickers. Auto-scroll fails to engage on new messages because the animated element starts at height:0, and the sentinel hasn't moved yet.
+**What goes wrong:** The existing ToolChip uses CSS classes (`tool-chip--invoked`, `tool-chip--resolved`) for static state display. Adding animated transitions between states (height change for expanding card, color transitions, icon morphs) triggers layout recalculation. During active streaming, the rAF loop is painting tokens to a sibling DOM node. Layout recalculation from tool animations competes with the paint loop, causing dropped frames.
 
-V1 confirmed this failure mode in Phase 7 RESEARCH.md with precise root cause analysis.
+**Why it happens:** The Constitution (11.4) bans animating `height`/`width` during streaming for exactly this reason. But tool state transitions naturally want height animation (chip expands to card). If a tool resolves while the model is still streaming text, the expansion animation triggers layout in the same frame as the rAF paint.
 
-**Why it happens:**
-- CSS transitions introduce intermediate height states that the scroll tracking system doesn't expect
-- `useScrollAnchor` assumes content height changes are immediate (one frame); animations spread height change over 200-300ms
-- Each animation-to-scroll interaction must be designed together, but feature phases often add animations without revisiting scroll behavior
+**Consequences:**
+- Dropped frames (FPS dip from 60 to 30-40) during tool resolution while streaming
+- Scroll jitter as tool card expansion changes content height
+- Worse on complex tool outputs (file diffs, large grep results) where the card expansion is significant
 
-**How to avoid:**
-1. Entry animations use ONLY `opacity` and `transform: translateY` — never `height`, `max-height`, or anything that affects layout flow
-2. During active streaming (`isStreaming === true`), entry animations are disabled — new messages appear instantly; animations are for completed history
-3. Debounce scroll pill visibility by 150ms to absorb animation-induced IntersectionObserver noise
-4. Tool call expand/collapse: use CSS Grid `grid-template-rows: 0fr / 1fr` — this is layout-triggering but predictable; compensate with a pre/post `scrollHeight` delta adjustment in rAF
-5. Every phase that adds any animation must include scroll regression testing as a gate requirement
+**Prevention:**
+1. **GPU-only animations for state transitions during streaming.** Animate `opacity` and `transform` only. Use `transform: scaleY()` for the "expansion" visual effect instead of actual height change. Apply the real height change only after the animation completes (two-phase: animate visual, then commit layout).
+2. **Defer card expansion during active streaming.** While `isStreaming === true`, tool chips show resolved/error status visually (color dot, icon change) but DON'T expand the card body. Expansion is enabled only after streaming ends. This keeps layout stable during the critical streaming window.
+3. **Use `content-visibility: auto` on tool cards.** Combined with `contain-intrinsic-height`, this prevents offscreen tool card layout from affecting the streaming paint loop.
+4. **Batch tool state updates.** The multiplexer can receive multiple tool_result messages in rapid succession. Batch these into a single state update rather than triggering N re-renders.
 
-**Warning signs:**
-- Scroll pill appears/disappears more than once per second
-- Auto-scroll stops tracking after a tool call expands
-- Scroll position jumps when an animated element completes its transition
-- IntersectionObserver callback fires > 10 times per animation cycle
+**Detection:** React DevTools Profiler showing `ToolChip` re-renders during streaming. Chrome Performance tab showing "Layout" markers concurrent with rAF paint. FPS dips correlating with tool state changes.
 
-**Phase to address:**
-Streaming foundation phase (build scroll tracking correctly) and every subsequent animation phase. Gate reports must include a scroll behavior regression check.
+**Phase assignment:** Phase 2 of M2 (Tool cards). Must coordinate with existing ToolChip/ToolCard components.
 
 ---
 
-### Pitfall 6: Orphaned Components — Built but Never Wired
+### Pitfall 6: Activity Status Line Creates Unnecessary Re-renders
 
-**What goes wrong:**
-A component or utility is created in one plan task and intended to be consumed by a subsequent task, but the wiring never happens. V1 confirmed this exact failure in Phase 5 Wave 2: `ToolCallGroup.tsx` and `groupConsecutiveToolCalls.ts` were fully implemented but never imported or rendered anywhere in the codebase. The gate report classified them as BLOCKERS and required a Wave 3 remediation pass.
+**What goes wrong:** The `activityText` field in the stream store updates frequently during tool execution (every tool_progress message, every tool_use_start). Every component subscribing to `activityText` re-renders on each update. If the activity status line component is a child of the message container or chat viewport, its re-renders can propagate upward.
 
-**Why it happens:**
-- AI coding agents create files in isolation (one plan task = one set of files)
-- The agent that implements a component doesn't always also wire it into the consuming component
-- Multi-wave phases have natural handoff gaps between task boundaries
-- No automated check verifies import graph completeness
+**Why it happens:** `setActivityText` is called from the multiplexer on every tool_progress event (which fires periodically during long-running tools). The stream store update triggers Zustand selector notifications. If the activity status component doesn't use `React.memo` with proper equality, or if parent components subscribe to the same store slice, cascading re-renders occur.
 
-**How to avoid:**
-1. Gate reports must explicitly verify wiring: for every file created, check that it is imported and rendered somewhere
-2. Plan tasks must include explicit wiring steps: "Import X into Y at line Z"
-3. Wave N should begin by verifying all Wave N-1 artifacts are wired before building new ones
-4. Never advance to the next wave with unresolved BLOCKER-level wiring gaps (enforce in process, not just documentation)
+**Consequences:**
+- Unnecessary re-renders during tool execution
+- Minor FPS impact (not critical, but accumulates with other pitfalls)
+- Scroll container may re-render if it subscribes to stream store
 
-**Warning signs:**
-- A new file exists but `grep -rn "ComponentName" src/` returns only the file's own export
-- Feature behavior absent from the running app despite the implementing file passing all unit tests
-- Gate report finds orphaned exports with zero import references
+**Prevention:**
+1. **Isolate the activity status component.** It should be a standalone `React.memo` component that subscribes ONLY to `activityText` via `useStreamStore(s => s.activityText)`. No parent should subscribe to this slice.
+2. **Debounce activity text updates.** The multiplexer can fire tool_progress every second. Debounce `setActivityText` to 200ms to reduce store updates.
+3. **Place outside the scroll container.** The activity status line should be in the composer area (below messages, above the textarea) or in a fixed position. NEVER inside the scrollable message list -- it would cause scroll height changes.
 
-**Phase to address:**
-Every phase with multi-task dependencies. This is a process pitfall — the gate report wiring check is the primary mitigation. It must be faithfully executed, not skipped.
+**Detection:** React DevTools showing activity status re-renders at >5/sec during tool execution. Other components re-rendering when activity text changes.
+
+**Phase assignment:** Phase 3-4 of M2 (Activity status). Lower priority than markdown and composer, but must be architected correctly.
 
 ---
 
-### Pitfall 7: AI-Assisted Development Pattern Drift — Constitution Erosion
+## Moderate Pitfalls
 
-**What goes wrong:**
-The V2 Constitution establishes enforceable conventions (no default exports, named props interfaces, selector-only Zustand, no hardcoded colors, etc.). Over multiple phases, each Claude Code session has partial context of the Constitution. The agent follows the rules it can see but misses ones it can't. By Phase 6, components start appearing with default exports. By Phase 10, inline style objects with hex colors appear. By Phase 14, whole-store Zustand subscriptions creep in. The Constitution erodes slowly, phase by phase, until fixing violations requires another dedicated cleanup phase.
-
-This is the primary documented failure mode that forced the V2 rewrite — V1's "accumulated quality issues across phases" and "foundation rot."
-
-**Why it happens:**
-- Claude Code context windows reset between sessions
-- The Constitution is a long document; not all rules fit in context simultaneously
-- Agents optimize for making the current task work, not for long-term consistency
-- Without automated enforcement, human review cannot catch all violations across many files
-
-**How to avoid:**
-1. Phase 1 must wire ALL ESLint rules from the Constitution before any feature work begins — automated enforcement beats human review
-2. Every coding session MUST load the Constitution into context (via CLAUDE.md or session preamble)
-3. Gate reports should include a Constitution compliance scan: `no-explicit-any`, no default exports, no hardcoded color utilities, no whole-store subscriptions
-4. When a gate report finds a Constitution violation, it is a BLOCKER — not a warning — regardless of whether the feature works
-5. Keep a "banned patterns quick reference" file that agents load alongside task plans
-
-**Warning signs:**
-- `export default function Component` in any non-route file
-- Inline style objects with hex values in chat components
-- `const state = useStore()` without selector
-- `any` type appearing in production code files
-- Hardcoded Tailwind color utilities (`bg-gray-800`, `text-amber-500`) in component files
-
-**Phase to address:**
-Phase 1 (linting setup) is where automated enforcement must be installed. Every subsequent phase gate report must include a Constitution compliance check. This is ongoing — not a one-time fix.
+Issues that cause significant rework or degraded UX but not full rewrites.
 
 ---
 
-### Pitfall 8: Multi-Provider WebSocket Message Type Explosion
+### Pitfall 7: Unclosed Markdown Blocks During Streaming
 
-**What goes wrong:**
-The backend emits fundamentally different message shapes for Claude (`content_block_start` / `content_block_delta` / `content_block_stop` protocol), Codex (item-based: `agent_message`, `reasoning`, `command_execution`, `file_change`), and Gemini (simple text response). V1's `useChatRealtimeHandlers.ts` grew to 1050 lines with extensive branching for all three providers. This single file became the most complex in the codebase and the most common source of bugs when adding new features.
+**What goes wrong:** The model streams a code fence opening (` ```python\n `) but hasn't sent the closing fence yet. react-markdown sees this as invalid markdown and either: (a) renders it as inline code or plain text, then suddenly becomes a code block when the closing fence arrives (layout shift), or (b) doesn't render anything until the block is complete (missing content).
 
-**Why it happens:**
-- Multi-provider support is added incrementally — one provider at a time
-- Each provider's branching is added to the existing handler rather than being isolated
-- The handler file becomes the "easy place to add things" and accumulates responsibility
+**Prevention:**
+1. **Inject synthetic closing tags.** A custom remark plugin detects unclosed code fences (odd number of triple-backtick sequences) and appends a closing fence to the string before parsing. This renders the code block container immediately, with content filling in as tokens arrive.
+2. **Track block state in the stream buffer.** Count code fence openers/closers. When open > closed, the final text segment is "inside a code block" -- render it in a code block container regardless of markdown parser output.
+3. **Consider Streamdown.** Vercel's Streamdown library handles this automatically via regex-based recovery rules. If adopting react-markdown proves too painful for streaming, Streamdown is the purpose-built alternative.
 
-**How to avoid:**
-1. Design provider-specific message normalization at the WebSocket layer, not in the UI layer
-2. The WebSocket client normalizes all three protocols into a single canonical discriminated union (`WSMessage`) before any React component or store sees the data
-3. Provider-specific parsing lives in dedicated files: `parseClaudeMessage.ts`, `parseCodexMessage.ts`, `parseGeminiMessage.ts`
-4. The store action that receives normalized messages has zero provider-specific branching
-5. TypeScript exhaustive switch on the discriminated union catches missing cases at compile time
+**Detection:** Code blocks appearing as inline code during streaming, then "jumping" into a proper code block. Layout shifts when code fences close.
 
-**Warning signs:**
-- Any `if (provider === 'claude') ... else if (provider === 'codex')` branching in store actions or components
-- WebSocket message handler file exceeds 300 lines
-- Adding Gemini support requires touching files that have nothing to do with Gemini
-
-**Phase to address:**
-Phase 2 (API and state contract / WebSocket integration). The normalization layer must be designed before any provider-specific UI is built. Retrofitting normalization after three providers are working inline is extremely painful.
+**Phase assignment:** Phase 1 of M2, solved alongside the markdown parsing approach.
 
 ---
 
-### Pitfall 9: Z-Index Wars — Unmanaged Stacking Contexts
+### Pitfall 8: Shiki Theme Colors Conflict with OKLCH Token System
 
-**What goes wrong:**
-By Phase 8, overlapping UI elements fight for z-index supremacy. V1 ended with z-index values ranging from `z-10` to `z-[9999]` across the codebase — modals at 9999, a toast system needing to go above 9999, dropdowns getting clipped by overflow containers, and toasts appearing behind Settings modals. Every new overlay required trial-and-error to find a working z-index, and adding new layers broke existing ones.
+**What goes wrong:** Shiki themes use hardcoded hex colors. The Constitution bans hardcoded colors. If you apply a Shiki theme directly, syntax highlighting colors are outside the OKLCH token system. Theme changes (future light mode, or palette tuning) won't affect code blocks. Worse, the Constitution ESLint rule for "no hardcoded colors" will flag Shiki's theme configuration.
 
-**Why it happens:**
-- Each component picks an arbitrary z-index value that "works in isolation"
-- No global z-index ledger exists until problems force one
-- Stacking contexts created by `position: relative` + `z-index`, `transform`, `filter`, `will-change`, or `isolation: isolate` on ancestor elements trap descendant z-index values
-- Modals rendered inline (not portalled to `document.body`) are subject to ancestor stacking context traps
+**Prevention:**
+1. **The Constitution already has an exception (Section 3.1):** "Third-party library theme objects that require JS objects (xterm.js theme, Shiki colorReplacements). These MUST reference CSS variable values via a shared constants file." Follow this pattern.
+2. **Create `src/src/lib/shiki-theme.ts`.** Map Shiki token types to CSS custom properties. Use `getComputedStyle` to read OKLCH values at runtime, or define a constants file that maps token names to `var(--token)` references.
+3. **Use Shiki's `colorReplacements` option.** This allows overriding specific colors in a theme with custom values. Map the base colors to CSS variable references.
+4. **Don't create a full custom Shiki theme.** It's hundreds of token type mappings. Instead, pick a dark theme close to the OKLCH palette (e.g., `vitesse-dark`, `github-dark-dimmed`) and override just the background/foreground/comment colors to match design tokens.
 
-**How to avoid:**
-1. The z-index dictionary is defined in Phase 1 CSS tokens and enforced from commit #1 — V2 Constitution Section 3.3 has this: `--z-base` through `--z-critical`
-2. Ban arbitrary z-index values via ESLint: `z-[999]`, `z-[100]`, `z-50` (raw utility without CSS variable) are all banned
-3. ALL overlay content — toasts, modals, dropdowns, lightboxes — must use `ReactDOM.createPortal` to `document.body`, escaping ancestor stacking contexts
-4. `will-change: transform` on animated elements creates a new stacking context — document this in comments where used
+**Detection:** ESLint Constitution rule fires on Shiki theme config. Code block colors visibly clashing with the rest of the UI.
 
-**Warning signs:**
-- Any `z-index` value not referencing `var(--z-*)` token
-- A modal or toast rendered at a DOM position inside a scroll container or relatively-positioned ancestor
-- "My modal is invisible" or "dropdown gets clipped" bug reports
-
-**Phase to address:**
-Phase 1 (design system foundation). Z-index dictionary in CSS tokens, ESLint enforcement, portal requirement for all overlays. Must be established before any modal or overlay component is built.
+**Phase assignment:** Phase 1-2 of M2 (code highlighting setup).
 
 ---
 
-### Pitfall 10: Session State Race Conditions During Provider Switch
+### Pitfall 9: Send/Stop Button Morph Requires WebSocket State Awareness
 
-**What goes wrong:**
-When the user switches providers (Claude → Gemini) while a streaming response is active, or when switching sessions while loading is in progress, the UI enters inconsistent states. A Gemini response renders inside the Claude streaming component. A session switch loads new messages on top of an in-progress turn. A reconnect event fires while session loading is in progress, causing double-loading. V1 identified these as "Complex" in the session management complexity summary, with a `pendingViewSession` guard added specifically to handle the race condition.
+**What goes wrong:** The composer needs a Send button when idle and a Stop button when streaming. The morph seems simple (`isStreaming ? Stop : Send`). But the actual state machine is more complex: connecting -> sending -> processing -> streaming -> tool_executing -> streaming_again -> complete. The button must handle: (a) the gap between "user pressed Send" and "backend acknowledged receipt" (optimistic UI), (b) the Stop action actually sending an abort message to the backend, (c) multiple rapid Send/Stop presses.
 
-**Why it happens:**
-- Async operations (session load, stream start, reconnect) have race conditions when they overlap
-- The streaming state and the session state are often managed in the same component or hook, creating implicit coupling
-- Provider switching adds a dimension of state that the basic streaming pipeline wasn't designed for
+**Prevention:**
+1. **Use a local component state machine, not just `isStreaming`.** States: `idle` -> `sending` (optimistic, after click, before WS ack) -> `active` (streaming received) -> `aborting` (stop pressed, before backend confirms) -> `idle`. This prevents double-sends and double-stops.
+2. **Debounce the button.** After pressing Send, disable for 200ms. After pressing Stop, disable for 500ms (abort acknowledgment can be slow).
+3. **Wire Stop to the correct backend message.** The backend expects a `claude-abort` message (check BACKEND_API_CONTRACT.md). The abort may not be immediate -- the model might send a few more tokens before stopping. Handle gracefully.
+4. **Visual feedback during state transitions.** The send icon morphs to a stop icon with a CSS transition. Use `opacity` + `transform: rotate` for the morph, not conditional rendering (which would flash).
 
-**How to avoid:**
-1. The `stream` store is completely cleared (reset to initial state) before any session switch is allowed to proceed
-2. Session switching uses a "pending" guard: the UI shows a loading state until the previous session's async operations have settled
-3. Provider identity (claude/codex/gemini) is stored on the session, not derived from ambient state — prevents cross-contamination
-4. WebSocket reconnect events check current session ID before re-applying received data; stale data is discarded
-5. Use `useTransition` to mark session switch as non-urgent, preventing the UI from blocking on history load
+**Detection:** Users pressing Send multiple times creating duplicate messages. Stop button appearing to do nothing (backend abort delay). Button flickering during state transitions.
 
-**Warning signs:**
-- Messages from session A appearing in the view for session B after a switch
-- A streaming response continues rendering after the user clicked a different session
-- Reconnect causes messages to appear twice in the chat list
-
-**Phase to address:**
-Phase 2 (state contract) and Phase 3 (session management). The session guard architecture must be designed into the state stores from the beginning, not patched in later.
+**Phase assignment:** Phase 2-3 of M2 (Composer).
 
 ---
 
-## Technical Debt Patterns
+### Pitfall 10: Image Paste/Upload Creates Memory Pressure
 
-Shortcuts that seem reasonable at the time but create long-term problems specific to this domain.
+**What goes wrong:** Pasting a screenshot from clipboard creates a Blob. If you convert it to a data URL for preview, you're doubling the memory usage (original Blob + base64 string, which is 33% larger). Multiple pasted images in a session accumulate. The existing timeline store persists sessions -- if images are stored as data URLs in message content, localStorage fills up fast (5MB limit).
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Copy-paste component with hardcoded color | Fast to implement | Phase-long remediation sweep required | Never — use token reference instead |
-| Inline WebSocket message handling in a UI component | Simple, no abstraction layer | 1050-line God file, impossible to test, brittle to provider changes | Never |
-| `any` type for WebSocket message data | Avoids upfront type design | Runtime crashes from unexpected shapes, no autocomplete, security holes | Never (use `unknown` + runtime narrowing) |
-| `transition: all` for micro-interactions | Easy to apply globally | Layout-triggering transitions compete with streaming rAF buffer | Never during streaming |
-| `React.Context` for streaming state | Familiar API | All context consumers re-render 100x/sec during streaming | Never for mutable state; only for static config |
-| Barrel file (`index.ts`) exports in component subdirectories | Cleaner import paths | Breaks tree-shaking, obscures import graph, causes circular dependency nightmares | Only for `components/shared/` design primitives |
-| Snapshot tests for dynamic components | Easy to write | Brittle to any content change, no behavioral coverage | Only for static CSS files |
-| Whole-store Zustand subscription | One line to add | Entire component tree re-renders on any store change | Never in production code |
-| Default exports | Shorter component file | Inconsistent naming across codebase, breaks refactoring tools | Only for router lazy-load pages if required |
+**Prevention:**
+1. **Use `URL.createObjectURL(blob)` for preview, not data URLs.** Object URLs are pointers, not copies. Revoke them when the message is sent.
+2. **Upload images via the backend REST API, not inline in WebSocket messages.** The backend likely has an image upload endpoint. Send the image as multipart/form-data, get back a URL, embed the URL in the message.
+3. **Never persist image data in the timeline store.** Store image references (URLs), not data. The timeline store uses localStorage with `partialize` that excludes messages -- this is already safe, but be careful if message content includes base64 strings during the session (before persistence).
+4. **Limit paste size.** Cap at 5MB per image, 3 images per message. Provide UI feedback when limits are exceeded.
+
+**Detection:** Memory usage climbing in Chrome DevTools during image-heavy sessions. localStorage quota exceeded errors. Slow message rendering with data URL images.
+
+**Phase assignment:** Phase 3 of M2 (Composer image features). Lower priority than text input.
 
 ---
 
-## Integration Gotchas
+### Pitfall 11: Thinking Blocks with Markdown Content
 
-Common mistakes when connecting to this specific backend.
+**What goes wrong:** The existing `ThinkingDisclosure` renders thinking block text as plain `<p>` tags. Claude's thinking blocks can contain markdown (code snippets, lists, emphasis). If M2 adds markdown rendering to assistant messages but not to thinking blocks, the UX is inconsistent. But rendering markdown in thinking blocks doubles the parsing work for messages with large thinking content.
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| Claude WebSocket | Treat `content_block_delta` as a simple text event | Claude streams a multi-phase protocol: `content_block_start` → zero or more `content_block_delta` → `content_block_stop`. Thinking blocks, tool calls, and text are all different block types with different delta shapes |
-| Claude WebSocket | Assume streaming ends when text stops | Claude sends `claude-complete` only after ALL blocks finish; `content_block_stop` ends a single block; a turn can have multiple blocks |
-| Codex WebSocket | Use same message parser as Claude | Codex uses an item-based protocol (`agent_message`, `reasoning`, `command_execution`, `file_change`, `mcp_tool_call`) — completely different shape; requires separate parser |
-| Gemini WebSocket | Assume tool result handling works like Claude | Gemini sends `gemini-tool-use` and `gemini-tool-result` as separate events (not nested inside response events) |
-| JWT auth | Put token in `Authorization` header for WebSocket | WebSocket doesn't support custom headers in browser APIs; token goes in the URL query string or first message payload |
-| Session loading | Load all messages at once | Backend supports pagination (`GET /api/sessions/:id/messages`); 2000-message sessions will time out or OOM without pagination |
-| Reconnect | Reload all messages from history on reconnect | Re-request only the delta since last known message ID; don't reload the full history on every reconnect |
-| File uploads | `fetch` with default content-type | Image uploads require `FormData` with specific endpoint (`POST /api/projects/:name/upload-images`); JSON bodies are rejected |
+**Prevention:**
+1. **Render thinking block content as markdown, but deferred.** Use `useDeferredValue` on the thinking block text. The thinking disclosure is collapsed by default after completion -- markdown parsing only happens when the user expands it.
+2. **Simpler alternative: lightweight markdown.** Thinking blocks rarely have complex markdown. Use a minimal parser (just code spans, bold, italic -- skip tables, images, complex blocks) for thinking content. Or just render as monospace text (it's "thinking" -- raw text is arguably the right UX).
+3. **Don't block on this.** Thinking block markdown is a polish item, not a blocker. Ship with plain text in M2, add markdown in M3 if needed.
+
+**Detection:** Thinking blocks showing raw asterisks and backticks. User feedback about inconsistent rendering.
+
+**Phase assignment:** Phase 2-3 of M2 or defer to M3.
 
 ---
 
-## Performance Traps
+## Minor Pitfalls
 
-Patterns that work fine during development but fail under real streaming loads.
-
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| `useEffect` + `setState` on every token | FPS drops to single digits during streaming, input freezes | rAF buffer + DOM mutation for streaming, state flush on completion | Any response > 200 tokens |
-| Whole-store Zustand subscription | All components re-render 100x/sec during streaming, CPU maxes | Selector-only subscriptions | Any streaming response |
-| Parsing markdown on every token | Main thread blocked 50-100ms per token during streaming, visible stutter | Debounce markdown parsing; parse on newlines/sentence-end or 50ms idle | Any response with markdown formatting |
-| Shiki highlight during streaming | 200-500ms blocking call per code block during streaming | Defer Shiki until `isStreaming === false`; use raw monospace during streaming | First code block in streaming response |
-| `content-visibility: auto` without `contain-intrinsic-size` | Scrollbar jumps as user scrolls (browser recalculates real sizes) | Always pair with a reasonable estimated height: `contain-intrinsic-size: 0 120px` | Long conversations (50+ messages) |
-| CSS `transition: all` on streaming-adjacent elements | Streaming tokens cause layout-triggering transitions on neighboring elements | Specify exact transition properties; add `.is-streaming` class to suppress non-critical transitions | During any streaming response |
-| Rendering all tool call histories inline | 200+ tool calls in one session saturate DOM, scroll becomes sluggish | Use `content-visibility: auto` on past tool cards; virtualize if > 500 tool calls | Sessions with > 100 tool calls |
+Issues that cause minor friction but are quickly fixable.
 
 ---
 
-## UX Pitfalls
+### Pitfall 12: Scroll Anchor Disrupted by Dynamic Content Height Changes
 
-Common UX mistakes in streaming chat / AI agent interfaces.
+**What goes wrong:** The existing scroll anchor from M1 works for append-only text streaming. M2 adds dynamic height changes: code blocks expanding when highlighting loads, tool cards expanding/collapsing, thinking blocks expanding. Each height change can disrupt the scroll position.
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Auto-scroll re-engages after user scrolled up | User loses reading position; infuriating during long responses | Immediate pause on any upward scroll; auto re-engage ONLY when user scrolls back to bottom manually |
-| Scroll pill shows message count, not turn count | "17 new messages" is meaningless when most messages are tool calls; turns are the semantic unit | Count AI turns (agent responses), not individual message objects |
-| Scroll pill auto-dismisses when response ends | User is reading history while response finishes; pill disappears before they can click it | Pill persists until user explicitly scrolls to bottom or clicks the pill |
-| All tool calls expanded by default | Dense walls of file content overwhelm the conversation; hard to find prose responses | Collapsed by default; auto-expand only on error; show compact summary (file name, exit code, line count) |
-| "Thinking..." shown as loading spinner | Spinner is anxiety-inducing and provides no information about progress | Aurora shimmer with elapsed time counter gives sense of active progress |
-| Toast inside scroll container | Toast changes scroll height, fighting IntersectionObserver sentinel; scroll pill flickers | Always portal toasts to `document.body` via `ReactDOM.createPortal` |
-| Error message as styled markdown block | Error formatting is lost or misinterpreted as model output | Dedicated `ErrorBanner` component with distinct destructive styling, not inline markdown |
-| Markdown rendered on every streaming token | Bold text "flashes" during streaming as partial syntax is opened/closed | Inline elements (bold, italic, code) can stream live; block elements (code fences, tables, headers) buffer until delimiter detected |
-| "Stop" button separate from "Send" | Dual affordance in the same area causes confusion (V1 audit found this exact bug) | Send button morphs into Stop button during streaming — single button, single location |
+**Prevention:**
+1. **The existing `useScrollAnchor` needs enhancement.** It currently checks "is user scrolled to bottom" and auto-scrolls on new content. Add: "if user is near bottom (within 100px), maintain bottom lock even when height changes above the viewport." This covers code block highlighting and tool card expansion.
+2. **Use `ResizeObserver` on the scroll container's content.** When content height changes and the user is in "auto-scroll" mode, scroll to bottom. This handles all dynamic height changes generically.
+3. **Don't use `scrollIntoView` -- use `scrollTop = scrollHeight`.** `scrollIntoView` can conflict with the rAF paint loop.
+
+**Phase assignment:** Phase 1-2 of M2, incremental enhancement of existing M1 scroll anchor.
+
+---
+
+### Pitfall 13: GFM Tables During Streaming Cause Wild Reflow
+
+**What goes wrong:** The Constitution (12.3) notes this: "During streaming, table rendering is deferred until the closing `|` row is detected." If you render partial tables during streaming, each new `|` character causes the table to re-layout as columns shift. A 5-column table streamed cell-by-cell produces 25+ layout recalculations.
+
+**Prevention:**
+1. **Detect table context in the stream buffer.** If the last line starts with `|` and no empty line follows, buffer the content instead of parsing it as markdown. Render a "Table loading..." placeholder.
+2. **Simpler: don't render tables during streaming at all.** Tables are rare in AI responses. Render them only on flush. During streaming, pipe-delimited lines render as plain text.
+3. **If using Streamdown, check if it handles this.** It may buffer tables automatically.
+
+**Phase assignment:** Phase 1 of M2 (markdown rendering). Minor edge case but explicitly called out in the Constitution.
+
+---
+
+### Pitfall 14: ESLint Constitution Rules Block Legitimate Shiki/Markdown Patterns
+
+**What goes wrong:** The 9 existing ESLint rules ban hardcoded colors, inline styles, and more. Shiki theme objects, markdown component styles, and code block containers may trigger false positives. Developers waste time fighting ESLint for legitimate library integration patterns.
+
+**Prevention:**
+1. **Add targeted ESLint disable comments with SAFETY explanations.** The Constitution allows `// eslint-disable-next-line ... -- [reason]` for exceptions.
+2. **Create a shared constants file for Shiki/markdown theme values.** Keep all library-required hardcoded values in one file with clear comments explaining why they bypass the token system.
+3. **Don't weaken the ESLint rules.** The rules are correct. The exceptions are few and well-defined. Document each exception in the file where it appears.
+
+**Phase assignment:** Throughout M2. Handle as they arise, not proactively.
+
+---
+
+### Pitfall 15: Multiple `claude-response` Entries Per Turn Not Handled in Markdown
+
+**What goes wrong:** M1 already learned that multiple assistant JSONL entries share the same `message.id` and must be merged. But in M2, each of those entries may contain text content blocks that need to be concatenated for markdown rendering. If the merge logic concatenates text without proper spacing, markdown parsing breaks (e.g., two text blocks without a newline between them merge a sentence ending into a heading).
+
+**Prevention:**
+1. **Ensure text block concatenation preserves whitespace.** When merging text blocks from multiple `claude-response` entries, join with the original whitespace (which should be preserved in the token stream).
+2. **This is likely already handled** by the rAF buffer concatenation (`bufferRef.current += token`). Verify that the flush produces correct markdown by testing with real multi-entry responses.
+3. **Test edge case: text -> tool_use -> text in a single turn.** The segment architecture handles this for streaming. Verify it also works for historical messages loaded from the backend JSONL.
+
+**Phase assignment:** Phase 1 of M2 (message rendering). Verify with real backend data.
 
 ---
 
@@ -373,30 +300,59 @@ Common UX mistakes in streaming chat / AI agent interfaces.
 
 | Phase Topic | Likely Pitfall | Mitigation |
 |-------------|---------------|------------|
-| Phase 1: Design system & ESLint | Skipping ESLint setup to "get to real code faster" — causes Constitution erosion by Phase 4 | ESLint rules are non-negotiable Phase 1 deliverables; gate report must verify all rules are wired |
-| Phase 1: CSS token architecture | Defining too few semantic tokens (missing secondary text, diff colors, FX tokens) — forces mid-phase additions that disrupt ongoing work | Reference the full Constitution Section 7 token map; define all tokens up front |
-| Phase 2: WebSocket + store setup | Provider-specific parsing mixed into store actions — creates 1000+ line handler file | Normalize to discriminated union at WebSocket layer before store receives data |
-| Phase 2: Store architecture | Using React Context for streaming state "temporarily" — never gets replaced | Zustand from the start; Context only for truly static values (theme config, feature flags) |
-| Phase 3: Streaming message rendering | Building `TurnBlock` and streaming display in the same phase — the streaming display needs to be correct before TurnBlock wraps it | Implement streaming message display first, verify FPS under load, then add turn grouping on top |
-| Phase 3: Scroll tracking | Using `onScroll` + `getBoundingClientRect` instead of IntersectionObserver | IntersectionObserver sentinel from the start; the rAF pattern in the existing phase 7 research is the verified correct implementation |
-| Phase 4: Markdown + tool calls | Rendering Shiki during streaming | Streaming fallback (raw monospace in code block container) first; Shiki deferred to post-stream is mandatory |
-| Phase 4: Tool call display | Building all tool-type-specific renderers before the base card | Base card with state machine (running/success/error) first; tool-specific variants are additive |
-| Phase 5+: Multi-agent workspaces | Session/provider state interleaving during rapid tab switching | Provider identity must be stored on session objects; stream store clears on any session change |
-| Any phase: Animation additions | Adding animations without re-verifying scroll behavior and streaming FPS | Every phase that adds animation must include streaming FPS test + scroll regression test in gate report |
-| Any phase: Component splitting | Splitting components without verifying that memo comparators still prevent unnecessary re-renders | After split, run React DevTools Profiler during streaming to verify zero past-message re-renders |
+| Markdown rendering | Pitfall 1 (re-parse on every token), Pitfall 3 (segment conflict), Pitfall 7 (unclosed blocks) | Decide streaming vs flush-only markdown upfront. This is THE architectural decision of M2. |
+| Code highlighting | Pitfall 2 (layout shift), Pitfall 8 (OKLCH conflict) | Use react-shiki with throttle + preloaded common languages. Constants file for theme. |
+| Composer | Pitfall 4 (grid shell conflict), Pitfall 9 (send/stop state machine), Pitfall 10 (image memory) | Grid template `1fr auto`, useLayoutEffect for resize, local state machine for button. |
+| Tool animations | Pitfall 5 (layout during streaming) | GPU-only animations during streaming. Defer expansion until stream ends. |
+| Activity status | Pitfall 6 (re-renders) | Isolated memo component, debounced updates, outside scroll container. |
+| Scroll anchoring | Pitfall 12 (dynamic height) | ResizeObserver + near-bottom threshold enhancement. |
+| Message rendering | Pitfall 15 (multi-entry merge) | Verify whitespace preservation in text concatenation. |
+| All phases | Pitfall 14 (ESLint false positives) | Targeted disable comments with SAFETY explanation. |
+
+---
+
+## The Big Decision: Streaming Markdown Strategy
+
+This is not a pitfall -- it's a crossroads that determines which pitfalls you face. There are three viable approaches:
+
+### Option A: Raw Text During Stream, Markdown on Flush
+
+- **Keeps the M1 rAF architecture entirely intact**
+- Streaming looks like a terminal (raw text, no formatting)
+- On flush, the full message re-renders with markdown/highlighting
+- **Pro:** Simplest, highest performance, zero risk of layout shift during streaming
+- **Con:** Users don't see formatted text while streaming (other AI UIs do show it)
+
+### Option B: Debounced Incremental Markdown
+
+- Parse markdown on newline or 100ms idle, not on every token
+- Use `useDeferredValue` so raw text shows immediately, formatted version catches up
+- Keep the rAF buffer for token accumulation, but periodically flush to a React-rendered markdown component
+- **Pro:** Users see formatting during streaming
+- **Con:** Complex, must solve segment/markdown conflict (Pitfall 3), unclosed block handling (Pitfall 7)
+
+### Option C: Streamdown (Vercel)
+
+- Purpose-built streaming markdown renderer
+- Handles unclosed blocks, incremental parsing, token buffering
+- Replaces react-markdown for streaming contexts
+- **Pro:** Solves Pitfalls 1, 3, 7, 13 out of the box
+- **Con:** External dependency, may not integrate with existing rAF architecture, potential conflict with Shiki integration (they recently opened an issue about react-shiki integration)
+
+**Recommendation:** Start with Option A for Phase 1 of M2. It ships fast, keeps M1 architecture intact, and delivers a working chat. Explore Option B or C in a later M2 phase or M3 as a UX enhancement. The V1 app rendered markdown only on completed messages and users were fine with it.
 
 ---
 
 ## Sources
 
-**Evidence base (HIGH confidence):**
-- V1 Phase 5 Gate Report Wave 2: Confirmed orphaned components (`ToolCallGroup`, `groupConsecutiveToolCalls`) wired as BLOCKERS
-- V1 Phase 5 CONTEXT.md + RESEARCH.md: 1050-line `useChatRealtimeHandlers.ts` documented as most complex file; multi-provider branching identified as architecture risk
-- V1 Phase 7 RESEARCH.md: Confirmed aurora GPU layer explosion pitfall with AMD Radeon 780M context; Safari `overflow-anchor` gap verified via MDN; IntersectionObserver timing race documented
-- V1 Phase 10 CONTEXT.md: 144+ hardcoded hex references across 15 files documented; Phase 11 required exclusively for remediation
-- V1 Phase 11 Gate Report Wave 1: Confirmed token system was infrastructure-complete but required a dedicated phase for sweep
-- V1 REPORT.md (Gemini audit): "Settings modal catastrophe" — blue buttons shattering palette; dual stop buttons creating confusion; documented as real user-facing failures
-- V1 V1_FEATURE_INVENTORY.md: 51 hardcoded hex values in chat components alone; session management race conditions documented as "Complex"; `useChatComposerState.ts` documented at 500+ lines as God file risk
-- V2 PROJECT.md: Explicitly names "hardcoded styles, inconsistent patterns, and foundation rot" as failure modes requiring the V2 greenfield rewrite
-- V2 V2_CONSTITUTION.md: 12 sections of enforceable conventions — each rule exists because V1 violated it
-- V2 V2_REWRITE_PLAYBOOK.md: Gemini architect's phase ordering rationale — emphasizes scroll physics and streaming correctness before chat UI
+- [react-markdown performance discussion](https://github.com/remarkjs/react-markdown/issues/459)
+- [remarkjs virtualization discussion](https://github.com/orgs/remarkjs/discussions/1027)
+- [Streamdown by Vercel](https://streamdown.ai/)
+- [Next.js Markdown Chatbot with Memoization](https://ai-sdk.dev/cookbook/next/markdown-chatbot-with-memoization)
+- [react-shiki (streaming-optimized Shiki for React)](https://github.com/AVGVSTVS96/react-shiki)
+- [Shiki dynamic language loading](http://blog.innei.ren/shiki-dynamic-load-language?locale=en)
+- [Shiki flickering in virtual lists](https://github.com/vercel/streamdown/issues/186)
+- [Auto-Resizing Textarea pitfalls](https://infinitejs.com/posts/auto-resizing-textarea-react-pitfalls/)
+- [react-shiki + Streamdown integration proposal](https://github.com/vercel/streamdown/issues/115)
+- Loom M1 source: `src/src/hooks/useStreamBuffer.ts`, `src/src/components/chat/view/ActiveMessage.tsx`, `src/src/lib/stream-multiplexer.ts`
+- Loom Constitution: `.planning/V2_CONSTITUTION.md` Sections 10, 11, 12
