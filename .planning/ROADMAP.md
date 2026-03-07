@@ -121,11 +121,11 @@ Plans:
   2. Executing tools show elapsed time counter that updates live ("1.2s", "5.4s") and cleans up on resolve/error
   3. Error tool cards force-expand with red accent and error message text -- never auto-collapsed
   4. ToolCardShell provides consistent header/footer/expand behavior; DefaultToolCard handles unregistered tools
-**Plans**: 3 plans
+**Plans**: 2 plans
 
 Plans:
-- [ ] 15-01: TBD
-- [ ] 15-02: TBD
+- [ ] 15-01-PLAN.md -- formatElapsed utility + useElapsedTime hook + ToolCardShell component + CSS
+- [ ] 15-02-PLAN.md -- ToolChip refactor (elapsed time, error force-expand, ToolCardShell wiring) + DefaultToolCard upgrade
 
 ### Phase 16: Per-Tool Cards
 **Goal**: Each tool type has a rich, purpose-built card showing its specific output format
@@ -213,7 +213,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 12. Streaming Markdown + Marker Interleaving | 3/3 | Complete    | 2026-03-07 | - |
 | 13. Composer | v1.1 | Complete    | 2026-03-07 | 2026-03-07 |
 | 14. Message Types | 3/3 | Complete    | 2026-03-07 | - |
-| 15. Tool Card Shell + Interleaving | v1.1 | 0/? | Not started | - |
+| 15. Tool Card Shell + State Machine | v1.1 | 0/2 | Not started | - |
 | 16. Per-Tool Cards | v1.1 | 0/? | Not started | - |
 | 17. Tool Grouping + Permissions | v1.1 | 0/? | Not started | - |
 | 18. Activity, Scroll, Polish | v1.1 | 0/? | Not started | - |
