@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Tool Registry + Proof of Life** - Pluggable tool-call component registry and the vertical slice proving the entire pipeline end-to-end (completed 2026-03-06)
 - [x] **Phase 8: Navigation + Session Management** - Sidebar with grouped session list, session switching with message loading, and URL-driven routing (completed 2026-03-06)
 - [x] **Phase 9: E2E Integration Wiring + Playwright Verification** - Wire WebSocket init into production route, fix sidebar navigation, Playwright E2E tests for all human-verification gaps (completed 2026-03-06)
-- [ ] **Phase 10: Pre-Archive Cleanup** - Remove orphaned exports, fix inline styles, correct stale traceability
+- [x] **Phase 10: Pre-Archive Cleanup** - Remove orphaned exports, fix inline styles, correct stale traceability (completed 2026-03-07)
 
 ## Phase Details
 
@@ -173,7 +173,7 @@ Plans:
   2. tool-registry.ts has zero inline styles (uses CSS classes with design tokens)
   3. ENF-01 traceability table shows "Complete" (matching its checkbox status)
   4. No unused test-only exports in production code
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 10-01-PLAN.md — Orphan removal, inline style cleanup, test export cleanup
@@ -194,4 +194,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 7. Tool Registry + Proof of Life | 2/2 | Complete   | 2026-03-06 |
 | 8. Navigation + Sessions | 2/2 | Complete   | 2026-03-06 |
 | 9. E2E Integration + Playwright | 2/2 | Complete | 2026-03-06 |
-| 10. Pre-Archive Cleanup | 0/1 | Pending | - |
+| 10. Pre-Archive Cleanup | 1/1 | Complete   | 2026-03-07 |
