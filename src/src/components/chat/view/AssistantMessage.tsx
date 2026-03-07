@@ -18,6 +18,9 @@
 
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
+import { ProviderHeader } from '@/components/chat/provider-logos/ProviderHeader';
+import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
+import { useUIStore } from '@/stores/ui';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
 
@@ -62,7 +65,9 @@ function toToolCallStates(
 }
 
 export function AssistantMessage({ message }: AssistantMessageProps) {
+  const thinkingExpanded = useUIStore((state) => state.thinkingExpanded);
   const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
+  const hasThinking = message.thinkingBlocks && message.thinkingBlocks.length > 0;
 
   const content = hasToolCalls
     ? injectToolMarkers(message.content, message.toolCalls!) // ASSERT: hasToolCalls guards truthiness of toolCalls
@@ -74,6 +79,14 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
 
   return (
     <MessageContainer role="assistant">
+      <ProviderHeader providerId={message.providerContext.providerId} />
+      {hasThinking && (
+        <ThinkingDisclosure
+          blocks={message.thinkingBlocks!} // ASSERT: hasThinking guards truthiness of thinkingBlocks
+          isStreaming={false}
+          globalExpanded={thinkingExpanded}
+        />
+      )}
       <MarkdownRenderer content={content} toolCalls={toolCallStates} />
     </MessageContainer>
   );

@@ -7,7 +7,7 @@
  * Constitution: Named exports only (2.2), no default export.
  */
 
-import type { Message, ToolCall } from '@/types/message';
+import type { Message, MessageRole, ToolCall } from '@/types/message';
 import type { Session } from '@/types/session';
 
 /** Content block types from Claude SDK responses */
@@ -25,11 +25,16 @@ interface ToolUseBlock {
 
 type ContentBlock = TextBlock | ToolUseBlock;
 
+/** Entry types that map to displayable messages */
+const CHAT_ENTRY_TYPES = new Set<string>([
+  'user', 'assistant', 'error', 'system', 'task_notification',
+]);
+
 /** Raw JSONL entry shape from backend API */
 export interface BackendEntry {
   type: string;
   message?: {
-    role: 'user' | 'assistant';
+    role: MessageRole;
     content: string | ContentBlock[];
   };
   sessionId: string;
@@ -107,9 +112,9 @@ function isToolResultEntry(entry: BackendEntry): boolean {
 export function transformBackendMessages(entries: BackendEntry[]): Message[] {
   const messages: Message[] = [];
 
-  // Only process actual chat entries (user/assistant with message content)
+  // Only process displayable entry types (user/assistant/error/system/task_notification)
   const chatEntries = entries.filter((entry) => {
-    if (entry.type !== 'user' && entry.type !== 'assistant') return false;
+    if (!CHAT_ENTRY_TYPES.has(entry.type)) return false;
     if (!entry.message?.role) return false;
     if (isToolResultEntry(entry)) return false;
     return true;
@@ -117,8 +122,34 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
 
   for (let i = 0; i < chatEntries.length; i++) {
     const entry = chatEntries[i]!; // ASSERT: bounded by chatEntries.length loop guard
-    const { text, toolCalls } = extractContent(entry);
     const role = entry.message!.role; // ASSERT: chatEntries filter guarantees message.role exists
+
+    // For non-chat message types (error, system, task_notification),
+    // create simple Message objects with string content only
+    if (role !== 'user' && role !== 'assistant') {
+      const content = typeof entry.message!.content === 'string' // ASSERT: chatEntries filter guarantees message exists
+        ? entry.message!.content // ASSERT: same guard as above
+        : '';
+      messages.push({
+        id: entry.uuid ?? Math.random().toString(36).slice(2, 10),
+        role,
+        content,
+        metadata: {
+          timestamp: entry.timestamp ?? new Date().toISOString(),
+          tokenCount: null,
+          cost: null,
+          duration: null,
+        },
+        providerContext: {
+          providerId: 'claude',
+          modelId: '',
+          agentName: null,
+        },
+      });
+      continue;
+    }
+
+    const { text, toolCalls } = extractContent(entry);
 
     // For assistant messages, merge consecutive entries that share the same
     // message.id (Claude sends text + tool_use as separate JSONL lines

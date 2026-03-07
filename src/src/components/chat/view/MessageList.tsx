@@ -1,7 +1,7 @@
 /**
  * MessageList -- renders an array of Message objects with scroll anchoring.
  *
- * Dispatches to UserMessage or AssistantMessage based on message.role.
+ * 5-way dispatch: user, assistant, error, system, task_notification.
  * Each message wrapped in MessageErrorBoundary for crash isolation.
  * During streaming, renders ActiveMessage at the end.
  * Includes scroll anchor sentinel and ScrollToBottomPill.
@@ -16,6 +16,9 @@
 import { useRef, useState, useCallback, useLayoutEffect, type RefObject } from 'react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
+import { ErrorMessage } from '@/components/chat/view/ErrorMessage';
+import { SystemMessage } from '@/components/chat/view/SystemMessage';
+import { TaskNotificationMessage } from '@/components/chat/view/TaskNotificationMessage';
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
 import { ScrollToBottomPill } from '@/components/chat/view/ScrollToBottomPill';
 import { MessageErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -68,6 +71,23 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
     if (el) el.scrollTop = el.scrollHeight;
   }, [sessionId, messages.length, scrollRef]);
 
+  function renderMessage(msg: Message) {
+    switch (msg.role) {
+      case 'user':
+        return <UserMessage message={msg} />;
+      case 'assistant':
+        return <AssistantMessage message={msg} />;
+      case 'error':
+        return <ErrorMessage message={msg} />;
+      case 'system':
+        return <SystemMessage message={msg} />;
+      case 'task_notification':
+        return <TaskNotificationMessage message={msg} />;
+      default:
+        return null;
+    }
+  }
+
   return (
     <div
       ref={assignRef}
@@ -77,11 +97,7 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
       <div className="mx-auto max-w-3xl flex flex-col py-4">
         {messages.map((msg) => (
           <MessageErrorBoundary key={msg.id}>
-            {msg.role === 'user' ? (
-              <UserMessage message={msg} />
-            ) : (
-              <AssistantMessage message={msg} />
-            )}
+            {renderMessage(msg)}
           </MessageErrorBoundary>
         ))}
         {showActiveMessage && (

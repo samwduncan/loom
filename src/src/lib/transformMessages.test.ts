@@ -178,6 +178,85 @@ describe('transformBackendMessages', () => {
     expect(messages[0]?.content).toBe('Real message');
   });
 
+  it('passes through error entries as error role messages', () => {
+    const entries = [
+      {
+        type: 'error',
+        message: { role: 'error' as const, content: 'Something went wrong' },
+        sessionId: 'sess-1',
+        uuid: 'err-1',
+        timestamp: '2026-03-07T12:00:00Z',
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.role).toBe('error');
+    expect(messages[0]?.content).toBe('Something went wrong');
+    expect(messages[0]?.id).toBe('err-1');
+  });
+
+  it('passes through system entries as system role messages', () => {
+    const entries = [
+      {
+        type: 'system',
+        message: { role: 'system' as const, content: 'Session started' },
+        sessionId: 'sess-1',
+        uuid: 'sys-1',
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.role).toBe('system');
+    expect(messages[0]?.content).toBe('Session started');
+  });
+
+  it('passes through task_notification entries', () => {
+    const entries = [
+      {
+        type: 'task_notification',
+        message: { role: 'task_notification' as const, content: 'Task completed' },
+        sessionId: 'sess-1',
+        uuid: 'task-1',
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.role).toBe('task_notification');
+    expect(messages[0]?.content).toBe('Task completed');
+  });
+
+  it('interleaves new message types with user/assistant messages', () => {
+    const entries = [
+      {
+        type: 'system',
+        message: { role: 'system' as const, content: 'Session started' },
+        sessionId: 'sess-1',
+        uuid: 'sys-1',
+      },
+      {
+        type: 'user',
+        message: { role: 'user' as const, content: 'Hello' },
+        sessionId: 'sess-1',
+        uuid: 'msg-1',
+      },
+      {
+        type: 'error',
+        message: { role: 'error' as const, content: 'API limit reached' },
+        sessionId: 'sess-1',
+        uuid: 'err-1',
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(3);
+    expect(messages[0]?.role).toBe('system');
+    expect(messages[1]?.role).toBe('user');
+    expect(messages[2]?.role).toBe('error');
+  });
+
   it('omits toolCalls when no tool_use blocks exist', () => {
     const entries = [
       {
