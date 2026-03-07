@@ -31,7 +31,7 @@
 - Integer phases (11, 12, 13...): Planned milestone work
 - Decimal phases (12.1, 12.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 11: Markdown + Code Blocks + UI Primitives** - Finalized message rendering with react-markdown, Shiki, code block UI, and shadcn/ui foundation
+- [x] **Phase 11: Markdown + Code Blocks + UI Primitives** - Finalized message rendering with react-markdown, Shiki, code block UI, and shadcn/ui foundation (completed 2026-03-07)
 - [ ] **Phase 12: Streaming Markdown + Marker Interleaving** - Two-phase rendering, marker-based tool chip placement, Streamdown evaluation
 - [ ] **Phase 13: Composer** - Auto-resize textarea, image paste/drop, send/stop morph, keyboard shortcuts, draft preservation
 - [ ] **Phase 14: Message Types** - All 7 message types rendering with correct styling and layout
@@ -208,7 +208,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 8. Navigation + Sessions | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 9. E2E Integration + Playwright | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 10. Pre-Archive Cleanup | v1.0 | 1/1 | Complete | 2026-03-07 |
-| 11. Markdown + Code Blocks | 2/3 | In Progress|  | - |
+| 11. Markdown + Code Blocks | 3/3 | Complete   | 2026-03-07 | - |
 | 12. Streaming Markdown + UI Primitives | v1.1 | 0/? | Not started | - |
 | 13. Composer | v1.1 | 0/? | Not started | - |
 | 14. Message Types | v1.1 | 0/? | Not started | - |

@@ -17,12 +17,12 @@
 
 ### Markdown Rendering — Finalized Messages
 
-- [ ] **MD-01**: Finalized assistant messages render full Markdown via react-markdown: bold, italic, strikethrough, lists (ordered + unordered), links, headings (h1-h6), blockquotes, horizontal rules, task lists (GFM checkboxes)
-- [ ] **MD-02**: react-markdown configured with `remarkPlugins: [remarkGfm]` and `rehypePlugins: [rehypeRaw]` for GFM + raw HTML passthrough (`<details>`, `<summary>`)
-- [ ] **MD-03**: Custom react-markdown component overrides for: `code` (routes to CodeBlock for fenced, inline `<code>` for spans), `a` (external links: `target="_blank" rel="noopener noreferrer"`; internal links: no target), `table` (horizontal scroll wrapper `overflow-x: auto`), `pre` (code block container)
-- [ ] **MD-04**: Inline code renders with `bg-surface-1` background, `rounded-sm` border radius, `px-1.5 py-0.5` padding, monospace font
-- [ ] **MD-05**: Blockquotes render with left border accent (`border-l-2 border-primary/30`), muted text, indented padding
-- [ ] **MD-06**: Links render with underline on hover, `text-primary` color, distinguishable from surrounding text
+- [x] **MD-01**: Finalized assistant messages render full Markdown via react-markdown: bold, italic, strikethrough, lists (ordered + unordered), links, headings (h1-h6), blockquotes, horizontal rules, task lists (GFM checkboxes)
+- [x] **MD-02**: react-markdown configured with `remarkPlugins: [remarkGfm]` and `rehypePlugins: [rehypeRaw]` for GFM + raw HTML passthrough (`<details>`, `<summary>`)
+- [x] **MD-03**: Custom react-markdown component overrides for: `code` (routes to CodeBlock for fenced, inline `<code>` for spans), `a` (external links: `target="_blank" rel="noopener noreferrer"`; internal links: no target), `table` (horizontal scroll wrapper `overflow-x: auto`), `pre` (code block container)
+- [x] **MD-04**: Inline code renders with `bg-surface-1` background, `rounded-sm` border radius, `px-1.5 py-0.5` padding, monospace font
+- [x] **MD-05**: Blockquotes render with left border accent (`border-l-2 border-primary/30`), muted text, indented padding
+- [x] **MD-06**: Links render with underline on hover, `text-primary` color, distinguishable from surrounding text
 
 ### Markdown Rendering — Streaming (Two-Phase)
 
@@ -189,12 +189,12 @@ Updated during roadmap creation (2026-03-07).
 | DEP-04 | Phase 11 | Complete |
 | DEP-05 | Phase 11 | Complete |
 | DEP-06 | Phase 18 | Pending |
-| MD-01 | Phase 11 | Pending |
-| MD-02 | Phase 11 | Pending |
-| MD-03 | Phase 11 | Pending |
-| MD-04 | Phase 11 | Pending |
-| MD-05 | Phase 11 | Pending |
-| MD-06 | Phase 11 | Pending |
+| MD-01 | Phase 11 | Complete |
+| MD-02 | Phase 11 | Complete |
+| MD-03 | Phase 11 | Complete |
+| MD-04 | Phase 11 | Complete |
+| MD-05 | Phase 11 | Complete |
+| MD-06 | Phase 11 | Complete |
 | MD-10 | Phase 12 | Pending |
 | MD-11 | Phase 12 | Pending |
 | MD-12 | Phase 12 | Pending |
