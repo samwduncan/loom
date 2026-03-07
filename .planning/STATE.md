@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Phase 12 Plan 01 complete
-last_updated: "2026-03-07T18:05:45.000Z"
-last_activity: 2026-03-07 -- Phase 12 Plan 01 complete (streaming markdown converter + rAF wiring)
+stopped_at: Phase 12 complete
+last_updated: "2026-03-07T18:12:00.000Z"
+last_activity: 2026-03-07 -- Phase 12 Plan 03 complete (Streamdown evaluation -- custom converter wins)
 progress:
   total_phases: 9
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 44
+  completed_phases: 2
+  total_plans: 6
+  completed_plans: 6
+  percent: 67
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 12 of 19 (Streaming Markdown + Marker Interleaving)
-Plan: 1 of 1 complete
-Status: Phase 12 Plan 01 complete
-Last activity: 2026-03-07 -- Phase 12 Plan 01 complete (streaming markdown converter + rAF wiring)
+Plan: 3 of 3 complete
+Status: Phase 12 complete
+Last activity: 2026-03-07 -- Phase 12 Plan 03 complete (Streamdown evaluation -- custom converter wins)
 
-Progress: [####......] 44%
+Progress: [######....] 67%
 
 ## Performance Metrics
 
@@ -40,6 +40,7 @@ Progress: [####......] 44%
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 12    | 03   | 4min     | 1     | 2     |
 | 12    | 01   | 4min     | 2     | 7     |
 | 11    | 03   | 3min     | 2     | 3     |
 | 11    | 02   | 6min     | 2     | 12    |
@@ -51,6 +52,7 @@ Progress: [####......] 44%
 
 See PROJECT.md Key Decisions table (updated at milestone completion).
 
+- Phase 12-03: Custom streaming converter over Streamdown (React component incompatible with rAF)
 - Phase 12-01: Unicode PUA placeholders over null bytes for code extraction
 - Phase 12-01: DOMPurify over manual sanitization for XSS protection
 - Phase 12-01: Permanent converter failure fallback in rAF paint loop
@@ -81,6 +83,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-07T18:05:45.000Z
-Stopped at: Phase 12 Plan 01 complete
-Resume: Continue with next plan in phase 12 or next phase
+Last session: 2026-03-07T18:12:00.000Z
+Stopped at: Phase 12 complete
+Resume: Continue with Phase 13 (Composer)
