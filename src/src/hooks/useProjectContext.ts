@@ -29,12 +29,6 @@ type ProjectsResponse = ProjectEntry[] | { projects: ProjectEntry[] };
 let resolvedProjectName: string | null = null;
 let resolvePromise: Promise<string> | null = null;
 
-/** Reset for testing */
-export function _resetProjectContextForTesting(): void {
-  resolvedProjectName = null;
-  resolvePromise = null;
-}
-
 async function resolveProject(): Promise<string> {
   if (resolvedProjectName) return resolvedProjectName;
 
