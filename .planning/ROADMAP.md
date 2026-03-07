@@ -71,11 +71,12 @@ Plans:
   3. The transition from streaming to finalized markdown is visually smooth with no flash or layout jump (200ms+ masked transition)
   4. Tool chips render at correct inline positions within finalized markdown content via marker-based interleaving -- not orphaned at bottom of message
   5. Streamdown evaluated as alternative streaming renderer -- decision documented with rationale (adopt or stick with two-phase)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
+- [ ] 12-01-PLAN.md -- Streaming markdown converter + DOMPurify + useStreamBuffer innerHTML wiring
+- [ ] 12-02-PLAN.md -- Crossfade transition + rehype tool markers + MarkdownRenderer integration
+- [ ] 12-03-PLAN.md -- Streamdown evaluation prototype + comparison
 
 ### Phase 13: Composer
 **Goal**: Users can compose multiline messages with image attachments and keyboard shortcuts
@@ -87,7 +88,7 @@ Plans:
   3. Send button morphs to Stop button during streaming with no position jump, and the state machine prevents double-send and double-stop
   4. User can paste or drag-and-drop up to 5 images, see thumbnail previews, remove individual images, and images upload to backend on send
   5. Draft text survives session switches and page reloads
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 13-01: TBD
@@ -104,7 +105,7 @@ Plans:
   3. Thinking blocks expand/collapse with CSS Grid animation, show character count when collapsed and duration when available, and respect the global thinking toggle
   4. Image blocks display as thumbnails that expand in a lightbox overlay on click
   5. Historical messages loaded from backend look identical to messages that were streamed in the current session
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 14-01: TBD
@@ -120,7 +121,7 @@ Plans:
   2. Executing tools show elapsed time counter that updates live ("1.2s", "5.4s") and cleans up on resolve/error
   3. Error tool cards force-expand with red accent and error message text -- never auto-collapsed
   4. ToolCardShell provides consistent header/footer/expand behavior; DefaultToolCard handles unregistered tools
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 15-01: TBD
@@ -136,7 +137,7 @@ Plans:
   3. EditToolCard shows unified diff with green additions, red deletions, and dual line numbers
   4. WriteToolCard shows file path with icon and syntax-highlighted content preview (first ~20 lines)
   5. GlobToolCard shows pattern and bulleted file list with count; GrepToolCard shows pattern, match context with highlighted match terms
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 16-01: TBD
@@ -152,7 +153,7 @@ Plans:
   2. Error tool calls within a group are always force-expanded and visible even when the group is collapsed
   3. Permission request banners appear inline above the composer with tool name, input preview, and Allow/Deny buttons
   4. Permission banners show countdown timer (55s default), auto-dismiss on timeout or backend cancellation, and only one banner displays at a time
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 17-01: TBD
@@ -168,7 +169,7 @@ Plans:
   3. Scroll position is preserved per session -- switching away and back restores exact scroll position via useLayoutEffect
   4. Scroll-to-bottom pill appears when scrolled up 200px+ with unread count badge; auto-scroll locks to bottom during streaming even when code blocks or tool cards expand
   5. New messages animate in with fade + slide-from-bottom (respecting prefers-reduced-motion); streaming cursor pulses at end of active text with primary accent color
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 18-01: TBD
@@ -185,7 +186,7 @@ Plans:
   3. Error messages include a "Retry" button that resends the last user message
   4. User can search within a session to filter/highlight messages matching search text
   5. User can export a conversation as Markdown or JSON file
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
 - [ ] 19-01: TBD
