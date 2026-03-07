@@ -41,6 +41,7 @@ Progress: [######....] 67%
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 12    | 03   | 4min     | 1     | 2     |
+| 12    | 02   | 6min     | 2     | 7     |
 | 12    | 01   | 4min     | 2     | 7     |
 | 11    | 03   | 3min     | 2     | 3     |
 | 11    | 02   | 6min     | 2     | 12    |
@@ -53,6 +54,9 @@ Progress: [######....] 67%
 See PROJECT.md Key Decisions table (updated at milestone completion).
 
 - Phase 12-03: Custom streaming converter over Streamdown (React component incompatible with rAF)
+- Phase 12-02: Opacity-based crossfade detection for streaming-to-finalized transition
+- Phase 12-02: rAF-gated height measurement before crossfade start
+- Phase 12-02: Empty text node filtering in rehype plugin for cleaner hast output
 - Phase 12-01: Unicode PUA placeholders over null bytes for code extraction
 - Phase 12-01: DOMPurify over manual sanitization for XSS protection
 - Phase 12-01: Permanent converter failure fallback in rAF paint loop

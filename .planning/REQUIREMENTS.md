@@ -30,8 +30,8 @@
 - [x] **MD-11**: Lightweight streaming markdown-to-HTML pure function converts basic formatting (bold, italic, code spans, paragraphs, line breaks) to sanitized HTML via `dangerouslySetInnerHTML`. Allowlist: `<strong>`, `<em>`, `<code>`, `<a>`, `<p>`, `<br>`, `<ul>`, `<ol>`, `<li>`, `<h1>`-`<h6>`. All other tags stripped.
 - [x] **MD-12**: Unclosed code fences during streaming: detect odd number of triple-backtick sequences and inject synthetic closing fence before parsing. Code block container renders immediately with content filling in as tokens arrive.
 - [x] **MD-13**: GFM tables during streaming: if last line starts with `|` and no empty line follows, render as plain text until table completes. Tables only parsed on flush or double-newline. (Constitution 12.3)
-- [ ] **MD-14**: Transition from streaming to finalized markdown is visually smooth — masked by existing `data-phase` CSS transition (minimum 200ms). No visible "flash" or layout jump.
-- [ ] **MD-15**: Interleaved tool chips within finalized markdown: marker-based approach — insert unique placeholder tokens (`\x00TOOL:id\x00`) at tool positions, parse full document as markdown, walk rendered tree and replace markers with React ToolChip components. Marker schema defined once, used consistently.
+- [x] **MD-14**: Transition from streaming to finalized markdown is visually smooth — masked by existing `data-phase` CSS transition (minimum 200ms). No visible "flash" or layout jump.
+- [x] **MD-15**: Interleaved tool chips within finalized markdown: marker-based approach — insert unique placeholder tokens (`\x00TOOL:id\x00`) at tool positions, parse full document as markdown, walk rendered tree and replace markers with React ToolChip components. Marker schema defined once, used consistently.
 
 ### Code Blocks (Shiki)
 
@@ -199,8 +199,8 @@ Updated during roadmap creation (2026-03-07).
 | MD-11 | Phase 12 | Complete |
 | MD-12 | Phase 12 | Complete |
 | MD-13 | Phase 12 | Complete |
-| MD-14 | Phase 12 | Pending |
-| MD-15 | Phase 12 | Pending |
+| MD-14 | Phase 12 | Complete |
+| MD-15 | Phase 12 | Complete |
 | CODE-01 | Phase 11 | Complete |
 | CODE-02 | Phase 11 | Complete |
 | CODE-03 | Phase 11 | Complete |
