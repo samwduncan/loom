@@ -58,7 +58,7 @@
 - [ ] **CMP-09**: Images use `URL.createObjectURL(blob)` for previews (not data URLs — prevents memory doubling). Object URLs revoked after message sent. Max 5MB per image.
 - [ ] **CMP-10**: Images uploaded to backend via REST endpoint (`/api/projects/:name/upload-images`) as multipart/form-data, or sent inline in WebSocket `claude-command` message `options.images` field. Image references stored in message, not raw data.
 - [x] **CMP-11**: Cmd+. (Mac) / Ctrl+. (Windows) stops active generation (global keyboard shortcut via `useEffect`). Escape clears input text and blurs textarea.
-- [ ] **CMP-12**: Draft text preserved per session in `useRef<Map<string, string>>`. On session switch, current draft saved, target session's draft restored. Persisted to localStorage for reload survival.
+- [x] **CMP-12**: Draft text preserved per session in `useRef<Map<string, string>>`. On session switch, current draft saved, target session's draft restored. Persisted to localStorage for reload survival.
 - [x] **CMP-13**: Composer integrates with CSS Grid shell: `grid-template-rows: 1fr auto` (messages flex, composer intrinsic). Scroll position stabilized when composer height changes (capture scrollTop before resize, restore after).
 - [x] **CMP-14**: Textarea auto-focuses on session switch and on app load. Focus returned to textarea after sending a message.
 
@@ -221,7 +221,7 @@ Updated during roadmap creation (2026-03-07).
 | CMP-09 | Phase 13 | Pending |
 | CMP-10 | Phase 13 | Pending |
 | CMP-11 | Phase 13 | Complete |
-| CMP-12 | Phase 13 | Pending |
+| CMP-12 | Phase 13 | Complete |
 | CMP-13 | Phase 13 | Complete |
 | CMP-14 | Phase 13 | Complete |
 | MSG-01 | Phase 14 | Pending |

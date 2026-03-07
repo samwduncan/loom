@@ -211,7 +211,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 10. Pre-Archive Cleanup | v1.0 | 1/1 | Complete | 2026-03-07 |
 | 11. Markdown + Code Blocks | 3/3 | Complete    | 2026-03-07 | - |
 | 12. Streaming Markdown + Marker Interleaving | 3/3 | Complete    | 2026-03-07 | - |
-| 13. Composer | v1.1 | 1/3 | In progress | - |
+| 13. Composer | 2/3 | In Progress|  | - |
 | 14. Message Types | v1.1 | 0/? | Not started | - |
 | 15. Tool Card Shell + Interleaving | v1.1 | 0/? | Not started | - |
 | 16. Per-Tool Cards | v1.1 | 0/? | Not started | - |
