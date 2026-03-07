@@ -208,7 +208,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 8. Navigation + Sessions | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 9. E2E Integration + Playwright | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 10. Pre-Archive Cleanup | v1.0 | 1/1 | Complete | 2026-03-07 |
-| 11. Markdown + Code Blocks | 3/3 | Complete   | 2026-03-07 | - |
+| 11. Markdown + Code Blocks | 3/3 | Complete    | 2026-03-07 | - |
 | 12. Streaming Markdown + UI Primitives | v1.1 | 0/? | Not started | - |
 | 13. Composer | v1.1 | 0/? | Not started | - |
 | 14. Message Types | v1.1 | 0/? | Not started | - |
