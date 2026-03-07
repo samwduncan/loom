@@ -41,7 +41,7 @@ export function ChatEmptyState({ onSuggestionClick }: ChatEmptyStateProps) {
                 className={cn(
                   'rounded-lg bg-surface-raised px-3 py-1.5 text-sm text-secondary',
                   'hover:bg-surface-overlay transition-colors',
-                  'border border-border',
+                  'border border-border/10',
                 )}
               >
                 {suggestion}

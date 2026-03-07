@@ -88,24 +88,15 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     }
   }, [suggestionText]);
 
+  // Scroll stability: capture scroll position BEFORE React re-renders and
+  // useAutoResize fires its useLayoutEffect. We store the snapshot in a ref
+  // so the restore layout effect can compare against the pre-resize state.
+  const prevScrollRef = useRef<{ top: number; height: number } | null>(null);
+
   // Auto-resize textarea
   useAutoResize(textareaRef, input, 200);
 
-  // Scroll stability: capture scroll position before resize, restore after
-  const prevScrollRef = useRef<{ top: number; height: number } | null>(null);
-
-  // Capture scroll state before auto-resize modifies textarea height
-  useLayoutEffect(() => {
-    const container = scrollContainerRef?.current;
-    if (container) {
-      prevScrollRef.current = {
-        top: container.scrollTop,
-        height: container.scrollHeight,
-      };
-    }
-  }, [input, scrollContainerRef]);
-
-  // Restore scroll position after resize
+  // Restore scroll position after auto-resize layout effect has fired
   useLayoutEffect(() => {
     const container = scrollContainerRef?.current;
     const prev = prevScrollRef.current;
@@ -115,6 +106,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         container.scrollTop = prev.top + heightDelta;
       }
     }
+    prevScrollRef.current = null;
   });
 
   // When a new chat session is created, update sidebar title
@@ -362,6 +354,14 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
           ref={textareaRef}
           value={input}
           onChange={(e) => {
+            // Capture scroll position BEFORE setInput triggers re-render + useAutoResize
+            const container = scrollContainerRef?.current;
+            if (container) {
+              prevScrollRef.current = {
+                top: container.scrollTop,
+                height: container.scrollHeight,
+              };
+            }
             setInput(e.target.value);
             if (sessionId) saveDraft(sessionId, e.target.value);
           }}

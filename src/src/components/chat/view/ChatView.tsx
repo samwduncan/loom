@@ -72,8 +72,7 @@ export function ChatView() {
 
   return (
     <div
-      className="grid h-full"
-      style={{ gridTemplateRows: '1fr auto' }}
+      className="grid h-full grid-rows-[1fr_auto]"
       data-testid="chat-view"
     >
       {!hasSession ? (
