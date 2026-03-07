@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: completed
-stopped_at: Phase 13 context gathered
-last_updated: "2026-03-07T18:37:30.851Z"
-last_activity: 2026-03-07 -- Phase 12 Plan 03 complete (Streamdown evaluation -- custom converter wins)
+stopped_at: Phase 13 Plan 01 complete
+last_updated: "2026-03-07T19:03:00Z"
+last_activity: 2026-03-07 -- Phase 13 Plan 01 complete (Core composer with auto-resize, FSM, keyboard shortcuts)
 progress:
   total_phases: 9
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 67
+  total_plans: 9
+  completed_plans: 7
+  percent: 70
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 12 of 19 (Streaming Markdown + Marker Interleaving)
-Plan: 3 of 3 complete
-Status: Phase 12 complete
-Last activity: 2026-03-07 -- Phase 12 Plan 03 complete (Streamdown evaluation -- custom converter wins)
+Phase: 13 of 19 (Composer)
+Plan: 1 of 3
+Status: In progress
+Last activity: 2026-03-07 -- Phase 13 Plan 01 complete (Core composer with auto-resize, FSM, keyboard shortcuts)
 
-Progress: [######....] 67%
+Progress: [######....] 70%
 
 ## Performance Metrics
 
@@ -40,6 +40,7 @@ Progress: [######....] 67%
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 13    | 01   | 6min     | 2     | 10    |
 | 12    | 03   | 4min     | 1     | 2     |
 | 12    | 02   | 6min     | 2     | 7     |
 | 12    | 01   | 4min     | 2     | 7     |
@@ -53,6 +54,9 @@ Progress: [######....] 67%
 
 See PROJECT.md Key Decisions table (updated at milestone completion).
 
+- Phase 13-01: Scroll container ref as prop (not querySelector) per Constitution 10.2
+- Phase 13-01: FSM idle->active transition for mid-stream component mount
+- Phase 13-01: abort-session for both Stop button and Cmd+. shortcut
 - Phase 12-03: Custom streaming converter over Streamdown (React component incompatible with rAF)
 - Phase 12-02: Opacity-based crossfade detection for streaming-to-finalized transition
 - Phase 12-02: rAF-gated height measurement before crossfade start
@@ -87,6 +91,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-07T18:37:30.850Z
-Stopped at: Phase 13 context gathered
-Resume: Continue with Phase 13 (Composer)
+Last session: 2026-03-07T19:03:00Z
+Stopped at: Phase 13 Plan 01 complete
+Resume: Continue with Phase 13 Plan 02 (Image attachments)
