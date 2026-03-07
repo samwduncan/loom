@@ -5,8 +5,10 @@
  * (bold, italic, code blocks, tables, links, etc.). Fenced code blocks
  * route to CodeBlock with Shiki syntax highlighting.
  *
- * If message has toolCalls, renders each as a collapsed ToolChip with
- * status 'resolved' using the tool registry.
+ * Tool calls are rendered inline within the markdown content via
+ * \x00TOOL:id\x00 markers. The rehypeToolMarkers plugin in MarkdownRenderer
+ * converts these to <tool-marker> elements, which render as ToolChip
+ * components via the component override system.
  *
  * Wraps content in MessageContainer with role="assistant" for unified CSS
  * with streaming ActiveMessage (CLS prevention).
@@ -16,7 +18,6 @@
 
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
-import { ToolChip } from '@/components/chat/tools/ToolChip';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
 
@@ -24,27 +25,56 @@ interface AssistantMessageProps {
   message: Message;
 }
 
+/**
+ * Inject \x00TOOL:id\x00 markers into the content string for inline rendering.
+ *
+ * Strategy: Append markers at the end of content for each tool call.
+ * Historical messages don't have position data, so markers go after the
+ * main content separated by newlines. The markers render as inline ToolChip
+ * components within the markdown flow.
+ */
+function injectToolMarkers(content: string, toolCalls: NonNullable<Message['toolCalls']>): string {
+  if (toolCalls.length === 0) return content;
+
+  // Insert markers after the content, each on its own line for block-level placement
+  const markers = toolCalls.map((tc) => `\x00TOOL:${tc.id}\x00`).join('\n\n');
+  const trimmed = content.trimEnd();
+  return trimmed + '\n\n' + markers;
+}
+
+/**
+ * Convert message toolCalls to ToolCallState array for MarkdownRenderer lookup.
+ */
+function toToolCallStates(
+  toolCalls: NonNullable<Message['toolCalls']>,
+  timestamp: string,
+): ToolCallState[] {
+  return toolCalls.map((tc) => ({
+    id: tc.id,
+    toolName: tc.toolName,
+    status: 'resolved' as const,
+    input: tc.input,
+    output: tc.output,
+    isError: tc.isError,
+    startedAt: timestamp,
+    completedAt: timestamp,
+  }));
+}
+
 export function AssistantMessage({ message }: AssistantMessageProps) {
+  const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
+
+  const content = hasToolCalls
+    ? injectToolMarkers(message.content, message.toolCalls!) // ASSERT: hasToolCalls guards truthiness of toolCalls
+    : message.content;
+
+  const toolCallStates = hasToolCalls
+    ? toToolCallStates(message.toolCalls!, message.metadata.timestamp) // ASSERT: hasToolCalls guards truthiness of toolCalls
+    : undefined;
+
   return (
     <MessageContainer role="assistant">
-      <MarkdownRenderer content={message.content} />
-      {message.toolCalls && message.toolCalls.length > 0 && (
-        <div className="mt-2 flex flex-col gap-1">
-          {message.toolCalls.map((tc) => {
-            const toolCallState: ToolCallState = {
-              id: tc.id,
-              toolName: tc.toolName,
-              status: 'resolved',
-              input: tc.input,
-              output: tc.output,
-              isError: tc.isError,
-              startedAt: message.metadata.timestamp,
-              completedAt: message.metadata.timestamp,
-            };
-            return <ToolChip key={tc.id} toolCall={toolCallState} />;
-          })}
-        </div>
-      )}
+      <MarkdownRenderer content={content} toolCalls={toolCallStates} />
     </MessageContainer>
   );
 }
