@@ -22,14 +22,18 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Active
 
-**Core Chat Experience (M2)**
-- [ ] All 7 message types render correctly (user, assistant, tool, thinking, error, system, task_notification)
-- [ ] Tool cards with state machine animations (running -> success -> error)
-- [ ] Thinking/reasoning blocks with expand/collapse
-- [ ] Markdown rendering with syntax-highlighted code blocks (Shiki)
-- [ ] Composer: auto-resize, send/stop morph, image paste/upload
-- [ ] Activity status line ("Reading auth.ts...", "Writing server.js...")
-- [ ] Session switching with real data (connected to backend)
+**Current Milestone: v1.1 "The Chat"**
+
+**Goal:** Build the complete conversation experience — every message type renders, tools display with animations, markdown is syntax-highlighted, the composer works, and you can have a full conversation.
+
+**Target features:**
+- All 7 message types rendering (user, assistant, tool, thinking, error, system, task_notification)
+- Tool cards with state machine animations (invoked -> executing -> resolved/error)
+- Thinking/reasoning blocks with expand/collapse + global toggle
+- Markdown rendering with syntax-highlighted code blocks (Shiki, lazy-loaded)
+- Composer: auto-resize textarea, send/stop morph, image paste/upload
+- Activity status line ("Reading auth.ts...", "Writing server.js...")
+- Scroll position preservation across session switches
 
 **Visual Excellence (M3)**
 - [ ] Spring physics animations on all interactions
@@ -105,4 +109,4 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 | Segment array architecture for ActiveMessage | Interleaved text spans + ToolChip components | Good — handles complex tool-call streams |
 
 ---
-*Last updated: 2026-03-07 after v1.0 milestone*
+*Last updated: 2026-03-07 after v1.1 milestone start*
