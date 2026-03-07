@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Completed 14-01-PLAN.md
-last_updated: "2026-03-07T20:28:08.247Z"
+stopped_at: Completed 14-03-PLAN.md
+last_updated: "2026-03-07T20:33:49.751Z"
 last_activity: 2026-03-07 -- Phase 14 Plan 01 complete (5-way message dispatch + new message type components)
 progress:
   total_phases: 9
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
   percent: 83
 ---
 
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 14 of 19 (Message Types)
-Plan: 2 of 3
-Status: in-progress
-Last activity: 2026-03-07 -- Phase 14 Plan 01 complete (5-way message dispatch + new message type components)
+Phase: 14 of 19 (Message Types) -- COMPLETE
+Plan: 3 of 3
+Status: phase-complete
+Last activity: 2026-03-07 -- Phase 14 Plan 03 complete (UserMessage enhancements + ImageLightbox + MarkdownRenderer img override)
 
-Progress: [########..] 83%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [########..] 83%
 | 11    | 02   | 6min     | 2     | 12    |
 | 11    | 01   | 7min     | 2     | 13    |
 | Phase 14 P01 | 9min | 2 tasks | 11 files |
+| Phase 14 P03 | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - [Phase 14]: bg-card for user bubble (replaces bg-primary-muted per user preference)
 - [Phase 14]: Set allowlist pattern for transformBackendMessages entry filtering
 - [Phase 14]: ImageAttachment type added to Message interface early (prepares Plan 03)
+- [Phase 14]: Dialog primitive composition for ImageLightbox (bypass DialogContent for custom bg-black/80 overlay)
+- [Phase 14]: Per-instance lightbox state in MarkdownRenderer (Dialog portals prevent nesting issues)
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -107,6 +110,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-07T20:28:08.246Z
-Stopped at: Completed 14-01-PLAN.md
+Last session: 2026-03-07T20:33:49.749Z
+Stopped at: Completed 14-03-PLAN.md
 Resume: Continue with Phase 14 Plan 03

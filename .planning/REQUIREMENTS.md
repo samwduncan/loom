@@ -64,7 +64,7 @@
 
 ### Message Types
 
-- [ ] **MSG-01**: User messages: `bg-card` background, `rounded-lg`, pre-wrapped text, timestamp visible on hover (opacity 0→1 transition, zero layout shift, shows relative time like "2m ago")
+- [x] **MSG-01**: User messages: `bg-card` background, `rounded-lg`, pre-wrapped text, timestamp visible on hover (opacity 0→1 transition, zero layout shift, shows relative time like "2m ago")
 - [x] **MSG-02**: Assistant messages: no background (transparent), left-aligned, content rendered via MarkdownRenderer. Provider logo/icon in message header.
 - [x] **MSG-03**: Error messages: inline banner with `border-l-4 border-error` accent, `bg-error/10` muted background, error icon, error text. No retry button in M2 (defer complex retry logic).
 - [x] **MSG-04**: System messages: centered horizontally, `text-muted` color, smaller font size (`text-xs`), no background. Used for "Session started", "Context compacted", etc.
@@ -72,7 +72,7 @@
 - [x] **MSG-06**: Thinking blocks: expand/collapse disclosure with character count label ("1,234 chars") when collapsed, duration label ("took 3.2s") when available. Muted italic text styling inside disclosure. CSS Grid `grid-template-rows: 0fr/1fr` animation for expand/collapse (M1 pattern).
 - [x] **MSG-07**: Thinking block content renders as plain monospace text in M2 (defer markdown rendering of thinking to M3 — thinking rarely has complex markdown, and double-parsing is expensive)
 - [x] **MSG-08**: Global thinking toggle in UI store (persisted to localStorage). When collapsed-all, thinking disclosures render in collapsed state. Toggle accessible from chat header or keyboard shortcut.
-- [ ] **MSG-09**: Image blocks in messages: user-sent images display as thumbnails (max 200px width, click to expand in lightbox overlay). Assistant-referenced images render inline at natural size with max-width constraint.
+- [x] **MSG-09**: Image blocks in messages: user-sent images display as thumbnails (max 200px width, click to expand in lightbox overlay). Assistant-referenced images render inline at natural size with max-width constraint.
 - [x] **MSG-10**: All message types use consistent spacing: `gap-3` between messages, `py-3 px-4` internal padding. MessageContainer wrapper provides consistent layout regardless of type.
 - [x] **MSG-11**: Messages display in chronological order. Historical messages loaded from backend render identically to streamed messages (same components, same styling).
 
@@ -224,7 +224,7 @@ Updated during roadmap creation (2026-03-07).
 | CMP-12 | Phase 13 | Complete |
 | CMP-13 | Phase 13 | Complete |
 | CMP-14 | Phase 13 | Complete |
-| MSG-01 | Phase 14 | Pending |
+| MSG-01 | Phase 14 | Complete |
 | MSG-02 | Phase 14 | Complete |
 | MSG-03 | Phase 14 | Complete |
 | MSG-04 | Phase 14 | Complete |
@@ -232,7 +232,7 @@ Updated during roadmap creation (2026-03-07).
 | MSG-06 | Phase 14 | Complete |
 | MSG-07 | Phase 14 | Complete |
 | MSG-08 | Phase 14 | Complete |
-| MSG-09 | Phase 14 | Pending |
+| MSG-09 | Phase 14 | Complete |
 | MSG-10 | Phase 14 | Complete |
 | MSG-11 | Phase 14 | Complete |
 | TOOL-01 | Phase 15 | Pending |
