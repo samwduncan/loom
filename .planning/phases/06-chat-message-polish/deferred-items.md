@@ -1,1 +1,0 @@
-- **Pre-existing: ImageLightbox missing** - src/components/chat/view/subcomponents/MessageComponent.tsx imports ./ImageLightbox but the file doesn't exist. Causes tsc and build errors. Not related to 06-03 changes.

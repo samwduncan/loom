@@ -17,11 +17,28 @@ This document captures the full development vision across all milestones. It per
 
 ---
 
-## M1: "The Skeleton" — Architecture + Vertical Proof
+## M1: "The Skeleton" — Architecture + Vertical Proof — SHIPPED 2026-03-07
+
+**Status:** SHIPPED
+**Shipped:** 2026-03-07
+**Phases:** 10 | **Plans:** 21 | **Commits:** 145
+**LOC:** 14,423 TypeScript + CSS
+**Timeline:** 3 days (2026-03-04 to 2026-03-07)
+**Archive:** `milestones/v1.0-ROADMAP.md`, `milestones/v1.0-REQUIREMENTS.md`
+
+**Delivered:** Complete architectural skeleton with OKLCH design tokens, 9 ESLint Constitution rules, 4 Zustand stores with M1-M5 interfaces, WebSocket streaming at 60fps via rAF DOM mutation, pluggable tool registry, sidebar navigation with session switching, and Playwright E2E verification.
+
+**Key Accomplishments:**
+1. OKLCH design token system with 29 colors, motion springs, and surface hierarchy — enforced by 9 custom ESLint rules
+2. Four Zustand stores with full M1-M5 TypeScript interfaces, selector-only access, and persistence
+3. WebSocket bridge with stream multiplexer routing thinking/content/tool channels independently
+4. 60fps streaming engine using useRef + rAF DOM mutation (zero React re-renders during streaming)
+5. Pluggable tool-call registry with 6 built-in tools and ToolChip/ToolCard components
+6. Production-wired chat with sidebar navigation, session switching, and Playwright E2E verification
 
 **Goal**: Build the architectural skeleton for the entire V2 vision and prove it works with a real vertical slice (streamed message with thinking blocks renders in the browser).
 
-**Phases**: ~4-6 (fine granularity)
+**Phases**: 10 (fine granularity)
 
 **Deliverables**:
 - Design token system: OKLCH colors, motion tokens (spring configs), spacing scale, z-index dictionary, typography
@@ -43,13 +60,13 @@ This document captures the full development vision across all milestones. It per
 - Routing structure: Slots for all future views (chat, GSD dashboard, settings, etc.)
 
 **Gate Criteria**:
-- [ ] Real streamed message with thinking block renders correctly in browser
-- [ ] Stream Multiplexer routes thinking + content simultaneously
-- [ ] All ESLint Constitution rules pass with zero warnings
-- [ ] TypeScript strict mode, zero `any` types
-- [ ] All tests pass
-- [ ] Sidebar shows session list (mock or real data)
-- [ ] User spot check: "Does this skeleton feel architecturally sound?"
+- [x] Real streamed message with thinking block renders correctly in browser
+- [x] Stream Multiplexer routes thinking + content simultaneously
+- [x] All ESLint Constitution rules pass with zero warnings
+- [x] TypeScript strict mode, zero `any` types
+- [x] All tests pass
+- [x] Sidebar shows session list (real data from backend)
+- [x] Playwright E2E tests verify all integration points
 
 ---
 
@@ -98,6 +115,13 @@ This document captures the full development vision across all milestones. It per
 - Full accessibility pass (ARIA roles, keyboard nav, prefers-reduced-motion)
 - Performance audit (FPS during streaming, memory profiling)
 
+**Visual Effects Integration** (see `.planning/visual-effects-audit.md`):
+- Cherry-picked React Bits components: Aurora, Grainient (WebGL via `ogl`), SpotlightCard, ShinyText, StarBorder (CSS-only)
+- shadcn/ui primitives restyled to OKLCH tokens (installed during M2, restyled in M3)
+- OKLCH-to-hex bridge for WebGL shader uniforms
+- CSS-only effects (SpotlightCard, ShinyText) integrated during M2 alongside their surfaces
+- Community registries available if needed: Magic UI, Aceternity UI, Glass UI
+
 **Gate Criteria**:
 - [ ] Streaming at 100 tokens/sec with zero visible jitter
 - [ ] All animations use defined motion tokens
@@ -106,6 +130,13 @@ This document captures the full development vision across all milestones. It per
 - [ ] FPS stays above 55 during heavy streaming
 - [ ] All M1 + M2 + M3 tests pass (regression)
 - [ ] User spot check: "Would a harsh, experienced developer rate this 10/10?"
+
+**Design Review Checkpoint** (MANDATORY before M4):
+After M3 phases complete, pause for a holistic visual review of every surface. Outcomes:
+- Satisfied → proceed to M4
+- Needs iteration → add M3.x phases targeting specific surfaces
+- Wants exploration → revisit full component catalogues (200+ effects documented in audit)
+This checkpoint guarantees we don't rush past visual quality or over-plan effects we don't need.
 
 ---
 

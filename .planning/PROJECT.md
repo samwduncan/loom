@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Loom is a premium web interface for AI coding agents (Claude Code, Gemini, Codex) that transforms the black-box CLI experience into a visually stunning, multi-agent workspace. It consumes the existing CloudCLI Node.js backend while providing a from-scratch React frontend built to a 10/10 quality standard. The goal is not just functional parity with the CLI — it's making the agent's work *visible and beautiful*: satisfying tool call animations, clear MCP interactions, elegant code streaming, and a design that makes you want to come back purely for how it looks.
+Loom is a premium web interface for AI coding agents (Claude Code, Gemini, Codex) that transforms the black-box CLI experience into a visually stunning, multi-agent workspace. Built on a from-scratch React frontend with a 10/10 quality standard, consuming the existing CloudCLI Node.js backend. The architectural skeleton is complete with OKLCH design tokens, enforced coding conventions, streaming at 60fps, and a pluggable tool registry.
 
 ## Core Value
 
@@ -12,120 +12,97 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Validated
 
-<!-- Shipped and confirmed valuable. -->
-
-(None yet — ship to validate)
+- v1.0 Design Token System (DS-01 through DS-06) — 29 OKLCH color tokens, motion springs, spacing scale, z-index dictionary, typography, surface hierarchy
+- v1.0 Enforcement (ENF-01 through ENF-04) — 9 custom ESLint rules, TypeScript strict, Vitest, pre-commit gates
+- v1.0 App Shell (SHELL-01 through SHELL-04) — CSS Grid layout, 100dvh viewport, React Router, 3-tier error boundaries
+- v1.0 State Architecture (STATE-01 through STATE-05) — 4 Zustand stores, M1-M5 interfaces, selector enforcement, persistence
+- v1.0 Streaming (STRM-01 through STRM-04) — WebSocket client, stream multiplexer, rAF buffer, proof-of-life
+- v1.0 Components (COMP-01 through COMP-03) — Tool registry, ActiveMessage, scroll anchor
+- v1.0 Navigation (NAV-01, NAV-02) — Sidebar with sessions, session switching with message loading
 
 ### Active
 
-**Core Chat Experience**
-- [ ] Send messages and receive streaming AI responses with smooth scroll anchoring
-- [ ] Tool call display with stateful animations (running → success → error)
-- [ ] Thinking/reasoning block display with expand/collapse
-- [ ] Markdown rendering with syntax-highlighted code blocks
-- [ ] Session management (create, switch, browse history)
-- [ ] Settings panel (appearance, agents, API configuration)
-- [ ] Error handling with graceful degradation (3-tier error boundaries)
-- [ ] Connection management with reconnection and status display
+**Core Chat Experience (M2)**
+- [ ] All 7 message types render correctly (user, assistant, tool, thinking, error, system, task_notification)
+- [ ] Tool cards with state machine animations (running -> success -> error)
+- [ ] Thinking/reasoning blocks with expand/collapse
+- [ ] Markdown rendering with syntax-highlighted code blocks (Shiki)
+- [ ] Composer: auto-resize, send/stop morph, image paste/upload
+- [ ] Activity status line ("Reading auth.ts...", "Writing server.js...")
+- [ ] Session switching with real data (connected to backend)
 
-**Design System & Visual Excellence**
-- [ ] Comprehensive design token system (CSS custom properties, OKLCH color space)
-- [ ] Surface hierarchy via lightness steps (no drop shadows)
+**Visual Excellence (M3)**
 - [ ] Spring physics animations on all interactions
-- [ ] Satisfying tool call card animations with state machine transitions
 - [ ] Message entrance animations (spring translateY + opacity)
-- [ ] Streaming aurora/ambient effects during AI response generation
-- [ ] Typography system: Inter (UI), Instrument Serif (editorial), JetBrains Mono (code)
-- [ ] Award-winning level visual design — the kind that centers a marketing campaign
+- [ ] Streaming aurora/ambient effects
+- [ ] Scroll physics perfected (zero jitter at 100 tokens/sec)
+- [ ] Cmd+K command palette
+- [ ] Sidebar slim collapse mode
+- [ ] Settings panel (appearance, agents, API)
+- [ ] Full accessibility pass (ARIA, keyboard nav, prefers-reduced-motion)
 
-**Multi-Provider Tabbed Workspaces**
-- [ ] Tabbed interface: work with Claude in one tab, Gemini in another, simultaneously
-- [ ] Background tasks continue when tab is not active (with notifications on completion)
-- [ ] Shared context: Gemini tab can access Claude conversation context for parallel exploration
-- [ ] Real-time visibility into what each agent is doing (no black box)
+**Multi-Provider (M4)**
+- [ ] Tabbed interface for simultaneous Claude/Gemini/Codex work
+- [ ] Background task execution with tab notifications
+- [ ] Shared context between provider tabs
+- [ ] MCP server management UI
 
-**GSD Visual Dashboard**
-- [ ] Visual build pipeline showing phases, progress, task status
-- [ ] Agent assignment visibility (which agent owns which phase/task)
-- [ ] Phase handoff between Claude and Gemini based on task type
-- [ ] Native GSD orchestration from within the UI
-
-**Plugin/MCP Management**
-- [ ] UI for managing installed MCP servers (enable, disable, configure)
-- [ ] UI for managing Claude Code plugins and skills
-- [ ] Visual display of active MCP connections and their status
-
-**Nextcloud Integration**
-- [ ] File picker to attach Nextcloud files to chat messages
-- [ ] Screenshot upload from phone → directly into chat via Nextcloud
-- [ ] File sharing/hosting through Nextcloud for agent file operations
-- [ ] Browse Nextcloud files within the app
-
-**Companion System**
-- [ ] Animated pixel-art companion characters (tanuki, red panda, and/or Shiba Inu)
-- [ ] Multiple animation states reacting to system events (thinking, success, error, idle)
-- [ ] Pre-sourced sprite libraries from itch.io or similar (not AI-generated)
-- [ ] Pending feasibility assessment before architectural commitment
-
-**CodeRabbit Integration**
-- [ ] PR review and management from within the app
-- [ ] Local code review before pushing to GitHub
-- [ ] Issue and suggestion management for open source repos
+**Integrations (M5)**
+- [ ] GSD visual dashboard
+- [ ] Nextcloud integration (file picker, screenshot upload)
+- [ ] Companion system (conditional on feasibility)
+- [ ] CodeRabbit integration
 
 ### Out of Scope
 
-- **Mobile-native app** — Web-first, responsive design handles mobile access
-- **Self-hosted multi-user** — Single-user tool for the developer who runs it
-- **AI model training/fine-tuning** — Loom consumes models, doesn't train them
-- **Full IDE replacement** — Not trying to replace VS Code/Cursor, complementing them
-- **Arbitrary LLM provider support** — Claude, Gemini, Codex only (backend already supports these)
+- **Mobile-native app** — Web-first, responsive handles mobile access
+- **Multi-user / auth system** — Single-user tool; backend already handles auth
+- **AI model training** — Loom consumes models, doesn't train them
+- **Full IDE replacement** — Complements VS Code/Cursor, doesn't replace
+- **Light mode** — Dark-only for M1-M3; potential M5 stretch goal
+- **Arbitrary LLM providers** — Claude, Gemini, Codex only (backend constraint)
+- **Character-by-character typewriter** — Anti-pattern; use batch rendering via rAF buffer
+- **Conversation branching** — High complexity, low value for single-user tool
 
 ## Context
 
-**Technical Environment:**
-- Existing CloudCLI Node.js backend on port 5555 with Express, JWT auth, SQLite
-- WebSocket for chat streaming and terminal, SSE for git clone progress only
-- 47+ REST endpoints across 14 route files (fully documented in BACKEND_API_CONTRACT.md)
-- Multi-provider: Claude (SDK), Codex (child process), Gemini (child process)
-- Server: AMD Ryzen 7, 27GB RAM, no discrete GPU, Tailscale network access
+**Current State (post v1.0):**
+- 14,423 LOC TypeScript + CSS across 10 phases, 21 plans
+- Tech stack: Vite + React 19 + TypeScript, Tailwind v4, Zustand (4 stores), Vitest
+- 145 commits, 3-day build (2026-03-04 to 2026-03-07)
+- 359+ tests passing, Playwright E2E suite, 9 custom ESLint rules
+- Frontend at `src/`, backend at `server/` (port 5555)
+- Dev server: port 5184
 
 **Prior Work:**
-- V1 frontend exists as CloudCLI fork, rated 5.5/10 in audits
-- V1 has 40+ source files with 17 tool display configs, 7 message types, 5 tabs
-- Loom-original features: aurora overlay, turn grouping, tool action cards, Catppuccin theme, activity status
-- 8 planning/audit documents from Gemini analyzing architecture, UX, and reference apps
-- 6 reference product analyses (Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat)
-- 106 chat interface requirements cataloged across 16 categories
-- Architectural consensus reached between Claude and Gemini architects (ARCHITECT_SYNC.md)
-- V2 Constitution drafted with 12 sections of enforceable coding conventions
-
-**Previous Attempt Lessons:**
-- V1 GSD project failed due to accumulated quality issues across phases
-- Hardcoded styles, inconsistent patterns, and foundation rot made fixing harder than rewriting
-- Key learning: architecture must be designed for final vision from Phase 1, enforcement must be automated, phases must be small enough to verify thoroughly
-- Companion system sprite generation via AI failed — need pre-made sprite libraries
+- V1 frontend rated 5.5/10 in audits, archived to `.planning/v1-archive/`
+- 8 planning/audit documents, 6 reference product analyses
+- Architectural consensus between Claude and Gemini architects (ARCHITECT_SYNC.md)
+- V2 Constitution with 12 sections of enforceable conventions
 
 ## Constraints
 
-- **Backend**: Keep existing CloudCLI Node.js server — no backend rewrite. Frontend is the only deliverable.
-- **Tech Stack**: Vite + React 18 + TypeScript, Tailwind v4, Zustand (4 stores), Vitest
-- **Quality Bar**: Every phase must pass automated linting, TypeScript strict mode, regression tests, and visual review. No "good enough" — 10/10 or iterate.
-- **Process**: GSD methodology with smaller phases (3-5 tasks), machine-enforced conventions, regression gates, visual verification at milestone boundaries.
-- **Design**: No hardcoded colors, no inline styles for static values, no z-index outside dictionary, all animations through defined easing tokens. Constitution enforced via ESLint.
+- **Backend**: Keep existing CloudCLI Node.js server — no backend rewrite
+- **Tech Stack**: Vite + React 19 + TypeScript, Tailwind v4, Zustand (4 stores), Vitest
+- **Quality Bar**: 10/10 or iterate. Automated enforcement from commit #1.
+- **Design**: No hardcoded colors, no inline styles for static values, all animations through defined tokens. Constitution enforced via ESLint.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Full frontend rewrite (not fork iteration) | Fork divergence makes merging impossible; current foundation can't support quality bar | — Pending |
-| Zustand over React Context | Context re-renders entire tree on any change; Zustand selectors prevent streaming perf death | — Pending |
-| useRef + DOM mutation for streaming tokens | Bypass React reconciler at 100 tokens/sec; flush to state on stream completion | — Pending |
-| content-visibility before virtual scrolling | Preserves DOM for simpler scroll math; pivot to @tanstack/react-virtual if insufficient | — Pending |
-| Tiered animation: CSS → LazyMotion → Full Framer | Keeps initial bundle lean (~5KB) while having spring physics where needed | — Pending |
-| Inter + Instrument Serif + JetBrains Mono | Editorial warmth without licensing issues (Instrument Serif free vs Tiempos $200+) | — Pending |
-| Pre-sourced sprites for companions | AI-generated sprites failed in V1; itch.io libraries have professional quality | — Pending |
-| Tabbed workspaces over split pane for multi-agent | Simpler to implement, still provides parallel work experience | — Pending |
-| Nextcloud in roadmap, CodeRabbit deferred | Nextcloud is daily-use integration; CodeRabbit is nice-to-have | — Pending |
+| Full frontend rewrite (not fork iteration) | Fork divergence makes merging impossible; V1 foundation can't support quality bar | Good — clean architecture, zero V1 debt |
+| Zustand over React Context | Context re-renders entire tree; Zustand selectors prevent streaming perf death | Good — zero re-renders during 60fps streaming |
+| useRef + DOM mutation for streaming tokens | Bypass React reconciler at 100 tokens/sec; flush to state on completion | Good — proven in Playwright E2E |
+| content-visibility before virtual scrolling | Preserves DOM for simpler scroll math; pivot to @tanstack/react-virtual if insufficient | Pending — not stress-tested yet |
+| Tiered animation: CSS -> LazyMotion -> Full Framer | Keeps initial bundle lean (~5KB) | Pending — full motion bundle not yet needed |
+| Inter + Instrument Serif + JetBrains Mono | Editorial warmth without licensing issues | Good — fonts load correctly |
+| OKLCH color space | Modern, perceptually uniform, CSS-native | Good — 29 tokens, surface hierarchy works |
+| 9 custom ESLint rules | Automated Constitution enforcement from commit #1 | Good — zero violations in codebase |
+| WebSocket callback injection (not direct store imports) | Keeps network layer decoupled from React/Zustand | Good — multiplexer is fully testable |
+| Multiplexer as pure functions | Zero store/React imports, fully testable with mock callbacks | Good — clean separation |
+| React 19 (not 18) | Vite template ships 19, backwards compatible | Good — no issues encountered |
+| Segment array architecture for ActiveMessage | Interleaved text spans + ToolChip components | Good — handles complex tool-call streams |
 
 ---
-*Last updated: 2026-03-04 after V2 initialization*
+*Last updated: 2026-03-07 after v1.0 milestone*
