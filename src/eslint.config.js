@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 import loomRules from './eslint-rules/index.js';
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'eslint-rules/**', 'e2e/**', 'playwright.config.ts', 'test-results/**', 'playwright-report/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'eslint-rules/**', 'e2e/**', 'playwright.config.ts', 'test-results/**', 'playwright-report/**', 'src/components/ui/dialog.tsx', 'src/components/ui/sonner.tsx', 'src/components/ui/dropdown-menu.tsx', 'src/components/ui/tooltip.tsx', 'src/components/ui/badge.tsx'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

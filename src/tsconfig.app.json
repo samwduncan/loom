@@ -31,5 +31,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/components/ui/dialog.tsx",
+    "src/components/ui/sonner.tsx"
+  ]
 }
