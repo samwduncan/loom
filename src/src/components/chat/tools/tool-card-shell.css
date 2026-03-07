@@ -1,0 +1,119 @@
+/*
+ * ToolCardShell styles -- shared card wrapper for all tool cards.
+ * Uses design tokens only -- no hardcoded colors.
+ * Constitution: No hex/HSL colors (7.14), no raw z-index (7.6).
+ */
+
+/* ─── Shell Container ───────────────────────────────────────────────── */
+
+.tool-card-shell {
+  margin-top: 4px;
+}
+
+/* ─── Header ────────────────────────────────────────────────────────── */
+
+.tool-card-shell-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.tool-card-shell-header:hover {
+  border-color: var(--border-interactive);
+}
+
+/* Top corners only when body is expanded */
+.tool-card-shell[data-expanded="true"] .tool-card-shell-header {
+  border-radius: 6px 6px 0 0;
+  border-bottom-color: transparent;
+}
+
+/* ─── Header: Left Group ────────────────────────────────────────────── */
+
+.tool-card-shell-icon {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tool-card-shell-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.tool-card-shell-error-icon {
+  color: var(--status-error);
+  flex-shrink: 0;
+}
+
+/* ─── Header: Right Group ───────────────────────────────────────────── */
+
+.tool-card-shell-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tool-card-shell-status-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.tool-card-shell-elapsed {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Body: CSS Grid Expand/Collapse ────────────────────────────────── */
+
+.tool-card-shell-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-spring) var(--ease-spring);
+}
+
+.tool-card-shell-body[data-expanded="true"] {
+  grid-template-rows: 1fr;
+}
+
+.tool-card-shell-body > div {
+  overflow: hidden;
+}
+
+.tool-card-shell-body-inner {
+  padding: 8px 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-subtle);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+}
+
+/* ─── Error Treatment ───────────────────────────────────────────────── */
+
+.tool-card-shell[data-status="rejected"] .tool-card-shell-header {
+  border-color: oklch(from var(--status-error) l c h / 0.3);
+  background: oklch(from var(--status-error) l c h / 0.05);
+}
+
+.tool-card-shell[data-status="rejected"] .tool-card-shell-body-inner {
+  border-color: oklch(from var(--status-error) l c h / 0.3);
+}
+
+/* ─── Reduced Motion ────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-card-shell-body {
+    transition: none;
+  }
+}
