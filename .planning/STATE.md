@@ -40,6 +40,7 @@ Progress: [########..] 78%
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
+| 13    | 02   | 5min     | 2     | 6     |
 | 13    | 03   | 3min     | 2     | 4     |
 | 13    | 01   | 6min     | 2     | 10    |
 | 12    | 03   | 4min     | 1     | 2     |
@@ -55,6 +56,9 @@ Progress: [########..] 78%
 
 See PROJECT.md Key Decisions table (updated at milestone completion).
 
+- Phase 13-02: ClaudeCommandOptions type for options with images array (replaces Record<string,string>)
+- Phase 13-02: useEffect ref sync pattern (not render-time) for react-hooks/refs compliance
+- Phase 13-02: dragCounter ref pattern for flicker-free drag-and-drop overlay
 - Phase 13-03: localStorage + custom event for sidebar draft dot (no Zustand store coupling)
 - Phase 13-03: Module-level Map init to avoid ref access during React render
 - Phase 13-01: Scroll container ref as prop (not querySelector) per Constitution 10.2
@@ -94,6 +98,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-07T19:08:41Z
-Stopped at: Phase 13 Plan 03 complete
+Last session: 2026-03-07T19:11:00Z
+Stopped at: Phase 13 Plan 02 complete (all Phase 13 plans done)
 Resume: Continue with Phase 14

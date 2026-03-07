@@ -33,7 +33,7 @@
 
 - [x] **Phase 11: Markdown + Code Blocks + UI Primitives** - Finalized message rendering with react-markdown, Shiki, code block UI, and shadcn/ui foundation (completed 2026-03-07)
 - [x] **Phase 12: Streaming Markdown + Marker Interleaving** - Two-phase rendering, marker-based tool chip placement, Streamdown evaluation (completed 2026-03-07)
-- [ ] **Phase 13: Composer** - Auto-resize textarea, image paste/drop, send/stop morph, keyboard shortcuts, draft preservation
+- [x] **Phase 13: Composer** - Auto-resize textarea, image paste/drop, send/stop morph, keyboard shortcuts, draft preservation (completed 2026-03-07)
 - [ ] **Phase 14: Message Types** - All 7 message types rendering with correct styling and layout
 - [ ] **Phase 15: Tool Card Shell + State Machine** - Tool state machine, ToolCardShell wrapper, elapsed time counter
 - [ ] **Phase 16: Per-Tool Cards** - Rich card implementations for Bash, Read, Edit, Write, Glob, Grep with syntax highlighting and diff views
@@ -211,7 +211,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 10. Pre-Archive Cleanup | v1.0 | 1/1 | Complete | 2026-03-07 |
 | 11. Markdown + Code Blocks | 3/3 | Complete    | 2026-03-07 | - |
 | 12. Streaming Markdown + Marker Interleaving | 3/3 | Complete    | 2026-03-07 | - |
-| 13. Composer | 2/3 | In Progress|  | - |
+| 13. Composer | v1.1 | 3/3 | Complete | 2026-03-07 |
 | 14. Message Types | v1.1 | 0/? | Not started | - |
 | 15. Tool Card Shell + Interleaving | v1.1 | 0/? | Not started | - |
 | 16. Per-Tool Cards | v1.1 | 0/? | Not started | - |

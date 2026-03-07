@@ -53,10 +53,10 @@
 - [x] **CMP-04**: Send button visible when idle + input non-empty. Stop button visible when streaming. Morph between states with CSS crossfade (opacity transition, 100ms), position-stable in same grid cell. Uses Lucide `Send` and `Square` icons.
 - [x] **CMP-05**: Send/Stop button has a local state machine: `idle` → `sending` (optimistic, after click before WS ack) → `active` (streaming) → `aborting` (stop pressed, before backend confirms abort) → `idle`. Prevents double-send and double-stop. Send disabled for 200ms after press, Stop disabled for 500ms.
 - [x] **CMP-06**: Stop sends `claude-abort` message to backend via WebSocket. Handles graceful wind-down (model may send a few more tokens before stopping).
-- [ ] **CMP-07**: Image paste: `onPaste` handler extracts `image/png` and `image/jpeg` from `clipboardData`. Shows thumbnail preview chips above textarea (small cards with X to remove). Max 5 images per message.
-- [ ] **CMP-08**: Image drag-and-drop: `onDrop` handler with drag overlay (dashed border, dimmed background via `onDragEnter`/`onDragLeave`). Same thumbnail preview as paste.
-- [ ] **CMP-09**: Images use `URL.createObjectURL(blob)` for previews (not data URLs — prevents memory doubling). Object URLs revoked after message sent. Max 5MB per image.
-- [ ] **CMP-10**: Images uploaded to backend via REST endpoint (`/api/projects/:name/upload-images`) as multipart/form-data, or sent inline in WebSocket `claude-command` message `options.images` field. Image references stored in message, not raw data.
+- [x] **CMP-07**: Image paste: `onPaste` handler extracts `image/png` and `image/jpeg` from `clipboardData`. Shows thumbnail preview chips above textarea (small cards with X to remove). Max 5 images per message.
+- [x] **CMP-08**: Image drag-and-drop: `onDrop` handler with drag overlay (dashed border, dimmed background via `onDragEnter`/`onDragLeave`). Same thumbnail preview as paste.
+- [x] **CMP-09**: Images use `URL.createObjectURL(blob)` for previews (not data URLs — prevents memory doubling). Object URLs revoked after message sent. Max 5MB per image.
+- [x] **CMP-10**: Images uploaded to backend via REST endpoint (`/api/projects/:name/upload-images`) as multipart/form-data, or sent inline in WebSocket `claude-command` message `options.images` field. Image references stored in message, not raw data.
 - [x] **CMP-11**: Cmd+. (Mac) / Ctrl+. (Windows) stops active generation (global keyboard shortcut via `useEffect`). Escape clears input text and blurs textarea.
 - [x] **CMP-12**: Draft text preserved per session in `useRef<Map<string, string>>`. On session switch, current draft saved, target session's draft restored. Persisted to localStorage for reload survival.
 - [x] **CMP-13**: Composer integrates with CSS Grid shell: `grid-template-rows: 1fr auto` (messages flex, composer intrinsic). Scroll position stabilized when composer height changes (capture scrollTop before resize, restore after).
@@ -216,10 +216,10 @@ Updated during roadmap creation (2026-03-07).
 | CMP-04 | Phase 13 | Complete |
 | CMP-05 | Phase 13 | Complete |
 | CMP-06 | Phase 13 | Complete |
-| CMP-07 | Phase 13 | Pending |
-| CMP-08 | Phase 13 | Pending |
-| CMP-09 | Phase 13 | Pending |
-| CMP-10 | Phase 13 | Pending |
+| CMP-07 | Phase 13 | Complete |
+| CMP-08 | Phase 13 | Complete |
+| CMP-09 | Phase 13 | Complete |
+| CMP-10 | Phase 13 | Complete |
 | CMP-11 | Phase 13 | Complete |
 | CMP-12 | Phase 13 | Complete |
 | CMP-13 | Phase 13 | Complete |
