@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: completed
-stopped_at: Phase 13 Plan 01 complete
-last_updated: "2026-03-07T19:03:00Z"
-last_activity: 2026-03-07 -- Phase 13 Plan 01 complete (Core composer with auto-resize, FSM, keyboard shortcuts)
+stopped_at: Phase 13 Plan 02 complete (all Phase 13 plans done)
+last_updated: "2026-03-07T19:15:36.041Z"
+last_activity: 2026-03-07 -- Phase 13 Plan 03 complete (Draft persistence with sidebar dot indicator)
 progress:
   total_phases: 9
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
   completed_plans: 9
   percent: 78
