@@ -54,12 +54,12 @@
   4. Long code blocks cap at 400px with inner scroll; long lines scroll horizontally without wrapping
   5. Inline code spans render with surface-1 background and monospace font, visually distinct from surrounding text
   6. shadcn/ui components (dialog, tooltip, scroll-area, collapsible, sonner, dropdown-menu, badge, kbd, separator) are installed and restyled to OKLCH tokens -- no default shadcn colors remain
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
-- [ ] 11-03: TBD
+- [ ] 11-01-PLAN.md -- Dependencies + shadcn/ui init + OKLCH restyling
+- [ ] 11-02-PLAN.md -- Shiki singleton + OKLCH theme + CodeBlock component
+- [ ] 11-03-PLAN.md -- MarkdownRenderer + AssistantMessage integration
 
 ### Phase 12: Streaming Markdown + Marker Interleaving
 **Goal**: Active streaming shows lightweight formatted text, finalized messages transition smoothly to full markdown with tool chips correctly placed inline via markers, and Streamdown is evaluated as an alternative
@@ -208,7 +208,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 8. Navigation + Sessions | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 9. E2E Integration + Playwright | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 10. Pre-Archive Cleanup | v1.0 | 1/1 | Complete | 2026-03-07 |
-| 11. Markdown + Code Blocks | v1.1 | 0/? | Not started | - |
+| 11. Markdown + Code Blocks | v1.1 | 0/3 | Planning | - |
 | 12. Streaming Markdown + UI Primitives | v1.1 | 0/? | Not started | - |
 | 13. Composer | v1.1 | 0/? | Not started | - |
 | 14. Message Types | v1.1 | 0/? | Not started | - |
