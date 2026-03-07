@@ -14,7 +14,7 @@
  * Constitution: Named exports (2.2), cn() not needed (pure className strings).
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -201,21 +201,24 @@ function buildComponents(toolCalls?: ToolCallState[]): Components {
 
 export function MarkdownRenderer({ content, toolCalls }: MarkdownRendererProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
-  const resolvedComponents = buildComponents(toolCalls);
 
-  // Add img override for click-to-lightbox on inline images
-  const componentsWithImg: Components = {
-    ...resolvedComponents,
-    img: ({ src, alt, ...props }) => (
-      <img
-        src={src}
-        alt={alt ?? ''}
-        className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity my-2"
-        onClick={() => src && setLightboxSrc(src)}
-        {...props}
-      />
-    ),
-  };
+  // Memoize components to prevent react-markdown from remounting custom elements
+  // on parent re-renders. Without this, ToolChip loses expanded state on every render.
+  const componentsWithImg = useMemo<Components>(() => {
+    const resolved = buildComponents(toolCalls);
+    return {
+      ...resolved,
+      img: ({ src, alt, ...props }) => (
+        <img
+          src={src}
+          alt={alt ?? ''}
+          className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity my-2"
+          onClick={() => src && setLightboxSrc(src)}
+          {...props}
+        />
+      ),
+    };
+  }, [toolCalls]);
 
   return (
     <div className="markdown-body text-foreground text-sm leading-relaxed">

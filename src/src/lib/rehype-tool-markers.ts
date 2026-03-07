@@ -18,8 +18,11 @@
 import { visit, SKIP } from 'unist-util-visit';
 import type { Root, Text, Element, ElementContent } from 'hast';
 
+// Match both raw null bytes (\x00) and U+FFFD replacement characters.
+// HTML spec replaces null bytes with U+FFFD during parsing, so by the time
+// rehype sees the hast tree, markers may use either character.
 // eslint-disable-next-line no-control-regex -- null byte delimiters are intentional marker protocol
-const MARKER_REGEX = /\x00TOOL:([^\x00]+)\x00/;
+const MARKER_REGEX = /[\x00\uFFFD]TOOL:([^\x00\uFFFD]+)[\x00\uFFFD]/;
 
 /**
  * rehype plugin that replaces \x00TOOL:id\x00 markers in text nodes

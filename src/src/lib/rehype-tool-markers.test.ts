@@ -164,4 +164,21 @@ describe('rehypeToolMarkers', () => {
     expect(marker).toBeDefined();
     expect(marker.children).toHaveLength(0);
   });
+
+  it('matches U+FFFD replacement characters (HTML null byte substitution)', () => {
+    // HTML spec replaces \x00 with \uFFFD during parsing, so markers
+    // arrive at rehype as \uFFFD delimiters instead of \x00.
+    const tree = root([
+      element('p', [text('before \uFFFDTOOL:replaced\uFFFD after')]),
+    ]);
+
+    runPlugin(tree);
+
+    const p = tree.children[0] as Element;
+    expect(p.children).toHaveLength(3);
+    expect((p.children[0] as Text).value).toBe('before ');
+    expect((p.children[1] as Element).tagName).toBe('tool-marker');
+    expect((p.children[1] as Element).properties['data-id']).toBe('replaced');
+    expect((p.children[2] as Text).value).toBe(' after');
+  });
 });
