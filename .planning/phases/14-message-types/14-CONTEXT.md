@@ -30,10 +30,12 @@ Every message type in a real conversation renders with correct styling and layou
 ### Error, system & task notification messages
 - All message types share extended `MessageContainer` — role prop expanded to `'user' | 'assistant' | 'system' | 'error' | 'task_notification'`
 - Consistent spacing for all: `px-4 py-3 leading-relaxed` (existing MessageContainer base)
+- System and error messages must NOT use the 80% bubble constraint — full-width or centered treatment to distinguish from chat turns
 - Error messages: inline banner with `border-l-4 border-error` accent, `bg-error/10` background, error icon, error text. No retry button in M2 (deferred to Phase 19 per ENH-04).
 - System messages: centered horizontally, `text-muted text-xs`, no background. Used for "Session started", "Context compacted", etc.
 - Task notifications: distinct checklist icon, label text, `bg-surface-1` background, compact layout
 - MessageList dispatch updated from 2-way (user/assistant) to 5-way switch
+- `transformBackendMessages` must be expanded to pass through error/system/task entries (currently filters to user/assistant only — blocks MSG-03/04/05 on historical load)
 
 ### Thinking blocks for historical messages
 - Historical assistant messages render `ThinkingDisclosure` using `message.thinkingBlocks` data
@@ -71,6 +73,19 @@ Every message type in a real conversation renders with correct styling and layou
 - Handled by MarkdownRenderer `img` component override
 - Also clickable for lightbox (same shared component)
 - Rare in coding agent context but handles generated diagrams, screenshots
+
+### ThinkingDisclosure prop refactor (Bard review finding)
+- Current `ThinkingDisclosure` takes `ThinkingState` (streaming shape with `isThinking` boolean). Historical messages have `ThinkingBlock[]` — different shape.
+- Refactor props to: `blocks: ThinkingBlock[]` + `isStreaming: boolean` (standardized interface for both contexts)
+- Streaming caller: passes `streamStore.thinkingState.blocks` + `isStreaming: true`
+- Historical caller: passes `message.thinkingBlocks` + `isStreaming: false`
+- This ensures "Thinking..." pulse for live streaming and "Thinking (1,234 chars, 3.2s)" for history
+
+### Image URL lifecycle (Bard review finding)
+- Optimistic user messages use `URL.createObjectURL(blob)` from composer (Phase 13 pattern)
+- Historical messages will have base64 data URLs from backend JSONL
+- `ImageAttachment.url` must handle both URL types without unmounting/flashing the image on transition
+- When a message goes from optimistic to persisted, the URL may change — handle via key stability (key on attachment id, not URL)
 
 ### Historical = streamed consistency (MSG-11)
 - Historical messages must use identical components to streamed messages
