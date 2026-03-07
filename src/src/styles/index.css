@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @import "./tokens.css";
 @import "./base.css";
 
@@ -54,6 +55,21 @@
   /* Diff utilities: bg-diff-added, bg-diff-removed */
   --color-diff-added: var(--diff-added-bg);
   --color-diff-removed: var(--diff-removed-bg);
+
+  /* Card & popover utilities (shadcn primitives) */
+  --color-card: var(--surface-raised);
+  --color-card-foreground: var(--text-primary);
+  --color-popover: var(--surface-overlay);
+  --color-popover-foreground: var(--text-primary);
+
+  /* Accent foreground for hover states in dropdowns/menus */
+  --color-accent-foreground: var(--text-primary);
+
+  /* Destructive foreground */
+  --color-destructive-foreground: var(--text-primary);
+
+  /* Input border */
+  --color-input: var(--border-interactive);
 
   /* Rose accent utilities */
   --color-rose: var(--rose-accent);
