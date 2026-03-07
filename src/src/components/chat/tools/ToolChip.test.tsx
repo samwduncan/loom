@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import type { ToolCallState, ToolCallStatus } from '@/types/stream';
 
@@ -65,8 +65,12 @@ describe('ToolChip', () => {
   });
 
   it('renders chip label from getChipLabel', () => {
-    render(<ToolChip toolCall={makeToolCall({ input: { command: 'echo hello' } })} />);
-    expect(screen.getByText('echo hello')).toBeInTheDocument();
+    const { container } = render(
+      <ToolChip toolCall={makeToolCall({ input: { command: 'echo hello' } })} />,
+    );
+    const label = container.querySelector('button.tool-chip .tool-chip-label');
+    expect(label).not.toBeNull();
+    expect(label?.textContent).toBe('echo hello');
   });
 
   it('click toggles ToolCardShell expanded state', () => {

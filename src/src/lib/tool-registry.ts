@@ -87,31 +87,38 @@ function DefaultIcon() {
 function DefaultToolCard(props: ToolCardProps) {
   const { input, output, isError } = props;
 
-  // Show the most relevant input field, truncated
-  const inputStr = JSON.stringify(input, null, 2);
-  const truncatedInput =
-    inputStr.length > 200 ? inputStr.slice(0, 197) + '...' : inputStr;
+  // Structured key-value rows for input
+  const inputRows = Object.entries(input).map(([key, value]) => {
+    const displayValue =
+      typeof value === 'string'
+        ? value
+        : JSON.stringify(value, null, 2);
 
-  const truncatedOutput =
-    output && output.length > 500 ? output.slice(0, 497) + '...' : output;
+    return createElement(
+      'div',
+      { className: 'default-tool-card-row', key },
+      createElement('span', { className: 'default-tool-card-key' }, key),
+      createElement('span', { className: 'default-tool-card-value' }, displayValue),
+    );
+  });
 
   return createElement(
     'div',
-    { className: 'tool-card' },
+    { className: 'tool-card default-tool-card' },
     createElement(
       'div',
       { className: 'tool-card-input' },
-      createElement('pre', null, truncatedInput),
+      ...inputRows,
     ),
-    truncatedOutput != null
+    output != null
       ? createElement(
           'div',
           {
             className: isError
-              ? 'tool-card-output tool-card-output--error'
-              : 'tool-card-output',
+              ? 'tool-card-output tool-card-output--error default-tool-card-output default-tool-card-output--error'
+              : 'tool-card-output default-tool-card-output',
           },
-          createElement('pre', null, truncatedOutput),
+          createElement('pre', null, output),
         )
       : null,
   );
