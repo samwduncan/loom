@@ -91,9 +91,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
-- [ ] 13-03: TBD
+- [ ] 13-01-PLAN.md -- Core composer: auto-resize textarea, 5-state FSM, keyboard shortcuts, floating pill layout
+- [ ] 13-02-PLAN.md -- Image attachments: paste, drag-drop, thumbnails, base64 WebSocket send
+- [ ] 13-03-PLAN.md -- Draft persistence + sidebar draft dot indicator
 
 ### Phase 14: Message Types
 **Goal**: Every message type in a real conversation renders with correct styling and layout
