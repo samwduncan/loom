@@ -1,7 +1,7 @@
 /**
  * ActiveMessage — Component tests for streaming message display.
  *
- * Tests the finalization lifecycle: streaming -> finalizing -> unmount,
+ * Tests the finalization lifecycle: streaming -> finalizing -> finalized,
  * timeline store flush, mid-stream disconnect error display, ThinkingDisclosure
  * rendering, and multi-span tool call segment interleaving.
  *
@@ -63,9 +63,12 @@ function sendToken(token: string): void {
   }
 }
 
-function dispatchTransitionEnd(element: Element): void {
+function dispatchTransitionEnd(element: Element, propertyName = 'opacity'): void {
   const event = new Event('transitionend', { bubbles: true });
-  Object.defineProperty(event, 'propertyName', { value: 'background-color' });
+  Object.defineProperty(event, 'propertyName', { value: propertyName });
+  // Find the finalized layer and dispatch on it (crossfade listens on finalized div)
+  const finalized = element.querySelector('.crossfade-finalized');
+  Object.defineProperty(event, 'target', { value: finalized ?? element });
   element.dispatchEvent(event);
 }
 
@@ -161,6 +164,11 @@ describe('ActiveMessage', () => {
       useStreamStore.getState().endStream();
     });
 
+    // Crossfade uses rAF to measure heights before setting data-phase
+    act(() => {
+      flushRaf();
+    });
+
     expect(container).toHaveAttribute('data-phase', 'finalizing');
   });
 
@@ -175,10 +183,15 @@ describe('ActiveMessage', () => {
       useStreamStore.getState().endStream();
     });
 
+    // Flush the rAF that starts the crossfade
+    act(() => {
+      flushRaf();
+    });
+
     // Not yet called
     expect(onFinalizationComplete).not.toHaveBeenCalled();
 
-    // Simulate CSS background-color transition completing
+    // Simulate CSS opacity transition completing on finalized layer
     const container = screen.getByTestId('active-message');
     act(() => {
       dispatchTransitionEnd(container);
@@ -198,11 +211,16 @@ describe('ActiveMessage', () => {
       useStreamStore.getState().endStream();
     });
 
+    // Flush the rAF that starts the crossfade
+    act(() => {
+      flushRaf();
+    });
+
     expect(onFinalizationComplete).not.toHaveBeenCalled();
 
-    // Don't dispatch transitionend — rely on 500ms safety fallback
+    // Don't dispatch transitionend — rely on 350ms safety fallback (250ms + 100ms)
     act(() => {
-      vi.advanceTimersByTime(500);
+      vi.advanceTimersByTime(350);
     });
 
     expect(onFinalizationComplete).toHaveBeenCalledOnce();
@@ -243,6 +261,11 @@ describe('ActiveMessage', () => {
 
     act(() => {
       useStreamStore.getState().endStream();
+    });
+
+    // Flush the rAF that starts the crossfade
+    act(() => {
+      flushRaf();
     });
 
     // Component is still in the DOM during finalization

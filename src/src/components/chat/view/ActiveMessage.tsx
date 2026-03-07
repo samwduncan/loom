@@ -1,10 +1,14 @@
 /**
- * ActiveMessage — Multi-span streaming message display component.
+ * ActiveMessage — Multi-span streaming message display with crossfade finalization.
  *
  * Renders a segment array: text spans interleaved with ToolChip components.
  * The rAF loop paints to the current active text span via useStreamBuffer.
  * When a new tool call appears, the buffer is checkpointed and a new text
  * span is appended after the tool chip.
+ *
+ * On flush: renders MarkdownRenderer behind the streaming DOM, then crossfades
+ * over 250ms (opacity + height animation). After transition, streaming DOM is
+ * removed and container height set to auto.
  *
  * ThinkingDisclosure renders above the content segments.
  *
@@ -18,6 +22,7 @@ import { useStreamStore } from '@/stores/stream';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
+import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
 import '../styles/streaming-cursor.css';
@@ -34,6 +39,11 @@ type Segment =
   | { type: 'text'; id: string }
   | { type: 'tool'; toolCallId: string };
 
+type Phase = 'streaming' | 'finalizing' | 'finalized';
+
+/** Crossfade duration in ms — matches CSS var(--duration-normal) */
+const CROSSFADE_MS = 250;
+
 let segmentCounter = 0;
 function nextSegmentId(): string {
   return `seg-${++segmentCounter}`;
@@ -45,6 +55,8 @@ export const ActiveMessage = memo(function ActiveMessage(
   const { sessionId, onFinalizationComplete } = props;
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const streamingRef = useRef<HTMLDivElement>(null);
+  const finalizedRef = useRef<HTMLDivElement>(null);
   const currentTextRef = useRef<HTMLSpanElement | null>(null);
   const finalizationFiredRef = useRef(false);
   const knownToolCountRef = useRef(0);
@@ -52,7 +64,8 @@ export const ActiveMessage = memo(function ActiveMessage(
   const [segments, setSegments] = useState<Segment[]>(() => [
     { type: 'text', id: nextSegmentId() },
   ]);
-  const [phase, setPhase] = useState<'streaming' | 'finalizing'>('streaming');
+  const [phase, setPhase] = useState<Phase>('streaming');
+  const [finalizedContent, setFinalizedContent] = useState<string | null>(null);
   const [disconnected, setDisconnected] = useState(false);
 
   // Store actions via selectors — functions are referentially stable (Constitution 4.2)
@@ -85,8 +98,8 @@ export const ActiveMessage = memo(function ActiveMessage(
     if (finalizationFiredRef.current) return;
     finalizationFiredRef.current = true;
 
-    // Enter finalizing phase — React state drives data-phase attribute, CSS drives the fade
-    setPhase('finalizing');
+    // Set finalized content — triggers React render with MarkdownRenderer
+    setFinalizedContent(text);
 
     // Prefer stream store's activeSessionId — it's updated during stub reconciliation
     // when the backend assigns a real session ID. The prop sessionId may still point
@@ -133,18 +146,49 @@ export const ActiveMessage = memo(function ActiveMessage(
 
     addMessage(currentSessionId, message);
 
-    // Signal parent after CSS transition completes (driven by data-phase change)
-    const container = containerRef.current;
-    if (container) {
+    // Crossfade orchestration: measure heights, animate, clean up
+    // Use rAF to wait for React to render the finalized content
+    requestAnimationFrame(() => {
+      const container = containerRef.current;
+      const streaming = streamingRef.current;
+      const finalized = finalizedRef.current;
+
+      if (!container || !streaming || !finalized) {
+        // Fallback: skip animation, go straight to finalized
+        setPhase('finalized');
+        onFinalizationCompleteRef.current();
+        return;
+      }
+
+      // Measure heights
+      const streamingHeight = streaming.getBoundingClientRect().height;
+      const finalizedHeight = finalized.getBoundingClientRect().height;
+
+      // Set container to explicit streaming height
+      container.style.height = `${streamingHeight}px`;
+
+      // Force reflow to ensure starting height is committed
+      void container.offsetHeight;
+
+      // Animate to finalized height + trigger opacity crossfade via data-phase
+      container.style.height = `${finalizedHeight}px`;
+      setPhase('finalizing');
+
+      // After crossfade completes: clean up and signal parent
       let signaled = false;
       const signalComplete = () => {
         if (signaled) return;
         signaled = true;
+        setPhase('finalized');
+        if (container) {
+          container.style.height = 'auto';
+        }
         onFinalizationCompleteRef.current();
       };
 
       const handleTransitionEnd = (e: TransitionEvent) => {
-        if (e.propertyName === 'background-color') {
+        // Wait for the opacity transition on the finalized layer
+        if (e.propertyName === 'opacity' && e.target === finalized) {
           container.removeEventListener('transitionend', handleTransitionEnd);
           signalComplete();
         }
@@ -155,8 +199,8 @@ export const ActiveMessage = memo(function ActiveMessage(
       setTimeout(() => {
         container.removeEventListener('transitionend', handleTransitionEnd);
         signalComplete();
-      }, 500);
-    }
+      }, CROSSFADE_MS + 100);
+    });
   }, [addMessage, addSession]);
 
   const handleDisconnect = useCallback(() => {
@@ -225,18 +269,29 @@ export const ActiveMessage = memo(function ActiveMessage(
     <MessageContainer role="assistant">
       <div
         ref={containerRef}
-        className="active-message"
+        className="crossfade-container active-message"
         data-phase={phase}
         data-testid="active-message"
       >
-        <ThinkingDisclosure thinkingState={thinkingState} />
-        {segments.map((seg) => {
-          if (seg.type === 'text') {
-            return <span key={seg.id} ref={makeTextRefCallback(seg.id)} />;
-          }
-          return <ToolChipFromStore key={seg.toolCallId} toolCallId={seg.toolCallId} />;
-        })}
-        <span className="streaming-cursor" data-testid="streaming-cursor" />
+        {/* Streaming layer — removed after finalization */}
+        {phase !== 'finalized' && (
+          <div ref={streamingRef} className="crossfade-streaming">
+            <ThinkingDisclosure thinkingState={thinkingState} />
+            {segments.map((seg) => {
+              if (seg.type === 'text') {
+                return <span key={seg.id} ref={makeTextRefCallback(seg.id)} />;
+              }
+              return <ToolChipFromStore key={seg.toolCallId} toolCallId={seg.toolCallId} />;
+            })}
+            <span className="streaming-cursor" data-testid="streaming-cursor" />
+          </div>
+        )}
+        {/* Finalized layer — rendered once flush provides content */}
+        {finalizedContent !== null && (
+          <div ref={finalizedRef} className="crossfade-finalized">
+            <MarkdownRenderer content={finalizedContent} />
+          </div>
+        )}
         {disconnected && (
           <div className="active-message-disconnect">
             Connection lost during response.

@@ -1,9 +1,10 @@
 /**
- * ActiveMessage streaming styles — cursor blink, tint, and finalization.
+ * ActiveMessage streaming styles — cursor blink, tint, crossfade, and finalization.
  *
  * Constitution 10.3: contain: content is REQUIRED on .active-message.
  * Uses color-mix() with --accent-primary for background tint.
  * CSS-only cursor animation (no JS animation loop).
+ * Crossfade transition uses position:absolute overlap to prevent layout jump.
  */
 
 .active-message {
@@ -20,6 +21,42 @@
   background-color: transparent;
 }
 
+/* Crossfade container: wraps streaming + finalized layers */
+.crossfade-container {
+  position: relative;
+  overflow: hidden;
+  transition: height var(--duration-normal) var(--ease-out);
+}
+
+/* Streaming layer: fades out during finalization */
+.crossfade-streaming {
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+/* Finalized layer: positioned behind streaming, fades in during finalization */
+.crossfade-finalized {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.crossfade-container[data-phase="finalizing"] .crossfade-streaming {
+  opacity: 0;
+}
+
+.crossfade-container[data-phase="finalizing"] .crossfade-finalized {
+  opacity: 1;
+}
+
+/* After finalization: finalized layer becomes normal flow, streaming removed */
+.crossfade-container[data-phase="finalized"] .crossfade-finalized {
+  position: static;
+  opacity: 1;
+}
+
 .streaming-cursor {
   display: inline-block;
   width: 2px;
@@ -30,7 +67,8 @@
   transition: opacity var(--duration-normal) var(--ease-out);
 }
 
-.active-message[data-phase="finalizing"] .streaming-cursor {
+.active-message[data-phase="finalizing"] .streaming-cursor,
+.crossfade-container[data-phase="finalizing"] .streaming-cursor {
   animation: none;
   opacity: 0;
 }
@@ -51,5 +89,17 @@
   .streaming-cursor {
     animation: none;
     opacity: 1;
+  }
+
+  .crossfade-container {
+    transition: none;
+  }
+
+  .crossfade-streaming {
+    transition: none;
+  }
+
+  .crossfade-finalized {
+    transition: none;
   }
 }
