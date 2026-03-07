@@ -179,114 +179,114 @@ Tracked from Gemini Architect consultation on 2026-03-07:
 
 ## Traceability
 
-Updated during roadmap creation.
+Updated during roadmap creation (2026-03-07).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEP-01 | — | Pending |
-| DEP-02 | — | Pending |
-| DEP-03 | — | Pending |
-| DEP-04 | — | Pending |
-| DEP-05 | — | Pending |
-| DEP-06 | — | Pending |
-| MD-01 | — | Pending |
-| MD-02 | — | Pending |
-| MD-03 | — | Pending |
-| MD-04 | — | Pending |
-| MD-05 | — | Pending |
-| MD-06 | — | Pending |
-| MD-10 | — | Pending |
-| MD-11 | — | Pending |
-| MD-12 | — | Pending |
-| MD-13 | — | Pending |
-| MD-14 | — | Pending |
-| MD-15 | — | Pending |
-| CODE-01 | — | Pending |
-| CODE-02 | — | Pending |
-| CODE-03 | — | Pending |
-| CODE-04 | — | Pending |
-| CODE-05 | — | Pending |
-| CODE-06 | — | Pending |
-| CODE-07 | — | Pending |
-| CODE-08 | — | Pending |
-| CODE-09 | — | Pending |
-| CMP-01 | — | Pending |
-| CMP-02 | — | Pending |
-| CMP-03 | — | Pending |
-| CMP-04 | — | Pending |
-| CMP-05 | — | Pending |
-| CMP-06 | — | Pending |
-| CMP-07 | — | Pending |
-| CMP-08 | — | Pending |
-| CMP-09 | — | Pending |
-| CMP-10 | — | Pending |
-| CMP-11 | — | Pending |
-| CMP-12 | — | Pending |
-| CMP-13 | — | Pending |
-| CMP-14 | — | Pending |
-| MSG-01 | — | Pending |
-| MSG-02 | — | Pending |
-| MSG-03 | — | Pending |
-| MSG-04 | — | Pending |
-| MSG-05 | — | Pending |
-| MSG-06 | — | Pending |
-| MSG-07 | — | Pending |
-| MSG-08 | — | Pending |
-| MSG-09 | — | Pending |
-| MSG-10 | — | Pending |
-| MSG-11 | — | Pending |
-| TOOL-01 | — | Pending |
-| TOOL-02 | — | Pending |
-| TOOL-03 | — | Pending |
-| TOOL-04 | — | Pending |
-| TOOL-05 | — | Pending |
-| TOOL-06 | — | Pending |
-| TOOL-10 | — | Pending |
-| TOOL-11 | — | Pending |
-| TOOL-12 | — | Pending |
-| TOOL-13 | — | Pending |
-| TOOL-14 | — | Pending |
-| TOOL-15 | — | Pending |
-| TOOL-20 | — | Pending |
-| TOOL-21 | — | Pending |
-| TOOL-22 | — | Pending |
-| TOOL-23 | — | Pending |
-| PERM-01 | — | Pending |
-| PERM-02 | — | Pending |
-| PERM-03 | — | Pending |
-| PERM-04 | — | Pending |
-| PERM-05 | — | Pending |
-| ACT-01 | — | Pending |
-| ACT-02 | — | Pending |
-| ACT-03 | — | Pending |
-| ACT-04 | — | Pending |
-| ACT-05 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| NAV-04 | — | Pending |
-| POL-01 | — | Pending |
-| POL-02 | — | Pending |
-| POL-03 | — | Pending |
-| POL-04 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
-| UI-04 | — | Pending |
-| UI-05 | — | Pending |
-| ENH-01 | — | Pending |
-| ENH-02 | — | Pending |
-| ENH-03 | — | Pending |
-| ENH-04 | — | Pending |
-| ENH-05 | — | Pending |
-| ENH-06 | — | Pending |
+| DEP-01 | Phase 11 | Pending |
+| DEP-02 | Phase 11 | Pending |
+| DEP-03 | Phase 11 | Pending |
+| DEP-04 | Phase 11 | Pending |
+| DEP-05 | Phase 11 | Pending |
+| DEP-06 | Phase 18 | Pending |
+| MD-01 | Phase 11 | Pending |
+| MD-02 | Phase 11 | Pending |
+| MD-03 | Phase 11 | Pending |
+| MD-04 | Phase 11 | Pending |
+| MD-05 | Phase 11 | Pending |
+| MD-06 | Phase 11 | Pending |
+| MD-10 | Phase 12 | Pending |
+| MD-11 | Phase 12 | Pending |
+| MD-12 | Phase 12 | Pending |
+| MD-13 | Phase 12 | Pending |
+| MD-14 | Phase 12 | Pending |
+| MD-15 | Phase 12 | Pending |
+| CODE-01 | Phase 11 | Pending |
+| CODE-02 | Phase 11 | Pending |
+| CODE-03 | Phase 11 | Pending |
+| CODE-04 | Phase 11 | Pending |
+| CODE-05 | Phase 11 | Pending |
+| CODE-06 | Phase 11 | Pending |
+| CODE-07 | Phase 11 | Pending |
+| CODE-08 | Phase 11 | Pending |
+| CODE-09 | Phase 11 | Pending |
+| CMP-01 | Phase 13 | Pending |
+| CMP-02 | Phase 13 | Pending |
+| CMP-03 | Phase 13 | Pending |
+| CMP-04 | Phase 13 | Pending |
+| CMP-05 | Phase 13 | Pending |
+| CMP-06 | Phase 13 | Pending |
+| CMP-07 | Phase 13 | Pending |
+| CMP-08 | Phase 13 | Pending |
+| CMP-09 | Phase 13 | Pending |
+| CMP-10 | Phase 13 | Pending |
+| CMP-11 | Phase 13 | Pending |
+| CMP-12 | Phase 13 | Pending |
+| CMP-13 | Phase 13 | Pending |
+| CMP-14 | Phase 13 | Pending |
+| MSG-01 | Phase 14 | Pending |
+| MSG-02 | Phase 14 | Pending |
+| MSG-03 | Phase 14 | Pending |
+| MSG-04 | Phase 14 | Pending |
+| MSG-05 | Phase 14 | Pending |
+| MSG-06 | Phase 14 | Pending |
+| MSG-07 | Phase 14 | Pending |
+| MSG-08 | Phase 14 | Pending |
+| MSG-09 | Phase 14 | Pending |
+| MSG-10 | Phase 14 | Pending |
+| MSG-11 | Phase 14 | Pending |
+| TOOL-01 | Phase 15 | Pending |
+| TOOL-02 | Phase 15 | Pending |
+| TOOL-03 | Phase 15 | Pending |
+| TOOL-04 | Phase 15 | Pending |
+| TOOL-05 | Phase 15 | Pending |
+| TOOL-06 | Phase 15 | Pending |
+| TOOL-10 | Phase 16 | Pending |
+| TOOL-11 | Phase 16 | Pending |
+| TOOL-12 | Phase 16 | Pending |
+| TOOL-13 | Phase 16 | Pending |
+| TOOL-14 | Phase 16 | Pending |
+| TOOL-15 | Phase 16 | Pending |
+| TOOL-20 | Phase 17 | Pending |
+| TOOL-21 | Phase 17 | Pending |
+| TOOL-22 | Phase 17 | Pending |
+| TOOL-23 | Phase 17 | Pending |
+| PERM-01 | Phase 17 | Pending |
+| PERM-02 | Phase 17 | Pending |
+| PERM-03 | Phase 17 | Pending |
+| PERM-04 | Phase 17 | Pending |
+| PERM-05 | Phase 17 | Pending |
+| ACT-01 | Phase 18 | Pending |
+| ACT-02 | Phase 18 | Pending |
+| ACT-03 | Phase 18 | Pending |
+| ACT-04 | Phase 18 | Pending |
+| ACT-05 | Phase 18 | Pending |
+| NAV-01 | Phase 18 | Pending |
+| NAV-02 | Phase 18 | Pending |
+| NAV-03 | Phase 18 | Pending |
+| NAV-04 | Phase 18 | Pending |
+| POL-01 | Phase 18 | Pending |
+| POL-02 | Phase 18 | Pending |
+| POL-03 | Phase 18 | Pending |
+| POL-04 | Phase 18 | Pending |
+| UI-01 | Phase 11 | Pending |
+| UI-02 | Phase 11 | Pending |
+| UI-03 | Phase 11 | Pending |
+| UI-04 | Phase 19 | Pending |
+| UI-05 | Phase 19 | Pending |
+| ENH-01 | Phase 12 | Pending |
+| ENH-02 | Phase 16 | Pending |
+| ENH-03 | Phase 19 | Pending |
+| ENH-04 | Phase 19 | Pending |
+| ENH-05 | Phase 19 | Pending |
+| ENH-06 | Phase 19 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 87 total
+- v1.1 requirements: 97 total (corrected from initial 87 count)
 - Categories: 13 (DEP, MD, CODE, CMP, MSG, TOOL, PERM, ACT, NAV, POL, UI, ENH)
-- Mapped to phases: 0
-- Unmapped: 87 (pending roadmap creation)
+- Mapped to phases: 97/97
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after comprehensive expansion + deferred items promoted*
+*Last updated: 2026-03-07 -- traceability updated during roadmap creation*
