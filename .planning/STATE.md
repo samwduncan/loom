@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Phase 15 Plan 01 complete
-last_updated: "2026-03-07T21:37:25Z"
-last_activity: 2026-03-07 -- Phase 15 Plan 01 complete (ToolCardShell + formatElapsed + useElapsedTime)
+stopped_at: Phase 15 complete
+last_updated: "2026-03-07T21:43:15Z"
+last_activity: 2026-03-07 -- Phase 15 complete (ToolChip integration + DefaultToolCard upgrade)
 progress:
   total_phases: 9
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 14
-  completed_plans: 13
-  percent: 93
+  completed_plans: 14
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 15 of 19 (Tool Card Shell + State Machine)
-Plan: 1 of 2 -- COMPLETE
+Phase: 15 of 19 (Tool Card Shell + State Machine) -- COMPLETE
+Plan: 2 of 2 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-07 -- Phase 15 Plan 01 complete (ToolCardShell + formatElapsed + useElapsedTime)
+Last activity: 2026-03-07 -- Phase 15 complete (ToolChip integration + DefaultToolCard upgrade)
 
-Progress: [#########-] 93%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [#########-] 93%
 | Phase 14 P01 | 9min | 2 tasks | 11 files |
 | Phase 14 P03 | 3min | 2 tasks | 7 files |
 | 15    | 01   | 3min     | 2     | 6     |
+| 15    | 02   | 4min     | 2     | 4     |
 
 ## Accumulated Context
 
@@ -97,6 +98,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 15-01: useEffect ref sync for completedAtRef (react-hooks/refs compliance)
 - Phase 15-01: Status labels Starting/Running/Done/Failed for tool card header
 - Phase 15-01: onToggle callback prop on ToolCardShell for parent-controlled expand state
+- Phase 15-02: Always-mounted ToolCardShell for smooth CSS Grid animation (not conditional render)
+- Phase 15-02: Adjust-state-during-rendering for error force-expand on transition to rejected
+- Phase 15-02: DefaultToolCard no-truncation policy with scrollable container
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -115,6 +119,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-07T21:37:25Z
-Stopped at: Completed 15-01-PLAN.md
-Resume: Continue with Phase 15 Plan 02
+Last session: 2026-03-07T21:43:15Z
+Stopped at: Completed 15-02-PLAN.md
+Resume: Continue with Phase 16
