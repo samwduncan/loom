@@ -39,12 +39,21 @@ export interface ToolCall {
   parentToolUseId: string | null;
 }
 
+export interface ImageAttachment {
+  id: string;
+  url: string;
+  name: string;
+  width?: number;
+  height?: number;
+}
+
 export interface Message {
   id: string;
   role: MessageRole;
   content: string;
   toolCalls?: ToolCall[];
   thinkingBlocks?: ThinkingBlock[];
+  attachments?: ImageAttachment[];
   metadata: MessageMetadata;
   providerContext: ProviderContext;
 }

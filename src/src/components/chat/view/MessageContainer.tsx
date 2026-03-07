@@ -6,18 +6,23 @@
  * wrapper to prevent CLS (Cumulative Layout Shift) jitter at the
  * streaming/historical boundary. Identical padding, line-height, and spacing.
  *
- * User role: right-aligned bubble with accent-primary-muted background.
- * Assistant role: full-width, no background.
+ * Supports all 5 message roles:
+ *   user: right-aligned bubble with bg-card background
+ *   assistant: full-width, no background
+ *   system: centered, no constraints
+ *   error: full-width, no bubble constraint
+ *   task_notification: full-width, no bubble constraint
  *
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6).
  */
 
 import type { ReactNode } from 'react';
+import type { MessageRole } from '@/types/message';
 import { cn } from '@/utils/cn';
 
 interface MessageContainerProps {
   children: ReactNode;
-  role: 'user' | 'assistant';
+  role: MessageRole;
 }
 
 export function MessageContainer({ children, role }: MessageContainerProps) {
@@ -26,6 +31,7 @@ export function MessageContainer({ children, role }: MessageContainerProps) {
       className={cn(
         'px-4 py-3 leading-relaxed text-[length:var(--text-body)]',
         role === 'user' && 'flex justify-end',
+        role === 'system' && 'flex justify-center',
       )}
       data-role={role}
       data-testid="message-container"
@@ -34,13 +40,20 @@ export function MessageContainer({ children, role }: MessageContainerProps) {
         <div
           className={cn(
             'max-w-[80%] rounded-2xl px-4 py-2',
-            'bg-primary-muted text-foreground',
+            'bg-card text-foreground',
           )}
         >
           {children}
         </div>
       ) : (
-        <div className="w-full text-foreground">{children}</div>
+        <div className={cn(
+          role === 'assistant' && 'w-full text-foreground',
+          role === 'system' && 'text-foreground',
+          role === 'error' && 'w-full text-foreground',
+          role === 'task_notification' && 'w-full text-foreground',
+        )}>
+          {children}
+        </div>
       )}
     </div>
   );
