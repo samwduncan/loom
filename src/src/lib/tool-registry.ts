@@ -101,7 +101,7 @@ function DefaultToolCard(props: ToolCardProps) {
     createElement(
       'div',
       { className: 'tool-card-input' },
-      createElement('pre', { style: { margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' } }, truncatedInput),
+      createElement('pre', null, truncatedInput),
     ),
     truncatedOutput != null
       ? createElement(
@@ -111,7 +111,7 @@ function DefaultToolCard(props: ToolCardProps) {
               ? 'tool-card-output tool-card-output--error'
               : 'tool-card-output',
           },
-          createElement('pre', { style: { margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' } }, truncatedOutput),
+          createElement('pre', null, truncatedOutput),
         )
       : null,
   );
