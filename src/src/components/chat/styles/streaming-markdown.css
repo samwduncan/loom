@@ -1,0 +1,128 @@
+/**
+ * Streaming-phase markdown formatting styles.
+ *
+ * Scoped under .active-message to avoid leaking to finalized messages.
+ * Uses design tokens only (Constitution 1.1).
+ * Matches MarkdownRenderer appearance for seamless streaming -> finalized transition.
+ */
+
+/* --- Code blocks (fenced) --- */
+.active-message .streaming-code-block {
+  background-color: var(--surface-0);
+  font-family: var(--font-mono);
+  border-radius: 6px;
+  padding: var(--space-3);
+  margin: var(--space-2) 0;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.active-message .streaming-code-block code {
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  color: var(--text-secondary);
+}
+
+.active-message .streaming-code-lang {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--space-1);
+}
+
+/* --- Inline code --- */
+.active-message code {
+  background-color: var(--surface-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+}
+
+/* Reset for code inside fenced blocks (don't double-style) */
+.active-message .streaming-code-block code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* --- Headings --- */
+.active-message h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.active-message h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.active-message h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: var(--space-2) 0 var(--space-1);
+}
+
+.active-message h4,
+.active-message h5,
+.active-message h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: var(--space-2) 0 var(--space-1);
+}
+
+/* --- Blockquotes --- */
+.active-message blockquote {
+  border-left: 3px solid color-mix(in oklch, var(--accent-primary) 30%, transparent);
+  padding-left: var(--space-3);
+  color: var(--text-muted);
+  font-style: italic;
+  margin: var(--space-2) 0;
+}
+
+/* --- Lists --- */
+.active-message ul {
+  list-style: disc;
+  padding-left: var(--space-5);
+  margin: var(--space-2) 0;
+}
+
+.active-message ol {
+  list-style: decimal;
+  padding-left: var(--space-5);
+  margin: var(--space-2) 0;
+}
+
+.active-message li {
+  margin: var(--space-1) 0;
+}
+
+/* --- Paragraphs --- */
+.active-message p {
+  margin: var(--space-2) 0;
+}
+
+.active-message p:first-child {
+  margin-top: 0;
+}
+
+.active-message p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Links --- */
+.active-message a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.active-message a:hover {
+  text-decoration: underline;
+}
+
+/* --- Pre (wrapper for code blocks) --- */
+.active-message pre {
+  margin: var(--space-2) 0;
+}

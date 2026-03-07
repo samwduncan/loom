@@ -21,6 +21,7 @@ import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
 import '../styles/streaming-cursor.css';
+import '../styles/streaming-markdown.css';
 
 export interface ActiveMessageProps {
   /** Session ID for flushing to timeline store */

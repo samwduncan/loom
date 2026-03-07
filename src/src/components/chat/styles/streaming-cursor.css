@@ -12,7 +12,6 @@
   background-color: color-mix(in oklch, var(--accent-primary) 4%, transparent);
   transition: background-color var(--duration-normal) var(--ease-out);
   position: relative;
-  white-space: pre-wrap;
   word-break: break-word;
   /* No padding here -- MessageContainer provides it for CLS-free finalization */
 }

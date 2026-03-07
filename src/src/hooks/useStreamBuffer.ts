@@ -3,10 +3,14 @@
  *
  * Subscribes to wsClient.subscribeContent() for streaming tokens,
  * accumulates them in a useRef (zero React re-renders), and paints
- * to a DOM node's textContent via requestAnimationFrame.
+ * to a DOM node's innerHTML via requestAnimationFrame using the
+ * streaming markdown converter.
  *
  * When streaming completes (isStreaming transitions true -> false),
  * flushes accumulated text to the parent via onFlush callback.
+ *
+ * If the converter throws, streaming silently falls back to raw
+ * textContent with no visible error (permanent for that session).
  *
  * Constitution: Named export only (2.2), selector-only store access (4.2).
  */
@@ -14,6 +18,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { wsClient } from '@/lib/websocket-client';
 import { useStreamStore } from '@/stores/stream';
+import { convertStreamingMarkdown } from '@/lib/streaming-markdown';
 
 export interface UseStreamBufferOptions {
   /** Ref to the DOM text node that receives token updates */
@@ -39,6 +44,7 @@ export function useStreamBuffer(options: UseStreamBufferOptions): UseStreamBuffe
   const isActiveRef = useRef(false);
   const rafIdRef = useRef<number>(0);
   const disconnectFiredRef = useRef(false);
+  const converterFailedRef = useRef(false);
 
   // Stable callback refs — synced via effect to satisfy react-hooks/refs
   const onFlushRef = useRef(onFlush);
@@ -64,11 +70,22 @@ export function useStreamBuffer(options: UseStreamBufferOptions): UseStreamBuffe
   useEffect(() => {
     isActiveRef.current = true;
     disconnectFiredRef.current = false;
+    converterFailedRef.current = false;
 
     const paint = (): void => {
       const node = textNodeRefRef.current.current;
       if (node && bufferRef.current.length > bufferOffsetRef.current) {
-        node.textContent = bufferRef.current.slice(bufferOffsetRef.current);
+        const raw = bufferRef.current.slice(bufferOffsetRef.current);
+        if (converterFailedRef.current) {
+          node.textContent = raw;
+        } else {
+          try {
+            node.innerHTML = convertStreamingMarkdown(raw);
+          } catch {
+            node.textContent = raw;
+            converterFailedRef.current = true;
+          }
+        }
       }
 
       // Check for disconnect: wsClient no longer streaming and disconnected
