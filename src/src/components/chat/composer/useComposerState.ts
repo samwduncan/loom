@@ -33,7 +33,8 @@ function composerReducer(state: ComposerState, action: ComposerAction): Composer
     case 'SEND':
       return state === 'idle' ? 'sending' : state;
     case 'STREAM_STARTED':
-      return state === 'sending' ? 'active' : state;
+      // Allow idle -> active for cases where component mounts mid-stream
+      return state === 'sending' || state === 'idle' ? 'active' : state;
     case 'STOP':
       return state === 'active' ? 'aborting' : state;
     case 'STREAM_ENDED':

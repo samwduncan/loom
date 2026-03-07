@@ -2,16 +2,18 @@
  * ChatComposer tests -- text input, send, stop, keyboard behavior.
  *
  * Tests verify:
- * - Renders input and send button
+ * - Renders textarea and send button
  * - Send disabled when input empty
  * - Enter key sends message via wsClient
  * - Input clears after send
  * - Stop button appears during streaming
  * - Stop button sends abort-session
+ * - Escape clears input, then blurs
+ * - Suggestion text populates input
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { ChatComposer } from './ChatComposer';
@@ -46,7 +48,7 @@ describe('ChatComposer', () => {
     useTimelineStore.getState().reset();
   });
 
-  it('renders input and send button', () => {
+  it('renders textarea and send button', () => {
     renderComposer({ projectName: 'test-proj', sessionId: null });
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument();
@@ -124,20 +126,37 @@ describe('ChatComposer', () => {
     });
   });
 
-  it('shows stop button during streaming', () => {
-    useStreamStore.getState().startStream();
-    useStreamStore.getState().setActiveSessionId('sess-1');
-
+  it('shows stop button during streaming', async () => {
     renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
-    expect(screen.getByRole('button', { name: /stop/i })).toBeInTheDocument();
+
+    // Simulate streaming starting (triggers useEffect in useComposerState)
+    act(() => {
+      useStreamStore.getState().startStream();
+      useStreamStore.getState().setActiveSessionId('sess-1');
+    });
+
+    // Wait for FSM to transition via useEffect
+    await waitFor(() => {
+      const stopBtn = screen.getByRole('button', { name: /stop/i });
+      expect(stopBtn).not.toBeDisabled();
+    });
   });
 
   it('stop button sends abort-session', async () => {
     const user = userEvent.setup();
-    useStreamStore.getState().startStream();
-    useStreamStore.getState().setActiveSessionId('sess-1');
-
     renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
+
+    // Simulate streaming starting
+    act(() => {
+      useStreamStore.getState().startStream();
+      useStreamStore.getState().setActiveSessionId('sess-1');
+    });
+
+    // Wait for FSM to reach 'active' state
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /stop/i })).not.toBeDisabled();
+    });
+
     await user.click(screen.getByRole('button', { name: /stop/i }));
 
     expect(mockWsSend).toHaveBeenCalledWith({
@@ -171,6 +190,23 @@ describe('ChatComposer', () => {
     expect(session?.messages).toHaveLength(1);
     expect(session?.messages[0]?.role).toBe('user');
     expect(session?.messages[0]?.content).toBe('hello world');
+  });
+
+  it('clears input on Escape, blurs on second Escape', async () => {
+    const user = userEvent.setup();
+    renderComposer({ projectName: 'test-proj', sessionId: null });
+
+    const textarea = screen.getByRole('textbox');
+    await user.type(textarea, 'some text');
+    expect(textarea).toHaveValue('some text');
+
+    // First Escape clears input
+    await user.keyboard('{Escape}');
+    expect(textarea).toHaveValue('');
+
+    // Second Escape blurs
+    await user.keyboard('{Escape}');
+    expect(textarea).not.toHaveFocus();
   });
 
   describe('new chat optimistic stub', () => {

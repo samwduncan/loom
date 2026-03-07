@@ -1,5 +1,5 @@
 /**
- * ChatView -- main chat content area replacing ChatPlaceholder.
+ * ChatView -- main chat content area.
  *
  * Reads sessionId from URL params, coordinates session loading via
  * useSessionSwitch, and renders the appropriate state:
@@ -7,13 +7,13 @@
  * - Loading: MessageListSkeleton + ChatComposer
  * - Loaded: MessageList + ChatComposer
  *
- * URL sync on mount/param change handles direct navigation, browser
- * back/forward, and sidebar clicks.
+ * Uses CSS Grid (1fr auto) for scroll-stable layout -- composer height
+ * changes don't cause scroll position jumps.
  *
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useSessionSwitch } from '@/hooks/useSessionSwitch';
@@ -31,6 +31,7 @@ export function ChatView() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { projectName } = useProjectContext();
   const { switchSession, isLoadingMessages } = useSessionSwitch();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const activeSessionId = useTimelineStore((state) => state.activeSessionId);
   // Use URL sessionId as the source of truth for which messages to display.
@@ -42,7 +43,7 @@ export function ChatView() {
     return session?.messages ?? EMPTY_MESSAGES;
   });
   // URL sync: when sessionId param changes (direct nav, back/forward, sidebar click).
-  // Skip stub sessions — they are optimistic placeholders that will be reconciled
+  // Skip stub sessions -- they are optimistic placeholders that will be reconciled
   // to real session IDs by onSessionCreated in websocket-init.ts.
   // Trigger fetch whenever URL points to a session with no loaded messages.
   useEffect(() => {
@@ -52,23 +53,32 @@ export function ChatView() {
   }, [sessionId, projectName, messages.length, switchSession]);
 
   // Stream finalization callback -- no-op since the finalized message is already
-  // in the store via ActiveMessage's handleFlush. The streaming state is managed
-  // by the stream store's endStream action (called from websocket-init).
+  // in the store via ActiveMessage's handleFlush.
   const handleStreamFinalized = useCallback(() => {
     // Message already added to store by ActiveMessage.handleFlush
   }, []);
 
   // Determine content state.
-  // Prefer activeSessionId over stub session IDs from URL — stubs are optimistic
-  // placeholders that get reconciled to real IDs by onSessionCreated.
   const hasSession = Boolean(sessionId || activeSessionId);
   const effectiveSessionId = (sessionId?.startsWith('stub-') ? activeSessionId : sessionId) ?? activeSessionId;
 
+  // Suggestion chip handler: sets composer input text via state
+  const [suggestionText, setSuggestionText] = useState<string | null>(null);
+  const handleSuggestionClick = useCallback((text: string) => {
+    setSuggestionText(text);
+    // Clear after a tick so re-clicking same chip works
+    requestAnimationFrame(() => setSuggestionText(null));
+  }, []);
+
   return (
-    <div className="flex h-full flex-col" data-testid="chat-view">
+    <div
+      className="grid h-full"
+      style={{ gridTemplateRows: '1fr auto' }}
+      data-testid="chat-view"
+    >
       {!hasSession ? (
-        // No session selected -- show empty state
-        <ChatEmptyState />
+        // No session selected -- show empty state with suggestion chips
+        <ChatEmptyState onSuggestionClick={handleSuggestionClick} />
       ) : isLoadingMessages && messages.length === 0 ? (
         // Loading messages -- show skeleton
         <MessageListSkeleton />
@@ -78,11 +88,14 @@ export function ChatView() {
           messages={messages}
           sessionId={effectiveSessionId ?? ''}
           onStreamFinalized={handleStreamFinalized}
+          scrollContainerRef={scrollContainerRef}
         />
       )}
       <ChatComposer
         projectName={projectName}
         sessionId={effectiveSessionId ?? null}
+        scrollContainerRef={scrollContainerRef}
+        suggestionText={suggestionText}
       />
     </div>
   );

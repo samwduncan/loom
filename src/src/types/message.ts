@@ -20,6 +20,8 @@ export interface MessageMetadata {
   tokenCount: number | null;
   cost: number | null;
   duration: number | null;
+  /** True when message was sent during active streaming (queued for processing) */
+  queued?: boolean;
 }
 
 export interface ThinkingBlock {

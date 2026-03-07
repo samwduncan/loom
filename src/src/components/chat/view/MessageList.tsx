@@ -13,7 +13,7 @@
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useRef, useState, useCallback, useLayoutEffect } from 'react';
+import { useRef, useState, useCallback, useLayoutEffect, type RefObject } from 'react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
@@ -27,15 +27,20 @@ interface MessageListProps {
   messages: Message[];
   sessionId: string;
   onStreamFinalized: () => void;
+  /** Scroll container ref passed from ChatView for composer scroll stability */
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
 }
 
-export function MessageList({ messages, sessionId, onStreamFinalized }: MessageListProps) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+export function MessageList({ messages, sessionId, onStreamFinalized, scrollContainerRef }: MessageListProps) {
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  // Use external ref if provided (for composer scroll stability), otherwise internal
+  const scrollRef = scrollContainerRef ?? internalScrollRef;
+  const assignRef = scrollContainerRef ?? internalScrollRef;
   const isStreaming = useStreamStore((state) => state.isStreaming);
 
   // ActiveMessage must stay mounted through finalization fade (200ms).
   // showActiveMessage turns ON when streaming starts, OFF only when
-  // onFinalizationComplete fires — NOT when isStreaming flips to false.
+  // onFinalizationComplete fires -- NOT when isStreaming flips to false.
   // Uses React "adjust state during rendering" pattern (not useEffect)
   // to avoid the set-state-in-effect ESLint rule.
   const [showActiveMessage, setShowActiveMessage] = useState(false);
@@ -49,29 +54,27 @@ export function MessageList({ messages, sessionId, onStreamFinalized }: MessageL
     onStreamFinalized();
   }, [onStreamFinalized]);
 
-  const { sentinelRef, showPill, scrollToBottom } = useScrollAnchor(scrollContainerRef);
+  const { sentinelRef, showPill, scrollToBottom } = useScrollAnchor(scrollRef);
 
   // Scroll to bottom on mount and on session change. useLayoutEffect fires
   // synchronously after React commits DOM mutations, so scrollHeight is final.
-  // We skip the scroll if we've already scrolled for this session to avoid
-  // fighting with user scroll during streaming.
   const scrolledSessionRef = useRef<string | null>(null);
   useLayoutEffect(() => {
     if (messages.length === 0) return;
     if (scrolledSessionRef.current === sessionId) return;
     scrolledSessionRef.current = sessionId;
 
-    const el = scrollContainerRef.current;
+    const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [sessionId, messages.length]);
+  }, [sessionId, messages.length, scrollRef]);
 
   return (
     <div
-      ref={scrollContainerRef}
+      ref={assignRef}
       className="flex-1 overflow-y-auto"
       data-testid="message-list-scroll"
     >
-      <div className="flex flex-col py-4">
+      <div className="mx-auto max-w-3xl flex flex-col py-4">
         {messages.map((msg) => (
           <MessageErrorBoundary key={msg.id}>
             {msg.role === 'user' ? (
