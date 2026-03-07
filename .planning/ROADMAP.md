@@ -173,10 +173,10 @@ Plans:
   2. tool-registry.ts has zero inline styles (uses CSS classes with design tokens)
   3. ENF-01 traceability table shows "Complete" (matching its checkbox status)
   4. No unused test-only exports in production code
-**Plans:** TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 10-01-PLAN.md — Orphan removal, inline style cleanup, traceability fix
+- [ ] 10-01-PLAN.md — Orphan removal, inline style cleanup, test export cleanup
 
 ## Progress
 
