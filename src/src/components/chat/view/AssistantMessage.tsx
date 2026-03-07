@@ -1,7 +1,10 @@
 /**
  * AssistantMessage -- historical assistant message display.
  *
- * Renders content as plain text (no markdown in M1, that's CHAT-04 in M2).
+ * Renders content through MarkdownRenderer for rich formatted output
+ * (bold, italic, code blocks, tables, links, etc.). Fenced code blocks
+ * route to CodeBlock with Shiki syntax highlighting.
+ *
  * If message has toolCalls, renders each as a collapsed ToolChip with
  * status 'resolved' using the tool registry.
  *
@@ -12,6 +15,7 @@
  */
 
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
+import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
@@ -23,9 +27,7 @@ interface AssistantMessageProps {
 export function AssistantMessage({ message }: AssistantMessageProps) {
   return (
     <MessageContainer role="assistant">
-      <div className="whitespace-pre-wrap break-words">
-        {message.content}
-      </div>
+      <MarkdownRenderer content={message.content} />
       {message.toolCalls && message.toolCalls.length > 0 && (
         <div className="mt-2 flex flex-col gap-1">
           {message.toolCalls.map((tc) => {
