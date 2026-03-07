@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: The Chat
 status: executing
-stopped_at: Completed 11-02-PLAN.md (Shiki + CodeBlock)
+stopped_at: Completed 11-01-PLAN.md (Dependencies + UI Primitives)
 last_updated: "2026-03-07"
-last_activity: 2026-03-07 — Phase 11 Plan 02 complete (Shiki singleton + CodeBlock component)
+last_activity: 2026-03-07 — Phase 11 Plan 01 complete (shadcn/ui primitives + OKLCH restyling)
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 11
+  completed_plans: 2
+  percent: 22
 ---
 
 # Project State
@@ -26,21 +26,22 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 11 of 19 (Markdown + Code Blocks)
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Executing
-Last activity: 2026-03-07 -- Phase 11 Plan 02 complete (Shiki + CodeBlock)
+Last activity: 2026-03-07 -- Phase 11 Plan 01 complete (shadcn/ui + OKLCH restyling)
 
-Progress: [#.........] 11%
+Progress: [##........] 22%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1 (M2)
+- Total plans completed: 2 (M2)
 - M1 reference: 21 plans in 3 days
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 11    | 02   | 6min     | 2     | 12    |
+| 11    | 01   | 7min     | 2     | 13    |
 
 ## Accumulated Context
 
@@ -52,6 +53,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 11-02: CSS variables theme for OKLCH-driven syntax colors
 - Phase 11-02: Map-based highlight cache keyed by lang:code
 - Phase 11-02: useDeferredValue for non-blocking highlight swap
+- Phase 11-01: Hardcoded dark theme in sonner (no next-themes)
+- Phase 11-01: lib/utils.ts re-export for shadcn compatibility
+- Phase 11-01: z-index tier mapping: overlay->40, modal->50, dropdown->20
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -71,5 +75,5 @@ None -- clean slate for M2.
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Completed 11-02-PLAN.md (Shiki + CodeBlock)
+Stopped at: Completed 11-01-PLAN.md (Dependencies + UI Primitives)
 Resume: `/gsd:execute-phase 11` (Plan 03 next)

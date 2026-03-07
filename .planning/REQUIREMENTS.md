@@ -8,8 +8,8 @@
 
 ### Dependencies & Setup
 
-- [ ] **DEP-01**: Install react-markdown ^10.1.0, remark-gfm ^4.0.1, rehype-raw ^7.0.0 in `src/` workspace
-- [ ] **DEP-02**: Install shiki ^4.0.1 in `src/` workspace
+- [x] **DEP-01**: Install react-markdown ^10.1.0, remark-gfm ^4.0.1, rehype-raw ^7.0.0 in `src/` workspace
+- [x] **DEP-02**: Install shiki ^4.0.1 in `src/` workspace
 - [x] **DEP-03**: Create Shiki singleton module (`shiki-highlighter.ts`) using JavaScript RegExp engine (no WASM), empty initial language set, `css-variables` theme
 - [x] **DEP-04**: Pre-load 7 common language grammars at app startup: JavaScript, TypeScript, Python, Bash, JSON, CSS, HTML. All other languages load on first encounter.
 - [x] **DEP-05**: Create Shiki OKLCH theme mapping file (`shiki-theme.ts`) that maps `--shiki-token-*` CSS custom properties to design tokens in `tokens.css`. Use Constitution Section 3.1 exception pattern for third-party theme objects.
@@ -133,9 +133,9 @@
 
 ### UI Primitives & Component Libraries
 
-- [ ] **UI-01**: Initialize shadcn/ui in `src/` workspace (`npx shadcn@latest init`). Configure to use OKLCH design tokens by overriding shadcn CSS variables in `tokens.css`.
-- [ ] **UI-02**: Install shadcn primitives needed for M2: `dialog` (permission requests, image lightbox), `tooltip` (hover info on tools, timestamps), `scroll-area` (code blocks, tool card output), `collapsible` (tool grouping, thinking blocks), `sonner` (toast notifications for copy feedback, errors), `dropdown-menu` (thinking toggle, context menus), `badge` (tool status, file counts), `kbd` (keyboard shortcut hints), `separator` (between message groups)
-- [ ] **UI-03**: All shadcn components restyled to OKLCH token system — no default shadcn colors remain. Components in `src/src/components/ui/` use `bg-surface-*`, `text-muted`, `border-subtle` etc.
+- [x] **UI-01**: Initialize shadcn/ui in `src/` workspace (`npx shadcn@latest init`). Configure to use OKLCH design tokens by overriding shadcn CSS variables in `tokens.css`.
+- [x] **UI-02**: Install shadcn primitives needed for M2: `dialog` (permission requests, image lightbox), `tooltip` (hover info on tools, timestamps), `scroll-area` (code blocks, tool card output), `collapsible` (tool grouping, thinking blocks), `sonner` (toast notifications for copy feedback, errors), `dropdown-menu` (thinking toggle, context menus), `badge` (tool status, file counts), `kbd` (keyboard shortcut hints), `separator` (between message groups)
+- [x] **UI-03**: All shadcn components restyled to OKLCH token system — no default shadcn colors remain. Components in `src/src/components/ui/` use `bg-surface-*`, `text-muted`, `border-subtle` etc.
 - [ ] **UI-04**: Cherry-pick CSS-only effects from React Bits (source-level copy, not npm): `SpotlightCard` (hover effect on tool cards, sidebar items), `ShinyText` (thinking/status indicators), `StarBorder` / `ElectricBorder` (composer border during active streaming)
 - [ ] **UI-05**: All cherry-picked components use design tokens only — no hardcoded colors. Constitution ESLint rules must pass.
 
@@ -183,8 +183,8 @@ Updated during roadmap creation (2026-03-07).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEP-01 | Phase 11 | Pending |
-| DEP-02 | Phase 11 | Pending |
+| DEP-01 | Phase 11 | Complete |
+| DEP-02 | Phase 11 | Complete |
 | DEP-03 | Phase 11 | Complete |
 | DEP-04 | Phase 11 | Complete |
 | DEP-05 | Phase 11 | Complete |
@@ -269,9 +269,9 @@ Updated during roadmap creation (2026-03-07).
 | POL-02 | Phase 18 | Pending |
 | POL-03 | Phase 18 | Pending |
 | POL-04 | Phase 18 | Pending |
-| UI-01 | Phase 11 | Pending |
-| UI-02 | Phase 11 | Pending |
-| UI-03 | Phase 11 | Pending |
+| UI-01 | Phase 11 | Complete |
+| UI-02 | Phase 11 | Complete |
+| UI-03 | Phase 11 | Complete |
 | UI-04 | Phase 19 | Pending |
 | UI-05 | Phase 19 | Pending |
 | ENH-01 | Phase 12 | Pending |
