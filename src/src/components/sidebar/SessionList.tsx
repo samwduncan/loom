@@ -12,7 +12,7 @@
  * 200-line limit (2.4), cn() for classes (3.6).
  */
 
-import { useState, useCallback, type MouseEvent } from 'react';
+import { useState, useCallback, useEffect, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/utils/cn';
 import { useTimelineStore } from '@/stores/timeline';
@@ -25,6 +25,21 @@ import { SessionItem } from './SessionItem';
 import { SessionContextMenu } from './SessionContextMenu';
 import { SessionListSkeleton } from './SessionListSkeleton';
 import { NewChatButton } from './NewChatButton';
+import { DRAFTS_CHANGED_EVENT } from '@/components/chat/composer/useDraftPersistence';
+
+const DRAFTS_STORAGE_KEY = 'loom-composer-drafts';
+
+function readDraftSessionIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(DRAFTS_STORAGE_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (typeof parsed !== 'object' || parsed === null) return new Set();
+    return new Set(Object.keys(parsed));
+  } catch {
+    return new Set();
+  }
+}
 
 interface ContextMenuState {
   isOpen: boolean;
@@ -39,6 +54,24 @@ export function SessionList() {
   const removeSession = useTimelineStore((s) => s.removeSession);
   const { isLoading, error } = useSessionList();
   const { projectName } = useProjectContext();
+
+  // Draft indicator: read localStorage for sessions with drafts
+  const [draftSessionIds, setDraftSessionIds] = useState<Set<string>>(readDraftSessionIds);
+
+  useEffect(() => {
+    const refresh = () => setDraftSessionIds(readDraftSessionIds());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === DRAFTS_STORAGE_KEY) refresh();
+    };
+    // Same-tab updates via custom event
+    window.addEventListener(DRAFTS_CHANGED_EVENT, refresh);
+    // Cross-tab updates via storage event
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(DRAFTS_CHANGED_EVENT, refresh);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({
     isOpen: false,
@@ -137,6 +170,7 @@ export function SessionList() {
                 updatedAt={session.updatedAt}
                 providerId={session.providerId}
                 isActive={session.id === activeSessionId}
+                hasDraft={draftSessionIds.has(session.id)}
                 onClick={() => handleSessionClick(session.id)}
                 onContextMenu={(e) => handleContextMenu(e, session.id)}
               />

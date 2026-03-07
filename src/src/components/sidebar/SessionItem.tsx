@@ -24,6 +24,7 @@ interface SessionItemProps {
   updatedAt: string;
   providerId: ProviderId;
   isActive: boolean;
+  hasDraft?: boolean;
   onClick: () => void;
   onContextMenu: (e: MouseEvent<HTMLDivElement>) => void;
 }
@@ -33,6 +34,7 @@ export function SessionItem({
   updatedAt,
   providerId,
   isActive,
+  hasDraft,
   onClick,
   onContextMenu,
 }: SessionItemProps) {
@@ -56,14 +58,22 @@ export function SessionItem({
         isActive && 'session-item-active',
       )}
     >
-      {/* Line 1: title */}
-      <div
-        className={cn(
-          'text-[length:var(--text-body)] text-foreground',
-          'truncate',
+      {/* Line 1: title + draft dot */}
+      <div className="flex items-center gap-1.5">
+        <div
+          className={cn(
+            'text-[length:var(--text-body)] text-foreground',
+            'truncate min-w-0 flex-1',
+          )}
+        >
+          {title}
+        </div>
+        {hasDraft && (
+          <span
+            className="w-1.5 h-1.5 rounded-full bg-primary opacity-60 shrink-0"
+            aria-label="Has unsent draft"
+          />
         )}
-      >
-        {title}
       </div>
       {/* Line 2: timestamp + provider logo */}
       <div className="flex items-center gap-1.5 mt-0.5">

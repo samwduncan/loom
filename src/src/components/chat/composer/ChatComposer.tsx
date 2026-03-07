@@ -25,6 +25,7 @@ import { useStreamStore } from '@/stores/stream';
 import { useTimelineStore } from '@/stores/timeline';
 import { useAutoResize } from './useAutoResize';
 import { useComposerState } from './useComposerState';
+import { useDraftPersistence } from './useDraftPersistence';
 import { ComposerKeyboardHints } from './ComposerKeyboardHints';
 import type { Message } from '@/types/message';
 import './composer.css';
@@ -44,6 +45,10 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pendingTitleRef = useRef<string | null>(null);
   const hasMessageSentRef = useRef(false);
+  const prevSessionIdRef = useRef<string | null>(sessionId);
+
+  // Draft persistence
+  const { saveDraft, loadDraft, clearDraft } = useDraftPersistence();
 
   // Stream store selectors
   const isStreaming = useStreamStore((s) => s.isStreaming);
@@ -102,6 +107,34 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     }
   }, [streamSessionId, updateSessionTitle]);
 
+  // Draft persistence: save old session draft, restore new session draft on switch
+  useEffect(() => {
+    const prevId = prevSessionIdRef.current;
+    if (prevId !== sessionId) {
+      // Save draft for the session we're leaving
+      if (prevId) {
+        saveDraft(prevId, input);
+      }
+      // Load draft for the session we're entering
+      if (sessionId) {
+        setInput(loadDraft(sessionId));
+      } else {
+        setInput('');
+      }
+      prevSessionIdRef.current = sessionId;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, saveDraft, loadDraft]);
+
+  // On mount: load draft for initial session
+  useEffect(() => {
+    if (sessionId) {
+      const draft = loadDraft(sessionId);
+      if (draft) setInput(draft);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Auto-focus on session switch
   useEffect(() => {
     textareaRef.current?.focus();
@@ -158,6 +191,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       };
       addMessage(effectiveId, queuedMessage);
       setInput('');
+      clearDraft(effectiveId);
       requestAnimationFrame(() => textareaRef.current?.focus());
       return;
     }
@@ -227,8 +261,9 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
     hasMessageSentRef.current = true;
     setInput('');
+    if (effectiveSessionId) clearDraft(effectiveSessionId);
     requestAnimationFrame(() => textareaRef.current?.focus());
-  }, [input, isStreaming, canSend, projectName, sessionId, streamSessionId, addMessage, addSession, navigate, dispatch]);
+  }, [input, isStreaming, canSend, projectName, sessionId, streamSessionId, addMessage, addSession, navigate, dispatch, clearDraft]);
 
   const handleStop = useCallback(() => {
     if (!canStop) return;
@@ -275,7 +310,10 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         <textarea
           ref={textareaRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+            if (sessionId) saveDraft(sessionId, e.target.value);
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Send a message..."
           aria-label="Message input"
