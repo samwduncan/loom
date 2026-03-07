@@ -31,6 +31,7 @@ interface UIState {
   commandPaletteOpen: boolean;
   companionState: CompanionState | null;
   theme: ThemeConfig;
+  thinkingExpanded: boolean;
 
   // Actions
   toggleSidebar: () => void;
@@ -40,6 +41,7 @@ interface UIState {
   closeModal: () => void;
   toggleCommandPalette: () => void;
   setTheme: (theme: Partial<ThemeConfig>) => void;
+  toggleThinking: () => void;
   reset: () => void;
 }
 
@@ -52,6 +54,7 @@ const INITIAL_UI_STATE = {
   commandPaletteOpen: false,
   companionState: null as CompanionState | null,
   theme: { fontSize: 14, density: 'comfortable' } as ThemeConfig,
+  thinkingExpanded: true,
 };
 
 export const useUIStore = create<UIState>()(
@@ -94,20 +97,28 @@ export const useUIStore = create<UIState>()(
         }));
       },
 
+      toggleThinking: () => {
+        set((state) => ({ thinkingExpanded: !state.thinkingExpanded }));
+      },
+
       reset: () => {
         set({ ...INITIAL_UI_STATE });
       },
     }),
     {
       name: 'loom-ui',
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         theme: state.theme,
         sidebarCollapsed: state.sidebarCollapsed,
+        thinkingExpanded: state.thinkingExpanded,
       }),
-      migrate: (persistedState: unknown, _version: number) => {
-        // Version 1: initial schema, no migration needed
-        return persistedState as { theme: ThemeConfig; sidebarCollapsed: boolean };
+      migrate: (persistedState: unknown, version: number) => {
+        const state = persistedState as Record<string, unknown>;
+        if (version < 2) {
+          return { ...state, thinkingExpanded: true };
+        }
+        return state;
       },
     },
   ),

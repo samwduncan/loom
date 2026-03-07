@@ -41,6 +41,11 @@
   --status-warning: oklch(0.72 0.14 70);
   --status-info: oklch(0.65 0.12 240);
 
+  /* ─── Provider Logo Colors ──────────────────────────────────────── */
+  --logo-claude: oklch(0.68 0.15 45);
+  --logo-gemini: oklch(0.55 0.18 260);
+  --logo-codex: oklch(0.62 0.14 165);
+
   /* ─── Borders ─────────────────────────────────────────────────────
    * Two tiers: subtle (content separations) and interactive (cards, inputs)
    */

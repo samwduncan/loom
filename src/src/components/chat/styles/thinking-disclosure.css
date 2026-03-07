@@ -55,9 +55,6 @@
 }
 
 .thinking-disclosure-content p {
-  color: var(--text-muted);
-  font-family: var(--font-ui);
-  font-size: 0.875rem;
   line-height: 1.5;
   margin: var(--space-1) 0;
 }

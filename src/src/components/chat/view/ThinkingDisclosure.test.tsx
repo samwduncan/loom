@@ -1,135 +1,170 @@
 /**
- * ThinkingDisclosure component tests — covers STRM-04 thinking block display.
- * Tests expand/collapse, auto-collapse on thinking completion, null/empty handling.
+ * ThinkingDisclosure component tests — covers thinking block display.
+ * Tests new prop shape (blocks + isStreaming + globalExpanded), collapsed
+ * label with char count, monospace styling, global toggle behavior.
  */
 
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
-import type { ThinkingState } from '@/types/stream';
 import type { ThinkingBlock } from '@/types/message';
 
-function makeThinkingState(
-  overrides: Partial<ThinkingState> = {},
-): ThinkingState {
-  return {
-    isThinking: true,
-    blocks: [
-      { id: 'tb-1', text: 'Analyzing the problem...', isComplete: true },
-      { id: 'tb-2', text: 'Considering approaches...', isComplete: false },
-    ],
-    ...overrides,
-  };
-}
+const BLOCKS: ThinkingBlock[] = [
+  { id: 'tb-1', text: 'Analyzing the problem...', isComplete: true },
+  { id: 'tb-2', text: 'Considering approaches...', isComplete: false },
+];
 
 describe('ThinkingDisclosure', () => {
-  it('renders nothing when thinkingState is null', () => {
+  it('renders nothing when blocks array is empty', () => {
     const { container } = render(
-      <ThinkingDisclosure thinkingState={null} />,
+      <ThinkingDisclosure blocks={[]} isStreaming={false} />,
     );
     expect(container.querySelector('.thinking-disclosure')).toBeNull();
   });
 
-  it('renders nothing when thinkingState has zero blocks', () => {
+  it('shows pulsing "Thinking..." label when isStreaming is true', () => {
     const { container } = render(
-      <ThinkingDisclosure thinkingState={{ isThinking: false, blocks: [] }} />,
-    );
-    expect(container.querySelector('.thinking-disclosure')).toBeNull();
-  });
-
-  it('shows pulsing "Thinking..." label when isThinking is true', () => {
-    const { container } = render(
-      <ThinkingDisclosure thinkingState={makeThinkingState({ isThinking: true })} />,
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={true} />,
     );
     const pulse = container.querySelector('.thinking-pulse');
     expect(pulse).not.toBeNull();
     expect(pulse?.textContent).toBe('Thinking...');
   });
 
-  it('is expanded when isThinking is true', () => {
+  it('is expanded when isStreaming is true', () => {
     const { container } = render(
-      <ThinkingDisclosure thinkingState={makeThinkingState({ isThinking: true })} />,
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={true} />,
     );
     const content = container.querySelector('.thinking-disclosure-content');
     expect(content).not.toBeNull();
-    // Grid row is 1fr when expanded
     expect(content?.getAttribute('style')).toContain('1fr');
   });
 
-  it('shows "Thinking (N blocks)" when isThinking is false', () => {
-    const blocks: ThinkingBlock[] = [
-      { id: 'tb-1', text: 'First thought', isComplete: true },
-      { id: 'tb-2', text: 'Second thought', isComplete: true },
+  it('shows "Thinking (N chars)" with character count when not streaming', () => {
+    const totalChars = BLOCKS.reduce((sum, b) => sum + b.text.length, 0);
+    render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} />,
+    );
+    expect(
+      screen.getByText(`Thinking (${totalChars.toLocaleString()} chars)`),
+    ).toBeInTheDocument();
+  });
+
+  it('formats large char counts with locale separators', () => {
+    const longBlock: ThinkingBlock[] = [
+      { id: 'tb-big', text: 'x'.repeat(12345), isComplete: true },
     ];
     render(
-      <ThinkingDisclosure thinkingState={{ isThinking: false, blocks }} />,
+      <ThinkingDisclosure blocks={longBlock} isStreaming={false} />,
     );
-    expect(screen.getByText('Thinking (2 blocks)')).toBeInTheDocument();
+    expect(
+      screen.getByText(`Thinking (${(12345).toLocaleString()} chars)`),
+    ).toBeInTheDocument();
   });
 
-  it('shows singular "block" for 1 block', () => {
-    const blocks: ThinkingBlock[] = [
-      { id: 'tb-1', text: 'Only thought', isComplete: true },
-    ];
-    render(
-      <ThinkingDisclosure thinkingState={{ isThinking: false, blocks }} />,
-    );
-    expect(screen.getByText('Thinking (1 block)')).toBeInTheDocument();
-  });
-
-  it('auto-collapses when isThinking transitions from true to false', () => {
-    const { container, rerender } = render(
-      <ThinkingDisclosure
-        thinkingState={makeThinkingState({ isThinking: true })}
-      />,
-    );
-
-    // Initially expanded
-    let content = container.querySelector('.thinking-disclosure-content');
-    expect(content?.getAttribute('style')).toContain('1fr');
-
-    // Transition to not thinking
-    act(() => {
-      rerender(
-        <ThinkingDisclosure
-          thinkingState={makeThinkingState({ isThinking: false })}
-        />,
-      );
-    });
-
-    // Should be collapsed
-    content = container.querySelector('.thinking-disclosure-content');
-    expect(content?.getAttribute('style')).toContain('0fr');
-  });
-
-  it('click toggles expansion regardless of thinking state', () => {
+  it('renders thinking text with monospace italic muted styling', () => {
     const { container } = render(
-      <ThinkingDisclosure
-        thinkingState={makeThinkingState({ isThinking: false })}
-      />,
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={true} />,
+    );
+    const paragraphs = container.querySelectorAll('.thinking-disclosure-content p');
+    expect(paragraphs.length).toBe(2);
+    for (const p of paragraphs) {
+      expect(p.className).toContain('italic');
+      expect(p.className).toContain('text-muted');
+      expect(p.className).toContain('font-mono');
+      expect(p.className).toContain('text-sm');
+    }
+  });
+
+  it('click toggles expansion regardless of streaming state', () => {
+    const { container } = render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} />,
     );
 
     const trigger = container.querySelector('.thinking-disclosure-trigger');
     expect(trigger).not.toBeNull();
 
-    // Initially collapsed (thinking is false)
+    // By default when not streaming, follows globalExpanded (default true)
     let content = container.querySelector('.thinking-disclosure-content');
-    expect(content?.getAttribute('style')).toContain('0fr');
-
-    // Click to expand
-    fireEvent.click(trigger!); // ASSERT: trigger exists since component rendered with non-empty blocks
-    content = container.querySelector('.thinking-disclosure-content');
     expect(content?.getAttribute('style')).toContain('1fr');
 
     // Click to collapse
-    fireEvent.click(trigger!); // ASSERT: trigger confirmed non-null above
+    fireEvent.click(trigger!); // ASSERT: trigger confirmed non-null by expect on line 85
     content = container.querySelector('.thinking-disclosure-content');
     expect(content?.getAttribute('style')).toContain('0fr');
+
+    // Click to expand
+    fireEvent.click(trigger!); // ASSERT: trigger confirmed non-null by expect on line 85
+    content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('1fr');
+  });
+
+  it('globalExpanded=false collapses non-streaming disclosures', () => {
+    const { container } = render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} globalExpanded={false} />,
+    );
+    const content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('0fr');
+  });
+
+  it('individual click overrides globalExpanded=false', () => {
+    const { container } = render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} globalExpanded={false} />,
+    );
+
+    const trigger = container.querySelector('.thinking-disclosure-trigger');
+    // Initially collapsed due to globalExpanded=false
+    let content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('0fr');
+
+    // Click to override
+    fireEvent.click(trigger!); // ASSERT: trigger exists since component rendered with non-empty blocks
+    content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('1fr');
+  });
+
+  it('resets userToggled when globalExpanded changes', () => {
+    const { container, rerender } = render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} globalExpanded={true} />,
+    );
+
+    const trigger = container.querySelector('.thinking-disclosure-trigger');
+
+    // User manually collapses
+    fireEvent.click(trigger!); // ASSERT: trigger exists since component rendered with non-empty blocks
+    let content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('0fr');
+
+    // Global toggle changes — should reset user override, now follow global
+    act(() => {
+      rerender(
+        <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} globalExpanded={false} />,
+      );
+    });
+    content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('0fr');
+
+    // Toggle back to true — user override was cleared, should expand
+    act(() => {
+      rerender(
+        <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} globalExpanded={true} />,
+      );
+    });
+    content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('1fr');
+  });
+
+  it('streaming always starts expanded regardless of globalExpanded', () => {
+    const { container } = render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={true} globalExpanded={false} />,
+    );
+    const content = container.querySelector('.thinking-disclosure-content');
+    expect(content?.getAttribute('style')).toContain('1fr');
   });
 
   it('renders each thinking block as a paragraph', () => {
     render(
-      <ThinkingDisclosure thinkingState={makeThinkingState({ isThinking: true })} />,
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={true} />,
     );
     expect(screen.getByText('Analyzing the problem...')).toBeInTheDocument();
     expect(screen.getByText('Considering approaches...')).toBeInTheDocument();
@@ -137,7 +172,7 @@ describe('ThinkingDisclosure', () => {
 
   it('disclosure arrow has data-expanded attribute', () => {
     const { container } = render(
-      <ThinkingDisclosure thinkingState={makeThinkingState({ isThinking: true })} />,
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={true} />,
     );
     const arrow = container.querySelector('.thinking-disclosure-arrow');
     expect(arrow).not.toBeNull();

@@ -19,6 +19,7 @@ import { memo, useRef, useCallback, useEffect, useState } from 'react';
 import { useStreamBuffer } from '@/hooks/useStreamBuffer';
 import { useTimelineStore } from '@/stores/timeline';
 import { useStreamStore } from '@/stores/stream';
+import { useUIStore } from '@/stores/ui';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
@@ -75,6 +76,7 @@ export const ActiveMessage = memo(function ActiveMessage(
   // Stream store subscriptions
   const thinkingState = useStreamStore((state) => state.thinkingState);
   const toolCallCount = useStreamStore((state) => state.activeToolCalls.length);
+  const thinkingExpanded = useUIStore((state) => state.thinkingExpanded);
 
   // Stable callback refs — synced via useEffect (react-hooks/refs compliance)
   const onFinalizationCompleteRef = useRef(onFinalizationComplete);
@@ -276,7 +278,11 @@ export const ActiveMessage = memo(function ActiveMessage(
         {/* Streaming layer — removed after finalization */}
         {phase !== 'finalized' && (
           <div ref={streamingRef} className="crossfade-streaming">
-            <ThinkingDisclosure thinkingState={thinkingState} />
+            <ThinkingDisclosure
+              blocks={thinkingState?.blocks ?? []}
+              isStreaming={thinkingState?.isThinking ?? false}
+              globalExpanded={thinkingExpanded}
+            />
             {segments.map((seg) => {
               if (seg.type === 'text') {
                 return <span key={seg.id} ref={makeTextRefCallback(seg.id)} />;
