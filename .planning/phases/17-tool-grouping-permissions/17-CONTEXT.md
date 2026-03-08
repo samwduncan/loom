@@ -14,10 +14,11 @@ Consecutive tool calls (3+) collapse into manageable accordion groups with real-
 ## Implementation Decisions
 
 ### Group collapse behavior
-- 3+ consecutive tool calls trigger grouping (not 2 — two side-by-side is common enough to show inline)
+- ≥2 consecutive tool calls trigger grouping (per TOOL-20 spec — two Edit cards with expanded diffs occupy ~800px, pushing composer off-screen)
+- When the 2nd consecutive tool arrives, retroactively wrap both into a group within a single render cycle (no flicker/snap)
 - Collapsed header shows count + inline mini-chips with tool names only: "5 tool calls [Read] [Read] [Edit] [Bash] [Bash]"
 - Auto-collapse when all tools in the group resolve
-- Group in real-time during streaming — header updates live as new tool calls arrive ("3 tool calls" → "4 tool calls")
+- Group in real-time during streaming — group container established on 2nd tool, header updates live as more tools arrive
 - Historical groups (loaded from backend) always start collapsed
 - Error tool calls are extracted from the group and displayed separately below it — group collapses normally for non-error tools
 
@@ -42,6 +43,7 @@ Consecutive tool calls (3+) collapse into manageable accordion groups with real-
 - Allow button: solid green/success accent background (dominant, encourages flow)
 - Deny button: ghost/outline style (secondary)
 - Only one permission banner at a time (backend enforces sequential requests; new request replaces old)
+- Permission request is session-scoped: `activePermissionRequest` includes `sessionId`. Banner only renders when `activePermissionRequest.sessionId === currentSessionId`. On session switch, banner vanishes (request stays pending in store, reappears when switching back).
 - Auto-dismisses on `claude-permission-cancelled` WebSocket event
 - Auto-dismisses on timeout (55s default from `CLAUDE_TOOL_APPROVAL_TIMEOUT_MS`)
 
@@ -54,8 +56,8 @@ Consecutive tool calls (3+) collapse into manageable accordion groups with real-
 
 ### Keyboard shortcuts for permissions
 - Y key = Allow, N key = Deny
-- Only active when permission banner is visible AND composer textarea does not have focus
-- Prevents accidental grants while typing in the composer
+- Only active when permission banner is visible AND no focusable element has focus (check `document.activeElement` against `textarea`, `input`, and `contenteditable` — not just the composer textarea)
+- Prevents accidental grants while typing in the composer or any other input
 
 ### Claude's Discretion
 - Exact CSS Grid animation timing for group expand/collapse
@@ -98,7 +100,7 @@ Consecutive tool calls (3+) collapse into manageable accordion groups with real-
 
 ### Integration Points
 - **Tool grouping**: Operates at the message rendering layer — `AssistantMessage.tsx` currently injects tool markers into markdown, `MarkdownRenderer` replaces markers with ToolChip components. Grouping needs to intercept consecutive tool markers and wrap them in a `ToolCallGroup` component.
-- **Permission banners**: `stream-multiplexer.ts` must stop auto-allowing and instead surface `claude-permission-request` to a new Zustand store slice (or dedicated store). `ChatView.tsx` renders the banner based on this state. Banner sends `claude-permission-response` via the WebSocket `sendFn`.
+- **Permission banners**: `stream-multiplexer.ts` must stop auto-allowing and instead set `activePermissionRequest` in the stream store (`useStreamStore`). `ChatView.tsx` renders the banner when `activePermissionRequest.sessionId === currentSessionId`. Banner's Allow/Deny callbacks call `wsClient.send({ type: 'claude-permission-response', ... })` and clear the store. Backend is already paused waiting — no complex pause mechanism needed in frontend.
 - **Composer grid**: Currently `grid-template-rows: 1fr auto` (messages, composer). Permission banner adds a third row: `1fr auto auto`.
 
 </code_context>
