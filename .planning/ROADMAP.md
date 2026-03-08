@@ -214,7 +214,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 13. Composer | v1.1 | Complete    | 2026-03-07 | 2026-03-07 |
 | 14. Message Types | 3/3 | Complete    | 2026-03-07 | - |
 | 15. Tool Card Shell + State Machine | 2/2 | Complete    | 2026-03-07 | - |
-| 16. Per-Tool Cards | v1.1 | 0/3 | Not started | - |
+| 16. Per-Tool Cards | 1/3 | In Progress|  | - |
 | 17. Tool Grouping + Permissions | v1.1 | 0/? | Not started | - |
 | 18. Activity, Scroll, Polish | v1.1 | 0/? | Not started | - |
 | 19. Visual Effects + Enhancements | v1.1 | 0/? | Not started | - |

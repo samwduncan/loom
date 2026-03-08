@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Phase 16 context gathered
-last_updated: "2026-03-08T04:27:34.113Z"
-last_activity: 2026-03-07 -- Phase 15 complete (ToolChip integration + DefaultToolCard upgrade)
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-08T04:59:30Z"
+last_activity: 2026-03-08 -- Phase 16 Plan 01 complete (shared utilities + BashToolCard)
 progress:
   total_phases: 9
   completed_phases: 5
-  total_plans: 14
-  completed_plans: 14
-  percent: 100
+  total_plans: 17
+  completed_plans: 15
+  percent: 88
 ---
 
 # Project State
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 15 - Tool Card Shell + State Machine
+**Current focus:** Phase 16 - Per-Tool Cards
 
 ## Current Position
 
-Phase: 15 of 19 (Tool Card Shell + State Machine) -- COMPLETE
-Plan: 2 of 2 -- COMPLETE
+Phase: 16 of 19 (Per-Tool Cards)
+Plan: 1 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-07 -- Phase 15 complete (ToolChip integration + DefaultToolCard upgrade)
+Last activity: 2026-03-08 -- Phase 16 Plan 01 complete (shared utilities + BashToolCard)
 
-Progress: [##########] 100%
+Progress: [########--] 88%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6 (M2)
+- Total plans completed: 7 (M2)
 - M1 reference: 21 plans in 3 days
 
 | Phase | Plan | Duration | Tasks | Files |
@@ -55,6 +55,7 @@ Progress: [##########] 100%
 | Phase 14 P03 | 3min | 2 tasks | 7 files |
 | 15    | 01   | 3min     | 2     | 6     |
 | 15    | 02   | 4min     | 2     | 4     |
+| 16    | 01   | 7min     | 2     | 15    |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 15-02: Always-mounted ToolCardShell for smooth CSS Grid animation (not conditional render)
 - Phase 15-02: Adjust-state-during-rendering for error force-expand on transition to rejected
 - Phase 15-02: DefaultToolCard no-truncation policy with scrollable container
+- Phase 16-01: Skip backslash lines in diff output (No newline at end of file markers)
+- Phase 16-01: ANSI parser uses CSS classes only (no inline styles) per Constitution 7.14
+- Phase 16-01: TruncatedContent as wrapper component (not hook) for cleaner composition
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -119,6 +123,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T04:27:34.112Z
-Stopped at: Phase 16 context gathered
-Resume: Continue with Phase 16
+Last session: 2026-03-08T04:59:30Z
+Stopped at: Completed 16-01-PLAN.md
+Resume: Continue with Phase 16 Plan 02

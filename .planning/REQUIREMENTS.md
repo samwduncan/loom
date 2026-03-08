@@ -87,7 +87,7 @@
 
 ### Tool Cards — Per-Tool Implementations
 
-- [ ] **TOOL-10**: BashToolCard: command displayed in monospace header with `$` prefix. Output in terminal-styled container (dark `bg-surface-0`, monospace font, `whitespace-pre-wrap`). Long output truncated at ~50 lines with "Show more" expand.
+- [x] **TOOL-10**: BashToolCard: command displayed in monospace header with `$` prefix. Output in terminal-styled container (dark `bg-surface-0`, monospace font, `whitespace-pre-wrap`). Long output truncated at ~50 lines with "Show more" expand.
 - [ ] **TOOL-11**: ReadToolCard: file path in header with file icon. Content rendered with Shiki syntax highlighting (language inferred from file extension). Line numbers displayed. Long files truncated at ~100 lines with "Show more" expand.
 - [ ] **TOOL-12**: EditToolCard: file path in header. Unified diff view with green lines (`bg-diff-added`) for additions, red lines (`bg-diff-removed`) for deletions. Line numbers for both old and new. Diff parsing from tool output text.
 - [ ] **TOOL-13**: WriteToolCard: file path in header with file icon. Content preview (first ~20 lines) with Shiki highlighting. "Show full file" expand for longer content.
@@ -142,7 +142,7 @@
 ### Enhanced Chat Features
 
 - [x] **ENH-01**: Streamdown evaluation — if raw-to-formatted flash on stream completion feels jarring after Phase 1 ships, evaluate Streamdown as alternative streaming markdown renderer. Decision documented either way.
-- [ ] **ENH-02**: BashToolCard output supports ANSI color codes (bold, colors, underline) via lightweight ANSI-to-HTML conversion
+- [x] **ENH-02**: BashToolCard output supports ANSI color codes (bold, colors, underline) via lightweight ANSI-to-HTML conversion
 - [ ] **ENH-03**: Thinking block content renders markdown (bold, italic, code spans) via lightweight parser — not full react-markdown, just basic inline formatting
 - [ ] **ENH-04**: Error messages include retry affordance — "Retry" button resends the last user message
 - [ ] **ENH-05**: Message search within session — filter/highlight messages matching search text (basic substring match, not fuzzy)
@@ -241,7 +241,7 @@ Updated during roadmap creation (2026-03-07).
 | TOOL-04 | Phase 15 | Complete |
 | TOOL-05 | Phase 15 | Complete |
 | TOOL-06 | Phase 15 | Complete |
-| TOOL-10 | Phase 16 | Pending |
+| TOOL-10 | Phase 16 | Complete |
 | TOOL-11 | Phase 16 | Pending |
 | TOOL-12 | Phase 16 | Pending |
 | TOOL-13 | Phase 16 | Pending |
@@ -275,7 +275,7 @@ Updated during roadmap creation (2026-03-07).
 | UI-04 | Phase 19 | Pending |
 | UI-05 | Phase 19 | Pending |
 | ENH-01 | Phase 12 | Complete |
-| ENH-02 | Phase 16 | Pending |
+| ENH-02 | Phase 16 | Complete |
 | ENH-03 | Phase 19 | Pending |
 | ENH-04 | Phase 19 | Pending |
 | ENH-05 | Phase 19 | Pending |
