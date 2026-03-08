@@ -156,8 +156,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 17-01: TBD
-- [ ] 17-02: TBD
+- [ ] 17-01-PLAN.md -- groupToolCalls utility + ToolCallGroup component + AssistantMessage integration
+- [ ] 17-02-PLAN.md -- Streaming tool grouping in ActiveMessage
+- [ ] 17-03-PLAN.md -- Permission banner + countdown timer + multiplexer wiring + ChatView integration
 
 ### Phase 18: Activity, Scroll, Polish
 **Goal**: The chat experience feels complete and polished -- activity feedback, smooth scrolling, entrance animations, and streaming cursor
@@ -215,7 +216,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 14. Message Types | 3/3 | Complete    | 2026-03-07 | - |
 | 15. Tool Card Shell + State Machine | 2/2 | Complete    | 2026-03-07 | - |
 | 16. Per-Tool Cards | 3/3 | Complete    | 2026-03-08 | - |
-| 17. Tool Grouping + Permissions | v1.1 | 0/? | Not started | - |
+| 17. Tool Grouping + Permissions | v1.1 | 0/3 | Not started | - |
 | 18. Activity, Scroll, Polish | v1.1 | 0/? | Not started | - |
 | 19. Visual Effects + Enhancements | v1.1 | 0/? | Not started | - |
 
