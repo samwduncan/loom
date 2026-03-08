@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Completed 18-02-PLAN.md
-last_updated: "2026-03-08T22:05:19.632Z"
-last_activity: 2026-03-08 -- Phase 18 Plan 02 complete (scroll position preservation, ResizeObserver, unread badge, content-visibility)
+stopped_at: Completed 18-03-PLAN.md
+last_updated: "2026-03-08T22:13:00.000Z"
+last_activity: 2026-03-08 -- Phase 18 Plan 03 complete (token/cost display, entrance animations)
 progress:
   total_phases: 9
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 23
-  completed_plans: 22
-  percent: 96
+  completed_plans: 23
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 18 of 19 (Activity, Scroll, Polish)
-Plan: 2 of 3 -- COMPLETE
+Plan: 3 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 18 Plan 02 complete (scroll position preservation, ResizeObserver, unread badge, content-visibility)
+Last activity: 2026-03-08 -- Phase 18 Plan 03 complete (token/cost display, entrance animations)
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [██████████] 96%
 | Phase 17 P02 | 2min | 1 tasks | 1 files |
 | 18    | 01   | 3min     | 2     | 8     |
 | Phase 18 P02 | 4min | 2 tasks | 8 files |
+| 18    | 03   | 6min     | 2     | 19    |
 
 ## Accumulated Context
 
@@ -135,6 +136,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - [Phase 18-02]: ResizeObserver with rAF throttle for bottom lock during streaming content expansion
 - [Phase 18-02]: content-visibility: auto with containIntrinsicHeight for finalized messages
 - [Phase 18-02]: useEffect ref sync pattern for unread count (react-hooks/refs compliance)
+- Phase 18-03: Extend MessageMetadata with inputTokens/outputTokens/cacheReadTokens for granular display
+- Phase 18-03: Extract token data from SDKResultMessage.modelUsage (authoritative, sum across models)
+- Phase 18-03: Adjust-state-during-rendering for animation base index (react-hooks/refs compliance)
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -153,6 +157,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T22:05:19.630Z
-Stopped at: Completed 18-02-PLAN.md
-Resume: Continue with Phase 18 Plan 02
+Last session: 2026-03-08T22:13:00.000Z
+Stopped at: Completed 18-03-PLAN.md
+Resume: Phase 18 complete. All M2 plans shipped.

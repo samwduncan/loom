@@ -13,7 +13,7 @@
 - [x] **DEP-03**: Create Shiki singleton module (`shiki-highlighter.ts`) using JavaScript RegExp engine (no WASM), empty initial language set, `css-variables` theme
 - [x] **DEP-04**: Pre-load 7 common language grammars at app startup: JavaScript, TypeScript, Python, Bash, JSON, CSS, HTML. All other languages load on first encounter.
 - [x] **DEP-05**: Create Shiki OKLCH theme mapping file (`shiki-theme.ts`) that maps `--shiki-token-*` CSS custom properties to design tokens in `tokens.css`. Use Constitution Section 3.1 exception pattern for third-party theme objects.
-- [ ] **DEP-06**: Install tailwindcss-animate for message entrance animations (Constitution Tier 2 motion)
+- [x] **DEP-06**: Install tailwindcss-animate for message entrance animations (Constitution Tier 2 motion)
 
 ### Markdown Rendering — Finalized Messages
 
@@ -115,7 +115,7 @@
 - [x] **ACT-02**: Activity text fades in/out with CSS transition (200ms opacity). Truncates long paths with ellipsis (`truncate` class). Only visible when `isStreaming && activityText` is truthy.
 - [x] **ACT-03**: Activity text updates debounced to 200ms in the multiplexer (not on every `tool_progress` event) to prevent excessive re-renders.
 - [x] **ACT-04**: Activity status line positioned outside the scroll container (fixed relative to composer area) — never causes scroll height changes.
-- [ ] **ACT-05**: Token/cost display below each finalized assistant message: "1,234 in / 567 out · $0.003". Data from `Message.metadata.tokenCount` and `Message.metadata.cost`, populated from `token-budget` and `result` WebSocket events. Muted text (`text-muted text-xs`), always visible (not hover-only).
+- [x] **ACT-05**: Token/cost display below each finalized assistant message: "1,234 in / 567 out · $0.003". Data from `Message.metadata.tokenCount` and `Message.metadata.cost`, populated from `token-budget` and `result` WebSocket events. Muted text (`text-muted text-xs`), always visible (not hover-only).
 
 ### Scroll & Navigation
 
@@ -126,7 +126,7 @@
 
 ### Polish
 
-- [ ] **POL-01**: Message entrance animations: `animate-in fade-in-0 slide-in-from-bottom-2` via tailwindcss-animate. Duration 200ms, easing ease-out. Respects `prefers-reduced-motion` (instant, no animation). Only on newly appended messages, not on initial session load.
+- [x] **POL-01**: Message entrance animations: `animate-in fade-in-0 slide-in-from-bottom-2` via tailwindcss-animate. Duration 200ms, easing ease-out. Respects `prefers-reduced-motion` (instant, no animation). Only on newly appended messages, not on initial session load.
 - [x] **POL-02**: Streaming cursor: pulsing vertical bar at end of streaming text. Rose accent color (`var(--primary)`), 1s pulse cycle (opacity 0.4→1.0), hides on `data-phase="finalizing"` transition. Width 2px, height matches line-height.
 - [x] **POL-03**: Thinking block text: `italic text-muted font-mono text-sm` inside disclosure. Consistent with "internal monologue" visual language.
 - [x] **POL-04**: All CSS animations and transitions use design tokens (`--transition-fast`, `--transition-normal`, `--duration-*`) — no hardcoded durations. Constitution enforcement via existing ESLint rules.
@@ -188,7 +188,7 @@ Updated during roadmap creation (2026-03-07).
 | DEP-03 | Phase 11 | Complete |
 | DEP-04 | Phase 11 | Complete |
 | DEP-05 | Phase 11 | Complete |
-| DEP-06 | Phase 18 | Pending |
+| DEP-06 | Phase 18 | Complete |
 | MD-01 | Phase 11 | Complete |
 | MD-02 | Phase 11 | Complete |
 | MD-03 | Phase 11 | Complete |
@@ -260,12 +260,12 @@ Updated during roadmap creation (2026-03-07).
 | ACT-02 | Phase 18 | Complete |
 | ACT-03 | Phase 18 | Complete |
 | ACT-04 | Phase 18 | Complete |
-| ACT-05 | Phase 18 | Pending |
+| ACT-05 | Phase 18 | Complete |
 | NAV-01 | Phase 18 | Complete |
 | NAV-02 | Phase 18 | Complete |
 | NAV-03 | Phase 18 | Complete |
 | NAV-04 | Phase 18 | Complete |
-| POL-01 | Phase 18 | Pending |
+| POL-01 | Phase 18 | Complete |
 | POL-02 | Phase 18 | Complete |
 | POL-03 | Phase 18 | Complete |
 | POL-04 | Phase 18 | Complete |
