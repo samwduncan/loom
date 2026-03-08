@@ -219,6 +219,10 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 18. Activity, Scroll, Polish | v1.1 | 0/? | Not started | - |
 | 19. Visual Effects + Enhancements | v1.1 | 0/? | Not started | - |
 
+## Backlog (Future Milestones)
+
+- **Subagent Monitoring Panel** — When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (M4/M5 scope — needs backend `claude-sdk.js` changes to expose child process streams.)
+
 ---
 *Created: 2026-03-07*
 *Last updated: 2026-03-08*
