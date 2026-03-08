@@ -47,15 +47,22 @@ Each of the 6 registered tools (Bash, Read, Edit, Write, Glob, Grep) gets a purp
 - 2 context lines above/below each match (from Grep tool's `-C` output)
 - Summary: "8 matches in 4 files"
 - Truncation by file count (~5 files), "Show N more files" to expand
+- **Output parsing**: Grep tool output is ripgrep-style `file:line:content` format. Parser must handle this standard format. Match term highlighting: extract `pattern` from `input` and apply regex to output lines for accent highlighting. If output format doesn't match expected pattern, fall back to plain monospace rendering.
 
 ### ReadToolCard & WriteToolCard
 - Reuse existing `CodeBlock` component (Shiki highlighting, line numbers, copy button) or extract its core for card body use
 - ReadToolCard: file path with Lucide icon in card body, Shiki-highlighted content, language inferred from file extension, truncated at ~100 lines
 - WriteToolCard: file path with Lucide icon, Shiki-highlighted content preview (first ~20 lines), "Show full file" to expand
+- **Language inference**: Need a `getLanguageFromPath(filePath)` utility (in `shiki-highlighter.ts` or co-located) that maps file extensions to Shiki grammar IDs (`.ts` → `typescript`, `.py` → `python`, `.css` → `css`, etc.). CodeBlock currently receives language from markdown fence — ReadToolCard/WriteToolCard must infer it from `file_path` input.
 
 ### Icon migration
 - Replace emoji icons in tool-registry.ts with Lucide icons for consistency (File, FileCode, Terminal, GitCompare, Search, etc.)
 - Aligns with ToolCardShell which already uses Lucide AlertTriangle
+
+### File organization
+- Each per-tool card in its own `.tsx` file: `BashToolCard.tsx`, `ReadToolCard.tsx`, `EditToolCard.tsx`, `WriteToolCard.tsx`, `GlobToolCard.tsx`, `GrepToolCard.tsx` — all in `src/src/components/chat/tools/`
+- Registry (`tool-registry.ts`) stays lean: only config objects and imports. No card implementation code in the registry file.
+- Diff colors use existing design tokens: `--diff-added-bg` (oklch green) and `--diff-removed-bg` (oklch red) from `tokens.css`
 
 ### Claude's Discretion
 - Exact Lucide icon choices per file type
