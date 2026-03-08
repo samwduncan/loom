@@ -1,0 +1,9 @@
+/**
+ * StatusLine -- activity status line transition styles.
+ *
+ * Opacity transition using design tokens (POL-04).
+ */
+
+.status-line {
+  transition: opacity var(--duration-normal) var(--ease-out);
+}

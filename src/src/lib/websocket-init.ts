@@ -22,6 +22,9 @@ import type { ServerMessage } from '@/types/websocket';
 /** Double-init guard — prevents multiple connections from React strict mode or re-mounts */
 let isInitialized = false;
 
+/** Module-scoped debounce timer for activity text updates (200ms) */
+let activityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
 /** Reset the init guard — for tests only. */
 export function _resetInitForTesting(): void {
   isInitialized = false;
@@ -68,9 +71,22 @@ export async function initializeWebSocket(): Promise<void> {
       streamStore().updateToolCall(toolUseId, { status: 'executing' });
     },
 
-    onActivityText: (text) => streamStore().setActivityText(text),
+    onActivityText: (text) => {
+      if (activityDebounceTimer !== null) clearTimeout(activityDebounceTimer);
+      activityDebounceTimer = setTimeout(() => {
+        streamStore().setActivityText(text);
+        activityDebounceTimer = null;
+      }, 200);
+    },
     onStreamStart: () => streamStore().startStream(),
-    onStreamEnd: (_sessionId, _exitCode) => streamStore().endStream(),
+    onStreamEnd: (_sessionId, _exitCode) => {
+      // Clear pending activity debounce to avoid stale text after stream ends
+      if (activityDebounceTimer !== null) {
+        clearTimeout(activityDebounceTimer);
+        activityDebounceTimer = null;
+      }
+      streamStore().endStream();
+    },
 
     onError: (error, _sessionId) => {
       connectionStore().setProviderError('claude', error);

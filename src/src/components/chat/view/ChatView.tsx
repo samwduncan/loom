@@ -25,6 +25,7 @@ import { MessageList } from '@/components/chat/view/MessageList';
 import { MessageListSkeleton } from '@/components/chat/view/MessageListSkeleton';
 import { ChatComposer } from '@/components/chat/composer/ChatComposer';
 import { PermissionBanner } from '@/components/chat/tools/PermissionBanner';
+import { StatusLine } from '@/components/chat/view/StatusLine';
 import { cn } from '@/utils/cn';
 import type { Message } from '@/types/message';
 
@@ -78,7 +79,7 @@ export function ChatView() {
 
   return (
     <div
-      className="relative grid h-full grid-rows-[1fr_auto_auto]"
+      className="relative grid h-full grid-rows-[1fr_auto_auto_auto]"
       data-testid="chat-view"
     >
       {/* Thinking toggle — collapses/expands all thinking blocks globally */}
@@ -113,6 +114,7 @@ export function ChatView() {
           scrollContainerRef={scrollContainerRef}
         />
       )}
+      <StatusLine />
       <PermissionBanner sessionId={effectiveSessionId ?? null} />
       <ChatComposer
         projectName={projectName}
