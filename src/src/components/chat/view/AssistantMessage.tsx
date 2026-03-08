@@ -5,10 +5,10 @@
  * (bold, italic, code blocks, tables, links, etc.). Fenced code blocks
  * route to CodeBlock with Shiki syntax highlighting.
  *
- * Tool calls are rendered inline within the markdown content via
- * \x00TOOL:id\x00 markers. The rehypeToolMarkers plugin in MarkdownRenderer
- * converts these to <tool-marker> elements, which render as ToolChip
- * components via the component override system.
+ * Tool calls render AFTER markdown content as grouped or single components.
+ * Consecutive tool calls (2+) collapse into a ToolCallGroup accordion.
+ * Single tool calls render as standalone ToolChip components.
+ * Error tool calls are extracted from groups and shown separately.
  *
  * Wraps content in MessageContainer with role="assistant" for unified CSS
  * with streaming ActiveMessage (CLS prevention).
@@ -20,6 +20,9 @@ import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
 import { ProviderHeader } from '@/components/chat/provider-logos/ProviderHeader';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
+import { ToolChip } from '@/components/chat/tools/ToolChip';
+import { ToolCallGroup } from '@/components/chat/tools/ToolCallGroup';
+import { groupToolCalls } from '@/lib/groupToolCalls';
 import { useUIStore } from '@/stores/ui';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
@@ -29,24 +32,7 @@ interface AssistantMessageProps {
 }
 
 /**
- * Inject \x00TOOL:id\x00 markers into the content string for inline rendering.
- *
- * Strategy: Append markers at the end of content for each tool call.
- * Historical messages don't have position data, so markers go after the
- * main content separated by newlines. The markers render as inline ToolChip
- * components within the markdown flow.
- */
-function injectToolMarkers(content: string, toolCalls: NonNullable<Message['toolCalls']>): string {
-  if (toolCalls.length === 0) return content;
-
-  // Insert markers after the content, each on its own line for block-level placement
-  const markers = toolCalls.map((tc) => `\x00TOOL:${tc.id}\x00`).join('\n\n');
-  const trimmed = content.trimEnd();
-  return trimmed + '\n\n' + markers;
-}
-
-/**
- * Convert message toolCalls to ToolCallState array for MarkdownRenderer lookup.
+ * Convert message toolCalls to ToolCallState array.
  */
 function toToolCallStates(
   toolCalls: NonNullable<Message['toolCalls']>,
@@ -69,13 +55,11 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
   const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
   const hasThinking = message.thinkingBlocks && message.thinkingBlocks.length > 0;
 
-  const content = hasToolCalls
-    ? injectToolMarkers(message.content, message.toolCalls!) // ASSERT: hasToolCalls guards truthiness of toolCalls
-    : message.content;
-
   const toolCallStates = hasToolCalls
     ? toToolCallStates(message.toolCalls!, message.metadata.timestamp) // ASSERT: hasToolCalls guards truthiness of toolCalls
-    : undefined;
+    : [];
+
+  const partitions = hasToolCalls ? groupToolCalls(toolCallStates) : [];
 
   return (
     <MessageContainer role="assistant">
@@ -87,7 +71,19 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           globalExpanded={thinkingExpanded}
         />
       )}
-      <MarkdownRenderer content={content} toolCalls={toolCallStates} />
+      <MarkdownRenderer content={message.content} />
+      {partitions.map((partition, i) =>
+        partition.type === 'group' ? (
+          <ToolCallGroup
+            key={`group-${i}`}
+            tools={partition.tools}
+            errors={partition.errors}
+            defaultExpanded={false}
+          />
+        ) : (
+          <ToolChip key={partition.tool.id} toolCall={partition.tool} />
+        ),
+      )}
     </MessageContainer>
   );
 }

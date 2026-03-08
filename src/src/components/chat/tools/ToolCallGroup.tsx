@@ -54,11 +54,18 @@ export const ToolCallGroup = memo(function ToolCallGroup({
   return (
     <div className="tool-group" data-testid="tool-group">
       {/* Header -- always visible */}
-      <button
-        type="button"
+      <div
         className="tool-group-header"
         data-testid="tool-group-header"
+        role="button"
+        tabIndex={0}
         onClick={() => setIsExpanded((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded((prev) => !prev);
+          }
+        }}
         aria-expanded={isExpanded}
       >
         <ChevronRight
@@ -87,7 +94,7 @@ export const ToolCallGroup = memo(function ToolCallGroup({
             Expand all
           </button>
         )}
-      </button>
+      </div>
 
       {/* Body -- CSS Grid expand/collapse */}
       <div
