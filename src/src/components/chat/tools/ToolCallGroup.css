@@ -1,0 +1,129 @@
+/*
+ * ToolCallGroup styles -- collapsible group container for consecutive tool calls.
+ * Uses design tokens only -- no hardcoded colors.
+ * Constitution: No hex/HSL colors (7.14), no raw z-index (7.6).
+ */
+
+/* ─── Group Container ────────────────────────────────────────────────── */
+
+.tool-group {
+  margin: var(--space-1) 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: oklch(from var(--surface-1) l c h / 0.5);
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────── */
+
+.tool-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.tool-group-header:hover {
+  background: oklch(from var(--surface-1) l c h / 0.3);
+}
+
+/* ─── Header: Chevron ────────────────────────────────────────────────── */
+
+.tool-group-chevron {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.tool-group-chevron--expanded {
+  transform: rotate(90deg);
+}
+
+/* ─── Header: Count + Summary ────────────────────────────────────────── */
+
+.tool-group-count {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tool-group-separator {
+  color: var(--text-muted);
+  margin: 0 2px;
+}
+
+.tool-group-summary {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── Header: Expand All Button ──────────────────────────────────────── */
+
+.tool-group-expand-all {
+  margin-left: auto;
+  padding: 2px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+
+.tool-group-expand-all:hover {
+  border-color: var(--border-interactive);
+  color: var(--text-primary);
+}
+
+/* ─── Body: CSS Grid Expand/Collapse ─────────────────────────────────── */
+
+.tool-group-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-spring) var(--ease-spring);
+}
+
+.tool-group-body > div {
+  overflow: hidden;
+}
+
+.tool-group-body-inner {
+  padding: 4px 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ─── Error Tools (below group) ──────────────────────────────────────── */
+
+.tool-group-errors {
+  padding: 4px 12px 8px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-group-body {
+    transition: none;
+  }
+
+  .tool-group-chevron {
+    transition: none;
+  }
+}

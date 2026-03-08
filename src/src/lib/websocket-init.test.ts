@@ -39,6 +39,8 @@ const mockUpdateToolCall = vi.fn();
 const mockSetThinkingState = vi.fn();
 const mockSetActivityText = vi.fn();
 const mockSetActiveSessionId = vi.fn();
+const mockSetPermissionRequest = vi.fn();
+const mockClearPermissionRequest = vi.fn();
 
 vi.mock('@/stores/stream', () => ({
   useStreamStore: {
@@ -50,6 +52,8 @@ vi.mock('@/stores/stream', () => ({
       setThinkingState: mockSetThinkingState,
       setActivityText: mockSetActivityText,
       setActiveSessionId: mockSetActiveSessionId,
+      setPermissionRequest: mockSetPermissionRequest,
+      clearPermissionRequest: mockClearPermissionRequest,
       thinkingState: null,
     }),
   },
@@ -386,6 +390,55 @@ describe('initializeWebSocket', () => {
       expect(mockSetActiveSession).toHaveBeenCalledWith('real-session-id');
 
       replaceStateSpy.mockRestore();
+    });
+  });
+
+  describe('permission request callback wiring', () => {
+    it('wires onPermissionRequest to streamStore.setPermissionRequest', async () => {
+      await initializeWebSocket();
+
+      const configCall = mockConfigure.mock.calls[0] as [{ onMessage: (msg: ServerMessage) => void; onStateChange: (state: ConnectionState) => void }];
+      const onMessage = configCall[0].onMessage;
+
+      // Send a dummy message to capture callbacks
+      const dummyMsg: ServerMessage = { type: 'error', error: 'test' };
+      onMessage(dummyMsg);
+
+      const callArgs = mockRouteServerMessage.mock.calls[0] as [unknown, {
+        onPermissionRequest: (requestId: string, toolName: string, input: unknown, sessionId: string | null) => void;
+        onPermissionCancelled: (requestId: string) => void;
+      }, unknown];
+      const callbacks = callArgs[1];
+
+      // Invoke onPermissionRequest callback
+      callbacks.onPermissionRequest('pr-1', 'Bash', { command: 'npm test' }, 's1');
+
+      expect(mockSetPermissionRequest).toHaveBeenCalledWith({
+        requestId: 'pr-1',
+        toolName: 'Bash',
+        input: { command: 'npm test' },
+        sessionId: 's1',
+        receivedAt: expect.any(Number),
+      });
+    });
+
+    it('wires onPermissionCancelled to streamStore.clearPermissionRequest', async () => {
+      await initializeWebSocket();
+
+      const configCall = mockConfigure.mock.calls[0] as [{ onMessage: (msg: ServerMessage) => void; onStateChange: (state: ConnectionState) => void }];
+      const onMessage = configCall[0].onMessage;
+
+      const dummyMsg: ServerMessage = { type: 'error', error: 'test' };
+      onMessage(dummyMsg);
+
+      const callArgs = mockRouteServerMessage.mock.calls[0] as [unknown, {
+        onPermissionRequest: (requestId: string, toolName: string, input: unknown, sessionId: string | null) => void;
+        onPermissionCancelled: (requestId: string) => void;
+      }, unknown];
+      const callbacks = callArgs[1];
+
+      callbacks.onPermissionCancelled('pr-1');
+      expect(mockClearPermissionRequest).toHaveBeenCalled();
     });
   });
 

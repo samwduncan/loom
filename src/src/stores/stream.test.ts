@@ -129,6 +129,63 @@ describe('useStreamStore', () => {
     expect(useStreamStore.getState().activityText).toBe('Reading file...');
   });
 
+  // -- setPermissionRequest / clearPermissionRequest --
+  it('setPermissionRequest sets activePermissionRequest', () => {
+    const request = {
+      requestId: 'pr-1',
+      toolName: 'Bash',
+      input: { command: 'npm test' },
+      sessionId: 's1',
+      receivedAt: 1000,
+    };
+    useStreamStore.getState().setPermissionRequest(request);
+    expect(useStreamStore.getState().activePermissionRequest).toEqual(request);
+  });
+
+  it('setPermissionRequest replaces existing request (only one at a time)', () => {
+    const first = {
+      requestId: 'pr-1',
+      toolName: 'Bash',
+      input: { command: 'npm test' },
+      sessionId: 's1',
+      receivedAt: 1000,
+    };
+    const second = {
+      requestId: 'pr-2',
+      toolName: 'Write',
+      input: { file_path: '/tmp/foo' },
+      sessionId: 's1',
+      receivedAt: 2000,
+    };
+    useStreamStore.getState().setPermissionRequest(first);
+    useStreamStore.getState().setPermissionRequest(second);
+    expect(useStreamStore.getState().activePermissionRequest?.requestId).toBe('pr-2');
+  });
+
+  it('clearPermissionRequest nulls activePermissionRequest', () => {
+    useStreamStore.getState().setPermissionRequest({
+      requestId: 'pr-1',
+      toolName: 'Bash',
+      input: {},
+      sessionId: 's1',
+      receivedAt: 1000,
+    });
+    useStreamStore.getState().clearPermissionRequest();
+    expect(useStreamStore.getState().activePermissionRequest).toBeNull();
+  });
+
+  it('endStream clears activePermissionRequest', () => {
+    useStreamStore.getState().setPermissionRequest({
+      requestId: 'pr-1',
+      toolName: 'Bash',
+      input: {},
+      sessionId: 's1',
+      receivedAt: 1000,
+    });
+    useStreamStore.getState().endStream();
+    expect(useStreamStore.getState().activePermissionRequest).toBeNull();
+  });
+
   // -- reset --
   it('reset() restores initial state', () => {
     useStreamStore.getState().startStream();

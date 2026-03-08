@@ -21,11 +21,13 @@ import './tool-chip.css';
 
 export interface ToolChipProps {
   toolCall: ToolCallState;
+  /** Override initial expanded state (used by ToolCallGroup "Expand all") */
+  defaultExpanded?: boolean;
 }
 
-export const ToolChip = memo(function ToolChip({ toolCall }: ToolChipProps) {
+export const ToolChip = memo(function ToolChip({ toolCall, defaultExpanded }: ToolChipProps) {
   const [isExpanded, setIsExpanded] = useState(
-    toolCall.isError && toolCall.status === 'rejected',
+    defaultExpanded ?? (toolCall.isError && toolCall.status === 'rejected'),
   );
   const config = getToolConfig(toolCall.toolName);
   const chipLabel = config.getChipLabel(toolCall.input);

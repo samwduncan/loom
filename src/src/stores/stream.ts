@@ -11,6 +11,14 @@
 import { create } from 'zustand';
 import type { ThinkingState, ToolCallState } from '@/types/stream';
 
+export interface PermissionRequest {
+  requestId: string;
+  toolName: string;
+  input: unknown;
+  sessionId: string | null;
+  receivedAt: number;
+}
+
 interface StreamState {
   // Data
   isStreaming: boolean;
@@ -18,6 +26,7 @@ interface StreamState {
   activeToolCalls: ToolCallState[];
   thinkingState: ThinkingState | null;
   activityText: string;
+  activePermissionRequest: PermissionRequest | null;
 
   // Actions
   startStream: () => void;
@@ -30,6 +39,8 @@ interface StreamState {
   ) => void;
   setThinkingState: (thinkingState: ThinkingState | null) => void;
   setActivityText: (text: string) => void;
+  setPermissionRequest: (request: PermissionRequest) => void;
+  clearPermissionRequest: () => void;
   reset: () => void;
 }
 
@@ -39,6 +50,7 @@ const INITIAL_STREAM_STATE = {
   activeToolCalls: [] as ToolCallState[],
   thinkingState: null as ThinkingState | null,
   activityText: '',
+  activePermissionRequest: null as PermissionRequest | null,
 };
 
 export const useStreamStore = create<StreamState>()((set) => ({
@@ -76,6 +88,14 @@ export const useStreamStore = create<StreamState>()((set) => ({
 
   setActivityText: (text: string) => {
     set({ activityText: text });
+  },
+
+  setPermissionRequest: (request: PermissionRequest) => {
+    set({ activePermissionRequest: request });
+  },
+
+  clearPermissionRequest: () => {
+    set({ activePermissionRequest: null });
   },
 
   reset: () => {

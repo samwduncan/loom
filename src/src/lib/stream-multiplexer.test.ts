@@ -39,6 +39,7 @@ function createMockCallbacks(): MultiplexerCallbacks {
     onActiveSessions: vi.fn(),
     onTokenBudget: vi.fn(),
     onPermissionRequest: vi.fn(),
+    onPermissionCancelled: vi.fn(),
     onProjectsUpdated: vi.fn(),
   };
 }
@@ -281,9 +282,7 @@ describe('routeServerMessage', () => {
     expect(cbs.onError).toHaveBeenCalledWith('Process crashed', 's1');
   });
 
-  it('auto-allows read-only permission requests silently', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
+  it('auto-allows read-only permission requests silently via sendFn', () => {
     const msg: ServerMessage = {
       type: 'claude-permission-request',
       requestId: 'pr-1',
@@ -299,21 +298,11 @@ describe('routeServerMessage', () => {
       requestId: 'pr-1',
       allow: true,
     });
-    // Read is read-only -- no console.warn
-    expect(warnSpy).not.toHaveBeenCalled();
-    expect(cbs.onPermissionRequest).toHaveBeenCalledWith(
-      'pr-1',
-      'Read',
-      { file_path: 'test.ts' },
-      's1',
-    );
-
-    warnSpy.mockRestore();
+    // Read-only tools do NOT fire onPermissionRequest (auto-allowed)
+    expect(cbs.onPermissionRequest).not.toHaveBeenCalled();
   });
 
-  it('auto-allows write/execute permission requests with console.warn', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-
+  it('routes write/execute permission requests to onPermissionRequest without auto-sending', () => {
     const msg: ServerMessage = {
       type: 'claude-permission-request',
       requestId: 'pr-2',
@@ -324,23 +313,28 @@ describe('routeServerMessage', () => {
 
     routeServerMessage(msg, cbs, sendFn);
 
-    expect(sendFn).toHaveBeenCalledWith({
-      type: 'claude-permission-response',
-      requestId: 'pr-2',
-      allow: true,
-    });
-    expect(warnSpy).toHaveBeenCalledWith(
-      '[Loom] Auto-allowing write/execute tool:',
-      'Bash',
-    );
+    // Should NOT auto-send response for write/execute tools
+    expect(sendFn).not.toHaveBeenCalled();
+    // Should route to callback for UI display
     expect(cbs.onPermissionRequest).toHaveBeenCalledWith(
       'pr-2',
       'Bash',
       { command: 'rm -rf node_modules' },
       's1',
     );
+  });
 
-    warnSpy.mockRestore();
+  it('routes claude-permission-cancelled to onPermissionCancelled', () => {
+    const msg: ServerMessage = {
+      type: 'claude-permission-cancelled',
+      requestId: 'pr-1',
+      reason: 'timeout',
+      sessionId: 's1',
+    };
+
+    routeServerMessage(msg, cbs, sendFn);
+
+    expect(cbs.onPermissionCancelled).toHaveBeenCalledWith('pr-1');
   });
 
   it('routes token-budget to onTokenBudget', () => {

@@ -146,8 +146,18 @@ export async function initializeWebSocket(): Promise<void> {
       // Future: update session metadata
     },
 
-    onPermissionRequest: (_requestId, _toolName, _input, _sessionId) => {
-      // M2 permission UI
+    onPermissionRequest: (requestId, toolName, input, sessionId) => {
+      streamStore().setPermissionRequest({
+        requestId,
+        toolName,
+        input,
+        sessionId,
+        receivedAt: Date.now(),
+      });
+    },
+
+    onPermissionCancelled: () => {
+      streamStore().clearPermissionRequest();
     },
 
     onProjectsUpdated: () => {

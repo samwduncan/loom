@@ -63,6 +63,7 @@ export interface MultiplexerCallbacks {
     input: unknown,
     sessionId: string | null,
   ) => void;
+  onPermissionCancelled: (requestId: string) => void;
   onProjectsUpdated: () => void;
 }
 
@@ -231,27 +232,25 @@ export function routeServerMessage(
       callbacks.onError(msg.error, msg.sessionId);
       break;
     case 'claude-permission-request':
-      // Auto-allow all permissions in M1
-      if (!READ_ONLY_TOOLS.has(msg.toolName)) {
-        console.warn(
-          '[Loom] Auto-allowing write/execute tool:',
+      if (READ_ONLY_TOOLS.has(msg.toolName)) {
+        // Auto-allow read-only tools silently
+        sendFn({
+          type: 'claude-permission-response',
+          requestId: msg.requestId,
+          allow: true,
+        });
+      } else {
+        // Route write/execute tools to UI for user approval
+        callbacks.onPermissionRequest(
+          msg.requestId,
           msg.toolName,
+          msg.input,
+          msg.sessionId,
         );
       }
-      sendFn({
-        type: 'claude-permission-response',
-        requestId: msg.requestId,
-        allow: true,
-      });
-      callbacks.onPermissionRequest(
-        msg.requestId,
-        msg.toolName,
-        msg.input,
-        msg.sessionId,
-      );
       break;
     case 'claude-permission-cancelled':
-      // No-op in M1
+      callbacks.onPermissionCancelled(msg.requestId);
       break;
     case 'session-created':
       callbacks.onSessionCreated(msg.sessionId);
