@@ -18,6 +18,7 @@
  */
 
 import { useRef, useState, useEffect, useCallback, useLayoutEffect, type RefObject } from 'react';
+import { cn } from '@/utils/cn';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
 import { ErrorMessage } from '@/components/chat/view/ErrorMessage';
@@ -70,6 +71,39 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
     restoreScrollPosition,
     incrementUnread,
   } = useScrollAnchor(scrollRef);
+
+  // --- Entrance animation tracking ---
+  // Uses React "adjust state during rendering" pattern to track which messages
+  // are "new" (appended after initial render or session switch).
+  // Initial load and session switches suppress animations to avoid cascade.
+  const [animationState, setAnimationState] = useState({
+    prevCount: messages.length,
+    prevSessionId: sessionId,
+    newStartIndex: messages.length, // Start with all "old" (no animations on mount)
+  });
+
+  // Adjust state during rendering: detect message count changes and session switches
+  // without useEffect. React explicitly supports calling setState during render as
+  // long as it's guarded by a condition that prevents infinite loops.
+  if (sessionId !== animationState.prevSessionId) {
+    // Session switch: suppress animations, reset base
+    setAnimationState({
+      prevCount: messages.length,
+      prevSessionId: sessionId,
+      newStartIndex: messages.length,
+    });
+  } else if (messages.length !== animationState.prevCount) {
+    // Same session, new messages: animate messages at index >= previous count
+    setAnimationState({
+      prevCount: messages.length,
+      prevSessionId: sessionId,
+      newStartIndex: messages.length > animationState.prevCount
+        ? animationState.prevCount
+        : messages.length, // Count decreased (unlikely) -- no animations
+    });
+  }
+
+  const newStartIndex = animationState.newStartIndex;
 
   // Scroll position save/restore on session switch.
   // Saves old session position, restores target session position.
@@ -137,9 +171,13 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
       data-testid="message-list-scroll"
     >
       <div className="mx-auto max-w-3xl flex flex-col py-4">
-        {messages.map((msg) => (
+        {messages.map((msg, idx) => (
           <MessageErrorBoundary key={msg.id}>
-            {renderMessage(msg)}
+            <div className={cn(
+              idx >= newStartIndex && 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 duration-200'
+            )}>
+              {renderMessage(msg)}
+            </div>
           </MessageErrorBoundary>
         ))}
         {showActiveMessage && (
