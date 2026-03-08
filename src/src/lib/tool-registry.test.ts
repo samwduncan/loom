@@ -98,7 +98,8 @@ describe('tool-registry', () => {
       for (const name of names) {
         const config = getToolConfig(name);
         expect(config.renderCard).toBeDefined();
-        expect(typeof config.renderCard).toBe('function');
+        // memo()-wrapped components are objects with $$typeof, not plain functions
+        expect(['function', 'object']).toContain(typeof config.renderCard);
       }
     });
   });

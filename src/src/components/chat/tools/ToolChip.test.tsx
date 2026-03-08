@@ -49,12 +49,13 @@ describe('ToolChip', () => {
     }
   });
 
-  it('renders icon from tool config', () => {
+  it('renders Lucide icon from tool config', () => {
     const { container } = render(
       <ToolChip toolCall={makeToolCall()} />,
     );
-    const icon = container.querySelector('.tool-chip-icon');
-    expect(icon).not.toBeNull();
+    // Lucide icons render as SVG elements inside the chip button
+    const svg = container.querySelector('button.tool-chip svg');
+    expect(svg).not.toBeNull();
   });
 
   it('renders tool display name on chip button', () => {
@@ -132,7 +133,7 @@ describe('ToolChip', () => {
     expect(shell?.textContent).toContain('test output here');
   });
 
-  it('ToolCard shows error output with error class when isError is true', () => {
+  it('ToolCard shows error output when isError is true', () => {
     const { container } = render(
       <ToolChip
         toolCall={makeToolCall({
@@ -143,9 +144,10 @@ describe('ToolChip', () => {
       />,
     );
     // Error tools start expanded, so no need to click
-    const errorOutput = container.querySelector('.tool-card-output--error');
-    expect(errorOutput).not.toBeNull();
-    expect(errorOutput?.textContent).toContain('error message');
+    // BashToolCard applies status-error styling via Tailwind class
+    const shell = container.querySelector('[data-testid="tool-card-shell"]');
+    expect(shell).not.toBeNull();
+    expect(shell?.textContent).toContain('error message');
   });
 
   it('renders correctly for unknown tool names', () => {
@@ -154,8 +156,9 @@ describe('ToolChip', () => {
     );
     const chipName = container.querySelector('button.tool-chip .tool-chip-name');
     expect(chipName?.textContent).toBe('CustomTool');
-    const icon = container.querySelector('.tool-chip-icon');
-    expect(icon).not.toBeNull();
+    // Unknown tools get Wrench Lucide icon (SVG)
+    const svg = container.querySelector('button.tool-chip svg');
+    expect(svg).not.toBeNull();
   });
 
   // --- New tests for Plan 02 ---

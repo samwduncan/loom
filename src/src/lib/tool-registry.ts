@@ -5,7 +5,8 @@
  * use createElement to avoid JSX requirement, keeping this as .ts not .tsx.
  *
  * 6 registered tools (Bash, Read, Edit, Write, Glob, Grep) self-register at
- * module scope. Unknown tools get a graceful default config.
+ * module scope with Lucide icons and per-tool card components.
+ * Unknown tools get a graceful default config with Wrench icon.
  *
  * Constitution: Named exports only (2.2), no default export.
  */
@@ -13,6 +14,25 @@
 import { createElement } from 'react';
 import type { ComponentType } from 'react';
 import type { ToolCallStatus } from '@/types/stream';
+
+// Lucide icons
+import {
+  Terminal,
+  FileText,
+  FilePen,
+  FilePlus,
+  FolderSearch,
+  Search,
+  Wrench,
+} from 'lucide-react';
+
+// Per-tool card components
+import { BashToolCard } from '@/components/chat/tools/BashToolCard';
+import { ReadToolCard } from '@/components/chat/tools/ReadToolCard';
+import { EditToolCard } from '@/components/chat/tools/EditToolCard';
+import { WriteToolCard } from '@/components/chat/tools/WriteToolCard';
+import { GlobToolCard } from '@/components/chat/tools/GlobToolCard';
+import { GrepToolCard } from '@/components/chat/tools/GrepToolCard';
 
 // ---------------------------------------------------------------------------
 // Public interfaces
@@ -55,33 +75,33 @@ function defaultChipLabel(input: Record<string, unknown>): string {
 }
 
 // ---------------------------------------------------------------------------
-// Icon components (createElement -- no JSX needed)
+// Icon components (Lucide icons via createElement -- no JSX needed)
 // ---------------------------------------------------------------------------
 
 function BashIcon() {
-  return createElement('span', { className: 'tool-chip-icon' }, '\u25B6');
+  return createElement(Terminal, { size: 14 });
 }
 function ReadIcon() {
-  return createElement('span', { className: 'tool-chip-icon' }, '\uD83D\uDCC4');
+  return createElement(FileText, { size: 14 });
 }
 function EditIcon() {
-  return createElement('span', { className: 'tool-chip-icon' }, '\u270F\uFE0F');
+  return createElement(FilePen, { size: 14 });
 }
 function WriteIcon() {
-  return createElement('span', { className: 'tool-chip-icon' }, '\uD83D\uDCDD');
+  return createElement(FilePlus, { size: 14 });
 }
 function GlobIcon() {
-  return createElement('span', { className: 'tool-chip-icon' }, '\uD83D\uDD0D');
+  return createElement(FolderSearch, { size: 14 });
 }
 function GrepIcon() {
-  return createElement('span', { className: 'tool-chip-icon' }, '\uD83D\uDD0E');
+  return createElement(Search, { size: 14 });
 }
 function DefaultIcon() {
-  return createElement('span', { className: 'tool-chip-icon' }, '\u2699\uFE0F');
+  return createElement(Wrench, { size: 14 });
 }
 
 // ---------------------------------------------------------------------------
-// Default tool card (shared in M1 for all tools)
+// Default tool card (fallback for unregistered tools)
 // ---------------------------------------------------------------------------
 
 function DefaultToolCard(props: ToolCardProps) {
@@ -187,40 +207,40 @@ registerTool('Bash', {
   displayName: 'Bash',
   icon: BashIcon,
   getChipLabel: bashChipLabel,
-  renderCard: DefaultToolCard,
+  renderCard: BashToolCard,
 });
 
 registerTool('Read', {
   displayName: 'Read',
   icon: ReadIcon,
   getChipLabel: (input) => filePathChipLabel('Read', input),
-  renderCard: DefaultToolCard,
+  renderCard: ReadToolCard,
 });
 
 registerTool('Edit', {
   displayName: 'Edit',
   icon: EditIcon,
   getChipLabel: (input) => filePathChipLabel('Edit', input),
-  renderCard: DefaultToolCard,
+  renderCard: EditToolCard,
 });
 
 registerTool('Write', {
   displayName: 'Write',
   icon: WriteIcon,
   getChipLabel: (input) => filePathChipLabel('Write', input),
-  renderCard: DefaultToolCard,
+  renderCard: WriteToolCard,
 });
 
 registerTool('Glob', {
   displayName: 'Glob',
   icon: GlobIcon,
   getChipLabel: (input) => patternChipLabel('Glob', input),
-  renderCard: DefaultToolCard,
+  renderCard: GlobToolCard,
 });
 
 registerTool('Grep', {
   displayName: 'Grep',
   icon: GrepIcon,
   getChipLabel: (input) => patternChipLabel('Grep', input),
-  renderCard: DefaultToolCard,
+  renderCard: GrepToolCard,
 });
