@@ -19,6 +19,12 @@ export interface PermissionRequest {
   receivedAt: number;
 }
 
+export interface ResultTokens {
+  input: number;
+  output: number;
+  cacheRead?: number;
+}
+
 interface StreamState {
   // Data
   isStreaming: boolean;
@@ -27,6 +33,8 @@ interface StreamState {
   thinkingState: ThinkingState | null;
   activityText: string;
   activePermissionRequest: PermissionRequest | null;
+  resultTokens: ResultTokens | null;
+  resultCost: number | null;
 
   // Actions
   startStream: () => void;
@@ -41,6 +49,8 @@ interface StreamState {
   setActivityText: (text: string) => void;
   setPermissionRequest: (request: PermissionRequest) => void;
   clearPermissionRequest: () => void;
+  setResultData: (tokens: ResultTokens, cost: number) => void;
+  clearResultData: () => void;
   reset: () => void;
 }
 
@@ -51,13 +61,15 @@ const INITIAL_STREAM_STATE = {
   thinkingState: null as ThinkingState | null,
   activityText: '',
   activePermissionRequest: null as PermissionRequest | null,
+  resultTokens: null as ResultTokens | null,
+  resultCost: null as number | null,
 };
 
 export const useStreamStore = create<StreamState>()((set) => ({
   ...INITIAL_STREAM_STATE,
 
   startStream: () => {
-    set({ isStreaming: true });
+    set({ isStreaming: true, resultTokens: null, resultCost: null });
   },
 
   setActiveSessionId: (sessionId: string) => {
@@ -96,6 +108,14 @@ export const useStreamStore = create<StreamState>()((set) => ({
 
   clearPermissionRequest: () => {
     set({ activePermissionRequest: null });
+  },
+
+  setResultData: (tokens: ResultTokens, cost: number) => {
+    set({ resultTokens: tokens, resultCost: cost });
+  },
+
+  clearResultData: () => {
+    set({ resultTokens: null, resultCost: null });
   },
 
   reset: () => {

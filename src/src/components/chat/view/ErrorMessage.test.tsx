@@ -15,6 +15,9 @@ function makeErrorMessage(content: string): Message {
     metadata: {
       timestamp: '2026-03-07T12:00:00Z',
       tokenCount: null,
+      inputTokens: null,
+      outputTokens: null,
+      cacheReadTokens: null,
       cost: null,
       duration: null,
     },

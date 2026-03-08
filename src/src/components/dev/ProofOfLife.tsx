@@ -98,6 +98,9 @@ export function ProofOfLife() {
       metadata: {
         timestamp: new Date().toISOString(),
         tokenCount: null,
+        inputTokens: null,
+        outputTokens: null,
+        cacheReadTokens: null,
         cost: null,
         duration: null,
       },

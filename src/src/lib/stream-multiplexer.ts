@@ -13,6 +13,7 @@ import type {
   ClientMessage,
 } from '@/types/websocket';
 import type { ToolCallState } from '@/types/stream';
+import type { ResultTokens } from '@/stores/stream';
 
 // ---------------------------------------------------------------------------
 // Callback interface -- injected by websocket-init.ts
@@ -64,6 +65,7 @@ export interface MultiplexerCallbacks {
     sessionId: string | null,
   ) => void;
   onPermissionCancelled: (requestId: string) => void;
+  onResultData: (tokens: ResultTokens, cost: number) => void;
   onProjectsUpdated: () => void;
 }
 
@@ -183,10 +185,34 @@ export function routeClaudeResponse(
       }
       break;
     }
-    case 'result':
+    case 'result': {
+      // Extract token usage from modelUsage (keyed by model name)
+      const modelUsage = data.modelUsage ?? {};
+      let inputTokens = 0;
+      let outputTokens = 0;
+      let cacheReadTokens = 0;
+
+      for (const key of Object.keys(modelUsage)) {
+        const usage = modelUsage[key] as Record<string, number> | undefined;
+        if (usage && typeof usage === 'object') {
+          inputTokens += usage.input_tokens ?? 0;
+          outputTokens += usage.output_tokens ?? 0;
+          cacheReadTokens += usage.cache_read_input_tokens ?? 0;
+        }
+      }
+
+      const cost = typeof data.total_cost_usd === 'number' ? data.total_cost_usd : 0;
+      const tokens: ResultTokens = { input: inputTokens, output: outputTokens };
+      if (cacheReadTokens > 0) tokens.cacheRead = cacheReadTokens;
+
+      if (inputTokens > 0 || outputTokens > 0 || cost > 0) {
+        callbacks.onResultData(tokens, cost);
+      }
+
       // Informational -- actual exit code comes from claude-complete
       callbacks.onStreamEnd(sessionId ?? '', 0);
       break;
+    }
     case 'system':
       if (data.subtype === 'init') {
         callbacks.onActivityText('Initializing session...');

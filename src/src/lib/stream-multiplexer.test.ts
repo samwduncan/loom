@@ -40,6 +40,7 @@ function createMockCallbacks(): MultiplexerCallbacks {
     onTokenBudget: vi.fn(),
     onPermissionRequest: vi.fn(),
     onPermissionCancelled: vi.fn(),
+    onResultData: vi.fn(),
     onProjectsUpdated: vi.fn(),
   };
 }

@@ -18,6 +18,9 @@ function createTestMetadata(overrides?: Partial<MessageMetadata>): MessageMetada
   return {
     timestamp: '2026-03-05T12:00:00Z',
     tokenCount: null,
+    inputTokens: null,
+    outputTokens: null,
+    cacheReadTokens: null,
     cost: null,
     duration: null,
     ...overrides,

@@ -22,6 +22,7 @@ import { ProviderHeader } from '@/components/chat/provider-logos/ProviderHeader'
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import { ToolCallGroup } from '@/components/chat/tools/ToolCallGroup';
+import { TokenUsage } from '@/components/chat/view/TokenUsage';
 import { groupToolCalls } from '@/lib/groupToolCalls';
 import { useUIStore } from '@/stores/ui';
 import type { Message } from '@/types/message';
@@ -84,6 +85,7 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           <ToolChip key={partition.tool.id} toolCall={partition.tool} />
         ),
       )}
+      <TokenUsage metadata={message.metadata} />
     </MessageContainer>
   );
 }

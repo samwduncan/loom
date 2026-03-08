@@ -131,14 +131,23 @@ export const ActiveMessage = memo(function ActiveMessage(
       });
     }
 
+    // Read result data from stream store (populated by multiplexer onResultData)
+    // eslint-disable-next-line loom/no-external-store-mutation -- one-time read in callback, not mutation
+    const resultTokens = useStreamStore.getState().resultTokens;
+    // eslint-disable-next-line loom/no-external-store-mutation -- one-time read in callback, not mutation
+    const resultCost = useStreamStore.getState().resultCost;
+
     const message: Message = {
       id: Math.random().toString(36).slice(2, 10),
       role: 'assistant',
       content: text,
       metadata: {
         timestamp: new Date().toISOString(),
-        tokenCount: null,
-        cost: null,
+        tokenCount: resultTokens ? resultTokens.input + resultTokens.output : null,
+        inputTokens: resultTokens?.input ?? null,
+        outputTokens: resultTokens?.output ?? null,
+        cacheReadTokens: resultTokens?.cacheRead ?? null,
+        cost: resultCost,
         duration: null,
       },
       providerContext: {

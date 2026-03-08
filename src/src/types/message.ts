@@ -18,6 +18,9 @@ export type MessageRole =
 export interface MessageMetadata {
   timestamp: string;
   tokenCount: number | null;
+  inputTokens: number | null;
+  outputTokens: number | null;
+  cacheReadTokens: number | null;
   cost: number | null;
   duration: number | null;
   /** True when message was sent during active streaming (queued for processing) */

@@ -44,7 +44,7 @@ vi.mock('@/lib/transformMessages', () => ({
         id: `msg-${i}`,
         role: e.message.role,
         content: typeof e.message.content === 'string' ? e.message.content : '',
-        metadata: { timestamp: new Date().toISOString(), tokenCount: null, cost: null, duration: null },
+        metadata: { timestamp: new Date().toISOString(), tokenCount: null, inputTokens: null, outputTokens: null, cacheReadTokens: null, cost: null, duration: null },
         providerContext: { providerId: 'claude', modelId: '', agentName: null },
       }));
   },
@@ -81,7 +81,7 @@ describe('useSessionSwitch', () => {
           id: 'msg-1',
           role: 'user',
           content: 'hello',
-          metadata: { timestamp: '2026-01-01', tokenCount: null, cost: null, duration: null },
+          metadata: { timestamp: '2026-01-01', tokenCount: null, inputTokens: null, outputTokens: null, cacheReadTokens: null, cost: null, duration: null },
           providerContext: { providerId: 'claude', modelId: '', agentName: null },
         },
       ],

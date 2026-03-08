@@ -137,6 +137,9 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
         metadata: {
           timestamp: entry.timestamp ?? new Date().toISOString(),
           tokenCount: null,
+          inputTokens: null,
+          outputTokens: null,
+          cacheReadTokens: null,
           cost: null,
           duration: null,
         },
@@ -182,6 +185,9 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
         metadata: {
           timestamp: entry.timestamp ?? new Date().toISOString(),
           tokenCount: null,
+          inputTokens: null,
+          outputTokens: null,
+          cacheReadTokens: null,
           cost: null,
           duration: null,
         },
@@ -204,6 +210,9 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
         metadata: {
           timestamp: entry.timestamp ?? new Date().toISOString(),
           tokenCount: null,
+          inputTokens: null,
+          outputTokens: null,
+          cacheReadTokens: null,
           cost: null,
           duration: null,
         },

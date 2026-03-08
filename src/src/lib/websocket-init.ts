@@ -162,6 +162,8 @@ export async function initializeWebSocket(): Promise<void> {
       // Future: update session metadata
     },
 
+    onResultData: (tokens, cost) => streamStore().setResultData(tokens, cost),
+
     onPermissionRequest: (requestId, toolName, input, sessionId) => {
       streamStore().setPermissionRequest({
         requestId,

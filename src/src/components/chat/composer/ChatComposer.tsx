@@ -195,6 +195,9 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         metadata: {
           timestamp: new Date().toISOString(),
           tokenCount: null,
+          inputTokens: null,
+          outputTokens: null,
+          cacheReadTokens: null,
           cost: null,
           duration: null,
           queued: true,
@@ -269,6 +272,9 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         metadata: {
           timestamp: new Date().toISOString(),
           tokenCount: null,
+          inputTokens: null,
+          outputTokens: null,
+          cacheReadTokens: null,
           cost: null,
           duration: null,
         },
