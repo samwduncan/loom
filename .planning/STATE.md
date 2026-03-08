@@ -4,14 +4,14 @@ milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
 stopped_at: Completed 17-02-PLAN.md
-last_updated: "2026-03-08T18:01:55.021Z"
-last_activity: 2026-03-08 -- Phase 17 Plan 03 complete (PermissionBanner + CountdownRing + ChatView integration)
+last_updated: "2026-03-08T18:05:33.900Z"
+last_activity: 2026-03-08 -- Phase 17 Plan 02 complete (streaming tool grouping in ActiveMessage)
 progress:
   total_phases: 9
   completed_phases: 7
   total_plans: 20
   completed_plans: 20
-  percent: 95
+  percent: 100
 ---
 
 # Project State
