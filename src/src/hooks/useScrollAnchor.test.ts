@@ -179,14 +179,58 @@ describe('useScrollAnchor', () => {
     expect(result.current.showPill).toBe(true);
   });
 
-  it('showPill is false when not streaming (even if scrolled up)', () => {
+  it('showPill is true when scrolled up, regardless of streaming state', () => {
     const { result } = setupHook(false);
 
     act(() => {
       triggerObserver(false);
     });
 
-    expect(result.current.showPill).toBe(false);
+    // Pill shows whenever user is scrolled away from bottom (not gated on streaming)
+    expect(result.current.showPill).toBe(true);
+  });
+
+  it('unreadCount starts at 0 and increments via incrementUnread', () => {
+    const { result } = setupHook(false);
+    expect(result.current.unreadCount).toBe(0);
+
+    act(() => {
+      result.current.incrementUnread(3);
+    });
+    expect(result.current.unreadCount).toBe(3);
+
+    act(() => {
+      result.current.incrementUnread(2);
+    });
+    expect(result.current.unreadCount).toBe(5);
+  });
+
+  it('resetUnread clears the count', () => {
+    const { result } = setupHook(false);
+
+    act(() => {
+      result.current.incrementUnread(5);
+    });
+    expect(result.current.unreadCount).toBe(5);
+
+    act(() => {
+      result.current.resetUnread();
+    });
+    expect(result.current.unreadCount).toBe(0);
+  });
+
+  it('scrollToBottom resets unread count', () => {
+    const { result } = setupHook(false);
+
+    act(() => {
+      result.current.incrementUnread(3);
+    });
+    expect(result.current.unreadCount).toBe(3);
+
+    act(() => {
+      result.current.scrollToBottom();
+    });
+    expect(result.current.unreadCount).toBe(0);
   });
 
   it('scrollToBottom calls scrollIntoView on sentinel with smooth behavior', () => {
