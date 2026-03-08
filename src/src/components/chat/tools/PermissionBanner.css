@@ -1,0 +1,76 @@
+/**
+ * PermissionBanner styles -- slide animation, layout, and countdown pulse.
+ *
+ * Uses design tokens only (Constitution 7.14).
+ */
+
+/* Banner container */
+.permission-banner {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg, 0.5rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+}
+
+/* Enter animation: slide up + fade in */
+.permission-banner-enter {
+  animation: permission-slide-in 200ms ease-out forwards;
+}
+
+@keyframes permission-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Exit animation: slide down + fade out */
+.permission-banner-exit {
+  animation: permission-slide-out 150ms ease-in forwards;
+}
+
+@keyframes permission-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Countdown ring pulse (last 10 seconds) */
+.countdown-ring-pulse {
+  animation: countdown-pulse 1s ease-in-out infinite;
+}
+
+@keyframes countdown-pulse {
+  0%, 100% {
+    transform: rotate(-90deg) scale(1);
+  }
+  50% {
+    transform: rotate(-90deg) scale(1.05);
+  }
+}
+
+/* Reduced motion: instant transitions, no animations */
+@media (prefers-reduced-motion: reduce) {
+  .permission-banner-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .permission-banner-exit {
+    animation: none;
+  }
+
+  .countdown-ring-pulse {
+    animation: none;
+  }
+}
