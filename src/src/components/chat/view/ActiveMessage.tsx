@@ -15,12 +15,13 @@
  * Constitution: Named export (2.2), contain:content (10.3), React.memo (perf).
  */
 
-import { memo, useRef, useCallback, useEffect, useState } from 'react';
+import { memo, useRef, useCallback, useEffect, useState, useMemo } from 'react';
 import { useStreamBuffer } from '@/hooks/useStreamBuffer';
 import { useTimelineStore } from '@/stores/timeline';
 import { useStreamStore } from '@/stores/stream';
 import { useUIStore } from '@/stores/ui';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
+import { ToolCallGroup } from '@/components/chat/tools/ToolCallGroup';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
@@ -267,6 +268,34 @@ export const ActiveMessage = memo(function ActiveMessage(
     [],
   );
 
+  // Derive render chunks from segments: leading text, grouped tools, trailing text.
+  // During streaming, tools are always consecutive (text spans between them are empty
+  // checkpointed spans). This groups 2+ consecutive tool segments into a ToolCallGroup.
+  const renderChunks = useMemo(() => {
+    type TextSeg = Extract<Segment, { type: 'text' }>;
+    type ToolSeg = Extract<Segment, { type: 'tool' }>;
+
+    const toolSegs: ToolSeg[] = [];
+    const leadingText: TextSeg[] = [];
+    let trailingText: TextSeg | null = null;
+    let foundFirstTool = false;
+
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i]!; // ASSERT: loop index i is within bounds [0, segments.length)
+      if (seg.type === 'tool') {
+        foundFirstTool = true;
+        toolSegs.push(seg);
+      } else if (!foundFirstTool) {
+        leadingText.push(seg);
+      } else {
+        // Text segment after a tool — only the last one matters (receives streaming content)
+        trailingText = seg;
+      }
+    }
+
+    return { leadingText, toolSegs, trailingText };
+  }, [segments]);
+
   return (
     <MessageContainer role="assistant">
       <div
@@ -283,12 +312,30 @@ export const ActiveMessage = memo(function ActiveMessage(
               isStreaming={thinkingState?.isThinking ?? false}
               globalExpanded={thinkingExpanded}
             />
-            {segments.map((seg) => {
-              if (seg.type === 'text') {
-                return <span key={seg.id} ref={makeTextRefCallback(seg.id)} />;
-              }
-              return <ToolChipFromStore key={seg.toolCallId} toolCallId={seg.toolCallId} />;
-            })}
+            {/* Leading text spans (before any tools) */}
+            {renderChunks.leadingText.map((seg) => (
+              <span key={seg.id} ref={makeTextRefCallback(seg.id)} />
+            ))}
+            {/* Tool calls: group 2+ into ToolCallGroup, single as ToolChipFromStore */}
+            {renderChunks.toolSegs.length >= 2 ? (
+              <ToolCallGroupFromStore
+                toolCallIds={renderChunks.toolSegs.map((seg) => seg.toolCallId)}
+              />
+            ) : (
+              renderChunks.toolSegs.map((seg) => (
+                <ToolChipFromStore
+                  key={seg.toolCallId}
+                  toolCallId={seg.toolCallId}
+                />
+              ))
+            )}
+            {/* Trailing text span (receives streaming content after last tool) */}
+            {renderChunks.trailingText && (
+              <span
+                key={renderChunks.trailingText.id}
+                ref={makeTextRefCallback(renderChunks.trailingText.id)}
+              />
+            )}
             <span className="streaming-cursor" data-testid="streaming-cursor" />
           </div>
         )}
@@ -319,4 +366,43 @@ function ToolChipFromStore({ toolCallId }: { toolCallId: string }) {
 
   if (!toolCall) return null;
   return <ToolChip toolCall={toolCall} />;
+}
+
+/**
+ * ToolCallGroupFromStore — subscribes to multiple tool calls and renders
+ * them inside a ToolCallGroup container during streaming.
+ *
+ * Groups start expanded (defaultExpanded=true) so users can see tool
+ * activity in real time. Error tools are extracted from the group.
+ */
+function ToolCallGroupFromStore({ toolCallIds }: { toolCallIds: string[] }) {
+  const toolCalls = useStreamStore((state) =>
+    toolCallIds
+      .map((id) => state.activeToolCalls.find((tc: ToolCallState) => tc.id === id))
+      .filter((tc): tc is ToolCallState => tc != null),
+  );
+
+  if (toolCalls.length === 0) return null;
+
+  // If demoted to single (shouldn't happen, but safety)
+  if (toolCalls.length === 1) {
+    return <ToolChip toolCall={toolCalls[0]!} />; // ASSERT: length === 1 guarantees index 0 exists
+  }
+
+  const errors = toolCalls.filter((tc) => tc.isError);
+  const nonErrors = toolCalls.filter((tc) => !tc.isError);
+
+  // If all tools are errors, show them individually
+  if (nonErrors.length === 0) {
+    return (
+      <>
+        {errors.map((tc) => (
+          <ToolChip key={tc.id} toolCall={tc} />
+        ))}
+      </>
+    );
+  }
+
+  // During streaming, show group expanded so user sees what's happening
+  return <ToolCallGroup tools={nonErrors} errors={errors} defaultExpanded />;
 }
