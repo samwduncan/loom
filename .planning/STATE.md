@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Completed 16-01-PLAN.md
-last_updated: "2026-03-08T05:05:56Z"
-last_activity: 2026-03-08 -- Phase 16 Plan 02 complete (ReadToolCard + WriteToolCard + EditToolCard)
+stopped_at: Completed 16-03-PLAN.md
+last_updated: "2026-03-08T05:08:30Z"
+last_activity: 2026-03-08 -- Phase 16 complete (GlobToolCard + GrepToolCard + Lucide registry migration)
 progress:
   total_phases: 9
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 17
-  completed_plans: 16
-  percent: 94
+  completed_plans: 17
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 16 of 19 (Per-Tool Cards)
-Plan: 2 of 3 -- COMPLETE
+Phase: 16 of 19 (Per-Tool Cards) -- COMPLETE
+Plan: 3 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 16 Plan 02 complete (ReadToolCard + WriteToolCard + EditToolCard)
+Last activity: 2026-03-08 -- Phase 16 complete (GlobToolCard + GrepToolCard + Lucide registry migration)
 
-Progress: [#########-] 94%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [#########-] 94%
 | 15    | 02   | 4min     | 2     | 4     |
 | 16    | 01   | 7min     | 2     | 15    |
 | 16    | 02   | 3min     | 2     | 6     |
+| 16    | 03   | 5min     | 2     | 7     |
 
 ## Accumulated Context
 
@@ -106,6 +107,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 16-01: Skip backslash lines in diff output (No newline at end of file markers)
 - Phase 16-01: ANSI parser uses CSS classes only (no inline styles) per Constitution 7.14
 - Phase 16-01: TruncatedContent as wrapper component (not hook) for cleaner composition
+- Phase 16-03: Lucide icons via createElement (keeps tool-registry.ts as .ts, no JSX)
+- Phase 16-03: GrepToolCard local state for file truncation (items are GrepFileGroup[], not TruncatedContent strings)
+- Phase 16-03: safeRegex wrapper for match highlighting (invalid user patterns degrade gracefully)
 - Phase 16-02: FileContentCard shared component for Read/Write Shiki-highlighted file display
 - Phase 16-02: Early return in useEffect for text language (avoid setState-in-effect ESLint violation)
 - Phase 16-02: No Shiki inside diffs -- line coloring only with bg-diff-added/bg-diff-removed
@@ -128,6 +132,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T05:05:56Z
-Stopped at: Completed 16-02-PLAN.md
-Resume: Continue with Phase 16 Plan 03
+Last session: 2026-03-08T05:08:30Z
+Stopped at: Completed 16-03-PLAN.md
+Resume: Continue with Phase 17

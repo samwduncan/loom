@@ -91,8 +91,8 @@
 - [x] **TOOL-11**: ReadToolCard: file path in header with file icon. Content rendered with Shiki syntax highlighting (language inferred from file extension). Line numbers displayed. Long files truncated at ~100 lines with "Show more" expand.
 - [x] **TOOL-12**: EditToolCard: file path in header. Unified diff view with green lines (`bg-diff-added`) for additions, red lines (`bg-diff-removed`) for deletions. Line numbers for both old and new. Diff parsing from tool output text.
 - [x] **TOOL-13**: WriteToolCard: file path in header with file icon. Content preview (first ~20 lines) with Shiki highlighting. "Show full file" expand for longer content.
-- [ ] **TOOL-14**: GlobToolCard: glob pattern in header. Results as bulleted file list with file type icons. Count shown in header ("12 files found").
-- [ ] **TOOL-15**: GrepToolCard: search pattern in header. Match results with file path, line number, and highlighted match context (2 lines before/after). Match term highlighted with `bg-primary/20`.
+- [x] **TOOL-14**: GlobToolCard: glob pattern in header. Results as bulleted file list with file type icons. Count shown in header ("12 files found").
+- [x] **TOOL-15**: GrepToolCard: search pattern in header. Match results with file path, line number, and highlighted match context (2 lines before/after). Match term highlighted with `bg-primary/20`.
 
 ### Tool Cards — Grouping
 
@@ -245,8 +245,8 @@ Updated during roadmap creation (2026-03-07).
 | TOOL-11 | Phase 16 | Complete |
 | TOOL-12 | Phase 16 | Complete |
 | TOOL-13 | Phase 16 | Complete |
-| TOOL-14 | Phase 16 | Pending |
-| TOOL-15 | Phase 16 | Pending |
+| TOOL-14 | Phase 16 | Complete |
+| TOOL-15 | Phase 16 | Complete |
 | TOOL-20 | Phase 17 | Pending |
 | TOOL-21 | Phase 17 | Pending |
 | TOOL-22 | Phase 17 | Pending |
