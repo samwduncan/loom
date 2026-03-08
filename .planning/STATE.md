@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Phase 17 context gathered
-last_updated: "2026-03-08T17:08:40.520Z"
-last_activity: 2026-03-08 -- Phase 16 complete (GlobToolCard + GrepToolCard + Lucide registry migration)
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-03-08T17:52:15.000Z"
+last_activity: 2026-03-08 -- Phase 17 Plan 01 complete (groupToolCalls + ToolCallGroup + AssistantMessage integration)
 progress:
   total_phases: 9
   completed_phases: 6
-  total_plans: 17
-  completed_plans: 17
-  percent: 100
+  total_plans: 20
+  completed_plans: 18
+  percent: 90
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 16 - Per-Tool Cards
+**Current focus:** Phase 17 - Tool Grouping + Permissions
 
 ## Current Position
 
-Phase: 16 of 19 (Per-Tool Cards) -- COMPLETE
-Plan: 3 of 3 -- COMPLETE
+Phase: 17 of 19 (Tool Grouping + Permissions)
+Plan: 1 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 16 complete (GlobToolCard + GrepToolCard + Lucide registry migration)
+Last activity: 2026-03-08 -- Phase 17 Plan 01 complete (groupToolCalls + ToolCallGroup + AssistantMessage integration)
 
-Progress: [##########] 100%
+Progress: [#########░] 90%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [##########] 100%
 | 16    | 01   | 7min     | 2     | 15    |
 | 16    | 02   | 3min     | 2     | 6     |
 | 16    | 03   | 5min     | 2     | 7     |
+| 17    | 01   | 5min     | 2     | 7     |
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 16-02: Early return in useEffect for text language (avoid setState-in-effect ESLint violation)
 - Phase 16-02: No Shiki inside diffs -- line coloring only with bg-diff-added/bg-diff-removed
 - Phase 16-02: DiffLineRow flex layout with w-10 fixed gutters for dual line numbers
+- Phase 17-01: Tools as React components after markdown (not marker injection into rehype pipeline)
+- Phase 17-01: div[role=button] for group header (avoids button-in-button HTML nesting)
+- Phase 17-01: defaultExpanded prop on ToolChip for group Expand all via key remounting
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -132,6 +136,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T17:08:40.519Z
-Stopped at: Phase 17 context gathered
-Resume: Continue with Phase 17
+Last session: 2026-03-08T17:52:15.000Z
+Stopped at: Completed 17-01-PLAN.md
+Resume: Continue with Phase 17 Plan 02

@@ -96,10 +96,10 @@
 
 ### Tool Cards — Grouping
 
-- [ ] **TOOL-20**: Consecutive tool calls (≥2 in a row without intervening text) group into collapsible accordion. Header shows "N tool calls" with expand chevron and summary of tool types used.
-- [ ] **TOOL-21**: Accordion expand/collapse uses CSS Grid `grid-template-rows: 0fr/1fr` animation (Constitution Tier 1 motion).
-- [ ] **TOOL-22**: Error tool calls within a group are always force-expanded (never hidden in collapsed state).
-- [ ] **TOOL-23**: Individual tool chips within a group are clickable to expand their specific card.
+- [x] **TOOL-20**: Consecutive tool calls (≥2 in a row without intervening text) group into collapsible accordion. Header shows "N tool calls" with expand chevron and summary of tool types used.
+- [x] **TOOL-21**: Accordion expand/collapse uses CSS Grid `grid-template-rows: 0fr/1fr` animation (Constitution Tier 1 motion).
+- [x] **TOOL-22**: Error tool calls within a group are always force-expanded (never hidden in collapsed state).
+- [x] **TOOL-23**: Individual tool chips within a group are clickable to expand their specific card.
 
 ### Permissions
 
@@ -247,10 +247,10 @@ Updated during roadmap creation (2026-03-07).
 | TOOL-13 | Phase 16 | Complete |
 | TOOL-14 | Phase 16 | Complete |
 | TOOL-15 | Phase 16 | Complete |
-| TOOL-20 | Phase 17 | Pending |
-| TOOL-21 | Phase 17 | Pending |
-| TOOL-22 | Phase 17 | Pending |
-| TOOL-23 | Phase 17 | Pending |
+| TOOL-20 | Phase 17 | Complete |
+| TOOL-21 | Phase 17 | Complete |
+| TOOL-22 | Phase 17 | Complete |
+| TOOL-23 | Phase 17 | Complete |
 | PERM-01 | Phase 17 | Pending |
 | PERM-02 | Phase 17 | Pending |
 | PERM-03 | Phase 17 | Pending |
