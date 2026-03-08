@@ -173,9 +173,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 18-01: TBD
-- [ ] 18-02: TBD
-- [ ] 18-03: TBD
+- [ ] 18-01-PLAN.md -- Activity status line + streaming cursor React component + activity debounce
+- [ ] 18-02-PLAN.md -- Scroll preservation + ResizeObserver bottom lock + unread badge + content-visibility
+- [ ] 18-03-PLAN.md -- Token/cost display + message entrance animations
 
 ### Phase 19: Visual Effects + Enhancements
 **Goal**: Cherry-picked visual effects elevate the interface and enhanced features round out the chat experience
@@ -217,7 +217,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 15. Tool Card Shell + State Machine | 2/2 | Complete    | 2026-03-07 | - |
 | 16. Per-Tool Cards | 3/3 | Complete    | 2026-03-08 | - |
 | 17. Tool Grouping + Permissions | 3/3 | Complete    | 2026-03-08 | - |
-| 18. Activity, Scroll, Polish | v1.1 | 0/? | Not started | - |
+| 18. Activity, Scroll, Polish | v1.1 | 0/3 | Not started | - |
 | 19. Visual Effects + Enhancements | v1.1 | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
