@@ -6,6 +6,10 @@
  * During streaming, renders ActiveMessage at the end.
  * Includes scroll anchor sentinel and ScrollToBottomPill.
  *
+ * Scroll position is saved per session and restored on switch.
+ * New sessions (no saved position) scroll to bottom.
+ * Unread count tracks messages arriving while scrolled away from bottom.
+ *
  * ActiveMessage stays mounted through finalization to complete the 200ms
  * fade-out before unmounting. showActiveMessage is driven by
  * onFinalizationComplete, NOT by isStreaming going false.
@@ -13,7 +17,7 @@
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useRef, useState, useCallback, useLayoutEffect, type RefObject } from 'react';
+import { useRef, useState, useEffect, useCallback, useLayoutEffect, type RefObject } from 'react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
 import { ErrorMessage } from '@/components/chat/view/ErrorMessage';
@@ -57,19 +61,57 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
     onStreamFinalized();
   }, [onStreamFinalized]);
 
-  const { sentinelRef, showPill, scrollToBottom } = useScrollAnchor(scrollRef);
+  const {
+    sentinelRef,
+    showPill,
+    scrollToBottom,
+    unreadCount,
+    saveScrollPosition,
+    restoreScrollPosition,
+    incrementUnread,
+  } = useScrollAnchor(scrollRef);
 
-  // Scroll to bottom on mount and on session change. useLayoutEffect fires
-  // synchronously after React commits DOM mutations, so scrollHeight is final.
-  const scrolledSessionRef = useRef<string | null>(null);
+  // Scroll position save/restore on session switch.
+  // Saves old session position, restores target session position.
+  // New sessions (no saved position) scroll to bottom.
+  const prevSessionIdRef = useRef<string | null>(null);
+  const prevMessageCountRef = useRef(messages.length);
+
   useLayoutEffect(() => {
     if (messages.length === 0) return;
-    if (scrolledSessionRef.current === sessionId) return;
-    scrolledSessionRef.current = sessionId;
 
-    const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [sessionId, messages.length, scrollRef]);
+    // Save outgoing session's scroll position
+    if (prevSessionIdRef.current !== null && prevSessionIdRef.current !== sessionId) {
+      saveScrollPosition(prevSessionIdRef.current);
+    }
+
+    // Restore target session's position or scroll to bottom for new sessions
+    if (prevSessionIdRef.current !== sessionId) {
+      const restored = restoreScrollPosition(sessionId);
+      if (!restored) {
+        // No saved position -- scroll to bottom (new session)
+        const el = scrollRef.current;
+        if (el) el.scrollTop = el.scrollHeight;
+      }
+      prevSessionIdRef.current = sessionId;
+    }
+  }, [sessionId, messages.length, scrollRef, saveScrollPosition, restoreScrollPosition]);
+
+  // Track new messages arriving while scrolled up for unread badge.
+  // useEffect syncs message count changes to unread counter when pill is visible.
+  // The ref sync pattern (useEffect, not render-time) satisfies react-hooks/refs.
+  useEffect(() => {
+    const prev = prevMessageCountRef.current;
+    prevMessageCountRef.current = messages.length;
+    if (messages.length > prev && showPill) {
+      incrementUnread(messages.length - prev);
+    }
+  }, [messages.length, showPill, incrementUnread]);
+
+  // Combined scroll-to-bottom + reset unread handler for pill click
+  const handlePillClick = useCallback(() => {
+    scrollToBottom();
+  }, [scrollToBottom]);
 
   function renderMessage(msg: Message) {
     switch (msg.role) {
@@ -108,7 +150,11 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
         )}
       </div>
       <div ref={sentinelRef} className="h-0" aria-hidden="true" />
-      <ScrollToBottomPill visible={showPill} onClick={scrollToBottom} />
+      <ScrollToBottomPill
+        visible={showPill}
+        onClick={handlePillClick}
+        unreadCount={unreadCount}
+      />
     </div>
   );
 }

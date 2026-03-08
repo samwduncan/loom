@@ -298,7 +298,7 @@ export const ActiveMessage = memo(function ActiveMessage(
   }, [segments]);
 
   return (
-    <MessageContainer role="assistant">
+    <MessageContainer role="assistant" isStreaming>
       <div
         ref={containerRef}
         className="crossfade-container active-message"

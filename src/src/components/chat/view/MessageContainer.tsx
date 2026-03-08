@@ -13,19 +13,30 @@
  *   error: full-width, no bubble constraint
  *   task_notification: full-width, no bubble constraint
  *
+ * Finalized (non-streaming) messages get content-visibility: auto for
+ * off-screen rendering optimization in long conversations.
+ *
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6).
  */
 
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import type { MessageRole } from '@/types/message';
 import { cn } from '@/utils/cn';
 
 interface MessageContainerProps {
   children: ReactNode;
   role: MessageRole;
+  /** When true, disables content-visibility optimization (for actively streaming messages) */
+  isStreaming?: boolean;
 }
 
-export function MessageContainer({ children, role }: MessageContainerProps) {
+/** content-visibility styles for finalized messages -- skips off-screen rendering */
+const contentVisibilityStyle: CSSProperties = {
+  contentVisibility: 'auto',
+  containIntrinsicHeight: 'auto 200px',
+};
+
+export function MessageContainer({ children, role, isStreaming = false }: MessageContainerProps) {
   return (
     <div
       className={cn(
@@ -35,6 +46,7 @@ export function MessageContainer({ children, role }: MessageContainerProps) {
       )}
       data-role={role}
       data-testid="message-container"
+      style={!isStreaming ? contentVisibilityStyle : undefined}
     >
       {role === 'user' ? (
         <div
