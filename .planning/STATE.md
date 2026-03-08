@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-03-08T17:52:15.000Z"
-last_activity: 2026-03-08 -- Phase 17 Plan 01 complete (groupToolCalls + ToolCallGroup + AssistantMessage integration)
+stopped_at: Completed 17-02-PLAN.md
+last_updated: "2026-03-08T18:01:55.021Z"
+last_activity: 2026-03-08 -- Phase 17 Plan 03 complete (PermissionBanner + CountdownRing + ChatView integration)
 progress:
   total_phases: 9
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 20
-  completed_plans: 18
-  percent: 90
+  completed_plans: 20
+  percent: 95
 ---
 
 # Project State
@@ -28,9 +28,9 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 Phase: 17 of 19 (Tool Grouping + Permissions)
 Plan: 3 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 17 Plan 03 complete (PermissionBanner + CountdownRing + ChatView integration)
+Last activity: 2026-03-08 -- Phase 17 Plan 02 complete (streaming tool grouping in ActiveMessage)
 
-Progress: [#########░] 95%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [#########░] 95%
 | 16    | 03   | 5min     | 2     | 7     |
 | 17    | 03   | 8min     | 2     | 11    |
 | 17    | 01   | 5min     | 2     | 7     |
+| Phase 17 P02 | 2min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,8 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 17-01: Tools as React components after markdown (not marker injection into rehype pipeline)
 - Phase 17-01: div[role=button] for group header (avoids button-in-button HTML nesting)
 - Phase 17-01: defaultExpanded prop on ToolChip for group Expand all via key remounting
+- [Phase 17]: Render-time segment chunking via useMemo instead of modifying segment model
+- [Phase 17]: ToolCallGroupFromStore subscribes to individual tool calls for granular streaming updates
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -141,6 +144,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T17:56:22Z
-Stopped at: Completed 17-03-PLAN.md
+Last session: 2026-03-08T18:01:55.020Z
+Stopped at: Completed 17-02-PLAN.md
 Resume: Continue with Phase 17 Plan 02 or next phase
