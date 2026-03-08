@@ -31,6 +31,71 @@ const LANG_IMPORTS: Record<string, () => Promise<unknown>> = {
   html: () => import('shiki/langs/html.mjs'),
 };
 
+/** Maps file extension to Shiki language grammar ID */
+const EXT_TO_LANG: Record<string, string> = {
+  '.ts': 'typescript',
+  '.tsx': 'typescript',
+  '.js': 'javascript',
+  '.jsx': 'javascript',
+  '.mjs': 'javascript',
+  '.cjs': 'javascript',
+  '.py': 'python',
+  '.sh': 'bash',
+  '.bash': 'bash',
+  '.zsh': 'bash',
+  '.json': 'json',
+  '.jsonc': 'json',
+  '.css': 'css',
+  '.scss': 'css',
+  '.html': 'html',
+  '.htm': 'html',
+  '.xml': 'html',
+  '.svg': 'html',
+  '.md': 'markdown',
+  '.mdx': 'markdown',
+  '.yml': 'yaml',
+  '.yaml': 'yaml',
+  '.rs': 'rust',
+  '.go': 'go',
+  '.rb': 'ruby',
+  '.java': 'java',
+  '.c': 'c',
+  '.cpp': 'cpp',
+  '.h': 'c',
+  '.hpp': 'cpp',
+  '.sql': 'sql',
+  '.toml': 'toml',
+  '.env': 'bash',
+  '.dockerfile': 'docker',
+  '.graphql': 'graphql',
+  '.gql': 'graphql',
+  '.vue': 'vue',
+  '.svelte': 'svelte',
+  '.php': 'php',
+  '.swift': 'swift',
+  '.kt': 'kotlin',
+  '.lua': 'lua',
+  '.r': 'r',
+};
+
+/**
+ * Infers the Shiki language grammar ID from a file path's extension.
+ * Returns 'text' for unknown extensions.
+ */
+export function getLanguageFromPath(filePath: string): string {
+  const lastDot = filePath.lastIndexOf('.');
+  if (lastDot === -1) return 'text';
+  const ext = filePath.slice(lastDot).toLowerCase();
+  // Handle special filenames like "Dockerfile"
+  if (ext === filePath.toLowerCase() || !ext) {
+    const basename = filePath.split('/').pop()?.toLowerCase() ?? '';
+    if (basename === 'dockerfile') return 'docker';
+    if (basename === 'makefile') return 'makefile';
+    return 'text';
+  }
+  return EXT_TO_LANG[ext] ?? 'text';
+}
+
 let highlighterPromise: Promise<HighlighterCore> | null = null;
 
 /** Cache: key = `${lang}:${code}`, value = highlighted HTML */

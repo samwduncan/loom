@@ -3,6 +3,7 @@ import {
   getHighlighter,
   preloadLanguages,
   highlightCode,
+  getLanguageFromPath,
 } from './shiki-highlighter';
 
 describe('shiki-highlighter', () => {
@@ -49,6 +50,48 @@ describe('shiki-highlighter', () => {
       const code = 'some random code';
       const result = await highlightCode('nonexistent-lang-xyz', code);
       expect(result).toBe(code);
+    });
+  });
+
+  describe('getLanguageFromPath', () => {
+    it('maps .ts to typescript', () => {
+      expect(getLanguageFromPath('src/app.ts')).toBe('typescript');
+    });
+
+    it('maps .tsx to typescript', () => {
+      expect(getLanguageFromPath('Component.tsx')).toBe('typescript');
+    });
+
+    it('maps .py to python', () => {
+      expect(getLanguageFromPath('/home/user/script.py')).toBe('python');
+    });
+
+    it('maps .json to json', () => {
+      expect(getLanguageFromPath('package.json')).toBe('json');
+    });
+
+    it('maps .css to css', () => {
+      expect(getLanguageFromPath('styles/main.css')).toBe('css');
+    });
+
+    it('maps .rs to rust', () => {
+      expect(getLanguageFromPath('src/main.rs')).toBe('rust');
+    });
+
+    it('maps .go to go', () => {
+      expect(getLanguageFromPath('main.go')).toBe('go');
+    });
+
+    it('returns text for unknown extension', () => {
+      expect(getLanguageFromPath('file.xyz')).toBe('text');
+    });
+
+    it('returns text for file with no extension', () => {
+      expect(getLanguageFromPath('Makefile')).toBe('text');
+    });
+
+    it('handles case-insensitive extension', () => {
+      expect(getLanguageFromPath('FILE.JS')).toBe('javascript');
     });
   });
 });

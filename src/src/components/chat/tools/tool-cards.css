@@ -1,0 +1,35 @@
+/*
+ * Shared styles for per-tool card bodies.
+ * ANSI foreground colors mapped to design tokens (Constitution 7.14).
+ */
+
+/* ─── ANSI Standard Foreground (30-37) ──────────────────────────────── */
+.ansi-black { color: var(--text-muted); }
+.ansi-red { color: var(--status-error); }
+.ansi-green { color: var(--status-success); }
+.ansi-yellow { color: var(--status-warning); }
+.ansi-blue { color: var(--status-info); }
+.ansi-magenta { color: var(--accent-primary); }
+.ansi-cyan { color: oklch(0.72 0.10 195); }
+.ansi-white { color: var(--text-primary); }
+
+/* ─── ANSI Bright Foreground (90-97) ────────────────────────────────── */
+.ansi-bright-black { color: oklch(0.50 0.008 30); }
+.ansi-bright-red { color: oklch(0.70 0.18 25); }
+.ansi-bright-green { color: oklch(0.75 0.15 145); }
+.ansi-bright-yellow { color: oklch(0.80 0.14 70); }
+.ansi-bright-blue { color: oklch(0.75 0.12 240); }
+.ansi-bright-magenta { color: oklch(0.73 0.14 20); }
+.ansi-bright-cyan { color: oklch(0.80 0.10 195); }
+.ansi-bright-white { color: oklch(0.95 0.01 30); }
+
+/* ─── ANSI Attributes ───────────────────────────────────────────────── */
+.ansi-bold { font-weight: 700; }
+.ansi-underline { text-decoration: underline; }
+
+/* ─── Shared Card Body ──────────────────────────────────────────────── */
+.tool-card-body {
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
