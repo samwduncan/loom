@@ -119,10 +119,10 @@
 
 ### Scroll & Navigation
 
-- [ ] **NAV-01**: Scroll position preserved per session in `useRef<Map<string, number>>`. On session switch: save current `scrollTop`, restore target session's stored position via `useLayoutEffect`.
-- [ ] **NAV-02**: `content-visibility: auto` with `contain-intrinsic-height: auto 200px` applied to past message containers (not the actively streaming message). Reduces rendering cost for off-screen messages. (Constitution 10.5)
-- [ ] **NAV-03**: Existing scroll anchor enhanced with ResizeObserver on the scroll container's content. When dynamic height changes occur (code block highlighting, tool card expansion) and user is in auto-scroll mode (within 100px of bottom), maintain bottom lock.
-- [ ] **NAV-04**: Scroll-to-bottom pill appears when user scrolls up more than 200px from bottom. Click returns to bottom with smooth scroll. Shows unread message count badge if new messages arrived while scrolled up.
+- [x] **NAV-01**: Scroll position preserved per session in `useRef<Map<string, number>>`. On session switch: save current `scrollTop`, restore target session's stored position via `useLayoutEffect`.
+- [x] **NAV-02**: `content-visibility: auto` with `contain-intrinsic-height: auto 200px` applied to past message containers (not the actively streaming message). Reduces rendering cost for off-screen messages. (Constitution 10.5)
+- [x] **NAV-03**: Existing scroll anchor enhanced with ResizeObserver on the scroll container's content. When dynamic height changes occur (code block highlighting, tool card expansion) and user is in auto-scroll mode (within 100px of bottom), maintain bottom lock.
+- [x] **NAV-04**: Scroll-to-bottom pill appears when user scrolls up more than 200px from bottom. Click returns to bottom with smooth scroll. Shows unread message count badge if new messages arrived while scrolled up.
 
 ### Polish
 
@@ -261,10 +261,10 @@ Updated during roadmap creation (2026-03-07).
 | ACT-03 | Phase 18 | Complete |
 | ACT-04 | Phase 18 | Complete |
 | ACT-05 | Phase 18 | Pending |
-| NAV-01 | Phase 18 | Pending |
-| NAV-02 | Phase 18 | Pending |
-| NAV-03 | Phase 18 | Pending |
-| NAV-04 | Phase 18 | Pending |
+| NAV-01 | Phase 18 | Complete |
+| NAV-02 | Phase 18 | Complete |
+| NAV-03 | Phase 18 | Complete |
+| NAV-04 | Phase 18 | Complete |
 | POL-01 | Phase 18 | Pending |
 | POL-02 | Phase 18 | Complete |
 | POL-03 | Phase 18 | Complete |

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Phase 18 context gathered
-last_updated: "2026-03-08T22:03:39.870Z"
-last_activity: 2026-03-08 -- Phase 17 Plan 02 complete (streaming tool grouping in ActiveMessage)
+stopped_at: Completed 18-02-PLAN.md
+last_updated: "2026-03-08T22:05:19.632Z"
+last_activity: 2026-03-08 -- Phase 18 Plan 02 complete (scroll position preservation, ResizeObserver, unread badge, content-visibility)
 progress:
   total_phases: 9
   completed_phases: 7
   total_plans: 23
-  completed_plans: 21
-  percent: 100
+  completed_plans: 22
+  percent: 96
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 18 of 19 (Activity, Scroll, Polish)
-Plan: 1 of 3 -- COMPLETE
+Plan: 2 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 18 Plan 01 complete (StatusLine + StreamingCursor + activity debounce)
+Last activity: 2026-03-08 -- Phase 18 Plan 02 complete (scroll position preservation, ResizeObserver, unread badge, content-visibility)
 
-Progress: [█████████░] 91%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [█████████░] 91%
 | 17    | 01   | 5min     | 2     | 7     |
 | Phase 17 P02 | 2min | 1 tasks | 1 files |
 | 18    | 01   | 3min     | 2     | 8     |
+| Phase 18 P02 | 4min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,10 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 18-01: CSS class for StatusLine transition (Constitution 7.14 bans inline styles)
 - Phase 18-01: Smooth pulse animation (0.4-1.0 opacity) replaces hard blink (step-end)
 - Phase 18-01: StreamingCursor shown inline within incomplete thinking block paragraphs
+- [Phase 18-02]: showPill no longer gated on isStreaming -- shows whenever scrolled up 200px+
+- [Phase 18-02]: ResizeObserver with rAF throttle for bottom lock during streaming content expansion
+- [Phase 18-02]: content-visibility: auto with containIntrinsicHeight for finalized messages
+- [Phase 18-02]: useEffect ref sync pattern for unread count (react-hooks/refs compliance)
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -148,6 +153,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T22:02:52Z
-Stopped at: Completed 18-01-PLAN.md
+Last session: 2026-03-08T22:05:19.630Z
+Stopped at: Completed 18-02-PLAN.md
 Resume: Continue with Phase 18 Plan 02
