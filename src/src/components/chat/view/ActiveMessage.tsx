@@ -25,6 +25,7 @@ import { ToolCallGroup } from '@/components/chat/tools/ToolCallGroup';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
+import { StreamingCursor } from '@/components/chat/view/StreamingCursor';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
 import '../styles/streaming-cursor.css';
@@ -336,7 +337,7 @@ export const ActiveMessage = memo(function ActiveMessage(
                 ref={makeTextRefCallback(renderChunks.trailingText.id)}
               />
             )}
-            <span className="streaming-cursor" data-testid="streaming-cursor" />
+            <StreamingCursor />
           </div>
         )}
         {/* Finalized layer — rendered once flush provides content */}

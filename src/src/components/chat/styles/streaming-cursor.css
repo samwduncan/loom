@@ -63,8 +63,12 @@
   height: 1.2em;
   vertical-align: text-bottom;
   background-color: var(--accent-primary);
-  animation: cursor-blink 1.06s step-end infinite;
+  animation: cursor-pulse 1.06s ease-in-out infinite;
   transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.streaming-cursor--muted {
+  background-color: var(--text-muted);
 }
 
 .active-message[data-phase="finalizing"] .streaming-cursor,
@@ -73,9 +77,9 @@
   opacity: 0;
 }
 
-@keyframes cursor-blink {
+@keyframes cursor-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  50% { opacity: 0.4; }
 }
 
 /* Muted error line for mid-stream disconnect */

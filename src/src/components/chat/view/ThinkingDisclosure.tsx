@@ -13,8 +13,10 @@
  */
 
 import { useState } from 'react';
+import { StreamingCursor } from '@/components/chat/view/StreamingCursor';
 import type { ThinkingBlock } from '@/types/message';
 import '../styles/thinking-disclosure.css';
+import '../styles/streaming-cursor.css';
 
 interface ThinkingDisclosureProps {
   blocks: ThinkingBlock[];
@@ -79,6 +81,7 @@ export function ThinkingDisclosure({
           {blocks.map((block) => (
             <p key={block.id} className="italic text-muted font-mono text-sm">
               {block.text}
+              {isStreaming && !block.isComplete && <StreamingCursor variant="muted" />}
             </p>
           ))}
         </div>
