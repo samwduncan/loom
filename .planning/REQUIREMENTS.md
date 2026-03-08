@@ -111,10 +111,10 @@
 
 ### Activity & Status
 
-- [ ] **ACT-01**: Activity status line renders below message list, above composer. Displays current tool action text from `useStreamStore(s => s.activityText)`. Isolated `React.memo` component with single selector subscription.
-- [ ] **ACT-02**: Activity text fades in/out with CSS transition (200ms opacity). Truncates long paths with ellipsis (`truncate` class). Only visible when `isStreaming && activityText` is truthy.
-- [ ] **ACT-03**: Activity text updates debounced to 200ms in the multiplexer (not on every `tool_progress` event) to prevent excessive re-renders.
-- [ ] **ACT-04**: Activity status line positioned outside the scroll container (fixed relative to composer area) — never causes scroll height changes.
+- [x] **ACT-01**: Activity status line renders below message list, above composer. Displays current tool action text from `useStreamStore(s => s.activityText)`. Isolated `React.memo` component with single selector subscription.
+- [x] **ACT-02**: Activity text fades in/out with CSS transition (200ms opacity). Truncates long paths with ellipsis (`truncate` class). Only visible when `isStreaming && activityText` is truthy.
+- [x] **ACT-03**: Activity text updates debounced to 200ms in the multiplexer (not on every `tool_progress` event) to prevent excessive re-renders.
+- [x] **ACT-04**: Activity status line positioned outside the scroll container (fixed relative to composer area) — never causes scroll height changes.
 - [ ] **ACT-05**: Token/cost display below each finalized assistant message: "1,234 in / 567 out · $0.003". Data from `Message.metadata.tokenCount` and `Message.metadata.cost`, populated from `token-budget` and `result` WebSocket events. Muted text (`text-muted text-xs`), always visible (not hover-only).
 
 ### Scroll & Navigation
@@ -127,9 +127,9 @@
 ### Polish
 
 - [ ] **POL-01**: Message entrance animations: `animate-in fade-in-0 slide-in-from-bottom-2` via tailwindcss-animate. Duration 200ms, easing ease-out. Respects `prefers-reduced-motion` (instant, no animation). Only on newly appended messages, not on initial session load.
-- [ ] **POL-02**: Streaming cursor: pulsing vertical bar at end of streaming text. Rose accent color (`var(--primary)`), 1s pulse cycle (opacity 0.4→1.0), hides on `data-phase="finalizing"` transition. Width 2px, height matches line-height.
-- [ ] **POL-03**: Thinking block text: `italic text-muted font-mono text-sm` inside disclosure. Consistent with "internal monologue" visual language.
-- [ ] **POL-04**: All CSS animations and transitions use design tokens (`--transition-fast`, `--transition-normal`, `--duration-*`) — no hardcoded durations. Constitution enforcement via existing ESLint rules.
+- [x] **POL-02**: Streaming cursor: pulsing vertical bar at end of streaming text. Rose accent color (`var(--primary)`), 1s pulse cycle (opacity 0.4→1.0), hides on `data-phase="finalizing"` transition. Width 2px, height matches line-height.
+- [x] **POL-03**: Thinking block text: `italic text-muted font-mono text-sm` inside disclosure. Consistent with "internal monologue" visual language.
+- [x] **POL-04**: All CSS animations and transitions use design tokens (`--transition-fast`, `--transition-normal`, `--duration-*`) — no hardcoded durations. Constitution enforcement via existing ESLint rules.
 
 ### UI Primitives & Component Libraries
 
@@ -256,19 +256,19 @@ Updated during roadmap creation (2026-03-07).
 | PERM-03 | Phase 17 | Complete |
 | PERM-04 | Phase 17 | Complete |
 | PERM-05 | Phase 17 | Complete |
-| ACT-01 | Phase 18 | Pending |
-| ACT-02 | Phase 18 | Pending |
-| ACT-03 | Phase 18 | Pending |
-| ACT-04 | Phase 18 | Pending |
+| ACT-01 | Phase 18 | Complete |
+| ACT-02 | Phase 18 | Complete |
+| ACT-03 | Phase 18 | Complete |
+| ACT-04 | Phase 18 | Complete |
 | ACT-05 | Phase 18 | Pending |
 | NAV-01 | Phase 18 | Pending |
 | NAV-02 | Phase 18 | Pending |
 | NAV-03 | Phase 18 | Pending |
 | NAV-04 | Phase 18 | Pending |
 | POL-01 | Phase 18 | Pending |
-| POL-02 | Phase 18 | Pending |
-| POL-03 | Phase 18 | Pending |
-| POL-04 | Phase 18 | Pending |
+| POL-02 | Phase 18 | Complete |
+| POL-03 | Phase 18 | Complete |
+| POL-04 | Phase 18 | Complete |
 | UI-01 | Phase 11 | Complete |
 | UI-02 | Phase 11 | Complete |
 | UI-03 | Phase 11 | Complete |

@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
 stopped_at: Phase 18 context gathered
-last_updated: "2026-03-08T20:51:51.927Z"
+last_updated: "2026-03-08T22:03:39.870Z"
 last_activity: 2026-03-08 -- Phase 17 Plan 02 complete (streaming tool grouping in ActiveMessage)
 progress:
   total_phases: 9
   completed_phases: 7
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 23
+  completed_plans: 21
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 17 - Tool Grouping + Permissions
+**Current focus:** Phase 18 - Activity, Scroll, Polish
 
 ## Current Position
 
-Phase: 17 of 19 (Tool Grouping + Permissions)
-Plan: 3 of 3 -- COMPLETE
+Phase: 18 of 19 (Activity, Scroll, Polish)
+Plan: 1 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 17 Plan 02 complete (streaming tool grouping in ActiveMessage)
+Last activity: 2026-03-08 -- Phase 18 Plan 01 complete (StatusLine + StreamingCursor + activity debounce)
 
-Progress: [██████████] 100%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [██████████] 100%
 | 17    | 03   | 8min     | 2     | 11    |
 | 17    | 01   | 5min     | 2     | 7     |
 | Phase 17 P02 | 2min | 1 tasks | 1 files |
+| 18    | 01   | 3min     | 2     | 8     |
 
 ## Accumulated Context
 
@@ -126,6 +127,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 17-01: defaultExpanded prop on ToolChip for group Expand all via key remounting
 - [Phase 17]: Render-time segment chunking via useMemo instead of modifying segment model
 - [Phase 17]: ToolCallGroupFromStore subscribes to individual tool calls for granular streaming updates
+- Phase 18-01: CSS class for StatusLine transition (Constitution 7.14 bans inline styles)
+- Phase 18-01: Smooth pulse animation (0.4-1.0 opacity) replaces hard blink (step-end)
+- Phase 18-01: StreamingCursor shown inline within incomplete thinking block paragraphs
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -144,6 +148,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T20:51:51.925Z
-Stopped at: Phase 18 context gathered
-Resume: Continue with Phase 17 Plan 02 or next phase
+Last session: 2026-03-08T22:02:52Z
+Stopped at: Completed 18-01-PLAN.md
+Resume: Continue with Phase 18 Plan 02
