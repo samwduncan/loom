@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 17 of 19 (Tool Grouping + Permissions)
-Plan: 1 of 3 -- COMPLETE
+Plan: 3 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 17 Plan 01 complete (groupToolCalls + ToolCallGroup + AssistantMessage integration)
+Last activity: 2026-03-08 -- Phase 17 Plan 03 complete (PermissionBanner + CountdownRing + ChatView integration)
 
-Progress: [#########░] 90%
+Progress: [#########░] 95%
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [#########░] 90%
 | 16    | 01   | 7min     | 2     | 15    |
 | 16    | 02   | 3min     | 2     | 6     |
 | 16    | 03   | 5min     | 2     | 7     |
+| 17    | 03   | 8min     | 2     | 11    |
 | 17    | 01   | 5min     | 2     | 7     |
 
 ## Accumulated Context
@@ -115,6 +116,10 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 16-02: Early return in useEffect for text language (avoid setState-in-effect ESLint violation)
 - Phase 16-02: No Shiki inside diffs -- line coloring only with bg-diff-added/bg-diff-removed
 - Phase 16-02: DiffLineRow flex layout with w-10 fixed gutters for dual line numbers
+- Phase 17-03: CSS custom property --ring-offset for SVG stroke-dashoffset (Constitution 7.14)
+- Phase 17-03: setTimeout(0) for initial countdown tick (avoids setState-in-effect ESLint rule)
+- Phase 17-03: Read-only tools auto-allowed at multiplexer level, never reach UI
+- Phase 17-03: Session-scoped permission banner (checks request.sessionId match)
 - Phase 17-01: Tools as React components after markdown (not marker injection into rehype pipeline)
 - Phase 17-01: div[role=button] for group header (avoids button-in-button HTML nesting)
 - Phase 17-01: defaultExpanded prop on ToolChip for group Expand all via key remounting
@@ -136,6 +141,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-08T17:52:15.000Z
-Stopped at: Completed 17-01-PLAN.md
-Resume: Continue with Phase 17 Plan 02
+Last session: 2026-03-08T17:56:22Z
+Stopped at: Completed 17-03-PLAN.md
+Resume: Continue with Phase 17 Plan 02 or next phase

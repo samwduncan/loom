@@ -103,11 +103,11 @@
 
 ### Permissions
 
-- [ ] **PERM-01**: WebSocket `claude-permission-request` events render as inline banners above the composer (not modal, not toast). Shows: tool name, truncated input preview (first 100 chars), Allow (green accent) and Deny (red accent) buttons.
-- [ ] **PERM-02**: Allow click sends `claude-permission-response` with `granted: true` via WebSocket. Deny sends `granted: false`. Banner dismissed immediately after action.
-- [ ] **PERM-03**: Timeout indicator: circular progress or countdown text showing remaining time (55s default from `CLAUDE_TOOL_APPROVAL_TIMEOUT_MS`). On timeout, banner auto-dismisses.
-- [ ] **PERM-04**: Banner auto-dismisses on `claude-permission-cancelled` WebSocket event (backend cancelled the request).
-- [ ] **PERM-05**: Only one permission banner active at a time (backend enforces sequential requests). If a new request arrives while one is displayed, replace the old one.
+- [x] **PERM-01**: WebSocket `claude-permission-request` events render as inline banners above the composer (not modal, not toast). Shows: tool name, truncated input preview (first 100 chars), Allow (green accent) and Deny (red accent) buttons.
+- [x] **PERM-02**: Allow click sends `claude-permission-response` with `granted: true` via WebSocket. Deny sends `granted: false`. Banner dismissed immediately after action.
+- [x] **PERM-03**: Timeout indicator: circular progress or countdown text showing remaining time (55s default from `CLAUDE_TOOL_APPROVAL_TIMEOUT_MS`). On timeout, banner auto-dismisses.
+- [x] **PERM-04**: Banner auto-dismisses on `claude-permission-cancelled` WebSocket event (backend cancelled the request).
+- [x] **PERM-05**: Only one permission banner active at a time (backend enforces sequential requests). If a new request arrives while one is displayed, replace the old one.
 
 ### Activity & Status
 
@@ -251,11 +251,11 @@ Updated during roadmap creation (2026-03-07).
 | TOOL-21 | Phase 17 | Complete |
 | TOOL-22 | Phase 17 | Complete |
 | TOOL-23 | Phase 17 | Complete |
-| PERM-01 | Phase 17 | Pending |
-| PERM-02 | Phase 17 | Pending |
-| PERM-03 | Phase 17 | Pending |
-| PERM-04 | Phase 17 | Pending |
-| PERM-05 | Phase 17 | Pending |
+| PERM-01 | Phase 17 | Complete |
+| PERM-02 | Phase 17 | Complete |
+| PERM-03 | Phase 17 | Complete |
+| PERM-04 | Phase 17 | Complete |
+| PERM-05 | Phase 17 | Complete |
 | ACT-01 | Phase 18 | Pending |
 | ACT-02 | Phase 18 | Pending |
 | ACT-03 | Phase 18 | Pending |
