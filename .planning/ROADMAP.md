@@ -190,8 +190,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 19-01: TBD
-- [ ] 19-02: TBD
+- [ ] 19-01-PLAN.md -- CSS visual effects (SpotlightCard, ShinyText, ElectricBorder) + integration
+- [ ] 19-02-PLAN.md -- Thinking inline markdown + error retry button
+- [ ] 19-03-PLAN.md -- Message search + conversation export
 
 ## Progress
 
@@ -218,7 +219,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 16. Per-Tool Cards | 3/3 | Complete    | 2026-03-08 | - |
 | 17. Tool Grouping + Permissions | 3/3 | Complete    | 2026-03-08 | - |
 | 18. Activity, Scroll, Polish | 3/3 | Complete    | 2026-03-08 | - |
-| 19. Visual Effects + Enhancements | v1.1 | 0/? | Not started | - |
+| 19. Visual Effects + Enhancements | v1.1 | 0/3 | Not started | - |
 
 ## Backlog (Future Milestones)
 
@@ -226,4 +227,4 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-08*
+*Last updated: 2026-03-09*
