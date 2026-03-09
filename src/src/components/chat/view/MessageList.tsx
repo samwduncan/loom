@@ -30,6 +30,7 @@ import { MessageErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useScrollAnchor } from '@/hooks/useScrollAnchor';
 import { useStreamStore } from '@/stores/stream';
 import type { Message } from '@/types/message';
+import type { ReactNode } from 'react';
 
 interface MessageListProps {
   messages: Message[];
@@ -37,9 +38,13 @@ interface MessageListProps {
   onStreamFinalized: () => void;
   /** Scroll container ref passed from ChatView for composer scroll stability */
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  /** Active search query (debounced) -- used for empty state display */
+  searchQuery?: string;
+  /** Highlight function to wrap matching text in <mark> elements */
+  highlightText?: (text: string) => ReactNode;
 }
 
-export function MessageList({ messages, sessionId, onStreamFinalized, scrollContainerRef }: MessageListProps) {
+export function MessageList({ messages, sessionId, onStreamFinalized, scrollContainerRef, searchQuery, highlightText: _highlightText }: MessageListProps) {
   const internalScrollRef = useRef<HTMLDivElement>(null);
   // Use external ref if provided (for composer scroll stability), otherwise internal
   const scrollRef = scrollContainerRef ?? internalScrollRef;
@@ -170,6 +175,12 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
       className="flex-1 overflow-y-auto"
       data-testid="message-list-scroll"
     >
+      {/* Search empty state */}
+      {messages.length === 0 && searchQuery ? (
+        <div className="flex flex-1 items-center justify-center py-20 text-sm text-muted" data-testid="search-empty-state">
+          No messages match &lsquo;{searchQuery}&rsquo;
+        </div>
+      ) : (
       <div className="mx-auto max-w-3xl flex flex-col py-4">
         {messages.map((msg, idx) => (
           <MessageErrorBoundary key={msg.id}>
@@ -187,6 +198,7 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
           />
         )}
       </div>
+      )}
       <div ref={sentinelRef} className="h-0" aria-hidden="true" />
       <ScrollToBottomPill
         visible={showPill}
