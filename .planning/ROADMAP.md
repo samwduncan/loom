@@ -39,7 +39,7 @@
 - [x] **Phase 16: Per-Tool Cards** - Rich card implementations for Bash, Read, Edit, Write, Glob, Grep with syntax highlighting and diff views (completed 2026-03-08)
 - [x] **Phase 17: Tool Grouping + Permissions** - Consecutive tool call accordion and permission request banners with Allow/Deny (completed 2026-03-08)
 - [x] **Phase 18: Activity, Scroll, Polish** - Activity status line, scroll preservation, message entrance animations, streaming cursor, content-visibility (completed 2026-03-08)
-- [ ] **Phase 19: Visual Effects + Enhancements** - Cherry-picked CSS effects, thinking markdown, error retry, message search, conversation export
+- [x] **Phase 19: Visual Effects + Enhancements** - Cherry-picked CSS effects, thinking markdown, error retry, message search, conversation export (completed 2026-03-09)
 
 ## Phase Details
 
@@ -219,7 +219,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 16. Per-Tool Cards | 3/3 | Complete    | 2026-03-08 | - |
 | 17. Tool Grouping + Permissions | 3/3 | Complete    | 2026-03-08 | - |
 | 18. Activity, Scroll, Polish | 3/3 | Complete    | 2026-03-08 | - |
-| 19. Visual Effects + Enhancements | 2/3 | In Progress|  | - |
+| 19. Visual Effects + Enhancements | 3/3 | Complete   | 2026-03-09 | - |
 
 ## Backlog (Future Milestones)
 

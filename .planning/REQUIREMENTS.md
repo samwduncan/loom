@@ -145,8 +145,8 @@
 - [x] **ENH-02**: BashToolCard output supports ANSI color codes (bold, colors, underline) via lightweight ANSI-to-HTML conversion
 - [x] **ENH-03**: Thinking block content renders markdown (bold, italic, code spans) via lightweight parser — not full react-markdown, just basic inline formatting
 - [x] **ENH-04**: Error messages include retry affordance — "Retry" button resends the last user message
-- [ ] **ENH-05**: Message search within session — filter/highlight messages matching search text (basic substring match, not fuzzy)
-- [ ] **ENH-06**: Conversation export — download session as Markdown file or JSON
+- [x] **ENH-05**: Message search within session — filter/highlight messages matching search text (basic substring match, not fuzzy)
+- [x] **ENH-06**: Conversation export — download session as Markdown file or JSON
 
 ## Out of Scope
 
@@ -278,8 +278,8 @@ Updated during roadmap creation (2026-03-07).
 | ENH-02 | Phase 16 | Complete |
 | ENH-03 | Phase 19 | Complete |
 | ENH-04 | Phase 19 | Complete |
-| ENH-05 | Phase 19 | Pending |
-| ENH-06 | Phase 19 | Pending |
+| ENH-05 | Phase 19 | Complete |
+| ENH-06 | Phase 19 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 97 total (corrected from initial 87 count)

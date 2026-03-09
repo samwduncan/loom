@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
-stopped_at: Phase 19 context gathered
-last_updated: "2026-03-09T17:11:00.303Z"
-last_activity: 2026-03-08 -- Phase 18 Plan 03 complete (token/cost display, entrance animations)
+stopped_at: Completed 19-03-PLAN.md
+last_updated: "2026-03-09T17:14:00.000Z"
+last_activity: 2026-03-09 -- Phase 19 Plan 03 complete (message search, conversation export)
 progress:
   total_phases: 9
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 26
-  completed_plans: 24
+  completed_plans: 26
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 19 - Visual Effects + Enhancements
+**Current focus:** Phase 19 - Visual Effects + Enhancements (COMPLETE)
 
 ## Current Position
 
 Phase: 19 of 19 (Visual Effects + Enhancements)
-Plan: 2 of 3 -- COMPLETE
-Status: in-progress
-Last activity: 2026-03-09 -- Phase 19 Plan 02 complete (thinking markdown, error retry)
+Plan: 3 of 3 -- COMPLETE
+Status: complete
+Last activity: 2026-03-09 -- Phase 19 Plan 03 complete (message search, conversation export)
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [██████████] 96%
 | 19    | 01   | -        | -     | -     |
 | 19    | 02   | 7min     | 2     | 6     |
 | 19    | 01   | 7min     | 2     | 10    |
+| 19    | 03   | 10min    | 2     | 7     |
 
 ## Accumulated Context
 
@@ -148,6 +149,10 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 19-02: Separate thinking-markdown.ts parser for strict inline-only output (no block elements)
 - Phase 19-02: DOMPurify strict 4-tag allowlist (strong, em, code, a) for thinking blocks
 - Phase 19-02: ErrorMessage uses stores directly (useTimelineStore, useConnectionStore) rather than prop threading
+- Phase 19-03: Pre-filter messages in ChatView (not MessageList) for cleaner search data flow
+- Phase 19-03: 150ms debounce on search query (immediate display, delayed filter)
+- Phase 19-03: Conditional grid-rows template when search bar visible (auto row added)
+- Phase 19-03: Blob + createObjectURL + anchor click pattern for file downloads
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -166,6 +171,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-09T17:11:00Z
-Stopped at: Completed 19-02-PLAN.md
-Resume: Phase 19 Plan 02 complete. Plan 03 remaining.
+Last session: 2026-03-09T17:14:00Z
+Stopped at: Completed 19-03-PLAN.md
+Resume: Phase 19 complete. All M2 plans shipped. Milestone v1.1 "The Chat" complete.
