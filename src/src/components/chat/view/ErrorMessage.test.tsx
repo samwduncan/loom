@@ -35,17 +35,17 @@ describe('ErrorMessage', () => {
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
 
-  it('has border-l-4 border-error accent', () => {
+  it('has border-l-4 border-destructive accent', () => {
     render(<ErrorMessage message={makeErrorMessage('Error text')} />);
     const inner = screen.getByTestId('error-message-inner');
     expect(inner.className).toContain('border-l-4');
-    expect(inner.className).toContain('border-error');
+    expect(inner.className).toContain('border-destructive');
   });
 
-  it('has bg-error/10 muted background', () => {
+  it('has bg-destructive/10 muted background', () => {
     render(<ErrorMessage message={makeErrorMessage('Error text')} />);
     const inner = screen.getByTestId('error-message-inner');
-    expect(inner.className).toContain('bg-error/10');
+    expect(inner.className).toContain('bg-destructive/10');
   });
 
   it('renders an AlertCircle icon (svg element)', () => {

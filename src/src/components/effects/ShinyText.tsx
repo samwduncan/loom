@@ -12,14 +12,14 @@ import type { ReactNode } from 'react';
 import { cn } from '@/utils/cn';
 import './ShinyText.css';
 
-interface ShinyTextProps {
+export interface ShinyTextProps {
   children: ReactNode;
-  disabled?: boolean;
+  isDisabled?: boolean;
   className?: string;
 }
 
-export function ShinyText({ children, disabled, className }: ShinyTextProps) {
-  if (disabled) {
+export function ShinyText({ children, isDisabled, className }: ShinyTextProps) {
+  if (isDisabled) {
     return <span className={className}>{children}</span>;
   }
 

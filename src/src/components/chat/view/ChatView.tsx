@@ -65,11 +65,6 @@ export function ChatView() {
     }
   }, [sessionId, projectName, messages.length, switchSession]);
 
-  // Stream finalization callback -- no-op since the finalized message is already
-  // in the store via ActiveMessage's handleFlush.
-  const handleStreamFinalized = useCallback(() => {
-    // Message already added to store by ActiveMessage.handleFlush
-  }, []);
 
   // Determine content state.
   const hasSession = Boolean(sessionId || activeSessionId);
@@ -82,20 +77,21 @@ export function ChatView() {
     return session?.title || 'Conversation';
   });
 
-  // Keyboard shortcut: Cmd+F / Ctrl+F opens search
+  // Keyboard shortcut: Cmd+F / Ctrl+F opens search.
+  const { open: searchOpen, isOpen: searchIsOpen } = search;
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
         e.preventDefault();
-        if (!search.isOpen) {
-          search.open();
+        if (!searchIsOpen) {
+          searchOpen();
         }
-        // When already open, SearchBar auto-focuses -- no extra action needed
       }
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [search]);
+  }, [searchOpen, searchIsOpen]);
 
   // Close export dropdown on outside click
   useEffect(() => {
@@ -188,7 +184,7 @@ export function ChatView() {
               <Download className="size-4" />
             </button>
             {exportOpen && (
-              <div className="absolute right-0 top-full mt-1 min-w-[160px] rounded-md border border-border bg-surface-1 py-1 shadow-lg">
+              <div className="absolute right-0 top-full mt-1 min-w-[160px] rounded-md border border-border bg-surface-overlay py-1 shadow-lg">
                 <button
                   type="button"
                   onClick={handleExportMarkdown}
@@ -228,7 +224,6 @@ export function ChatView() {
         <MessageList
           messages={displayMessages}
           sessionId={effectiveSessionId ?? ''}
-          onStreamFinalized={handleStreamFinalized}
           scrollContainerRef={scrollContainerRef}
           searchQuery={search.debouncedQuery}
           highlightText={search.highlightText}

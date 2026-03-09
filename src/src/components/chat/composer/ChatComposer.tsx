@@ -332,7 +332,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 pb-4 pt-2">
-      <ElectricBorder active={isStreaming}>
+      <ElectricBorder isActive={isStreaming}>
       <div
         className="composer-pill relative p-3"
         data-streaming={isStreamingState}

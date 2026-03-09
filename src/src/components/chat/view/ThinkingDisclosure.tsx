@@ -20,7 +20,7 @@ import type { ThinkingBlock } from '@/types/message';
 import '../styles/thinking-disclosure.css';
 import '../styles/streaming-cursor.css';
 
-interface ThinkingDisclosureProps {
+export interface ThinkingDisclosureProps {
   blocks: ThinkingBlock[];
   isStreaming: boolean;
   globalExpanded?: boolean;
@@ -66,6 +66,7 @@ export function ThinkingDisclosure({
       <button
         type="button"
         className="thinking-disclosure-trigger"
+        aria-expanded={isExpanded}
         onClick={() => setUserToggled((prev) => prev === null ? !defaultExpanded : !prev)}
       >
         {isStreaming ? (

@@ -29,7 +29,7 @@ import { useUIStore } from '@/stores/ui';
 import type { Message } from '@/types/message';
 import type { ToolCallState } from '@/types/stream';
 
-interface AssistantMessageProps {
+export interface AssistantMessageProps {
   message: Message;
   /** Highlight function for search -- threaded to ThinkingDisclosure */
   highlightText?: (text: string) => ReactNode;

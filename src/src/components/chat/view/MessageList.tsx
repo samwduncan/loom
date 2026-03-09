@@ -32,10 +32,9 @@ import { useStreamStore } from '@/stores/stream';
 import type { Message } from '@/types/message';
 import type { ReactNode } from 'react';
 
-interface MessageListProps {
+export interface MessageListProps {
   messages: Message[];
   sessionId: string;
-  onStreamFinalized: () => void;
   /** Scroll container ref passed from ChatView for composer scroll stability */
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
   /** Active search query (debounced) -- used for empty state display */
@@ -44,7 +43,7 @@ interface MessageListProps {
   highlightText?: (text: string) => ReactNode;
 }
 
-export function MessageList({ messages, sessionId, onStreamFinalized, scrollContainerRef, searchQuery, highlightText }: MessageListProps) {
+export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText }: MessageListProps) {
   const internalScrollRef = useRef<HTMLDivElement>(null);
   // Use external ref if provided (for composer scroll stability), otherwise internal
   const scrollRef = scrollContainerRef ?? internalScrollRef;
@@ -64,8 +63,7 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
 
   const handleFinalized = useCallback(() => {
     setShowActiveMessage(false);
-    onStreamFinalized();
-  }, [onStreamFinalized]);
+  }, []);
 
   const {
     sentinelRef,
@@ -117,11 +115,15 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
   const prevMessageCountRef = useRef(messages.length);
 
   useLayoutEffect(() => {
-    if (messages.length === 0) return;
-
-    // Save outgoing session's scroll position
+    // Save outgoing session's scroll position (must run before early return
+    // so switching to an empty session still saves the outgoing position)
     if (prevSessionIdRef.current !== null && prevSessionIdRef.current !== sessionId) {
       saveScrollPosition(prevSessionIdRef.current);
+    }
+
+    if (messages.length === 0) {
+      prevSessionIdRef.current = sessionId;
+      return;
     }
 
     // Restore target session's position or scroll to bottom for new sessions

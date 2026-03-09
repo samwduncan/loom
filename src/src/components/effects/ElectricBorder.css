@@ -34,6 +34,7 @@
   left: -250%;
   background: radial-gradient(circle, var(--accent-primary), transparent 10%);
   animation: electric-top 4s linear infinite alternate;
+  animation-play-state: paused;
 }
 
 .electric-border-gradient-bottom {
@@ -41,6 +42,12 @@
   right: -250%;
   background: radial-gradient(circle, var(--accent-primary), transparent 10%);
   animation: electric-bottom 4s linear infinite alternate;
+  animation-play-state: paused;
+}
+
+.electric-border[data-active="true"] .electric-border-gradient-top,
+.electric-border[data-active="true"] .electric-border-gradient-bottom {
+  animation-play-state: running;
 }
 
 @keyframes electric-top {

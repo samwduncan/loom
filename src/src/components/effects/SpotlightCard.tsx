@@ -12,7 +12,7 @@ import { useRef, type MouseEvent, type ReactNode } from 'react';
 import { cn } from '@/utils/cn';
 import './SpotlightCard.css';
 
-interface SpotlightCardProps {
+export interface SpotlightCardProps {
   children: ReactNode;
   className?: string;
 }

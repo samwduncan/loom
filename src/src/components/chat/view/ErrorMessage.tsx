@@ -22,7 +22,7 @@ import { cn } from '@/utils/cn';
 import type { Message } from '@/types/message';
 import type { ClaudeCommandOptions } from '@/types/websocket';
 
-interface ErrorMessageProps {
+export interface ErrorMessageProps {
   message: Message;
   /** Session ID this error belongs to -- used for retry targeting */
   sessionId?: string;
@@ -70,10 +70,10 @@ export function ErrorMessage({ message, sessionId }: ErrorMessageProps) {
   return (
     <MessageContainer role="error">
       <div
-        className="flex items-start gap-2 border-l-4 border-error bg-error/10 rounded-r-lg px-3 py-2"
+        className="flex items-start gap-2 border-l-4 border-destructive bg-destructive/10 rounded-r-lg px-3 py-2"
         data-testid="error-message-inner"
       >
-        <AlertCircle className="size-4 text-error shrink-0 mt-0.5" />
+        <AlertCircle className="size-4 text-destructive shrink-0 mt-0.5" />
         <span className="text-sm text-foreground flex-1">{message.content}</span>
         {lastUserMessage && (
           <button
@@ -81,9 +81,9 @@ export function ErrorMessage({ message, sessionId }: ErrorMessageProps) {
             onClick={handleRetry}
             disabled={!canRetry}
             className={cn(
-              'flex items-center gap-1 text-sm text-error shrink-0',
+              'flex items-center gap-1 text-sm text-destructive shrink-0',
               canRetry
-                ? 'hover:text-error/80 cursor-pointer'
+                ? 'hover:text-destructive/80 cursor-pointer'
                 : 'opacity-50 cursor-not-allowed',
             )}
             data-testid="error-retry-button"

@@ -16,7 +16,7 @@ import { ImageLightbox } from '@/components/chat/view/ImageLightbox';
 import { formatRelativeTime } from '@/lib/formatTime';
 import type { Message, ImageAttachment } from '@/types/message';
 
-interface UserMessageProps {
+export interface UserMessageProps {
   message: Message;
   /** Highlight function to wrap matching search text in <mark> elements */
   highlightText?: (text: string) => ReactNode;

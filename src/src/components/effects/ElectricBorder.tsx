@@ -12,15 +12,15 @@ import type { ReactNode } from 'react';
 import { cn } from '@/utils/cn';
 import './ElectricBorder.css';
 
-interface ElectricBorderProps {
+export interface ElectricBorderProps {
   children: ReactNode;
-  active?: boolean;
+  isActive?: boolean;
   className?: string;
 }
 
-export function ElectricBorder({ children, active, className }: ElectricBorderProps) {
+export function ElectricBorder({ children, isActive, className }: ElectricBorderProps) {
   return (
-    <div className={cn('electric-border', className)} data-active={active ? 'true' : 'false'}>
+    <div className={cn('electric-border', className)} data-active={isActive ? 'true' : 'false'}>
       <div className="electric-border-gradient-top" aria-hidden="true" />
       <div className="electric-border-gradient-bottom" aria-hidden="true" />
       <div className="electric-border-content">
