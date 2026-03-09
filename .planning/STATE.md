@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 19 of 19 (Visual Effects + Enhancements)
-Plan: 1 of 3 -- COMPLETE
+Plan: 2 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-09 -- Phase 19 Plan 01 complete (SpotlightCard, ShinyText, ElectricBorder effects)
+Last activity: 2026-03-09 -- Phase 19 Plan 02 complete (thinking markdown, error retry)
 
-Progress: [█████████░] 92%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -64,6 +64,8 @@ Progress: [█████████░] 92%
 | 18    | 01   | 3min     | 2     | 8     |
 | Phase 18 P02 | 4min | 2 tasks | 8 files |
 | 18    | 03   | 6min     | 2     | 19    |
+| 19    | 01   | -        | -     | -     |
+| 19    | 02   | 7min     | 2     | 6     |
 | 19    | 01   | 7min     | 2     | 10    |
 
 ## Accumulated Context
@@ -143,6 +145,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 19-01: CSS-only effects with zero JS animation libraries (no Framer Motion, no Canvas)
 - Phase 19-01: data-active attribute pattern for ElectricBorder activation via CSS selectors
 - Phase 19-01: element.style.setProperty for SpotlightCard mouse tracking (no React state re-renders)
+- Phase 19-02: Separate thinking-markdown.ts parser for strict inline-only output (no block elements)
+- Phase 19-02: DOMPurify strict 4-tag allowlist (strong, em, code, a) for thinking blocks
+- Phase 19-02: ErrorMessage uses stores directly (useTimelineStore, useConnectionStore) rather than prop threading
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -161,6 +166,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-09T17:10:08.000Z
-Stopped at: Completed 19-01-PLAN.md
-Resume: Phase 19 Plan 01 complete. Plans 02-03 remaining.
+Last session: 2026-03-09T17:11:00Z
+Stopped at: Completed 19-02-PLAN.md
+Resume: Phase 19 Plan 02 complete. Plan 03 remaining.
