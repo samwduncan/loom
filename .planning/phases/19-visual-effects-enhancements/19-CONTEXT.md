@@ -33,22 +33,27 @@ Cherry-picked CSS visual effects elevate the interface (SpotlightCard, ShinyText
 - Click resends the most recent user message before the error via WebSocket
 - Error message stays visible in timeline until new response starts arriving
 - No loading indicator transformation — error stays as-is, new assistant message appears below
+- **Edge case — no prior user message**: Retry button hidden if no user message exists before the error
+- **Edge case — disconnected WebSocket**: Retry button disabled when connection is down (same pattern as composer send button)
 
 ### Message Search
 - Search icon in chat header bar — click reveals search input that slides in
-- **Cmd+F** (Mac) / **Ctrl+F** (Windows) keyboard shortcut triggers search (intercepts browser find)
+- **Cmd+F** (Mac) / **Ctrl+F** (Windows) keyboard shortcut triggers search — hijacks browser find via `preventDefault`. This is standard practice (VS Code, Slack, Discord all do it). Pressing Cmd+F when search is already open focuses the input; Escape closes search and restores browser find behavior.
 - **Filter mode**: non-matching messages hidden, matching messages shown with search terms highlighted (`bg-primary/20`)
-- Clear search restores full message list
+- **Zero results**: centered muted empty state message — "No messages match '{query}'" — in the message area
+- Clear search (Escape or X button) restores full message list
 - **Search scope**: user message text, assistant message text, and thinking block content
 - Does NOT search tool call inputs/outputs
 - Basic substring match (case-insensitive), not fuzzy search
 
 ### Conversation Export
-- **Markdown format only** (.md file download) — no JSON export in this phase
-- **Included content**: user messages, assistant messages (with markdown formatting), tool call summaries (tool name + key input, e.g., "Read: src/auth.ts"), token/cost metadata per assistant message as footer notes
-- **Excluded**: thinking blocks, full tool call outputs, image data
+- **Two formats**: Markdown (.md) and JSON (.json) — user picks format from dropdown/menu when exporting
+- **Markdown export includes**: user messages, assistant messages (with markdown formatting), tool call summaries (tool name + key input, e.g., "Read: src/auth.ts"), token/cost metadata per assistant message as footer notes
+- **JSON export includes**: full message data with all metadata, token counts, timestamps, tool call inputs/outputs — machine-readable for re-import or analysis
+- **Excluded from both**: image binary data (referenced by path only)
+- **Excluded from Markdown only**: thinking blocks, full tool call outputs
 - Export button in **chat header menu** (alongside thinking toggle and search)
-- **Filename**: `{session-title-slug}-{YYYY-MM-DD}.md` — falls back to session ID if no title
+- **Filename**: `{session-title-slug}-{YYYY-MM-DD}.{md|json}` — falls back to session ID if no title
 
 ### Claude's Discretion
 - SpotlightCard gradient colors and radius
@@ -57,7 +62,9 @@ Cherry-picked CSS visual effects elevate the interface (SpotlightCard, ShinyText
 - Thinking markdown regex implementation details
 - Search input slide-in animation and layout
 - Export markdown template structure and formatting
-- How Cmd+F intercept coexists with browser default (likely preventDefault + custom handler)
+- Thinking markdown: handling of nested inline formatting (e.g., `_**bold italic**_`) — best effort is fine
+- Search debounce timing (filter on every keystroke vs after 200ms pause)
+- Search highlight implementation (`<mark>` tag vs span with bg class)
 
 </decisions>
 
@@ -68,7 +75,7 @@ Cherry-picked CSS visual effects elevate the interface (SpotlightCard, ShinyText
 - ElectricBorder on composer creates the "alive" feeling during generation without being overwhelming
 - ShinyText on "Thinking..." makes the waiting feel intentional and polished rather than static
 - Search filter mode works better with our content-visibility architecture than highlight-and-navigate (no need to scroll to off-screen matches)
-- Export is Markdown-only for now — keeps it simple, most useful for sharing/reading. JSON can come later if needed.
+- Markdown export for human reading/sharing, JSON export for data portability and analysis — both serve different "pro" use cases
 
 </specifics>
 
@@ -100,7 +107,7 @@ Cherry-picked CSS visual effects elevate the interface (SpotlightCard, ShinyText
 - ElectricBorder: wraps ChatComposer outer container — conditional on `isStreaming`
 - Retry button: inside ErrorMessage, needs access to timeline store to find last user message and WebSocket to resend
 - Search: new state in ChatView (searchQuery), filters messages prop passed to MessageList
-- Export: utility function that serializes messages to Markdown string, triggers browser download via Blob + URL.createObjectURL
+- Export: utility functions that serialize messages to Markdown or JSON, trigger browser download via Blob + URL.createObjectURL
 
 </code_context>
 
