@@ -1,0 +1,61 @@
+/* ElectricBorder.css -- CSS gradient animation (StarBorder pattern) */
+/* Design tokens only, no hardcoded colors (Constitution 7.14) */
+
+.electric-border {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+}
+
+.electric-border-content {
+  position: relative;
+  z-index: 1;
+}
+
+.electric-border-gradient-top,
+.electric-border-gradient-bottom {
+  position: absolute;
+  width: 300%;
+  height: 50%;
+  opacity: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.electric-border[data-active="true"] .electric-border-gradient-top,
+.electric-border[data-active="true"] .electric-border-gradient-bottom {
+  opacity: 0.5;
+}
+
+.electric-border-gradient-top {
+  top: -10px;
+  left: -250%;
+  background: radial-gradient(circle, var(--accent-primary), transparent 10%);
+  animation: electric-top 4s linear infinite alternate;
+}
+
+.electric-border-gradient-bottom {
+  bottom: -11px;
+  right: -250%;
+  background: radial-gradient(circle, var(--accent-primary), transparent 10%);
+  animation: electric-bottom 4s linear infinite alternate;
+}
+
+@keyframes electric-top {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes electric-bottom {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .electric-border-gradient-top,
+  .electric-border-gradient-bottom {
+    display: none;
+  }
+}

@@ -1,0 +1,31 @@
+/* ShinyText.css -- CSS-only shimmer text effect */
+/* Design tokens only, no hardcoded colors (Constitution 7.14) */
+
+.shiny-text {
+  display: inline-block;
+  background: linear-gradient(
+    120deg,
+    var(--text-muted) 40%,
+    var(--accent-primary) 50%,
+    var(--text-muted) 60%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shiny-sweep 3s linear infinite;
+}
+
+@keyframes shiny-sweep {
+  0% { background-position: 100% center; }
+  100% { background-position: -100% center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shiny-text {
+    animation: none;
+    -webkit-text-fill-color: unset;
+    background: none;
+    color: var(--text-muted);
+  }
+}
