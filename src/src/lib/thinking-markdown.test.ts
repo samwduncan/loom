@@ -85,6 +85,17 @@ describe('parseThinkingMarkdown', () => {
     expect(result).toBeTruthy();
   });
 
+  it('does not italicize underscores in identifiers like my_var_name', () => {
+    const result = parseThinkingMarkdown('check my_var_name here');
+    expect(result).not.toContain('<em>');
+    expect(result).toContain('my_var_name');
+  });
+
+  it('still italicizes _word_ surrounded by whitespace', () => {
+    const result = parseThinkingMarkdown('this is _italic_ text');
+    expect(result).toContain('<em>italic</em>');
+  });
+
   it('strips PUA characters to prevent placeholder spoofing', () => {
     const result = parseThinkingMarkdown('\uE000TH1\uE001');
     // PUA chars stripped, so the text renders as "TH1" (not a code block)

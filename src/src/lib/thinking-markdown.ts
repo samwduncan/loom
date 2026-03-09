@@ -68,8 +68,11 @@ export function parseThinkingMarkdown(text: string): string {
   result = result.replace(/__(.+?)__/g, '<strong>$1</strong>');
 
   // Step 4: Italic (*text* or _text_)
+  // Asterisk italic: match *text* not preceded/followed by *
   result = result.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
-  result = result.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '<em>$1</em>');
+  // Underscore italic: require word boundary (whitespace/start/end) to avoid
+  // mangling identifiers like my_variable_name in thinking blocks
+  result = result.replace(/(?<=\s|^)_(?!_)(.+?)(?<!_)_(?=\s|$)/gm, '<em>$1</em>');
 
   // Step 5: Links [text](url)
   result = result.replace(
