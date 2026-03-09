@@ -70,6 +70,7 @@ export function AssistantMessage({ message }: AssistantMessageProps) {
           blocks={message.thinkingBlocks!} // ASSERT: hasThinking guards truthiness of thinkingBlocks
           isStreaming={false}
           globalExpanded={thinkingExpanded}
+          duration={message.metadata.duration}
         />
       )}
       <MarkdownRenderer content={message.content} />

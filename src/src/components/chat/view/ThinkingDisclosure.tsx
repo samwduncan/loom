@@ -22,12 +22,15 @@ interface ThinkingDisclosureProps {
   blocks: ThinkingBlock[];
   isStreaming: boolean;
   globalExpanded?: boolean;
+  /** Message-level duration in seconds (from metadata.duration) */
+  duration?: number | null;
 }
 
 export function ThinkingDisclosure({
   blocks,
   isStreaming,
   globalExpanded = true,
+  duration,
 }: ThinkingDisclosureProps) {
   const [userToggled, setUserToggled] = useState<boolean | null>(null);
   const [prevGlobalExpanded, setPrevGlobalExpanded] = useState(globalExpanded);
@@ -63,7 +66,10 @@ export function ThinkingDisclosure({
         {isStreaming ? (
           <span className="thinking-pulse">Thinking...</span>
         ) : (
-          <span>{`Thinking (${totalChars.toLocaleString()} chars)`}</span>
+          <span>
+            {`Thinking (${totalChars.toLocaleString()} chars)`}
+            {duration != null && ` · took ${duration.toFixed(1)}s`}
+          </span>
         )}
         <span
           className="thinking-disclosure-arrow"

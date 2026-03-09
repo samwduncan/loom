@@ -50,6 +50,22 @@ describe('ThinkingDisclosure', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows duration when provided', () => {
+    render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} duration={3.247} />,
+    );
+    const trigger = screen.getByRole('button');
+    expect(trigger.textContent).toContain('took 3.2s');
+  });
+
+  it('omits duration when null', () => {
+    render(
+      <ThinkingDisclosure blocks={BLOCKS} isStreaming={false} duration={null} />,
+    );
+    const trigger = screen.getByRole('button');
+    expect(trigger.textContent).not.toContain('took');
+  });
+
   it('formats large char counts with locale separators', () => {
     const longBlock: ThinkingBlock[] = [
       { id: 'tb-big', text: 'x'.repeat(12345), isComplete: true },
