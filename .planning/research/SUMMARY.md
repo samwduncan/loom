@@ -1,189 +1,183 @@
 # Project Research Summary
 
-**Project:** Loom V2 -- M2 "The Chat"
-**Domain:** AI chat interface -- streaming markdown, syntax highlighting, composer, tool cards
-**Researched:** 2026-03-07
+**Project:** Loom V2 -- M3 "The Workspace"
+**Domain:** AI coding tool workspace panels (Settings, Cmd+K, File Tree, Terminal, Git Panel, Code Editor)
+**Researched:** 2026-03-09
 **Confidence:** HIGH
 
 ## Executive Summary
 
-M2 transforms Loom from a functioning streaming skeleton into a complete chat experience. The core challenge is integrating rich content rendering (markdown, syntax highlighting, tool-specific cards) into an existing rAF-based streaming architecture that was deliberately built to bypass React. This is not greenfield -- it is surgical integration into proven M1 infrastructure, which constrains the approach but also reduces risk. The stack additions are minimal (4 npm packages: react-markdown, remark-gfm, rehype-raw, shiki), and most M2 features require zero new dependencies.
+M3 "The Workspace" transforms Loom from a chat-only interface into a usable daily-driver coding tool by adding six workspace panels: Settings, Command Palette (Cmd+K), File Tree, Code Editor, Terminal, and Git Panel. The existing V2 architecture (AppShell CSS Grid, 4 Zustand stores, WebSocket client, React Router v7) is well-structured to absorb these panels. The core stack is already installed -- only three new dependency clusters are needed: xterm.js for the terminal, CodeMirror 6 for the code editor, and cmdk for the command palette. The bulk of the UI will be built from shadcn/ui primitives (14 components to install), which ride on the already-installed Radix foundation with zero incremental bundle cost.
 
-The recommended approach is a two-phase rendering model: raw text during active streaming (preserving the 60fps rAF buffer), full markdown + Shiki highlighting on message finalization. This is the safest path that keeps the M1 architecture intact. The research surfaced a tension between the STACK and FEATURES researchers on Streamdown vs react-markdown -- STACK recommends react-markdown (Constitution-mandated, full control over rAF integration), while FEATURES recommends Streamdown (purpose-built for AI streaming). The resolution: start with react-markdown + flush-only markdown, which ships fast with zero streaming performance risk. Evaluate Streamdown or debounced incremental parsing as a UX enhancement in a later phase if users want live formatted streaming.
+The recommended approach is a tab-based workspace inside the existing content column, with Chat, Files, Shell, and Git as switchable tabs and Settings/Cmd+K as overlays. This matches V1's proven UX, aligns with every IDE-like workspace pattern, and requires minimal changes to the existing AppShell grid. A 5th Zustand store (file store) is needed for shared state between the file tree and code editor -- this is the only structural change to the existing architecture. The terminal uses a separate WebSocket connection to `/shell`, completely independent of the chat WebSocket, matching the backend's design.
 
-The highest-risk area is the interaction between markdown parsing and the segment architecture (Pitfall 3). ActiveMessage interleaves text spans with tool chips -- markdown is a block-level format that needs full-document context. The two-phase model sidesteps this during streaming, but finalized messages still need a strategy for placing tool chips within parsed markdown. The marker-based approach (insert placeholder tokens, parse full document, replace markers with React components) is the cleanest solution. Everything else -- composer upgrade, tool card enhancements, activity status -- is well-understood with standard patterns.
+The key risks are: (1) xterm.js lifecycle mismatch with React tab switching -- the terminal DOM must stay mounted but hidden, not conditionally rendered, or all session state is lost; (2) CodeMirror's ~300KB bundle must be lazy-loaded to avoid degrading initial paint; (3) shell WebSocket connection leaks from React strict mode double-mounts need ref-based guards; and (4) git panel state going stale when the AI agent makes changes, requiring WebSocket event-driven refresh. All of these have known solutions documented in the pitfalls research.
 
 ## Key Findings
 
 ### Recommended Stack
 
-M2 adds only 4 packages to the validated M1 stack. No framework changes, no new state management, no animation libraries.
+The core stack (React 19, TypeScript, Vite 7, Tailwind v4, Zustand 5) is fully installed and requires zero changes. Three new dependency clusters are needed, all with proven V1 precedent or industry-standard adoption. See [STACK.md](STACK.md) for full details.
 
 **New dependencies:**
-- **react-markdown ^10.1.0**: Markdown-to-React renderer -- Constitution Section 12.1 mandates this pipeline, peer dep confirmed compatible with React 19
-- **remark-gfm ^4.0.1**: GFM extensions (tables, strikethrough, task lists) -- AI agents produce GFM tables constantly
-- **rehype-raw ^7.0.0**: HTML passthrough for `<details>`/`<summary>` blocks in AI output
-- **shiki ^4.0.1**: Syntax highlighting with JavaScript RegExp engine (no WASM), lazy language loading, CSS variable theming maps to OKLCH tokens
-
-**Explicitly rejected:** react-textarea-autosize (pulls @babel/runtime), motion/framer-motion (CSS transitions suffice for M2), Streamdown (dual parser, CDN grammar loading, conflicts with rAF architecture), @tailwindcss/typography (not needed on Tailwind v4), @shikijs/rehype (blocks parse pipeline during grammar loading).
-
-**Bundle impact:** ~50-60KB gzipped total (react-markdown pipeline ~40KB + Shiki core ~15KB, grammars load on demand).
-
-See `.planning/research/STACK.md` for full version matrix, integration code patterns, and rejected alternatives with rationale.
+- **@xterm/xterm + addons**: Terminal emulation -- only viable option for browser terminals, V1 proven (~200KB, lazy-loaded)
+- **@uiw/react-codemirror + lang-***: Code editor -- best React wrapper for CodeMirror 6, 5x smaller than Monaco (~300KB, lazy-loaded)
+- **cmdk**: Command palette core -- powers shadcn Command component, fuzzy search + keyboard nav out of the box (~8KB)
+- **14 shadcn/ui primitives**: tabs, form, input, label, switch, select, accordion, slider, checkbox, card, command, textarea, alert-dialog, context-menu, table, skeleton -- zero incremental bundle (Radix already installed)
 
 ### Expected Features
 
+See [FEATURES.md](FEATURES.md) for full feature landscape with complexity estimates.
+
 **Must have (table stakes):**
-- Streaming markdown rendering (plain text -> formatted content on flush)
-- Syntax-highlighted code blocks with copy button and language labels
-- Auto-resize textarea composer (replace single-line input)
-- All 7 message types rendering (user, assistant, tool, thinking, error, system, task_notification)
-- Tool call state machine with timing (invoked -> executing -> resolved/error + elapsed time)
-- Activity status line ("Reading auth.ts...")
-- Scroll position preservation across session switches
-- GFM table support, long content handling, user message styling
+- Settings panel with agent auth status, API key management, git config, appearance prefs (5-tab layout)
+- Command palette (Cmd+K) with session search, project switching, fuzzy filtering, grouped commands
+- File tree with hierarchical browsing, expand/collapse, file type icons, click-to-open-in-editor
+- Code editor with syntax highlighting, read/write, file tabs, line numbers, search, OKLCH theme
+- Terminal with full PTY emulation, auto-resize, connection state UI, project-scoped cwd
+- Git panel with changes view, file staging, commit, branch display, diff viewer, commit history
 
 **Should have (differentiators):**
-- Rich per-tool card views (BashCard, ReadCard, EditCard, WriteCard, GlobCard, GrepCard) -- THE differentiator for a coding agent UI
-- Image paste/drop in composer (backend already supports it)
-- Permission request banners (Allow/Deny for tool execution)
-- Consecutive tool call grouping (accordion)
-- Token/cost display per turn
-- Keyboard shortcuts (Cmd+. stop, Escape clear)
-- Draft preservation per session
-- Message entrance animations, streaming cursor polish
+- MCP server management in settings
+- Slash command execution from Cmd+K
+- Context menu in file tree (copy path, open in editor/terminal)
+- "Open file from tool card" flow (click file path in chat -> opens in editor)
+- Branch switching/creation, push/pull/fetch, AI commit messages in git panel
 
-**Defer to M3+:**
-- Virtual scrolling (use content-visibility: auto first)
-- Conversation branching/forking
-- Rich text editor in composer (TipTap/ProseMirror)
-- Full Framer Motion (CSS transitions for M2)
-- Artifacts/Canvas panel, Aurora effects, Model selector, Settings panel, Light mode, Cmd+K palette
-
-See `.planning/research/FEATURES.md` for complete competitive analysis, anti-features list, dependency graph, and phasing recommendation.
+**Defer to later milestones:**
+- MCP server management UI (M5 "The Power")
+- File change indicators from git status (M4 "The Polish")
+- Multiple terminal sessions (M5)
+- Editor minimap, split panes (M4/M5)
+- Git stash management, merge conflict UI (M5+)
+- Light mode, aurora effects (M4)
 
 ### Architecture Approach
 
-M2 extends the existing M1 data flow at five well-defined integration points without replacing any core infrastructure. The WebSocket -> multiplexer -> stores/refs pipeline stays intact. Changes are purely at the rendering layer: ActiveMessage gains a lightweight streaming markdown parser for innerHTML (pure function, not React), AssistantMessage wraps content in a MarkdownRenderer with Shiki code blocks, ToolChip gets CSS state machine animations, ChatComposer becomes a textarea, and ActivityStatusLine reads an already-populated store field.
+All panels integrate into a new `ContentLayout` component within the existing content column of the AppShell CSS grid. Panels are tab-switched (Chat/Files/Git) with the terminal as a resizable bottom panel and Settings/Cmd+K as overlays. A 5th Zustand store handles file tree + editor state. See [ARCHITECTURE.md](ARCHITECTURE.md) for full component boundaries and data flow.
 
 **Major components:**
-1. **streaming-markdown.ts** -- Lightweight pure function (markdown string -> HTML string) for rAF loop, handles unclosed blocks gracefully
-2. **MarkdownRenderer** -- react-markdown wrapper with custom renderers for code, tables, links (finalized messages only)
-3. **shiki-highlighter.ts** -- Singleton Shiki instance with lazy language loading, CSS variable theme mapped to OKLCH tokens
-4. **CodeBlock** -- Fenced code display with Shiki highlighting, language label, copy button, deferred rendering via useDeferredValue
-5. **ChatComposer (rewrite)** -- Auto-resize textarea, image paste/upload, send/stop morph, keyboard shortcuts
-6. **Tool card components** -- BashCard, FileCard, SearchCard registered via existing pluggable registry
-
-**Key patterns:**
-- Two-Phase Rendering: lightweight innerHTML during streaming, full react-markdown + Shiki on finalization
-- Lazy Singleton: module-level Shiki highlighter created once, reused everywhere
-- Registry Extension: new tool cards self-register via existing `registerTool()` API, no switch statements
-
-See `.planning/research/ARCHITECTURE.md` for complete data flow diagrams, component boundaries, integration point analysis, and anti-patterns.
+1. **ContentLayout** -- Tab switching orchestrator, bottom panel management, thin coordination layer
+2. **ContentHeader** -- Tab bar rendering (Chat, Files, Git), keyboard shortcuts (Cmd+1/2/3)
+3. **SettingsPanel** -- 5-tab settings page (Agents, API Keys, Appearance, Git, Tasks), REST API CRUD
+4. **CommandPalette** -- Portal overlay with cmdk/shadcn Command, reads from timeline + file stores
+5. **FileTreePanel + FileStore** -- Recursive tree component, new 5th Zustand store for file state
+6. **CodeEditorPanel** -- CodeMirror 6 with custom OKLCH theme, file tabs, lazy-loaded languages
+7. **TerminalPanel** -- xterm.js with separate WebSocket to `/shell`, CSS show/hide (not unmount)
+8. **GitPanel** -- Changes/history views, staging checkboxes, commit flow, diff viewer
 
 ### Critical Pitfalls
 
-1. **react-markdown re-parses entire content on every token** -- Never run react-markdown inside the rAF loop. Use two-phase rendering: raw text during streaming, full markdown on flush. This is the foundational decision of M2.
+See [PITFALLS.md](PITFALLS.md) for all 13 pitfalls with full prevention strategies.
 
-2. **Markdown parsing breaks the segment architecture** -- ActiveMessage interleaves text spans with tool chips, but markdown needs full-document context. Use marker-based approach for finalized messages: insert placeholder tokens at tool positions, parse full document, replace markers with React components.
-
-3. **Shiki async grammar loading causes layout shifts** -- Reserve height for code blocks immediately (min-height based on line count), pre-load 7 common language grammars at startup, cache highlighted results, use useDeferredValue for non-blocking rendering.
-
-4. **Composer auto-resize fights the CSS Grid shell** -- Grid template must be `1fr auto` (messages flex, composer intrinsic). Use useLayoutEffect for height recalculation. Cap at ~200px with inner scroll. Stabilize scroll position on resize.
-
-5. **Tool state animations trigger layout during streaming** -- Use GPU-only animations (opacity, transform) during active streaming. Defer actual card expansion until stream ends. Constitution Section 11.4 explicitly bans height/width animation during streaming.
-
-See `.planning/research/PITFALLS.md` for 15 pitfalls (6 critical, 5 moderate, 4 minor) with detection strategies, prevention code, and phase assignments.
+1. **xterm.js lifecycle mismatch** -- Terminal must stay mounted but hidden via CSS when tab switches away. Conditional rendering (`{activeTab === 'terminal' && <Terminal />}`) destroys session state. Same applies to ChatView for scroll position preservation.
+2. **CodeMirror bundle bloat** -- Must use `React.lazy()` + `<Suspense>`. Language grammars must be dynamically imported per file extension, never at module level.
+3. **Shell WebSocket connection leak** -- React strict mode double-mounts cause duplicate PTY processes. Use ref-based guards and close WS with code 1000 on cleanup.
+4. **Settings persistence inconsistency** -- Some settings are SQLite-backed, some are env vars (not mutable at runtime). Map every setting to its persistence mechanism; show "requires restart" where appropriate.
+5. **Git panel stale state** -- Agent changes files without the git panel knowing. Listen for `projects_updated` WebSocket events to trigger automatic refresh.
 
 ## Implications for Roadmap
 
-Based on combined research, suggested 4-phase structure for M2:
+Based on research, suggested phase structure (7 phases):
 
-### Phase 1: Streaming Markdown + Code Blocks
-**Rationale:** Highest-value, highest-risk feature. Every subsequent phase depends on formatted content rendering. The architectural decision (two-phase rendering) must be validated first. All 4 new npm packages are installed here.
-**Delivers:** Formatted assistant messages with syntax-highlighted code blocks. Streaming shows lightweight markdown via innerHTML (bold, italic, code spans, paragraphs). Finalized messages show full react-markdown + Shiki rendering. Code blocks have copy buttons and language labels. GFM tables with horizontal scroll wrapper. Long content handling (word-break, link targets).
-**Addresses:** Streaming markdown, syntax-highlighted code blocks, GFM tables, long content handling, code block copy button
-**Avoids:** Pitfall 1 (rAF re-parse), Pitfall 2 (Shiki layout shift), Pitfall 3 (segment conflict), Pitfall 7 (unclosed blocks), Pitfall 8 (OKLCH theme conflict)
-**Stack:** react-markdown ^10.1.0, remark-gfm ^4.0.1, rehype-raw ^7.0.0, shiki ^4.0.1
+### Phase 1: Content Layout + Tab System
+**Rationale:** Every other panel depends on this. It is the foundation for rendering any workspace panel. Highest leverage, smallest scope.
+**Delivers:** Tab bar component, tab switching (Chat/Files/Git tabs), UI store expansion (TabId union, bottomPanelHeight), ContentLayout component, keyboard shortcuts (Cmd+1/2/3/4).
+**Addresses:** Panel layout strategy from FEATURES.md, content area sub-grid from ARCHITECTURE.md.
+**Avoids:** Tab switching destroying component state (Pitfall 9) -- implement CSS show/hide for Chat from the start.
 
-### Phase 2: Composer Upgrade
-**Rationale:** The composer is the user's primary interaction point. Upgrading from single-line input to auto-resize textarea unlocks multiline prompts, image paste, and keyboard shortcuts. Independent of Phase 1 in code, but testing is better with formatted messages available.
-**Delivers:** Auto-resize textarea (CSS Grid trick or useLayoutEffect mirror), Shift+Enter for newlines, image paste/drop with thumbnail previews (blob URLs, not data URIs), send/stop morph animation (CSS crossfade), keyboard shortcuts (Cmd+. stop, Escape clear), draft preservation per session (localStorage).
-**Addresses:** Auto-resize textarea, image paste/drop, send/stop polish, keyboard shortcuts, draft preservation
-**Avoids:** Pitfall 4 (Grid shell conflict), Pitfall 9 (send/stop state machine), Pitfall 10 (image memory pressure)
+### Phase 2: Settings Panel
+**Rationale:** Zero dependencies on other panels. Largest surface area (5 tabs, many forms) so starting early burns down the biggest unknown. Installing 14 shadcn primitives here benefits all subsequent phases.
+**Delivers:** Complete settings page with Agents, API Keys, Appearance, Git Config tabs. Agent auth status display. API key CRUD. shadcn primitives installed.
+**Uses:** shadcn tabs, form, input, label, switch, select, accordion, slider, card from STACK.md.
+**Avoids:** Settings persistence inconsistency (Pitfall 5) -- map each setting to its backend storage mechanism.
 
-### Phase 3: Message Types + Tool Cards
-**Rationale:** Complete message type coverage prevents broken gaps in real conversations. Rich tool cards are Loom's core differentiator. Depends on Phase 1 -- tool card output needs MarkdownRenderer and Shiki for syntax-highlighted file contents and diff views.
-**Delivers:** All 7 message types (error banner with retry affordance, system message centered/muted, task notification with icon), permission request banners with Allow/Deny + 55s timeout indicator, rich per-tool cards (BashCard with terminal-styled output, ReadCard with syntax-highlighted content, EditCard with unified diff view, WriteCard with content preview, GlobCard with file list, GrepCard with match context), tool state elapsed time counter, consecutive tool call grouping accordion, activity status line.
-**Addresses:** All message types, permission banners, rich tool cards, tool timing, tool grouping, activity status
-**Avoids:** Pitfall 5 (tool animation layout during streaming), Pitfall 6 (activity status re-renders)
+### Phase 3: Command Palette (Cmd+K)
+**Rationale:** Small scope, high UX impact. Uses shadcn Command installed in Phase 2. Better after other panels exist (can navigate to them).
+**Delivers:** Global Cmd+K overlay with session search, project switching, tab navigation, grouped commands. Fuzzy search via cmdk.
+**Uses:** cmdk + shadcn Command from STACK.md.
+**Avoids:** Focus trap conflicts with composer (Pitfall 8) -- guard composer keyboard events when palette is open.
 
-### Phase 4: Scroll, Polish, Integration
-**Rationale:** Wire everything together for the complete experience. Individually small items that accumulate into the 10/10 quality bar. Good candidate for parallel execution within the phase.
-**Delivers:** Scroll position preservation across session switches (per-session Map in useRef + useLayoutEffect restore), message entrance animations (tailwindcss-animate: fade-in + slide-from-bottom, respects prefers-reduced-motion), token/cost display per turn (muted text below assistant message), thinking block styling polish (character count, global toggle, italic text), content-visibility: auto on past messages (Constitution 10.5), streaming cursor polish (rose accent, 1s pulse cycle), user message styling upgrade (bg-card, rounded-lg, hover timestamp).
-**Addresses:** Scroll preservation, entrance animations, token display, thinking polish, content-visibility, cursor polish, user message styling
+### Phase 4: File Tree + File Store
+**Rationale:** Code editor depends on file store. File tree is the gateway to the file workspace experience.
+**Delivers:** 5th Zustand store (file state), recursive file tree component, file type icons, expand/collapse, click-to-open. Constitution amendment for 5th store.
+**Avoids:** Large repo performance (Pitfall 6) -- lazy-load children on expand, defer virtualization. Store proliferation (Pitfall 4) -- formal Constitution amendment.
+
+### Phase 5: Code Editor
+**Rationale:** Requires file store from Phase 4. Heavy dependency (CodeMirror ~300KB) that must be lazy-loaded.
+**Delivers:** CodeMirror 6 editor, syntax highlighting, file tabs, read/write, OKLCH custom theme, markdown preview, Cmd+F search.
+**Uses:** @uiw/react-codemirror + lang-* packages from STACK.md.
+**Avoids:** Bundle bloat (Pitfall 2) -- React.lazy() + dynamic language imports. Theme mismatch (Pitfall 10) -- custom OKLCH theme from day one.
+
+### Phase 6: Terminal
+**Rationale:** Fully independent of other panels. Could be parallelized with Phases 4-5 but serialized here for single-developer workflow.
+**Delivers:** xterm.js terminal, Shell WebSocket connection, auto-resize, connection state UI, project-scoped cwd, plain shell mode.
+**Uses:** @xterm/xterm + addons from STACK.md.
+**Avoids:** Lifecycle mismatch (Pitfall 1) -- CSS show/hide, not conditional rendering. WS leak (Pitfall 3) -- ref-based cleanup with strict mode guard. Resize thrashing (Pitfall 12) -- debounce FitAddon.fit().
+
+### Phase 7: Git Panel
+**Rationale:** Independent REST API panel. Benefits from file store (open changed file in editor) but works standalone. Highest complexity panel, so placing it last gives maximum context from prior phases.
+**Delivers:** Changes view, file staging with checkboxes, commit message + action, branch display, diff viewer, commit history, branch switching, push/pull/fetch.
+**Uses:** shadcn checkbox, textarea, alert-dialog, select, table from STACK.md. diff package (already installed).
+**Avoids:** Stale state (Pitfall 7) -- WebSocket event-driven refresh. Commit without staged files (Pitfall 13) -- disable button when nothing staged.
 
 ### Phase Ordering Rationale
 
-- **Phase 1 first** because it installs all new dependencies and makes the foundational architectural decision (two-phase rendering). Phases 3 and 4 depend on markdown rendering being solved.
-- **Phase 2 is independent** of Phase 1 in code, but sequencing it second means all subsequent testing happens with the upgraded composer, which is better for integration validation.
-- **Phase 3 depends on Phase 1** -- tool card output needs the MarkdownRenderer and Shiki for syntax-highlighted file contents and diff views in ReadCard and EditCard.
-- **Phase 4 is pure polish** -- each item is small, low-risk, and independently shippable. ResizeObserver enhancement to scroll anchor should happen after all dynamic-height components (code blocks, tool cards) are built.
+- **Dependency-driven:** Content Layout must come first (all panels render inside it). File Store must precede Code Editor. Settings installs shadcn primitives reused everywhere.
+- **Risk front-loading:** Settings (largest surface, most form complexity) is early to surface integration issues with shadcn and REST APIs before tackling heavier panels.
+- **Independence exploitation:** Terminal and Git Panel have zero cross-panel dependencies. They are placed last because they can be deferred without blocking other work if the milestone runs long.
+- **Pitfall-aware:** The most dangerous pitfalls (xterm lifecycle, CodeMirror bundle) are addressed in their specific phases with explicit prevention strategies.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 1:** The streaming markdown strategy (raw text vs debounced incremental) needs a spike. The segment/markdown conflict (Pitfall 3) needs careful implementation design with the marker-based approach. The Shiki CSS variable theme integration with OKLCH tokens needs a concrete theme file.
-- **Phase 3:** Permission request banner interaction needs validation against backend WebSocket protocol (timeout behavior, cancellation edge cases, concurrent requests). EditToolCard unified diff rendering needs a concrete approach (diff parsing library or manual, syntax-aware line coloring).
+- **Phase 2 (Settings):** Backend persistence mapping -- which settings are SQLite vs env vars vs config files needs verification per endpoint.
+- **Phase 5 (Code Editor):** CodeMirror 6 OKLCH theme API -- custom theme creation needs hands-on experimentation. V1's `loom-dark.ts` is a starting reference but used different token system.
+- **Phase 7 (Git Panel):** Diff rendering approach -- custom diff viewer vs @codemirror/merge for inline diffs. Need to evaluate visual quality vs complexity tradeoff.
 
 Phases with standard patterns (skip research-phase):
-- **Phase 2:** Textarea auto-resize, image paste, keyboard shortcuts are well-documented with clear implementation paths from STACK.md and ARCHITECTURE.md.
-- **Phase 4:** All items are incremental enhancements to existing components using standard CSS/React patterns.
+- **Phase 1 (Content Layout):** Tab bar + CSS grid sub-layout is trivial. Well-understood pattern.
+- **Phase 3 (Cmd+K):** cmdk/shadcn Command is extremely well-documented with examples. Drop-in.
+- **Phase 4 (File Tree):** Recursive tree component is a solved problem. No research needed.
+- **Phase 6 (Terminal):** xterm.js integration is well-documented. V1 code serves as direct reference.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All versions verified via npm registry 2026-03-07. Peer dep compatibility confirmed with React 19. Bundle sizes measured. Only 4 new packages. |
-| Features | HIGH | Verified against 6 reference apps. Clear table stakes vs differentiators. Anti-features explicitly documented. Backend WebSocket protocol already supports all needed message types. |
-| Architecture | HIGH | Based on direct analysis of existing M1 source code. Integration points are concrete with specific file paths, not speculative. Two-phase rendering validated against rAF buffer design. |
-| Pitfalls | HIGH | All pitfalls specific to Loom's existing architecture (rAF buffer, segment array, OKLCH tokens, CSS Grid shell). Prevention strategies reference actual code paths and M1 lessons learned. |
+| Stack | HIGH | All deps are V1-proven or industry-standard. Versions verified against current package.json. |
+| Features | HIGH | Feature landscape derived from V1 inventory, backend API contract, and competitive analysis of 6 products. |
+| Architecture | HIGH | Based on direct analysis of existing V2 source code, not speculation. Integration points verified. |
+| Pitfalls | HIGH | Terminal and CodeMirror pitfalls from V1 experience. Settings and git pitfalls from backend API analysis. |
 
 **Overall confidence:** HIGH
 
+All four research files drew from high-quality primary sources: the existing V2 codebase, V1 implementation (which actually shipped), the documented backend API contract, and verified dependency documentation. No research area relied on speculation or single secondary sources.
+
 ### Gaps to Address
 
-- **Streaming markdown UX tradeoff:** The recommended approach (raw text during streaming, markdown on flush) is safest but means users see unformatted text while the model streams. V1 did this and users accepted it, but competitors show formatted streaming. This is a UX call that may need revisiting after Phase 1 ships. If the raw-to-formatted flash on completion feels bad, evaluate Streamdown or debounced incremental parsing.
-
-- **Streamdown vs react-markdown disagreement:** FEATURES research recommends Streamdown, STACK research recommends react-markdown. Synthesis recommends react-markdown (lower integration risk, Constitution compliance, full control over rAF integration). If Phase 1 streaming-to-formatted transition feels jarring, Streamdown should be evaluated as an alternative for the streaming path specifically.
-
-- **Shiki theme mapping to OKLCH:** No research file provided a complete Shiki theme file mapping token types to OKLCH CSS variables. The `css-variables` theme approach is documented but the concrete variable names and OKLCH values need to be worked out during Phase 1 planning.
-
-- **EditToolCard diff rendering:** No research file specified how to parse unified diff format or render syntax-aware diffs. This needs a mini-research spike during Phase 3 planning -- options include a lightweight diff parser, repurposing the V1 DiffViewer component patterns, or rendering raw diff text with syntax highlighting.
-
-- **Permission request edge cases:** The Allow/Deny banner design is straightforward, but edge cases (timeout while user is typing, permission cancelled by backend while banner is visible, rapid sequential permission requests) need validation against actual backend behavior during Phase 3 planning.
+- **File tree API response shape:** The exact structure of `GET /api/projects/:name/files` needs verification during Phase 4 planning. The backend contract documents it exists but the response schema may need runtime validation.
+- **Settings persistence mapping:** Which specific settings endpoints write to SQLite vs env vars vs config files is not fully documented. Needs investigation during Phase 2 implementation.
+- **CodeMirror 6 OKLCH theme API:** Custom theme creation for CodeMirror 6 needs hands-on testing. The `EditorView.theme()` API has changed across versions. V1's theme file is a reference but not directly portable.
+- **Git diff rendering strategy:** Whether to use a custom diff component (like V1) or @codemirror/merge for a richer inline diff experience. Decision can be deferred to Phase 7 planning.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Loom M1 source code: useStreamBuffer.ts, ActiveMessage.tsx, stream-multiplexer.ts, tool-registry.ts, ChatComposer.tsx, AssistantMessage.tsx, stream.ts, timeline.ts
-- npm registry (2026-03-07): react-markdown@10.1.0, remark-gfm@4.0.1, rehype-raw@7.0.0, shiki@4.0.1
-- Shiki documentation: RegExp engines, lazy loading, CSS variable themes, custom themes
-- Loom V2 Constitution (.planning/V2_CONSTITUTION.md): Sections 3, 10, 11, 12
-- Backend API Contract (.planning/BACKEND_API_CONTRACT.md): WebSocket protocol, image upload, permission request/response
+- V2 source code (`src/src/`) -- direct analysis of stores, components, routing, WebSocket client
+- V1 Feature Inventory (`.planning/V1_FEATURE_INVENTORY.md`) -- verified feature list
+- Backend API Contract (`.planning/BACKEND_API_CONTRACT.md`) -- 47+ endpoints documented
+- Component Adoption Map (`.planning/COMPONENT_ADOPTION_MAP.md`) -- shadcn primitive mapping
+- Reference App Analysis (`.planning/reference-app-analysis.md`) -- 6 competitive products
 
 ### Secondary (MEDIUM confidence)
-- 6 reference app analysis (.planning/reference-app-analysis.md): Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat
-- Streamdown (streamdown.ai): Evaluated by FEATURES researcher, deferred by synthesis -- may revisit after Phase 1
-- react-shiki: Streaming-optimized Shiki wrapper with throttle support
-- AI SDK markdown chatbot memoization cookbook
-- CSS-Tricks autogrowing textarea technique
-- react-markdown performance discussion (GitHub #459)
-
-### Tertiary (LOW confidence)
-- Streamdown + react-shiki integration: Open GitHub issue (#115), unresolved at time of research
-- shiki-stream: Streaming Shiki highlighting, evaluated but not recommended for Loom's two-phase architecture
+- [Cursor Features](https://cursor.com/features) -- competitive feature baseline
+- [Windsurf Docs](https://docs.windsurf.com/) -- competitive feature baseline
+- [xterm.js](https://xtermjs.org/) -- terminal integration patterns
+- [CodeMirror 6](https://codemirror.net/) -- editor architecture and theming
+- [cmdk](https://cmdk.paco.me/) -- command palette API
+- [shadcn Command](https://ui.shadcn.com/docs/components/radix/command) -- component docs
 
 ---
-*Research completed: 2026-03-07*
+*Research completed: 2026-03-09*
 *Ready for roadmap: yes*

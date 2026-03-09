@@ -1,251 +1,335 @@
-# Feature Landscape: M2 "The Chat"
+# Feature Landscape: M3 "The Workspace"
 
-**Domain:** AI chat interface -- complete conversation experience
-**Researched:** 2026-03-07
-**Confidence:** HIGH (verified against 6 reference apps, current tooling ecosystem, existing M1 architecture)
+**Domain:** AI coding tool workspace -- Settings, Cmd+K, File Tree, Terminal, Git Panel, Code Editor
+**Researched:** 2026-03-09
+**Confidence:** HIGH (V1 code analyzed, backend API contract verified, competitive analysis complete)
 
-**Scope:** NEW features only. M1 delivered: streaming rAF buffer, ActiveMessage segments, ToolChip/ToolCard, session list, session switching, turn merging, tool_result filtering, basic scroll anchor, ThinkingDisclosure.
+**Scope:** NEW features only. M1+M2 delivered: complete chat with streaming markdown, Shiki highlighting, tool cards, permissions, sidebar with sessions, composer with auto-resize/image attachments/FSM, 4 Zustand stores.
 
 ---
 
 ## Table Stakes
 
-Features users expect. Missing = product feels incomplete.
+Features users expect from an AI coding tool workspace. Missing = product feels incomplete or unusable as a daily driver.
 
-| Feature | Why Expected | Complexity | Depends On (M1) | Notes |
-|---------|-------------|------------|------------------|-------|
-| Streaming Markdown rendering | Every competitor renders formatted text during stream. Plain text (current M1 state) feels broken. | High | `useStreamBuffer`, `ActiveMessage` segment array, `AssistantMessage` | **Use Streamdown** (Vercel's drop-in react-markdown replacement, built for AI streaming). Handles unterminated blocks (`**bold` without closing), progressive formatting, zero layout shift. Same plugin API as react-markdown. Constitution 12.1 already specifies this need. |
-| Syntax-highlighted code blocks | Users immediately judge code quality by highlighting. Unformatted code = amateur hour. | Medium | Markdown renderer (above) | Shiki via `@streamdown/code` plugin or `react-shiki`. Lazy-load grammars per-language. Plain monospace shell renders first, colors apply when grammar loads (no CLS). Copy button with "Copied!" feedback. Language label in header bar. Max ~400px height with overflow scroll. |
-| Auto-resize textarea | Every reference app uses auto-growing input. M1's fixed `<input type="text">` is a stub. | Low | `ChatComposer` (replace `<input>` with `<textarea>`) | CSS Grid trick: hidden `::after` pseudo-element mirrors content, grid stacks them, tallest child wins. Zero JS measurement. Cap at `max-height: 200px` with `overflow-y: auto`. Shift+Enter for newlines. |
-| Send/Stop animation polish | M1 has conditional render (send vs stop). Needs smooth transition, not hard swap. | Low | `ChatComposer`, `useStreamStore.isStreaming` | Add CSS crossfade between send arrow and stop square (opacity transition, 100ms). Use Lucide `Send` and `Square` icons instead of inline SVG. Icon should morph position-stable (same grid cell). |
-| All 7 message types rendering | Backend sends: user, assistant, tool, thinking, error, system, task_notification. M1 only renders user and assistant. | Medium | `MessageList`, `MessageContainer`, discriminated union types | Error messages: inline banner with red accent border, muted bg, retry affordance. System messages: centered, muted, smaller text. Task notifications: distinct icon + label. Each is a small component (~50 LOC). |
-| Tool call state machine with timing | Users need to see tool execution progress. M1 has status dots but no elapsed time or transition animation. | Medium | `ToolChip`, `ToolCard`, `useStreamStore.activeToolCalls` | State machine: `invoked` -> `executing` -> `resolved`/`error`. Add: elapsed time counter (updates every 100ms while executing), CSS transition on status dot color change, error state with expanded red-tinted card. ToolCallState already has `startedAt`/`completedAt` fields. |
-| Activity status line | "Reading auth.ts...", "Editing server.js..." -- shows agent is working, not frozen. | Low | `useStreamStore.activityText` (already in store, populated by multiplexer) | Render below composer or above ActiveMessage. Text derived from tool_start WebSocket events. Fade in/out with CSS transition (200ms). Truncate long paths with `truncatePath()` from tool-registry. |
-| Scroll position preservation | Switching sessions must restore scroll position, not jump to top or bottom. | Medium | `useScrollAnchor`, `useSessionSwitch` | Store scroll position per-session in a `useRef<Map<string, number>>`. Save on session switch, restore with `useLayoutEffect` (lesson from Phase 9: useLayoutEffect, not useEffect + setTimeout). |
-| User message styling | M1 UserMessage is minimal. Needs proper visual treatment. | Low | `UserMessage` component (exists) | Subtle background (`bg-card`), rounded corners (`rounded-lg`), left-aligned (Loom is a dev tool, not iMessage). Content as pre-wrapped text. Timestamp on hover (opacity:0 -> opacity:1, zero layout shift). |
-| GFM table support | Markdown tables common in AI responses. Without GFM, tables render as plain text. | Low | Markdown renderer (Streamdown) | Streamdown supports GFM out of box. Tables need horizontal scroll wrapper (`overflow-x: auto` container). Constitution 12.3: defer table rendering during streaming until closing row detected. |
-| Long content handling | URLs, file paths, hashes break layout without word-break rules. | Low | CSS on message containers | `overflow-wrap: break-word` on message content containers. Inline code: `overflow-x: auto`. Links: `target="_blank"` + `rel="noopener noreferrer"`. Constitution 12.4. |
-| Thinking block improvements | M1 ThinkingDisclosure works but needs polish for daily use. | Low | `ThinkingDisclosure` (exists) | Add: character count or duration label, muted italic text styling inside disclosure, global toggle (collapse all thinking in session). CSS Grid animation already correct from M1. |
+### Settings Panel
+
+| Feature | Why Expected | Complexity | Dependencies |
+|---------|--------------|------------|--------------|
+| Agent auth status display (Claude/Codex/Gemini) | Can't know which providers are connected without it | Medium | `GET /api/cli/claude/status`, `/codex/status`, `/gemini/status` |
+| API key management (CRUD) | Core security credential management | Low | `GET/POST/DELETE /api/settings/api-keys` |
+| GitHub/GitLab credential management | Required for git operations | Low | `GET/POST/DELETE /api/settings/credentials` |
+| Git user config (name/email) | Commits need author identity | Low | `GET/POST /api/user/git-config` |
+| Appearance: font size, code editor prefs | Every dev tool has customizable appearance | Low | localStorage persistence |
+| Tab-based navigation (5 tabs like V1) | Organized settings are expected | Low | shadcn Tabs (planned in component adoption map) |
+| Modal or full-panel presentation | Settings must be accessible without leaving context | Low | shadcn Dialog (installed) |
+
+### Command Palette (Cmd+K)
+
+| Feature | Why Expected | Complexity | Dependencies |
+|---------|--------------|------------|--------------|
+| Global keyboard shortcut (Cmd+K / Ctrl+K) | Universal convention: VS Code, Linear, Raycast, Claude.ai, ChatGPT | Low | UI store `commandPaletteOpen` already exists |
+| Session search and switching | Primary navigation accelerator | Medium | Timeline store sessions data |
+| Project switching | Multi-project navigation without sidebar | Medium | `GET /api/projects` |
+| Fuzzy search filtering | Users type partial names, expect instant matches | Low | cmdk handles this natively |
+| Keyboard navigation (arrows + Enter + Escape) | Expected from every command palette | Low | cmdk handles this natively |
+| Grouped commands (Navigation, Actions, Settings) | Organization prevents cognitive overload | Low | cmdk CommandGroup |
+
+### File Tree Panel
+
+| Feature | Why Expected | Complexity | Dependencies |
+|---------|--------------|------------|--------------|
+| Hierarchical directory browsing | Core file navigation | Medium | `GET /api/projects/:name/files` |
+| File/folder expand/collapse | Standard tree behavior | Low | Local state |
+| File type icons | Visual differentiation (folder, JS, TS, JSON, etc.) | Low | lucide-react (installed) |
+| Click-to-open in code editor | Primary file opening mechanism | Low | Wires to Code Editor tab/panel |
+| Current project scoping | Tree shows active project only | Low | Timeline store active project context |
+| Loading state | Skeleton/spinner during file tree fetch | Low | shadcn Skeleton |
+
+### Code Editor
+
+| Feature | Why Expected | Complexity | Dependencies |
+|---------|--------------|------------|--------------|
+| Syntax highlighting (50+ languages) | Core editor function | Low | CodeMirror lang-* packages |
+| Read-only file viewing | View files agent is working on | Low | CodeMirror readOnly extension |
+| File save (write-back) | Edit files without leaving Loom | Medium | `PUT /api/projects/:name/file` |
+| Line numbers | Standard editor feature | Low | CodeMirror lineNumbers() |
+| Search within file (Cmd+F) | Basic text search | Low | CodeMirror search extension |
+| File tab bar (open files) | Multiple files open simultaneously | Medium | Local UI state |
+| Markdown preview | View rendered markdown for docs | Medium | react-markdown (installed) |
+| OKLCH-themed syntax colors | Must match Loom design system | Medium | Custom CodeMirror theme using CSS vars |
+
+### Terminal / Shell
+
+| Feature | Why Expected | Complexity | Dependencies |
+|---------|--------------|------------|--------------|
+| Full terminal emulation | Run commands, see output with ANSI colors | Medium | xterm.js + WebSocket `/shell` |
+| Auto-resize to container | Terminal fills available space | Low | @xterm/addon-fit |
+| Clickable URLs in output | Convenience for links in terminal output | Low | @xterm/addon-web-links |
+| Connection state UI (connecting/connected/disconnected) | Users need to know terminal status | Low | Connection store or local state |
+| Project-scoped working directory | Terminal opens in project root | Low | `projectPath` in shell init message |
+| Session persistence (30min buffer) | Reconnect without losing output | Low | Backend already handles this |
+| Restart / disconnect controls | Recovery from stuck terminals | Low | Header buttons |
+
+### Git Panel
+
+| Feature | Why Expected | Complexity | Dependencies |
+|---------|--------------|------------|--------------|
+| Changes view (modified/added/deleted/untracked) | See what agent changed | Medium | `GET /api/git/status` |
+| File staging (checkbox per file) | Selective commit | Medium | Local state + `POST /api/git/commit` with files array |
+| Commit message input | Write commit messages | Low | Auto-resize textarea |
+| Commit action | Commit staged files | Low | `POST /api/git/commit` |
+| Current branch display | Know which branch you are on | Low | From git status response |
+| Diff viewer (per file) | Review changes before committing | High | `GET /api/git/diff` + custom diff renderer |
+| Commit history list | See recent commits | Medium | `GET /api/git/commits` |
 
 ---
 
 ## Differentiators
 
-Features that set Loom apart. Not expected, but create the "10/10" quality bar.
+Features that set Loom apart from typical AI coding tool UIs. Not expected, but valued.
 
-| Feature | Value Proposition | Complexity | Depends On | Notes |
-|---------|-------------------|------------|------------|-------|
-| Rich tool card views per tool type | Loom is a CODE tool -- tool inputs/outputs deserve proper rendering, not truncated JSON. This is THE differentiator. | High | Tool registry `renderCard`, Shiki | M1 `DefaultToolCard` shows truncated JSON `createElement` output. M2 upgrades each tool to a custom TSX component: **BashToolCard** (command header + terminal-styled output with ANSI color support), **ReadToolCard** (file path + syntax-highlighted content with line numbers), **EditToolCard** (file path + unified diff view with green/red lines using `--diff-added-bg`/`--diff-removed-bg` tokens), **WriteToolCard** (file path + content preview), **GlobToolCard** (pattern + file list), **GrepToolCard** (pattern + match results with line numbers + context). Each registers via existing `registerTool()`. |
-| Image paste/drop in composer | Drag-and-drop or Ctrl+V image into chat. Backend already supports it (`images` field in `claude-command` WebSocket message). | Medium | `ChatComposer` textarea, backend `/api/projects/:name/upload-images` | Handle `onPaste` event, extract `image/png` from `clipboardData`. Handle `onDrop` with drag overlay (dashed border, dimmed background). Show thumbnail preview chips above textarea (small cards with X to remove). Convert to base64 data URI. Max 5 images (backend constraint). |
-| Permission request banners | Claude requests tool permissions via WebSocket. M1 ignores `claude-permission-request` events. M2 renders them as interactive inline banners. | Medium | WebSocket `claude-permission-request` type, `PermissionResponse` message | Render in message flow with accent border (`border-primary/20`). Show: tool name, input preview (truncated), Allow/Deny buttons. Send `claude-permission-response` back via WebSocket. Auto-dismiss on `claude-permission-cancelled`. Timeout indicator (55s default from `CLAUDE_TOOL_APPROVAL_TIMEOUT_MS`). |
-| Consecutive tool call grouping | When Claude runs 5 file reads in a row, show them as a collapsible group, not 5 separate chips. Reduces visual noise. | Medium | `ActiveMessage` segments, new `ToolCallGroup` component | Accordion: "5 tool calls" header with expand chevron. Expand to see individual ToolChips. V1 had this (`useTurnGrouping`, `ToolCallGroup`). Reimplement using CSS Grid `grid-template-rows: 0fr/1fr` for smooth expand/collapse. Error calls always force-expanded (never hidden in collapsed group). |
-| Streaming cursor polish | Pulsing vertical bar at the end of streaming text. M1 has basic cursor. | Low | `streaming-cursor.css` (exists) | Upgrade: rose accent color (`var(--primary)`), pulse animation keyframe synced to 1s cycle, opacity 0.4-1.0 range. Hide via `data-phase="finalizing"` transition. Brand moment -- the cursor IS Loom during streaming. |
-| Message entrance animation | Messages fade+slide in when appearing. Creates "alive" feeling. | Low | CSS on `MessageContainer` | `tailwindcss-animate` classes: `animate-in fade-in-0 slide-in-from-bottom-2`. Duration `300ms`, easing `ease-out-expo`. Stagger with `animation-delay` if multiple messages render simultaneously. Respect `prefers-reduced-motion` (instant, no animation). Constitution Tier 2 motion. |
-| Token/cost display per turn | Show input/output tokens and estimated cost per assistant response. | Low | Backend `token-budget` WebSocket event, `Message.metadata` fields | Render below assistant message as muted text, always visible (not hover-only). Format: "1,234 tokens / $0.003". Data flows via `token-budget` WebSocket event and `result` SDK message type. Store in `Message.metadata.tokenCount` and `Message.metadata.cost`. |
-| Keyboard shortcuts | Enter send, Shift+Enter newline, Cmd+. stop, Escape clear input. | Low | `ChatComposer` keydown handler | M1 has Enter-to-send on `<input>`. M2 with `<textarea>`: Shift+Enter inserts newline (default textarea behavior), Enter sends (preventDefault). Add global `useEffect` for Cmd+. (stop generation) and Escape (blur + clear). Foundation for M3 Cmd+K palette. |
-| Draft preservation per session | Losing unsent text on session switch = frustration. | Low | `ChatComposer`, session switching | Store draft text per sessionId in a `useRef<Map<string, string>>`. Restore on session switch. Persist to localStorage for reload survival. Lightweight -- just the input value string. |
+### Settings Panel
+
+| Feature | Value Proposition | Complexity | Dependencies |
+|---------|-------------------|------------|--------------|
+| MCP server management (list/add/remove) | Most AI UIs don't expose MCP config visually | High | `GET/POST/DELETE /api/mcp/cli/*` |
+| Per-provider MCP management (Claude + Codex) | Provider-specific server configs | Medium | Separate API routes per provider |
+| Quick Settings overlay (chat prefs) | Instant toggle for auto-expand tools, show thinking, show raw params without opening full settings | Medium | localStorage + Zustand |
+
+### Command Palette (Cmd+K)
+
+| Feature | Value Proposition | Complexity | Dependencies |
+|---------|-------------------|------------|--------------|
+| Slash command execution from palette | Run `/help`, `/model`, `/cost` etc. without typing in composer | Medium | `POST /api/commands/execute` |
+| Recent commands / frequent actions | Personalized command ranking | Low | localStorage history |
+| Quick action: New session | Create session from palette | Low | Existing session creation flow |
+| Quick action: Toggle thinking visibility | Preference toggle without opening settings | Low | UI store `toggleThinking` |
+| Tab switching (Chat/Files/Shell/Git) | Navigate workspace areas without mouse | Low | UI store `setActiveTab` |
+| Fuzzy file search from palette | Cmd+K then type filename, opens in editor | Medium | Compose with file tree data |
+
+### File Tree Panel
+
+| Feature | Value Proposition | Complexity | Dependencies |
+|---------|-------------------|------------|--------------|
+| File search/filter with fuzzy matching | Fast file finding in large projects | Medium | Local filter, fuse.js or native |
+| Context menu (copy path, open in editor, open in terminal) | Right-click power user actions | Medium | shadcn Context-menu |
+| Image preview (inline or lightbox) | View screenshots/assets without external tool | Medium | shadcn Dialog for lightbox |
+| File change indicators (dots on modified files) | See which files git says changed, in the tree | Medium | Cross-reference with git status |
+| Detailed view mode (size, modified date) | Extra metadata for power users | Low | Backend already returns file metadata |
+
+### Code Editor
+
+| Feature | Value Proposition | Complexity | Dependencies |
+|---------|-------------------|------------|--------------|
+| Diff view mode (side-by-side or unified) | Review agent edits in-place | High | @codemirror/merge |
+| Word wrap toggle | Preference for long lines | Low | CodeMirror lineWrapping |
+| "Open file from tool card" flow | Click file path in tool card -> opens in editor | Medium | Event bus or callback from chat to editor |
+| Markdown preview split | Edit + preview side by side | Medium | react-markdown + split pane |
+
+### Terminal / Shell
+
+| Feature | Value Proposition | Complexity | Dependencies |
+|---------|-------------------|------------|--------------|
+| Plain shell mode (no AI provider) | Just a terminal, no Claude/Codex/Gemini | Low | `provider: 'plain-shell'` in init |
+| Auth URL detection and display | Auto-handle browser auth flows from CLI | Low | Backend sends `auth_url` messages |
+
+### Git Panel
+
+| Feature | Value Proposition | Complexity | Dependencies |
+|---------|-------------------|------------|--------------|
+| Branch switching | Change branches from UI | Medium | `POST /api/git/checkout` |
+| New branch creation | Create feature branches from UI | Medium | `POST /api/git/create-branch` |
+| Remote status (ahead/behind) | Know if you need to push/pull | Medium | `GET /api/git/remote-status` |
+| Push / Pull / Fetch actions | Full git workflow from UI | Medium | `POST /api/git/push`, `/pull`, `/fetch` |
+| AI-generated commit messages | One-click smart commit messages | Medium | `POST /api/git/generate-commit-message` |
+| Discard changes (per file) | Undo agent modifications | Medium | `POST /api/git/discard` |
+| Commit detail diff view | Click commit to see what changed | Medium | `GET /api/git/commit-diff` |
+| Select all / deselect all for staging | Bulk staging convenience | Low | Local UI state |
 
 ---
 
 ## Anti-Features
 
-Features to explicitly NOT build in M2.
+Features to explicitly NOT build in M3. These are traps that add complexity without proportional value.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Character-by-character typewriter | PROJECT.md explicitly bans. Causes jitter at 100 tokens/sec. rAF buffer already batches correctly. | Continue M1 pattern: rAF buffer + batch DOM mutation. Streamdown handles visual smoothness of markdown rendering. |
-| Virtual scrolling (react-virtual) | Constitution specifies `content-visibility: auto` first. Virtual scrolling fundamentally changes DOM/scroll math. Premature for M2. | Apply `content-visibility: auto` + `contain-intrinsic-size` on past `MessageContainer` elements. Escape hatch to react-virtual documented for M3 if insufficient. |
-| Conversation branching/forking | PROJECT.md "Out of Scope". High complexity, low value for single-user tool. | Single linear thread per session. "New chat" is the branch mechanism. |
-| Rich text editor (TipTap/ProseMirror) in composer | Massive bundle, massive complexity, minimal gain. Loom sends plain text prompts to coding agents, not formatted documents. Open WebUI uses TipTap for @ mentions, but we don't need that in M2. | Plain `<textarea>` with auto-resize. Slash commands via overlay menu in M3, not inline rich text. |
-| Full Framer Motion | Constitution Tier 3 says LazyMotion only for complex orchestrations. M2 should use CSS transitions (Tier 1) and tailwindcss-animate (Tier 2). | CSS `transition` for state changes, `@keyframes` for continuous effects (cursor pulse), tailwindcss-animate for entrance/exit. |
-| Artifacts/Canvas panel | M3/M4 scope. Massive feature (code execution, live preview, version control). | Tool cards within chat stream ARE the artifacts for a coding agent. Tool output displays inline. |
-| Aurora/ambient effects | M3 scope. Visual effects audit documented these for polish phase. | No gradient overlays, shimmer effects, or ambient backgrounds. Focus on content rendering quality. |
-| Model selector in composer | M4 multi-provider scope. Currently hardcoded to Claude. | No model picker. Provider fixed to Claude. |
-| Sidebar slim collapse | M3 scope. Current sidebar is functional. | Keep existing sidebar behavior. |
-| Cmd+K command palette | M3 scope. Needs settings, project switching, session search. | Basic keyboard shortcuts only (Enter, Shift+Enter, Cmd+., Escape). |
-| Light mode | PROJECT.md: "Dark-only for M1-M3". OKLCH tokens are dark-only. | Dark mode only. |
-| Settings panel | M3 scope. Not needed for core chat experience. | No settings UI. Configuration via backend/env only. |
+| Full IDE replacement (LSP, intellisense, debugging) | Out of scope per PROJECT.md. Loom complements VS Code, doesn't replace it. | Keep editor focused on viewing agent work, light edits, and diffs. |
+| Monaco editor (vs CodeMirror) | Monaco is 5-10MB, poor mobile support, VS Code coupling. CodeMirror 6 is modular (~200KB), mobile-friendly, used by ChatGPT Canvas. | Use @uiw/react-codemirror (same as V1). |
+| Real-time collaborative editing | Single-user tool, no multi-user requirement. | N/A |
+| Git merge conflict resolution UI | Extremely complex, better handled in real IDE. | Show conflicts as diffs, let user resolve in VS Code. |
+| Settings sync across devices | Single-server deployment, one user. | localStorage is sufficient. |
+| File creation/rename/delete from tree | Agent handles file ops. Adding write operations creates dangerous dual-path mutation. | Read-only tree. Agent creates files. |
+| Terminal multiplexer (split panes, tmux-like) | Massive complexity for marginal value in a web UI. | Single terminal is sufficient. |
+| Multiple terminal tabs | Extra complexity for M3, limited value with single terminal. | Single terminal session, consider for M5 if requested. |
+| Inline git blame / annotations | Complex, low value for AI coding workflow. | Show in commit history instead. |
+| Custom keybinding configuration | Enormous complexity, almost no one uses it in web apps. | Hard-code sensible defaults (Cmd+K, Cmd+S, Escape). |
+| Light mode | PROJECT.md: "Dark-only for M1-M3". | Dark mode only. |
+| Aurora/ambient effects | M4 "The Polish" scope per milestone restructuring. | No gradient overlays on panels. |
+| Inline code completion | Requires LSP integration, not Loom's value prop. | Out of scope entirely. |
+| Editor minimap | Visual noise, rarely used in V1 per user feedback. | Omit for M3, add if requested in M4. |
+| Settings import/export | Low value for single-user tool. | Defer indefinitely. |
+| Split editor panes | High complexity, low value for M3 scope. | Single editor, consider for M5. |
+| File search (ripgrep) | Would need new backend endpoint. | Use Cmd+K for file name search only. |
+| Git stash management | Niche feature. | Defer to M5+. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Streaming Markdown (Streamdown) ──────┐
-                                      ├─> Code blocks (Shiki highlighting lives inside markdown renderer)
-GFM tables ───────────────────────────┘
-                                      ├─> Rich tool cards (tool output needs markdown/syntax rendering)
-                                      └─> EditToolCard diff view (needs syntax-aware rendering)
-
-Auto-resize textarea ─────────────────┐
-                                      ├─> Image paste (needs textarea onPaste, not input)
-Shift+Enter newlines ─────────────────┘
-                                      └─> Draft preservation (needs textarea value tracking)
-
-Tool state machine (M1 exists) ───────┐
-                                      ├─> Activity status line (derived from tool_start events)
-                                      ├─> Rich tool card views (needs status to show output when resolved)
-                                      ├─> Consecutive tool grouping (needs activeToolCalls array)
-                                      └─> Elapsed time counter (needs startedAt timestamp)
-
-All message types rendering ──────────┐
-                                      ├─> Permission request banners (interactive message type)
-                                      └─> Error display (inline banner vs toast routing)
-
-Scroll anchor (M1) ──────────────────> Scroll position preservation (per-session map)
-
-Markdown rendering ──────────────────> Token/cost display (renders below markdown content)
+Content Layout + Tab System (FOUNDATION -- must exist before any panel renders)
+  |
+  +--> Settings Panel (independent overlay, no panel deps)
+  +--> Terminal / Shell (independent panel, no deps)
+  +--> Cmd+K Command Palette (independent overlay, better after other panels exist)
+  |
+  +--> File Tree -----> Code Editor (tree opens files IN editor)
+  |      |                  |
+  |      v                  v
+  +--> Git Panel -------> Code Editor Diff Mode (diff opens IN editor)
+         |
+         v
+       File Tree + Git Status (change indicators on tree nodes -- OPTIONAL polish)
 ```
 
----
-
-## Phasing Recommendation
-
-### Phase 1: Markdown + Code Blocks (Foundation)
-Streaming markdown is the highest-value, highest-risk feature. All visual quality depends on it.
-- Streamdown integration (replace plain text in AssistantMessage + ActiveMessage)
-- Shiki code blocks with lazy-loaded grammars
-- GFM tables with horizontal scroll wrapper
-- Long content handling (word-break, link targets)
-- Code block copy button with "Copied!" feedback
-- **Risk:** Streamdown is new (2025). If it breaks our rAF buffer pattern, fallback is react-markdown with custom incomplete-block remark plugin (Constitution 12.1 specifies this approach).
-
-### Phase 2: Composer Upgrade
-The composer is the user's primary interaction. Must feel right before testing full loop.
-- Replace `<input>` with auto-resize `<textarea>` (CSS Grid trick)
-- Shift+Enter for newlines, Enter to send
-- Image paste/drop with thumbnail preview chips
-- Send/Stop animation polish (crossfade, Lucide icons)
-- Keyboard shortcuts (Cmd+., Escape)
-- Draft preservation per session
-
-### Phase 3: Message Types + Tool Polish
-Complete message type coverage and elevate tool call experience.
-- All 7 message types (error banner, system message, task_notification)
-- Permission request banners (Allow/Deny interactive)
-- Rich tool card views (BashToolCard, ReadToolCard, EditToolCard, WriteToolCard, GlobToolCard, GrepToolCard)
-- Tool state elapsed time counter
-- Consecutive tool call grouping (accordion)
-- Activity status line
-
-### Phase 4: Scroll + Polish + Integration
-Wire everything together for complete experience.
-- Scroll position preservation across session switches
-- Message entrance animations (tailwindcss-animate)
-- Token/cost display per turn
-- Thinking block global toggle + styling polish
-- `content-visibility: auto` on past messages (Constitution 10.5)
-- Streaming cursor polish (rose accent, pulse timing)
-- User message styling upgrade
+**Critical path:** Content Layout + Tab System is the foundation. File Tree must exist before Code Editor is useful. Git Panel benefits from Code Editor for diff view but works standalone for status + commit. Terminal and Settings are fully independent.
 
 ---
 
 ## MVP Recommendation
 
-Prioritize:
+**Phase 1 -- Foundation + Independent Panels:**
+1. Content Layout + Tab System (tab bar, active tab routing, keyboard shortcuts Cmd+1/2/3/4)
+2. Settings Panel (Agents, API Keys, Appearance, Git tabs -- modal overlay)
+3. Terminal / Shell (xterm.js + WebSocket -- fully independent)
 
-1. **Streaming Markdown** (Phase 1) -- single highest-impact feature. Transforms plain text into a professional chat. Streamdown is purpose-built for this exact use case.
+**Phase 2 -- Navigation Acceleration:**
+4. Cmd+K Command Palette (session search, project switching, tab switching, slash commands)
 
-2. **Auto-resize textarea** (Phase 2) -- low effort, massive UX improvement. CSS Grid trick = near-zero JS complexity. Unlocks Shift+Enter and image paste.
+**Phase 3 -- File Workspace:**
+5. File Tree (hierarchical browsing, expand/collapse, file type icons, click-to-open)
+6. Code Editor (CodeMirror 6, syntax highlighting, file tabs, read/write, OKLCH theme)
 
-3. **All 7 message types** (Phase 3) -- without error/system rendering, real conversations show broken gaps. Each type is a small component.
+**Phase 4 -- Git Workflow:**
+7. Git Panel (changes view, staging, commit, branch display, diff viewer, commit history)
 
-4. **Rich tool cards** (Phase 3) -- tools are Loom's identity. A coding agent's file reads, edits, and bash commands should look exceptional, not like truncated JSON.
-
-Defer:
-- **Image paste**: Medium complexity, not blocking conversation flow. End of Phase 2.
-- **Permission banners**: Important for real usage but not for visual quality assessment. Phase 3.
-- **Token/cost display**: Nice-to-have, data already flows through WebSocket. Phase 4.
-- **Consecutive tool grouping**: Polish feature, not blocking. Phase 3.
-- **Draft preservation**: Low priority, low effort. Phase 2 if time permits.
+**Defer to later milestones:**
+- MCP server management UI (complex, M5 "The Power" scope per MILESTONES.md)
+- File change indicators in tree from git status (M4 polish)
+- AI-generated commit messages (convenience, not critical path)
+- Editor minimap (M4 polish if requested)
+- Multiple terminal sessions (M5 if requested)
 
 ---
 
-## Key Technical Decisions
+## Panel Layout Strategy
 
-### Streamdown vs react-markdown
-**Use Streamdown.** Vercel's drop-in replacement for react-markdown, purpose-built for AI streaming. Key advantages over react-markdown:
-- Handles unterminated markdown blocks during streaming (no layout flash)
-- Progressive formatting (applies styling to partial content as tokens arrive)
-- Same plugin API (`remarkPlugins`, `rehypePlugins` arrays)
-- Built-in Shiki integration via `@streamdown/code`
-- Security hardening (blocks images/links from unexpected origins)
+The existing AppShell uses a 3-column CSS Grid: `sidebar | content | artifact (0px)`.
 
-The Constitution already specifies react-markdown + remark + rehype, and Streamdown is API-compatible. If Streamdown's internal rendering conflicts with our rAF DOM-mutation pattern (LOW risk -- Streamdown takes a string prop, doesn't need to own the DOM), fallback is react-markdown with a custom remark plugin that closes unclosed code blocks (Constitution 12.1).
+**Recommendation:** The content column should contain a tab-based workspace where Chat, Files, Shell, and Git are tabs. This matches V1's approach and the `activeTab` / `TabId` type already defined in the UI store.
 
-**Confidence:** HIGH -- Streamdown launched 2025, maintained by Vercel, production-proven.
+The artifact column (currently 0px) should remain reserved for M5 (multi-provider tabs, artifacts panel). Do NOT use it for workspace panels in M3.
 
-### Shiki integration path
-**Use `@streamdown/code` first** (Streamdown's built-in code plugin). If insufficient (e.g., can't map OKLCH tokens to theme colors), fall back to `react-shiki` which provides `useShikiHighlighter` hook with throttled streaming support. Either way, grammars lazy-load per-language. Web bundle is ~695KB total but only used grammars are downloaded. Theme must map to OKLCH design tokens (create a custom Shiki theme JSON that references CSS custom properties via `color-mix()` or computed hex values from `--tokens`).
-
-**Confidence:** HIGH -- Shiki is the industry standard. Claude.ai, ChatGPT, Streamdown all use it.
-
-### Textarea auto-resize technique
-**CSS Grid trick** from CSS-Tricks:
-```css
-.composer-wrap { display: grid; }
-.composer-wrap > textarea,
-.composer-wrap::after {
-  grid-column: 1; grid-row: 1;
-  font: inherit; padding: inherit;
-  white-space: pre-wrap; word-wrap: break-word;
-}
-.composer-wrap::after {
-  content: attr(data-value) " ";
-  visibility: hidden;
-}
+**Tab layout within content area:**
 ```
-Update `data-value` attribute on every input change. The hidden `::after` element grows with content, pushing the grid row height, and the textarea follows. Zero JS measurement, no `scrollHeight` polling, no `ResizeObserver`. Cap at `max-height: 200px` with `overflow-y: auto`.
++------------------------------------------+
+| Tab Bar: [Chat] [Files] [Shell] [Git]    |
++------------------------------------------+
+| Active Tab Content                        |
+|                                           |
+| (Chat = existing ChatView)               |
+| (Files = File Tree + Code Editor split)  |
+| (Shell = Terminal full-height)           |
+| (Git = Changes + History views)          |
++------------------------------------------+
+```
 
-**Confidence:** HIGH -- well-documented, widely used.
+The Files tab needs an internal split (tree sidebar + editor main). Use CSS Grid or flexbox with the tree at ~240px and editor taking remaining space.
 
-### Streamdown + rAF buffer integration
-**Key architectural question:** M1 uses `useStreamBuffer` with `useRef` + direct DOM mutation to paint tokens at 60fps, bypassing React. Streamdown is a React component that takes a `content` string prop. These patterns need to coexist:
+Settings and Cmd+K are **overlays** (modal/dialog), not tabs. They appear on top of any active tab.
 
-**Approach:** During streaming, ActiveMessage continues using rAF DOM mutation for raw text (immediate visual feedback). On stream completion (`handleFlush`), the final text is stored in the timeline store. `AssistantMessage` (historical messages) renders via Streamdown with full markdown formatting. This means streaming text is PLAIN during stream and FORMATTED after completion. This is acceptable because:
-1. Streaming text changes too fast for users to read markdown formatting anyway
-2. Streamdown re-renders on every content change, which would fight the rAF buffer
-3. The "flash" from plain to formatted on completion can be masked by the finalization CSS transition (already exists in M1's `data-phase` attribute)
+---
 
-**Alternative:** Feed accumulated text to Streamdown on a debounced schedule (every 200ms) during streaming, keeping rAF for the cursor/text painting. This gives live markdown during streaming but adds complexity. Research flag for phase execution.
+## Complexity Assessment
 
-**Confidence:** MEDIUM -- the integration pattern needs validation during Phase 1 implementation.
+| Panel | Estimated Complexity | LOC Estimate | Rationale |
+|-------|---------------------|--------------|-----------|
+| Content Layout + Tabs | Low | 200-400 | Tab bar + route rendering. Foundation for everything. |
+| Settings | Medium | 1500-2500 | 5 tabs, CRUD forms, provider auth status. shadcn primitives handle most UI. |
+| Cmd+K | Low-Medium | 500-800 | cmdk/shadcn Command handles heavy lifting. Custom groups + actions. |
+| File Tree | Medium | 800-1200 | Recursive tree rendering, expand/collapse state, search filter. |
+| Code Editor | Medium-High | 1200-2000 | CodeMirror setup, custom OKLCH theme, file tabs, diff mode, markdown preview. |
+| Terminal | Low-Medium | 400-700 | xterm.js handles emulation; we wire WebSocket + fit addon + connection state. |
+| Git Panel | High | 1500-2500 | Changes view, staging, commit flow, branch mgmt, diff viewer, history list. |
+| **Total** | | **~6100-10100** | Comparable to M2's 10,363 net LOC. |
 
-### Tool card architecture
-**Keep M1 registry, replace DefaultToolCard with per-tool components:**
-- `BashToolCard` -- command in monospace header + terminal-styled output (dark bg, green/white text)
-- `ReadToolCard` -- file path header + Shiki-highlighted content with line numbers
-- `EditToolCard` -- file path header + unified diff view (Constitution diff tokens: `--diff-added-bg`, `--diff-removed-bg`)
-- `WriteToolCard` -- file path header + content preview (truncated, expandable)
-- `GlobToolCard` -- pattern header + file list (bulleted, clickable paths)
-- `GrepToolCard` -- pattern header + matches with line numbers and context lines
+---
 
-Each card registers via existing `registerTool()`. The `ToolConfig` interface already supports `renderCard: ComponentType<ToolCardProps>`. Cards share a `ToolCardShell` wrapper for consistent header/footer/expand behavior.
+## Existing Infrastructure to Leverage
 
-**Confidence:** HIGH -- M1 registry is proven. Just needs richer implementations.
+| What Exists | Where | How M3 Uses It |
+|-------------|-------|----------------|
+| `activeTab: TabId` in UI store | `src/src/stores/ui.ts` | Tab switching between Chat/Files/Shell/Git |
+| `commandPaletteOpen` in UI store | `src/src/stores/ui.ts` | Cmd+K toggle state |
+| `modalState: ModalState` in UI store | `src/src/stores/ui.ts` | Settings modal state |
+| `toggleCommandPalette()` action | `src/src/stores/ui.ts` | Cmd+K keyboard shortcut handler |
+| `setActiveTab()` action | `src/src/stores/ui.ts` | Tab navigation from Cmd+K |
+| AppShell 3-column grid | `src/src/components/app-shell/AppShell.tsx` | Content column hosts tab workspace |
+| PanelErrorBoundary | `src/src/components/shared/ErrorBoundary.tsx` | Wrap each panel |
+| shadcn Dialog (installed) | shadcn/ui | Settings modal |
+| shadcn Scroll-area (installed) | shadcn/ui | File tree, commit history scrolling |
+| shadcn Tooltip (installed) | shadcn/ui | Icon button tooltips in panel headers |
+| shadcn Kbd (installed) | shadcn/ui | Keyboard shortcuts in Cmd+K |
+| shadcn Collapsible (installed) | shadcn/ui | File tree directories |
+| react-markdown (installed) | npm | Code editor markdown preview |
+| Shiki (installed) | npm | Code editor syntax highlighting reuse |
+| lucide-react (installed) | npm | File type icons, panel controls |
+| OKLCH design tokens | `src/src/styles/tokens.css` | All panel styling |
+| cn() utility | `src/src/utils/cn.ts` | Class composition |
+| Backend git routes (18 endpoints) | `server/routes/git.js` | Full git workflow API |
+| Backend settings routes (8 endpoints) | `server/routes/settings.js` | API keys, credentials CRUD |
+| Backend MCP routes (6 endpoints) | `server/routes/mcp.js` | MCP server management |
+| Backend shell WebSocket (`/shell`) | `server/index.js` | Terminal PTY sessions |
+| Backend file routes (3 endpoints) | inline in `server/index.js` | File tree + content reading |
+| Backend commands routes (3 endpoints) | `server/routes/commands.js` | Slash commands for Cmd+K |
+| Backend CLI auth routes (3 endpoints) | `server/routes/cli-auth.js` | Agent auth status for settings |
 
-### Permission request approach
-**Inline banner in message flow, not modal/toast.** Permission requests are contextual (they appear during a specific tool call) and need Allow/Deny interaction. A modal would block the whole UI; a toast would be dismissible. An inline banner at the bottom of the message list (above composer) is correct:
-- Shows tool name + truncated input
-- Allow (green) / Deny (red) buttons
-- Timer indicator (55s countdown)
-- Dismisses on `claude-permission-cancelled` event
-- Only one active at a time (backend enforces this)
+---
 
-**Confidence:** HIGH -- matches Claude.ai's permission pill pattern + LibreChat's approval flow.
+## Key Competitive Insights
+
+**What Cursor/Windsurf have that Loom should match (table stakes for AI coding tools):**
+- File explorer with tree navigation
+- Integrated terminal with AI awareness
+- Git source control panel with diff view
+- Settings accessible via both UI and command palette
+- Cmd+K / Ctrl+Shift+P command palette for everything
+
+**What Loom can do that IDE forks cannot:**
+- Beautiful, opinionated dark-only design (not VS Code's generic theme)
+- OKLCH-based color system with warm charcoal aesthetic
+- Purpose-built tool cards showing exactly what the agent is doing
+- Streaming-first architecture with 60fps rendering
+- Cross-provider support (Claude + Codex + Gemini in one workspace)
+
+**Key lesson from reference analysis:** Claude.ai and ChatGPT keep their workspace panels minimal and focused. These panels exist to support the chat workflow, not replace a real IDE. Build the minimum viable version of each panel, then polish in M4.
 
 ---
 
 ## Sources
 
-- [Streamdown (Vercel)](https://streamdown.ai/) -- drop-in react-markdown replacement for AI streaming
-- [Streamdown GitHub](https://github.com/vercel/streamdown) -- source, docs, plugin API
-- [react-shiki](https://github.com/AVGVSTVS96/react-shiki) -- React Shiki component with streaming throttle support
-- [Shiki](https://shiki.style/guide/) -- syntax highlighter, lazy-loaded grammars, ~695KB web bundle
-- [CSS-Tricks autogrowing textareas](https://css-tricks.com/the-cleanest-trick-for-autogrowing-textareas/) -- CSS Grid auto-resize technique
-- [Incremark](https://www.incremark.com/) -- alternative O(n) incremental streaming markdown renderer
-- [AI SDK markdown chatbot memoization](https://ai-sdk.dev/cookbook/next/markdown-chatbot-with-memoization) -- block-level memoization pattern
-- `.planning/reference-app-analysis.md` -- 6 reference app UX analysis (Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat)
-- `.planning/V2_CONSTITUTION.md` -- Sections 11-12 (motion + markdown conventions)
-- `.planning/BACKEND_API_CONTRACT.md` -- WebSocket protocol (claude-permission-request/response, token-budget, tool events)
-- `.planning/MILESTONES.md` -- M2 gate criteria, store schemas
+- V1 Feature Inventory (`.planning/V1_FEATURE_INVENTORY.md`) -- HIGH confidence, source-code verified
+- Backend API Contract (`.planning/BACKEND_API_CONTRACT.md`) -- HIGH confidence, 47+ endpoints documented
+- Component Adoption Map (`.planning/COMPONENT_ADOPTION_MAP.md`) -- HIGH confidence
+- Reference App Analysis (`.planning/reference-app-analysis.md`) -- HIGH confidence, 6 products analyzed
+- M3 Deferred Context (`.planning/M3-POLISH-DEFERRED-CONTEXT.md`) -- HIGH confidence
+- UI Store (`src/src/stores/ui.ts`) -- HIGH confidence, verified in codebase
+- [Cursor Features](https://cursor.com/features) -- MEDIUM confidence
+- [shadcn Command](https://ui.shadcn.com/docs/components/radix/command) -- HIGH confidence
+- [cmdk](https://cmdk.paco.me/) -- HIGH confidence
+- [CodeMirror 6](https://codemirror.net/) -- HIGH confidence
+- [xterm.js](https://xtermjs.org/) -- HIGH confidence
+- [react-codemirror](https://uiwjs.github.io/react-codemirror/) -- HIGH confidence
+- [Windsurf Docs](https://docs.windsurf.com/) -- MEDIUM confidence
