@@ -136,8 +136,8 @@
 - [x] **UI-01**: Initialize shadcn/ui in `src/` workspace (`npx shadcn@latest init`). Configure to use OKLCH design tokens by overriding shadcn CSS variables in `tokens.css`.
 - [x] **UI-02**: Install shadcn primitives needed for M2: `dialog` (permission requests, image lightbox), `tooltip` (hover info on tools, timestamps), `scroll-area` (code blocks, tool card output), `collapsible` (tool grouping, thinking blocks), `sonner` (toast notifications for copy feedback, errors), `dropdown-menu` (thinking toggle, context menus), `badge` (tool status, file counts), `kbd` (keyboard shortcut hints), `separator` (between message groups)
 - [x] **UI-03**: All shadcn components restyled to OKLCH token system — no default shadcn colors remain. Components in `src/src/components/ui/` use `bg-surface-*`, `text-muted`, `border-subtle` etc.
-- [ ] **UI-04**: Cherry-pick CSS-only effects from React Bits (source-level copy, not npm): `SpotlightCard` (hover effect on tool cards, sidebar items), `ShinyText` (thinking/status indicators), `StarBorder` / `ElectricBorder` (composer border during active streaming)
-- [ ] **UI-05**: All cherry-picked components use design tokens only — no hardcoded colors. Constitution ESLint rules must pass.
+- [x] **UI-04**: Cherry-pick CSS-only effects from React Bits (source-level copy, not npm): `SpotlightCard` (hover effect on tool cards, sidebar items), `ShinyText` (thinking/status indicators), `StarBorder` / `ElectricBorder` (composer border during active streaming)
+- [x] **UI-05**: All cherry-picked components use design tokens only — no hardcoded colors. Constitution ESLint rules must pass.
 
 ### Enhanced Chat Features
 
@@ -272,8 +272,8 @@ Updated during roadmap creation (2026-03-07).
 | UI-01 | Phase 11 | Complete |
 | UI-02 | Phase 11 | Complete |
 | UI-03 | Phase 11 | Complete |
-| UI-04 | Phase 19 | Pending |
-| UI-05 | Phase 19 | Pending |
+| UI-04 | Phase 19 | Complete |
+| UI-05 | Phase 19 | Complete |
 | ENH-01 | Phase 12 | Complete |
 | ENH-02 | Phase 16 | Complete |
 | ENH-03 | Phase 19 | Pending |

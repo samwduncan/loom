@@ -219,7 +219,7 @@ Phases execute in numeric order: 11 -> 11.1 -> 12 -> 12.1 -> 13 -> ... -> 19
 | 16. Per-Tool Cards | 3/3 | Complete    | 2026-03-08 | - |
 | 17. Tool Grouping + Permissions | 3/3 | Complete    | 2026-03-08 | - |
 | 18. Activity, Scroll, Polish | 3/3 | Complete    | 2026-03-08 | - |
-| 19. Visual Effects + Enhancements | v1.1 | 0/3 | Not started | - |
+| 19. Visual Effects + Enhancements | 2/3 | In Progress|  | - |
 
 ## Backlog (Future Milestones)
 

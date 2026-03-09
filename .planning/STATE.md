@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: "The Chat"
 status: in-progress
 stopped_at: Phase 19 context gathered
-last_updated: "2026-03-09T14:58:47.024Z"
+last_updated: "2026-03-09T17:11:00.303Z"
 last_activity: 2026-03-08 -- Phase 18 Plan 03 complete (token/cost display, entrance animations)
 progress:
   total_phases: 9
   completed_phases: 8
-  total_plans: 23
-  completed_plans: 23
+  total_plans: 26
+  completed_plans: 24
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 18 - Activity, Scroll, Polish
+**Current focus:** Phase 19 - Visual Effects + Enhancements
 
 ## Current Position
 
-Phase: 18 of 19 (Activity, Scroll, Polish)
-Plan: 3 of 3 -- COMPLETE
+Phase: 19 of 19 (Visual Effects + Enhancements)
+Plan: 1 of 3 -- COMPLETE
 Status: in-progress
-Last activity: 2026-03-08 -- Phase 18 Plan 03 complete (token/cost display, entrance animations)
+Last activity: 2026-03-09 -- Phase 19 Plan 01 complete (SpotlightCard, ShinyText, ElectricBorder effects)
 
-Progress: [██████████] 100%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [██████████] 100%
 | 18    | 01   | 3min     | 2     | 8     |
 | Phase 18 P02 | 4min | 2 tasks | 8 files |
 | 18    | 03   | 6min     | 2     | 19    |
+| 19    | 01   | 7min     | 2     | 10    |
 
 ## Accumulated Context
 
@@ -139,6 +140,9 @@ See PROJECT.md Key Decisions table (updated at milestone completion).
 - Phase 18-03: Extend MessageMetadata with inputTokens/outputTokens/cacheReadTokens for granular display
 - Phase 18-03: Extract token data from SDKResultMessage.modelUsage (authoritative, sum across models)
 - Phase 18-03: Adjust-state-during-rendering for animation base index (react-hooks/refs compliance)
+- Phase 19-01: CSS-only effects with zero JS animation libraries (no Framer Motion, no Canvas)
+- Phase 19-01: data-active attribute pattern for ElectricBorder activation via CSS selectors
+- Phase 19-01: element.style.setProperty for SpotlightCard mouse tracking (no React state re-renders)
 
 ### Architect Concerns (Bard, M2 consult)
 
@@ -157,6 +161,6 @@ None -- clean slate for M2.
 
 ## Session Continuity
 
-Last session: 2026-03-09T14:58:47.022Z
-Stopped at: Phase 19 context gathered
-Resume: Phase 18 complete. All M2 plans shipped.
+Last session: 2026-03-09T17:10:08.000Z
+Stopped at: Completed 19-01-PLAN.md
+Resume: Phase 19 Plan 01 complete. Plans 02-03 remaining.
