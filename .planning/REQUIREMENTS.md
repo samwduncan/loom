@@ -1,0 +1,228 @@
+# Requirements: Loom V2
+
+**Defined:** 2026-03-09
+**Core Value:** Make AI agent work visible, beautiful, and controllable — every tool call, every code write, every MCP interaction should be a satisfying visual experience that enhances understanding of what the agent is doing.
+
+## v1.2 Requirements
+
+Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
+
+### Layout (LAY)
+
+- [ ] **LAY-01**: Content area renders a horizontal tab bar at the top with tabs: Chat, Files, Shell, Git
+- [ ] **LAY-02**: Clicking a tab switches the visible panel below the tab bar
+- [ ] **LAY-03**: Tab switching uses CSS display (show/hide), NOT conditional rendering — all panels stay mounted to preserve state (terminal session, scroll position, editor content)
+- [ ] **LAY-04**: Active tab has a visual indicator (underline or highlight using design tokens)
+- [ ] **LAY-05**: Keyboard shortcuts Cmd+1/2/3/4 switch to Chat/Files/Shell/Git respectively
+- [ ] **LAY-06**: Tab bar does not render on mobile (< 768px) — only Chat tab visible, other panels accessible via Cmd+K or menu
+- [ ] **LAY-07**: New Zustand file store (5th store) manages file tree state, open editor tabs, active file, dirty file tracking — Constitution amended
+- [ ] **LAY-08**: Each panel wrapped in PanelErrorBoundary to isolate crashes from other panels
+- [ ] **LAY-09**: TabId union type extended to include 'chat' | 'files' | 'shell' | 'git' in UI store
+
+### Settings (SET)
+
+- [ ] **SET-01**: Settings opens as a full-screen modal overlay (portal) accessible from sidebar gear icon and Cmd+K
+- [ ] **SET-02**: Settings modal has 5 tabs: Agents, API Keys, Appearance, Git, MCP
+- [ ] **SET-03**: Settings modal closes on Escape key or clicking backdrop
+- [ ] **SET-04**: Agents tab displays connection status (connected/disconnected/error) for Claude, Codex, and Gemini with colored status dots
+- [ ] **SET-05**: Agents tab shows provider version info when connected (model name, CLI version)
+- [ ] **SET-06**: API Keys tab lists existing API keys (masked except last 4 chars) with delete buttons
+- [ ] **SET-07**: API Keys tab has "Add API Key" form with name, key, provider fields and validation (non-empty, minimum length)
+- [ ] **SET-08**: Deleting an API key shows confirmation dialog before deletion
+- [ ] **SET-09**: API Keys tab shows success/error toast after add/delete operations
+- [ ] **SET-10**: Git tab displays current git user name and email with editable fields and Save button
+- [ ] **SET-11**: Git tab shows success/error feedback on save
+- [ ] **SET-12**: Appearance tab has font size slider (12-20px) with live preview
+- [ ] **SET-13**: Appearance tab has code font selection (JetBrains Mono default)
+- [ ] **SET-14**: Appearance preferences persist to localStorage and apply immediately without page reload
+- [ ] **SET-15**: MCP tab lists all configured MCP servers per provider (Claude, Codex) with name and status
+- [ ] **SET-16**: MCP tab has "Add Server" form with name, command, args, env fields per provider
+- [ ] **SET-17**: MCP tab allows removing servers with confirmation dialog
+- [ ] **SET-18**: All settings tabs show loading skeletons while fetching data from backend
+- [ ] **SET-19**: Settings that require server restart display a "(requires restart)" indicator
+- [ ] **SET-20**: GitHub/GitLab credentials section allows adding/viewing/deleting credentials with token masking
+
+### Command Palette (CMD)
+
+- [ ] **CMD-01**: Cmd+K (Mac) / Ctrl+K (Linux/Windows) opens command palette as centered modal overlay with backdrop blur
+- [ ] **CMD-02**: Palette renders as portal above all content, including Settings modal
+- [ ] **CMD-03**: Search input is auto-focused on open with placeholder "Type a command or search..."
+- [ ] **CMD-04**: Escape key or clicking backdrop closes palette
+- [ ] **CMD-05**: Commands grouped into sections: Navigation, Sessions, Actions, Settings — each with section header
+- [ ] **CMD-06**: Navigation group includes: Switch to Chat (Cmd+1), Switch to Files (Cmd+2), Switch to Shell (Cmd+3), Switch to Git (Cmd+4), Open Settings
+- [ ] **CMD-07**: Sessions group lists all sessions with fuzzy search matching on title, sorted by recency
+- [ ] **CMD-08**: Selecting a session switches to Chat tab and navigates to that session
+- [ ] **CMD-09**: Actions group includes: New Session, Toggle Thinking Visibility, Toggle Sidebar
+- [ ] **CMD-10**: User can type file paths/names to fuzzy-search project files; selecting opens in editor (switches to Files tab)
+- [ ] **CMD-11**: Slash commands (/) are listed and executable from palette — results shown as toast or inline
+- [ ] **CMD-12**: Arrow keys navigate between items, Enter selects, items show keyboard shortcut hints where applicable
+- [ ] **CMD-13**: Empty state shows "No results found" when search matches nothing
+- [ ] **CMD-14**: Recent/frequent commands appear at top of list when search input is empty
+- [ ] **CMD-15**: Project switching group lists available projects; selecting switches active project
+
+### File Tree (FT)
+
+- [ ] **FT-01**: Files tab shows project file tree in left panel (~240px) with code editor in remaining space
+- [ ] **FT-02**: File tree renders hierarchical directory structure with indentation per nesting level
+- [ ] **FT-03**: Directories show expand/collapse chevron; clicking toggles children visibility
+- [ ] **FT-04**: Expansion state persists across tab switches (stored in file store)
+- [ ] **FT-05**: Files and folders display type-appropriate icons (folder, TypeScript, JavaScript, JSON, CSS, Markdown, image, etc.) using lucide-react
+- [ ] **FT-06**: Clicking a file opens it in the code editor panel (right side of Files tab)
+- [ ] **FT-07**: Currently open file is highlighted in the tree
+- [ ] **FT-08**: Search/filter input at top of tree panel filters visible files/folders by fuzzy match as user types
+- [ ] **FT-09**: Right-click context menu on files with actions: Copy Path, Copy Relative Path, Open in Editor, Open Containing Folder in Terminal
+- [ ] **FT-10**: Right-click context menu on directories with actions: Copy Path, Expand All, Collapse All
+- [ ] **FT-11**: Image files (png, jpg, gif, svg, webp) open in lightbox preview instead of code editor
+- [ ] **FT-12**: File tree shows loading skeleton on initial fetch
+- [ ] **FT-13**: File tree shows error state with retry button if fetch fails
+- [ ] **FT-14**: Directories lazy-load children on expand (not full tree at once) for large projects
+- [ ] **FT-15**: node_modules, .git, and other standard ignored directories are hidden by default
+- [ ] **FT-16**: File tree refreshes when backend sends file change notifications via WebSocket
+
+### Code Editor (ED)
+
+- [ ] **ED-01**: CodeMirror 6 editor renders in right panel of Files tab with syntax highlighting for 50+ languages
+- [ ] **ED-02**: Language grammar loaded dynamically based on file extension (not bundled at module level)
+- [ ] **ED-03**: Editor uses custom OKLCH theme built from design system tokens (--color-* CSS variables)
+- [ ] **ED-04**: Editor displays line numbers in gutter
+- [ ] **ED-05**: User can edit file content; modified files show unsaved indicator (dot) on their tab
+- [ ] **ED-06**: User can save file with Cmd+S / Ctrl+S — writes back to backend via PUT endpoint
+- [ ] **ED-07**: Save shows success/error toast; error toast includes reason (permission denied, file not found, etc.)
+- [ ] **ED-08**: Multiple files open as horizontal tabs above editor — clicking switches editor content
+- [ ] **ED-09**: File tabs show filename; hovering shows full path in tooltip
+- [ ] **ED-10**: File tabs have close button (x); closing last tab shows empty state ("Open a file from the tree or Cmd+K")
+- [ ] **ED-11**: Closing a tab with unsaved changes shows confirmation dialog ("Save / Discard / Cancel")
+- [ ] **ED-12**: Cmd+F / Ctrl+F opens CodeMirror's built-in search within active file
+- [ ] **ED-13**: User can toggle word wrap via button in editor header
+- [ ] **ED-14**: Editor supports diff view mode — shows unified or side-by-side diff using @codemirror/merge
+- [ ] **ED-15**: Diff view activated when opening files from git panel's changed files list
+- [ ] **ED-16**: Clicking a file path in a chat tool card (Read, Edit, Write) switches to Files tab and opens that file in the editor
+- [ ] **ED-17**: Editor is lazy-loaded via React.lazy() + Suspense with loading skeleton — not in initial bundle
+- [ ] **ED-18**: Binary files show "Binary file — cannot display" message instead of editor
+- [ ] **ED-19**: Large files (>1MB) show warning before loading with option to proceed or cancel
+- [ ] **ED-20**: Editor panel shows breadcrumb path of active file above the editor surface
+
+### Terminal (TERM)
+
+- [ ] **TERM-01**: Shell tab renders xterm.js terminal with full PTY emulation and ANSI 256-color support
+- [ ] **TERM-02**: Terminal connects via separate WebSocket to /shell endpoint (independent from chat WS)
+- [ ] **TERM-03**: Terminal auto-resizes to fill container using @xterm/addon-fit, debounced to prevent layout thrashing
+- [ ] **TERM-04**: URLs in terminal output are clickable and open in new browser tab via @xterm/addon-web-links
+- [ ] **TERM-05**: Connection state indicator in panel header: connecting (yellow pulse), connected (green dot), disconnected (red dot)
+- [ ] **TERM-06**: Terminal opens with working directory set to active project root
+- [ ] **TERM-07**: Plain shell mode available (no AI provider attached) — dropdown or toggle in header
+- [ ] **TERM-08**: Auth URLs from CLI providers are detected and displayed as clickable links
+- [ ] **TERM-09**: Header has Restart and Disconnect buttons with icons and tooltips
+- [ ] **TERM-10**: Terminal is lazy-loaded via React.lazy() + Suspense — not in initial bundle
+- [ ] **TERM-11**: Terminal stays DOM-mounted when switching to other tabs (CSS display:none) — session state preserved
+- [ ] **TERM-12**: React strict mode double-mount handled via ref-based WebSocket guard (no duplicate PTY sessions)
+- [ ] **TERM-13**: Disconnected state shows reconnect button and "Session ended" message overlay
+- [ ] **TERM-14**: Terminal uses custom OKLCH-derived color scheme matching design system (not default xterm colors)
+- [ ] **TERM-15**: Copy/paste works via Cmd+C / Cmd+V within terminal
+
+### Git Panel (GIT)
+
+- [ ] **GIT-01**: Git tab shows two switchable views: Changes and History, toggled via sub-tab bar
+- [ ] **GIT-02**: Changes view lists all changed files grouped by status: Staged, Modified, Untracked, Deleted
+- [ ] **GIT-03**: Each file row shows: status icon (M/A/D/?), filename, relative path, checkbox for staging
+- [ ] **GIT-04**: Clicking checkbox stages/unstages the file (immediate API call)
+- [ ] **GIT-05**: "Select All" and "Deselect All" buttons above the file list
+- [ ] **GIT-06**: Clicking a changed file opens its diff in the code editor (switches to Files tab, activates diff view)
+- [ ] **GIT-07**: Commit composer at bottom: auto-resize textarea for message, "Commit" button disabled when nothing staged or message empty
+- [ ] **GIT-08**: Successful commit shows toast, clears message, refreshes changes list
+- [ ] **GIT-09**: Failed commit shows error toast with reason
+- [ ] **GIT-10**: Panel header shows current branch name with branch icon
+- [ ] **GIT-11**: Branch dropdown allows switching between existing local branches
+- [ ] **GIT-12**: "New Branch" button opens inline input for branch name with Create/Cancel
+- [ ] **GIT-13**: Push, Pull, Fetch buttons in panel header with icons and tooltips
+- [ ] **GIT-14**: Push/Pull/Fetch show loading spinner during operation and success/error toast on completion
+- [ ] **GIT-15**: Remote status indicator shows ahead/behind count relative to tracking branch
+- [ ] **GIT-16**: "Generate Message" button uses AI to generate commit message from staged changes — fills textarea
+- [ ] **GIT-17**: Discard changes action per file (right-click or button) with confirmation dialog ("This cannot be undone")
+- [ ] **GIT-18**: History view shows recent commits (20-30) with: hash (short), message, author, relative date
+- [ ] **GIT-19**: Clicking a commit in history opens its diff summary (files changed + per-file diff)
+- [ ] **GIT-20**: Git panel auto-refreshes when backend sends file/project change WebSocket events
+- [ ] **GIT-21**: All destructive operations (discard, force push) require confirmation dialog
+- [ ] **GIT-22**: Loading skeleton shown while fetching git status/history
+- [ ] **GIT-23**: Error state with retry button if git operations fail (e.g., not a git repo)
+
+### Navigation (NAV)
+
+- [ ] **NAV-01**: User can rename sessions via double-click on session title in sidebar — inline edit with Enter to confirm, Escape to cancel
+- [ ] **NAV-02**: User can delete sessions via right-click context menu — confirmation dialog before deletion
+- [ ] **NAV-03**: Deleted session removed from sidebar list immediately; if it was active, switches to most recent remaining session
+
+## Future Requirements
+
+Deferred to later milestones. Tracked but not in current roadmap.
+
+### Visual Polish (M4 "The Polish")
+
+- **POL-01**: Spring physics animations on all interactions
+- **POL-02**: Aurora/ambient overlay during streaming
+- **POL-03**: Glass surface effects for modals and overlays
+- **POL-04**: File change indicators (dots) on file tree nodes from git status
+- **POL-05**: Sidebar slim collapse mode (icon-only rail)
+- **POL-06**: Full accessibility pass (ARIA roles, keyboard nav, screen reader)
+- **POL-07**: Performance audit (FPS during streaming, memory profiling)
+- **POL-08**: Editor minimap
+- **POL-09**: "Run in Terminal" button on Bash tool cards
+- **POL-10**: Markdown preview in code editor
+
+### Multi-Provider (M5 "The Power")
+
+- **PWR-01**: Tabbed interface for simultaneous Claude/Gemini/Codex work
+- **PWR-02**: Background task execution with tab notifications
+- **PWR-03**: Shared context between provider tabs
+- **PWR-04**: Multiple terminal sessions
+- **PWR-05**: Editor split panes
+- **PWR-06**: Active file/tab context injection into agent messages
+- **PWR-07**: File mentions (@) in composer with fuzzy search
+
+### Integrations (M6 "The Vision")
+
+- **VIS-01**: GSD visual dashboard
+- **VIS-02**: Nextcloud integration (file picker, screenshot upload)
+- **VIS-03**: Companion system (conditional on feasibility)
+- **VIS-04**: CodeRabbit integration
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| Full IDE replacement (LSP, intellisense, debugging) | Loom complements VS Code, doesn't replace it |
+| Monaco editor | 5-10MB bundle, VS Code coupling. CodeMirror 6 is modular (~200KB) |
+| Real-time collaborative editing | Single-user tool |
+| Git merge conflict resolution UI | Too complex; handle in real IDE |
+| Settings sync across devices | Single-server deployment |
+| File creation/rename/delete from tree | Agent handles file ops; dual-path mutation is dangerous |
+| Terminal multiplexer (split panes, tmux-like) | Massive complexity for marginal value |
+| Multiple terminal tabs | Defer to M5 if requested |
+| Inline git blame / annotations | Complex, low value for AI coding workflow |
+| Custom keybinding configuration | Enormous complexity, almost no one uses in web apps |
+| Light mode | Dark-only for M1-M3; potential M4+ stretch |
+| Inline code completion / LSP | Not Loom's value prop; agent handles code |
+| Full git history (infinite scroll) | Recent 20-30 commits sufficient for M3 |
+| Git stash management | Niche feature, defer to M5+ |
+| Semantic code search / RAG indexing | Over-engineering for single-user; native grep/glob sufficient |
+| Character-by-character typewriter | Anti-pattern; batch rendering via rAF buffer |
+| Conversation branching | High complexity, low value for single-user tool |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| (populated by roadmapper) | | |
+
+**Coverage:**
+- v1.2 requirements: 87 total
+- Mapped to phases: 0
+- Unmapped: 87
+
+---
+*Requirements defined: 2026-03-09*
+*Last updated: 2026-03-09 after initial definition*
