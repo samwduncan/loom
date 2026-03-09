@@ -1,7 +1,7 @@
 # Requirements: Loom V2
 
 **Defined:** 2026-03-09
-**Core Value:** Make AI agent work visible, beautiful, and controllable — every tool call, every code write, every MCP interaction should be a satisfying visual experience that enhances understanding of what the agent is doing.
+**Core Value:** Make AI agent work visible, beautiful, and controllable -- every tool call, every code write, every MCP interaction should be a satisfying visual experience that enhances understanding of what the agent is doing.
 
 ## v1.2 Requirements
 
@@ -11,11 +11,11 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 - [ ] **LAY-01**: Content area renders a horizontal tab bar at the top with tabs: Chat, Files, Shell, Git
 - [ ] **LAY-02**: Clicking a tab switches the visible panel below the tab bar
-- [ ] **LAY-03**: Tab switching uses CSS display (show/hide), NOT conditional rendering — all panels stay mounted to preserve state (terminal session, scroll position, editor content)
+- [ ] **LAY-03**: Tab switching uses CSS display (show/hide), NOT conditional rendering -- all panels stay mounted to preserve state (terminal session, scroll position, editor content)
 - [ ] **LAY-04**: Active tab has a visual indicator (underline or highlight using design tokens)
 - [ ] **LAY-05**: Keyboard shortcuts Cmd+1/2/3/4 switch to Chat/Files/Shell/Git respectively
-- [ ] **LAY-06**: Tab bar does not render on mobile (< 768px) — only Chat tab visible, other panels accessible via Cmd+K or menu
-- [ ] **LAY-07**: New Zustand file store (5th store) manages file tree state, open editor tabs, active file, dirty file tracking — Constitution amended
+- [ ] **LAY-06**: Tab bar does not render on mobile (< 768px) -- only Chat tab visible, other panels accessible via Cmd+K or menu
+- [ ] **LAY-07**: New Zustand file store (5th store) manages file tree state, open editor tabs, active file, dirty file tracking -- Constitution amended
 - [ ] **LAY-08**: Each panel wrapped in PanelErrorBoundary to isolate crashes from other panels
 - [ ] **LAY-09**: TabId union type extended to include 'chat' | 'files' | 'shell' | 'git' in UI store
 
@@ -48,13 +48,13 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **CMD-02**: Palette renders as portal above all content, including Settings modal
 - [ ] **CMD-03**: Search input is auto-focused on open with placeholder "Type a command or search..."
 - [ ] **CMD-04**: Escape key or clicking backdrop closes palette
-- [ ] **CMD-05**: Commands grouped into sections: Navigation, Sessions, Actions, Settings — each with section header
+- [ ] **CMD-05**: Commands grouped into sections: Navigation, Sessions, Actions, Settings -- each with section header
 - [ ] **CMD-06**: Navigation group includes: Switch to Chat (Cmd+1), Switch to Files (Cmd+2), Switch to Shell (Cmd+3), Switch to Git (Cmd+4), Open Settings
 - [ ] **CMD-07**: Sessions group lists all sessions with fuzzy search matching on title, sorted by recency
 - [ ] **CMD-08**: Selecting a session switches to Chat tab and navigates to that session
 - [ ] **CMD-09**: Actions group includes: New Session, Toggle Thinking Visibility, Toggle Sidebar
 - [ ] **CMD-10**: User can type file paths/names to fuzzy-search project files; selecting opens in editor (switches to Files tab)
-- [ ] **CMD-11**: Slash commands (/) are listed and executable from palette — results shown as toast or inline
+- [ ] **CMD-11**: Slash commands (/) are listed and executable from palette -- results shown as toast or inline
 - [ ] **CMD-12**: Arrow keys navigate between items, Enter selects, items show keyboard shortcut hints where applicable
 - [ ] **CMD-13**: Empty state shows "No results found" when search matches nothing
 - [ ] **CMD-14**: Recent/frequent commands appear at top of list when search input is empty
@@ -86,19 +86,19 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **ED-03**: Editor uses custom OKLCH theme built from design system tokens (--color-* CSS variables)
 - [ ] **ED-04**: Editor displays line numbers in gutter
 - [ ] **ED-05**: User can edit file content; modified files show unsaved indicator (dot) on their tab
-- [ ] **ED-06**: User can save file with Cmd+S / Ctrl+S — writes back to backend via PUT endpoint
+- [ ] **ED-06**: User can save file with Cmd+S / Ctrl+S -- writes back to backend via PUT endpoint
 - [ ] **ED-07**: Save shows success/error toast; error toast includes reason (permission denied, file not found, etc.)
-- [ ] **ED-08**: Multiple files open as horizontal tabs above editor — clicking switches editor content
+- [ ] **ED-08**: Multiple files open as horizontal tabs above editor -- clicking switches editor content
 - [ ] **ED-09**: File tabs show filename; hovering shows full path in tooltip
 - [ ] **ED-10**: File tabs have close button (x); closing last tab shows empty state ("Open a file from the tree or Cmd+K")
 - [ ] **ED-11**: Closing a tab with unsaved changes shows confirmation dialog ("Save / Discard / Cancel")
 - [ ] **ED-12**: Cmd+F / Ctrl+F opens CodeMirror's built-in search within active file
 - [ ] **ED-13**: User can toggle word wrap via button in editor header
-- [ ] **ED-14**: Editor supports diff view mode — shows unified or side-by-side diff using @codemirror/merge
+- [ ] **ED-14**: Editor supports diff view mode -- shows unified or side-by-side diff using @codemirror/merge
 - [ ] **ED-15**: Diff view activated when opening files from git panel's changed files list
 - [ ] **ED-16**: Clicking a file path in a chat tool card (Read, Edit, Write) switches to Files tab and opens that file in the editor
-- [ ] **ED-17**: Editor is lazy-loaded via React.lazy() + Suspense with loading skeleton — not in initial bundle
-- [ ] **ED-18**: Binary files show "Binary file — cannot display" message instead of editor
+- [ ] **ED-17**: Editor is lazy-loaded via React.lazy() + Suspense with loading skeleton -- not in initial bundle
+- [ ] **ED-18**: Binary files show "Binary file -- cannot display" message instead of editor
 - [ ] **ED-19**: Large files (>1MB) show warning before loading with option to proceed or cancel
 - [ ] **ED-20**: Editor panel shows breadcrumb path of active file above the editor surface
 
@@ -110,11 +110,11 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **TERM-04**: URLs in terminal output are clickable and open in new browser tab via @xterm/addon-web-links
 - [ ] **TERM-05**: Connection state indicator in panel header: connecting (yellow pulse), connected (green dot), disconnected (red dot)
 - [ ] **TERM-06**: Terminal opens with working directory set to active project root
-- [ ] **TERM-07**: Plain shell mode available (no AI provider attached) — dropdown or toggle in header
+- [ ] **TERM-07**: Plain shell mode available (no AI provider attached) -- dropdown or toggle in header
 - [ ] **TERM-08**: Auth URLs from CLI providers are detected and displayed as clickable links
 - [ ] **TERM-09**: Header has Restart and Disconnect buttons with icons and tooltips
-- [ ] **TERM-10**: Terminal is lazy-loaded via React.lazy() + Suspense — not in initial bundle
-- [ ] **TERM-11**: Terminal stays DOM-mounted when switching to other tabs (CSS display:none) — session state preserved
+- [ ] **TERM-10**: Terminal is lazy-loaded via React.lazy() + Suspense -- not in initial bundle
+- [ ] **TERM-11**: Terminal stays DOM-mounted when switching to other tabs (CSS display:none) -- session state preserved
 - [ ] **TERM-12**: React strict mode double-mount handled via ref-based WebSocket guard (no duplicate PTY sessions)
 - [ ] **TERM-13**: Disconnected state shows reconnect button and "Session ended" message overlay
 - [ ] **TERM-14**: Terminal uses custom OKLCH-derived color scheme matching design system (not default xterm colors)
@@ -137,7 +137,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **GIT-13**: Push, Pull, Fetch buttons in panel header with icons and tooltips
 - [ ] **GIT-14**: Push/Pull/Fetch show loading spinner during operation and success/error toast on completion
 - [ ] **GIT-15**: Remote status indicator shows ahead/behind count relative to tracking branch
-- [ ] **GIT-16**: "Generate Message" button uses AI to generate commit message from staged changes — fills textarea
+- [ ] **GIT-16**: "Generate Message" button uses AI to generate commit message from staged changes -- fills textarea
 - [ ] **GIT-17**: Discard changes action per file (right-click or button) with confirmation dialog ("This cannot be undone")
 - [ ] **GIT-18**: History view shows recent commits (20-30) with: hash (short), message, author, relative date
 - [ ] **GIT-19**: Clicking a commit in history opens its diff summary (files changed + per-file diff)
@@ -148,8 +148,8 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Navigation (NAV)
 
-- [ ] **NAV-01**: User can rename sessions via double-click on session title in sidebar — inline edit with Enter to confirm, Escape to cancel
-- [ ] **NAV-02**: User can delete sessions via right-click context menu — confirmation dialog before deletion
+- [ ] **NAV-01**: User can rename sessions via double-click on session title in sidebar -- inline edit with Enter to confirm, Escape to cancel
+- [ ] **NAV-02**: User can delete sessions via right-click context menu -- confirmation dialog before deletion
 - [ ] **NAV-03**: Deleted session removed from sidebar list immediately; if it was active, switches to most recent remaining session
 
 ## Future Requirements
@@ -216,13 +216,133 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| LAY-01 | Phase 20 | Pending |
+| LAY-02 | Phase 20 | Pending |
+| LAY-03 | Phase 20 | Pending |
+| LAY-04 | Phase 20 | Pending |
+| LAY-05 | Phase 20 | Pending |
+| LAY-06 | Phase 20 | Pending |
+| LAY-07 | Phase 20 | Pending |
+| LAY-08 | Phase 20 | Pending |
+| LAY-09 | Phase 20 | Pending |
+| SET-01 | Phase 21 | Pending |
+| SET-02 | Phase 21 | Pending |
+| SET-03 | Phase 21 | Pending |
+| SET-04 | Phase 21 | Pending |
+| SET-05 | Phase 21 | Pending |
+| SET-06 | Phase 21 | Pending |
+| SET-07 | Phase 21 | Pending |
+| SET-08 | Phase 21 | Pending |
+| SET-09 | Phase 21 | Pending |
+| SET-10 | Phase 21 | Pending |
+| SET-11 | Phase 21 | Pending |
+| SET-12 | Phase 21 | Pending |
+| SET-13 | Phase 21 | Pending |
+| SET-14 | Phase 21 | Pending |
+| SET-15 | Phase 21 | Pending |
+| SET-16 | Phase 21 | Pending |
+| SET-17 | Phase 21 | Pending |
+| SET-18 | Phase 21 | Pending |
+| SET-19 | Phase 21 | Pending |
+| SET-20 | Phase 21 | Pending |
+| CMD-01 | Phase 22 | Pending |
+| CMD-02 | Phase 22 | Pending |
+| CMD-03 | Phase 22 | Pending |
+| CMD-04 | Phase 22 | Pending |
+| CMD-05 | Phase 22 | Pending |
+| CMD-06 | Phase 22 | Pending |
+| CMD-07 | Phase 22 | Pending |
+| CMD-08 | Phase 22 | Pending |
+| CMD-09 | Phase 22 | Pending |
+| CMD-10 | Phase 22 | Pending |
+| CMD-11 | Phase 22 | Pending |
+| CMD-12 | Phase 22 | Pending |
+| CMD-13 | Phase 22 | Pending |
+| CMD-14 | Phase 22 | Pending |
+| CMD-15 | Phase 22 | Pending |
+| FT-01 | Phase 23 | Pending |
+| FT-02 | Phase 23 | Pending |
+| FT-03 | Phase 23 | Pending |
+| FT-04 | Phase 23 | Pending |
+| FT-05 | Phase 23 | Pending |
+| FT-06 | Phase 23 | Pending |
+| FT-07 | Phase 23 | Pending |
+| FT-08 | Phase 23 | Pending |
+| FT-09 | Phase 23 | Pending |
+| FT-10 | Phase 23 | Pending |
+| FT-11 | Phase 23 | Pending |
+| FT-12 | Phase 23 | Pending |
+| FT-13 | Phase 23 | Pending |
+| FT-14 | Phase 23 | Pending |
+| FT-15 | Phase 23 | Pending |
+| FT-16 | Phase 23 | Pending |
+| ED-01 | Phase 24 | Pending |
+| ED-02 | Phase 24 | Pending |
+| ED-03 | Phase 24 | Pending |
+| ED-04 | Phase 24 | Pending |
+| ED-05 | Phase 24 | Pending |
+| ED-06 | Phase 24 | Pending |
+| ED-07 | Phase 24 | Pending |
+| ED-08 | Phase 24 | Pending |
+| ED-09 | Phase 24 | Pending |
+| ED-10 | Phase 24 | Pending |
+| ED-11 | Phase 24 | Pending |
+| ED-12 | Phase 24 | Pending |
+| ED-13 | Phase 24 | Pending |
+| ED-14 | Phase 24 | Pending |
+| ED-15 | Phase 24 | Pending |
+| ED-16 | Phase 24 | Pending |
+| ED-17 | Phase 24 | Pending |
+| ED-18 | Phase 24 | Pending |
+| ED-19 | Phase 24 | Pending |
+| ED-20 | Phase 24 | Pending |
+| TERM-01 | Phase 25 | Pending |
+| TERM-02 | Phase 25 | Pending |
+| TERM-03 | Phase 25 | Pending |
+| TERM-04 | Phase 25 | Pending |
+| TERM-05 | Phase 25 | Pending |
+| TERM-06 | Phase 25 | Pending |
+| TERM-07 | Phase 25 | Pending |
+| TERM-08 | Phase 25 | Pending |
+| TERM-09 | Phase 25 | Pending |
+| TERM-10 | Phase 25 | Pending |
+| TERM-11 | Phase 25 | Pending |
+| TERM-12 | Phase 25 | Pending |
+| TERM-13 | Phase 25 | Pending |
+| TERM-14 | Phase 25 | Pending |
+| TERM-15 | Phase 25 | Pending |
+| GIT-01 | Phase 26 | Pending |
+| GIT-02 | Phase 26 | Pending |
+| GIT-03 | Phase 26 | Pending |
+| GIT-04 | Phase 26 | Pending |
+| GIT-05 | Phase 26 | Pending |
+| GIT-06 | Phase 26 | Pending |
+| GIT-07 | Phase 26 | Pending |
+| GIT-08 | Phase 26 | Pending |
+| GIT-09 | Phase 26 | Pending |
+| GIT-10 | Phase 26 | Pending |
+| GIT-11 | Phase 26 | Pending |
+| GIT-12 | Phase 26 | Pending |
+| GIT-13 | Phase 26 | Pending |
+| GIT-14 | Phase 26 | Pending |
+| GIT-15 | Phase 26 | Pending |
+| GIT-16 | Phase 26 | Pending |
+| GIT-17 | Phase 26 | Pending |
+| GIT-18 | Phase 26 | Pending |
+| GIT-19 | Phase 26 | Pending |
+| GIT-20 | Phase 26 | Pending |
+| GIT-21 | Phase 26 | Pending |
+| GIT-22 | Phase 26 | Pending |
+| GIT-23 | Phase 26 | Pending |
+| NAV-01 | Phase 26 | Pending |
+| NAV-02 | Phase 26 | Pending |
+| NAV-03 | Phase 26 | Pending |
 
 **Coverage:**
-- v1.2 requirements: 87 total
-- Mapped to phases: 0
-- Unmapped: 87
+- v1.2 requirements: 121 total
+- Mapped to phases: 121
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after initial definition*
+*Last updated: 2026-03-09 after roadmap creation (traceability populated)*
