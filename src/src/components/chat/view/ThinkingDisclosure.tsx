@@ -14,6 +14,8 @@
 
 import { useState } from 'react';
 import { StreamingCursor } from '@/components/chat/view/StreamingCursor';
+import { ShinyText } from '@/components/effects/ShinyText';
+import { parseThinkingMarkdown } from '@/lib/thinking-markdown';
 import type { ThinkingBlock } from '@/types/message';
 import '../styles/thinking-disclosure.css';
 import '../styles/streaming-cursor.css';
@@ -64,7 +66,7 @@ export function ThinkingDisclosure({
         onClick={() => setUserToggled((prev) => prev === null ? !defaultExpanded : !prev)}
       >
         {isStreaming ? (
-          <span className="thinking-pulse">Thinking...</span>
+          <ShinyText><span className="thinking-pulse">Thinking...</span></ShinyText>
         ) : (
           <span>
             {`Thinking (${totalChars.toLocaleString()} chars)`}
@@ -86,7 +88,7 @@ export function ThinkingDisclosure({
         <div>
           {blocks.map((block) => (
             <p key={block.id} className="italic text-muted font-mono text-sm">
-              {block.text}
+              <span dangerouslySetInnerHTML={{ __html: parseThinkingMarkdown(block.text) }} />
               {isStreaming && !block.isComplete && <StreamingCursor variant="muted" />}
             </p>
           ))}

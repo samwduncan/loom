@@ -11,6 +11,7 @@ import { memo } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useElapsedTime } from '@/hooks/useElapsedTime';
+import { SpotlightCard } from '@/components/effects/SpotlightCard';
 import type { ToolCallState, ToolCallStatus } from '@/types/stream';
 import type { ToolConfig } from '@/lib/tool-registry';
 import './tool-card-shell.css';
@@ -42,6 +43,7 @@ export const ToolCardShell = memo(function ToolCardShell({
   const isError = toolCall.status === 'rejected';
 
   return (
+    <SpotlightCard>
     <div
       className="tool-card-shell"
       data-status={toolCall.status}
@@ -89,5 +91,6 @@ export const ToolCardShell = memo(function ToolCardShell({
         </div>
       </div>
     </div>
+    </SpotlightCard>
   );
 });

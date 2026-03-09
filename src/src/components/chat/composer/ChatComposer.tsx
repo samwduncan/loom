@@ -30,6 +30,7 @@ import { useImageAttachments } from './useImageAttachments';
 import { ComposerKeyboardHints } from './ComposerKeyboardHints';
 import { ImagePreviewRow } from './ImagePreviewRow';
 import { DragOverlay } from './DragOverlay';
+import { ElectricBorder } from '@/components/effects/ElectricBorder';
 import type { Message } from '@/types/message';
 import type { ClaudeCommandOptions } from '@/types/websocket';
 import './composer.css';
@@ -331,6 +332,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
   return (
     <div className="max-w-3xl mx-auto w-full px-4 pb-4 pt-2">
+      <ElectricBorder active={isStreaming}>
       <div
         className="composer-pill relative p-3"
         data-streaming={isStreamingState}
@@ -433,6 +435,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         {/* Drag-and-drop overlay */}
         <DragOverlay isDragOver={isDragOver} />
       </div>
+      </ElectricBorder>
     </div>
   );
 }

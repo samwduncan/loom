@@ -13,6 +13,7 @@
 import { memo } from 'react';
 import { useStreamStore } from '@/stores/stream';
 import { cn } from '@/utils/cn';
+import { ShinyText } from '@/components/effects/ShinyText';
 import '../styles/status-line.css';
 
 export const StatusLine = memo(function StatusLine() {
@@ -29,7 +30,7 @@ export const StatusLine = memo(function StatusLine() {
       )}
       data-testid="status-line"
     >
-      {activityText}
+      <ShinyText>{activityText}</ShinyText>
     </div>
   );
 });

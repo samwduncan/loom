@@ -59,6 +59,27 @@
   margin: var(--space-1) 0;
 }
 
+/* ─── Thinking Inline Code ──────────────────────────────────────────── */
+
+.thinking-code {
+  background: var(--surface-overlay);
+  border-radius: 2px;
+  padding: 0 0.25rem;
+  font-family: inherit; /* Already in monospace context */
+}
+
+/* ─── Thinking Inline Links ────────────────────────────────────────── */
+
+.thinking-disclosure-content a {
+  color: var(--text-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.thinking-disclosure-content a:hover {
+  opacity: 0.8;
+}
+
 /* ─── Thinking Pulse Animation ───────────────────────────────────────── */
 
 @keyframes thinking-pulse {
