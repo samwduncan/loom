@@ -84,4 +84,11 @@ describe('parseThinkingMarkdown', () => {
     const result = parseThinkingMarkdown('line1\nline2');
     expect(result).toBeTruthy();
   });
+
+  it('strips PUA characters to prevent placeholder spoofing', () => {
+    const result = parseThinkingMarkdown('\uE000TH1\uE001');
+    // PUA chars stripped, so the text renders as "TH1" (not a code block)
+    expect(result).not.toContain('<code');
+    expect(result).toContain('TH1');
+  });
 });

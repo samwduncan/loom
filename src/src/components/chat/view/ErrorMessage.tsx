@@ -24,19 +24,23 @@ import type { ClaudeCommandOptions } from '@/types/websocket';
 
 interface ErrorMessageProps {
   message: Message;
+  /** Session ID this error belongs to -- used for retry targeting */
+  sessionId?: string;
 }
 
-export function ErrorMessage({ message }: ErrorMessageProps) {
+export function ErrorMessage({ message, sessionId }: ErrorMessageProps) {
   const { projectName } = useProjectContext();
   const isConnected = useConnectionStore(
     (s) => s.providers.claude.status === 'connected',
   );
 
-  // Find the active session's messages and locate last user message before this error
-  const activeSessionId = useTimelineStore((s) => s.activeSessionId);
+  // Use explicit sessionId prop (from MessageList) to avoid race when user switches sessions
+  const fallbackSessionId = useTimelineStore((s) => s.activeSessionId);
+  const effectiveSessionId = sessionId ?? fallbackSessionId;
+
   const lastUserMessage = useTimelineStore((s) => {
-    if (!activeSessionId) return null;
-    const session = s.sessions.find((sess) => sess.id === activeSessionId);
+    if (!effectiveSessionId) return null;
+    const session = s.sessions.find((sess) => sess.id === effectiveSessionId);
     if (!session) return null;
     const errorIndex = session.messages.findIndex((m) => m.id === message.id);
     if (errorIndex === -1) return null;
@@ -49,11 +53,11 @@ export function ErrorMessage({ message }: ErrorMessageProps) {
   const canRetry = lastUserMessage !== null && isConnected;
 
   const handleRetry = useCallback(() => {
-    if (!lastUserMessage || !isConnected || !activeSessionId) return;
+    if (!lastUserMessage || !isConnected || !effectiveSessionId) return;
 
     const options: ClaudeCommandOptions = {
       projectPath: projectName,
-      sessionId: activeSessionId,
+      sessionId: effectiveSessionId,
     };
 
     wsClient.send({
@@ -61,7 +65,7 @@ export function ErrorMessage({ message }: ErrorMessageProps) {
       command: lastUserMessage.content,
       options,
     });
-  }, [lastUserMessage, isConnected, activeSessionId, projectName]);
+  }, [lastUserMessage, isConnected, effectiveSessionId, projectName]);
 
   return (
     <MessageContainer role="error">

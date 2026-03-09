@@ -12,7 +12,7 @@
  * Constitution: Named exports only (2.2), gridTemplateRows in ESLint allowlist (Phase 3).
  */
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { StreamingCursor } from '@/components/chat/view/StreamingCursor';
 import { ShinyText } from '@/components/effects/ShinyText';
 import { parseThinkingMarkdown } from '@/lib/thinking-markdown';
@@ -26,6 +26,8 @@ interface ThinkingDisclosureProps {
   globalExpanded?: boolean;
   /** Message-level duration in seconds (from metadata.duration) */
   duration?: number | null;
+  /** Highlight function for search -- wraps matching text in <mark> elements */
+  highlightText?: (text: string) => ReactNode;
 }
 
 export function ThinkingDisclosure({
@@ -33,6 +35,7 @@ export function ThinkingDisclosure({
   isStreaming,
   globalExpanded = true,
   duration,
+  highlightText,
 }: ThinkingDisclosureProps) {
   const [userToggled, setUserToggled] = useState<boolean | null>(null);
   const [prevGlobalExpanded, setPrevGlobalExpanded] = useState(globalExpanded);
@@ -88,7 +91,11 @@ export function ThinkingDisclosure({
         <div>
           {blocks.map((block) => (
             <p key={block.id} className="italic text-muted font-mono text-sm">
-              <span dangerouslySetInnerHTML={{ __html: parseThinkingMarkdown(block.text) }} />
+              {highlightText ? (
+                <span>{highlightText(block.text)}</span>
+              ) : (
+                <span dangerouslySetInnerHTML={{ __html: parseThinkingMarkdown(block.text) }} />
+              )}
               {isStreaming && !block.isComplete && <StreamingCursor variant="muted" />}
             </p>
           ))}

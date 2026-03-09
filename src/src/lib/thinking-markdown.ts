@@ -22,15 +22,9 @@ interface Placeholder {
   code: string;
 }
 
-let counter = 0;
-
 // Unicode PUA characters as placeholder delimiters (same pattern as streaming-markdown.ts)
 const PH_START = '\uE000';
 const PH_END = '\uE001';
-
-function makePlaceholder(): string {
-  return `${PH_START}TH${++counter}${PH_END}`;
-}
 
 /**
  * Escape HTML entities in text content.
@@ -53,14 +47,18 @@ function escapeHtml(str: string): string {
 export function parseThinkingMarkdown(text: string): string {
   if (!text) return '';
 
+  let counter = 0;
   const placeholders: Placeholder[] = [];
 
+  // Step 0: Strip PUA characters from input to prevent placeholder spoofing
+  let result = text.replace(/[\uE000\uE001]/g, '');
+
   // Step 1: Escape HTML
-  let result = escapeHtml(text);
+  result = escapeHtml(result);
 
   // Step 2: Extract inline code spans to placeholders (prevents inner formatting)
   result = result.replace(/`([^`]+)`/g, (_match, code: string) => {
-    const key = makePlaceholder();
+    const key = `${PH_START}TH${++counter}${PH_END}`;
     placeholders.push({ key, code });
     return key;
   });

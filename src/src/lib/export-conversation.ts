@@ -16,11 +16,12 @@ import type { Message } from '@/types/message';
 
 /** Lowercase, replace non-alphanumeric with hyphens, collapse, trim hyphens */
 export function slugify(text: string): string {
-  return text
+  const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
+  return slug || 'conversation';
 }
 
 function downloadFile(content: string, filename: string, mimeType: string): void {

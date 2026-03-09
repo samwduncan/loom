@@ -10,7 +10,7 @@
  * Constitution: Named exports (2.2), no inline styles (7.14).
  */
 
-import { useState, useRef, useCallback, type ReactNode } from 'react';
+import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react';
 import { createElement } from 'react';
 import type { Message } from '@/types/message';
 
@@ -51,6 +51,13 @@ export function useMessageSearch(): UseMessageSearchReturn {
     debounceRef.current = setTimeout(() => {
       setDebouncedQuery(q);
     }, 150);
+  }, []);
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, []);
 
   const open = useCallback(() => {

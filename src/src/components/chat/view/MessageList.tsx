@@ -44,7 +44,7 @@ interface MessageListProps {
   highlightText?: (text: string) => ReactNode;
 }
 
-export function MessageList({ messages, sessionId, onStreamFinalized, scrollContainerRef, searchQuery, highlightText: _highlightText }: MessageListProps) {
+export function MessageList({ messages, sessionId, onStreamFinalized, scrollContainerRef, searchQuery, highlightText }: MessageListProps) {
   const internalScrollRef = useRef<HTMLDivElement>(null);
   // Use external ref if provided (for composer scroll stability), otherwise internal
   const scrollRef = scrollContainerRef ?? internalScrollRef;
@@ -155,11 +155,11 @@ export function MessageList({ messages, sessionId, onStreamFinalized, scrollCont
   function renderMessage(msg: Message) {
     switch (msg.role) {
       case 'user':
-        return <UserMessage message={msg} />;
+        return <UserMessage message={msg} highlightText={highlightText} />;
       case 'assistant':
-        return <AssistantMessage message={msg} />;
+        return <AssistantMessage message={msg} highlightText={highlightText} />;
       case 'error':
-        return <ErrorMessage message={msg} />;
+        return <ErrorMessage message={msg} sessionId={sessionId} />;
       case 'system':
         return <SystemMessage message={msg} />;
       case 'task_notification':
