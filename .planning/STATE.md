@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.2
-milestone_name: "The Polish"
+milestone_name: "The Workspace"
 status: not_started
 stopped_at: null
-last_updated: "2026-03-09T21:55:00.000Z"
-last_activity: 2026-03-09 -- v1.1 milestone archived
+last_updated: "2026-03-09T22:30:00.000Z"
+last_activity: 2026-03-09 -- Milestone v1.2 started
 progress:
   total_phases: 0
   completed_phases: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Planning next milestone (v1.2 "The Polish")
+**Current focus:** Defining requirements for v1.2 "The Workspace"
 
 ## Current Position
 
-Phase: None (milestone not started)
-Plan: None
-Status: not_started
-Last activity: 2026-03-09 -- v1.1 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-09 — Milestone v1.2 started
 
 Progress: [..........] 0%
 
@@ -51,10 +51,10 @@ None.
 
 ### Blockers/Concerns
 
-None -- clean slate for next milestone.
+None — clean slate for next milestone.
 
 ## Session Continuity
 
-Last session: 2026-03-09T21:55:00Z
-Stopped at: v1.1 milestone archived
-Resume: Start next milestone with `/gsd:new-milestone`
+Last session: 2026-03-09T22:30:00Z
+Stopped at: Defining v1.2 requirements
+Resume: Continue `/gsd:new-milestone` workflow

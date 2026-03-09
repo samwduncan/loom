@@ -30,26 +30,22 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Active
 
-**Visual Excellence (M3)**
-- [ ] Spring physics animations on interactions
-- [ ] Aurora/ambient streaming effects
+**Current Milestone: v1.2 "The Workspace"**
+
+**Goal:** Make Loom a usable daily-driver by building the workspace panels that V1 had — settings, command palette, file tree, terminal, git panel, and code editor.
+
+**Target features:**
+- [ ] Settings panel (appearance, agents, API keys)
 - [ ] Cmd+K command palette
-- [ ] Sidebar slim collapse mode
-- [ ] Settings panel (appearance, agents, API)
-- [ ] Full accessibility pass (ARIA, keyboard nav)
-- [ ] Performance audit (FPS, memory profiling)
+- [ ] File Tree panel with file browsing
+- [ ] Code Editor (CodeMirror/Monaco)
+- [ ] Terminal / Shell (xterm.js + WebSocket)
+- [ ] Git Panel (changes, staging, commit, history)
 
-**Multi-Provider (M4)**
-- [ ] Tabbed interface for simultaneous Claude/Gemini/Codex work
-- [ ] Background task execution with tab notifications
-- [ ] Shared context between provider tabs
-- [ ] MCP server management UI
-
-**Integrations (M5)**
-- [ ] GSD visual dashboard
-- [ ] Nextcloud integration (file picker, screenshot upload)
-- [ ] Companion system (conditional on feasibility)
-- [ ] CodeRabbit integration
+**Future milestones:**
+- M4 "The Polish" — Spring physics, Aurora effects, glass surfaces, a11y, perf audit
+- M5 "The Power" — Multi-provider tabs, MCP management
+- M6 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
 
 ### Out of Scope
 
@@ -116,4 +112,4 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 | CSS-only visual effects | SpotlightCard/ShinyText/ElectricBorder without JS animation libs | Good — zero bundle impact |
 
 ---
-*Last updated: 2026-03-09 after v1.1 milestone*
+*Last updated: 2026-03-09 after v1.2 milestone started*
