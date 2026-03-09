@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Loom is a premium web interface for AI coding agents (Claude Code, Gemini, Codex) that transforms the black-box CLI experience into a visually stunning, multi-agent workspace. Built on a from-scratch React frontend with a 10/10 quality standard, consuming the existing CloudCLI Node.js backend. The architectural skeleton is complete with OKLCH design tokens, enforced coding conventions, streaming at 60fps, and a pluggable tool registry.
+Loom is a premium web interface for AI coding agents (Claude Code, Gemini, Codex) that transforms the black-box CLI experience into a visually stunning, multi-agent workspace. Built on a from-scratch React frontend with a 10/10 quality standard, consuming the existing CloudCLI Node.js backend. The full conversation experience is shipped — rich markdown with Shiki syntax highlighting, 6 purpose-built tool cards with state machines, streaming at 60fps, auto-resize composer with image attachments, permission banners, activity status, and CSS visual effects.
 
 ## Core Value
 
@@ -12,38 +12,32 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Validated
 
-- v1.0 Design Token System (DS-01 through DS-06) — 29 OKLCH color tokens, motion springs, spacing scale, z-index dictionary, typography, surface hierarchy
-- v1.0 Enforcement (ENF-01 through ENF-04) — 9 custom ESLint rules, TypeScript strict, Vitest, pre-commit gates
-- v1.0 App Shell (SHELL-01 through SHELL-04) — CSS Grid layout, 100dvh viewport, React Router, 3-tier error boundaries
-- v1.0 State Architecture (STATE-01 through STATE-05) — 4 Zustand stores, M1-M5 interfaces, selector enforcement, persistence
-- v1.0 Streaming (STRM-01 through STRM-04) — WebSocket client, stream multiplexer, rAF buffer, proof-of-life
-- v1.0 Components (COMP-01 through COMP-03) — Tool registry, ActiveMessage, scroll anchor
-- v1.0 Navigation (NAV-01, NAV-02) — Sidebar with sessions, session switching with message loading
+- ✓ v1.0 Design Token System (DS-01 through DS-06) — v1.0
+- ✓ v1.0 Enforcement (ENF-01 through ENF-04) — v1.0
+- ✓ v1.0 App Shell (SHELL-01 through SHELL-04) — v1.0
+- ✓ v1.0 State Architecture (STATE-01 through STATE-05) — v1.0
+- ✓ v1.0 Streaming (STRM-01 through STRM-04) — v1.0
+- ✓ v1.0 Components (COMP-01 through COMP-03) — v1.0
+- ✓ v1.0 Navigation (NAV-01, NAV-02) — v1.0
+- ✓ v1.1 Markdown rendering (MD-01 through MD-15, CODE-01 through CODE-09) — react-markdown + Shiki + streaming two-phase — v1.1
+- ✓ v1.1 Composer (CMP-01 through CMP-14) — auto-resize, FSM, image attachments, draft persistence — v1.1
+- ✓ v1.1 Message types (MSG-01 through MSG-11) — 5 roles, thinking, images, lightbox — v1.1
+- ✓ v1.1 Tool cards (TOOL-01 through TOOL-23) — state machine, 6 cards, grouping accordion — v1.1
+- ✓ v1.1 Permissions (PERM-01 through PERM-05) — inline banners with countdown — v1.1
+- ✓ v1.1 Activity & scroll (ACT-01 through ACT-05, NAV-01 through NAV-04) — status line, scroll preservation, bottom lock — v1.1
+- ✓ v1.1 Polish (POL-01 through POL-04, UI-01 through UI-05) — animations, cursor, shadcn/ui, CSS effects — v1.1
+- ✓ v1.1 Enhanced features (ENH-01 through ENH-06) — Streamdown eval, ANSI, thinking markdown, retry, search, export — v1.1
 
 ### Active
 
-**Current Milestone: v1.1 "The Chat"**
-
-**Goal:** Build the complete conversation experience — every message type renders, tools display with animations, markdown is syntax-highlighted, the composer works, and you can have a full conversation.
-
-**Target features:**
-- All 7 message types rendering (user, assistant, tool, thinking, error, system, task_notification)
-- Tool cards with state machine animations (invoked -> executing -> resolved/error)
-- Thinking/reasoning blocks with expand/collapse + global toggle
-- Markdown rendering with syntax-highlighted code blocks (Shiki, lazy-loaded)
-- Composer: auto-resize textarea, send/stop morph, image paste/upload
-- Activity status line ("Reading auth.ts...", "Writing server.js...")
-- Scroll position preservation across session switches
-
 **Visual Excellence (M3)**
-- [ ] Spring physics animations on all interactions
-- [ ] Message entrance animations (spring translateY + opacity)
-- [ ] Streaming aurora/ambient effects
-- [ ] Scroll physics perfected (zero jitter at 100 tokens/sec)
+- [ ] Spring physics animations on interactions
+- [ ] Aurora/ambient streaming effects
 - [ ] Cmd+K command palette
 - [ ] Sidebar slim collapse mode
 - [ ] Settings panel (appearance, agents, API)
-- [ ] Full accessibility pass (ARIA, keyboard nav, prefers-reduced-motion)
+- [ ] Full accessibility pass (ARIA, keyboard nav)
+- [ ] Performance audit (FPS, memory profiling)
 
 **Multi-Provider (M4)**
 - [ ] Tabbed interface for simultaneous Claude/Gemini/Codex work
@@ -70,17 +64,21 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (post v1.0):**
-- 14,423 LOC TypeScript + CSS across 10 phases, 21 plans
+**Current State (post v1.1):**
+- 24,786 LOC TypeScript + CSS across 19 phases, 47 plans (2 milestones)
 - Tech stack: Vite + React 19 + TypeScript, Tailwind v4, Zustand (4 stores), Vitest
-- 145 commits, 3-day build (2026-03-04 to 2026-03-07)
-- 359+ tests passing, Playwright E2E suite, 9 custom ESLint rules
+- 303 commits (145 M1 + 158 M2), 6-day total build (2026-03-04 to 2026-03-09)
+- 700+ tests passing, Playwright E2E suite, 9 custom ESLint rules
+- Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui primitives, tailwindcss-animate
 - Frontend at `src/`, backend at `server/` (port 5555)
 - Dev server: port 5184
 
+**Known Tech Debt:**
+- rehypeToolMarkers plugin runs as no-op (tools render as React components post-markdown)
+- highlightText not threaded into MarkdownRenderer for assistant body content (search filtering works, visual highlighting deferred)
+
 **Prior Work:**
 - V1 frontend rated 5.5/10 in audits, archived to `.planning/v1-archive/`
-- 8 planning/audit documents, 6 reference product analyses
 - Architectural consensus between Claude and Gemini architects (ARCHITECT_SYNC.md)
 - V2 Constitution with 12 sections of enforceable conventions
 
@@ -107,6 +105,15 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 | Multiplexer as pure functions | Zero store/React imports, fully testable with mock callbacks | Good — clean separation |
 | React 19 (not 18) | Vite template ships 19, backwards compatible | Good — no issues encountered |
 | Segment array architecture for ActiveMessage | Interleaved text spans + ToolChip components | Good — handles complex tool-call streams |
+| Two-phase streaming renderer | rAF innerHTML for streaming, react-markdown for finalized | Good — 60fps streaming, rich finalized output |
+| DOMPurify over manual sanitization | Industry-standard XSS protection for innerHTML | Good — zero security incidents |
+| Custom streaming converter over Streamdown | Streamdown exports React components incompatible with rAF | Good — pure function fits architecture |
+| CSS Grid 0fr/1fr for expand/collapse | No JS animation library needed, GPU-accelerated | Good — used across thinking, tools, groups |
+| Tools as React components after markdown | Cleaner than rehype marker injection into hast tree | Good — simpler, more maintainable |
+| Shiki CSS variables theme | OKLCH tokens drive syntax colors via CSS custom properties | Good — no inline styles, Constitution compliant |
+| 5-state composer FSM | Prevents double-send, double-stop, handles abort timeout | Good — zero race conditions |
+| Session-scoped permission banners | Prevents cross-session permission leakage | Good — security-correct |
+| CSS-only visual effects | SpotlightCard/ShinyText/ElectricBorder without JS animation libs | Good — zero bundle impact |
 
 ---
-*Last updated: 2026-03-07 after v1.1 milestone start*
+*Last updated: 2026-03-09 after v1.1 milestone*

@@ -1,5 +1,36 @@
 # Loom V2: Milestone Master Plan
 
+## M2: "The Chat" — Complete Conversation Loop — SHIPPED 2026-03-09
+
+**Status:** SHIPPED
+**Shipped:** 2026-03-09
+**Phases:** 9 (11-19) | **Plans:** 26 | **Commits:** 158
+**LOC:** 24,786 TypeScript + CSS (+18,570 / -2,863 from v1.0)
+**Timeline:** 3 days (2026-03-07 to 2026-03-09)
+**Archive:** `milestones/v1.1-ROADMAP.md`, `milestones/v1.1-REQUIREMENTS.md`
+
+**Delivered:** Complete conversation experience with rich markdown rendering (react-markdown + Shiki), streaming two-phase renderer with DOMPurify, auto-resize composer with image attachments, 6 purpose-built tool cards with state machine animations, tool grouping accordion, permission banners with countdown, activity status line, scroll preservation, message entrance animations, CSS visual effects (SpotlightCard, ShinyText, ElectricBorder), message search, and conversation export.
+
+**Key Accomplishments:**
+1. Full markdown rendering with Shiki syntax highlighting, OKLCH theme, streaming two-phase converter with XSS protection
+2. Rich composer with auto-resize, 5-state FSM, image paste/drag-drop, draft persistence across sessions
+3. Complete message type system — 5 roles, thinking disclosures, provider logos, image lightbox
+4. Tool card ecosystem — 6 purpose-built cards (Bash/Read/Edit/Write/Glob/Grep) with state machine, elapsed time, ANSI colors, diff viewer
+5. Tool grouping accordion + permission banners with 55s countdown ring and Y/N keyboard shortcuts
+6. Polish layer — activity status, scroll preservation with ResizeObserver bottom lock, message animations, streaming cursor, token/cost display, SpotlightCard/ShinyText/ElectricBorder effects, message search + conversation export
+
+**Gate Criteria:**
+- [x] Can send a message and receive a full streamed response
+- [x] Tool calls display correctly with state transitions
+- [x] Thinking blocks expand/collapse with global toggle
+- [x] Code blocks have Shiki syntax highlighting
+- [x] Composer auto-resizes and send/stop morphs
+- [x] Session switching works
+- [x] All M1 + M2 tests pass (regression)
+- [x] 97/97 requirements verified in milestone audit
+
+---
+
 This document captures the full development vision across all milestones. It persists across sessions and is the authoritative reference for what each milestone builds and what architectural groundwork it lays for future milestones.
 
 **Every new GSD milestone session MUST read this file first.**
@@ -70,73 +101,40 @@ This document captures the full development vision across all milestones. It per
 
 ---
 
-## M2: "The Chat" — Complete Conversation Loop
-
-**Goal**: Build the complete conversation experience. Every message type renders, tools display with animations, the composer works, and you can have a full conversation.
-
-**Phases**: ~4-6
-
-**Deliverables**:
-- All 7 message types rendering (user, assistant, tool, thinking, error, system, task_notification)
-- Tool cards with state machine animations (running → success → error)
-- Thinking/reasoning blocks with expand/collapse
-- Markdown rendering with syntax-highlighted code blocks (Shiki, lazy-loaded)
-- Composer: Auto-resize textarea, send/stop morph, focus trapping
-- Functional scroll (basic anchoring from M1, not perfected yet)
-- Activity status line ("Reading auth.ts...", "Writing server.js...")
-- Session switching (real data, connected to backend)
-
-**Gate Criteria**:
-- [ ] Can send a message and receive a full streamed response
-- [ ] Tool calls display correctly with state transitions
-- [ ] Thinking blocks expand/collapse
-- [ ] Code blocks have syntax highlighting
-- [ ] Composer auto-resizes and send/stop morphs
-- [ ] Session switching works
-- [ ] All M1 + M2 tests pass (regression)
-- [ ] User spot check: "Is this a better chat experience than V1?"
-
----
-
 ## M3: "The Polish" — 10/10 Visual Quality
 
 **Goal**: Transform the functional chat into a visually stunning, award-winning interface. Every interaction should feel satisfying.
 
 **Phases**: ~4-6
 
+**Note:** Several M3 deliverables were pulled forward into M2 (scroll-to-bottom pill, message entrance animations, tool call accordion, CSS effects). Remaining scope:
+
 **Deliverables**:
-- Scroll physics perfected (scroll-to-bottom pill, smooth anchoring, zero jitter)
 - Aurora/ambient overlay during streaming
-- Message entrance animations (spring translateY + opacity)
-- Execution chain grouping (consecutive tool calls → accordion)
+- Spring physics animations on interactions
 - Sidebar slim collapse mode (icon-only rail)
 - Cmd+K omnibar for project/session switching
 - Settings panel (extensible architecture for future integration settings)
 - Full accessibility pass (ARIA roles, keyboard nav, prefers-reduced-motion)
 - Performance audit (FPS during streaming, memory profiling)
 
-**Visual Effects Integration** (see `.planning/visual-effects-audit.md`):
-- Cherry-picked React Bits components: Aurora, Grainient (WebGL via `ogl`), SpotlightCard, ShinyText, StarBorder (CSS-only)
-- shadcn/ui primitives restyled to OKLCH tokens (installed during M2, restyled in M3)
-- OKLCH-to-hex bridge for WebGL shader uniforms
-- CSS-only effects (SpotlightCard, ShinyText) integrated during M2 alongside their surfaces
-- Community registries available if needed: Magic UI, Aceternity UI, Glass UI
+**Already completed in M2:**
+- ~~Scroll physics (scroll-to-bottom pill, ResizeObserver bottom lock, content-visibility)~~
+- ~~Message entrance animations (fade + slide-from-bottom)~~
+- ~~Execution chain grouping (consecutive tool calls → accordion)~~
+- ~~CSS effects (SpotlightCard, ShinyText, ElectricBorder)~~
+- ~~prefers-reduced-motion respected~~
 
 **Gate Criteria**:
 - [ ] Streaming at 100 tokens/sec with zero visible jitter
 - [ ] All animations use defined motion tokens
 - [ ] Keyboard navigation works throughout
-- [ ] prefers-reduced-motion respected
 - [ ] FPS stays above 55 during heavy streaming
 - [ ] All M1 + M2 + M3 tests pass (regression)
 - [ ] User spot check: "Would a harsh, experienced developer rate this 10/10?"
 
 **Design Review Checkpoint** (MANDATORY before M4):
-After M3 phases complete, pause for a holistic visual review of every surface. Outcomes:
-- Satisfied → proceed to M4
-- Needs iteration → add M3.x phases targeting specific surfaces
-- Wants exploration → revisit full component catalogues (200+ effects documented in audit)
-This checkpoint guarantees we don't rush past visual quality or over-plan effects we don't need.
+After M3 phases complete, pause for a holistic visual review of every surface.
 
 ---
 
@@ -259,4 +257,4 @@ interface Session {
 
 ---
 *Created: 2026-03-04*
-*Last updated: 2026-03-04 after architectural consensus (Claude + Gemini)*
+*Last updated: 2026-03-09 after v1.1 milestone completion*

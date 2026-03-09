@@ -52,21 +52,74 @@
 
 ---
 
+## Milestone: v1.1 — The Chat
+
+**Shipped:** 2026-03-09
+**Phases:** 9 | **Plans:** 26
+
+### What Was Built
+- Rich markdown rendering with Shiki syntax highlighting, OKLCH theme, and streaming two-phase converter
+- Auto-resize composer with 5-state FSM, image paste/drag-drop, draft persistence
+- 5 message types (user, assistant, error, system, task notification) with thinking disclosures and provider logos
+- 6 purpose-built tool cards (Bash, Read, Edit, Write, Glob, Grep) with state machine, elapsed time, ANSI color support
+- Tool grouping accordion and permission request banners with 55s countdown ring
+- Activity status line, scroll preservation with ResizeObserver bottom lock, message entrance animations
+- CSS visual effects (SpotlightCard, ShinyText, ElectricBorder) — zero JS animation library dependency
+- Message search with keyboard shortcut and conversation export (Markdown + JSON)
+- 24,786 LOC across 158 commits in 3 days
+
+### What Worked
+- **M2 velocity higher than M1** — 8.7 plans/day vs 7 plans/day. Foundation work in M1 paid off: stores, multiplexer, and tool registry were ready.
+- **Per-phase research spikes** — every phase had a RESEARCH.md. Phase 11 density concern (flagged by Bard) was mitigated by splitting into 3 focused plans.
+- **Constitution enforcement continued holding** — zero violations across 158 commits. The ANSI parser, diff viewer, and SVG logos all found compliant solutions (CSS classes, custom properties, etc.)
+- **Adversarial review caught real issues** — Phase 19 adversarial review found token violations, convention gaps, and quality issues across 5 areas. ~40% false positive rate, but the real findings saved debugging time.
+- **Two-phase streaming was the right call** — Streamdown evaluation (Phase 12-03) confirmed that pure function streaming converter + react-markdown finalization outperforms Streamdown's React component model for the rAF architecture.
+
+### What Was Inefficient
+- **Summaries still lack one_liner field** — same issue from M1. The `summary-extract` command returns null. Manual accomplishment extraction required reading all 26 SUMMARY.md files.
+- **Phase 17 decision pivot** — Originally planned to inject tools via rehype markers into markdown hast tree. During implementation, discovered it was simpler and cleaner to render tools as React components after markdown. The rehypeToolMarkers plugin now runs as a no-op (minor tech debt).
+- **Some M3 scope pulled into M2** — scroll-to-bottom pill, message animations, tool grouping, and CSS effects were originally M3 scope. Pulling them forward was the right call (they're integral to the chat experience) but meant M2 had 9 phases instead of the planned ~4-6.
+
+### Patterns Established
+- **CSS Grid 0fr/1fr for all expand/collapse** — thinking blocks, tool cards, tool groups all use the same animation pattern
+- **Adjust-state-during-rendering** — React 19 pattern for conditional state updates in render (avoids useEffect setState ESLint violations)
+- **DOMPurify allowlist per context** — full allowlist for streaming markdown, strict 4-tag allowlist for thinking blocks
+- **Session-scoped UI** — permission banners check sessionId to prevent cross-session leakage
+- **CSS-only visual effects** — SpotlightCard uses element.style.setProperty for mouse tracking (no React re-renders), ElectricBorder uses data-active attribute for CSS selector activation
+
+### Key Lessons
+1. **Don't over-plan intermediate rendering** — the rehype marker injection for tool chips was over-engineered. React components rendered after markdown was simpler and equally correct.
+2. **Streaming and finalized paths should diverge early** — trying to share rendering logic between rAF streaming and react-markdown finalized content creates coupling. Separate paths with a masked crossfade transition is cleaner.
+3. **Image handling needs careful memory management** — URL.createObjectURL for previews, revokeObjectURL on remove/send/unmount. Data URLs double memory. The ref-based cleanup pattern is essential.
+4. **Constitution ESLint rules scale beyond expectations** — rules written for M1 (no hardcoded colors, no inline styles) caught issues in M2 tool cards, SVG logos, and CSS effects without modification. The investment pays compounding dividends.
+5. **Adversarial review false positive rate requires cross-vendor triangulation** — ~40% of findings are false positives. Using Gemini as second opinion before fixing prevents wasted effort.
+
+### Cost Observations
+- Model mix: ~75% Opus, ~20% Sonnet (subagents), ~5% Haiku (subagents)
+- Total execution time: ~3.5 hours across 26 plans
+- Notable: Average plan execution 5 min (faster than M1's 7 min avg). Foundation stability eliminated debugging time.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
 
-| Milestone | Phases | Plans | Key Change |
-|-----------|--------|-------|------------|
-| v1.0 | 10 | 21 | Strict dependency chain + automated enforcement from commit #1 |
+| Milestone | Phases | Plans | Avg Plan Time | Key Change |
+|-----------|--------|-------|---------------|------------|
+| v1.0 | 10 | 21 | 7 min | Strict dependency chain + automated enforcement from commit #1 |
+| v1.1 | 9 | 26 | 5 min | Research spikes per phase, adversarial reviews, M3 scope pull-forward |
 
 ### Cumulative Quality
 
-| Milestone | Tests | LOC | Commits |
-|-----------|-------|-----|---------|
-| v1.0 | 359+ | 14,423 | 145 |
+| Milestone | Tests | LOC | Commits | Velocity |
+|-----------|-------|-----|---------|----------|
+| v1.0 | 359+ | 14,423 | 145 | 7 plans/day |
+| v1.1 | 700+ | 24,786 | 303 | 8.7 plans/day |
 
 ### Top Lessons (Verified Across Milestones)
 
-1. Automated enforcement prevents quality rot — 9 ESLint rules caught every banned pattern before accumulation
-2. Integration audits catch what unit tests miss — mandatory milestone audit before archival
+1. Automated enforcement prevents quality rot — 9 ESLint rules caught every banned pattern across 303 commits without modification
+2. Integration audits catch what unit tests miss — mandatory milestone audit before archival (both milestones)
+3. Foundation investment compounds — M1's strict architecture made M2 faster (higher velocity with more complex features)
+4. Research spikes before implementation pay off — both milestones benefited from upfront research, reducing mid-implementation pivots

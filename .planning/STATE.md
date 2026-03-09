@@ -1,165 +1,49 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: "The Chat"
-status: completed
-stopped_at: Completed 19-03-PLAN.md
-last_updated: "2026-03-09T17:18:17.524Z"
-last_activity: 2026-03-09 -- Phase 19 Plan 03 complete (message search, conversation export)
+milestone: v1.2
+milestone_name: "The Polish"
+status: not_started
+stopped_at: null
+last_updated: "2026-03-09T21:55:00.000Z"
+last_activity: 2026-03-09 -- v1.1 milestone archived
 progress:
-  total_phases: 9
-  completed_phases: 9
-  total_plans: 26
-  completed_plans: 26
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-07)
+See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 19 - Visual Effects + Enhancements (COMPLETE)
+**Current focus:** Planning next milestone (v1.2 "The Polish")
 
 ## Current Position
 
-Phase: 19 of 19 (Visual Effects + Enhancements)
-Plan: 3 of 3 -- COMPLETE
-Status: complete
-Last activity: 2026-03-09 -- Phase 19 Plan 03 complete (message search, conversation export)
+Phase: None (milestone not started)
+Plan: None
+Status: not_started
+Last activity: 2026-03-09 -- v1.1 milestone archived
 
-Progress: [██████████] 100%
+Progress: [..........] 0%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7 (M2)
-- M1 reference: 21 plans in 3 days
-
-| Phase | Plan | Duration | Tasks | Files |
-|-------|------|----------|-------|-------|
-| 14    | 02   | 7min     | 2     | 13    |
-| 14    | 01   | -        | -     | -     |
-| 13    | 02   | 5min     | 2     | 6     |
-| 13    | 03   | 3min     | 2     | 4     |
-| 13    | 01   | 6min     | 2     | 10    |
-| 12    | 03   | 4min     | 1     | 2     |
-| 12    | 02   | 6min     | 2     | 7     |
-| 12    | 01   | 4min     | 2     | 7     |
-| 11    | 03   | 3min     | 2     | 3     |
-| 11    | 02   | 6min     | 2     | 12    |
-| 11    | 01   | 7min     | 2     | 13    |
-| Phase 14 P01 | 9min | 2 tasks | 11 files |
-| Phase 14 P03 | 3min | 2 tasks | 7 files |
-| 15    | 01   | 3min     | 2     | 6     |
-| 15    | 02   | 4min     | 2     | 4     |
-| 16    | 01   | 7min     | 2     | 15    |
-| 16    | 02   | 3min     | 2     | 6     |
-| 16    | 03   | 5min     | 2     | 7     |
-| 17    | 03   | 8min     | 2     | 11    |
-| 17    | 01   | 5min     | 2     | 7     |
-| Phase 17 P02 | 2min | 1 tasks | 1 files |
-| 18    | 01   | 3min     | 2     | 8     |
-| Phase 18 P02 | 4min | 2 tasks | 8 files |
-| 18    | 03   | 6min     | 2     | 19    |
-| 19    | 01   | -        | -     | -     |
-| 19    | 02   | 7min     | 2     | 6     |
-| 19    | 01   | 7min     | 2     | 10    |
-| 19    | 03   | 10min    | 2     | 7     |
+- M1: 21 plans in 3 days (7 plans/day)
+- M2: 26 plans in 3 days (8.7 plans/day)
+- Total: 47 plans in 6 days
 
 ## Accumulated Context
 
 ### Decisions
 
-See PROJECT.md Key Decisions table (updated at milestone completion).
-
-- Phase 14-02: CSS custom property fills (--logo-*) for SVG brand colors (no-hardcoded-colors compliance)
-- Phase 14-02: Adjust-state-during-rendering pattern for globalExpanded reset (avoids useEffect setState and ref-during-render)
-- Phase 14-02: useUIStore version 2 migration adding thinkingExpanded with backward compat
-- Phase 13-02: ClaudeCommandOptions type for options with images array (replaces Record<string,string>)
-- Phase 13-02: useEffect ref sync pattern (not render-time) for react-hooks/refs compliance
-- Phase 13-02: dragCounter ref pattern for flicker-free drag-and-drop overlay
-- Phase 13-03: localStorage + custom event for sidebar draft dot (no Zustand store coupling)
-- Phase 13-03: Module-level Map init to avoid ref access during React render
-- Phase 13-01: Scroll container ref as prop (not querySelector) per Constitution 10.2
-- Phase 13-01: FSM idle->active transition for mid-stream component mount
-- Phase 13-01: abort-session for both Stop button and Cmd+. shortcut
-- Phase 12-03: Custom streaming converter over Streamdown (React component incompatible with rAF)
-- Phase 12-02: Opacity-based crossfade detection for streaming-to-finalized transition
-- Phase 12-02: rAF-gated height measurement before crossfade start
-- Phase 12-02: Empty text node filtering in rehype plugin for cleaner hast output
-- Phase 12-01: Unicode PUA placeholders over null bytes for code extraction
-- Phase 12-01: DOMPurify over manual sanitization for XSS protection
-- Phase 12-01: Permanent converter failure fallback in rAF paint loop
-- Phase 11-03: Component override pattern over @tailwindcss/typography prose
-- Phase 11-03: language-* className regex for fenced vs inline code detection
-- Phase 11-02: JS RegExp engine over WASM for Shiki (simpler bundling)
-- Phase 11-02: CSS variables theme for OKLCH-driven syntax colors
-- Phase 11-02: Map-based highlight cache keyed by lang:code
-- Phase 11-02: useDeferredValue for non-blocking highlight swap
-- Phase 11-01: Hardcoded dark theme in sonner (no next-themes)
-- Phase 11-01: lib/utils.ts re-export for shadcn compatibility
-- Phase 11-01: z-index tier mapping: overlay->40, modal->50, dropdown->20
-- [Phase 14]: bg-card for user bubble (replaces bg-primary-muted per user preference)
-- [Phase 14]: Set allowlist pattern for transformBackendMessages entry filtering
-- [Phase 14]: ImageAttachment type added to Message interface early (prepares Plan 03)
-- [Phase 14]: Dialog primitive composition for ImageLightbox (bypass DialogContent for custom bg-black/80 overlay)
-- [Phase 14]: Per-instance lightbox state in MarkdownRenderer (Dialog portals prevent nesting issues)
-- Phase 15-01: Adjust-state-during-rendering for completedAt transitions (avoids setState-in-effect ESLint rule)
-- Phase 15-01: useEffect ref sync for completedAtRef (react-hooks/refs compliance)
-- Phase 15-01: Status labels Starting/Running/Done/Failed for tool card header
-- Phase 15-01: onToggle callback prop on ToolCardShell for parent-controlled expand state
-- Phase 15-02: Always-mounted ToolCardShell for smooth CSS Grid animation (not conditional render)
-- Phase 15-02: Adjust-state-during-rendering for error force-expand on transition to rejected
-- Phase 15-02: DefaultToolCard no-truncation policy with scrollable container
-- Phase 16-01: Skip backslash lines in diff output (No newline at end of file markers)
-- Phase 16-01: ANSI parser uses CSS classes only (no inline styles) per Constitution 7.14
-- Phase 16-01: TruncatedContent as wrapper component (not hook) for cleaner composition
-- Phase 16-03: Lucide icons via createElement (keeps tool-registry.ts as .ts, no JSX)
-- Phase 16-03: GrepToolCard local state for file truncation (items are GrepFileGroup[], not TruncatedContent strings)
-- Phase 16-03: safeRegex wrapper for match highlighting (invalid user patterns degrade gracefully)
-- Phase 16-02: FileContentCard shared component for Read/Write Shiki-highlighted file display
-- Phase 16-02: Early return in useEffect for text language (avoid setState-in-effect ESLint violation)
-- Phase 16-02: No Shiki inside diffs -- line coloring only with bg-diff-added/bg-diff-removed
-- Phase 16-02: DiffLineRow flex layout with w-10 fixed gutters for dual line numbers
-- Phase 17-03: CSS custom property --ring-offset for SVG stroke-dashoffset (Constitution 7.14)
-- Phase 17-03: setTimeout(0) for initial countdown tick (avoids setState-in-effect ESLint rule)
-- Phase 17-03: Read-only tools auto-allowed at multiplexer level, never reach UI
-- Phase 17-03: Session-scoped permission banner (checks request.sessionId match)
-- Phase 17-01: Tools as React components after markdown (not marker injection into rehype pipeline)
-- Phase 17-01: div[role=button] for group header (avoids button-in-button HTML nesting)
-- Phase 17-01: defaultExpanded prop on ToolChip for group Expand all via key remounting
-- [Phase 17]: Render-time segment chunking via useMemo instead of modifying segment model
-- [Phase 17]: ToolCallGroupFromStore subscribes to individual tool calls for granular streaming updates
-- Phase 18-01: CSS class for StatusLine transition (Constitution 7.14 bans inline styles)
-- Phase 18-01: Smooth pulse animation (0.4-1.0 opacity) replaces hard blink (step-end)
-- Phase 18-01: StreamingCursor shown inline within incomplete thinking block paragraphs
-- [Phase 18-02]: showPill no longer gated on isStreaming -- shows whenever scrolled up 200px+
-- [Phase 18-02]: ResizeObserver with rAF throttle for bottom lock during streaming content expansion
-- [Phase 18-02]: content-visibility: auto with containIntrinsicHeight for finalized messages
-- [Phase 18-02]: useEffect ref sync pattern for unread count (react-hooks/refs compliance)
-- Phase 18-03: Extend MessageMetadata with inputTokens/outputTokens/cacheReadTokens for granular display
-- Phase 18-03: Extract token data from SDKResultMessage.modelUsage (authoritative, sum across models)
-- Phase 18-03: Adjust-state-during-rendering for animation base index (react-hooks/refs compliance)
-- Phase 19-01: CSS-only effects with zero JS animation libraries (no Framer Motion, no Canvas)
-- Phase 19-01: data-active attribute pattern for ElectricBorder activation via CSS selectors
-- Phase 19-01: element.style.setProperty for SpotlightCard mouse tracking (no React state re-renders)
-- Phase 19-02: Separate thinking-markdown.ts parser for strict inline-only output (no block elements)
-- Phase 19-02: DOMPurify strict 4-tag allowlist (strong, em, code, a) for thinking blocks
-- Phase 19-02: ErrorMessage uses stores directly (useTimelineStore, useConnectionStore) rather than prop threading
-- Phase 19-03: Pre-filter messages in ChatView (not MessageList) for cleaner search data flow
-- Phase 19-03: 150ms debounce on search query (immediate display, delayed filter)
-- Phase 19-03: Conditional grid-rows template when search bar visible (auto row added)
-- Phase 19-03: Blob + createObjectURL + anchor click pattern for file downloads
-
-### Architect Concerns (Bard, M2 consult)
-
-- Markdown + segment interleaving: Need unified parser strategy for tool chips within markdown
-- Message.attachments[]: Image paste/upload needs attachments array on Message interface
-- Streaming-to-formatted flash: Must be 200ms+ to mask content swap
-- Phase 11 density: ~60% of milestone risk -- research spike recommended
+See PROJECT.md Key Decisions table (updated at v1.1 milestone completion).
 
 ### Pending Todos
 
@@ -167,10 +51,10 @@ None.
 
 ### Blockers/Concerns
 
-None -- clean slate for M2.
+None -- clean slate for next milestone.
 
 ## Session Continuity
 
-Last session: 2026-03-09T17:14:00Z
-Stopped at: Completed 19-03-PLAN.md
-Resume: Phase 19 complete. All M2 plans shipped. Milestone v1.1 "The Chat" complete.
+Last session: 2026-03-09T21:55:00Z
+Stopped at: v1.1 milestone archived
+Resume: Start next milestone with `/gsd:new-milestone`
