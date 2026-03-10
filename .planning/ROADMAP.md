@@ -103,8 +103,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 22-01-PLAN.md -- Core palette shell (cmdk + fuse.js), CSS, keyboard shortcut, search + recent hooks
-- [ ] 22-02-PLAN.md -- All 7 command groups (Navigation, Session, File, Action, Slash, Project, Recent) + wiring
+- [x] 22-01-PLAN.md -- Core palette shell (cmdk + fuse.js), CSS, keyboard shortcut, search + recent hooks
+- [x] 22-02-PLAN.md -- All 7 command groups (Navigation, Session, File, Action, Slash, Project, Recent) + wiring
 
 ### Phase 23: File Tree + File Store
 **Goal**: Users can browse their project's file structure and open files for viewing/editing
@@ -116,12 +116,12 @@ Plans:
   3. User can right-click files and directories for context menu actions (Copy Path, Open in Editor, etc.)
   4. User can filter the file tree by typing in the search input; node_modules/.git are hidden by default
   5. File tree updates automatically when the backend sends file change notifications via WebSocket
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 23-01: TBD
-- [ ] 23-02: TBD
-- [ ] 23-03: TBD
+- [ ] 23-01-PLAN.md -- File store implementation, FileTreeNode type, useFileTree hook, FileIcon, FileTreePanel layout
+- [ ] 23-02-PLAN.md -- FileNode recursive component, FileTree container, search/filter, loading/error states, wire into ContentArea
+- [ ] 23-03-PLAN.md -- Context menus (shadcn context-menu), image lightbox, wire FileGroup in command palette
 
 ### Phase 24: Code Editor
 **Goal**: Users can view and edit project files with full syntax highlighting and multi-tab support
@@ -196,4 +196,4 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-10 after Phase 22 planning*
+*Last updated: 2026-03-10 after Phase 23 planning*
