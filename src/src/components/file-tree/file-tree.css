@@ -1,0 +1,19 @@
+/**
+ * File tree CSS -- indentation, hover, and active states.
+ *
+ * Uses CSS custom property --depth for tree indentation.
+ * Constitution: Design tokens only (3.1), no hardcoded colors.
+ */
+
+.file-node {
+  padding-left: calc(var(--depth, 0) * 12px);
+  transition: background 100ms ease;
+}
+
+.file-node:hover {
+  background: var(--color-surface-hover, hsl(var(--muted) / 0.5));
+}
+
+.file-node-active {
+  background: var(--color-surface-raised, hsl(var(--card)));
+}
