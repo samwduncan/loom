@@ -182,7 +182,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 |-------|-----------|----------------|--------|-----------|
 | 1-10 | v1.0 | 21/21 | Complete | 2026-03-07 |
 | 11-19 | v1.1 | 26/26 | Complete | 2026-03-09 |
-| 20. Content Layout + Tab System | 2/2 | Complete   | 2026-03-10 | - |
+| 20. Content Layout + Tab System | 2/2 | Complete    | 2026-03-10 | - |
 | 21. Settings Panel | v1.2 | 0/3 | Not started | - |
 | 22. Command Palette | v1.2 | 0/2 | Not started | - |
 | 23. File Tree + File Store | v1.2 | 0/3 | Not started | - |
