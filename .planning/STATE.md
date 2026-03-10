@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: in-progress
-stopped_at: Completed 22-01-PLAN.md (command palette foundation)
-last_updated: "2026-03-10T21:09:00Z"
-last_activity: 2026-03-10 -- Completed 22-01 command palette foundation (cmdk + fuse.js + hooks)
+stopped_at: Completed 22-02-PLAN.md (command groups + palette wiring)
+last_updated: "2026-03-10T21:17:32Z"
+last_activity: 2026-03-10 -- Completed 22-02 command groups (7 groups, 44 tests, phase 22 complete)
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
-  percent: 86
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 22 -- Command Palette
+**Current focus:** Phase 23 -- File Tree
 
 ## Current Position
 
-Phase: 22 of 26 (Command Palette)
-Plan: 1 of 2 in current phase -- COMPLETE
-Status: In Progress
-Last activity: 2026-03-10 -- Completed 22-01 command palette foundation (cmdk + fuse.js + hooks)
+Phase: 22 of 26 (Command Palette) -- COMPLETE
+Plan: 2 of 2 in current phase -- COMPLETE
+Status: Phase 22 Complete
+Last activity: 2026-03-10 -- Completed 22-02 command groups (7 groups, 44 tests, phase 22 complete)
 
-Progress: [████████░░] 86% (6/7 plans complete)
+Progress: [██████████] 100% (7/7 plans complete)
 
 ## Performance Metrics
 
@@ -67,6 +67,10 @@ See PROJECT.md Key Decisions table.
 - 22-01: shouldFilter=false on cmdk Command.Dialog -- search orchestrated by useCommandSearch hook
 - 22-01: FetchState enum pattern for async loading -- avoids React lint violations
 - 22-01: cmdk CSS via [cmdk-*] attribute selectors -- Constitution-compliant styling
+- 22-02: Selector hooks for store actions in callbacks (not getState()) -- loom/no-external-store-mutation compliance
+- 22-02: Search reset via onOpenChange callback -- avoids set-state-in-effect and refs-during-render lint rules
+- 22-02: FileGroup uses console.warn stub for openFile (Phase 23 deferred)
+- 22-02: Endpoint-specific mock pattern for apiFetch in integration tests
 
 ### Pending Todos
 
@@ -78,6 +82,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T21:09:00Z
-Stopped at: Completed 22-01-PLAN.md (command palette foundation)
-Resume: `/gsd:execute-phase 22` (plan 02 remaining)
+Last session: 2026-03-10T21:17:32Z
+Stopped at: Completed 22-02-PLAN.md (command groups + palette wiring)
+Resume: `/gsd:plan-phase 23` (File Tree)
