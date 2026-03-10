@@ -47,7 +47,7 @@ const INITIAL_UI_STATE: Pick<UIState, 'sidebarOpen' | 'activeTab' | 'modalState'
   modalState: null,
   commandPaletteOpen: false,
   companionState: null,
-  theme: { fontSize: 14, density: 'comfortable' },
+  theme: { fontSize: 14, density: 'comfortable', codeFontFamily: 'JetBrains Mono' },
   thinkingExpanded: true,
 };
 
@@ -92,7 +92,7 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: 'loom-ui',
-      version: 4,
+      version: 5,
       partialize: (state) => ({
         theme: state.theme,
         sidebarOpen: state.sidebarOpen,
@@ -110,6 +110,11 @@ export const useUIStore = create<UIState>()(
           const wasCollapsed = s['sidebarCollapsed'] === true;
           delete s['sidebarCollapsed'];
           s = { ...s, sidebarOpen: !wasCollapsed };
+        }
+        if (version < 5) {
+          // v5: Added codeFontFamily to ThemeConfig.
+          const theme = (s['theme'] as Record<string, unknown>) ?? {};
+          s = { ...s, theme: { ...theme, codeFontFamily: 'JetBrains Mono' } };
         }
         return s;
       },

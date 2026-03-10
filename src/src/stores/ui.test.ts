@@ -87,10 +87,10 @@ describe('useUIStore', () => {
   // -- setTheme --
   it('setTheme merges partial theme updates', () => {
     useUIStore.getState().setTheme({ fontSize: 16 });
-    expect(useUIStore.getState().theme).toEqual({ fontSize: 16, density: 'comfortable' });
+    expect(useUIStore.getState().theme).toEqual({ fontSize: 16, density: 'comfortable', codeFontFamily: 'JetBrains Mono' });
 
     useUIStore.getState().setTheme({ density: 'compact' });
-    expect(useUIStore.getState().theme).toEqual({ fontSize: 16, density: 'compact' });
+    expect(useUIStore.getState().theme).toEqual({ fontSize: 16, density: 'compact', codeFontFamily: 'JetBrains Mono' });
   });
 
   // -- reset --
@@ -108,12 +108,12 @@ describe('useUIStore', () => {
     expect(state.modalState).toBeNull();
     expect(state.commandPaletteOpen).toBe(false);
     expect(state.companionState).toBeNull();
-    expect(state.theme).toEqual({ fontSize: 14, density: 'comfortable' });
+    expect(state.theme).toEqual({ fontSize: 14, density: 'comfortable', codeFontFamily: 'JetBrains Mono' });
   });
 
   // -- Default theme --
   it('default theme is { fontSize: 14, density: "comfortable" }', () => {
-    expect(useUIStore.getState().theme).toEqual({ fontSize: 14, density: 'comfortable' });
+    expect(useUIStore.getState().theme).toEqual({ fontSize: 14, density: 'comfortable', codeFontFamily: 'JetBrains Mono' });
   });
 
   // -- Initial sidebarOpen --

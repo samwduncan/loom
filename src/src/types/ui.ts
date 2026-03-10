@@ -24,4 +24,5 @@ export interface CompanionState {
 export interface ThemeConfig {
   fontSize: number;
   density: 'compact' | 'comfortable' | 'spacious';
+  codeFontFamily: string;
 }
