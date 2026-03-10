@@ -63,20 +63,20 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 ### File Tree (FT)
 
 - [x] **FT-01**: Files tab shows project file tree in left panel (~240px) with code editor in remaining space
-- [ ] **FT-02**: File tree renders hierarchical directory structure with indentation per nesting level
+- [x] **FT-02**: File tree renders hierarchical directory structure with indentation per nesting level
 - [x] **FT-03**: Directories show expand/collapse chevron; clicking toggles children visibility
 - [x] **FT-04**: Expansion state persists across tab switches (stored in file store)
 - [x] **FT-05**: Files and folders display type-appropriate icons (folder, TypeScript, JavaScript, JSON, CSS, Markdown, image, etc.) using lucide-react
-- [ ] **FT-06**: Clicking a file opens it in the code editor panel (right side of Files tab)
-- [ ] **FT-07**: Currently open file is highlighted in the tree
-- [ ] **FT-08**: Search/filter input at top of tree panel filters visible files/folders by fuzzy match as user types
+- [x] **FT-06**: Clicking a file opens it in the code editor panel (right side of Files tab)
+- [x] **FT-07**: Currently open file is highlighted in the tree
+- [x] **FT-08**: Search/filter input at top of tree panel filters visible files/folders by fuzzy match as user types
 - [ ] **FT-09**: Right-click context menu on files with actions: Copy Path, Copy Relative Path, Open in Editor, Open Containing Folder in Terminal
 - [ ] **FT-10**: Right-click context menu on directories with actions: Copy Path, Expand All, Collapse All
 - [ ] **FT-11**: Image files (png, jpg, gif, svg, webp) open in lightbox preview instead of code editor
-- [ ] **FT-12**: File tree shows loading skeleton on initial fetch
-- [ ] **FT-13**: File tree shows error state with retry button if fetch fails
+- [x] **FT-12**: File tree shows loading skeleton on initial fetch
+- [x] **FT-13**: File tree shows error state with retry button if fetch fails
 - [x] **FT-14**: Full tree loaded upfront (backend depth 10); expand/collapse is client-side. Lazy-load deferred to future optimization.
-- [ ] **FT-15**: node_modules, .git, and other standard ignored directories are hidden by default
+- [x] **FT-15**: node_modules, .git, and other standard ignored directories are hidden by default
 - [x] **FT-16**: File tree refreshes when backend sends file change notifications via WebSocket
 
 ### Code Editor (ED)
@@ -261,20 +261,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMD-14 | Deferred | Deferred — needs command registry |
 | CMD-15 | Phase 22 | Complete |
 | FT-01 | Phase 23 | Complete |
-| FT-02 | Phase 23 | Pending |
+| FT-02 | Phase 23 | Complete |
 | FT-03 | Phase 23 | Complete |
 | FT-04 | Phase 23 | Complete |
 | FT-05 | Phase 23 | Complete |
-| FT-06 | Phase 23 | Pending |
-| FT-07 | Phase 23 | Pending |
-| FT-08 | Phase 23 | Pending |
+| FT-06 | Phase 23 | Complete |
+| FT-07 | Phase 23 | Complete |
+| FT-08 | Phase 23 | Complete |
 | FT-09 | Phase 23 | Pending |
 | FT-10 | Phase 23 | Pending |
 | FT-11 | Phase 23 | Pending |
-| FT-12 | Phase 23 | Pending |
-| FT-13 | Phase 23 | Pending |
+| FT-12 | Phase 23 | Complete |
+| FT-13 | Phase 23 | Complete |
 | FT-14 | Phase 23 | Complete |
-| FT-15 | Phase 23 | Pending |
+| FT-15 | Phase 23 | Complete |
 | FT-16 | Phase 23 | Complete |
 | ED-01 | Phase 24 | Pending |
 | ED-02 | Phase 24 | Pending |

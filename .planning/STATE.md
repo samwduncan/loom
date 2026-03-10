@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: completed
-stopped_at: Completed 23-01-PLAN.md (file store + tree foundation)
-last_updated: "2026-03-10T23:14:56.783Z"
-last_activity: 2026-03-10 -- Completed 23-01 file store actions, useFileTree hook, FileIcon, FileTreePanel layout
+stopped_at: Completed 23-02-PLAN.md (recursive FileTree UI + ContentArea wiring)
+last_updated: "2026-03-10T23:20:00.000Z"
+last_activity: 2026-03-10 -- Completed 23-02 recursive FileTree UI, search, dotfile hiding, ContentArea wiring
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 10
-  completed_plans: 8
-  percent: 80
+  completed_plans: 9
+  percent: 90
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 23 of 26 (File Tree + File Store)
-Plan: 1 of 3 in current phase
-Status: Plan 23-01 Complete
-Last activity: 2026-03-10 -- Completed 23-01 file store actions, useFileTree hook, FileIcon, FileTreePanel layout
+Plan: 2 of 3 in current phase
+Status: Plan 23-02 Complete
+Last activity: 2026-03-10 -- Completed 23-02 recursive FileTree UI, search, dotfile hiding, ContentArea wiring
 
-Progress: [████████░░] 80% (8/10 plans complete)
+Progress: [█████████░] 90% (9/10 plans complete)
 
 ## Performance Metrics
 
@@ -75,6 +75,9 @@ See PROJECT.md Key Decisions table.
 - 23-01: file-icons.ts separated from FileIcon.tsx for react-refresh compatibility
 - 23-01: useState (not useRef) for prev-projectName tracking in adjust-state-during-rendering pattern
 - [Phase 23]: createElement over JSX for dynamic icon rendering (avoids react-hooks/static-components)
+- 23-02: FileNode subscribes to store slices per-instance (isExpanded, isActive) for minimal re-renders
+- 23-02: matchesFilter recursive helper for search filtering in both FileNode and FileTree
+- 23-02: Loading skeleton uses file-node CSS class with --depth instead of inline marginLeft (Constitution compliance)
 
 ### Pending Todos
 
@@ -86,6 +89,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:14:53.478Z
-Stopped at: Completed 23-01-PLAN.md (file store + tree foundation)
-Resume: `/gsd:execute-phase 23` (Plan 02 -- recursive FileTree component)
+Last session: 2026-03-10T23:20:00.000Z
+Stopped at: Completed 23-02-PLAN.md (recursive FileTree UI + ContentArea wiring)
+Resume: `/gsd:execute-phase 23` (Plan 03 -- code editor integration)
