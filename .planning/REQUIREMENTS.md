@@ -15,9 +15,9 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **LAY-04**: Active tab has a visual indicator (underline or highlight using design tokens)
 - [ ] **LAY-05**: Keyboard shortcuts Cmd+1/2/3/4 switch to Chat/Files/Shell/Git respectively
 - [ ] **LAY-06**: Tab bar does not render on mobile (< 768px) -- only Chat tab visible, other panels accessible via Cmd+K or menu
-- [ ] **LAY-07**: New Zustand file store (5th store) manages file tree state, open editor tabs, active file, dirty file tracking -- Constitution amended
+- [x] **LAY-07**: New Zustand file store (5th store) manages file tree state, open editor tabs, active file, dirty file tracking -- Constitution amended
 - [ ] **LAY-08**: Each panel wrapped in PanelErrorBoundary to isolate crashes from other panels
-- [ ] **LAY-09**: TabId union type extended to include 'chat' | 'files' | 'shell' | 'git' in UI store
+- [x] **LAY-09**: TabId union type extended to include 'chat' | 'files' | 'shell' | 'git' in UI store
 
 ### Settings (SET)
 
@@ -222,9 +222,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LAY-04 | Phase 20 | Pending |
 | LAY-05 | Phase 20 | Pending |
 | LAY-06 | Phase 20 | Pending |
-| LAY-07 | Phase 20 | Pending |
+| LAY-07 | Phase 20 | Complete |
 | LAY-08 | Phase 20 | Pending |
-| LAY-09 | Phase 20 | Pending |
+| LAY-09 | Phase 20 | Complete |
 | SET-01 | Phase 21 | Pending |
 | SET-02 | Phase 21 | Pending |
 | SET-03 | Phase 21 | Pending |
