@@ -24,14 +24,14 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **SET-01**: Settings opens as a full-screen modal overlay (portal) accessible from sidebar gear icon and Cmd+K
 - [x] **SET-02**: Settings modal has 5 tabs: Agents, API Keys, Appearance, Git, MCP
 - [x] **SET-03**: Settings modal closes on Escape key or clicking backdrop
-- [ ] **SET-04**: Agents tab displays connection status (connected/disconnected/error) for Claude, Codex, and Gemini with colored status dots
-- [ ] **SET-05**: Agents tab shows provider version info when connected (model name, CLI version)
-- [ ] **SET-06**: API Keys tab lists existing API keys (masked except last 4 chars) with delete buttons
-- [ ] **SET-07**: API Keys tab has "Add API Key" form with name, key, provider fields and validation (non-empty, minimum length)
-- [ ] **SET-08**: Deleting an API key shows confirmation dialog before deletion
-- [ ] **SET-09**: API Keys tab shows success/error toast after add/delete operations
-- [ ] **SET-10**: Git tab displays current git user name and email with editable fields and Save button
-- [ ] **SET-11**: Git tab shows success/error feedback on save
+- [x] **SET-04**: Agents tab displays connection status (connected/disconnected/error) for Claude, Codex, and Gemini with colored status dots
+- [x] **SET-05**: Agents tab shows provider version info when connected (model name, CLI version)
+- [x] **SET-06**: API Keys tab lists existing API keys (masked except last 4 chars) with delete buttons
+- [x] **SET-07**: API Keys tab has "Add API Key" form with name, key, provider fields and validation (non-empty, minimum length)
+- [x] **SET-08**: Deleting an API key shows confirmation dialog before deletion
+- [x] **SET-09**: API Keys tab shows success/error toast after add/delete operations
+- [x] **SET-10**: Git tab displays current git user name and email with editable fields and Save button
+- [x] **SET-11**: Git tab shows success/error feedback on save
 - [ ] **SET-12**: Appearance tab has font size slider (12-20px) with live preview
 - [ ] **SET-13**: Appearance tab has code font selection (JetBrains Mono default)
 - [ ] **SET-14**: Appearance preferences persist to localStorage and apply immediately without page reload
@@ -40,7 +40,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **SET-17**: MCP tab allows removing servers with confirmation dialog
 - [x] **SET-18**: All settings tabs show loading skeletons while fetching data from backend
 - [ ] **SET-19**: Settings that require server restart display a "(requires restart)" indicator
-- [ ] **SET-20**: GitHub/GitLab credentials section allows adding/viewing/deleting credentials with token masking
+- [x] **SET-20**: GitHub/GitLab credentials section allows adding/viewing/deleting credentials with token masking
 
 ### Command Palette (CMD)
 
@@ -228,14 +228,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-01 | Phase 21 | Complete |
 | SET-02 | Phase 21 | Complete |
 | SET-03 | Phase 21 | Complete |
-| SET-04 | Phase 21 | Pending |
-| SET-05 | Phase 21 | Pending |
-| SET-06 | Phase 21 | Pending |
-| SET-07 | Phase 21 | Pending |
-| SET-08 | Phase 21 | Pending |
-| SET-09 | Phase 21 | Pending |
-| SET-10 | Phase 21 | Pending |
-| SET-11 | Phase 21 | Pending |
+| SET-04 | Phase 21 | Complete |
+| SET-05 | Phase 21 | Complete |
+| SET-06 | Phase 21 | Complete |
+| SET-07 | Phase 21 | Complete |
+| SET-08 | Phase 21 | Complete |
+| SET-09 | Phase 21 | Complete |
+| SET-10 | Phase 21 | Complete |
+| SET-11 | Phase 21 | Complete |
 | SET-12 | Phase 21 | Pending |
 | SET-13 | Phase 21 | Pending |
 | SET-14 | Phase 21 | Pending |
@@ -244,7 +244,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-17 | Phase 21 | Pending |
 | SET-18 | Phase 21 | Complete |
 | SET-19 | Phase 21 | Pending |
-| SET-20 | Phase 21 | Pending |
+| SET-20 | Phase 21 | Complete |
 | CMD-01 | Phase 22 | Pending |
 | CMD-02 | Phase 22 | Pending |
 | CMD-03 | Phase 22 | Pending |

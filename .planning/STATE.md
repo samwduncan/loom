@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: executing
-stopped_at: Completed 21-01-PLAN.md (settings shell)
-last_updated: "2026-03-10T19:09:00Z"
-last_activity: 2026-03-10 -- Completed 21-01 settings shell (primitives, types, hooks, modal)
+stopped_at: Completed 21-02-PLAN.md (settings tab content)
+last_updated: "2026-03-10T19:16:00Z"
+last_activity: 2026-03-10 -- Completed 21-02 settings tab content (agents, api-keys, git tabs)
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 21 of 26 (Settings Panel)
-Plan: 1 of 3 in current phase -- COMPLETE
+Plan: 2 of 3 in current phase -- COMPLETE
 Status: Executing
-Last activity: 2026-03-10 -- Completed 21-01 settings shell (primitives, types, hooks, modal)
+Last activity: 2026-03-10 -- Completed 21-02 settings tab content (agents, api-keys, git tabs)
 
-Progress: [██████░░░░] 60% (3/5 plans complete)
+Progress: [████████░░] 80% (4/5 plans complete)
 
 ## Performance Metrics
 
@@ -59,6 +59,9 @@ See PROJECT.md Key Decisions table.
 - 21-01: ProviderStatus.defaultModel populated client-side (backend doesn't return model info)
 - 21-01: SettingsModal lazy-loaded via React.lazy (not in initial bundle)
 - 21-01: shadcn z-50 replaced with z-index design tokens per Constitution
+- 21-02: AlertDialog as sibling pattern for Radix focus trap avoidance in nested dialogs
+- 21-02: API key form accepts name only (backend generates key, no provider field in schema)
+- 21-02: Git save button dirty-check pattern (local state vs hook data comparison)
 
 ### Pending Todos
 
@@ -70,6 +73,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T19:09:00Z
-Stopped at: Completed 21-01-PLAN.md (settings shell)
-Resume: `/gsd:execute-phase 21` (plan 02 next)
+Last session: 2026-03-10T19:16:00Z
+Stopped at: Completed 21-02-PLAN.md (settings tab content)
+Resume: `/gsd:execute-phase 21` (plan 03 next)
