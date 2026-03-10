@@ -32,6 +32,7 @@ export interface PanelErrorBoundaryProps {
   children: React.ReactNode;
   panelName: string;
   onResetData?: () => void;
+  resetKeys?: unknown[];
 }
 
 export interface MessageErrorBoundaryProps {
@@ -62,9 +63,10 @@ export function AppErrorBoundary({ children }: AppErrorBoundaryProps) {
 
 // ---------- PanelErrorBoundary ----------
 
-export function PanelErrorBoundary({ children, panelName, onResetData }: PanelErrorBoundaryProps) {
+export function PanelErrorBoundary({ children, panelName, onResetData, resetKeys }: PanelErrorBoundaryProps) {
   return (
     <ErrorBoundary
+      resetKeys={resetKeys}
       fallbackRender={({ error, resetErrorBoundary }) => {
         const handleReset = () => {
           onResetData?.();

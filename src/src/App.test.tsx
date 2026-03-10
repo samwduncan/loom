@@ -69,18 +69,6 @@ describe('App routing', () => {
     expect(screen.getByTestId('app-shell')).toBeInTheDocument();
   });
 
-  it('navigating to /dashboard renders "Dashboard" placeholder inside AppShell', () => {
-    renderWithRouter(['/dashboard']);
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByTestId('app-shell')).toBeInTheDocument();
-  });
-
-  it('navigating to /settings renders "Settings" placeholder inside AppShell', () => {
-    renderWithRouter(['/settings']);
-    expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByTestId('app-shell')).toBeInTheDocument();
-  });
-
   it('navigating to /dev/tokens renders TokenPreview OUTSIDE AppShell', () => {
     renderWithRouter(['/dev/tokens']);
     expect(screen.queryByTestId('app-shell')).not.toBeInTheDocument();
