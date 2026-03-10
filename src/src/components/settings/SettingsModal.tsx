@@ -18,6 +18,9 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SettingsTabSkeleton } from './SettingsTabSkeleton';
+import { AgentsTab } from './AgentsTab';
+import { ApiKeysTab } from './ApiKeysTab';
+import { GitTab } from './GitTab';
 import type { SettingsTabId } from '@/types/settings';
 
 const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
@@ -55,11 +58,21 @@ export function SettingsModal() {
           </TabsList>
 
           <div className="overflow-y-auto min-h-[400px] mt-4">
-            {SETTINGS_TABS.map((tab) => (
-              <TabsContent key={tab.id} value={tab.id}>
-                <SettingsTabSkeleton />
-              </TabsContent>
-            ))}
+            <TabsContent value="agents">
+              <AgentsTab />
+            </TabsContent>
+            <TabsContent value="api-keys">
+              <ApiKeysTab />
+            </TabsContent>
+            <TabsContent value="appearance">
+              <SettingsTabSkeleton />
+            </TabsContent>
+            <TabsContent value="git">
+              <GitTab />
+            </TabsContent>
+            <TabsContent value="mcp">
+              <SettingsTabSkeleton />
+            </TabsContent>
           </div>
         </Tabs>
       </DialogContent>
