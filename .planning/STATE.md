@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: executing
-stopped_at: Completed 21-02-PLAN.md (settings tab content)
-last_updated: "2026-03-10T19:16:00Z"
-last_activity: 2026-03-10 -- Completed 21-02 settings tab content (agents, api-keys, git tabs)
+stopped_at: Completed 21-03-PLAN.md (appearance & MCP tabs)
+last_updated: "2026-03-10T19:23:00Z"
+last_activity: 2026-03-10 -- Completed 21-03 appearance & MCP tabs (phase 21 complete)
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 
 ## Current Position
 
-Phase: 21 of 26 (Settings Panel)
-Plan: 2 of 3 in current phase -- COMPLETE
-Status: Executing
-Last activity: 2026-03-10 -- Completed 21-02 settings tab content (agents, api-keys, git tabs)
+Phase: 21 of 26 (Settings Panel) -- COMPLETE
+Plan: 3 of 3 in current phase -- COMPLETE
+Status: Phase Complete
+Last activity: 2026-03-10 -- Completed 21-03 appearance & MCP tabs (phase 21 complete)
 
-Progress: [████████░░] 80% (4/5 plans complete)
+Progress: [██████████] 100% (5/5 plans complete)
 
 ## Performance Metrics
 
@@ -62,6 +62,8 @@ See PROJECT.md Key Decisions table.
 - 21-02: AlertDialog as sibling pattern for Radix focus trap avoidance in nested dialogs
 - 21-02: API key form accepts name only (backend generates key, no provider field in schema)
 - 21-02: Git save button dirty-check pattern (local state vs hook data comparison)
+- 21-03: font-[var(--font-code)] Tailwind class instead of inline style for code font preview (Constitution compliance)
+- 21-03: ProviderSection as internal component within McpTab for DRY Claude/Codex sections
 
 ### Pending Todos
 
@@ -73,6 +75,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T19:16:00Z
-Stopped at: Completed 21-02-PLAN.md (settings tab content)
-Resume: `/gsd:execute-phase 21` (plan 03 next)
+Last session: 2026-03-10T19:23:00Z
+Stopped at: Completed 21-03-PLAN.md (appearance & MCP tabs -- phase 21 complete)
+Resume: `/gsd:plan-phase 22` or `/gsd:execute-phase 22`

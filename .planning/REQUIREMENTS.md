@@ -32,14 +32,14 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **SET-09**: API Keys tab shows success/error toast after add/delete operations
 - [x] **SET-10**: Git tab displays current git user name and email with editable fields and Save button
 - [x] **SET-11**: Git tab shows success/error feedback on save
-- [ ] **SET-12**: Appearance tab has font size slider (12-20px) with live preview
-- [ ] **SET-13**: Appearance tab has code font selection (JetBrains Mono default)
-- [ ] **SET-14**: Appearance preferences persist to localStorage and apply immediately without page reload
-- [ ] **SET-15**: MCP tab lists all configured MCP servers per provider (Claude, Codex) with name and status
-- [ ] **SET-16**: MCP tab has "Add Server" form with name, command, args, env fields per provider
-- [ ] **SET-17**: MCP tab allows removing servers with confirmation dialog
+- [x] **SET-12**: Appearance tab has font size slider (12-20px) with live preview
+- [x] **SET-13**: Appearance tab has code font selection (JetBrains Mono default)
+- [x] **SET-14**: Appearance preferences persist to localStorage and apply immediately without page reload
+- [x] **SET-15**: MCP tab lists all configured MCP servers per provider (Claude, Codex) with name and status
+- [x] **SET-16**: MCP tab has "Add Server" form with name, command, args, env fields per provider
+- [x] **SET-17**: MCP tab allows removing servers with confirmation dialog
 - [x] **SET-18**: All settings tabs show loading skeletons while fetching data from backend
-- [ ] **SET-19**: Settings that require server restart display a "(requires restart)" indicator
+- [x] **SET-19**: Settings that require server restart display a "(requires restart)" indicator
 - [x] **SET-20**: GitHub/GitLab credentials section allows adding/viewing/deleting credentials with token masking
 
 ### Command Palette (CMD)
@@ -236,14 +236,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-09 | Phase 21 | Complete |
 | SET-10 | Phase 21 | Complete |
 | SET-11 | Phase 21 | Complete |
-| SET-12 | Phase 21 | Pending |
-| SET-13 | Phase 21 | Pending |
-| SET-14 | Phase 21 | Pending |
-| SET-15 | Phase 21 | Pending |
-| SET-16 | Phase 21 | Pending |
-| SET-17 | Phase 21 | Pending |
+| SET-12 | Phase 21 | Complete |
+| SET-13 | Phase 21 | Complete |
+| SET-14 | Phase 21 | Complete |
+| SET-15 | Phase 21 | Complete |
+| SET-16 | Phase 21 | Complete |
+| SET-17 | Phase 21 | Complete |
 | SET-18 | Phase 21 | Complete |
-| SET-19 | Phase 21 | Pending |
+| SET-19 | Phase 21 | Complete |
 | SET-20 | Phase 21 | Complete |
 | CMD-01 | Phase 22 | Pending |
 | CMD-02 | Phase 22 | Pending |
