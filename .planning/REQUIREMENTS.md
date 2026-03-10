@@ -75,7 +75,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **FT-11**: Image files (png, jpg, gif, svg, webp) open in lightbox preview instead of code editor
 - [ ] **FT-12**: File tree shows loading skeleton on initial fetch
 - [ ] **FT-13**: File tree shows error state with retry button if fetch fails
-- [ ] **FT-14**: Directories lazy-load children on expand (not full tree at once) for large projects
+- [ ] **FT-14**: Full tree loaded upfront (backend depth 10); expand/collapse is client-side. Lazy-load deferred to future optimization.
 - [ ] **FT-15**: node_modules, .git, and other standard ignored directories are hidden by default
 - [ ] **FT-16**: File tree refreshes when backend sends file change notifications via WebSocket
 
