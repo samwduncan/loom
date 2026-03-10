@@ -7,7 +7,7 @@
 
 export type SidebarState = 'expanded' | 'collapsed-hidden';
 
-export type TabId = 'chat' | 'dashboard' | 'settings';
+export type TabId = 'chat' | 'files' | 'shell' | 'git';
 
 export interface ModalState {
   type: string;

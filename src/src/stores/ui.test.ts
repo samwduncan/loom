@@ -50,12 +50,28 @@ describe('useUIStore', () => {
   });
 
   // -- setActiveTab --
-  it('setActiveTab sets activeTab', () => {
+  it('setActiveTab sets activeTab to files', () => {
     expect(useUIStore.getState().activeTab).toBe('chat');
-    useUIStore.getState().setActiveTab('settings');
-    expect(useUIStore.getState().activeTab).toBe('settings');
-    useUIStore.getState().setActiveTab('dashboard');
-    expect(useUIStore.getState().activeTab).toBe('dashboard');
+    useUIStore.getState().setActiveTab('files');
+    expect(useUIStore.getState().activeTab).toBe('files');
+  });
+
+  it('setActiveTab sets activeTab to shell', () => {
+    useUIStore.getState().setActiveTab('shell');
+    expect(useUIStore.getState().activeTab).toBe('shell');
+  });
+
+  it('setActiveTab sets activeTab to git', () => {
+    useUIStore.getState().setActiveTab('git');
+    expect(useUIStore.getState().activeTab).toBe('git');
+  });
+
+  it('setActiveTab accepts all four TabId values', () => {
+    const tabIds = ['chat', 'files', 'shell', 'git'] as const;
+    for (const tab of tabIds) {
+      useUIStore.getState().setActiveTab(tab);
+      expect(useUIStore.getState().activeTab).toBe(tab);
+    }
   });
 
   // -- openModal / closeModal --
@@ -93,7 +109,7 @@ describe('useUIStore', () => {
   // -- reset --
   it('reset() restores initial state', () => {
     useUIStore.getState().toggleSidebar();
-    useUIStore.getState().setActiveTab('settings');
+    useUIStore.getState().setActiveTab('files');
     useUIStore.getState().openModal({ type: 'test', props: {} });
     useUIStore.getState().setTheme({ fontSize: 20 });
 

@@ -107,7 +107,7 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: 'loom-ui',
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         theme: state.theme,
         sidebarCollapsed: state.sidebarCollapsed,
@@ -118,6 +118,7 @@ export const useUIStore = create<UIState>()(
         if (version < 2) {
           return { ...state, thinkingExpanded: true };
         }
+        // v3: TabId changed from 'chat'|'dashboard'|'settings' to 'chat'|'files'|'shell'|'git' — no persisted fields affected
         return state;
       },
     },
