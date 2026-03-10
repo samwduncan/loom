@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: completed
-stopped_at: Completed 23-02-PLAN.md (recursive FileTree UI + ContentArea wiring)
-last_updated: "2026-03-10T23:20:00.000Z"
-last_activity: 2026-03-10 -- Completed 23-02 recursive FileTree UI, search, dotfile hiding, ContentArea wiring
+stopped_at: Completed 23-03-PLAN.md (context menus, image preview, file opening)
+last_updated: "2026-03-10T23:31:00.000Z"
+last_activity: 2026-03-10 -- Completed 23-03 context menus, image preview, command palette file opening
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 9
-  percent: 90
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 23 of 26 (File Tree + File Store)
-Plan: 2 of 3 in current phase
-Status: Plan 23-02 Complete
-Last activity: 2026-03-10 -- Completed 23-02 recursive FileTree UI, search, dotfile hiding, ContentArea wiring
+Plan: 3 of 3 in current phase
+Status: Phase 23 Complete
+Last activity: 2026-03-10 -- Completed 23-03 context menus, image preview, command palette file opening
 
-Progress: [█████████░] 90% (9/10 plans complete)
+Progress: [██████████] 100% (10/10 plans complete)
 
 ## Performance Metrics
 
@@ -78,6 +78,10 @@ See PROJECT.md Key Decisions table.
 - 23-02: FileNode subscribes to store slices per-instance (isExpanded, isActive) for minimal re-renders
 - 23-02: matchesFilter recursive helper for search filtering in both FileNode and FileTree
 - 23-02: Loading skeleton uses file-node CSS class with --depth instead of inline marginLeft (Constitution compliance)
+- 23-03: Selector hooks over getState() for context menu store actions (Constitution 4.2/4.5)
+- 23-03: expandDirs/collapseDirs as named store actions (not external setState)
+- 23-03: isImageFile extracted to image-utils.ts for react-refresh compatibility
+- 23-03: vi.spyOn clipboard AFTER user-event setup to avoid replacement conflicts
 
 ### Pending Todos
 
@@ -89,6 +93,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:20:00.000Z
-Stopped at: Completed 23-02-PLAN.md (recursive FileTree UI + ContentArea wiring)
-Resume: `/gsd:execute-phase 23` (Plan 03 -- code editor integration)
+Last session: 2026-03-10T23:31:00.000Z
+Stopped at: Completed 23-03-PLAN.md (context menus, image preview, file opening)
+Resume: Phase 23 complete. Next: `/gsd:plan-phase 24` (Terminal)

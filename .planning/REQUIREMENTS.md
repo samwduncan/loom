@@ -70,9 +70,9 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **FT-06**: Clicking a file opens it in the code editor panel (right side of Files tab)
 - [x] **FT-07**: Currently open file is highlighted in the tree
 - [x] **FT-08**: Search/filter input at top of tree panel filters visible files/folders by fuzzy match as user types
-- [ ] **FT-09**: Right-click context menu on files with actions: Copy Path, Copy Relative Path, Open in Editor, Open Containing Folder in Terminal
-- [ ] **FT-10**: Right-click context menu on directories with actions: Copy Path, Expand All, Collapse All
-- [ ] **FT-11**: Image files (png, jpg, gif, svg, webp) open in lightbox preview instead of code editor
+- [x] **FT-09**: Right-click context menu on files with actions: Copy Path, Copy Relative Path, Open in Editor, Open Containing Folder in Terminal
+- [x] **FT-10**: Right-click context menu on directories with actions: Copy Path, Expand All, Collapse All
+- [x] **FT-11**: Image files (png, jpg, gif, svg, webp) open in lightbox preview instead of code editor
 - [x] **FT-12**: File tree shows loading skeleton on initial fetch
 - [x] **FT-13**: File tree shows error state with retry button if fetch fails
 - [x] **FT-14**: Full tree loaded upfront (backend depth 10); expand/collapse is client-side. Lazy-load deferred to future optimization.
@@ -268,9 +268,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FT-06 | Phase 23 | Complete |
 | FT-07 | Phase 23 | Complete |
 | FT-08 | Phase 23 | Complete |
-| FT-09 | Phase 23 | Pending |
-| FT-10 | Phase 23 | Pending |
-| FT-11 | Phase 23 | Pending |
+| FT-09 | Phase 23 | Complete |
+| FT-10 | Phase 23 | Complete |
+| FT-11 | Phase 23 | Complete |
 | FT-12 | Phase 23 | Complete |
 | FT-13 | Phase 23 | Complete |
 | FT-14 | Phase 23 | Complete |

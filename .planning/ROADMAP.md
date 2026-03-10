@@ -50,7 +50,7 @@
 - [x] **Phase 20: Content Layout + Tab System** - Tab bar, CSS show/hide panel switching, file store, keyboard shortcuts (completed 2026-03-10)
 - [x] **Phase 21: Settings Panel** - Full-screen settings modal with 5 tabs, installs shadcn primitives for later phases (completed 2026-03-10)
 - [x] **Phase 22: Command Palette** - Cmd+K overlay with fuzzy search, session/file/command navigation (completed 2026-03-10)
-- [ ] **Phase 23: File Tree + File Store** - Hierarchical file browser, file type icons, context menus, lazy-load directories
+- [x] **Phase 23: File Tree + File Store** - Hierarchical file browser, file type icons, context menus, lazy-load directories (completed 2026-03-10)
 - [ ] **Phase 24: Code Editor** - CodeMirror 6 with syntax highlighting, file tabs, read/write, diff view, OKLCH theme
 - [ ] **Phase 25: Terminal** - xterm.js terminal with separate /shell WebSocket, auto-resize, connection state
 - [ ] **Phase 26: Git Panel + Navigation** - Changes/history views, staging, commit, branch ops, session management
@@ -185,7 +185,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 20. Content Layout + Tab System | 2/2 | Complete    | 2026-03-10 | - |
 | 21. Settings Panel | 3/3 | Complete    | 2026-03-10 | - |
 | 22. Command Palette | 2/2 | Complete    | 2026-03-10 | - |
-| 23. File Tree + File Store | 2/3 | In Progress|  | - |
+| 23. File Tree + File Store | 3/3 | Complete   | 2026-03-10 | - |
 | 24. Code Editor | v1.2 | 0/3 | Not started | - |
 | 25. Terminal | v1.2 | 0/2 | Not started | - |
 | 26. Git Panel + Navigation | v1.2 | 0/3 | Not started | - |
