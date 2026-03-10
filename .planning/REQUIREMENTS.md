@@ -57,7 +57,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **CMD-11**: Slash commands (/) are listed and executable from palette -- results shown as toast or inline
 - [x] **CMD-12**: Arrow keys navigate between items, Enter selects, items show keyboard shortcut hints where applicable
 - [x] **CMD-13**: Empty state shows "No results found" when search matches nothing
-- [x] **CMD-14**: Recent/frequent commands appear at top of list when search input is empty
+- [ ] **CMD-14**: Recent/frequent commands appear at top of list when search input is empty *(deferred — requires command registry for re-execution)*
 - [x] **CMD-15**: Project switching group lists available projects; selecting switches active project
 
 ### File Tree (FT)
@@ -258,7 +258,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMD-11 | Phase 22 | Complete |
 | CMD-12 | Phase 22 | Complete |
 | CMD-13 | Phase 22 | Complete |
-| CMD-14 | Phase 22 | Complete |
+| CMD-14 | Deferred | Deferred — needs command registry |
 | CMD-15 | Phase 22 | Complete |
 | FT-01 | Phase 23 | Pending |
 | FT-02 | Phase 23 | Pending |

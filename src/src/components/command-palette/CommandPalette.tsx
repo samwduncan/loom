@@ -18,6 +18,7 @@ import { useCommandPaletteShortcut } from './hooks/useCommandPaletteShortcut';
 import { useCommandSearch } from './hooks/useCommandSearch';
 import { NavigationGroup } from './groups/NavigationGroup';
 import { SessionGroup } from './groups/SessionGroup';
+import { FileGroup } from './groups/FileGroup';
 import { ActionGroup } from './groups/ActionGroup';
 import { CommandGroup } from './groups/CommandGroup';
 import { ProjectGroup } from './groups/ProjectGroup';
@@ -28,7 +29,7 @@ export const CommandPalette = function CommandPalette() {
   const toggleCommandPalette = useUIStore((state) => state.toggleCommandPalette);
 
   const [search, setSearch] = useState('');
-  const { sessionResults } = useCommandSearch(search, { enabled: isOpen });
+  const { sessionResults, fileResults } = useCommandSearch(search, { enabled: isOpen });
 
   useCommandPaletteShortcut();
 
@@ -61,6 +62,9 @@ export const CommandPalette = function CommandPalette() {
         <NavigationGroup onClose={onClose} />
         {sessionResults.length > 0 && (
           <SessionGroup sessions={sessionResults} onClose={onClose} />
+        )}
+        {fileResults.length > 0 && (
+          <FileGroup files={fileResults} onClose={onClose} />
         )}
         <ActionGroup onClose={onClose} />
         <CommandGroup search={search} onClose={onClose} />
