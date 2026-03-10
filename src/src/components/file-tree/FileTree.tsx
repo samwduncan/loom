@@ -35,7 +35,7 @@ function matchesFilter(node: FileTreeNode, filter: string): boolean {
 
 export const FileTree = function FileTree({ className }: FileTreeProps) {
   const { projectName } = useProjectContext();
-  const { tree, fetchState, retry } = useFileTree(projectName);
+  const { tree, fetchState, retry, projectRoot } = useFileTree(projectName);
   const [filter, setFilter] = useState('');
   const [showHidden] = useState(false);
 
@@ -100,7 +100,7 @@ export const FileTree = function FileTree({ className }: FileTreeProps) {
         <div className="px-1 py-0.5">
           {hasFilteredResults ? (
             visibleTree.map((node) => (
-              <FileNode key={node.path} node={node} depth={0} filter={filter || undefined} />
+              <FileNode key={node.path} node={node} depth={0} filter={filter || undefined} projectRoot={projectRoot} projectName={projectName} />
             ))
           ) : (
             <p className="px-2 py-3 text-center text-xs text-muted-foreground">
