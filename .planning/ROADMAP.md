@@ -67,11 +67,11 @@
   3. User can press Cmd+1/2/3/4 to switch between tabs without using the mouse
   4. On mobile viewports (<768px), only the Chat tab is accessible; the tab bar is hidden
   5. A crash in one panel (e.g., Files) does not take down other panels (Chat continues working)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 20-01: TBD
-- [ ] 20-02: TBD
+- [ ] 20-01-PLAN.md -- Types + stores (TabId update, file store, UI store migration)
+- [ ] 20-02-PLAN.md -- TabBar, ContentArea, keyboard shortcuts, AppShell/App.tsx rewiring
 
 ### Phase 21: Settings Panel
 **Goal**: Users can view and manage all application settings (agents, API keys, appearance, git config, MCP servers) from within the app
@@ -196,4 +196,4 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-09 after v1.2 roadmap creation*
+*Last updated: 2026-03-10 after Phase 20 planning*
