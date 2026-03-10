@@ -9,14 +9,14 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Layout (LAY)
 
-- [ ] **LAY-01**: Content area renders a horizontal tab bar at the top with tabs: Chat, Files, Shell, Git
-- [ ] **LAY-02**: Clicking a tab switches the visible panel below the tab bar
-- [ ] **LAY-03**: Tab switching uses CSS display (show/hide), NOT conditional rendering -- all panels stay mounted to preserve state (terminal session, scroll position, editor content)
-- [ ] **LAY-04**: Active tab has a visual indicator (underline or highlight using design tokens)
-- [ ] **LAY-05**: Keyboard shortcuts Cmd+1/2/3/4 switch to Chat/Files/Shell/Git respectively
-- [ ] **LAY-06**: Tab bar does not render on mobile (< 768px) -- only Chat tab visible, other panels accessible via Cmd+K or menu
+- [x] **LAY-01**: Content area renders a horizontal tab bar at the top with tabs: Chat, Files, Shell, Git
+- [x] **LAY-02**: Clicking a tab switches the visible panel below the tab bar
+- [x] **LAY-03**: Tab switching uses CSS display (show/hide), NOT conditional rendering -- all panels stay mounted to preserve state (terminal session, scroll position, editor content)
+- [x] **LAY-04**: Active tab has a visual indicator (underline or highlight using design tokens)
+- [x] **LAY-05**: Keyboard shortcuts Cmd+1/2/3/4 switch to Chat/Files/Shell/Git respectively
+- [x] **LAY-06**: Tab bar does not render on mobile (< 768px) -- only Chat tab visible, other panels accessible via Cmd+K or menu
 - [x] **LAY-07**: New Zustand file store (5th store) manages file tree state, open editor tabs, active file, dirty file tracking -- Constitution amended
-- [ ] **LAY-08**: Each panel wrapped in PanelErrorBoundary to isolate crashes from other panels
+- [x] **LAY-08**: Each panel wrapped in PanelErrorBoundary to isolate crashes from other panels
 - [x] **LAY-09**: TabId union type extended to include 'chat' | 'files' | 'shell' | 'git' in UI store
 
 ### Settings (SET)
@@ -216,14 +216,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LAY-01 | Phase 20 | Pending |
-| LAY-02 | Phase 20 | Pending |
-| LAY-03 | Phase 20 | Pending |
-| LAY-04 | Phase 20 | Pending |
-| LAY-05 | Phase 20 | Pending |
-| LAY-06 | Phase 20 | Pending |
+| LAY-01 | Phase 20 | Complete |
+| LAY-02 | Phase 20 | Complete |
+| LAY-03 | Phase 20 | Complete |
+| LAY-04 | Phase 20 | Complete |
+| LAY-05 | Phase 20 | Complete |
+| LAY-06 | Phase 20 | Complete |
 | LAY-07 | Phase 20 | Complete |
-| LAY-08 | Phase 20 | Pending |
+| LAY-08 | Phase 20 | Complete |
 | LAY-09 | Phase 20 | Complete |
 | SET-01 | Phase 21 | Pending |
 | SET-02 | Phase 21 | Pending |

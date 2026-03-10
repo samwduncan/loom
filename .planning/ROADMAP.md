@@ -47,7 +47,7 @@
 - Integer phases (20, 21, ...): Planned milestone work
 - Decimal phases (20.1, 20.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 20: Content Layout + Tab System** - Tab bar, CSS show/hide panel switching, file store, keyboard shortcuts
+- [x] **Phase 20: Content Layout + Tab System** - Tab bar, CSS show/hide panel switching, file store, keyboard shortcuts (completed 2026-03-10)
 - [ ] **Phase 21: Settings Panel** - Full-screen settings modal with 5 tabs, installs shadcn primitives for later phases
 - [ ] **Phase 22: Command Palette** - Cmd+K overlay with fuzzy search, session/file/command navigation
 - [ ] **Phase 23: File Tree + File Store** - Hierarchical file browser, file type icons, context menus, lazy-load directories
@@ -182,7 +182,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 |-------|-----------|----------------|--------|-----------|
 | 1-10 | v1.0 | 21/21 | Complete | 2026-03-07 |
 | 11-19 | v1.1 | 26/26 | Complete | 2026-03-09 |
-| 20. Content Layout + Tab System | 1/2 | In Progress|  | - |
+| 20. Content Layout + Tab System | 2/2 | Complete   | 2026-03-10 | - |
 | 21. Settings Panel | v1.2 | 0/3 | Not started | - |
 | 22. Command Palette | v1.2 | 0/2 | Not started | - |
 | 23. File Tree + File Store | v1.2 | 0/3 | Not started | - |
