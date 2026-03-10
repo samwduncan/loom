@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: completed
-stopped_at: Completed 22-02-PLAN.md (command groups + palette wiring)
-last_updated: "2026-03-10T22:31:41.157Z"
-last_activity: 2026-03-10 -- Completed 22-02 command groups (7 groups, 44 tests, phase 22 complete)
+stopped_at: Completed 23-01-PLAN.md (file store + tree foundation)
+last_updated: "2026-03-10T23:14:56.783Z"
+last_activity: 2026-03-10 -- Completed 23-01 file store actions, useFileTree hook, FileIcon, FileTreePanel layout
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_plans: 10
+  completed_plans: 8
+  percent: 80
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 
 ## Current Position
 
-Phase: 22 of 26 (Command Palette) -- COMPLETE
-Plan: 2 of 2 in current phase -- COMPLETE
-Status: Phase 22 Complete
-Last activity: 2026-03-10 -- Completed 22-02 command groups (7 groups, 44 tests, phase 22 complete)
+Phase: 23 of 26 (File Tree + File Store)
+Plan: 1 of 3 in current phase
+Status: Plan 23-01 Complete
+Last activity: 2026-03-10 -- Completed 23-01 file store actions, useFileTree hook, FileIcon, FileTreePanel layout
 
-Progress: [██████████] 100% (7/7 plans complete)
+Progress: [████████░░] 80% (8/10 plans complete)
 
 ## Performance Metrics
 
@@ -71,6 +71,10 @@ See PROJECT.md Key Decisions table.
 - 22-02: Search reset via onOpenChange callback -- avoids set-state-in-effect and refs-during-render lint rules
 - 22-02: FileGroup uses console.warn stub for openFile (Phase 23 deferred)
 - 22-02: Endpoint-specific mock pattern for apiFetch in integration tests
+- 23-01: createElement over JSX for dynamic icon rendering (avoids react-hooks/static-components lint violation)
+- 23-01: file-icons.ts separated from FileIcon.tsx for react-refresh compatibility
+- 23-01: useState (not useRef) for prev-projectName tracking in adjust-state-during-rendering pattern
+- [Phase 23]: createElement over JSX for dynamic icon rendering (avoids react-hooks/static-components)
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T21:17:32Z
-Stopped at: Completed 22-02-PLAN.md (command groups + palette wiring)
-Resume: `/gsd:plan-phase 23` (File Tree)
+Last session: 2026-03-10T23:14:53.478Z
+Stopped at: Completed 23-01-PLAN.md (file store + tree foundation)
+Resume: `/gsd:execute-phase 23` (Plan 02 -- recursive FileTree component)
