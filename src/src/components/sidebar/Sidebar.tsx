@@ -12,6 +12,7 @@
  */
 
 import { memo } from 'react';
+import { Settings } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import { NewChatButton } from './NewChatButton';
@@ -20,6 +21,7 @@ import { SessionList } from './SessionList';
 export const Sidebar = memo(function Sidebar() {
   const isSidebarOpen = useUIStore((state) => state.sidebarOpen);
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
+  const openModal = useUIStore((state) => state.openModal);
 
   if (!isSidebarOpen) {
     return (
@@ -94,6 +96,20 @@ export const Sidebar = memo(function Sidebar() {
         <NewChatButton />
       </div>
       <SessionList />
+      <footer className="mt-auto p-3 border-t border-border">
+        <button
+          onClick={() => openModal({ type: 'settings', props: {} })}
+          className={cn(
+            'p-2 rounded-md',
+            'text-muted hover:text-foreground',
+            'transition-colors',
+          )}
+          aria-label="Open settings"
+          type="button"
+        >
+          <Settings size={18} />
+        </button>
+      </footer>
     </aside>
   );
 });

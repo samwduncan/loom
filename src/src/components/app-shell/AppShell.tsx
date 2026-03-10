@@ -9,17 +9,24 @@
  * selector-only store access (4.2), inline style only for dynamic grid dimensions (3.2).
  */
 
-import { memo } from 'react';
+import { memo, lazy, Suspense } from 'react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import { Sidebar } from '@/components/sidebar/Sidebar';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ContentArea } from '@/components/content-area/view/ContentArea';
 
+const LazySettingsModal = lazy(() =>
+  import('@/components/settings/SettingsModal').then((m) => ({
+    default: m.SettingsModal,
+  })),
+);
+
 export const AppShell = memo(function AppShell() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
 
   return (
+    <>
     <div
       data-testid="app-shell"
       data-sidebar-state={sidebarOpen ? 'expanded' : 'collapsed-hidden'}
@@ -45,5 +52,10 @@ export const AppShell = memo(function AppShell() {
       {/* Artifact column: 0px width, reserved for future phases */}
       <div className="overflow-hidden min-w-0" />
     </div>
+
+    <Suspense fallback={null}>
+      <LazySettingsModal />
+    </Suspense>
+  </>
   );
 });
