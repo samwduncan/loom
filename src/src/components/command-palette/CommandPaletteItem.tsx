@@ -34,8 +34,8 @@ export const CommandPaletteItem = function CommandPaletteItem({
       keywords={keywords ? [keywords] : undefined}
       className={cn('flex items-center gap-2', className)}
     >
-      {icon && <span className="flex shrink-0 items-center text-muted">{icon}</span>}
-      <span className="flex-1 truncate text-primary">{label}</span>
+      {icon && <span className="flex shrink-0 items-center text-muted-foreground">{icon}</span>}
+      <span className="flex-1 truncate text-foreground">{label}</span>
       {shortcut && <Kbd className="ml-auto shrink-0">{shortcut}</Kbd>}
     </Command.Item>
   );

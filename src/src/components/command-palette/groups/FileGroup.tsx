@@ -2,7 +2,7 @@
  * FileGroup -- Fuzzy-searched file list for the command palette.
  *
  * Renders files filtered by useCommandSearch. Selecting a file switches
- * to the Files tab. Full file opening deferred to Phase 23 (file store stubs).
+ * to the Files tab. Full file opening deferred to Phase 23 (file store).
  *
  * Constitution: Named export (2.2), token-based colors (3.1).
  */
@@ -17,19 +17,15 @@ import type { FileEntry } from '../hooks/useCommandSearch';
 export interface FileGroupProps {
   files: FileEntry[];
   onClose: () => void;
-  addRecent: (entry: { id: string; label: string; group: string }) => void;
 }
 
-export const FileGroup = function FileGroup({ files, onClose, addRecent }: FileGroupProps) {
+export const FileGroup = function FileGroup({ files, onClose }: FileGroupProps) {
   const setActiveTab = useUIStore((s) => s.setActiveTab);
 
-  const handleSelect = useCallback((file: FileEntry) => {
+  const handleSelect = useCallback((_file: FileEntry) => {
     setActiveTab('files');
-    // File store openFile is a Phase 23 stub -- log for now, switch to Files tab only
-    console.warn('TODO: openFile not implemented', file.path);
-    addRecent({ id: 'file-' + file.path, label: file.name, group: 'Files' });
     onClose();
-  }, [setActiveTab, onClose, addRecent]);
+  }, [setActiveTab, onClose]);
 
   if (files.length === 0) return null;
 

@@ -17,7 +17,6 @@ function renderInCommand(ui: React.ReactElement) {
 }
 
 describe('ProjectGroup', () => {
-  const mockAddRecent = vi.fn();
   const mockOnClose = vi.fn();
 
   beforeEach(() => {
@@ -30,7 +29,7 @@ describe('ProjectGroup', () => {
       { name: 'rowlab', path: '/home/swd/rowlab', isActive: false },
     ]);
 
-    renderInCommand(<ProjectGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ProjectGroup onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByText('loom')).toBeInTheDocument();
@@ -44,7 +43,7 @@ describe('ProjectGroup', () => {
       { name: 'rowlab', path: '/home/swd/rowlab' },
     ]);
 
-    renderInCommand(<ProjectGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ProjectGroup onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByText('Projects')).toBeInTheDocument();
@@ -56,7 +55,7 @@ describe('ProjectGroup', () => {
       { name: 'loom', path: '/home/swd/loom', isActive: true },
     ]);
 
-    renderInCommand(<ProjectGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ProjectGroup onClose={mockOnClose} />);
 
     // Wait for fetch to complete
     await waitFor(() => {
@@ -69,7 +68,7 @@ describe('ProjectGroup', () => {
   it('hides when fetch fails', async () => {
     mockApiFetch.mockRejectedValue(new Error('Network error'));
 
-    renderInCommand(<ProjectGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ProjectGroup onClose={mockOnClose} />);
 
     // Wait for fetch to fail
     await waitFor(() => {

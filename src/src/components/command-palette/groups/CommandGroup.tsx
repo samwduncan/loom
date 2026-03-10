@@ -2,7 +2,7 @@
  * CommandGroup -- Slash commands fetched from backend API.
  *
  * Fetches once on mount via POST /api/commands/list, caches in state.
- * Shows commands when search starts with '/' or search matches command names.
+ * Shows commands when search starts with '/' or when fuse matches.
  *
  * Constitution: Named export (2.2), typed API responses (5.4).
  */
@@ -30,10 +30,9 @@ interface CommandListResponse {
 export interface CommandGroupProps {
   search: string;
   onClose: () => void;
-  addRecent: (entry: { id: string; label: string; group: string }) => void;
 }
 
-export const CommandGroup = function CommandGroup({ search, onClose, addRecent }: CommandGroupProps) {
+export const CommandGroup = function CommandGroup({ search, onClose }: CommandGroupProps) {
   const [commands, setCommands] = useState<SlashCommand[]>([]);
   const fetchedRef = useRef(false);
 
@@ -57,9 +56,8 @@ export const CommandGroup = function CommandGroup({ search, onClose, addRecent }
 
   const handleSelect = useCallback((cmd: SlashCommand) => {
     toast.info(`Executed: ${cmd.name}`);
-    addRecent({ id: 'cmd-' + cmd.name, label: cmd.name, group: 'Commands' });
     onClose();
-  }, [onClose, addRecent]);
+  }, [onClose]);
 
   // Show when search starts with '/' or when fuse matches
   const isSlashSearch = search.startsWith('/');

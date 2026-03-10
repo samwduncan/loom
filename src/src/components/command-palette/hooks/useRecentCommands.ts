@@ -25,7 +25,13 @@ function readRecents(): RecentEntry[] {
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed as RecentEntry[];
+    return (parsed as unknown[]).filter(
+      (e): e is RecentEntry =>
+        typeof (e as RecentEntry).id === 'string' &&
+        typeof (e as RecentEntry).label === 'string' &&
+        typeof (e as RecentEntry).group === 'string' &&
+        typeof (e as RecentEntry).timestamp === 'number',
+    );
   } catch {
     return [];
   }

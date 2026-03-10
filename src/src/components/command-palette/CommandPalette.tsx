@@ -16,11 +16,8 @@ import { useState, useCallback } from 'react';
 import { useUIStore } from '@/stores/ui';
 import { useCommandPaletteShortcut } from './hooks/useCommandPaletteShortcut';
 import { useCommandSearch } from './hooks/useCommandSearch';
-import { useRecentCommands } from './hooks/useRecentCommands';
-import { RecentGroup } from './groups/RecentGroup';
 import { NavigationGroup } from './groups/NavigationGroup';
 import { SessionGroup } from './groups/SessionGroup';
-import { FileGroup } from './groups/FileGroup';
 import { ActionGroup } from './groups/ActionGroup';
 import { CommandGroup } from './groups/CommandGroup';
 import { ProjectGroup } from './groups/ProjectGroup';
@@ -31,22 +28,22 @@ export const CommandPalette = function CommandPalette() {
   const toggleCommandPalette = useUIStore((state) => state.toggleCommandPalette);
 
   const [search, setSearch] = useState('');
-  const { sessionResults, fileResults } = useCommandSearch(search, { enabled: isOpen });
-  const { recents, addRecent } = useRecentCommands();
+  const { sessionResults } = useCommandSearch(search, { enabled: isOpen });
 
   useCommandPaletteShortcut();
 
   const onClose = useCallback(() => {
+    setSearch('');
     toggleCommandPalette();
   }, [toggleCommandPalette]);
 
-  // Reset search when dialog closes via onOpenChange callback
+  // cmdk fires onOpenChange(false) on Escape/backdrop click.
+  // Delegate to onClose to avoid double-toggle when groups also call onClose.
   const handleOpenChange = useCallback((open: boolean) => {
     if (!open) {
-      setSearch('');
-      toggleCommandPalette();
+      onClose();
     }
-  }, [toggleCommandPalette]);
+  }, [onClose]);
 
   return (
     <Command.Dialog
@@ -61,17 +58,13 @@ export const CommandPalette = function CommandPalette() {
         onValueChange={setSearch}
       />
       <Command.List>
-        {!search && <RecentGroup recents={recents} onClose={onClose} />}
-        <NavigationGroup onClose={onClose} addRecent={addRecent} />
+        <NavigationGroup onClose={onClose} />
         {sessionResults.length > 0 && (
-          <SessionGroup sessions={sessionResults} onClose={onClose} addRecent={addRecent} />
+          <SessionGroup sessions={sessionResults} onClose={onClose} />
         )}
-        {fileResults.length > 0 && (
-          <FileGroup files={fileResults} onClose={onClose} addRecent={addRecent} />
-        )}
-        <ActionGroup onClose={onClose} addRecent={addRecent} />
-        <CommandGroup search={search} onClose={onClose} addRecent={addRecent} />
-        <ProjectGroup onClose={onClose} addRecent={addRecent} />
+        <ActionGroup onClose={onClose} />
+        <CommandGroup search={search} onClose={onClose} />
+        <ProjectGroup onClose={onClose} />
         <Command.Empty>No results found</Command.Empty>
       </Command.List>
     </Command.Dialog>

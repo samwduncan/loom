@@ -9,6 +9,11 @@ vi.mock('@/lib/api-client', () => ({
   apiFetch: vi.fn().mockResolvedValue([]),
 }));
 
+// Mock useProjectContext
+vi.mock('@/hooks/useProjectContext', () => ({
+  useProjectContext: () => ({ projectName: 'test-project', isLoading: false }),
+}));
+
 function makeSession(overrides: Partial<Session> = {}): Session {
   return {
     id: `session-${Math.random().toString(36).slice(2, 8)}`,
@@ -28,11 +33,7 @@ function makeSession(overrides: Partial<Session> = {}): Session {
 
 describe('useCommandSearch', () => {
   beforeEach(() => {
-    // Reset timeline store to have test sessions
-    const store = useTimelineStore.getState();
-    // Clear sessions via setState for test setup
     useTimelineStore.setState({ sessions: [] });
-    void store; // suppress unused
   });
 
   it('returns empty results for all categories when search is empty', () => {
@@ -42,7 +43,6 @@ describe('useCommandSearch', () => {
 
     expect(result.current.sessionResults).toEqual([]);
     expect(result.current.fileResults).toEqual([]);
-    expect(result.current.commandResults).toEqual([]);
   });
 
   it('returns empty results for whitespace-only search', () => {
@@ -52,7 +52,6 @@ describe('useCommandSearch', () => {
 
     expect(result.current.sessionResults).toEqual([]);
     expect(result.current.fileResults).toEqual([]);
-    expect(result.current.commandResults).toEqual([]);
   });
 
   it('searches sessions by title', () => {
@@ -77,26 +76,9 @@ describe('useCommandSearch', () => {
 
     // Fuse.js with threshold 0.4 should find "Settings" from "stgs"
     expect(result.current.sessionResults.length).toBeGreaterThanOrEqual(0);
-    // Note: fuzzy matching is probabilistic; exact match depends on Fuse scoring
-  });
-
-  it('searches commands when provided', () => {
-    const commands = [
-      { id: 'new-chat', label: 'New Chat', group: 'Actions', action: () => {} },
-      { id: 'settings', label: 'Open Settings', group: 'Actions', action: () => {} },
-      { id: 'theme', label: 'Toggle Theme', group: 'Appearance', action: () => {} },
-    ];
-
-    const { result } = renderHook(() =>
-      useCommandSearch('settings', { enabled: false, commands }),
-    );
-
-    expect(result.current.commandResults).toHaveLength(1);
-    expect(result.current.commandResults[0]?.id).toBe('settings');
   });
 
   it('limits results to 15 per category', () => {
-    // Create 20 sessions all matching "test"
     const sessions = Array.from({ length: 20 }, (_, i) =>
       makeSession({ title: `Test session ${i}` }),
     );

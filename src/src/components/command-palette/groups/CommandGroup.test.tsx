@@ -17,7 +17,6 @@ function renderInCommand(ui: React.ReactElement) {
 }
 
 describe('CommandGroup', () => {
-  const mockAddRecent = vi.fn();
   const mockOnClose = vi.fn();
 
   beforeEach(() => {
@@ -36,7 +35,7 @@ describe('CommandGroup', () => {
 
   it('fetches and renders slash commands when search starts with /', async () => {
     renderInCommand(
-      <CommandGroup search="/h" onClose={mockOnClose} addRecent={mockAddRecent} />,
+      <CommandGroup search="/h" onClose={mockOnClose} />,
     );
 
     await waitFor(() => {
@@ -46,7 +45,7 @@ describe('CommandGroup', () => {
 
   it('shows Commands heading', async () => {
     renderInCommand(
-      <CommandGroup search="/" onClose={mockOnClose} addRecent={mockAddRecent} />,
+      <CommandGroup search="/" onClose={mockOnClose} />,
     );
 
     await waitFor(() => {
@@ -56,7 +55,7 @@ describe('CommandGroup', () => {
 
   it('does not render when search does not match any commands', async () => {
     renderInCommand(
-      <CommandGroup search="zzzzz" onClose={mockOnClose} addRecent={mockAddRecent} />,
+      <CommandGroup search="zzzzz" onClose={mockOnClose} />,
     );
 
     // Wait for fetch to complete
@@ -69,7 +68,7 @@ describe('CommandGroup', () => {
 
   it('renders nothing when empty search', () => {
     renderInCommand(
-      <CommandGroup search="" onClose={mockOnClose} addRecent={mockAddRecent} />,
+      <CommandGroup search="" onClose={mockOnClose} />,
     );
 
     expect(screen.queryByText('Commands')).not.toBeInTheDocument();

@@ -16,12 +16,16 @@ vi.mock('@/lib/api-client', () => ({
   }),
 }));
 
+// Mock useProjectContext
+vi.mock('@/hooks/useProjectContext', () => ({
+  useProjectContext: () => ({ projectName: 'test-project', isLoading: false }),
+}));
+
 // Mock useCommandSearch to control search results
 vi.mock('./hooks/useCommandSearch', () => ({
   useCommandSearch: vi.fn().mockReturnValue({
     sessionResults: [],
     fileResults: [],
-    commandResults: [],
     isLoading: false,
   }),
 }));
@@ -45,7 +49,6 @@ describe('CommandPalette', () => {
     mockUseCommandSearch.mockReturnValue({
       sessionResults: [],
       fileResults: [],
-      commandResults: [],
       isLoading: false,
     });
   });
@@ -89,7 +92,6 @@ describe('CommandPalette', () => {
         },
       ],
       fileResults: [],
-      commandResults: [],
       isLoading: false,
     });
     renderPalette();

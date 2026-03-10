@@ -21,10 +21,9 @@ export interface Project {
 
 export interface ProjectGroupProps {
   onClose: () => void;
-  addRecent: (entry: { id: string; label: string; group: string }) => void;
 }
 
-export const ProjectGroup = function ProjectGroup({ onClose, addRecent }: ProjectGroupProps) {
+export const ProjectGroup = function ProjectGroup({ onClose }: ProjectGroupProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const fetchedRef = useRef(false);
 
@@ -42,6 +41,7 @@ export const ProjectGroup = function ProjectGroup({ onClose, addRecent }: Projec
   }, []);
 
   const handleSelect = useCallback((project: Project) => {
+    onClose();
     apiFetch('/api/projects/switch', {
       method: 'POST',
       body: JSON.stringify({ name: project.name }),
@@ -50,12 +50,9 @@ export const ProjectGroup = function ProjectGroup({ onClose, addRecent }: Projec
         window.location.reload();
       })
       .catch(() => {
-        // Reload anyway to attempt recovery
         window.location.reload();
       });
-    addRecent({ id: 'project-' + project.name, label: project.name, group: 'Projects' });
-    onClose();
-  }, [onClose, addRecent]);
+  }, [onClose]);
 
   // Don't render if 0 or 1 project
   if (projects.length <= 1) return null;

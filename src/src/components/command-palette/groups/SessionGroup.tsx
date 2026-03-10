@@ -19,10 +19,9 @@ import type { Session } from '@/types/session';
 export interface SessionGroupProps {
   sessions: Session[];
   onClose: () => void;
-  addRecent: (entry: { id: string; label: string; group: string }) => void;
 }
 
-export const SessionGroup = function SessionGroup({ sessions, onClose, addRecent }: SessionGroupProps) {
+export const SessionGroup = function SessionGroup({ sessions, onClose }: SessionGroupProps) {
   const navigate = useNavigate();
   const setActiveTab = useUIStore((s) => s.setActiveTab);
   const setActiveSession = useTimelineStore((s) => s.setActiveSession);
@@ -30,10 +29,9 @@ export const SessionGroup = function SessionGroup({ sessions, onClose, addRecent
   const handleSelect = useCallback((session: Session) => {
     setActiveTab('chat');
     setActiveSession(session.id);
-    navigate('/chat/' + session.id);
-    addRecent({ id: 'session-' + session.id, label: session.title, group: 'Sessions' });
+    navigate(`/chat/${encodeURIComponent(session.id)}`);
     onClose();
-  }, [setActiveTab, setActiveSession, navigate, onClose, addRecent]);
+  }, [setActiveTab, setActiveSession, navigate, onClose]);
 
   if (sessions.length === 0) return null;
 

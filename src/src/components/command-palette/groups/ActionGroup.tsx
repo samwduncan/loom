@@ -13,31 +13,27 @@ import { useUIStore } from '@/stores/ui';
 
 export interface ActionGroupProps {
   onClose: () => void;
-  addRecent: (entry: { id: string; label: string; group: string }) => void;
 }
 
-export const ActionGroup = function ActionGroup({ onClose, addRecent }: ActionGroupProps) {
+export const ActionGroup = function ActionGroup({ onClose }: ActionGroupProps) {
   const navigate = useNavigate();
   const toggleThinking = useUIStore((s) => s.toggleThinking);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   const handleNewSession = useCallback(() => {
     navigate('/chat');
-    addRecent({ id: 'action-new-session', label: 'New Session', group: 'Actions' });
     onClose();
-  }, [navigate, onClose, addRecent]);
+  }, [navigate, onClose]);
 
   const handleToggleThinking = useCallback(() => {
     toggleThinking();
-    addRecent({ id: 'action-toggle-thinking', label: 'Toggle Thinking Visibility', group: 'Actions' });
     onClose();
-  }, [toggleThinking, onClose, addRecent]);
+  }, [toggleThinking, onClose]);
 
   const handleToggleSidebar = useCallback(() => {
     toggleSidebar();
-    addRecent({ id: 'action-toggle-sidebar', label: 'Toggle Sidebar', group: 'Actions' });
     onClose();
-  }, [toggleSidebar, onClose, addRecent]);
+  }, [toggleSidebar, onClose]);
 
   return (
     <Command.Group heading="Actions">

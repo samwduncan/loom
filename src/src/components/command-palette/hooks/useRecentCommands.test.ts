@@ -98,4 +98,17 @@ describe('useRecentCommands', () => {
     const { result } = renderHook(() => useRecentCommands());
     expect(result.current.recents).toEqual([]);
   });
+
+  it('filters out entries with invalid shape from localStorage', () => {
+    const mixed = [
+      { id: 'valid', label: 'Valid', group: 'Commands', timestamp: 100 },
+      { id: null, label: 'Bad ID', group: 'Commands', timestamp: 200 },
+      { id: 'missing-fields' },
+      'not-an-object',
+    ];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(mixed));
+    const { result } = renderHook(() => useRecentCommands());
+    expect(result.current.recents).toHaveLength(1);
+    expect(result.current.recents[0]?.id).toBe('valid');
+  });
 });

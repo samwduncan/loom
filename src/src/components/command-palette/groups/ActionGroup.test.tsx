@@ -15,7 +15,6 @@ function renderInCommand(ui: React.ReactElement) {
 }
 
 describe('ActionGroup', () => {
-  const mockAddRecent = vi.fn();
   const mockOnClose = vi.fn();
 
   beforeEach(() => {
@@ -24,21 +23,21 @@ describe('ActionGroup', () => {
   });
 
   it('renders 3 action items', () => {
-    renderInCommand(<ActionGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ActionGroup onClose={mockOnClose} />);
     expect(screen.getByText('New Session')).toBeInTheDocument();
     expect(screen.getByText('Toggle Thinking Visibility')).toBeInTheDocument();
     expect(screen.getByText('Toggle Sidebar')).toBeInTheDocument();
   });
 
   it('renders Actions heading', () => {
-    renderInCommand(<ActionGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ActionGroup onClose={mockOnClose} />);
     expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
   it('clicking "Toggle Sidebar" calls toggleSidebar', async () => {
     const user = userEvent.setup();
     const initialSidebar = useUIStore.getState().sidebarOpen;
-    renderInCommand(<ActionGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ActionGroup onClose={mockOnClose} />);
 
     await user.click(screen.getByText('Toggle Sidebar'));
 
@@ -49,7 +48,7 @@ describe('ActionGroup', () => {
   it('clicking "Toggle Thinking Visibility" calls toggleThinking', async () => {
     const user = userEvent.setup();
     const initialThinking = useUIStore.getState().thinkingExpanded;
-    renderInCommand(<ActionGroup onClose={mockOnClose} addRecent={mockAddRecent} />);
+    renderInCommand(<ActionGroup onClose={mockOnClose} />);
 
     await user.click(screen.getByText('Toggle Thinking Visibility'));
 

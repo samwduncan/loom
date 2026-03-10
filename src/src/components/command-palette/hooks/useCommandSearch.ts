@@ -1,8 +1,8 @@
 /**
- * useCommandSearch -- Fuse.js search orchestration across multiple data sources.
+ * useCommandSearch -- Fuse.js search orchestration across sessions and files.
  *
- * Searches across sessions (from timeline store), files (fetched from API),
- * and built-in commands. Returns typed results per category.
+ * Searches across sessions (from timeline store) and files (fetched from API).
+ * Returns typed results per category.
  *
  * Constitution: Named export (2.2), selector-only store access (4.2).
  */
@@ -10,6 +10,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import Fuse, { type IFuseOptions } from 'fuse.js';
 import { useTimelineStore } from '@/stores/timeline';
+import { useProjectContext } from '@/hooks/useProjectContext';
 import { apiFetch } from '@/lib/api-client';
 import type { Session } from '@/types/session';
 
@@ -19,18 +20,9 @@ export interface FileEntry {
   type: 'file' | 'directory';
 }
 
-export interface CommandEntry {
-  id: string;
-  label: string;
-  group: string;
-  shortcut?: string;
-  action: () => void;
-}
-
 export interface UseCommandSearchReturn {
   sessionResults: Session[];
   fileResults: FileEntry[];
-  commandResults: CommandEntry[];
   isLoading: boolean;
 }
 
@@ -46,38 +38,29 @@ const FUSE_FILE_OPTIONS: IFuseOptions<FileEntry> = {
   threshold: 0.3,
 };
 
-const FUSE_COMMAND_OPTIONS: IFuseOptions<CommandEntry> = {
-  keys: ['label', 'group'],
-  threshold: 0.3,
-};
-
 type FetchState = 'idle' | 'loading' | 'done';
 
 export function useCommandSearch(
   search: string,
-  options: { enabled?: boolean; commands?: CommandEntry[] } = {},
+  options: { enabled?: boolean } = {},
 ): UseCommandSearchReturn {
-  const { enabled = true, commands = [] } = options;
+  const { enabled = true } = options;
   const sessions = useTimelineStore((s) => s.sessions);
+  const { projectName } = useProjectContext();
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [fetchState, setFetchState] = useState<FetchState>('idle');
 
-  // Fetch files once when palette opens (enabled transitions to true)
-  // setState calls are in async callbacks, not synchronously in the effect body.
+  // Fetch files when palette opens. Reset on close so next open re-fetches.
   useEffect(() => {
-    if (!enabled || fetchState !== 'idle') return;
+    if (!enabled || !projectName) return;
 
     let cancelled = false;
 
-    // Mark loading asynchronously via microtask to avoid synchronous setState in effect
     Promise.resolve().then(() => {
       if (!cancelled) setFetchState('loading');
     });
 
-    // Try to get the project name from the URL or use a default
-    const projectName = window.location.pathname.split('/')[1] || 'default';
-
-    apiFetch<FileEntry[]>(`/api/projects/${projectName}/files`)
+    apiFetch<FileEntry[]>(`/api/projects/${encodeURIComponent(projectName)}/files`)
       .then((data) => {
         if (!cancelled) {
           setFiles(data);
@@ -85,14 +68,14 @@ export function useCommandSearch(
         }
       })
       .catch(() => {
-        // Graceful degradation: file search stays empty on fetch failure
         if (!cancelled) setFetchState('done');
       });
 
     return () => {
       cancelled = true;
+      setFetchState('idle');
     };
-  }, [enabled, fetchState]);
+  }, [enabled, projectName]);
 
   const isLoading = fetchState === 'loading';
 
@@ -106,32 +89,16 @@ export function useCommandSearch(
     [files],
   );
 
-  const commandFuse = useMemo(
-    () => new Fuse(commands, FUSE_COMMAND_OPTIONS),
-    [commands],
-  );
-
   // When search is empty, return empty arrays (caller shows recent commands instead)
-  if (!search.trim()) {
-    return {
-      sessionResults: [],
-      fileResults: [],
-      commandResults: [],
-      isLoading,
-    };
-  }
+  const sessionResults = useMemo(() => {
+    if (!search.trim()) return [];
+    return sessionFuse.search(search, { limit: SEARCH_LIMIT }).map((r) => r.item);
+  }, [search, sessionFuse]);
 
-  const sessionResults = sessionFuse
-    .search(search, { limit: SEARCH_LIMIT })
-    .map((r) => r.item);
+  const fileResults = useMemo(() => {
+    if (!search.trim()) return [];
+    return fileFuse.search(search, { limit: SEARCH_LIMIT }).map((r) => r.item);
+  }, [search, fileFuse]);
 
-  const fileResults = fileFuse
-    .search(search, { limit: SEARCH_LIMIT })
-    .map((r) => r.item);
-
-  const commandResults = commandFuse
-    .search(search, { limit: SEARCH_LIMIT })
-    .map((r) => r.item);
-
-  return { sessionResults, fileResults, commandResults, isLoading };
+  return { sessionResults, fileResults, isLoading };
 }

@@ -9,7 +9,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--z-critical);
-  background: oklch(0 0 0 / 0.5);
+  background: var(--backdrop-overlay);
   backdrop-filter: blur(8px);
 }
 
@@ -30,8 +30,8 @@
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   box-shadow:
-    0 16px 70px oklch(0 0 0 / 0.5),
-    0 0 1px oklch(1 0 0 / 0.05);
+    0 16px 70px var(--shadow-heavy),
+    0 0 1px var(--shadow-edge);
   overflow: hidden;
 }
 
@@ -74,7 +74,7 @@
 }
 
 [cmdk-item]:active {
-  background: oklch(1 0 0 / 0.05);
+  background: var(--surface-active);
 }
 
 [cmdk-group-heading] {

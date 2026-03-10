@@ -120,6 +120,14 @@
   --fx-aurora-pulse-min: 0.3;
   --fx-aurora-pulse-max: 0.6;
 
+  /* ─── Overlay & Shadow Tokens ─────────────────────────────────────
+   * Backdrop overlays, drop shadows, and edge highlights
+   */
+  --backdrop-overlay: oklch(0 0 0 / 0.5);
+  --shadow-heavy: oklch(0 0 0 / 0.5);
+  --shadow-edge: oklch(1 0 0 / 0.05);
+  --surface-active: oklch(1 0 0 / 0.05);
+
   /* ─── Glass Tokens ────────────────────────────────────────────────
    * Frosted glass effects for overlays and modals
    */
