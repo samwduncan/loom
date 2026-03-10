@@ -49,7 +49,7 @@ function renderWithRouter(initialEntries: string[]) {
 
 describe('App routing', () => {
   beforeEach(() => {
-    useUIStore.setState({ sidebarOpen: true, sidebarState: 'expanded' });
+    useUIStore.setState({ sidebarOpen: true });
     useTimelineStore.getState().reset();
     useStreamStore.getState().reset();
   });

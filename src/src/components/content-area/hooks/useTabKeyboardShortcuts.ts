@@ -29,8 +29,10 @@ export function useTabKeyboardShortcuts(): void {
       const tab = CODE_TO_TAB[e.code];
       if (!tab) return;
 
-      // Don't steal shortcuts from terminal or code editor
-      const target = e.target as HTMLElement | null;
+      // Don't steal shortcuts from terminal or code editor.
+      // Note: this guard only fires for keys that xterm/CodeMirror don't stopPropagation() on.
+      // For keys those libraries claim, the event never reaches document — that's the real protection.
+      const target = e.target as HTMLElement | null; // ASSERT: KeyboardEvent.target is EventTarget; narrowed for DOM closest() access
       if (target && typeof target.closest === 'function' &&
           (target.closest('[data-terminal]') || target.closest('[data-codemirror]'))) {
         return;

@@ -8,13 +8,13 @@
  */
 
 import { create } from 'zustand';
-import type { FileStore } from '@/types/file';
+import type { FileState, FileStore } from '@/types/file';
 
-const INITIAL_FILE_STATE = {
-  expandedDirs: [] as string[],
-  selectedPath: null as string | null,
-  openTabs: [] as { filePath: string; isDirty: boolean }[],
-  activeFilePath: null as string | null,
+const INITIAL_FILE_STATE: FileState = {
+  expandedDirs: [],
+  selectedPath: null,
+  openTabs: [],
+  activeFilePath: null,
 };
 
 export const useFileStore = create<FileStore>()((set) => ({

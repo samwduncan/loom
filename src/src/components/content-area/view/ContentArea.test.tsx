@@ -136,7 +136,7 @@ describe('ContentArea', () => {
     expect(screen.getByTestId('chat-view')).toBeInTheDocument();
   });
 
-  it('each panel is wrapped in PanelErrorBoundary with resetKeys', () => {
+  it('each panel is wrapped in PanelErrorBoundary with scoped resetKeys', () => {
     mockActiveTab = 'chat';
     renderContentArea();
     // Should have 4 error boundaries -- one per panel
@@ -147,9 +147,13 @@ describe('ContentArea', () => {
     expect(panelNames).toContain('files');
     expect(panelNames).toContain('shell');
     expect(panelNames).toContain('git');
-    // Each should have resetKeys with current activeTab
+    // Only the active panel should have resetKeys with activeTab; others get empty array
     for (const b of boundaries) {
-      expect(b.resetKeys).toEqual(['chat']);
+      if (b.panelName === 'chat') {
+        expect(b.resetKeys).toEqual(['chat']);
+      } else {
+        expect(b.resetKeys).toEqual([]);
+      }
     }
   });
 

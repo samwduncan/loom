@@ -37,7 +37,7 @@ function renderSidebar() {
 
 describe('Sidebar', () => {
   beforeEach(() => {
-    useUIStore.setState({ sidebarOpen: true, sidebarState: 'expanded' });
+    useUIStore.setState({ sidebarOpen: true });
     useTimelineStore.setState({
       sessions: [],
       activeSessionId: null,
@@ -72,11 +72,10 @@ describe('Sidebar', () => {
     const button = screen.getByRole('button', { name: /collapse sidebar/i });
     await user.click(button);
     expect(useUIStore.getState().sidebarOpen).toBe(false);
-    expect(useUIStore.getState().sidebarState).toBe('collapsed-hidden');
   });
 
   it('when sidebarOpen is false, renders expand trigger button instead of full sidebar', () => {
-    useUIStore.setState({ sidebarOpen: false, sidebarState: 'collapsed-hidden' });
+    useUIStore.setState({ sidebarOpen: false });
     renderSidebar();
     const expandButton = screen.getByRole('button', { name: /expand sidebar/i });
     expect(expandButton).toBeInTheDocument();
@@ -84,7 +83,7 @@ describe('Sidebar', () => {
   });
 
   it('expand trigger has z-[var(--z-overlay)] positioning', () => {
-    useUIStore.setState({ sidebarOpen: false, sidebarState: 'collapsed-hidden' });
+    useUIStore.setState({ sidebarOpen: false });
     renderSidebar();
     const expandButton = screen.getByRole('button', { name: /expand sidebar/i });
     expect(expandButton.className).toContain('z-[var(--z-overlay)]');

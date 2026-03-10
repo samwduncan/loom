@@ -17,12 +17,12 @@ import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ContentArea } from '@/components/content-area/view/ContentArea';
 
 export const AppShell = memo(function AppShell() {
-  const sidebarState = useUIStore((state) => state.sidebarState);
+  const sidebarOpen = useUIStore((state) => state.sidebarOpen);
 
   return (
     <div
       data-testid="app-shell"
-      data-sidebar-state={sidebarState}
+      data-sidebar-state={sidebarOpen ? 'expanded' : 'collapsed-hidden'}
       className={cn('grid h-dvh overflow-hidden bg-surface-base')}
       style={{
         gridTemplateColumns:

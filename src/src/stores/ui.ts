@@ -1,12 +1,12 @@
 /**
  * UI Store — Layout state, modals, theme, and companion configuration.
  *
- * Expanded from the Phase 3 stub to include full MILESTONES.md schema.
- * Preserves backward-compatible sidebarState and toggleSidebar behavior
- * for AppShell and Sidebar consumers.
- *
- * Uses Persist middleware for theme and sidebar preference only.
+ * Uses Persist middleware for theme, sidebar, and thinking preferences.
  * All modal, command palette, and companion state is ephemeral.
+ *
+ * Sidebar state: `sidebarOpen` is the single source of truth.
+ * Consumers needing `SidebarState` strings should derive inline:
+ *   `sidebarOpen ? 'expanded' : 'collapsed-hidden'`
  *
  * Constitution: Selector-only access (4.2), named actions (4.5), no default export (2.2).
  */
@@ -16,7 +16,6 @@ import { persist } from 'zustand/middleware';
 import type {
   CompanionState,
   ModalState,
-  SidebarState,
   TabId,
   ThemeConfig,
 } from '@/types/ui';
@@ -24,8 +23,6 @@ import type {
 interface UIState {
   // Data
   sidebarOpen: boolean;
-  sidebarCollapsed: boolean;
-  sidebarState: SidebarState;
   activeTab: TabId;
   modalState: ModalState | null;
   commandPaletteOpen: boolean;
@@ -35,7 +32,6 @@ interface UIState {
 
   // Actions
   toggleSidebar: () => void;
-  setSidebarCollapsed: (collapsed: boolean) => void;
   setActiveTab: (tab: TabId) => void;
   openModal: (modal: ModalState) => void;
   closeModal: () => void;
@@ -45,15 +41,13 @@ interface UIState {
   reset: () => void;
 }
 
-const INITIAL_UI_STATE = {
+const INITIAL_UI_STATE: Pick<UIState, 'sidebarOpen' | 'activeTab' | 'modalState' | 'commandPaletteOpen' | 'companionState' | 'theme' | 'thinkingExpanded'> = {
   sidebarOpen: true,
-  sidebarCollapsed: false,
-  sidebarState: 'expanded' as SidebarState,
-  activeTab: 'chat' as TabId,
-  modalState: null as ModalState | null,
+  activeTab: 'chat',
+  modalState: null,
   commandPaletteOpen: false,
-  companionState: null as CompanionState | null,
-  theme: { fontSize: 14, density: 'comfortable' } as ThemeConfig,
+  companionState: null,
+  theme: { fontSize: 14, density: 'comfortable' },
   thinkingExpanded: true,
 };
 
@@ -63,16 +57,7 @@ export const useUIStore = create<UIState>()(
       ...INITIAL_UI_STATE,
 
       toggleSidebar: () => {
-        set((state) => ({
-          sidebarOpen: !state.sidebarOpen,
-          sidebarState: !state.sidebarOpen
-            ? 'expanded'
-            : ('collapsed-hidden' as SidebarState),
-        }));
-      },
-
-      setSidebarCollapsed: (collapsed: boolean) => {
-        set({ sidebarCollapsed: collapsed });
+        set((state) => ({ sidebarOpen: !state.sidebarOpen }));
       },
 
       setActiveTab: (tab: TabId) => {
@@ -107,18 +92,25 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: 'loom-ui',
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         theme: state.theme,
-        sidebarCollapsed: state.sidebarCollapsed,
+        sidebarOpen: state.sidebarOpen,
         thinkingExpanded: state.thinkingExpanded,
       }),
       migrate: (persistedState: unknown, version: number) => {
+        // ASSERT: persistedState is the partialize output from a previous version
         const state = persistedState as Record<string, unknown>;
         if (version < 2) {
           return { ...state, thinkingExpanded: true };
         }
-        // v3: TabId changed from 'chat'|'dashboard'|'settings' to 'chat'|'files'|'shell'|'git' — no persisted fields affected
+        if (version < 4) {
+          // v4: Replaced sidebarCollapsed + sidebarState with sidebarOpen as single source of truth.
+          // sidebarCollapsed was persisted; invert it to get sidebarOpen.
+          const wasCollapsed = state['sidebarCollapsed'] === true;
+          delete state['sidebarCollapsed'];
+          return { ...state, sidebarOpen: !wasCollapsed };
+        }
         return state;
       },
     },

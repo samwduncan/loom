@@ -20,7 +20,7 @@ function renderWithRouter(initialEntries = ['/chat']) {
 
 describe('AppShell', () => {
   beforeEach(() => {
-    useUIStore.setState({ sidebarOpen: true, sidebarState: 'expanded' });
+    useUIStore.setState({ sidebarOpen: true });
   });
 
   it('renders a grid container with data-sidebar-state attribute', () => {
@@ -38,7 +38,7 @@ describe('AppShell', () => {
   });
 
   it('sets data-sidebar-state to collapsed-hidden when sidebar is closed', () => {
-    useUIStore.setState({ sidebarOpen: false, sidebarState: 'collapsed-hidden' });
+    useUIStore.setState({ sidebarOpen: false });
     renderWithRouter();
     const shell = screen.getByTestId('app-shell');
     expect(shell).toHaveAttribute('data-sidebar-state', 'collapsed-hidden');

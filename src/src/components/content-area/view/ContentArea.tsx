@@ -15,7 +15,6 @@
 
 import { useSyncExternalStore } from 'react';
 import { FolderTree, Terminal, GitBranch } from 'lucide-react';
-import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import type { TabId } from '@/types/ui';
 import { TabBar } from './TabBar';
@@ -48,11 +47,11 @@ function getMobileServerSnapshot() {
   return false;
 }
 
-const PANELS: Array<{ id: TabId; content: React.ReactNode }> = [
-  { id: 'chat', content: <ChatView /> },
-  { id: 'files', content: <PanelPlaceholder name="Files" icon={FolderTree} /> },
-  { id: 'shell', content: <PanelPlaceholder name="Shell" icon={Terminal} /> },
-  { id: 'git', content: <PanelPlaceholder name="Git" icon={GitBranch} /> },
+const PANELS: Array<{ id: TabId; content: () => React.ReactNode }> = [
+  { id: 'chat', content: () => <ChatView /> },
+  { id: 'files', content: () => <PanelPlaceholder name="Files" icon={FolderTree} /> },
+  { id: 'shell', content: () => <PanelPlaceholder name="Shell" icon={Terminal} /> },
+  { id: 'git', content: () => <PanelPlaceholder name="Git" icon={GitBranch} /> },
 ];
 
 export function ContentArea() {
@@ -66,9 +65,9 @@ export function ContentArea() {
   const activeTab = isMobile ? 'chat' : rawActiveTab;
 
   return (
-    <div className={cn('flex h-full flex-col')}>
+    <div className="flex h-full flex-col">
       <TabBar />
-      <div className={cn('relative flex-1 min-h-0')}>
+      <div className="relative flex-1 min-h-0">
         {PANELS.map(({ id, content }) => (
           <div
             key={id}
@@ -77,8 +76,8 @@ export function ContentArea() {
             aria-labelledby={`tab-${id}`}
             className={activeTab === id ? 'h-full' : 'hidden'}
           >
-            <PanelErrorBoundary panelName={id} resetKeys={[activeTab]}>
-              {content}
+            <PanelErrorBoundary panelName={id} resetKeys={activeTab === id ? [activeTab] : []}>
+              {content()}
             </PanelErrorBoundary>
           </div>
         ))}

@@ -14,7 +14,7 @@
  * Constitution: Named exports (2.2), no default exports, no any types (5.2).
  */
 
-import { useCallback, type ErrorInfo } from 'react';
+import { type ErrorInfo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   AppErrorFallback,
@@ -94,12 +94,6 @@ export function PanelErrorBoundary({ children, panelName, onResetData, resetKeys
 // ---------- MessageErrorBoundary ----------
 
 export function MessageErrorBoundary({ children, onResetData }: MessageErrorBoundaryProps) {
-  // Stable callback to avoid unnecessary re-renders
-  const handleError = useCallback((error: unknown, info: ErrorInfo) => {
-    console.error('[MessageErrorBoundary]', error);
-    console.error('[MessageErrorBoundary] Component stack:', info.componentStack);
-  }, []);
-
   return (
     <ErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => {
@@ -115,7 +109,10 @@ export function MessageErrorBoundary({ children, onResetData }: MessageErrorBoun
           />
         );
       }}
-      onError={handleError}
+      onError={(error: unknown, info: ErrorInfo) => {
+        console.error('[MessageErrorBoundary]', error);
+        console.error('[MessageErrorBoundary] Component stack:', info.componentStack);
+      }}
     >
       {children}
     </ErrorBoundary>

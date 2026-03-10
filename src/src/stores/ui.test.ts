@@ -1,6 +1,6 @@
 /**
- * UI Store tests — exercises all actions including backward compatibility
- * with AppShell sidebarState.
+ * UI Store tests — exercises all actions including sidebar toggle
+ * and AppShell data-sidebar-state derivation.
  *
  * Uses getState()/setState() directly (exempted from no-external-store-mutation ESLint rule).
  */
@@ -27,26 +27,13 @@ describe('useUIStore', () => {
     expect(useUIStore.getState().sidebarOpen).toBe(true);
   });
 
-  it('toggleSidebar derives sidebarState (backward compatibility with AppShell)', () => {
-    // Initial: sidebarOpen=true -> sidebarState='expanded'
-    expect(useUIStore.getState().sidebarState).toBe('expanded');
-
-    // Toggle to closed -> sidebarState='collapsed-hidden'
+  it('sidebarOpen drives data-sidebar-state derivation (expanded when true, collapsed-hidden when false)', () => {
+    // Consumers derive: sidebarOpen ? 'expanded' : 'collapsed-hidden'
+    expect(useUIStore.getState().sidebarOpen).toBe(true); // -> 'expanded'
     useUIStore.getState().toggleSidebar();
-    expect(useUIStore.getState().sidebarState).toBe('collapsed-hidden');
-
-    // Toggle back to open -> sidebarState='expanded'
+    expect(useUIStore.getState().sidebarOpen).toBe(false); // -> 'collapsed-hidden'
     useUIStore.getState().toggleSidebar();
-    expect(useUIStore.getState().sidebarState).toBe('expanded');
-  });
-
-  // -- setSidebarCollapsed --
-  it('setSidebarCollapsed sets sidebarCollapsed', () => {
-    expect(useUIStore.getState().sidebarCollapsed).toBe(false);
-    useUIStore.getState().setSidebarCollapsed(true);
-    expect(useUIStore.getState().sidebarCollapsed).toBe(true);
-    useUIStore.getState().setSidebarCollapsed(false);
-    expect(useUIStore.getState().sidebarCollapsed).toBe(false);
+    expect(useUIStore.getState().sidebarOpen).toBe(true); // -> 'expanded'
   });
 
   // -- setActiveTab --
@@ -117,8 +104,6 @@ describe('useUIStore', () => {
 
     const state = useUIStore.getState();
     expect(state.sidebarOpen).toBe(true);
-    expect(state.sidebarCollapsed).toBe(false);
-    expect(state.sidebarState).toBe('expanded');
     expect(state.activeTab).toBe('chat');
     expect(state.modalState).toBeNull();
     expect(state.commandPaletteOpen).toBe(false);
@@ -131,8 +116,8 @@ describe('useUIStore', () => {
     expect(useUIStore.getState().theme).toEqual({ fontSize: 14, density: 'comfortable' });
   });
 
-  // -- Initial sidebarState (backward compatibility) --
-  it('initial sidebarState is "expanded" (backward compatibility)', () => {
-    expect(useUIStore.getState().sidebarState).toBe('expanded');
+  // -- Initial sidebarOpen --
+  it('initial sidebarOpen is true', () => {
+    expect(useUIStore.getState().sidebarOpen).toBe(true);
   });
 });
