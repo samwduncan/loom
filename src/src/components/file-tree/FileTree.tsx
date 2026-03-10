@@ -1,51 +1,48 @@
 /**
  * FileTree -- tree container with loading/error/success states.
  *
- * Orchestrates the file tree: fetches data via useFileTree hook, manages
- * search filter and hidden-file visibility, renders FileNode recursively.
+ * Receives tree data as props from FileTreePanel (single hook instance).
+ * Manages search filter and hidden-file visibility, renders FileNode recursively.
  *
  * Constitution: Named export (2.2), selector-only store (4.2),
  * cn() for classes (3.6), design tokens only (3.1).
  */
 
 import { useState, useMemo } from 'react';
-import { useProjectContext } from '@/hooks/useProjectContext';
-import { useFileTree } from '@/hooks/useFileTree';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { FileNode } from './FileNode';
 import { FileTreeSearch } from './FileTreeSearch';
+import { matchesFilter, filterHiddenNodes } from './file-utils';
 import type { FileTreeNode } from '@/types/file';
 
 export interface FileTreeProps {
   className?: string;
+  tree: FileTreeNode[];
+  fetchState: 'idle' | 'loading' | 'error' | 'success';
+  retry: () => void;
+  projectRoot: string | null;
+  projectName: string;
 }
 
-/**
- * Recursively checks if a node or any descendant matches the filter.
- */
-function matchesFilter(node: FileTreeNode, filter: string): boolean {
-  const lower = filter.toLowerCase();
-  if (node.name.toLowerCase().includes(lower)) return true;
-  if (node.type === 'directory' && node.children) {
-    return node.children.some((child) => matchesFilter(child, lower));
-  }
-  return false;
-}
-
-export const FileTree = function FileTree({ className }: FileTreeProps) {
-  const { projectName } = useProjectContext();
-  const { tree, fetchState, retry, projectRoot } = useFileTree(projectName);
+export const FileTree = function FileTree({
+  className,
+  tree,
+  fetchState,
+  retry,
+  projectRoot,
+  projectName,
+}: FileTreeProps) {
   const [filter, setFilter] = useState('');
-  const [showHidden] = useState(false);
+  const showHidden = false;
 
-  // Filter: remove dotfiles if !showHidden, then apply search filter
+  // Filter: remove dotfiles recursively if !showHidden, then apply search filter
   const visibleTree = useMemo(() => {
     let filtered = tree;
 
-    // Hide dotfiles
+    // Hide dotfiles at all nesting levels
     if (!showHidden) {
-      filtered = filtered.filter((node) => !node.name.startsWith('.'));
+      filtered = filterHiddenNodes(filtered);
     }
 
     // Apply search filter
@@ -54,7 +51,7 @@ export const FileTree = function FileTree({ className }: FileTreeProps) {
     }
 
     return filtered;
-  }, [tree, showHidden, filter]);
+  }, [tree, filter]);
 
   // Loading skeleton
   if (fetchState === 'idle' || fetchState === 'loading') {

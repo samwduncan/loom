@@ -74,7 +74,7 @@ describe('FileNode', () => {
     const node = makeDir('src', '/project/src');
     render(<FileNode node={node} depth={0} />);
     await user.click(screen.getByText('src'));
-    expect(useFileStore.getState().expandedDirs).toContain('/project/src');
+    expect(useFileStore.getState().expandedDirs.has('/project/src')).toBe(true);
   });
 
   it('applies active CSS class when file is active', () => {
@@ -89,7 +89,7 @@ describe('FileNode', () => {
     const child = makeFile('index.ts', '/project/src/index.ts');
     const node = makeDir('src', '/project/src', [child]);
     // Expand the directory
-    useFileStore.setState({ expandedDirs: ['/project/src'] });
+    useFileStore.setState({ expandedDirs: new Set(['/project/src']) });
     render(<FileNode node={node} depth={0} />);
     expect(screen.getByText('index.ts')).toBeInTheDocument();
   });

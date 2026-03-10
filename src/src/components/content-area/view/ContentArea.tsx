@@ -48,7 +48,7 @@ function getMobileServerSnapshot() {
   return false;
 }
 
-export function ContentArea() {
+export const ContentArea = function ContentArea() {
   useTabKeyboardShortcuts();
 
   const rawActiveTab = useUIStore((s) => s.activeTab);
@@ -87,4 +87,4 @@ export function ContentArea() {
       </div>
     </div>
   );
-}
+};

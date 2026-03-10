@@ -1,7 +1,7 @@
 /**
  * FileTreeContextMenu -- right-click context menus for file and directory nodes.
  *
- * FileContextMenu: Copy Path, Copy Relative Path, Open in Editor, Open in Terminal.
+ * FileContextMenu: Copy Path, Copy Relative Path, Open in Editor.
  * DirContextMenu: Copy Path, Expand All, Collapse All.
  *
  * Uses shadcn ContextMenu wrapping Radix primitives.
@@ -11,7 +11,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { Copy, FileText, Terminal, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
+import { Copy, FileText, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   ContextMenu,
@@ -21,7 +21,6 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { useFileStore } from '@/stores/file';
-import { useUIStore } from '@/stores/ui';
 import type { FileTreeNode } from '@/types/file';
 
 export interface FileContextMenuProps {
@@ -32,9 +31,7 @@ export interface FileContextMenuProps {
 
 export interface DirContextMenuProps {
   children: ReactNode;
-  dirPath: string;
   node: FileTreeNode;
-  projectRoot: string | null;
 }
 
 /**
@@ -63,31 +60,33 @@ function getAllDirPaths(node: FileTreeNode): string[] {
   return paths;
 }
 
+/**
+ * Copy text to clipboard with toast feedback.
+ */
+function copyToClipboard(text: string): void {
+  navigator.clipboard.writeText(text).then(
+    () => toast.success('Copied to clipboard'),
+    () => toast.error('Failed to copy to clipboard'),
+  );
+}
+
 export const FileContextMenu = function FileContextMenu({
   children,
   filePath,
   projectRoot,
 }: FileContextMenuProps) {
   const openFile = useFileStore((s) => s.openFile);
-  const setActiveTab = useUIStore((s) => s.setActiveTab);
 
   const handleCopyPath = () => {
-    navigator.clipboard.writeText(filePath);
-    toast.success('Copied to clipboard');
+    copyToClipboard(filePath);
   };
 
   const handleCopyRelativePath = () => {
-    navigator.clipboard.writeText(toRelativePath(filePath, projectRoot));
-    toast.success('Copied to clipboard');
+    copyToClipboard(toRelativePath(filePath, projectRoot));
   };
 
   const handleOpenInEditor = () => {
     openFile(filePath);
-  };
-
-  const handleOpenInTerminal = () => {
-    setActiveTab('shell');
-    // TODO: Phase 25 -- send cd command to terminal
   };
 
   return (
@@ -107,10 +106,6 @@ export const FileContextMenu = function FileContextMenu({
           <FileText size={14} />
           Open in Editor
         </ContextMenuItem>
-        <ContextMenuItem onSelect={handleOpenInTerminal}>
-          <Terminal size={14} />
-          Open in Terminal
-        </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   );
@@ -118,16 +113,13 @@ export const FileContextMenu = function FileContextMenu({
 
 export const DirContextMenu = function DirContextMenu({
   children,
-  dirPath: _dirPath,
   node,
-  projectRoot: _projectRoot,
 }: DirContextMenuProps) {
   const expandDirs = useFileStore((s) => s.expandDirs);
   const collapseDirs = useFileStore((s) => s.collapseDirs);
 
   const handleCopyPath = () => {
-    navigator.clipboard.writeText(node.path);
-    toast.success('Copied to clipboard');
+    copyToClipboard(node.path);
   };
 
   const handleExpandAll = () => {

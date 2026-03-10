@@ -13,7 +13,7 @@ import type { FileTreeNode } from '@/types/file';
 
 // Mock toast
 vi.mock('sonner', () => ({
-  toast: { success: vi.fn() },
+  toast: { success: vi.fn(), error: vi.fn() },
 }));
 
 // Reset stores between tests
@@ -56,7 +56,6 @@ describe('FileContextMenu', () => {
     expect(screen.getByText('Copy Path')).toBeInTheDocument();
     expect(screen.getByText('Copy Relative Path')).toBeInTheDocument();
     expect(screen.getByText('Open in Editor')).toBeInTheDocument();
-    expect(screen.getByText('Open in Terminal')).toBeInTheDocument();
   });
 
   it('Copy Path copies absolute path to clipboard', async () => {
@@ -129,7 +128,7 @@ describe('DirContextMenu', () => {
 
   it('renders children', () => {
     render(
-      <DirContextMenu dirPath={dirNode.path} node={dirNode} projectRoot="/home/project">
+      <DirContextMenu node={dirNode}>
         <span>Dir content</span>
       </DirContextMenu>,
     );
@@ -140,7 +139,7 @@ describe('DirContextMenu', () => {
     const { user } = setupWithClipboardSpy();
 
     render(
-      <DirContextMenu dirPath={dirNode.path} node={dirNode} projectRoot="/home/project">
+      <DirContextMenu node={dirNode}>
         <span>Right-click dir</span>
       </DirContextMenu>,
     );
@@ -156,7 +155,7 @@ describe('DirContextMenu', () => {
     const { user } = setupWithClipboardSpy();
 
     render(
-      <DirContextMenu dirPath={dirNode.path} node={dirNode} projectRoot="/home/project">
+      <DirContextMenu node={dirNode}>
         <span>Right-click dir</span>
       </DirContextMenu>,
     );
@@ -165,8 +164,8 @@ describe('DirContextMenu', () => {
     await user.click(screen.getByText('Expand All'));
 
     const { expandedDirs } = useFileStore.getState();
-    expect(expandedDirs).toContain('/home/project/src');
-    expect(expandedDirs).toContain('/home/project/src/utils');
+    expect(expandedDirs.has('/home/project/src')).toBe(true);
+    expect(expandedDirs.has('/home/project/src/utils')).toBe(true);
   });
 
   it('Collapse All removes descendant directories from expandedDirs', async () => {
@@ -174,11 +173,11 @@ describe('DirContextMenu', () => {
 
     // Pre-expand dirs
     useFileStore.setState({
-      expandedDirs: ['/home/project/src', '/home/project/src/utils', '/other/dir'],
+      expandedDirs: new Set(['/home/project/src', '/home/project/src/utils', '/other/dir']),
     });
 
     render(
-      <DirContextMenu dirPath={dirNode.path} node={dirNode} projectRoot="/home/project">
+      <DirContextMenu node={dirNode}>
         <span>Right-click dir</span>
       </DirContextMenu>,
     );
@@ -187,9 +186,9 @@ describe('DirContextMenu', () => {
     await user.click(screen.getByText('Collapse All'));
 
     const { expandedDirs } = useFileStore.getState();
-    expect(expandedDirs).not.toContain('/home/project/src');
-    expect(expandedDirs).not.toContain('/home/project/src/utils');
+    expect(expandedDirs.has('/home/project/src')).toBe(false);
+    expect(expandedDirs.has('/home/project/src/utils')).toBe(false);
     // Should preserve unrelated dirs
-    expect(expandedDirs).toContain('/other/dir');
+    expect(expandedDirs.has('/other/dir')).toBe(true);
   });
 });

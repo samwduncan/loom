@@ -2,7 +2,10 @@
  * FileTreePanel -- split layout with tree sidebar and editor placeholder.
  *
  * Left: 240px (w-60) tree sidebar with header, refresh button, and FileTree.
- * Right: flex-1 editor placeholder (replaced in Plan 03).
+ * Right: flex-1 editor placeholder (replaced in Phase 24).
+ *
+ * Owns the useFileTree hook instance — passes results as props to FileTree
+ * to avoid duplicate fetches.
  *
  * Constitution: Named export (2.2), design tokens only (3.1), cn() for classes (3.6).
  */
@@ -12,7 +15,7 @@ import { cn } from '@/utils/cn';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useFileTree } from '@/hooks/useFileTree';
 import { FileTree } from './FileTree';
-import './file-tree.css';
+import './styles/file-tree.css';
 
 export interface FileTreePanelProps {
   className?: string;
@@ -20,7 +23,7 @@ export interface FileTreePanelProps {
 
 export const FileTreePanel = function FileTreePanel({ className }: FileTreePanelProps) {
   const { projectName } = useProjectContext();
-  const { retry } = useFileTree(projectName);
+  const { tree, fetchState, retry, projectRoot } = useFileTree(projectName);
 
   return (
     <div className={cn('flex h-full', className)}>
@@ -42,7 +45,14 @@ export const FileTreePanel = function FileTreePanel({ className }: FileTreePanel
         </div>
 
         {/* File tree */}
-        <FileTree className="flex-1 min-h-0 flex flex-col" />
+        <FileTree
+          className="flex-1 min-h-0 flex flex-col"
+          tree={tree}
+          fetchState={fetchState}
+          retry={retry}
+          projectRoot={projectRoot}
+          projectName={projectName}
+        />
       </div>
 
       {/* Editor placeholder */}

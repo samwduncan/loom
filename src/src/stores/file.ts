@@ -11,7 +11,7 @@ import { create } from 'zustand';
 import type { FileState, FileStore } from '@/types/file';
 
 const INITIAL_FILE_STATE: FileState = {
-  expandedDirs: [],
+  expandedDirs: new Set<string>(),
   selectedPath: null,
   openTabs: [],
   activeFilePath: null,
@@ -21,11 +21,15 @@ export const useFileStore = create<FileStore>()((set) => ({
   ...INITIAL_FILE_STATE,
 
   toggleDir: (path: string) => {
-    set((state) => ({
-      expandedDirs: state.expandedDirs.includes(path)
-        ? state.expandedDirs.filter((d) => d !== path)
-        : [...state.expandedDirs, path],
-    }));
+    set((state) => {
+      const next = new Set(state.expandedDirs);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return { expandedDirs: next };
+    });
   },
 
   selectPath: (path: string | null) => {
@@ -71,19 +75,22 @@ export const useFileStore = create<FileStore>()((set) => ({
   },
 
   expandDirs: (paths: string[]) => {
-    set((state) => ({
-      expandedDirs: [...new Set([...state.expandedDirs, ...paths])],
-    }));
+    set((state) => {
+      const next = new Set(state.expandedDirs);
+      for (const p of paths) next.add(p);
+      return { expandedDirs: next };
+    });
   },
 
   collapseDirs: (paths: string[]) => {
-    const pathSet = new Set(paths);
-    set((state) => ({
-      expandedDirs: state.expandedDirs.filter((d) => !pathSet.has(d)),
-    }));
+    set((state) => {
+      const next = new Set(state.expandedDirs);
+      for (const p of paths) next.delete(p);
+      return { expandedDirs: next };
+    });
   },
 
   reset: () => {
-    set({ ...INITIAL_FILE_STATE });
+    set({ ...INITIAL_FILE_STATE, expandedDirs: new Set<string>() });
   },
 }));

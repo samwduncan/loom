@@ -15,22 +15,24 @@ describe('useFileStore', () => {
   describe('toggleDir', () => {
     it('adds path to expandedDirs when not present', () => {
       useFileStore.getState().toggleDir('/src');
-      expect(useFileStore.getState().expandedDirs).toEqual(['/src']);
+      expect(useFileStore.getState().expandedDirs.has('/src')).toBe(true);
     });
 
     it('removes path from expandedDirs when already present', () => {
       useFileStore.getState().toggleDir('/src');
       useFileStore.getState().toggleDir('/src');
-      expect(useFileStore.getState().expandedDirs).toEqual([]);
+      expect(useFileStore.getState().expandedDirs.size).toBe(0);
     });
 
     it('handles multiple directories independently', () => {
       useFileStore.getState().toggleDir('/src');
       useFileStore.getState().toggleDir('/lib');
-      expect(useFileStore.getState().expandedDirs).toEqual(['/src', '/lib']);
+      expect(useFileStore.getState().expandedDirs.has('/src')).toBe(true);
+      expect(useFileStore.getState().expandedDirs.has('/lib')).toBe(true);
 
       useFileStore.getState().toggleDir('/src');
-      expect(useFileStore.getState().expandedDirs).toEqual(['/lib']);
+      expect(useFileStore.getState().expandedDirs.has('/lib')).toBe(true);
+      expect(useFileStore.getState().expandedDirs.has('/src')).toBe(false);
     });
   });
 
@@ -149,7 +151,7 @@ describe('useFileStore', () => {
       useFileStore.getState().reset();
 
       const state = useFileStore.getState();
-      expect(state.expandedDirs).toEqual([]);
+      expect(state.expandedDirs.size).toBe(0);
       expect(state.selectedPath).toBeNull();
       expect(state.openTabs).toEqual([]);
       expect(state.activeFilePath).toBeNull();

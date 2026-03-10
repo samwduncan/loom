@@ -4,7 +4,7 @@
  * Consumed by the 5th Zustand store (useFileStore) and future file tree,
  * code editor, and git panel components.
  *
- * Uses string[] for expandedDirs (not Set) to avoid JSON serialization issues.
+ * Uses Set<string> for expandedDirs (O(1) lookups, no persist middleware).
  */
 
 export interface FileTab {
@@ -13,7 +13,7 @@ export interface FileTab {
 }
 
 export interface FileState {
-  expandedDirs: string[];
+  expandedDirs: Set<string>;
   selectedPath: string | null;
   openTabs: FileTab[];
   activeFilePath: string | null;

@@ -16,10 +16,10 @@ import {
   Cog,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { IMAGE_EXTENSIONS } from './file-utils';
 
 const CODE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx']);
 const TEXT_EXTENSIONS = new Set(['.css', '.md', '.txt', '.html', '.htm']);
-const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico']);
 const CONFIG_EXTENSIONS = new Set(['.yaml', '.yml', '.toml', '.env', '.ini', '.conf']);
 
 function getExtension(name: string): string {

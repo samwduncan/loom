@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ImagePreview } from './ImagePreview';
-import { isImageFile } from './image-utils';
+import { isImageFile } from './file-utils';
 
 describe('ImagePreview', () => {
   it('renders dialog with image when open', () => {

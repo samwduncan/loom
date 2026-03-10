@@ -7,7 +7,7 @@
  * Constitution: Named export (2.2), design tokens (3.1), cn() for classes (3.6).
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,11 @@ export const ImagePreview = function ImagePreview({
   projectName,
 }: ImagePreviewProps) {
   const [hasError, setHasError] = useState(false);
+
+  // Reset error state when dialog reopens
+  useEffect(() => {
+    if (open) setHasError(false); // eslint-disable-line react-hooks/set-state-in-effect -- Reset state on prop change
+  }, [open]);
 
   const imageUrl = `/api/projects/${encodeURIComponent(projectName)}/files/content?path=${encodeURIComponent(filePath)}`;
 

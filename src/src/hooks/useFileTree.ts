@@ -6,12 +6,11 @@
  *
  * Uses "adjust state during rendering" pattern for projectName changes
  * (avoids react-hooks/set-state-in-effect violation).
- * Uses queueMicrotask for initial fetch to avoid synchronous setState in effect.
  *
  * Constitution: Named export (2.2), async error handling (8.2).
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { apiFetch } from '@/lib/api-client';
 import type { FileTreeNode } from '@/types/file';
 
@@ -34,7 +33,8 @@ function deriveProjectRoot(tree: FileTreeNode[]): string | null {
   const first = tree[0];
   if (!first) return null;
   const lastSlash = first.path.lastIndexOf('/');
-  return lastSlash > 0 ? first.path.slice(0, lastSlash) : null;
+  if (lastSlash < 0) return null;
+  return lastSlash === 0 ? '/' : first.path.slice(0, lastSlash);
 }
 
 export function useFileTree(projectName: string): UseFileTreeResult {
@@ -42,8 +42,6 @@ export function useFileTree(projectName: string): UseFileTreeResult {
   const [fetchState, setFetchState] = useState<FetchState>(
     projectName ? 'loading' : 'idle',
   );
-  const [projectRoot, setProjectRoot] = useState<string | null>(null);
-  const mountedRef = useRef(true);
   const abortRef = useRef<AbortController | null>(null);
   const [fetchTrigger, setFetchTrigger] = useState(0);
   // Track previous projectName with state for "adjust during rendering" pattern
@@ -55,11 +53,13 @@ export function useFileTree(projectName: string): UseFileTreeResult {
     if (!projectName) {
       setFetchState('idle');
       setTree(EMPTY_TREE);
-      setProjectRoot(null);
     } else {
       setFetchState('loading');
     }
   }
+
+  // Derive projectRoot from tree data (computed, not stored)
+  const projectRoot = useMemo(() => deriveProjectRoot(tree), [tree]);
 
   const doFetch = useCallback(async (name: string, controller: AbortController) => {
     try {
@@ -68,15 +68,16 @@ export function useFileTree(projectName: string): UseFileTreeResult {
         {},
         controller.signal,
       );
-      if (mountedRef.current && !controller.signal.aborted) {
+      if (!controller.signal.aborted) {
         setTree(data);
-        setProjectRoot(deriveProjectRoot(data));
         setFetchState('success');
       }
     } catch (err) {
-      if (mountedRef.current && !(err instanceof DOMException && err.name === 'AbortError')) {
-        setFetchState('error');
-        console.error('Failed to fetch file tree:', err);
+      if (!(err instanceof DOMException && err.name === 'AbortError')) {
+        if (!controller.signal.aborted) {
+          setFetchState('error');
+          console.error('Failed to fetch file tree:', err);
+        }
       }
     }
   }, []);
@@ -86,8 +87,6 @@ export function useFileTree(projectName: string): UseFileTreeResult {
   }, []);
 
   useEffect(() => {
-    mountedRef.current = true;
-
     if (!projectName) return;
 
     // Create abort controller for this effect lifecycle
@@ -99,15 +98,17 @@ export function useFileTree(projectName: string): UseFileTreeResult {
     doFetch(projectName, controller); // eslint-disable-line react-hooks/set-state-in-effect -- Fetching external data is a valid effect use case
 
     const handleProjectsUpdated = () => {
-      // Re-fetch on project update event (async callback, not synchronous in effect)
-      setFetchState('loading');
-      doFetch(projectName, controller);
+      // Abort any in-flight fetch before starting a new one
+      controller.abort();
+      const newController = new AbortController();
+      abortRef.current = newController;
+      setFetchState('loading');  
+      doFetch(projectName, newController);  
     };
 
     window.addEventListener('loom:projects-updated', handleProjectsUpdated);
 
     return () => {
-      mountedRef.current = false;
       controller.abort();
       window.removeEventListener('loom:projects-updated', handleProjectsUpdated);
     };

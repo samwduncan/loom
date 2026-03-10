@@ -21,9 +21,9 @@ import { cn } from '@/utils/cn';
 import { FileIcon } from './FileIcon';
 import { FileContextMenu, DirContextMenu } from './FileTreeContextMenu';
 import { ImagePreview } from './ImagePreview';
-import { isImageFile } from './image-utils';
+import { isImageFile, matchesFilter } from './file-utils';
 import type { FileTreeNode } from '@/types/file';
-import './file-tree.css';
+import './styles/file-tree.css';
 
 export interface FileNodeProps {
   node: FileTreeNode;
@@ -33,44 +33,31 @@ export interface FileNodeProps {
   projectName?: string;
 }
 
-/**
- * Recursively checks if a node or any of its descendants match the filter.
- */
-function matchesFilter(node: FileTreeNode, filter: string): boolean {
-  const lowerFilter = filter.toLowerCase();
-  if (node.name.toLowerCase().includes(lowerFilter)) return true;
-  if (node.type === 'directory' && node.children) {
-    return node.children.some((child) => matchesFilter(child, lowerFilter));
-  }
-  return false;
-}
-
 export const FileNode = memo(function FileNode({ node, depth, filter, projectRoot, projectName }: FileNodeProps) {
-  const isExpanded = useFileStore((s) => s.expandedDirs.includes(node.path));
+  const isExpanded = useFileStore((s) => s.expandedDirs.has(node.path));
   const isActive = useFileStore((s) => s.activeFilePath === node.path);
   const toggleDir = useFileStore((s) => s.toggleDir);
   const openFile = useFileStore((s) => s.openFile);
 
   const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
 
-  const isImage = node.type === 'file' && isImageFile(node.name);
+  const isDirectory = node.type === 'directory';
+  const isImage = !isDirectory && isImageFile(node.name);
 
   const handleClick = useCallback(() => {
-    if (node.type === 'directory') {
+    if (isDirectory) {
       toggleDir(node.path);
     } else if (isImage) {
       setImagePreviewOpen(true);
     } else {
       openFile(node.path);
     }
-  }, [node.type, node.path, toggleDir, openFile, isImage]);
+  }, [isDirectory, node.path, toggleDir, openFile, isImage]);
 
   // Filter check: skip this node if it doesn't match
   if (filter && !matchesFilter(node, filter)) {
     return null;
   }
-
-  const isDirectory = node.type === 'directory';
 
   const rowContent = (
     <button
@@ -110,7 +97,7 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
   );
 
   const wrappedRow = isDirectory ? (
-    <DirContextMenu dirPath={node.path} node={node} projectRoot={projectRoot ?? null}>
+    <DirContextMenu node={node}>
       {rowContent}
     </DirContextMenu>
   ) : (
