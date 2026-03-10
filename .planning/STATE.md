@@ -4,7 +4,7 @@ milestone: v1.2
 milestone_name: "The Workspace"
 status: completed
 stopped_at: Completed 23-03-PLAN.md (context menus, image preview, file opening)
-last_updated: "2026-03-10T23:31:00.000Z"
+last_updated: "2026-03-10T23:36:37.344Z"
 last_activity: 2026-03-10 -- Completed 23-03 context menus, image preview, command palette file opening
 progress:
   total_phases: 7
