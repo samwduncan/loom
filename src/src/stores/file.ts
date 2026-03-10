@@ -1,5 +1,5 @@
 /**
- * File Store — File tree, editor tabs, and file selection state.
+ * File Store -- File tree, editor tabs, and file selection state.
  *
  * 5th Zustand store per M3 architectural decision. No persist middleware
  * (file state is ephemeral per session).
@@ -20,14 +20,55 @@ const INITIAL_FILE_STATE: FileState = {
 export const useFileStore = create<FileStore>()((set) => ({
   ...INITIAL_FILE_STATE,
 
-  // Stub actions — throw in dev to surface wiring mistakes early.
-  // Full implementation deferred to Phase 23 when consumers exist.
-  toggleDir: () => { if (import.meta.env.DEV) throw new Error('FileStore.toggleDir not implemented — Phase 23'); },
-  selectPath: () => { if (import.meta.env.DEV) throw new Error('FileStore.selectPath not implemented — Phase 23'); },
-  openFile: () => { if (import.meta.env.DEV) throw new Error('FileStore.openFile not implemented — Phase 23'); },
-  closeFile: () => { if (import.meta.env.DEV) throw new Error('FileStore.closeFile not implemented — Phase 23'); },
-  setDirty: () => { if (import.meta.env.DEV) throw new Error('FileStore.setDirty not implemented — Phase 23'); },
-  setActiveFile: () => { if (import.meta.env.DEV) throw new Error('FileStore.setActiveFile not implemented — Phase 23'); },
+  toggleDir: (path: string) => {
+    set((state) => ({
+      expandedDirs: state.expandedDirs.includes(path)
+        ? state.expandedDirs.filter((d) => d !== path)
+        : [...state.expandedDirs, path],
+    }));
+  },
+
+  selectPath: (path: string | null) => {
+    set({ selectedPath: path });
+  },
+
+  openFile: (path: string) => {
+    set((state) => {
+      const alreadyOpen = state.openTabs.some((tab) => tab.filePath === path);
+      return {
+        activeFilePath: path,
+        selectedPath: path,
+        openTabs: alreadyOpen
+          ? state.openTabs
+          : [...state.openTabs, { filePath: path, isDirty: false }],
+      };
+    });
+  },
+
+  closeFile: (path: string) => {
+    set((state) => {
+      const remaining = state.openTabs.filter((tab) => tab.filePath !== path);
+      const isClosingActive = state.activeFilePath === path;
+      return {
+        openTabs: remaining,
+        activeFilePath: isClosingActive
+          ? (remaining[remaining.length - 1]?.filePath ?? null)
+          : state.activeFilePath,
+      };
+    });
+  },
+
+  setDirty: (path: string, isDirty: boolean) => {
+    set((state) => ({
+      openTabs: state.openTabs.map((tab) =>
+        tab.filePath === path ? { ...tab, isDirty } : tab,
+      ),
+    }));
+  },
+
+  setActiveFile: (path: string | null) => {
+    set({ activeFilePath: path });
+  },
 
   reset: () => {
     set({ ...INITIAL_FILE_STATE });

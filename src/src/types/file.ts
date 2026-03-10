@@ -30,3 +30,18 @@ export interface FileActions {
 }
 
 export type FileStore = FileState & FileActions;
+
+/**
+ * FileTreeNode -- matches backend response shape from
+ * GET /api/projects/:projectName/files
+ *
+ * Recursive tree structure: directories have children array.
+ */
+export interface FileTreeNode {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  size: number;
+  modified: string | null;
+  children?: FileTreeNode[];
+}
