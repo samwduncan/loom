@@ -17,10 +17,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { SettingsTabSkeleton } from './SettingsTabSkeleton';
 import { AgentsTab } from './AgentsTab';
 import { ApiKeysTab } from './ApiKeysTab';
+import { AppearanceTab } from './AppearanceTab';
 import { GitTab } from './GitTab';
+import { McpTab } from './McpTab';
 import type { SettingsTabId } from '@/types/settings';
 
 const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
@@ -65,13 +66,13 @@ export function SettingsModal() {
               <ApiKeysTab />
             </TabsContent>
             <TabsContent value="appearance">
-              <SettingsTabSkeleton />
+              <AppearanceTab />
             </TabsContent>
             <TabsContent value="git">
               <GitTab />
             </TabsContent>
             <TabsContent value="mcp">
-              <SettingsTabSkeleton />
+              <McpTab />
             </TabsContent>
           </div>
         </Tabs>
