@@ -1,0 +1,100 @@
+/**
+ * Command Palette CSS -- Attribute selectors targeting cmdk data attributes.
+ *
+ * Uses design tokens exclusively per Constitution (3.1, 7.14).
+ * Z-index uses --z-critical to render above Settings modal.
+ */
+
+[cmdk-overlay] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-critical);
+  background: oklch(0 0 0 / 0.5);
+  backdrop-filter: blur(8px);
+}
+
+[cmdk-dialog] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-critical);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20vh;
+}
+
+[cmdk-root] {
+  width: 90vw;
+  max-width: 640px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow:
+    0 16px 70px oklch(0 0 0 / 0.5),
+    0 0 1px oklch(1 0 0 / 0.05);
+  overflow: hidden;
+}
+
+[cmdk-input] {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  outline: none;
+}
+
+[cmdk-input]::placeholder {
+  color: var(--text-muted);
+}
+
+[cmdk-list] {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+  overscroll-behavior: contain;
+}
+
+[cmdk-item] {
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: background var(--duration-fast) ease;
+  user-select: none;
+}
+
+[cmdk-item][data-selected='true'] {
+  background: var(--accent-primary-muted);
+}
+
+[cmdk-item]:active {
+  background: oklch(1 0 0 / 0.05);
+}
+
+[cmdk-group-heading] {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 8px 12px;
+  font-weight: 500;
+}
+
+[cmdk-empty] {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 24px;
+  font-size: 14px;
+}
+
+[cmdk-separator] {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 4px 0;
+}

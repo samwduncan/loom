@@ -22,6 +22,12 @@ const LazySettingsModal = lazy(() =>
   })),
 );
 
+const LazyCommandPalette = lazy(() =>
+  import('@/components/command-palette/CommandPalette').then((m) => ({
+    default: m.CommandPalette,
+  })),
+);
+
 export const AppShell = memo(function AppShell() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
 
@@ -55,6 +61,10 @@ export const AppShell = memo(function AppShell() {
 
     <Suspense fallback={null}>
       <LazySettingsModal />
+    </Suspense>
+
+    <Suspense fallback={null}>
+      <LazyCommandPalette />
     </Suspense>
   </>
   );
