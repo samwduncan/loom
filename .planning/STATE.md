@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
-status: completed
-stopped_at: Phase 21 planned (3 plans, 3 waves)
-last_updated: "2026-03-10T18:56:54.301Z"
-last_activity: 2026-03-10 -- Completed 20-02 content area and tab system
+status: executing
+stopped_at: Completed 21-01-PLAN.md (settings shell)
+last_updated: "2026-03-10T19:09:00Z"
+last_activity: 2026-03-10 -- Completed 21-01 settings shell (primitives, types, hooks, modal)
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 5
-  completed_plans: 2
-  percent: 100
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 20 -- Content Layout + Tab System
+**Current focus:** Phase 21 -- Settings Panel
 
 ## Current Position
 
-Phase: 20 of 26 (Content Layout + Tab System) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase Complete
-Last activity: 2026-03-10 -- Completed 20-02 content area and tab system
+Phase: 21 of 26 (Settings Panel)
+Plan: 1 of 3 in current phase -- COMPLETE
+Status: Executing
+Last activity: 2026-03-10 -- Completed 21-01 settings shell (primitives, types, hooks, modal)
 
-Progress: [██████████] 100% (Phase 20 complete)
+Progress: [██████░░░░] 60% (3/5 plans complete)
 
 ## Performance Metrics
 
@@ -55,6 +55,10 @@ See PROJECT.md Key Decisions table.
 - 20-02: useSyncExternalStore for mobile media query detection (synchronous, no useEffect flash)
 - 20-02: matchMedia per-invocation (not cached) for test mockability
 - 20-02: ChatView rendered by ContentArea directly, /chat/:sessionId? route has element={null} for useParams context
+- 21-01: ThemeConfig extended with codeFontFamily, UI store persist v5 with migration
+- 21-01: ProviderStatus.defaultModel populated client-side (backend doesn't return model info)
+- 21-01: SettingsModal lazy-loaded via React.lazy (not in initial bundle)
+- 21-01: shadcn z-50 replaced with z-index design tokens per Constitution
 
 ### Pending Todos
 
@@ -62,10 +66,10 @@ None.
 
 ### Blockers/Concerns
 
-None -- clean slate for Phase 20.
+None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T18:56:54.300Z
-Stopped at: Phase 21 planned (3 plans, 3 waves)
-Resume: `/gsd:plan-phase 21` or `/gsd:execute-phase 21`
+Last session: 2026-03-10T19:09:00Z
+Stopped at: Completed 21-01-PLAN.md (settings shell)
+Resume: `/gsd:execute-phase 21` (plan 02 next)

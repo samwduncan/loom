@@ -21,9 +21,9 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Settings (SET)
 
-- [ ] **SET-01**: Settings opens as a full-screen modal overlay (portal) accessible from sidebar gear icon and Cmd+K
-- [ ] **SET-02**: Settings modal has 5 tabs: Agents, API Keys, Appearance, Git, MCP
-- [ ] **SET-03**: Settings modal closes on Escape key or clicking backdrop
+- [x] **SET-01**: Settings opens as a full-screen modal overlay (portal) accessible from sidebar gear icon and Cmd+K
+- [x] **SET-02**: Settings modal has 5 tabs: Agents, API Keys, Appearance, Git, MCP
+- [x] **SET-03**: Settings modal closes on Escape key or clicking backdrop
 - [ ] **SET-04**: Agents tab displays connection status (connected/disconnected/error) for Claude, Codex, and Gemini with colored status dots
 - [ ] **SET-05**: Agents tab shows provider version info when connected (model name, CLI version)
 - [ ] **SET-06**: API Keys tab lists existing API keys (masked except last 4 chars) with delete buttons
@@ -38,7 +38,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **SET-15**: MCP tab lists all configured MCP servers per provider (Claude, Codex) with name and status
 - [ ] **SET-16**: MCP tab has "Add Server" form with name, command, args, env fields per provider
 - [ ] **SET-17**: MCP tab allows removing servers with confirmation dialog
-- [ ] **SET-18**: All settings tabs show loading skeletons while fetching data from backend
+- [x] **SET-18**: All settings tabs show loading skeletons while fetching data from backend
 - [ ] **SET-19**: Settings that require server restart display a "(requires restart)" indicator
 - [ ] **SET-20**: GitHub/GitLab credentials section allows adding/viewing/deleting credentials with token masking
 
@@ -225,9 +225,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LAY-07 | Phase 20 | Complete |
 | LAY-08 | Phase 20 | Complete |
 | LAY-09 | Phase 20 | Complete |
-| SET-01 | Phase 21 | Pending |
-| SET-02 | Phase 21 | Pending |
-| SET-03 | Phase 21 | Pending |
+| SET-01 | Phase 21 | Complete |
+| SET-02 | Phase 21 | Complete |
+| SET-03 | Phase 21 | Complete |
 | SET-04 | Phase 21 | Pending |
 | SET-05 | Phase 21 | Pending |
 | SET-06 | Phase 21 | Pending |
@@ -242,7 +242,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-15 | Phase 21 | Pending |
 | SET-16 | Phase 21 | Pending |
 | SET-17 | Phase 21 | Pending |
-| SET-18 | Phase 21 | Pending |
+| SET-18 | Phase 21 | Complete |
 | SET-19 | Phase 21 | Pending |
 | SET-20 | Phase 21 | Pending |
 | CMD-01 | Phase 22 | Pending |
