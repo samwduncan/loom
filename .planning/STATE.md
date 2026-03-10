@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
-status: completed
-stopped_at: Completed 21-03-PLAN.md (appearance & MCP tabs -- phase 21 complete)
-last_updated: "2026-03-10T19:27:43.382Z"
-last_activity: 2026-03-10 -- Completed 21-03 appearance & MCP tabs (phase 21 complete)
+status: in-progress
+stopped_at: Completed 22-01-PLAN.md (command palette foundation)
+last_updated: "2026-03-10T21:09:00Z"
+last_activity: 2026-03-10 -- Completed 22-01 command palette foundation (cmdk + fuse.js + hooks)
 progress:
   total_phases: 7
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_plans: 7
+  completed_plans: 6
+  percent: 86
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 21 -- Settings Panel
+**Current focus:** Phase 22 -- Command Palette
 
 ## Current Position
 
-Phase: 21 of 26 (Settings Panel) -- COMPLETE
-Plan: 3 of 3 in current phase -- COMPLETE
-Status: Phase Complete
-Last activity: 2026-03-10 -- Completed 21-03 appearance & MCP tabs (phase 21 complete)
+Phase: 22 of 26 (Command Palette)
+Plan: 1 of 2 in current phase -- COMPLETE
+Status: In Progress
+Last activity: 2026-03-10 -- Completed 22-01 command palette foundation (cmdk + fuse.js + hooks)
 
-Progress: [██████████] 100% (5/5 plans complete)
+Progress: [████████░░] 86% (6/7 plans complete)
 
 ## Performance Metrics
 
@@ -64,6 +64,9 @@ See PROJECT.md Key Decisions table.
 - 21-02: Git save button dirty-check pattern (local state vs hook data comparison)
 - 21-03: font-[var(--font-code)] Tailwind class instead of inline style for code font preview (Constitution compliance)
 - 21-03: ProviderSection as internal component within McpTab for DRY Claude/Codex sections
+- 22-01: shouldFilter=false on cmdk Command.Dialog -- search orchestrated by useCommandSearch hook
+- 22-01: FetchState enum pattern for async loading -- avoids React lint violations
+- 22-01: cmdk CSS via [cmdk-*] attribute selectors -- Constitution-compliant styling
 
 ### Pending Todos
 
@@ -75,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T19:23:00Z
-Stopped at: Completed 21-03-PLAN.md (appearance & MCP tabs -- phase 21 complete)
-Resume: `/gsd:plan-phase 22` or `/gsd:execute-phase 22`
+Last session: 2026-03-10T21:09:00Z
+Stopped at: Completed 22-01-PLAN.md (command palette foundation)
+Resume: `/gsd:execute-phase 22` (plan 02 remaining)

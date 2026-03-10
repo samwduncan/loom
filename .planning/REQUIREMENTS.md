@@ -44,10 +44,10 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Command Palette (CMD)
 
-- [ ] **CMD-01**: Cmd+K (Mac) / Ctrl+K (Linux/Windows) opens command palette as centered modal overlay with backdrop blur
-- [ ] **CMD-02**: Palette renders as portal above all content, including Settings modal
-- [ ] **CMD-03**: Search input is auto-focused on open with placeholder "Type a command or search..."
-- [ ] **CMD-04**: Escape key or clicking backdrop closes palette
+- [x] **CMD-01**: Cmd+K (Mac) / Ctrl+K (Linux/Windows) opens command palette as centered modal overlay with backdrop blur
+- [x] **CMD-02**: Palette renders as portal above all content, including Settings modal
+- [x] **CMD-03**: Search input is auto-focused on open with placeholder "Type a command or search..."
+- [x] **CMD-04**: Escape key or clicking backdrop closes palette
 - [ ] **CMD-05**: Commands grouped into sections: Navigation, Sessions, Actions, Settings -- each with section header
 - [ ] **CMD-06**: Navigation group includes: Switch to Chat (Cmd+1), Switch to Files (Cmd+2), Switch to Shell (Cmd+3), Switch to Git (Cmd+4), Open Settings
 - [ ] **CMD-07**: Sessions group lists all sessions with fuzzy search matching on title, sorted by recency
@@ -55,9 +55,9 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **CMD-09**: Actions group includes: New Session, Toggle Thinking Visibility, Toggle Sidebar
 - [ ] **CMD-10**: User can type file paths/names to fuzzy-search project files; selecting opens in editor (switches to Files tab)
 - [ ] **CMD-11**: Slash commands (/) are listed and executable from palette -- results shown as toast or inline
-- [ ] **CMD-12**: Arrow keys navigate between items, Enter selects, items show keyboard shortcut hints where applicable
-- [ ] **CMD-13**: Empty state shows "No results found" when search matches nothing
-- [ ] **CMD-14**: Recent/frequent commands appear at top of list when search input is empty
+- [x] **CMD-12**: Arrow keys navigate between items, Enter selects, items show keyboard shortcut hints where applicable
+- [x] **CMD-13**: Empty state shows "No results found" when search matches nothing
+- [x] **CMD-14**: Recent/frequent commands appear at top of list when search input is empty
 - [ ] **CMD-15**: Project switching group lists available projects; selecting switches active project
 
 ### File Tree (FT)
@@ -245,10 +245,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SET-18 | Phase 21 | Complete |
 | SET-19 | Phase 21 | Complete |
 | SET-20 | Phase 21 | Complete |
-| CMD-01 | Phase 22 | Pending |
-| CMD-02 | Phase 22 | Pending |
-| CMD-03 | Phase 22 | Pending |
-| CMD-04 | Phase 22 | Pending |
+| CMD-01 | Phase 22 | Complete |
+| CMD-02 | Phase 22 | Complete |
+| CMD-03 | Phase 22 | Complete |
+| CMD-04 | Phase 22 | Complete |
 | CMD-05 | Phase 22 | Pending |
 | CMD-06 | Phase 22 | Pending |
 | CMD-07 | Phase 22 | Pending |
@@ -256,9 +256,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMD-09 | Phase 22 | Pending |
 | CMD-10 | Phase 22 | Pending |
 | CMD-11 | Phase 22 | Pending |
-| CMD-12 | Phase 22 | Pending |
-| CMD-13 | Phase 22 | Pending |
-| CMD-14 | Phase 22 | Pending |
+| CMD-12 | Phase 22 | Complete |
+| CMD-13 | Phase 22 | Complete |
+| CMD-14 | Phase 22 | Complete |
 | CMD-15 | Phase 22 | Pending |
 | FT-01 | Phase 23 | Pending |
 | FT-02 | Phase 23 | Pending |
