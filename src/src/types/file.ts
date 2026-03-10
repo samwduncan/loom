@@ -26,6 +26,8 @@ export interface FileActions {
   closeFile: (path: string) => void;
   setDirty: (path: string, isDirty: boolean) => void;
   setActiveFile: (path: string | null) => void;
+  expandDirs: (paths: string[]) => void;
+  collapseDirs: (paths: string[]) => void;
   reset: () => void;
 }
 

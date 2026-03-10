@@ -70,6 +70,19 @@ export const useFileStore = create<FileStore>()((set) => ({
     set({ activeFilePath: path });
   },
 
+  expandDirs: (paths: string[]) => {
+    set((state) => ({
+      expandedDirs: [...new Set([...state.expandedDirs, ...paths])],
+    }));
+  },
+
+  collapseDirs: (paths: string[]) => {
+    const pathSet = new Set(paths);
+    set((state) => ({
+      expandedDirs: state.expandedDirs.filter((d) => !pathSet.has(d)),
+    }));
+  },
+
   reset: () => {
     set({ ...INITIAL_FILE_STATE });
   },
