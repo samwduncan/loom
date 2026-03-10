@@ -86,9 +86,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 21-01-PLAN.md -- shadcn primitives, settings types/hooks, modal shell with 5-tab navigation
-- [ ] 21-02-PLAN.md -- Agents tab, API Keys tab with credentials, Git tab
-- [ ] 21-03-PLAN.md -- Appearance tab with live preview, MCP tab
+- [x] 21-01-PLAN.md -- shadcn primitives, settings types/hooks, modal shell with 5-tab navigation
+- [x] 21-02-PLAN.md -- Agents tab, API Keys tab with credentials, Git tab
+- [x] 21-03-PLAN.md -- Appearance tab with live preview, MCP tab
 
 ### Phase 22: Command Palette
 **Goal**: Users can discover and execute any action in the app via a single keyboard shortcut
@@ -100,11 +100,11 @@ Plans:
   3. User can navigate results with arrow keys, select with Enter, and see keyboard shortcut hints on applicable items
   4. Selecting a session switches to Chat tab and navigates to it; selecting a file opens it in the editor (Files tab)
   5. Recent/frequent commands appear when the search input is empty; "No results found" shows when nothing matches
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 22-01: TBD
-- [ ] 22-02: TBD
+- [ ] 22-01-PLAN.md -- Core palette shell (cmdk + fuse.js), CSS, keyboard shortcut, search + recent hooks
+- [ ] 22-02-PLAN.md -- All 7 command groups (Navigation, Session, File, Action, Slash, Project, Recent) + wiring
 
 ### Phase 23: File Tree + File Store
 **Goal**: Users can browse their project's file structure and open files for viewing/editing
@@ -196,4 +196,4 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-10 after Phase 21 planning*
+*Last updated: 2026-03-10 after Phase 22 planning*
