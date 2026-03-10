@@ -1,11 +1,8 @@
 /**
  * UI types — layout state, modal state, companion, and theme configuration.
  *
- * SidebarState migrated from the Phase 3 ui store stub. All types defined
- * here are consumed by the UIStore and UI components.
+ * All types defined here are consumed by the UIStore and UI components.
  */
-
-export type SidebarState = 'expanded' | 'collapsed-hidden';
 
 export type TabId = 'chat' | 'files' | 'shell' | 'git';
 

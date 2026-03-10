@@ -5,7 +5,7 @@
  * All modal, command palette, and companion state is ephemeral.
  *
  * Sidebar state: `sidebarOpen` is the single source of truth.
- * Consumers needing `SidebarState` strings should derive inline:
+ * Consumers needing CSS attribute values derive inline:
  *   `sidebarOpen ? 'expanded' : 'collapsed-hidden'`
  *
  * Constitution: Selector-only access (4.2), named actions (4.5), no default export (2.2).
@@ -100,18 +100,18 @@ export const useUIStore = create<UIState>()(
       }),
       migrate: (persistedState: unknown, version: number) => {
         // ASSERT: persistedState is the partialize output from a previous version
-        const state = persistedState as Record<string, unknown>;
+        // Migrations are chained sequentially — no early returns — so all applicable transforms run.
+        let s = persistedState as Record<string, unknown>; // ASSERT: partialize output from localStorage
         if (version < 2) {
-          return { ...state, thinkingExpanded: true };
+          s = { ...s, thinkingExpanded: true };
         }
         if (version < 4) {
           // v4: Replaced sidebarCollapsed + sidebarState with sidebarOpen as single source of truth.
-          // sidebarCollapsed was persisted; invert it to get sidebarOpen.
-          const wasCollapsed = state['sidebarCollapsed'] === true;
-          delete state['sidebarCollapsed'];
-          return { ...state, sidebarOpen: !wasCollapsed };
+          const wasCollapsed = s['sidebarCollapsed'] === true;
+          delete s['sidebarCollapsed'];
+          s = { ...s, sidebarOpen: !wasCollapsed };
         }
-        return state;
+        return s;
       },
     },
   ),

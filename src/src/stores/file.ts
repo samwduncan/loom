@@ -20,13 +20,14 @@ const INITIAL_FILE_STATE: FileState = {
 export const useFileStore = create<FileStore>()((set) => ({
   ...INITIAL_FILE_STATE,
 
-  // Stub actions — full implementation deferred to Phase 23 when consumers exist
-  toggleDir: () => {},
-  selectPath: () => {},
-  openFile: () => {},
-  closeFile: () => {},
-  setDirty: () => {},
-  setActiveFile: () => {},
+  // Stub actions — throw in dev to surface wiring mistakes early.
+  // Full implementation deferred to Phase 23 when consumers exist.
+  toggleDir: () => { if (import.meta.env.DEV) throw new Error('FileStore.toggleDir not implemented — Phase 23'); },
+  selectPath: () => { if (import.meta.env.DEV) throw new Error('FileStore.selectPath not implemented — Phase 23'); },
+  openFile: () => { if (import.meta.env.DEV) throw new Error('FileStore.openFile not implemented — Phase 23'); },
+  closeFile: () => { if (import.meta.env.DEV) throw new Error('FileStore.closeFile not implemented — Phase 23'); },
+  setDirty: () => { if (import.meta.env.DEV) throw new Error('FileStore.setDirty not implemented — Phase 23'); },
+  setActiveFile: () => { if (import.meta.env.DEV) throw new Error('FileStore.setActiveFile not implemented — Phase 23'); },
 
   reset: () => {
     set({ ...INITIAL_FILE_STATE });

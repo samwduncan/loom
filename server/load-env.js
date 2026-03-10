@@ -27,3 +27,9 @@ try {
 if (!process.env.DATABASE_PATH) {
   process.env.DATABASE_PATH = path.join(os.homedir(), '.cloudcli', 'auth.db');
 }
+
+// Strip Claude Code session detection variables so Loom can spawn
+// independent Claude sessions even when started from within Claude Code.
+delete process.env.CLAUDECODE;
+delete process.env.CLAUDE_CODE_ENTRYPOINT;
+delete process.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS;

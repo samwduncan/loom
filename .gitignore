@@ -129,4 +129,13 @@ dev-debug.log
 
 # Task files
 tasks.json
-tasks/ 
+tasks/
+.gemini-agent-id
+
+# V1 archive (reference only, not tracked)
+.planning/v1-archive/
+
+# Transient artifacts
+*.png
+!public/**/*.png
+!src/public/**/*.png

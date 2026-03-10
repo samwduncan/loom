@@ -13,7 +13,7 @@
  * token-based styling (3.1).
  */
 
-import { useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 import { FolderTree, Terminal, GitBranch } from 'lucide-react';
 import { useUIStore } from '@/stores/ui';
 import type { TabId } from '@/types/ui';
@@ -47,13 +47,6 @@ function getMobileServerSnapshot() {
   return false;
 }
 
-const PANELS: Array<{ id: TabId; content: () => React.ReactNode }> = [
-  { id: 'chat', content: () => <ChatView /> },
-  { id: 'files', content: () => <PanelPlaceholder name="Files" icon={FolderTree} /> },
-  { id: 'shell', content: () => <PanelPlaceholder name="Shell" icon={Terminal} /> },
-  { id: 'git', content: () => <PanelPlaceholder name="Git" icon={GitBranch} /> },
-];
-
 export function ContentArea() {
   useTabKeyboardShortcuts();
 
@@ -64,11 +57,20 @@ export function ContentArea() {
   const isMobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServerSnapshot);
   const activeTab = isMobile ? 'chat' : rawActiveTab;
 
+  // Stable element references — created once per mount, inside React's render cycle
+  // so context is available. useMemo([]) = mount-once, matching the CSS show/hide pattern.
+  const panels = useMemo<Array<{ id: TabId; content: React.ReactNode }>>(() => [
+    { id: 'chat', content: <ChatView /> },
+    { id: 'files', content: <PanelPlaceholder name="Files" icon={FolderTree} /> },
+    { id: 'shell', content: <PanelPlaceholder name="Shell" icon={Terminal} /> },
+    { id: 'git', content: <PanelPlaceholder name="Git" icon={GitBranch} /> },
+  ], []);
+
   return (
     <div className="flex h-full flex-col">
       <TabBar />
       <div className="relative flex-1 min-h-0">
-        {PANELS.map(({ id, content }) => (
+        {panels.map(({ id, content }) => (
           <div
             key={id}
             id={`panel-${id}`}
@@ -77,7 +79,7 @@ export function ContentArea() {
             className={activeTab === id ? 'h-full' : 'hidden'}
           >
             <PanelErrorBoundary panelName={id} resetKeys={activeTab === id ? [activeTab] : []}>
-              {content()}
+              {content}
             </PanelErrorBoundary>
           </div>
         ))}

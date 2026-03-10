@@ -82,7 +82,7 @@ const WATCHER_IGNORED_PATTERNS = [
     '**/*.swp',
     '**/.DS_Store'
 ];
-const WATCHER_DEBOUNCE_MS = 300;
+const WATCHER_DEBOUNCE_MS = 1500; // Increased from 300ms — session list refresh doesn't need sub-second updates
 let projectsWatchers = [];
 let projectsWatcherDebounceTimer = null;
 const connectedClients = new Set();
@@ -177,17 +177,18 @@ async function setupProjectsWatcher() {
                 persistent: true,
                 ignoreInitial: true, // Don't fire events for existing files on startup
                 followSymlinks: false,
-                depth: 10, // Reasonable depth limit
+                depth: 3, // .claude/projects/[dir]/[file].jsonl is only 2 levels deep
                 awaitWriteFinish: {
-                    stabilityThreshold: 100, // Wait 100ms for file to stabilize
-                    pollInterval: 50
+                    stabilityThreshold: 2000, // Wait 2s for file to stabilize (JSONL files are written continuously)
+                    pollInterval: 500 // Poll every 500ms instead of 50ms (10x CPU reduction)
                 }
             });
 
             // Set up event listeners
             watcher
                 .on('add', (filePath) => debouncedUpdate('add', filePath, provider, rootPath))
-                .on('change', (filePath) => debouncedUpdate('change', filePath, provider, rootPath))
+                // .on('change') removed: JSONL files are written continuously by active Claude sessions.
+                // Changes don't affect the session list — only add/unlink matter for discovery.
                 .on('unlink', (filePath) => debouncedUpdate('unlink', filePath, provider, rootPath))
                 .on('addDir', (dirPath) => debouncedUpdate('addDir', dirPath, provider, rootPath))
                 .on('unlinkDir', (dirPath) => debouncedUpdate('unlinkDir', dirPath, provider, rootPath))
@@ -1221,17 +1222,23 @@ function handleShellConnection(ws) {
                     const termRows = data.rows || 24;
                     console.log('📐 Using terminal dimensions:', termCols, 'x', termRows);
 
+                    const ptyEnv = {
+                            ...process.env,
+                            TERM: 'xterm-256color',
+                            COLORTERM: 'truecolor',
+                            FORCE_COLOR: '3'
+                        };
+                    // Ensure spawned shells can create independent Claude sessions
+                    delete ptyEnv.CLAUDECODE;
+                    delete ptyEnv.CLAUDE_CODE_ENTRYPOINT;
+                    delete ptyEnv.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS;
+
                     shellProcess = pty.spawn(shell, shellArgs, {
                         name: 'xterm-256color',
                         cols: termCols,
                         rows: termRows,
                         cwd: os.homedir(),
-                        env: {
-                            ...process.env,
-                            TERM: 'xterm-256color',
-                            COLORTERM: 'truecolor',
-                            FORCE_COLOR: '3'
-                        }
+                        env: ptyEnv
                     });
 
                     console.log('🟢 Shell process started with PTY, PID:', shellProcess.pid);
