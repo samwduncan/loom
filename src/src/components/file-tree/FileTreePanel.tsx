@@ -1,16 +1,17 @@
 /**
  * FileTreePanel -- split layout with tree sidebar and editor placeholder.
  *
- * Left: 240px (w-60) tree sidebar with header and refresh button.
- * Right: flex-1 editor placeholder.
- *
- * Tree content and editor are placeholders for Plan 02 and Plan 03.
+ * Left: 240px (w-60) tree sidebar with header, refresh button, and FileTree.
+ * Right: flex-1 editor placeholder (replaced in Plan 03).
  *
  * Constitution: Named export (2.2), design tokens only (3.1), cn() for classes (3.6).
  */
 
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { useProjectContext } from '@/hooks/useProjectContext';
+import { useFileTree } from '@/hooks/useFileTree';
+import { FileTree } from './FileTree';
 import './file-tree.css';
 
 export interface FileTreePanelProps {
@@ -18,6 +19,9 @@ export interface FileTreePanelProps {
 }
 
 export const FileTreePanel = function FileTreePanel({ className }: FileTreePanelProps) {
+  const { projectName } = useProjectContext();
+  const { retry } = useFileTree(projectName);
+
   return (
     <div className={cn('flex h-full', className)}>
       {/* Tree sidebar */}
@@ -31,17 +35,14 @@ export const FileTreePanel = function FileTreePanel({ className }: FileTreePanel
             type="button"
             className="p-1 rounded-sm text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Refresh file tree"
+            onClick={retry}
           >
             <RefreshCw size={14} />
           </button>
         </div>
 
-        {/* Tree content placeholder -- replaced by FileTree in Plan 02 */}
-        <div className="flex-1 overflow-y-auto px-1 py-1">
-          <div className="px-2 py-1 text-xs text-muted-foreground">
-            File tree loading...
-          </div>
-        </div>
+        {/* File tree */}
+        <FileTree className="flex-1 min-h-0 flex flex-col" />
       </div>
 
       {/* Editor placeholder */}

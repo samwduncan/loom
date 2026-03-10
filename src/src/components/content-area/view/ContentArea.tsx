@@ -14,7 +14,7 @@
  */
 
 import { useMemo, useSyncExternalStore } from 'react';
-import { FolderTree, Terminal, GitBranch } from 'lucide-react';
+import { Terminal, GitBranch } from 'lucide-react';
 import { useUIStore } from '@/stores/ui';
 import type { TabId } from '@/types/ui';
 import { TabBar } from './TabBar';
@@ -22,6 +22,7 @@ import { PanelPlaceholder } from './PanelPlaceholder';
 import { useTabKeyboardShortcuts } from '../hooks/useTabKeyboardShortcuts';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ChatView } from '@/components/chat/view/ChatView';
+import { FileTreePanel } from '@/components/file-tree/FileTreePanel';
 
 // Mobile detection via matchMedia. Functions are called by useSyncExternalStore.
 // matchMedia is called per-invocation (not cached) to support test mocking.
@@ -61,7 +62,7 @@ export function ContentArea() {
   // so context is available. useMemo([]) = mount-once, matching the CSS show/hide pattern.
   const panels = useMemo<Array<{ id: TabId; content: React.ReactNode }>>(() => [
     { id: 'chat', content: <ChatView /> },
-    { id: 'files', content: <PanelPlaceholder name="Files" icon={FolderTree} /> },
+    { id: 'files', content: <FileTreePanel /> },
     { id: 'shell', content: <PanelPlaceholder name="Shell" icon={Terminal} /> },
     { id: 'git', content: <PanelPlaceholder name="Git" icon={GitBranch} /> },
   ], []);
