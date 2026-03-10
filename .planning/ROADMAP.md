@@ -70,8 +70,8 @@
 **Plans**: 2 plans
 
 Plans:
-- [ ] 20-01-PLAN.md -- Types + stores (TabId update, file store, UI store migration)
-- [ ] 20-02-PLAN.md -- TabBar, ContentArea, keyboard shortcuts, AppShell/App.tsx rewiring
+- [x] 20-01-PLAN.md -- Types + stores (TabId update, file store, UI store migration)
+- [x] 20-02-PLAN.md -- TabBar, ContentArea, keyboard shortcuts, AppShell/App.tsx rewiring
 
 ### Phase 21: Settings Panel
 **Goal**: Users can view and manage all application settings (agents, API keys, appearance, git config, MCP servers) from within the app
@@ -83,12 +83,12 @@ Plans:
   3. User can add, view (masked), and delete API keys with confirmation dialogs and success/error feedback
   4. User can change font size with a slider and see it apply immediately without page reload
   5. User can add/remove MCP servers per provider, and settings that require restart are clearly marked
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 21-01: TBD
-- [ ] 21-02: TBD
-- [ ] 21-03: TBD
+- [ ] 21-01-PLAN.md -- shadcn primitives, settings types/hooks, modal shell with 5-tab navigation
+- [ ] 21-02-PLAN.md -- Agents tab, API Keys tab with credentials, Git tab
+- [ ] 21-03-PLAN.md -- Appearance tab with live preview, MCP tab
 
 ### Phase 22: Command Palette
 **Goal**: Users can discover and execute any action in the app via a single keyboard shortcut
@@ -196,4 +196,4 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-10 after Phase 20 planning*
+*Last updated: 2026-03-10 after Phase 21 planning*
