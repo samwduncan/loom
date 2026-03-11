@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
-status: completed
-stopped_at: Completed 23-03-PLAN.md (context menus, image preview, file opening)
-last_updated: "2026-03-10T23:36:37.344Z"
-last_activity: 2026-03-10 -- Completed 23-03 context menus, image preview, command palette file opening
+status: in-progress
+stopped_at: Completed 24-01-PLAN.md (code editor core)
+last_updated: "2026-03-11T00:20:00Z"
+last_activity: 2026-03-11 -- Completed 24-01 code editor core (CodeMirror 6, OKLCH theme, hooks, guards)
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 11
+  completed_plans: 11
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 23 -- File Tree
+**Current focus:** Phase 24 -- Code Editor
 
 ## Current Position
 
-Phase: 23 of 26 (File Tree + File Store)
-Plan: 3 of 3 in current phase
-Status: Phase 23 Complete
-Last activity: 2026-03-10 -- Completed 23-03 context menus, image preview, command palette file opening
+Phase: 24 of 26 (Code Editor)
+Plan: 1 of 3 in current phase
+Status: Plan 24-01 Complete
+Last activity: 2026-03-11 -- Completed 24-01 code editor core (CodeMirror 6, OKLCH theme, hooks, guards)
 
-Progress: [██████████] 100% (10/10 plans complete)
+Progress: [███████████] 100% (11/11 plans complete)
 
 ## Performance Metrics
 
@@ -82,6 +82,11 @@ See PROJECT.md Key Decisions table.
 - 23-03: expandDirs/collapseDirs as named store actions (not external setState)
 - 23-03: isImageFile extracted to image-utils.ts for react-refresh compatibility
 - 23-03: vi.spyOn clipboard AFTER user-event setup to avoid replacement conflicts
+- 24-01: EditorView.theme() with CSS var() over createTheme() -- runtime design system sync
+- 24-01: Module-level _saveFn binding for Cmd+S keymap -- avoids refs-during-render lint violation
+- 24-01: domEventHandlers (not keymap.of) for save -- works with module-level function without render-time ref access
+- 24-01: Const object pattern over enum for FetchState -- erasableSyntaxOnly compatibility
+- 24-01: CSS custom property --editor-font-size on wrapper div -- avoids inline style lint violation
 
 ### Pending Todos
 
@@ -93,6 +98,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:31:00.000Z
-Stopped at: Completed 23-03-PLAN.md (context menus, image preview, file opening)
-Resume: Phase 23 complete. Next: `/gsd:plan-phase 24` (Terminal)
+Last session: 2026-03-11T00:20:00Z
+Stopped at: Completed 24-01-PLAN.md (code editor core)
+Resume: Continue Phase 24. Next: `/gsd:execute-plan 24-02` (tab bar and save wiring)

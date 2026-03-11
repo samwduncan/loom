@@ -81,10 +81,10 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Code Editor (ED)
 
-- [ ] **ED-01**: CodeMirror 6 editor renders in right panel of Files tab with syntax highlighting for 50+ languages
-- [ ] **ED-02**: Language grammar loaded dynamically based on file extension (not bundled at module level)
-- [ ] **ED-03**: Editor uses custom OKLCH theme built from design system tokens (--color-* CSS variables)
-- [ ] **ED-04**: Editor displays line numbers in gutter
+- [x] **ED-01**: CodeMirror 6 editor renders in right panel of Files tab with syntax highlighting for 50+ languages
+- [x] **ED-02**: Language grammar loaded dynamically based on file extension (not bundled at module level)
+- [x] **ED-03**: Editor uses custom OKLCH theme built from design system tokens (--color-* CSS variables)
+- [x] **ED-04**: Editor displays line numbers in gutter
 - [ ] **ED-05**: User can edit file content; modified files show unsaved indicator (dot) on their tab
 - [ ] **ED-06**: User can save file with Cmd+S / Ctrl+S -- writes back to backend via PUT endpoint
 - [ ] **ED-07**: Save shows success/error toast; error toast includes reason (permission denied, file not found, etc.)
@@ -92,15 +92,15 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **ED-09**: File tabs show filename; hovering shows full path in tooltip
 - [ ] **ED-10**: File tabs have close button (x); closing last tab shows empty state ("Open a file from the tree or Cmd+K")
 - [ ] **ED-11**: Closing a tab with unsaved changes shows confirmation dialog ("Save / Discard / Cancel")
-- [ ] **ED-12**: Cmd+F / Ctrl+F opens CodeMirror's built-in search within active file
-- [ ] **ED-13**: User can toggle word wrap via button in editor header
+- [x] **ED-12**: Cmd+F / Ctrl+F opens CodeMirror's built-in search within active file
+- [x] **ED-13**: User can toggle word wrap via button in editor header
 - [ ] **ED-14**: Editor supports diff view mode -- shows unified or side-by-side diff using @codemirror/merge
 - [ ] **ED-15**: Diff view activated when opening files from git panel's changed files list
 - [ ] **ED-16**: Clicking a file path in a chat tool card (Read, Edit, Write) switches to Files tab and opens that file in the editor
-- [ ] **ED-17**: Editor is lazy-loaded via React.lazy() + Suspense with loading skeleton -- not in initial bundle
-- [ ] **ED-18**: Binary files show "Binary file -- cannot display" message instead of editor
-- [ ] **ED-19**: Large files (>1MB) show warning before loading with option to proceed or cancel
-- [ ] **ED-20**: Editor panel shows breadcrumb path of active file above the editor surface
+- [x] **ED-17**: Editor is lazy-loaded via React.lazy() + Suspense with loading skeleton -- not in initial bundle
+- [x] **ED-18**: Binary files show "Binary file -- cannot display" message instead of editor
+- [x] **ED-19**: Large files (>1MB) show warning before loading with option to proceed or cancel
+- [x] **ED-20**: Editor panel shows breadcrumb path of active file above the editor surface
 
 ### Terminal (TERM)
 
@@ -276,10 +276,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FT-14 | Phase 23 | Complete |
 | FT-15 | Phase 23 | Complete |
 | FT-16 | Phase 23 | Complete |
-| ED-01 | Phase 24 | Pending |
-| ED-02 | Phase 24 | Pending |
-| ED-03 | Phase 24 | Pending |
-| ED-04 | Phase 24 | Pending |
+| ED-01 | Phase 24 | Complete |
+| ED-02 | Phase 24 | Complete |
+| ED-03 | Phase 24 | Complete |
+| ED-04 | Phase 24 | Complete |
 | ED-05 | Phase 24 | Pending |
 | ED-06 | Phase 24 | Pending |
 | ED-07 | Phase 24 | Pending |
@@ -287,15 +287,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ED-09 | Phase 24 | Pending |
 | ED-10 | Phase 24 | Pending |
 | ED-11 | Phase 24 | Pending |
-| ED-12 | Phase 24 | Pending |
-| ED-13 | Phase 24 | Pending |
+| ED-12 | Phase 24 | Complete |
+| ED-13 | Phase 24 | Complete |
 | ED-14 | Phase 24 | Pending |
 | ED-15 | Phase 24 | Pending |
 | ED-16 | Phase 24 | Pending |
-| ED-17 | Phase 24 | Pending |
-| ED-18 | Phase 24 | Pending |
-| ED-19 | Phase 24 | Pending |
-| ED-20 | Phase 24 | Pending |
+| ED-17 | Phase 24 | Complete |
+| ED-18 | Phase 24 | Complete |
+| ED-19 | Phase 24 | Complete |
+| ED-20 | Phase 24 | Complete |
 | TERM-01 | Phase 25 | Pending |
 | TERM-02 | Phase 25 | Pending |
 | TERM-03 | Phase 25 | Pending |
