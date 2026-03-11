@@ -13,6 +13,7 @@ import { useGitStatus } from '@/hooks/useGitStatus';
 import { GitPanelSkeleton } from '@/components/git/GitPanelSkeleton';
 import { GitPanelHeader } from '@/components/git/GitPanelHeader';
 import { ChangesView } from '@/components/git/ChangesView';
+import { HistoryView } from '@/components/git/HistoryView';
 import type { GitSubView } from '@/types/git';
 import './git-panel.css';
 
@@ -70,7 +71,7 @@ export function GitPanel() {
             <ChangesView files={data.files} refetchStatus={refetch} />
           )}
           {activeView === 'history' && (
-            <div data-testid="history-view">History view</div>
+            <HistoryView projectName={projectName} />
           )}
         </div>
       )}

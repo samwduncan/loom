@@ -328,6 +328,121 @@
   background: var(--surface-raised);
 }
 
+.git-commit-row[data-expanded="true"] {
+  background: var(--surface-raised);
+}
+
+.git-commit-row-main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.git-commit-hash {
+  font-family: var(--font-code);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.git-commit-message {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.git-commit-row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.git-commit-author {
+  font-weight: 500;
+}
+
+.git-commit-date {
+  color: var(--text-muted);
+}
+
+.git-commit-expanded {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.git-commit-stats {
+  font-size: var(--text-xs);
+  font-family: var(--font-code);
+  color: var(--text-secondary);
+}
+
+.git-commit-diff-loading {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  padding: var(--space-2) 0;
+}
+
+.git-commit-diff {
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  font-size: var(--text-xs);
+  font-family: var(--font-code);
+  color: var(--text-secondary);
+  background: var(--surface-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre;
+  line-height: 1.5;
+}
+
+/* History view */
+.git-history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.git-history-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+}
+
+.git-commit-row-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+.git-skeleton-line {
+  height: 12px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-sm);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.git-skeleton-short {
+  width: 40%;
+}
+
+.git-skeleton-long {
+  width: 80%;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
 /* Changes view */
 .git-changes-view {
   display: flex;
