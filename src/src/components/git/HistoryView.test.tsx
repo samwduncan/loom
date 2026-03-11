@@ -2,7 +2,7 @@
  * HistoryView tests -- commit list rendering, expand/collapse, loading/empty states.
  */
 
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -83,8 +83,7 @@ describe('HistoryView', () => {
     // Click first commit row
     const firstRow = screen.getByText('abc1234').closest('[data-testid="commit-row"]');
     expect(firstRow).toBeTruthy();
-    // ASSERT: firstRow is non-null (checked above)
-    await user.click(firstRow!);
+    await user.click(firstRow!); // ASSERT: firstRow is non-null (checked above)
 
     // Stats should be visible
     expect(screen.getByText(/3 files changed/)).toBeInTheDocument();
@@ -102,12 +101,11 @@ describe('HistoryView', () => {
     render(<HistoryView projectName="test-project" />);
 
     const firstRow = screen.getByText('abc1234').closest('[data-testid="commit-row"]');
-    // ASSERT: firstRow is non-null
-    await user.click(firstRow!);
+    await user.click(firstRow!); // ASSERT: firstRow is non-null (getByText guarantees element exists)
     expect(screen.getByText(/3 files changed/)).toBeInTheDocument();
 
     // Click again to collapse
-    await user.click(firstRow!);
+    await user.click(firstRow!); // ASSERT: same element as above
     expect(screen.queryByText(/3 files changed/)).not.toBeInTheDocument();
   });
 
