@@ -10,7 +10,7 @@
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface LargeFileWarningProps {
+export interface LargeFileWarningProps {
   filePath: string;
   fileSize: number;
   onProceed: () => void;

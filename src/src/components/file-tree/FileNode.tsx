@@ -50,9 +50,9 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
     } else if (isImage) {
       setImagePreviewOpen(true);
     } else {
-      openFile(node.path);
+      openFile(node.path, node.size);
     }
-  }, [isDirectory, node.path, toggleDir, openFile, isImage]);
+  }, [isDirectory, node.path, node.size, toggleDir, openFile, isImage]);
 
   // Filter check: skip this node if it doesn't match
   if (filter && !matchesFilter(node, filter)) {

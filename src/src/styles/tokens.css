@@ -32,6 +32,8 @@
    * Hue ~70 for warm complementary accent
    */
   --accent-secondary: oklch(0.72 0.14 70);
+  --search-match-bg: oklch(0.72 0.14 70 / 0.3);
+  --search-match-selected-bg: oklch(0.72 0.14 70 / 0.5);
 
   /* ─── Status Colors (DS-01) ───────────────────────────────────────
    * Warm-tinted, high readability against dark surfaces

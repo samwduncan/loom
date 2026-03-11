@@ -10,6 +10,7 @@
 export interface FileTab {
   filePath: string;
   isDirty: boolean;
+  fileSize?: number;
 }
 
 export interface FileState {
@@ -22,7 +23,7 @@ export interface FileState {
 export interface FileActions {
   toggleDir: (path: string) => void;
   selectPath: (path: string | null) => void;
-  openFile: (path: string) => void;
+  openFile: (path: string, fileSize?: number) => void;
   closeFile: (path: string) => void;
   setDirty: (path: string, isDirty: boolean) => void;
   setActiveFile: (path: string | null) => void;

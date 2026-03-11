@@ -11,6 +11,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { apiFetch } from '@/lib/api-client';
 import { useFileStore } from '@/stores/file';
+import { originalCache } from '@/components/editor/content-cache';
 
 export function useFileSave(projectName: string): {
   save: (filePath: string, content: string) => Promise<boolean>;
@@ -33,6 +34,7 @@ export function useFileSave(projectName: string): {
           },
         );
         setDirty(filePath, false);
+        originalCache.set(filePath, content);
         toast.success('File saved');
         return true;
       } catch (err: unknown) {

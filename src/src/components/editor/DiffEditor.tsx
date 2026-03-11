@@ -25,7 +25,7 @@ import './editor.css';
 const Original = CodeMirrorMerge.Original;
 const Modified = CodeMirrorMerge.Modified;
 
-interface DiffEditorProps {
+export interface DiffEditorProps {
   oldContent: string;
   newContent: string;
   filePath: string;

@@ -12,3 +12,9 @@ export const contentCache = new Map<string, string>();
 
 /** Original (fetched) content per file path, for dirty detection */
 export const originalCache = new Map<string, string>();
+
+/** Evict both caches for a file path (call on tab close) */
+export function evictFileCache(path: string): void {
+  contentCache.delete(path);
+  originalCache.delete(path);
+}

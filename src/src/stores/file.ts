@@ -36,7 +36,7 @@ export const useFileStore = create<FileStore>()((set) => ({
     set({ selectedPath: path });
   },
 
-  openFile: (path: string) => {
+  openFile: (path: string, fileSize?: number) => {
     set((state) => {
       const alreadyOpen = state.openTabs.some((tab) => tab.filePath === path);
       return {
@@ -44,7 +44,7 @@ export const useFileStore = create<FileStore>()((set) => ({
         selectedPath: path,
         openTabs: alreadyOpen
           ? state.openTabs
-          : [...state.openTabs, { filePath: path, isDirty: false }],
+          : [...state.openTabs, { filePath: path, isDirty: false, fileSize }],
       };
     });
   },

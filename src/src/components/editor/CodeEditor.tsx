@@ -35,11 +35,13 @@ import { Button } from '@/components/ui/button';
 import './editor.css';
 
 /**
- * Cmd+S save extension -- reads active path from file store at keystroke time.
- * Built once (no ref access during render). The save function is looked up
- * from the module-level binding updated via effect.
+ * Module-level save function binding for Cmd+S keymap extension.
+ * Keyed by mount ID to be StrictMode-safe: each mount/unmount cycle
+ * registers and deregisters its own save function. Only the latest
+ * registered mount's function is used.
  */
 let _saveFn: ((path: string, content: string) => Promise<boolean>) | null = null;
+let _saveFnMountId = 0;
 
 const saveKeymapExtension = EditorView.domEventHandlers({
   keydown(event: KeyboardEvent, view: EditorView) {
@@ -58,7 +60,7 @@ const saveKeymapExtension = EditorView.domEventHandlers({
 
 export function CodeEditor() {
   const activeFilePath = useFileStore((s) => s.activeFilePath);
-  const setDirty = useFileStore((s) => s.setDirty);
+  const activeTab = useFileStore((s) => s.openTabs.find((t) => t.filePath === s.activeFilePath));
   const setActiveFile = useFileStore((s) => s.setActiveFile);
   const { projectName } = useProjectContext();
   const fontSize = useUIStore((s) => s.theme.fontSize);
@@ -66,6 +68,7 @@ export function CodeEditor() {
   const { content, loading, error, isBinary, isLarge, proceed } = useFileContent(
     projectName,
     activeFilePath,
+    activeTab?.fileSize,
   );
   const { save } = useFileSave(projectName);
 
@@ -74,17 +77,21 @@ export function CodeEditor() {
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [prevFilePath, setPrevFilePath] = useState<string | null>(activeFilePath);
 
+  // Keep module-level save function in sync (StrictMode-safe via mount ID)
+  useEffect(() => {
+    const id = ++_saveFnMountId;
+    _saveFn = save;
+    return () => {
+      // Only clear if this mount's ID is still current (prevents StrictMode race)
+      if (_saveFnMountId === id) _saveFn = null;
+    };
+  }, [save]);
+
   // "Adjust state during rendering" -- reset lang extension on path change
   if (activeFilePath !== prevFilePath) {
     setPrevFilePath(activeFilePath);
     setLangExtension(null);
   }
-
-  // Keep module-level save function in sync
-  useEffect(() => {
-    _saveFn = save;
-    return () => { _saveFn = null; };
-  }, [save]);
 
   // Load language grammar when active file changes
   useEffect(() => {
@@ -101,7 +108,11 @@ export function CodeEditor() {
   // Populate caches when content loads from backend
   useEffect(() => {
     if (activeFilePath && content !== null) {
-      if (!contentCache.has(activeFilePath)) {
+      const prevOriginal = originalCache.get(activeFilePath);
+      const cached = contentCache.get(activeFilePath);
+      // If cache exists and matches old original (no user edits), update with fresh content
+      // If cache doesn't exist, populate it. If user edited, preserve their edits.
+      if (!cached || cached === prevOriginal) {
         contentCache.set(activeFilePath, content);
       }
       originalCache.set(activeFilePath, content);
@@ -122,12 +133,13 @@ export function CodeEditor() {
 
   const handleChange = useCallback(
     (value: string) => {
-      if (!activeFilePath) return;
-      contentCache.set(activeFilePath, value);
-      const original = originalCache.get(activeFilePath);
-      setDirty(activeFilePath, value !== original);
+      const path = useFileStore.getState().activeFilePath; // ASSERT: read from store to avoid stale closure on rapid tab switch
+      if (!path) return;
+      contentCache.set(path, value);
+      const original = originalCache.get(path);
+      useFileStore.getState().setDirty(path, value !== original);
     },
-    [activeFilePath, setDirty],
+    [],
   );
 
   const handleUpdate = useCallback((update: ViewUpdate) => {
@@ -168,7 +180,7 @@ export function CodeEditor() {
     return (
       <LargeFileWarning
         filePath={activeFilePath}
-        fileSize={0}
+        fileSize={activeTab?.fileSize ?? 0}
         onProceed={proceed}
         onCancel={() => setActiveFile(null)}
       />

@@ -9,7 +9,7 @@
 
 import { FileX } from 'lucide-react';
 
-interface BinaryPlaceholderProps {
+export interface BinaryPlaceholderProps {
   filePath: string;
 }
 

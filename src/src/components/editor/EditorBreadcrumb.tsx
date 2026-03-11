@@ -7,7 +7,7 @@
  * Constitution: Named export (2.2), design tokens only (7.14).
  */
 
-interface EditorBreadcrumbProps {
+export interface EditorBreadcrumbProps {
   filePath: string;
 }
 

@@ -29,18 +29,9 @@ export const EditToolCard = memo(function EditToolCard({
     typeof input.new_string === 'string' ? input.new_string : null;
 
   const diffLines = useMemo((): DiffLine[] | null => {
-    // Both present: compute diff
+    // Both present (including empty old_string): compute diff
     if (oldString != null && newString != null) {
       return computeDiff(oldString, newString, 3);
-    }
-    // Only new_string (empty old_string): pure addition
-    if (oldString != null && oldString === '' && newString != null) {
-      return newString.split('\n').map((line, i) => ({
-        type: 'added' as const,
-        content: line,
-        oldLineNo: null,
-        newLineNo: i + 1,
-      }));
     }
     // Only new_string, old_string missing entirely
     if (oldString == null && newString != null) {
@@ -133,7 +124,11 @@ const BG_MAP: Record<DiffLine['type'], string> = {
   context: '',
 };
 
-function DiffLineRow({ line }: { line: DiffLine }) {
+interface DiffLineRowProps {
+  line: DiffLine;
+}
+
+function DiffLineRow({ line }: DiffLineRowProps) {
   return (
     <div className={cn('flex', BG_MAP[line.type])}>
       {/* Old line number gutter */}

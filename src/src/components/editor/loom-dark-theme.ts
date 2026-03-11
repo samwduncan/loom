@@ -41,11 +41,11 @@ const loomEditorTheme = EditorView.theme(
       backgroundColor: 'var(--surface-active)',
     },
     '.cm-searchMatch': {
-      backgroundColor: 'oklch(0.72 0.14 70 / 0.3)',
-      outline: '1px solid oklch(0.72 0.14 70 / 0.5)',
+      backgroundColor: 'var(--search-match-bg)',
+      outline: '1px solid var(--search-match-selected-bg)',
     },
     '.cm-searchMatch.cm-searchMatch-selected': {
-      backgroundColor: 'oklch(0.72 0.14 70 / 0.5)',
+      backgroundColor: 'var(--search-match-selected-bg)',
     },
     '.cm-foldPlaceholder': {
       backgroundColor: 'var(--surface-overlay)',

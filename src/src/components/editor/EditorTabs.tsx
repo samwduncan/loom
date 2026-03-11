@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useFileStore } from '@/stores/file';
+import { evictFileCache } from '@/components/editor/content-cache';
 import type { FileTab } from '@/types/file';
 import {
   AlertDialog,
@@ -38,11 +39,12 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
 
   if (openTabs.length === 0) return null;
 
-  function handleClose(e: React.MouseEvent, tab: FileTab) {
+  function handleClose(e: React.SyntheticEvent, tab: FileTab) {
     e.stopPropagation();
     if (tab.isDirty) {
       setDirtyCloseTarget(tab);
     } else {
+      evictFileCache(tab.filePath);
       closeFile(tab.filePath);
     }
   }
@@ -51,6 +53,7 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
     if (!dirtyCloseTarget) return;
     const success = await onSave(dirtyCloseTarget.filePath);
     if (success) {
+      evictFileCache(dirtyCloseTarget.filePath);
       closeFile(dirtyCloseTarget.filePath);
     }
     setDirtyCloseTarget(null);
@@ -58,6 +61,7 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
 
   function handleDiscard() {
     if (!dirtyCloseTarget) return;
+    evictFileCache(dirtyCloseTarget.filePath);
     closeFile(dirtyCloseTarget.filePath);
     setDirtyCloseTarget(null);
   }
@@ -98,7 +102,7 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    handleClose(e as unknown as React.MouseEvent, tab);
+                    handleClose(e, tab);
                   }
                 }}
               >
