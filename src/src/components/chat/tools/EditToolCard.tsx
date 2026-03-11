@@ -12,6 +12,7 @@ import { memo, useMemo } from 'react';
 import { FilePen } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { computeDiff } from '@/lib/diff-parser';
+import { useOpenInEditor } from '@/hooks/useOpenInEditor';
 import type { DiffLine } from '@/lib/diff-parser';
 import type { ToolCardProps } from '@/lib/tool-registry';
 
@@ -19,6 +20,7 @@ export const EditToolCard = memo(function EditToolCard({
   input,
   output,
 }: ToolCardProps) {
+  const openInEditor = useOpenInEditor();
   const filePath =
     typeof input.file_path === 'string' ? input.file_path : 'unknown';
   const oldString =
@@ -72,9 +74,14 @@ export const EditToolCard = memo(function EditToolCard({
         )}
       >
         <FilePen size={14} className="text-[var(--text-muted)] shrink-0" />
-        <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--text-muted)] truncate">
+        <button
+          type="button"
+          onClick={() => openInEditor(filePath)}
+          aria-label={`Open ${filePath} in editor`}
+          className="font-[family-name:var(--font-mono)] text-xs text-[var(--text-muted)] truncate hover:text-foreground hover:underline cursor-pointer transition-colors"
+        >
           {filePath}
-        </span>
+        </button>
       </div>
 
       {/* Diff content */}

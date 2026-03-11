@@ -14,6 +14,7 @@ import { memo, useState, useEffect, useDeferredValue, useCallback } from 'react'
 import { FileText, Copy, Check } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { highlightCode, getLanguageFromPath } from '@/lib/shiki-highlighter';
+import { useOpenInEditor } from '@/hooks/useOpenInEditor';
 import type { ToolCardProps } from '@/lib/tool-registry';
 
 const READ_TRUNCATION_THRESHOLD = 100;
@@ -62,6 +63,7 @@ export const FileContentCard = memo(function FileContentCard({
   const [copied, setCopied] = useState(false);
   const [html, setHtml] = useState<string | null>(null);
   const deferredHtml = useDeferredValue(html);
+  const openInEditor = useOpenInEditor();
 
   const allLines = content?.split('\n') ?? [];
   const remaining = allLines.length - threshold;
@@ -107,9 +109,14 @@ export const FileContentCard = memo(function FileContentCard({
       >
         <div className="flex items-center gap-1.5 min-w-0">
           <span className="text-[var(--text-muted)]">{icon}</span>
-          <span className="font-[family-name:var(--font-mono)] text-xs text-[var(--text-muted)] truncate">
+          <button
+            type="button"
+            onClick={() => openInEditor(filePath)}
+            aria-label={`Open ${filePath} in editor`}
+            className="font-[family-name:var(--font-mono)] text-xs text-[var(--text-muted)] truncate hover:text-foreground hover:underline cursor-pointer transition-colors"
+          >
             {filePath}
-          </span>
+          </button>
         </div>
         {content != null && (
           <button
