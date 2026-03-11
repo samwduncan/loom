@@ -14,6 +14,31 @@ vi.mock('@/hooks/useGitStatus', () => ({
   useGitStatus: (...args: unknown[]) => mockUseGitStatus(...args),
 }));
 
+// Mock useGitOperations (used by ChangesView)
+vi.mock('@/hooks/useGitOperations', () => ({
+  useGitOperations: () => ({
+    commit: vi.fn(),
+    discard: vi.fn(),
+    deleteUntracked: vi.fn(),
+    generateCommitMessage: vi.fn(),
+    push: vi.fn(),
+    pull: vi.fn(),
+    fetch: vi.fn(),
+    checkout: vi.fn(),
+    createBranch: vi.fn(),
+  }),
+}));
+
+// Mock useOpenInEditor (used by ChangesView)
+vi.mock('@/hooks/useOpenInEditor', () => ({
+  useOpenInEditor: () => vi.fn(),
+}));
+
+// Mock sonner toast (used by CommitComposer)
+vi.mock('sonner', () => ({
+  toast: { success: vi.fn(), error: vi.fn() },
+}));
+
 import { GitPanel } from '@/components/git/GitPanel';
 
 describe('GitPanel', () => {
@@ -92,12 +117,13 @@ describe('GitPanel', () => {
 
     render(<GitPanel />);
 
-    // Initially shows Changes content
-    expect(screen.getByText(/changes view/i)).toBeInTheDocument();
+    // Initially shows Changes content (ChangesView with empty files shows "No changes")
+    expect(screen.getByText(/no changes/i)).toBeInTheDocument();
 
     // Click History tab
     await user.click(screen.getByRole('button', { name: /history/i }));
 
+    // History view is still a placeholder
     expect(screen.getByText(/history view/i)).toBeInTheDocument();
   });
 
