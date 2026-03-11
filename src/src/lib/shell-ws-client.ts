@@ -1,0 +1,167 @@
+/**
+ * Shell WebSocket client — manages connection to the /shell endpoint.
+ *
+ * Each terminal panel gets its own ShellWebSocketClient instance (not a
+ * singleton like the chat WebSocketClient). No auto-reconnect -- the user
+ * clicks Reconnect explicitly.
+ *
+ * Constitution: Named exports only (2.2), no default export, no React deps.
+ */
+
+import type {
+  ShellConnectionState,
+  ShellClientMessage,
+  ShellServerMessage,
+} from '@/types/shell';
+
+export class ShellWebSocketClient {
+  private ws: WebSocket | null = null;
+  private _state: ShellConnectionState = 'disconnected';
+  private lastParams: {
+    token: string;
+    projectPath: string;
+    isPlainShell: boolean;
+    cols: number;
+    rows: number;
+  } | null = null;
+
+  // Callbacks — set by consumers before connect()
+  onOutput: ((data: string) => void) | null = null;
+  onAuthUrl: ((url: string, autoOpen: boolean) => void) | null = null;
+  onStateChange: ((state: ShellConnectionState) => void) | null = null;
+
+  /**
+   * Current connection state.
+   */
+  get state(): ShellConnectionState {
+    return this._state;
+  }
+
+  /**
+   * Open a WebSocket connection to the /shell endpoint.
+   */
+  connect(params: {
+    token: string;
+    projectPath: string;
+    isPlainShell: boolean;
+    cols: number;
+    rows: number;
+  }): void {
+    // Clean up any existing connection
+    if (this.ws) {
+      this.disconnect();
+    }
+
+    this.lastParams = params;
+    this.setState('connecting');
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const url = `${protocol}//${window.location.host}/shell?token=${params.token}`;
+
+    this.ws = new WebSocket(url);
+
+    this.ws.addEventListener('open', this.handleOpen);
+    this.ws.addEventListener('message', this.handleMessage);
+    this.ws.addEventListener('close', this.handleClose);
+    this.ws.addEventListener('error', this.handleError);
+  }
+
+  /**
+   * Send terminal input data to the backend.
+   */
+  sendInput(data: string): void {
+    this.send({ type: 'input', data });
+  }
+
+  /**
+   * Notify backend of terminal resize.
+   */
+  sendResize(cols: number, rows: number): void {
+    this.send({ type: 'resize', cols, rows });
+  }
+
+  /**
+   * Cleanly close the WebSocket connection.
+   */
+  disconnect(): void {
+    if (this.ws) {
+      this.ws.removeEventListener('open', this.handleOpen);
+      this.ws.removeEventListener('message', this.handleMessage);
+      this.ws.removeEventListener('close', this.handleClose);
+      this.ws.removeEventListener('error', this.handleError);
+      this.ws.close(1000);
+      this.ws = null;
+    }
+    this.setState('disconnected');
+  }
+
+  /**
+   * Disconnect and reconnect with the same parameters.
+   */
+  restart(): void {
+    const params = this.lastParams;
+    this.disconnect();
+    if (params) {
+      this.connect(params);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Private
+  // ---------------------------------------------------------------------------
+
+  private setState(newState: ShellConnectionState): void {
+    this._state = newState;
+    this.onStateChange?.(newState);
+  }
+
+  private send(msg: ShellClientMessage): void {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(msg));
+    }
+  }
+
+  private handleOpen = (): void => {
+    this.setState('connected');
+
+    if (this.lastParams) {
+      const { projectPath, isPlainShell, cols, rows } = this.lastParams;
+      this.send({
+        type: 'init',
+        projectPath,
+        provider: 'claude',
+        isPlainShell,
+        cols,
+        rows,
+      });
+    }
+  };
+
+  private handleMessage = (event: MessageEvent): void => {
+    let parsed: ShellServerMessage;
+    try {
+      parsed = JSON.parse(event.data as string) as ShellServerMessage;
+    } catch {
+      console.warn('[ShellWS] Failed to parse message:', event.data);
+      return;
+    }
+
+    switch (parsed.type) {
+      case 'output':
+        this.onOutput?.(parsed.data);
+        break;
+      case 'auth_url':
+        this.onAuthUrl?.(parsed.url, parsed.autoOpen);
+        break;
+    }
+  };
+
+  private handleClose = (): void => {
+    this.ws = null;
+    this.setState('disconnected');
+  };
+
+  private handleError = (): void => {
+    // Close event will follow and handle state transition
+  };
+}
