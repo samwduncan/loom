@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: in_progress
-stopped_at: Completed 25-01-PLAN.md (terminal infrastructure)
-last_updated: "2026-03-11T01:19:29Z"
-last_activity: 2026-03-11 -- Completed 25-01 terminal infrastructure (xterm deps, shell types, WS client, theme)
+stopped_at: Completed 25-02-PLAN.md (terminal UI components)
+last_updated: "2026-03-11T01:27:00Z"
+last_activity: 2026-03-11 -- Completed 25-02 terminal UI (TerminalView, Header, Overlay, Panel, ContentArea wiring)
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 16
-  completed_plans: 14
-  percent: 87
+  completed_plans: 15
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 25 (Terminal) -- Plan 01 complete, Plan 02 next
+**Current focus:** Phase 25 (Terminal) -- Plan 02 complete, Plan 03 next (if exists)
 
 ## Current Position
 
 Phase: 25 of 26 (Terminal)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In Progress
-Last activity: 2026-03-11 -- Completed 25-01 terminal infrastructure (xterm deps, shell types, WS client, theme)
+Last activity: 2026-03-11 -- Completed 25-02 terminal UI (TerminalView, Header, Overlay, Panel, ContentArea wiring)
 
-Progress: [█████████████████] 100% (14/16 plans complete)
+Progress: [██████████████████] 100% (15/16 plans complete)
 
 ## Performance Metrics
 
@@ -96,6 +96,9 @@ See PROJECT.md Key Decisions table.
 - 25-01: Null-check (== null) ref init pattern for ShellWebSocketClient in useShellWebSocket -- avoids refs-during-render lint violation
 - 25-01: addEventListener/removeEventListener on shell WS (not onopen/onclose) for cleaner cleanup
 - 25-01: Shell WS per-instance (not singleton) -- each terminal panel gets its own ShellWebSocketClient
+- 25-02: Props callback pattern (onData/onResize/onReady) for TerminalView -- pure xterm wrapper, parent owns WS hook
+- 25-02: writeRef pattern: parent stores terminal.write fn via onReady, routes WS output through ref
+- 25-02: Class-based mocks for xterm.js constructors in vitest (vi.fn() not usable as constructor)
 
 ### Pending Todos
 
@@ -107,6 +110,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T01:19:29Z
-Stopped at: Completed 25-01-PLAN.md (terminal infrastructure)
-Resume: Next plan. `/gsd:execute-phase 25` (Plan 02 - TerminalView)
+Last session: 2026-03-11T01:27:00Z
+Stopped at: Completed 25-02-PLAN.md (terminal UI components)
+Resume: Next plan. `/gsd:execute-phase 25` (Plan 03 if exists, or phase complete)

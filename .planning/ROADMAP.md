@@ -52,7 +52,7 @@
 - [x] **Phase 22: Command Palette** - Cmd+K overlay with fuzzy search, session/file/command navigation (completed 2026-03-10)
 - [x] **Phase 23: File Tree + File Store** - Hierarchical file browser, file type icons, context menus, lazy-load directories (completed 2026-03-10)
 - [x] **Phase 24: Code Editor** - CodeMirror 6 with syntax highlighting, file tabs, read/write, diff view, OKLCH theme (completed 2026-03-11)
-- [ ] **Phase 25: Terminal** - xterm.js terminal with separate /shell WebSocket, auto-resize, connection state
+- [x] **Phase 25: Terminal** - xterm.js terminal with separate /shell WebSocket, auto-resize, connection state (completed 2026-03-11)
 - [ ] **Phase 26: Git Panel + Navigation** - Changes/history views, staging, commit, branch ops, session management
 
 ## Phase Details
@@ -187,7 +187,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 22. Command Palette | 2/2 | Complete    | 2026-03-10 | - |
 | 23. File Tree + File Store | 3/3 | Complete    | 2026-03-10 | - |
 | 24. Code Editor | 3/3 | Complete    | 2026-03-11 | - |
-| 25. Terminal | 1/2 | In Progress|  | - |
+| 25. Terminal | 2/2 | Complete   | 2026-03-11 | - |
 | 26. Git Panel + Navigation | v1.2 | 0/3 | Not started | - |
 
 ## Backlog (Future Milestones)

@@ -104,21 +104,21 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Terminal (TERM)
 
-- [ ] **TERM-01**: Shell tab renders xterm.js terminal with full PTY emulation and ANSI 256-color support
+- [x] **TERM-01**: Shell tab renders xterm.js terminal with full PTY emulation and ANSI 256-color support
 - [x] **TERM-02**: Terminal connects via separate WebSocket to /shell endpoint (independent from chat WS)
-- [ ] **TERM-03**: Terminal auto-resizes to fill container using @xterm/addon-fit, debounced to prevent layout thrashing
-- [ ] **TERM-04**: URLs in terminal output are clickable and open in new browser tab via @xterm/addon-web-links
-- [ ] **TERM-05**: Connection state indicator in panel header: connecting (yellow pulse), connected (green dot), disconnected (red dot)
+- [x] **TERM-03**: Terminal auto-resizes to fill container using @xterm/addon-fit, debounced to prevent layout thrashing
+- [x] **TERM-04**: URLs in terminal output are clickable and open in new browser tab via @xterm/addon-web-links
+- [x] **TERM-05**: Connection state indicator in panel header: connecting (yellow pulse), connected (green dot), disconnected (red dot)
 - [x] **TERM-06**: Terminal opens with working directory set to active project root
 - [x] **TERM-07**: Plain shell mode available (no AI provider attached) -- dropdown or toggle in header
 - [x] **TERM-08**: Auth URLs from CLI providers are detected and displayed as clickable links
-- [ ] **TERM-09**: Header has Restart and Disconnect buttons with icons and tooltips
-- [ ] **TERM-10**: Terminal is lazy-loaded via React.lazy() + Suspense -- not in initial bundle
-- [ ] **TERM-11**: Terminal stays DOM-mounted when switching to other tabs (CSS display:none) -- session state preserved
+- [x] **TERM-09**: Header has Restart and Disconnect buttons with icons and tooltips
+- [x] **TERM-10**: Terminal is lazy-loaded via React.lazy() + Suspense -- not in initial bundle
+- [x] **TERM-11**: Terminal stays DOM-mounted when switching to other tabs (CSS display:none) -- session state preserved
 - [x] **TERM-12**: React strict mode double-mount handled via ref-based WebSocket guard (no duplicate PTY sessions)
-- [ ] **TERM-13**: Disconnected state shows reconnect button and "Session ended" message overlay
+- [x] **TERM-13**: Disconnected state shows reconnect button and "Session ended" message overlay
 - [x] **TERM-14**: Terminal uses custom OKLCH-derived color scheme matching design system (not default xterm colors)
-- [ ] **TERM-15**: Copy/paste works via Cmd+C / Cmd+V within terminal
+- [x] **TERM-15**: Copy/paste works via Cmd+C / Cmd+V within terminal
 
 ### Git Panel (GIT)
 
@@ -296,21 +296,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ED-18 | Phase 24 | Complete |
 | ED-19 | Phase 24 | Complete |
 | ED-20 | Phase 24 | Complete |
-| TERM-01 | Phase 25 | Pending |
+| TERM-01 | Phase 25 | Complete |
 | TERM-02 | Phase 25 | Complete |
-| TERM-03 | Phase 25 | Pending |
-| TERM-04 | Phase 25 | Pending |
-| TERM-05 | Phase 25 | Pending |
+| TERM-03 | Phase 25 | Complete |
+| TERM-04 | Phase 25 | Complete |
+| TERM-05 | Phase 25 | Complete |
 | TERM-06 | Phase 25 | Complete |
 | TERM-07 | Phase 25 | Complete |
 | TERM-08 | Phase 25 | Complete |
-| TERM-09 | Phase 25 | Pending |
-| TERM-10 | Phase 25 | Pending |
-| TERM-11 | Phase 25 | Pending |
+| TERM-09 | Phase 25 | Complete |
+| TERM-10 | Phase 25 | Complete |
+| TERM-11 | Phase 25 | Complete |
 | TERM-12 | Phase 25 | Complete |
-| TERM-13 | Phase 25 | Pending |
+| TERM-13 | Phase 25 | Complete |
 | TERM-14 | Phase 25 | Complete |
-| TERM-15 | Phase 25 | Pending |
+| TERM-15 | Phase 25 | Complete |
 | GIT-01 | Phase 26 | Pending |
 | GIT-02 | Phase 26 | Pending |
 | GIT-03 | Phase 26 | Pending |
