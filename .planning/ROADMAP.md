@@ -136,9 +136,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 24-01-PLAN.md -- CM6 deps, OKLCH theme, language loader, file hooks, CodeEditor component, breadcrumb, binary/large guards
-- [ ] 24-02-PLAN.md -- EditorTabs with dirty indicators and close confirmation, wire CodeEditor into FileTreePanel via React.lazy
-- [ ] 24-03-PLAN.md -- DiffEditor merge view, useFileDiff hook, clickable file paths in tool cards
+- [x] 24-01-PLAN.md -- CM6 deps, OKLCH theme, language loader, file hooks, CodeEditor component, breadcrumb, binary/large guards
+- [x] 24-02-PLAN.md -- EditorTabs with dirty indicators and close confirmation, wire CodeEditor into FileTreePanel via React.lazy
+- [x] 24-03-PLAN.md -- DiffEditor merge view, useFileDiff hook, clickable file paths in tool cards
 
 ### Phase 25: Terminal
 **Goal**: Users can run shell commands directly within Loom without switching to an external terminal
@@ -150,11 +150,11 @@ Plans:
   3. User sees connection state (connecting/connected/disconnected) in the header and can restart or reconnect
   4. Terminal auto-resizes to fill the available space when the browser window resizes
   5. Copy/paste works via Cmd+C/V, and URLs in terminal output are clickable
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 25-01: TBD
-- [ ] 25-02: TBD
+- [ ] 25-01-PLAN.md -- Types, deps, OKLCH terminal theme, shell WebSocket client + hook
+- [ ] 25-02-PLAN.md -- TerminalView, TerminalHeader, TerminalOverlay, TerminalPanel, ContentArea wiring
 
 ### Phase 26: Git Panel + Navigation
 **Goal**: Users can manage git operations (stage, commit, branch, push/pull) and organize their sessions without leaving Loom
@@ -196,4 +196,4 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-11 after Phase 24 planning*
+*Last updated: 2026-03-11 after Phase 25 planning*
