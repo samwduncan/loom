@@ -25,6 +25,7 @@ export type ShellClientMessage =
   | {
       type: 'init';
       projectPath: string;
+      isPlainShell: boolean;
       cols: number;
       rows: number;
     }

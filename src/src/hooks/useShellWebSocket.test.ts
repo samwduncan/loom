@@ -154,6 +154,7 @@ describe('ShellWebSocketClient', () => {
       JSON.stringify({
         type: 'init',
         projectPath: '/home/user/project',
+        isPlainShell: true,
         cols: 120,
         rows: 40,
       }),

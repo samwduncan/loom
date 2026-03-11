@@ -145,6 +145,7 @@ export class ShellWebSocketClient {
       this.send({
         type: 'init',
         projectPath,
+        isPlainShell: true,
         cols,
         rows,
       });
