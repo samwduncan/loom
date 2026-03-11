@@ -14,19 +14,24 @@
  */
 
 import { lazy, Suspense, useMemo, useSyncExternalStore } from 'react';
-import { GitBranch } from 'lucide-react';
 import { useUIStore } from '@/stores/ui';
 import type { TabId } from '@/types/ui';
 import { TabBar } from './TabBar';
-import { PanelPlaceholder } from './PanelPlaceholder';
 import { useTabKeyboardShortcuts } from '../hooks/useTabKeyboardShortcuts';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ChatView } from '@/components/chat/view/ChatView';
 import { FileTreePanel } from '@/components/file-tree/FileTreePanel';
+import { GitPanelSkeleton } from '@/components/git/GitPanelSkeleton';
 
 const LazyTerminalPanel = lazy(() =>
   import('@/components/terminal/TerminalPanel').then((mod) => ({
     default: mod.TerminalPanel,
+  })),
+);
+
+const LazyGitPanel = lazy(() =>
+  import('@/components/git/GitPanel').then((mod) => ({
+    default: mod.GitPanel,
   })),
 );
 
@@ -78,7 +83,7 @@ export const ContentArea = function ContentArea() {
     { id: 'chat', content: <ChatView /> },
     { id: 'files', content: <FileTreePanel /> },
     { id: 'shell', content: <Suspense fallback={<TerminalSkeleton />}><LazyTerminalPanel /></Suspense> },
-    { id: 'git', content: <PanelPlaceholder name="Git" icon={GitBranch} /> },
+    { id: 'git', content: <Suspense fallback={<GitPanelSkeleton />}><LazyGitPanel /></Suspense> },
   ], []);
 
   return (
