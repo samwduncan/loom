@@ -21,7 +21,7 @@ import { ProviderLogo } from './ProviderLogo';
 import type { ProviderId } from '@/types/provider';
 import './sidebar.css';
 
-interface SessionItemProps {
+export interface SessionItemProps {
   id: string;
   title: string;
   updatedAt: string;

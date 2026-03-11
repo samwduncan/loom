@@ -4,15 +4,13 @@
  * Clicking the row (except checkbox/discard) opens the file in the diff editor.
  * Checkbox toggles client-side staging. Discard triggers confirmation in parent.
  *
- * Constitution: Named export (2.2), cn() for classes (3.6), token-based styling (3.1).
+ * Constitution: Named export (2.2), token-based styling (3.1).
  */
 
-import { useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
-import { cn } from '@/utils/cn';
 import type { GitFileChange, GitFileStatus } from '@/types/git';
 
-interface ChangedFileRowProps {
+export interface ChangedFileRowProps {
   file: GitFileChange;
   isStaged: boolean;
   onToggleStage: (path: string) => void;
@@ -47,40 +45,20 @@ export function ChangedFileRow({
   onClickFile,
   onDiscard,
 }: ChangedFileRowProps) {
-  const handleCheckboxChange = useCallback(() => {
-    onToggleStage(file.path);
-  }, [onToggleStage, file.path]);
-
-  const handleRowClick = useCallback(() => {
-    onClickFile(file.path);
-  }, [onClickFile, file.path]);
-
-  const handleDiscard = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      onDiscard(file);
-    },
-    [onDiscard, file],
-  );
-
-  const handleCheckboxClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
   const dir = dirname(file.path);
 
   return (
     <div
-      className={cn('git-file-row')}
-      onClick={handleRowClick}
+      className="git-file-row"
+      onClick={() => onClickFile(file.path)}
       role="row"
     >
       {/* Checkbox */}
       <input
         type="checkbox"
         checked={isStaged}
-        onChange={handleCheckboxChange}
-        onClick={handleCheckboxClick}
+        onChange={() => onToggleStage(file.path)}
+        onClick={(e) => e.stopPropagation()}
         className="git-file-checkbox"
         aria-label={`Stage ${file.path}`}
       />
@@ -103,7 +81,10 @@ export function ChangedFileRow({
       <button
         type="button"
         className="git-file-discard"
-        onClick={handleDiscard}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDiscard(file);
+        }}
         aria-label={`Discard ${file.path}`}
         title="Discard changes"
       >

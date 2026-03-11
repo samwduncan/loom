@@ -8,7 +8,7 @@
  * Constitution: Named export (2.2), cn() for classes (3.6), token-based styling (3.1).
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,9 +24,10 @@ import { useGitOperations } from '@/hooks/useGitOperations';
 import { useOpenInEditor } from '@/hooks/useOpenInEditor';
 import { ChangedFileRow } from '@/components/git/ChangedFileRow';
 import { CommitComposer } from '@/components/git/CommitComposer';
+import { toast } from 'sonner';
 import type { GitFileChange, GitFileStatus } from '@/types/git';
 
-interface ChangesViewProps {
+export interface ChangesViewProps {
   files: GitFileChange[];
   refetchStatus: () => void;
 }
@@ -46,6 +47,15 @@ export function ChangesView({ files, refetchStatus }: ChangesViewProps) {
 
   const [stagedFiles, setStagedFiles] = useState<Set<string>>(new Set());
   const [discardTarget, setDiscardTarget] = useState<GitFileChange | null>(null);
+
+  // Prune staged files that no longer exist in the file list
+  useEffect(() => {
+    setStagedFiles((prev) => {
+      const validPaths = new Set(files.map((f) => f.path));
+      const filtered = new Set([...prev].filter((p) => validPaths.has(p)));
+      return filtered.size === prev.size ? prev : filtered;
+    });
+  }, [files]);
 
   // Group files by status
   const grouped = new Map<GitFileStatus, GitFileChange[]>();
@@ -96,6 +106,8 @@ export function ChangesView({ files, refetchStatus }: ChangesViewProps) {
         await ops.discard(discardTarget.path);
       }
       refetchStatus();
+    } catch (err: unknown) {
+      toast.error(`Discard failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setDiscardTarget(null);
     }

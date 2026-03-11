@@ -14,62 +14,35 @@ import { useGitRemoteStatus } from '@/hooks/useGitRemoteStatus';
 import { useGitOperations } from '@/hooks/useGitOperations';
 import { BranchSelector } from '@/components/git/BranchSelector';
 
-interface GitPanelHeaderProps {
+export interface GitPanelHeaderProps {
   branch: string;
   projectName: string;
   onRefresh: () => void;
 }
 
+type RemoteOp = 'push' | 'pull' | 'fetch';
+
 export function GitPanelHeader({ branch, projectName, onRefresh }: GitPanelHeaderProps) {
   const { remoteStatus, refetch: refetchRemote } = useGitRemoteStatus(projectName);
   const operations = useGitOperations(projectName);
 
-  const [pushing, setPushing] = useState(false);
-  const [pulling, setPulling] = useState(false);
-  const [fetching, setFetching] = useState(false);
+  const [activeOp, setActiveOp] = useState<RemoteOp | null>(null);
 
   const hasRemote = remoteStatus?.hasRemote ?? false;
   const hasUpstream = remoteStatus?.hasUpstream ?? false;
 
-  async function handlePush() {
-    setPushing(true);
+  async function handleRemoteOp(op: RemoteOp) {
+    if (activeOp) return;
+    setActiveOp(op);
     try {
-      await operations.push();
-      toast.success('Push successful');
+      await operations[op]();
+      toast.success(`${op.charAt(0).toUpperCase() + op.slice(1)} successful`);
       refetchRemote();
       onRefresh();
     } catch (err) {
-      toast.error(`Push failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(`${op.charAt(0).toUpperCase() + op.slice(1)} failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setPushing(false);
-    }
-  }
-
-  async function handlePull() {
-    setPulling(true);
-    try {
-      await operations.pull();
-      toast.success('Pull successful');
-      refetchRemote();
-      onRefresh();
-    } catch (err) {
-      toast.error(`Pull failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setPulling(false);
-    }
-  }
-
-  async function handleFetch() {
-    setFetching(true);
-    try {
-      await operations.fetch();
-      toast.success('Fetch successful');
-      refetchRemote();
-      onRefresh();
-    } catch (err) {
-      toast.error(`Fetch failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setFetching(false);
+      setActiveOp(null);
     }
   }
 
@@ -116,28 +89,28 @@ export function GitPanelHeader({ branch, projectName, onRefresh }: GitPanelHeade
             type="button"
             className="git-action-btn"
             title="Push"
-            onClick={handlePush}
-            disabled={pushing}
+            onClick={() => handleRemoteOp('push')}
+            disabled={activeOp !== null}
           >
-            {pushing ? <Loader2 size={14} className="git-spinner" /> : <ArrowUp size={14} />}
+            {activeOp === 'push' ? <Loader2 size={14} className="git-spinner" /> : <ArrowUp size={14} />}
           </button>
           <button
             type="button"
             className="git-action-btn"
             title="Pull"
-            onClick={handlePull}
-            disabled={pulling}
+            onClick={() => handleRemoteOp('pull')}
+            disabled={activeOp !== null}
           >
-            {pulling ? <Loader2 size={14} className="git-spinner" /> : <ArrowDown size={14} />}
+            {activeOp === 'pull' ? <Loader2 size={14} className="git-spinner" /> : <ArrowDown size={14} />}
           </button>
           <button
             type="button"
             className="git-action-btn"
             title="Fetch"
-            onClick={handleFetch}
-            disabled={fetching}
+            onClick={() => handleRemoteOp('fetch')}
+            disabled={activeOp !== null}
           >
-            {fetching ? <Loader2 size={14} className="git-spinner" /> : <RefreshCw size={14} />}
+            {activeOp === 'fetch' ? <Loader2 size={14} className="git-spinner" /> : <RefreshCw size={14} />}
           </button>
         </div>
       )}

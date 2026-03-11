@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { useGitBranches } from '@/hooks/useGitBranches';
 import { useGitOperations } from '@/hooks/useGitOperations';
 
-interface BranchSelectorProps {
+export interface BranchSelectorProps {
   currentBranch: string;
   projectName: string;
   onBranchChange: () => void;
@@ -72,6 +72,10 @@ export function BranchSelector({ currentBranch, projectName, onBranchChange }: B
   async function handleCreateBranch() {
     const name = newBranchName.trim();
     if (!name) return;
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(name)) {
+      toast.error('Invalid branch name. Use letters, numbers, dots, dashes, or slashes.');
+      return;
+    }
     setOperationLoading(true);
     try {
       await operations.createBranch(name);

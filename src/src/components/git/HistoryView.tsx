@@ -7,12 +7,13 @@
  * Constitution: Named export (2.2), token-based styling (3.1).
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { toast } from 'sonner';
 import { useGitCommits } from '@/hooks/useGitCommits';
 import { apiFetch } from '@/lib/api-client';
 import { CommitRow } from '@/components/git/CommitRow';
 
-interface HistoryViewProps {
+export interface HistoryViewProps {
   projectName: string;
 }
 
@@ -21,12 +22,14 @@ export function HistoryView({ projectName }: HistoryViewProps) {
   const [expandedHash, setExpandedHash] = useState<string | null>(null);
   const [diffContent, setDiffContent] = useState<string | null>(null);
   const [diffLoading, setDiffLoading] = useState(false);
+  const activeHashRef = useRef<string | null>(null);
 
   function handleRowClick(hash: string) {
     if (expandedHash === hash) {
       // Collapse
       setExpandedHash(null);
       setDiffContent(null);
+      activeHashRef.current = null;
       return;
     }
 
@@ -34,18 +37,27 @@ export function HistoryView({ projectName }: HistoryViewProps) {
     setExpandedHash(hash);
     setDiffContent(null);
     setDiffLoading(true);
+    activeHashRef.current = hash;
 
-    apiFetch<string>(
-      `/api/git/commit-diff?project=${encodeURIComponent(projectName)}&hash=${encodeURIComponent(hash)}`,
+    apiFetch<{ diff: string }>(
+      `/api/git/commit-diff?project=${encodeURIComponent(projectName)}&commit=${encodeURIComponent(hash)}`,
     )
       .then((data) => {
-        setDiffContent(typeof data === 'string' ? data : JSON.stringify(data));
+        if (activeHashRef.current === hash) {
+          setDiffContent(data.diff);
+        }
       })
-      .catch(() => {
-        setDiffContent(null);
+      .catch((err: unknown) => {
+        console.error('Failed to fetch commit diff:', err);
+        if (activeHashRef.current === hash) {
+          toast.error('Failed to load diff');
+          setDiffContent(null);
+        }
       })
       .finally(() => {
-        setDiffLoading(false);
+        if (activeHashRef.current === hash) {
+          setDiffLoading(false);
+        }
       });
   }
 

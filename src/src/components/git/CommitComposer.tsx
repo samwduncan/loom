@@ -12,7 +12,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGitOperations } from '@/hooks/useGitOperations';
 
-interface CommitComposerProps {
+export interface CommitComposerProps {
   stagedFiles: Set<string>;
   onCommitSuccess: () => void;
   projectName: string;
@@ -54,7 +54,8 @@ export function CommitComposer({
     try {
       const message = await ops.generateCommitMessage();
       setCommitMessage(message);
-    } catch {
+    } catch (err: unknown) {
+      console.error('Failed to generate commit message:', err);
       toast.error('Failed to generate commit message');
     } finally {
       setIsGenerating(false);

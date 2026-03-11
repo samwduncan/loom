@@ -17,15 +17,26 @@ export function GitPanelSkeleton() {
       </div>
 
       {/* File list skeleton rows */}
-      {Array.from({ length: 5 }, (_, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <div className="h-3 w-3 animate-pulse rounded bg-surface-raised" />
-          <div
-            className="h-3 animate-pulse rounded bg-surface-raised"
-            style={{ width: `${40 + i * 8}%` }}
-          />
-        </div>
-      ))}
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 animate-pulse rounded bg-surface-raised" />
+        <div className="h-3 w-2/5 animate-pulse rounded bg-surface-raised" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 animate-pulse rounded bg-surface-raised" />
+        <div className="h-3 w-3/5 animate-pulse rounded bg-surface-raised" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 animate-pulse rounded bg-surface-raised" />
+        <div className="h-3 w-1/2 animate-pulse rounded bg-surface-raised" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 animate-pulse rounded bg-surface-raised" />
+        <div className="h-3 w-7/12 animate-pulse rounded bg-surface-raised" />
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 animate-pulse rounded bg-surface-raised" />
+        <div className="h-3 w-4/5 animate-pulse rounded bg-surface-raised" />
+      </div>
 
       {/* Commit message area */}
       <div className="space-y-2 pt-2">

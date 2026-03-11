@@ -14,6 +14,7 @@
 
 import { useState, useCallback, useEffect, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { cn } from '@/utils/cn';
 import { useTimelineStore } from '@/stores/timeline';
 import { useSessionList } from '@/hooks/useSessionList';
@@ -169,6 +170,7 @@ export function SessionList() {
       }
     } catch (err) {
       console.error('Failed to delete session:', err);
+      toast.error('Failed to delete session');
     }
 
     setDeleteSessionId(null);
