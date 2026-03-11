@@ -186,7 +186,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 21. Settings Panel | 3/3 | Complete    | 2026-03-10 | - |
 | 22. Command Palette | 2/2 | Complete    | 2026-03-10 | - |
 | 23. File Tree + File Store | 3/3 | Complete    | 2026-03-10 | - |
-| 24. Code Editor | 1/3 | In Progress|  | - |
+| 24. Code Editor | 2/3 | In Progress|  | - |
 | 25. Terminal | v1.2 | 0/2 | Not started | - |
 | 26. Git Panel + Navigation | v1.2 | 0/3 | Not started | - |
 
