@@ -106,6 +106,10 @@ See PROJECT.md Key Decisions table.
 - 26-04: SessionItem inline edit: local isEditing + isEditing prop for context menu trigger; blur confirms
 - 26-04: AlertDialog sibling pattern for delete confirmation (consistent with Phase 21/24)
 - [Phase 26]: Client-side staging model (Set<string>) rather than server-side git staging area
+- 26-03: Outside-click mousedown listener for branch dropdown (no shadcn Popover dependency)
+- 26-03: Per-button loading state (pushing/pulling/fetching) for independent remote operation tracking
+- 26-03: CommitRow diff fetched on expand from /api/git/commit-diff, displayed as raw pre/code
+- 26-03: formatRelativeDate inline utility in CommitRow (m/h/d ago format)
 
 ### Pending Todos
 
@@ -117,6 +121,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:58:50.163Z
-Stopped at: Completed 26-02-PLAN.md (Changes view)
-Resume: Phase 26 verification or next milestone
+Last session: 2026-03-11T02:58:00Z
+Stopped at: Completed 26-03-PLAN.md (Header + History)
+Resume: Plan 26-04 or phase verification

@@ -131,16 +131,16 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **GIT-07**: Commit composer at bottom: auto-resize textarea for message, "Commit" button disabled when nothing staged or message empty
 - [x] **GIT-08**: Successful commit shows toast, clears message, refreshes changes list
 - [x] **GIT-09**: Failed commit shows error toast with reason
-- [ ] **GIT-10**: Panel header shows current branch name with branch icon
-- [ ] **GIT-11**: Branch dropdown allows switching between existing local branches
-- [ ] **GIT-12**: "New Branch" button opens inline input for branch name with Create/Cancel
-- [ ] **GIT-13**: Push, Pull, Fetch buttons in panel header with icons and tooltips
-- [ ] **GIT-14**: Push/Pull/Fetch show loading spinner during operation and success/error toast on completion
-- [ ] **GIT-15**: Remote status indicator shows ahead/behind count relative to tracking branch
+- [x] **GIT-10**: Panel header shows current branch name with branch icon
+- [x] **GIT-11**: Branch dropdown allows switching between existing local branches
+- [x] **GIT-12**: "New Branch" button opens inline input for branch name with Create/Cancel
+- [x] **GIT-13**: Push, Pull, Fetch buttons in panel header with icons and tooltips
+- [x] **GIT-14**: Push/Pull/Fetch show loading spinner during operation and success/error toast on completion
+- [x] **GIT-15**: Remote status indicator shows ahead/behind count relative to tracking branch
 - [x] **GIT-16**: "Generate Message" button uses AI to generate commit message from staged changes -- fills textarea
 - [x] **GIT-17**: Discard changes action per file (right-click or button) with confirmation dialog ("This cannot be undone")
-- [ ] **GIT-18**: History view shows recent commits (20-30) with: hash (short), message, author, relative date
-- [ ] **GIT-19**: Clicking a commit in history opens its diff summary (files changed + per-file diff)
+- [x] **GIT-18**: History view shows recent commits (20-30) with: hash (short), message, author, relative date
+- [x] **GIT-19**: Clicking a commit in history opens its diff summary (files changed + per-file diff)
 - [x] **GIT-20**: Git panel auto-refreshes when backend sends file/project change WebSocket events
 - [x] **GIT-21**: All destructive operations (discard, force push) require confirmation dialog
 - [x] **GIT-22**: Loading skeleton shown while fetching git status/history
@@ -320,16 +320,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GIT-07 | Phase 26 | Complete |
 | GIT-08 | Phase 26 | Complete |
 | GIT-09 | Phase 26 | Complete |
-| GIT-10 | Phase 26 | Pending |
-| GIT-11 | Phase 26 | Pending |
-| GIT-12 | Phase 26 | Pending |
-| GIT-13 | Phase 26 | Pending |
-| GIT-14 | Phase 26 | Pending |
-| GIT-15 | Phase 26 | Pending |
+| GIT-10 | Phase 26 | Complete |
+| GIT-11 | Phase 26 | Complete |
+| GIT-12 | Phase 26 | Complete |
+| GIT-13 | Phase 26 | Complete |
+| GIT-14 | Phase 26 | Complete |
+| GIT-15 | Phase 26 | Complete |
 | GIT-16 | Phase 26 | Complete |
 | GIT-17 | Phase 26 | Complete |
-| GIT-18 | Phase 26 | Pending |
-| GIT-19 | Phase 26 | Pending |
+| GIT-18 | Phase 26 | Complete |
+| GIT-19 | Phase 26 | Complete |
 | GIT-20 | Phase 26 | Complete |
 | GIT-21 | Phase 26 | Complete |
 | GIT-22 | Phase 26 | Complete |
