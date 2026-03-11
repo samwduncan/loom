@@ -52,3 +52,17 @@
 .context-menu-item-danger {
   color: var(--status-error);
 }
+
+/* Inline rename input -- transparent background, same font, accent underline */
+.session-rename-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--accent-primary);
+  font-size: var(--text-body);
+  color: var(--text-primary);
+  padding: 0;
+  outline: none;
+  font-family: inherit;
+  line-height: inherit;
+}

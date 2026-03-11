@@ -1,17 +1,20 @@
 /**
- * SessionItem -- individual session row with 2-line layout.
+ * SessionItem -- individual session row with 2-line layout and inline rename.
  *
- * Line 1: title (truncated via text-overflow: ellipsis)
+ * Line 1: title (truncated via text-overflow: ellipsis), or inline input when editing
  * Line 2: relative timestamp + ProviderLogo
  * Active state: 3px left border in --accent-primary (no background tint)
  * Hover state: subtle background via sidebar.css class
+ *
+ * Inline rename: double-click title (or isEditing prop) enters edit mode.
+ * Enter confirms, Escape cancels, blur confirms. Empty/unchanged values are ignored.
  *
  * Receives data as props (NOT subscribing to store per-item).
  *
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6).
  */
 
-import type { MouseEvent } from 'react';
+import { useState, useCallback, type MouseEvent, type KeyboardEvent } from 'react';
 import { cn } from '@/utils/cn';
 import { formatRelativeTime } from '@/lib/formatTime';
 import { ProviderLogo } from './ProviderLogo';
@@ -25,28 +28,83 @@ interface SessionItemProps {
   providerId: ProviderId;
   isActive: boolean;
   hasDraft?: boolean;
+  isEditing?: boolean;
   onClick: () => void;
   onContextMenu: (e: MouseEvent<HTMLDivElement>) => void;
+  onRename: (id: string, newTitle: string) => void;
 }
 
 export function SessionItem({
+  id,
   title,
   updatedAt,
   providerId,
   isActive,
   hasDraft,
+  isEditing: isEditingProp,
   onClick,
   onContextMenu,
+  onRename,
 }: SessionItemProps) {
+  const [isEditingLocal, setIsEditingLocal] = useState(false);
+  const [editValue, setEditValue] = useState(title);
+
+  const isEditing = isEditingProp || isEditingLocal;
+
+  const startEditing = useCallback(() => {
+    setEditValue(title);
+    setIsEditingLocal(true);
+  }, [title]);
+
+  const confirmEdit = useCallback(() => {
+    setIsEditingLocal(false);
+    const trimmed = editValue.trim();
+    if (trimmed !== '' && trimmed !== title) {
+      onRename(id, trimmed);
+    }
+  }, [editValue, title, id, onRename]);
+
+  const cancelEdit = useCallback(() => {
+    setIsEditingLocal(false);
+    setEditValue(title);
+  }, [title]);
+
+  const handleDoubleClick = useCallback(
+    (e: MouseEvent) => {
+      e.stopPropagation();
+      startEditing();
+    },
+    [startEditing],
+  );
+
+  const handleInputKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        confirmEdit();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        cancelEdit();
+      }
+    },
+    [confirmEdit, cancelEdit],
+  );
+
+  // When isEditing prop changes to true externally, sync local state
+  if (isEditingProp && !isEditingLocal) {
+    setEditValue(title);
+    setIsEditingLocal(true);
+  }
+
   return (
     <div
       role="option"
       aria-selected={isActive}
       tabIndex={0}
-      onClick={onClick}
+      onClick={isEditing ? undefined : onClick}
       onContextMenu={onContextMenu}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (!isEditing && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           onClick();
         }
@@ -60,15 +118,28 @@ export function SessionItem({
     >
       {/* Line 1: title + draft dot */}
       <div className="flex items-center gap-1.5">
-        <div
-          className={cn(
-            'text-[length:var(--text-body)] text-foreground',
-            'truncate min-w-0 flex-1',
-          )}
-        >
-          {title}
-        </div>
-        {hasDraft && (
+        {isEditing ? (
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleInputKeyDown}
+            onBlur={confirmEdit}
+            autoFocus
+            className="session-rename-input"
+          />
+        ) : (
+          <div
+            className={cn(
+              'text-[length:var(--text-body)] text-foreground',
+              'truncate min-w-0 flex-1',
+            )}
+            onDoubleClick={handleDoubleClick}
+          >
+            {title}
+          </div>
+        )}
+        {hasDraft && !isEditing && (
           <span
             className="w-1.5 h-1.5 rounded-full bg-primary opacity-60 shrink-0"
             aria-label="Has unsent draft"

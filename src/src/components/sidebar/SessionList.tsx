@@ -52,6 +52,7 @@ export function SessionList() {
   const sessions = useTimelineStore((s) => s.sessions);
   const activeSessionId = useTimelineStore((s) => s.activeSessionId);
   const removeSession = useTimelineStore((s) => s.removeSession);
+  const updateSessionTitle = useTimelineStore((s) => s.updateSessionTitle);
   const { isLoading, error } = useSessionList();
   const { projectName } = useProjectContext();
 
@@ -72,6 +73,8 @@ export function SessionList() {
       window.removeEventListener('storage', onStorage);
     };
   }, []);
+
+  const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({
     isOpen: false,
@@ -103,9 +106,20 @@ export function SessionList() {
   }, []);
 
   const handleRename = useCallback(() => {
-    // Rename will be implemented with an inline editor in a future plan
+    const sessionId = contextMenu.sessionId;
     closeContextMenu();
-  }, [closeContextMenu]);
+    if (sessionId) {
+      setEditingSessionId(sessionId);
+    }
+  }, [contextMenu.sessionId, closeContextMenu]);
+
+  const handleSessionRename = useCallback(
+    (sessionId: string, newTitle: string) => {
+      updateSessionTitle(sessionId, newTitle);
+      setEditingSessionId(null);
+    },
+    [updateSessionTitle],
+  );
 
   const handleDelete = useCallback(async () => {
     const sessionId = contextMenu.sessionId;
@@ -171,8 +185,10 @@ export function SessionList() {
                 providerId={session.providerId}
                 isActive={session.id === activeSessionId}
                 hasDraft={draftSessionIds.has(session.id)}
+                isEditing={editingSessionId === session.id}
                 onClick={() => handleSessionClick(session.id)}
                 onContextMenu={(e) => handleContextMenu(e, session.id)}
+                onRename={handleSessionRename}
               />
             ))}
           </div>
