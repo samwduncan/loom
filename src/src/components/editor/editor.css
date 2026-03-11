@@ -1,0 +1,38 @@
+/**
+ * Editor CSS -- CodeMirror 6 container and scrollbar customization.
+ *
+ * Constitution: Design tokens only (7.14), no hardcoded colors.
+ */
+
+.cm-editor {
+  height: 100%;
+  font-size: var(--editor-font-size, 14px);
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+.cm-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-overlay) transparent;
+}
+
+/* WebKit scrollbar styling for Chrome/Safari */
+.cm-scroller::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.cm-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cm-scroller::-webkit-scrollbar-thumb {
+  background-color: var(--surface-overlay);
+  border-radius: 3px;
+}
+
+.cm-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+}
