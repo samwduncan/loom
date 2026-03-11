@@ -148,9 +148,9 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Navigation (NAV)
 
-- [ ] **NAV-01**: User can rename sessions via double-click on session title in sidebar -- inline edit with Enter to confirm, Escape to cancel
-- [ ] **NAV-02**: User can delete sessions via right-click context menu -- confirmation dialog before deletion
-- [ ] **NAV-03**: Deleted session removed from sidebar list immediately; if it was active, switches to most recent remaining session
+- [x] **NAV-01**: User can rename sessions via double-click on session title in sidebar -- inline edit with Enter to confirm, Escape to cancel
+- [x] **NAV-02**: User can delete sessions via right-click context menu -- confirmation dialog before deletion
+- [x] **NAV-03**: Deleted session removed from sidebar list immediately; if it was active, switches to most recent remaining session
 
 ## Future Requirements
 
@@ -334,9 +334,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GIT-21 | Phase 26 | Pending |
 | GIT-22 | Phase 26 | Complete |
 | GIT-23 | Phase 26 | Complete |
-| NAV-01 | Phase 26 | Pending |
-| NAV-02 | Phase 26 | Pending |
-| NAV-03 | Phase 26 | Pending |
+| NAV-01 | Phase 26 | Complete |
+| NAV-02 | Phase 26 | Complete |
+| NAV-03 | Phase 26 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 121 total

@@ -103,6 +103,8 @@ See PROJECT.md Key Decisions table.
 - 26-01: fetchTrigger counter pattern for imperative refetch (avoids useRef complexity)
 - 26-01: useGitOperations returns memoized object of async functions (not hooks) -- imperative fire-and-forget
 - 26-01: git-panel.css pre-defines file-row and commit-row hover styles for Plan 02/03 reuse
+- 26-04: SessionItem inline edit: local isEditing + isEditing prop for context menu trigger; blur confirms
+- 26-04: AlertDialog sibling pattern for delete confirmation (consistent with Phase 21/24)
 
 ### Pending Todos
 
@@ -114,6 +116,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:46:00Z
-Stopped at: Completed 26-01-PLAN.md
-Resume: Plan 26-02 (Changes view)
+Last session: 2026-03-11T02:47:00Z
+Stopped at: Completed 26-04-PLAN.md
+Resume: Phase 26 verification or next milestone
