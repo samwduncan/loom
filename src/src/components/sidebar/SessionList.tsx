@@ -20,6 +20,16 @@ import { useSessionList } from '@/hooks/useSessionList';
 import { groupSessionsByDate } from '@/lib/formatTime';
 import { apiFetch } from '@/lib/api-client';
 import { useProjectContext } from '@/hooks/useProjectContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { DateGroupHeader } from './DateGroupHeader';
 import { SessionItem } from './SessionItem';
 import { SessionContextMenu } from './SessionContextMenu';
@@ -75,6 +85,7 @@ export function SessionList() {
   }, []);
 
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+  const [deleteSessionId, setDeleteSessionId] = useState<string | null>(null);
 
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({
     isOpen: false,
@@ -121,25 +132,47 @@ export function SessionList() {
     [updateSessionTitle],
   );
 
-  const handleDelete = useCallback(async () => {
+  const handleDelete = useCallback(() => {
     const sessionId = contextMenu.sessionId;
-    if (!sessionId || !projectName) {
-      closeContextMenu();
+    closeContextMenu();
+    if (sessionId) {
+      setDeleteSessionId(sessionId);
+    }
+  }, [contextMenu.sessionId, closeContextMenu]);
+
+  const confirmDelete = useCallback(async () => {
+    if (!deleteSessionId || !projectName) {
+      setDeleteSessionId(null);
       return;
     }
 
+    const wasActive = deleteSessionId === activeSessionId;
+
     try {
       await apiFetch(
-        `/api/projects/${encodeURIComponent(projectName)}/sessions/${sessionId}`,
+        `/api/projects/${encodeURIComponent(projectName)}/sessions/${deleteSessionId}`,
         { method: 'DELETE' },
       );
-      removeSession(sessionId);
+      removeSession(deleteSessionId);
+
+      if (wasActive) {
+        // Find the most recent remaining session (excluding the deleted one)
+        const remaining = sessions
+          .filter((s) => s.id !== deleteSessionId)
+          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+        if (remaining.length > 0) {
+          navigate(`/chat/${remaining[0]!.id}`); // ASSERT: length check above guarantees [0] exists
+        } else {
+          navigate('/chat');
+        }
+      }
     } catch (err) {
       console.error('Failed to delete session:', err);
     }
 
-    closeContextMenu();
-  }, [contextMenu.sessionId, projectName, removeSession, closeContextMenu]);
+    setDeleteSessionId(null);
+  }, [deleteSessionId, projectName, activeSessionId, sessions, removeSession, navigate]);
 
   if (isLoading) {
     return <SessionListSkeleton />;
@@ -199,9 +232,32 @@ export function SessionList() {
         isOpen={contextMenu.isOpen}
         position={contextMenu.position}
         onRename={handleRename}
-        onDelete={() => void handleDelete()}
+        onDelete={handleDelete}
         onClose={closeContextMenu}
       />
+
+      <AlertDialog
+        open={deleteSessionId !== null}
+        onOpenChange={(open) => { if (!open) setDeleteSessionId(null); }}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this session and all its messages. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => void confirmDelete()}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
