@@ -1138,11 +1138,15 @@ function handleShellConnection(ws) {
                     // Prepare the shell command adapted to the platform and provider
                     let shellCommand;
                     if (isPlainShell) {
-                        // Plain shell mode - just run the initial command in the project directory
+                        // Plain shell mode - run initial command or spawn interactive shell
                         if (os.platform() === 'win32') {
-                            shellCommand = `Set-Location -Path "${projectPath}"; ${initialCommand}`;
+                            shellCommand = initialCommand
+                                ? `Set-Location -Path "${projectPath}"; ${initialCommand}`
+                                : `Set-Location -Path "${projectPath}"`;
                         } else {
-                            shellCommand = `cd "${projectPath}" && ${initialCommand}`;
+                            shellCommand = initialCommand
+                                ? `cd "${projectPath}" && ${initialCommand}`
+                                : `cd "${projectPath}" && exec $SHELL`;
                         }
                     } else if (provider === 'codex') {
                         // Use codex command

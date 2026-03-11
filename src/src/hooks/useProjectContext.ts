@@ -25,23 +25,34 @@ const RETRY_BASE_MS = 500;
 type ProjectEntry = { name: string; path: string; sessions?: unknown };
 type ProjectsResponse = ProjectEntry[] | { projects: ProjectEntry[] };
 
-/** Module-level singleton -- resolved once, reused on subsequent hook calls */
-let resolvedProjectName: string | null = null;
-let resolvePromise: Promise<string> | null = null;
+const PROJECT_PATH_STORAGE_KEY = 'loom-project-path';
 
-async function resolveProject(): Promise<string> {
-  if (resolvedProjectName) return resolvedProjectName;
+/** Module-level singletons -- resolved once, reused on subsequent hook calls */
+let resolvedProjectName: string | null = null;
+let resolvedProjectPath: string | null = null;
+let resolvePromise: Promise<{ name: string; path: string }> | null = null;
+
+async function resolveProject(): Promise<{ name: string; path: string }> {
+  if (resolvedProjectName !== null) {
+    return { name: resolvedProjectName, path: resolvedProjectPath ?? '' };
+  }
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
       const data = await apiFetch<ProjectsResponse>('/api/projects');
       const projects = Array.isArray(data) ? data : data.projects;
-      const firstName = projects[0]?.name ?? '';
+      const first = projects[0];
+      const firstName = first?.name ?? '';
+      const firstPath = first?.path ?? '';
       resolvedProjectName = firstName;
+      resolvedProjectPath = firstPath;
       if (firstName) {
         localStorage.setItem(PROJECT_STORAGE_KEY, firstName);
       }
-      return firstName;
+      if (firstPath) {
+        localStorage.setItem(PROJECT_PATH_STORAGE_KEY, firstPath);
+      }
+      return { name: firstName, path: firstPath };
     } catch {
       if (attempt < MAX_RETRIES) {
         // Wait before retrying -- auth token may not be stored yet
@@ -49,26 +60,30 @@ async function resolveProject(): Promise<string> {
         continue;
       }
       // All retries exhausted -- fallback to localStorage
-      const stored = localStorage.getItem(PROJECT_STORAGE_KEY);
-      resolvedProjectName = stored ?? '';
-      return resolvedProjectName;
+      const storedName = localStorage.getItem(PROJECT_STORAGE_KEY);
+      const storedPath = localStorage.getItem(PROJECT_PATH_STORAGE_KEY);
+      resolvedProjectName = storedName ?? '';
+      resolvedProjectPath = storedPath ?? '';
+      return { name: resolvedProjectName, path: resolvedProjectPath };
     }
   }
 
   // TypeScript exhaustiveness -- unreachable
-  return '';
+  return { name: '', path: '' };
 }
 
-export function useProjectContext(): { projectName: string; isLoading: boolean } {
+export function useProjectContext(): { projectName: string; projectPath: string; isLoading: boolean } {
   // "Adjust state during rendering" pattern -- initialize from resolved value
   // instead of setting state in effect synchronously (React 19 ESLint rule).
   const [projectName, setProjectName] = useState<string>(() => resolvedProjectName ?? '');
+  const [projectPath, setProjectPath] = useState<string>(() => resolvedProjectPath ?? '');
   const [isLoading, setIsLoading] = useState<boolean>(() => resolvedProjectName === null);
   const mountedRef = useRef(true);
 
   // If already resolved at render time, adjust state immediately (no effect needed)
   if (resolvedProjectName !== null && projectName !== resolvedProjectName) {
     setProjectName(resolvedProjectName);
+    setProjectPath(resolvedProjectPath ?? '');
     setIsLoading(false);
   }
 
@@ -82,9 +97,10 @@ export function useProjectContext(): { projectName: string; isLoading: boolean }
       resolvePromise = resolveProject();
     }
 
-    resolvePromise.then((name) => {
+    resolvePromise.then((result) => {
       if (mountedRef.current) {
-        setProjectName(name);
+        setProjectName(result.name);
+        setProjectPath(result.path);
         setIsLoading(false);
       }
     });
@@ -92,5 +108,5 @@ export function useProjectContext(): { projectName: string; isLoading: boolean }
     return () => { mountedRef.current = false; };
   }, []);
 
-  return { projectName, isLoading };
+  return { projectName, projectPath, isLoading };
 }
