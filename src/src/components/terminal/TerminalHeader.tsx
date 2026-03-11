@@ -1,0 +1,72 @@
+/**
+ * TerminalHeader -- connection state indicator, mode label, and control buttons.
+ *
+ * Shows a horizontal bar with:
+ * - Terminal icon + "Shell" label
+ * - Connection state dot (yellow/green/red)
+ * - "Plain Shell" mode indicator
+ * - Restart (RotateCw) and Disconnect (Unplug) buttons
+ *
+ * Constitution: Named export (2.2), cn() (3.6), design tokens (3.1).
+ */
+
+import { Terminal, RotateCw, Unplug } from 'lucide-react';
+import { cn } from '@/utils/cn';
+import type { ShellConnectionState } from '@/types/shell';
+
+interface TerminalHeaderProps {
+  state: ShellConnectionState;
+  onRestart: () => void;
+  onDisconnect: () => void;
+}
+
+const STATE_DOT_CLASSES: Record<ShellConnectionState, string> = {
+  connecting: 'bg-[var(--status-warning)] animate-pulse',
+  connected: 'bg-[var(--status-success)]',
+  disconnected: 'bg-[var(--status-error)]',
+};
+
+export const TerminalHeader = function TerminalHeader({
+  state,
+  onRestart,
+  onDisconnect,
+}: TerminalHeaderProps) {
+  return (
+    <div className="flex h-10 items-center gap-2 border-b border-border/8 bg-[var(--surface-raised)] px-3">
+      <Terminal className="h-4 w-4 text-[var(--text-muted)]" />
+      <span className="text-sm font-medium text-[var(--text-primary)]">
+        Shell
+      </span>
+
+      <div
+        className={cn('h-2 w-2 rounded-full', STATE_DOT_CLASSES[state])}
+        data-testid="connection-dot"
+        aria-label={`Connection: ${state}`}
+      />
+
+      <span className="text-xs text-[var(--text-muted)]">Plain Shell</span>
+
+      <div className="flex-1" />
+
+      <button
+        type="button"
+        title="Restart"
+        onClick={onRestart}
+        disabled={state === 'connecting'}
+        className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)] disabled:pointer-events-none disabled:opacity-40"
+      >
+        <RotateCw className="h-4 w-4" />
+      </button>
+
+      <button
+        type="button"
+        title="Disconnect"
+        onClick={onDisconnect}
+        disabled={state === 'disconnected' || state === 'connecting'}
+        className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)] disabled:pointer-events-none disabled:opacity-40"
+      >
+        <Unplug className="h-4 w-4" />
+      </button>
+    </div>
+  );
+};

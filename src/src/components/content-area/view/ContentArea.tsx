@@ -13,8 +13,8 @@
  * token-based styling (3.1).
  */
 
-import { useMemo, useSyncExternalStore } from 'react';
-import { Terminal, GitBranch } from 'lucide-react';
+import { lazy, Suspense, useMemo, useSyncExternalStore } from 'react';
+import { GitBranch } from 'lucide-react';
 import { useUIStore } from '@/stores/ui';
 import type { TabId } from '@/types/ui';
 import { TabBar } from './TabBar';
@@ -23,6 +23,20 @@ import { useTabKeyboardShortcuts } from '../hooks/useTabKeyboardShortcuts';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ChatView } from '@/components/chat/view/ChatView';
 import { FileTreePanel } from '@/components/file-tree/FileTreePanel';
+
+const LazyTerminalPanel = lazy(() =>
+  import('@/components/terminal/TerminalPanel').then((mod) => ({
+    default: mod.TerminalPanel,
+  })),
+);
+
+function TerminalSkeleton() {
+  return (
+    <div className="flex h-full items-center justify-center text-[var(--text-muted)]">
+      Loading terminal...
+    </div>
+  );
+}
 
 // Mobile detection via matchMedia. Functions are called by useSyncExternalStore.
 // matchMedia is called per-invocation (not cached) to support test mocking.
@@ -63,7 +77,7 @@ export const ContentArea = function ContentArea() {
   const panels = useMemo<Array<{ id: TabId; content: React.ReactNode }>>(() => [
     { id: 'chat', content: <ChatView /> },
     { id: 'files', content: <FileTreePanel /> },
-    { id: 'shell', content: <PanelPlaceholder name="Shell" icon={Terminal} /> },
+    { id: 'shell', content: <Suspense fallback={<TerminalSkeleton />}><LazyTerminalPanel /></Suspense> },
     { id: 'git', content: <PanelPlaceholder name="Git" icon={GitBranch} /> },
   ], []);
 
