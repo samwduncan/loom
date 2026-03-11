@@ -11,6 +11,8 @@ import { useState } from 'react';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useGitStatus } from '@/hooks/useGitStatus';
 import { GitPanelSkeleton } from '@/components/git/GitPanelSkeleton';
+import { GitPanelHeader } from '@/components/git/GitPanelHeader';
+import { ChangesView } from '@/components/git/ChangesView';
 import type { GitSubView } from '@/types/git';
 import './git-panel.css';
 
@@ -21,6 +23,15 @@ export function GitPanel() {
 
   return (
     <div className="git-panel">
+      {/* Header with branch selector and remote actions */}
+      {data && !loading && !error && (
+        <GitPanelHeader
+          branch={data.branch}
+          projectName={projectName}
+          onRefresh={refetch}
+        />
+      )}
+
       {/* Sub-tab bar */}
       <div className="git-sub-tabs">
         <button
@@ -56,7 +67,7 @@ export function GitPanel() {
       {data && !loading && !error && (
         <div className="git-panel-content">
           {activeView === 'changes' && (
-            <div data-testid="changes-view">Changes view</div>
+            <ChangesView files={data.files} refetchStatus={refetch} />
           )}
           {activeView === 'history' && (
             <div data-testid="history-view">History view</div>
