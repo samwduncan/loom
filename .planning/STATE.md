@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
 status: in-progress
-stopped_at: Completed 24-02-PLAN.md (tab bar and save wiring)
-last_updated: "2026-03-11T00:30:00Z"
-last_activity: 2026-03-11 -- Completed 24-02 tab bar and save wiring (EditorTabs, React.lazy CodeEditor)
+stopped_at: Completed 24-03-PLAN.md (diff view and tool card file links)
+last_updated: "2026-03-11T00:36:09Z"
+last_activity: 2026-03-11 -- Completed 24-03 diff view and tool card file links (DiffEditor, useOpenInEditor)
 progress:
   total_phases: 7
-  completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
+  completed_phases: 5
+  total_plans: 13
+  completed_plans: 13
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 24 -- Code Editor
+**Current focus:** Phase 24 Complete -- Next: Phase 25 (Terminal)
 
 ## Current Position
 
-Phase: 24 of 26 (Code Editor)
-Plan: 2 of 3 in current phase
-Status: Plan 24-02 Complete
-Last activity: 2026-03-11 -- Completed 24-02 tab bar and save wiring (EditorTabs, React.lazy CodeEditor)
+Phase: 24 of 26 (Code Editor) -- PHASE COMPLETE
+Plan: 3 of 3 in current phase
+Status: Phase 24 Complete
+Last activity: 2026-03-11 -- Completed 24-03 diff view and tool card file links (DiffEditor, useOpenInEditor)
 
-Progress: [████████████] 100% (12/12 plans complete)
+Progress: [█████████████] 100% (13/13 plans complete)
 
 ## Performance Metrics
 
@@ -90,6 +90,9 @@ See PROJECT.md Key Decisions table.
 - 24-02: contentCache extracted to content-cache.ts -- react-refresh only-export-components compliance
 - 24-02: EditorTabs outside Suspense boundary -- tabs render instantly while CodeEditor lazy-loads
 - 24-02: AlertDialog sibling pattern for dirty-close confirmation -- consistent with Phase 21
+- 24-03: FetchState pattern (same as useFileContent) for useFileDiff -- avoids setState-in-effect lint violations
+- 24-03: No default export on DiffEditor -- uses named export remapping pattern for React.lazy
+- 24-03: useOpenInEditor as shared hook for file-opening from any component
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T00:30:00Z
-Stopped at: Completed 24-02-PLAN.md (tab bar and save wiring)
-Resume: Continue Phase 24. Next: `/gsd:execute-plan 24-03` (diff view)
+Last session: 2026-03-11T00:36:09Z
+Stopped at: Completed 24-03-PLAN.md (diff view and tool card file links) -- Phase 24 complete
+Resume: Next phase. `/gsd:plan-phase 25` (Terminal)

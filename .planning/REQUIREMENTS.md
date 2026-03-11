@@ -94,8 +94,8 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **ED-11**: Closing a tab with unsaved changes shows confirmation dialog ("Save / Discard / Cancel")
 - [x] **ED-12**: Cmd+F / Ctrl+F opens CodeMirror's built-in search within active file
 - [x] **ED-13**: User can toggle word wrap via button in editor header
-- [ ] **ED-14**: Editor supports diff view mode -- shows unified or side-by-side diff using @codemirror/merge
-- [ ] **ED-15**: Diff view activated when opening files from git panel's changed files list
+- [x] **ED-14**: Editor supports diff view mode -- shows unified or side-by-side diff using @codemirror/merge
+- [x] **ED-15**: Diff view activated when opening files from git panel's changed files list
 - [x] **ED-16**: Clicking a file path in a chat tool card (Read, Edit, Write) switches to Files tab and opens that file in the editor
 - [x] **ED-17**: Editor is lazy-loaded via React.lazy() + Suspense with loading skeleton -- not in initial bundle
 - [x] **ED-18**: Binary files show "Binary file -- cannot display" message instead of editor
@@ -289,8 +289,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ED-11 | Phase 24 | Complete |
 | ED-12 | Phase 24 | Complete |
 | ED-13 | Phase 24 | Complete |
-| ED-14 | Phase 24 | Pending |
-| ED-15 | Phase 24 | Pending |
+| ED-14 | Phase 24 | Complete |
+| ED-15 | Phase 24 | Complete |
 | ED-16 | Phase 24 | Complete |
 | ED-17 | Phase 24 | Complete |
 | ED-18 | Phase 24 | Complete |
