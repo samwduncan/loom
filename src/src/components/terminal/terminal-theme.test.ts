@@ -11,6 +11,14 @@ describe('getTerminalTheme', () => {
     '--status-warning': 'rgb(190, 160, 70)',
     '--status-info': 'rgb(100, 140, 200)',
     '--text-muted': 'rgb(140, 130, 120)',
+    '--ansi-cyan': 'rgb(86, 212, 221)',
+    '--ansi-bright-red': 'rgb(200, 90, 75)',
+    '--ansi-bright-green': 'rgb(130, 200, 110)',
+    '--ansi-bright-yellow': 'rgb(220, 190, 90)',
+    '--ansi-bright-blue': 'rgb(130, 170, 230)',
+    '--ansi-bright-magenta': 'rgb(200, 130, 220)',
+    '--ansi-bright-cyan': 'rgb(140, 220, 230)',
+    '--ansi-bright-white': 'rgb(247, 247, 247)',
   };
 
   let getComputedStyleSpy: ReturnType<typeof vi.spyOn>;
@@ -49,21 +57,21 @@ describe('getTerminalTheme', () => {
     expect(theme.yellow).toBe('rgb(190, 160, 70)');
     expect(theme.blue).toBe('rgb(100, 140, 200)');
     expect(theme.magenta).toBe('rgb(180, 90, 70)');
-    expect(theme.cyan).toBe('#56d4dd');
+    expect(theme.cyan).toBe('rgb(86, 212, 221)');
     expect(theme.white).toBe('rgb(228, 218, 210)');
   });
 
-  it('uses hardcoded hex for bright ANSI colors', () => {
+  it('maps bright ANSI colors from CSS custom properties', () => {
     const theme = getTerminalTheme();
 
     expect(theme.brightBlack).toBe('rgb(140, 130, 120)');
-    expect(theme.brightRed).toBe('#ff6b6b');
-    expect(theme.brightGreen).toBe('#69db7c');
-    expect(theme.brightYellow).toBe('#ffd43b');
-    expect(theme.brightBlue).toBe('#74c0fc');
-    expect(theme.brightMagenta).toBe('#da77f2');
-    expect(theme.brightCyan).toBe('#66d9e8');
-    expect(theme.brightWhite).toBe('#ffffff');
+    expect(theme.brightRed).toBe('rgb(200, 90, 75)');
+    expect(theme.brightGreen).toBe('rgb(130, 200, 110)');
+    expect(theme.brightYellow).toBe('rgb(220, 190, 90)');
+    expect(theme.brightBlue).toBe('rgb(130, 170, 230)');
+    expect(theme.brightMagenta).toBe('rgb(200, 130, 220)');
+    expect(theme.brightCyan).toBe('rgb(140, 220, 230)');
+    expect(theme.brightWhite).toBe('rgb(247, 247, 247)');
   });
 
   it('reads CSS variables from document.documentElement', () => {
@@ -75,8 +83,6 @@ describe('getTerminalTheme', () => {
   it('calls getPropertyValue with correct CSS variable names', () => {
     const theme = getTerminalTheme();
 
-    // Trigger all property reads by accessing theme (already done above)
-    // Verify the mock was called with expected variable names
     const mockStyle = getComputedStyleSpy.mock.results[0]
       ?.value as CSSStyleDeclaration;
     const calls = (mockStyle.getPropertyValue as ReturnType<typeof vi.fn>).mock
@@ -90,6 +96,9 @@ describe('getTerminalTheme', () => {
     expect(calls).toContain('--status-warning');
     expect(calls).toContain('--status-info');
     expect(calls).toContain('--text-muted');
+    expect(calls).toContain('--ansi-cyan');
+    expect(calls).toContain('--ansi-bright-red');
+    expect(calls).toContain('--ansi-bright-green');
 
     // Ensure theme is used to avoid unused var warning
     expect(theme).toBeDefined();

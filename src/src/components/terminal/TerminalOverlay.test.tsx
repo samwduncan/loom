@@ -97,4 +97,28 @@ describe('TerminalOverlay', () => {
     expect(openSpy).toHaveBeenCalledWith('https://example.com/auth', '_blank');
     openSpy.mockRestore();
   });
+
+  it('blocks javascript: URLs from auto-opening', () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const { container } = render(
+      <TerminalOverlay
+        {...baseProps}
+        authUrl={{ url: 'javascript:alert(1)', autoOpen: true }}
+      />,
+    );
+    expect(openSpy).not.toHaveBeenCalled();
+    // Unsafe URLs should not render the banner at all
+    expect(container.innerHTML).toBe('');
+    openSpy.mockRestore();
+  });
+
+  it('blocks data: URLs from rendering in banner', () => {
+    const { container } = render(
+      <TerminalOverlay
+        {...baseProps}
+        authUrl={{ url: 'data:text/html,<script>alert(1)</script>', autoOpen: false }}
+      />,
+    );
+    expect(container.innerHTML).toBe('');
+  });
 });

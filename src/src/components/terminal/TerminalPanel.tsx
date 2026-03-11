@@ -16,7 +16,7 @@ import { TerminalView } from './TerminalView';
 import { TerminalOverlay } from './TerminalOverlay';
 
 export const TerminalPanel = function TerminalPanel() {
-  const { projectName } = useProjectContext();
+  const { projectName, isLoading } = useProjectContext();
 
   const writeRef = useRef<((data: string) => void) | null>(null);
 
@@ -27,7 +27,7 @@ export const TerminalPanel = function TerminalPanel() {
     connect,
     disconnect,
     restart,
-    onOutput,
+    setOutputCallback,
     authUrl,
     clearAuthUrl,
   } = useShellWebSocket({ projectPath: projectName });
@@ -36,12 +36,15 @@ export const TerminalPanel = function TerminalPanel() {
   const handleReady = useCallback(
     (write: (data: string) => void, cols: number, rows: number) => {
       writeRef.current = write;
-      onOutput((data: string) => {
+      setOutputCallback((data: string) => {
         writeRef.current?.(data);
       });
+
+      // Don't connect until project name is resolved
+      if (isLoading || !projectName) return;
       connect(cols, rows);
     },
-    [onOutput, connect],
+    [setOutputCallback, connect, isLoading, projectName],
   );
 
   // User keystrokes from terminal -> WS

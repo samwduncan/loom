@@ -1,7 +1,7 @@
 /**
  * useShellWebSocket — React hook wrapping ShellWebSocketClient.
  *
- * Manages WebSocket lifecycle, strict mode guard, and auth URL state.
+ * Manages WebSocket lifecycle and auth URL state.
  * Does NOT auto-connect on mount. Caller connects after xterm.open()
  * so terminal dimensions (cols/rows) are known.
  *
@@ -15,7 +15,6 @@ import type { ShellConnectionState } from '@/types/shell';
 
 interface UseShellWebSocketParams {
   projectPath: string;
-  isPlainShell?: boolean;
 }
 
 interface UseShellWebSocketReturn {
@@ -25,7 +24,8 @@ interface UseShellWebSocketReturn {
   connect: (cols: number, rows: number) => void;
   disconnect: () => void;
   restart: () => void;
-  onOutput: (callback: (data: string) => void) => void;
+  /** Single-slot callback setter. Only one consumer at a time — last call wins. */
+  setOutputCallback: (callback: (data: string) => void) => void;
   authUrl: { url: string; autoOpen: boolean } | null;
   clearAuthUrl: () => void;
 }
@@ -33,10 +33,9 @@ interface UseShellWebSocketReturn {
 export function useShellWebSocket(
   params: UseShellWebSocketParams,
 ): UseShellWebSocketReturn {
-  const { projectPath, isPlainShell = true } = params;
+  const { projectPath } = params;
 
   const clientRef = useRef<ShellWebSocketClient | null>(null);
-  const initializedRef = useRef(false);
   const [state, setState] = useState<ShellConnectionState>('disconnected');
   const [authUrl, setAuthUrl] = useState<{
     url: string;
@@ -48,11 +47,12 @@ export function useShellWebSocket(
     clientRef.current = new ShellWebSocketClient();
   }
 
-  // Wire up state change callback
+  // Wire up callbacks + token getter, cleanup on unmount
   useEffect(() => {
     const client = clientRef.current;
     if (!client) return;
 
+    client.getToken = getToken;
     client.onStateChange = (newState) => {
       setState(newState);
     };
@@ -63,40 +63,20 @@ export function useShellWebSocket(
     return () => {
       client.onStateChange = null;
       client.onAuthUrl = null;
-    };
-  }, []);
-
-  // Strict mode guard + cleanup on unmount
-  useEffect(() => {
-    if (initializedRef.current) {
-      // Second mount in strict mode -- skip
-      return;
-    }
-    initializedRef.current = true;
-
-    return () => {
-      initializedRef.current = false;
-      clientRef.current?.disconnect();
+      client.getToken = null;
+      client.disconnect();
     };
   }, []);
 
   const connect = useCallback(
     (cols: number, rows: number) => {
-      const token = getToken();
-      if (!token) {
-        console.warn('[useShellWebSocket] No auth token available');
-        return;
-      }
-
       clientRef.current?.connect({
-        token,
         projectPath,
-        isPlainShell,
         cols,
         rows,
       });
     },
-    [projectPath, isPlainShell],
+    [projectPath],
   );
 
   const disconnect = useCallback(() => {
@@ -115,7 +95,7 @@ export function useShellWebSocket(
     clientRef.current?.sendResize(cols, rows);
   }, []);
 
-  const onOutput = useCallback((callback: (data: string) => void) => {
+  const setOutputCallback = useCallback((callback: (data: string) => void) => {
     if (clientRef.current) {
       clientRef.current.onOutput = callback;
     }
@@ -132,7 +112,7 @@ export function useShellWebSocket(
     connect,
     disconnect,
     restart,
-    onOutput,
+    setOutputCallback,
     authUrl,
     clearAuthUrl,
   };

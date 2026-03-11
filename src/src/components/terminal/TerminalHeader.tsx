@@ -4,7 +4,7 @@
  * Shows a horizontal bar with:
  * - Terminal icon + "Shell" label
  * - Connection state dot (yellow/green/red)
- * - "Plain Shell" mode indicator
+ * - "Shell" mode label
  * - Restart (RotateCw) and Disconnect (Unplug) buttons
  *
  * Constitution: Named export (2.2), cn() (3.6), design tokens (3.1).
@@ -14,7 +14,7 @@ import { Terminal, RotateCw, Unplug } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { ShellConnectionState } from '@/types/shell';
 
-interface TerminalHeaderProps {
+export interface TerminalHeaderProps {
   state: ShellConnectionState;
   onRestart: () => void;
   onDisconnect: () => void;
@@ -43,8 +43,6 @@ export const TerminalHeader = function TerminalHeader({
         data-testid="connection-dot"
         aria-label={`Connection: ${state}`}
       />
-
-      <span className="text-xs text-[var(--text-muted)]">Plain Shell</span>
 
       <div className="flex-1" />
 

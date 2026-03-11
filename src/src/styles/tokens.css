@@ -43,6 +43,19 @@
   --status-warning: oklch(0.72 0.14 70);
   --status-info: oklch(0.65 0.12 240);
 
+  /* ─── ANSI Terminal Colors ────────────────────────────────────────
+   * Standard + bright variants for xterm.js theme (terminal-theme.ts).
+   * Standard ANSI 0-7 reuse status/surface tokens; only unique ones here.
+   */
+  --ansi-cyan: oklch(0.72 0.10 200);
+  --ansi-bright-red: oklch(0.68 0.20 25);
+  --ansi-bright-green: oklch(0.75 0.17 145);
+  --ansi-bright-yellow: oklch(0.82 0.16 85);
+  --ansi-bright-blue: oklch(0.72 0.14 240);
+  --ansi-bright-magenta: oklch(0.72 0.16 320);
+  --ansi-bright-cyan: oklch(0.78 0.10 200);
+  --ansi-bright-white: oklch(0.97 0 0);
+
   /* ─── Provider Logo Colors ──────────────────────────────────────── */
   --logo-claude: oklch(0.68 0.15 45);
   --logo-gemini: oklch(0.55 0.18 260);

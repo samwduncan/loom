@@ -18,12 +18,16 @@ export class ShellWebSocketClient {
   private ws: WebSocket | null = null;
   private _state: ShellConnectionState = 'disconnected';
   private lastParams: {
-    token: string;
     projectPath: string;
-    isPlainShell: boolean;
     cols: number;
     rows: number;
   } | null = null;
+
+  /**
+   * Token getter — called fresh on each connect/restart so the token is
+   * never stale. Set by the hook before connect().
+   */
+  getToken: (() => string | null) | null = null;
 
   // Callbacks — set by consumers before connect()
   onOutput: ((data: string) => void) | null = null;
@@ -41,9 +45,7 @@ export class ShellWebSocketClient {
    * Open a WebSocket connection to the /shell endpoint.
    */
   connect(params: {
-    token: string;
     projectPath: string;
-    isPlainShell: boolean;
     cols: number;
     rows: number;
   }): void {
@@ -52,11 +54,22 @@ export class ShellWebSocketClient {
       this.disconnect();
     }
 
+    const token = this.getToken?.();
+    if (!token) {
+      console.warn('[ShellWS] No auth token available');
+      return;
+    }
+
     this.lastParams = params;
     this.setState('connecting');
 
+    // Token must be in the URL query string — the WebSocket API does not
+    // support custom headers, and the backend's verifyClient reads the token
+    // from searchParams during the upgrade handshake. This is standard
+    // practice for WebSocket auth. The URL is not exposed in browser history
+    // or Referer headers (WebSocket connections are not navigations).
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${protocol}//${window.location.host}/shell?token=${params.token}`;
+    const url = `${protocol}//${window.location.host}/shell?token=${token}`;
 
     this.ws = new WebSocket(url);
 
@@ -97,13 +110,16 @@ export class ShellWebSocketClient {
 
   /**
    * Disconnect and reconnect with the same parameters.
+   * Fetches a fresh token via getToken(). No-ops if never connected.
    */
-  restart(): void {
+  restart(): boolean {
     const params = this.lastParams;
     this.disconnect();
     if (params) {
       this.connect(params);
+      return true;
     }
+    return false;
   }
 
   // ---------------------------------------------------------------------------
@@ -125,12 +141,10 @@ export class ShellWebSocketClient {
     this.setState('connected');
 
     if (this.lastParams) {
-      const { projectPath, isPlainShell, cols, rows } = this.lastParams;
+      const { projectPath, cols, rows } = this.lastParams;
       this.send({
         type: 'init',
         projectPath,
-        provider: 'claude',
-        isPlainShell,
         cols,
         rows,
       });

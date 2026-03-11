@@ -10,10 +10,20 @@
  * Constitution: Named export (2.2), cn() (3.6), design tokens (3.1).
  */
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { X } from 'lucide-react';
 
-interface TerminalOverlayProps {
+/** Only allow http/https URLs — blocks javascript:, data:, etc. */
+function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export interface TerminalOverlayProps {
   /** Show the disconnected overlay */
   visible: boolean;
   /** Called when user clicks Reconnect */
@@ -30,19 +40,26 @@ export const TerminalOverlay = function TerminalOverlay({
   authUrl,
   onDismissAuth,
 }: TerminalOverlayProps) {
+  const safeAuthUrl = useMemo(
+    () => (authUrl && isSafeUrl(authUrl.url) ? authUrl : null),
+    [authUrl],
+  );
+
   // Auto-open auth URL in new tab
   useEffect(() => {
-    if (authUrl?.autoOpen) {
-      window.open(authUrl.url, '_blank');
-    }
-  }, [authUrl]);
+    if (!safeAuthUrl?.autoOpen) return;
 
-  if (!visible && !authUrl) return null;
+    // window.open may return null if popup blocker prevents it.
+    // The auth banner link below remains visible as a fallback.
+    window.open(safeAuthUrl.url, '_blank');
+  }, [safeAuthUrl]);
+
+  if (!visible && !safeAuthUrl) return null;
 
   return (
     <>
       {/* Auth URL banner */}
-      {authUrl && (
+      {safeAuthUrl && (
         <div
           className="absolute left-0 right-0 top-0 z-[var(--z-sticky)] flex items-center gap-2 bg-[var(--surface-overlay)] px-3 py-2 text-sm"
           data-testid="auth-url-banner"
@@ -51,13 +68,13 @@ export const TerminalOverlay = function TerminalOverlay({
             Authentication required:
           </span>
           <a
-            href={authUrl.url}
+            href={safeAuthUrl.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-[var(--accent-primary)] underline hover:text-[var(--accent-primary-hover)]"
             data-testid="auth-url-link"
           >
-            {authUrl.url}
+            {safeAuthUrl.url}
           </a>
           <div className="flex-1" />
           <button

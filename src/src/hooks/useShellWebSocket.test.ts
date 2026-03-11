@@ -96,12 +96,11 @@ describe('ShellWebSocketClient', () => {
     ShellWebSocketClient = mod.ShellWebSocketClient;
   });
 
-  it('connect() creates WebSocket with correct URL including token', () => {
+  it('connect() creates WebSocket with token from getToken()', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'my-jwt';
     client.connect({
-      token: 'my-jwt',
       projectPath: '/home/user/project',
-      isPlainShell: true,
       cols: 80,
       rows: 24,
     });
@@ -110,15 +109,26 @@ describe('ShellWebSocketClient', () => {
     expect(lastWs().url).toContain('/shell?token=my-jwt');
   });
 
+  it('connect() does nothing when getToken returns null', () => {
+    const client = new ShellWebSocketClient();
+    client.getToken = () => null;
+    client.connect({
+      projectPath: '/home/user/project',
+      cols: 80,
+      rows: 24,
+    });
+
+    expect(MockWebSocket.instances).toHaveLength(0);
+  });
+
   it('transitions state to connecting on connect, connected on open', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     const stateChanges: string[] = [];
     client.onStateChange = (s: string) => stateChanges.push(s);
 
     client.connect({
-      token: 'tok',
       projectPath: '/p',
-      isPlainShell: false,
       cols: 80,
       rows: 24,
     });
@@ -130,10 +140,9 @@ describe('ShellWebSocketClient', () => {
 
   it('sends init message on WS open', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     client.connect({
-      token: 'tok',
       projectPath: '/home/user/project',
-      isPlainShell: true,
       cols: 120,
       rows: 40,
     });
@@ -145,8 +154,6 @@ describe('ShellWebSocketClient', () => {
       JSON.stringify({
         type: 'init',
         projectPath: '/home/user/project',
-        provider: 'claude',
-        isPlainShell: true,
         cols: 120,
         rows: 40,
       }),
@@ -155,13 +162,12 @@ describe('ShellWebSocketClient', () => {
 
   it('dispatches output messages to onOutput callback', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     const outputs: string[] = [];
     client.onOutput = (data: string) => outputs.push(data);
 
     client.connect({
-      token: 'tok',
       projectPath: '/p',
-      isPlainShell: false,
       cols: 80,
       rows: 24,
     });
@@ -175,14 +181,13 @@ describe('ShellWebSocketClient', () => {
 
   it('dispatches auth_url messages to onAuthUrl callback', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     const authUrls: Array<{ url: string; autoOpen: boolean }> = [];
     client.onAuthUrl = (url: string, autoOpen: boolean) =>
       authUrls.push({ url, autoOpen });
 
     client.connect({
-      token: 'tok',
       projectPath: '/p',
-      isPlainShell: false,
       cols: 80,
       rows: 24,
     });
@@ -202,10 +207,9 @@ describe('ShellWebSocketClient', () => {
 
   it('sendInput sends correct JSON', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     client.connect({
-      token: 'tok',
       projectPath: '/p',
-      isPlainShell: false,
       cols: 80,
       rows: 24,
     });
@@ -221,10 +225,9 @@ describe('ShellWebSocketClient', () => {
 
   it('sendResize sends correct JSON', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     client.connect({
-      token: 'tok',
       projectPath: '/p',
-      isPlainShell: false,
       cols: 80,
       rows: 24,
     });
@@ -240,10 +243,9 @@ describe('ShellWebSocketClient', () => {
 
   it('disconnect closes WS with code 1000', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     client.connect({
-      token: 'tok',
       projectPath: '/p',
-      isPlainShell: false,
       cols: 80,
       rows: 24,
     });
@@ -257,13 +259,12 @@ describe('ShellWebSocketClient', () => {
 
   it('disconnect transitions state to disconnected', () => {
     const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
     const stateChanges: string[] = [];
     client.onStateChange = (s: string) => stateChanges.push(s);
 
     client.connect({
-      token: 'tok',
       projectPath: '/p',
-      isPlainShell: false,
       cols: 80,
       rows: 24,
     });
@@ -273,6 +274,29 @@ describe('ShellWebSocketClient', () => {
     client.disconnect();
 
     expect(stateChanges[stateChanges.length - 1]).toBe('disconnected');
+  });
+
+  it('restart() returns false when never connected', () => {
+    const client = new ShellWebSocketClient();
+    client.getToken = () => 'tok';
+    expect(client.restart()).toBe(false);
+  });
+
+  it('restart() reconnects with fresh token', () => {
+    const client = new ShellWebSocketClient();
+    let tokenVersion = 'token-v1';
+    client.getToken = () => tokenVersion;
+
+    client.connect({ projectPath: '/p', cols: 80, rows: 24 });
+    lastWs().simulateOpen();
+
+    // Change token before restart
+    tokenVersion = 'token-v2';
+    const result = client.restart();
+
+    expect(result).toBe(true);
+    expect(MockWebSocket.instances).toHaveLength(2);
+    expect(lastWs().url).toContain('token=token-v2');
   });
 });
 

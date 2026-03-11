@@ -20,7 +20,7 @@ import { getTerminalTheme } from './terminal-theme';
 import { useUIStore } from '@/stores/ui';
 import './styles/terminal.css';
 
-interface TerminalViewProps {
+export interface TerminalViewProps {
   /** Called when user types in the terminal */
   onData: (data: string) => void;
   /** Called when terminal dimensions change */
@@ -52,6 +52,8 @@ export const TerminalView = function TerminalView({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    let isDisposed = false;
 
     const terminal = new Terminal({
       fontSize: 14,
@@ -87,8 +89,10 @@ export const TerminalView = function TerminalView({
     // ResizeObserver with debounce for container size changes
     let resizeTimer: ReturnType<typeof setTimeout> | null = null;
     const observer = new ResizeObserver(() => {
+      if (isDisposed) return;
       if (resizeTimer) clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
+        if (isDisposed) return;
         // Only fit when visible (offsetParent is null when display:none / hidden)
         if (container.offsetParent !== null && fitAddonRef.current) {
           fitAddonRef.current.fit();
@@ -104,6 +108,7 @@ export const TerminalView = function TerminalView({
     observer.observe(container);
 
     return () => {
+      isDisposed = true;
       if (resizeTimer) clearTimeout(resizeTimer);
       observer.disconnect();
       dataDisposable.dispose();
@@ -111,9 +116,26 @@ export const TerminalView = function TerminalView({
       terminalRef.current = null;
       fitAddonRef.current = null;
     };
-    // codeFontFamily intentionally excluded -- terminal font set at creation time
+    // codeFontFamily intentionally excluded -- updated via separate effect below
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Update font family at runtime when user changes it in settings
+  useEffect(() => {
+    if (terminalRef.current && codeFontFamily) {
+      terminalRef.current.options.fontFamily = codeFontFamily;
+      fitAddonRef.current?.fit();
+    }
+  }, [codeFontFamily]);
+
+  // Update theme at runtime when CSS custom properties change (e.g. dark/light toggle)
+  // Subscribes to the theme object reference from the UI store
+  const themeConfig = useUIStore((s) => s.theme);
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.options.theme = getTerminalTheme();
+    }
+  }, [themeConfig]);
 
   // Re-fit when Shell tab becomes active (container goes from hidden to visible)
   useEffect(() => {
