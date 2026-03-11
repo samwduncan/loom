@@ -123,26 +123,26 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 ### Git Panel (GIT)
 
 - [x] **GIT-01**: Git tab shows two switchable views: Changes and History, toggled via sub-tab bar
-- [ ] **GIT-02**: Changes view lists all changed files grouped by status: Staged, Modified, Untracked, Deleted
-- [ ] **GIT-03**: Each file row shows: status icon (M/A/D/?), filename, relative path, checkbox for staging
-- [ ] **GIT-04**: Clicking checkbox stages/unstages the file (immediate API call)
-- [ ] **GIT-05**: "Select All" and "Deselect All" buttons above the file list
-- [ ] **GIT-06**: Clicking a changed file opens its diff in the code editor (switches to Files tab, activates diff view)
-- [ ] **GIT-07**: Commit composer at bottom: auto-resize textarea for message, "Commit" button disabled when nothing staged or message empty
-- [ ] **GIT-08**: Successful commit shows toast, clears message, refreshes changes list
-- [ ] **GIT-09**: Failed commit shows error toast with reason
+- [x] **GIT-02**: Changes view lists all changed files grouped by status: Staged, Modified, Untracked, Deleted
+- [x] **GIT-03**: Each file row shows: status icon (M/A/D/?), filename, relative path, checkbox for staging
+- [x] **GIT-04**: Clicking checkbox stages/unstages the file (immediate API call)
+- [x] **GIT-05**: "Select All" and "Deselect All" buttons above the file list
+- [x] **GIT-06**: Clicking a changed file opens its diff in the code editor (switches to Files tab, activates diff view)
+- [x] **GIT-07**: Commit composer at bottom: auto-resize textarea for message, "Commit" button disabled when nothing staged or message empty
+- [x] **GIT-08**: Successful commit shows toast, clears message, refreshes changes list
+- [x] **GIT-09**: Failed commit shows error toast with reason
 - [ ] **GIT-10**: Panel header shows current branch name with branch icon
 - [ ] **GIT-11**: Branch dropdown allows switching between existing local branches
 - [ ] **GIT-12**: "New Branch" button opens inline input for branch name with Create/Cancel
 - [ ] **GIT-13**: Push, Pull, Fetch buttons in panel header with icons and tooltips
 - [ ] **GIT-14**: Push/Pull/Fetch show loading spinner during operation and success/error toast on completion
 - [ ] **GIT-15**: Remote status indicator shows ahead/behind count relative to tracking branch
-- [ ] **GIT-16**: "Generate Message" button uses AI to generate commit message from staged changes -- fills textarea
-- [ ] **GIT-17**: Discard changes action per file (right-click or button) with confirmation dialog ("This cannot be undone")
+- [x] **GIT-16**: "Generate Message" button uses AI to generate commit message from staged changes -- fills textarea
+- [x] **GIT-17**: Discard changes action per file (right-click or button) with confirmation dialog ("This cannot be undone")
 - [ ] **GIT-18**: History view shows recent commits (20-30) with: hash (short), message, author, relative date
 - [ ] **GIT-19**: Clicking a commit in history opens its diff summary (files changed + per-file diff)
 - [x] **GIT-20**: Git panel auto-refreshes when backend sends file/project change WebSocket events
-- [ ] **GIT-21**: All destructive operations (discard, force push) require confirmation dialog
+- [x] **GIT-21**: All destructive operations (discard, force push) require confirmation dialog
 - [x] **GIT-22**: Loading skeleton shown while fetching git status/history
 - [x] **GIT-23**: Error state with retry button if git operations fail (e.g., not a git repo)
 
@@ -312,26 +312,26 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TERM-14 | Phase 25 | Complete |
 | TERM-15 | Phase 25 | Complete |
 | GIT-01 | Phase 26 | Complete |
-| GIT-02 | Phase 26 | Pending |
-| GIT-03 | Phase 26 | Pending |
-| GIT-04 | Phase 26 | Pending |
-| GIT-05 | Phase 26 | Pending |
-| GIT-06 | Phase 26 | Pending |
-| GIT-07 | Phase 26 | Pending |
-| GIT-08 | Phase 26 | Pending |
-| GIT-09 | Phase 26 | Pending |
+| GIT-02 | Phase 26 | Complete |
+| GIT-03 | Phase 26 | Complete |
+| GIT-04 | Phase 26 | Complete |
+| GIT-05 | Phase 26 | Complete |
+| GIT-06 | Phase 26 | Complete |
+| GIT-07 | Phase 26 | Complete |
+| GIT-08 | Phase 26 | Complete |
+| GIT-09 | Phase 26 | Complete |
 | GIT-10 | Phase 26 | Pending |
 | GIT-11 | Phase 26 | Pending |
 | GIT-12 | Phase 26 | Pending |
 | GIT-13 | Phase 26 | Pending |
 | GIT-14 | Phase 26 | Pending |
 | GIT-15 | Phase 26 | Pending |
-| GIT-16 | Phase 26 | Pending |
-| GIT-17 | Phase 26 | Pending |
+| GIT-16 | Phase 26 | Complete |
+| GIT-17 | Phase 26 | Complete |
 | GIT-18 | Phase 26 | Pending |
 | GIT-19 | Phase 26 | Pending |
 | GIT-20 | Phase 26 | Complete |
-| GIT-21 | Phase 26 | Pending |
+| GIT-21 | Phase 26 | Complete |
 | GIT-22 | Phase 26 | Complete |
 | GIT-23 | Phase 26 | Complete |
 | NAV-01 | Phase 26 | Complete |

@@ -53,7 +53,7 @@
 - [x] **Phase 23: File Tree + File Store** - Hierarchical file browser, file type icons, context menus, lazy-load directories (completed 2026-03-10)
 - [x] **Phase 24: Code Editor** - CodeMirror 6 with syntax highlighting, file tabs, read/write, diff view, OKLCH theme (completed 2026-03-11)
 - [x] **Phase 25: Terminal** - xterm.js terminal with separate /shell WebSocket, auto-resize, connection state (completed 2026-03-11)
-- [ ] **Phase 26: Git Panel + Navigation** - Changes/history views, staging, commit, branch ops, session management
+- [x] **Phase 26: Git Panel + Navigation** - Changes/history views, staging, commit, branch ops, session management (completed 2026-03-11)
 
 ## Phase Details
 
@@ -189,7 +189,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 23. File Tree + File Store | 3/3 | Complete    | 2026-03-10 | - |
 | 24. Code Editor | 3/3 | Complete    | 2026-03-11 | - |
 | 25. Terminal | 2/2 | Complete   | 2026-03-11 | - |
-| 26. Git Panel + Navigation | 2/4 | In Progress|  | - |
+| 26. Git Panel + Navigation | 4/4 | Complete   | 2026-03-11 | - |
 
 ## Backlog (Future Milestones)
 
