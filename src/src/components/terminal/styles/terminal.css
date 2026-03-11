@@ -1,0 +1,20 @@
+/**
+ * Terminal container styles.
+ *
+ * Imports xterm.js base CSS and provides the container sizing.
+ * Constitution: Design tokens only (3.1), no hardcoded colors.
+ */
+
+@import '@xterm/xterm/css/xterm.css';
+
+.terminal-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--surface-base);
+}
+
+/* Ensure xterm viewport fills container without gaps */
+.terminal-container .xterm {
+  padding: 4px 0 0 4px;
+}
