@@ -34,9 +34,39 @@ vi.mock('@/hooks/useOpenInEditor', () => ({
   useOpenInEditor: () => vi.fn(),
 }));
 
-// Mock sonner toast (used by CommitComposer)
+// Mock sonner toast (used by CommitComposer, GitPanelHeader)
 vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
+}));
+
+// Mock useGitRemoteStatus (used by GitPanelHeader)
+vi.mock('@/hooks/useGitRemoteStatus', () => ({
+  useGitRemoteStatus: () => ({
+    remoteStatus: { hasRemote: false, hasUpstream: false, branch: 'main' },
+    loading: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
+}));
+
+// Mock useGitBranches (used by BranchSelector)
+vi.mock('@/hooks/useGitBranches', () => ({
+  useGitBranches: () => ({
+    branches: [{ name: 'main', current: true }],
+    loading: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
+}));
+
+// Mock useGitCommits (used by HistoryView)
+vi.mock('@/hooks/useGitCommits', () => ({
+  useGitCommits: () => ({
+    commits: [],
+    loading: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
 }));
 
 import { GitPanel } from '@/components/git/GitPanel';
@@ -123,8 +153,8 @@ describe('GitPanel', () => {
     // Click History tab
     await user.click(screen.getByRole('button', { name: /history/i }));
 
-    // History view is still a placeholder
-    expect(screen.getByText(/history view/i)).toBeInTheDocument();
+    // HistoryView renders with empty commits (shows "No commits yet")
+    expect(screen.getByText(/no commits yet/i)).toBeInTheDocument();
   });
 
   it('Changes tab has active styling by default', () => {
