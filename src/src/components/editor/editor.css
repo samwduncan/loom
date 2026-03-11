@@ -36,3 +36,20 @@
 .cm-scroller::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-muted);
 }
+
+/* ----------------------------------------------------------------
+ * DiffEditor -- merge view diff coloring
+ * Uses OKLCH diff tokens from tokens.css
+ * ---------------------------------------------------------------- */
+
+.diff-editor-wrapper .cm-mergeView {
+  height: 100%;
+}
+
+.diff-editor-wrapper .cm-changedLine {
+  background-color: var(--diff-added-bg);
+}
+
+.diff-editor-wrapper .cm-deletedChunk {
+  background-color: var(--diff-removed-bg);
+}
