@@ -119,9 +119,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 23-01-PLAN.md -- File store implementation, FileTreeNode type, useFileTree hook, FileIcon, FileTreePanel layout
-- [ ] 23-02-PLAN.md -- FileNode recursive component, FileTree container, search/filter, loading/error states, wire into ContentArea
-- [ ] 23-03-PLAN.md -- Context menus (shadcn context-menu), image lightbox, wire FileGroup in command palette
+- [x] 23-01-PLAN.md -- File store implementation, FileTreeNode type, useFileTree hook, FileIcon, FileTreePanel layout
+- [x] 23-02-PLAN.md -- FileNode recursive component, FileTree container, search/filter, loading/error states, wire into ContentArea
+- [x] 23-03-PLAN.md -- Context menus (shadcn context-menu), image lightbox, wire FileGroup in command palette
 
 ### Phase 24: Code Editor
 **Goal**: Users can view and edit project files with full syntax highlighting and multi-tab support
@@ -133,12 +133,12 @@ Plans:
   3. User can open multiple files as tabs, switch between them, and close tabs (with save/discard confirmation for dirty files)
   4. User can click a file path in a chat tool card (Read, Edit, Write) and it opens in the editor on the Files tab
   5. Binary files show a "cannot display" message; files >1MB show a size warning before loading
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 24-01: TBD
-- [ ] 24-02: TBD
-- [ ] 24-03: TBD
+- [ ] 24-01-PLAN.md -- CM6 deps, OKLCH theme, language loader, file hooks, CodeEditor component, breadcrumb, binary/large guards
+- [ ] 24-02-PLAN.md -- EditorTabs with dirty indicators and close confirmation, wire CodeEditor into FileTreePanel via React.lazy
+- [ ] 24-03-PLAN.md -- DiffEditor merge view, useFileDiff hook, clickable file paths in tool cards
 
 ### Phase 25: Terminal
 **Goal**: Users can run shell commands directly within Loom without switching to an external terminal
@@ -196,4 +196,4 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-10 after Phase 23 planning*
+*Last updated: 2026-03-11 after Phase 24 planning*
