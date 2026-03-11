@@ -122,7 +122,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 
 ### Git Panel (GIT)
 
-- [ ] **GIT-01**: Git tab shows two switchable views: Changes and History, toggled via sub-tab bar
+- [x] **GIT-01**: Git tab shows two switchable views: Changes and History, toggled via sub-tab bar
 - [ ] **GIT-02**: Changes view lists all changed files grouped by status: Staged, Modified, Untracked, Deleted
 - [ ] **GIT-03**: Each file row shows: status icon (M/A/D/?), filename, relative path, checkbox for staging
 - [ ] **GIT-04**: Clicking checkbox stages/unstages the file (immediate API call)
@@ -141,10 +141,10 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [ ] **GIT-17**: Discard changes action per file (right-click or button) with confirmation dialog ("This cannot be undone")
 - [ ] **GIT-18**: History view shows recent commits (20-30) with: hash (short), message, author, relative date
 - [ ] **GIT-19**: Clicking a commit in history opens its diff summary (files changed + per-file diff)
-- [ ] **GIT-20**: Git panel auto-refreshes when backend sends file/project change WebSocket events
+- [x] **GIT-20**: Git panel auto-refreshes when backend sends file/project change WebSocket events
 - [ ] **GIT-21**: All destructive operations (discard, force push) require confirmation dialog
-- [ ] **GIT-22**: Loading skeleton shown while fetching git status/history
-- [ ] **GIT-23**: Error state with retry button if git operations fail (e.g., not a git repo)
+- [x] **GIT-22**: Loading skeleton shown while fetching git status/history
+- [x] **GIT-23**: Error state with retry button if git operations fail (e.g., not a git repo)
 
 ### Navigation (NAV)
 
@@ -311,7 +311,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TERM-13 | Phase 25 | Complete |
 | TERM-14 | Phase 25 | Complete |
 | TERM-15 | Phase 25 | Complete |
-| GIT-01 | Phase 26 | Pending |
+| GIT-01 | Phase 26 | Complete |
 | GIT-02 | Phase 26 | Pending |
 | GIT-03 | Phase 26 | Pending |
 | GIT-04 | Phase 26 | Pending |
@@ -330,10 +330,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GIT-17 | Phase 26 | Pending |
 | GIT-18 | Phase 26 | Pending |
 | GIT-19 | Phase 26 | Pending |
-| GIT-20 | Phase 26 | Pending |
+| GIT-20 | Phase 26 | Complete |
 | GIT-21 | Phase 26 | Pending |
-| GIT-22 | Phase 26 | Pending |
-| GIT-23 | Phase 26 | Pending |
+| GIT-22 | Phase 26 | Complete |
+| GIT-23 | Phase 26 | Complete |
 | NAV-01 | Phase 26 | Pending |
 | NAV-02 | Phase 26 | Pending |
 | NAV-03 | Phase 26 | Pending |
