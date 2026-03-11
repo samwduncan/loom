@@ -153,8 +153,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 25-01-PLAN.md -- Types, deps, OKLCH terminal theme, shell WebSocket client + hook
-- [ ] 25-02-PLAN.md -- TerminalView, TerminalHeader, TerminalOverlay, TerminalPanel, ContentArea wiring
+- [x] 25-01-PLAN.md -- Types, deps, OKLCH terminal theme, shell WebSocket client + hook
+- [x] 25-02-PLAN.md -- TerminalView, TerminalHeader, TerminalOverlay, TerminalPanel, ContentArea wiring
 
 ### Phase 26: Git Panel + Navigation
 **Goal**: Users can manage git operations (stage, commit, branch, push/pull) and organize their sessions without leaving Loom
@@ -166,12 +166,13 @@ Plans:
   3. User can switch branches, create new branches, and push/pull/fetch with loading indicators and success/error feedback
   4. User can click a changed file to view its diff in the code editor; commit history shows recent commits with click-to-view-diff
   5. User can rename sessions (double-click in sidebar) and delete sessions (right-click context menu with confirmation)
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 26-01: TBD
-- [ ] 26-02: TBD
-- [ ] 26-03: TBD
+- [ ] 26-01-PLAN.md -- Git types, hooks (status/branches/commits/remote/operations), GitPanel shell with sub-tabs, ContentArea wiring
+- [ ] 26-02-PLAN.md -- ChangesView with staging checkboxes, CommitComposer with AI message generation, discard confirmation
+- [ ] 26-03-PLAN.md -- GitPanelHeader with branch selector + push/pull/fetch, HistoryView with commit list + click-to-diff
+- [ ] 26-04-PLAN.md -- Session rename (double-click inline edit) and delete confirmation dialog
 
 ## Progress
 
@@ -188,7 +189,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 23. File Tree + File Store | 3/3 | Complete    | 2026-03-10 | - |
 | 24. Code Editor | 3/3 | Complete    | 2026-03-11 | - |
 | 25. Terminal | 2/2 | Complete   | 2026-03-11 | - |
-| 26. Git Panel + Navigation | v1.2 | 0/3 | Not started | - |
+| 26. Git Panel + Navigation | v1.2 | 0/4 | Not started | - |
 
 ## Backlog (Future Milestones)
 
@@ -196,4 +197,4 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-11 after Phase 25 planning*
+*Last updated: 2026-03-11 after Phase 26 planning*
