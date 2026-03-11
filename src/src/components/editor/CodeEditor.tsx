@@ -30,14 +30,9 @@ import { useProjectContext } from '@/hooks/useProjectContext';
 import { EditorBreadcrumb } from '@/components/editor/EditorBreadcrumb';
 import { BinaryPlaceholder } from '@/components/editor/BinaryPlaceholder';
 import { LargeFileWarning } from '@/components/editor/LargeFileWarning';
+import { contentCache, originalCache } from '@/components/editor/content-cache';
 import { Button } from '@/components/ui/button';
 import './editor.css';
-
-/** Content cache: stores in-progress edits when switching tabs */
-const contentCache = new Map<string, string>();
-
-/** Original (fetched) content per file, for dirty detection */
-const originalCache = new Map<string, string>();
 
 /**
  * Cmd+S save extension -- reads active path from file store at keystroke time.

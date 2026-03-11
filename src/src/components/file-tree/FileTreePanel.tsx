@@ -1,21 +1,39 @@
 /**
- * FileTreePanel -- split layout with tree sidebar and editor placeholder.
+ * FileTreePanel -- split layout with tree sidebar and lazy-loaded code editor.
  *
  * Left: 240px (w-60) tree sidebar with header, refresh button, and FileTree.
- * Right: flex-1 editor placeholder (replaced in Phase 24).
+ * Right: flex-1 editor area with EditorTabs + CodeEditor (lazy-loaded).
  *
- * Owns the useFileTree hook instance — passes results as props to FileTree
+ * Owns the useFileTree hook instance -- passes results as props to FileTree
  * to avoid duplicate fetches.
  *
  * Constitution: Named export (2.2), design tokens only (3.1), cn() for classes (3.6).
  */
 
+import { lazy, Suspense, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useFileTree } from '@/hooks/useFileTree';
+import { useFileSave } from '@/hooks/useFileSave';
+import { EditorTabs } from '@/components/editor/EditorTabs';
+import { contentCache } from '@/components/editor/content-cache';
 import { FileTree } from './FileTree';
 import './styles/file-tree.css';
+
+const LazyCodeEditor = lazy(() =>
+  import('@/components/editor/CodeEditor').then((mod) => ({
+    default: mod.CodeEditor,
+  })),
+);
+
+function EditorSkeleton() {
+  return (
+    <div className="flex-1 flex items-center justify-center animate-pulse bg-[var(--surface-base)]">
+      <span className="text-xs text-muted-foreground">Loading editor...</span>
+    </div>
+  );
+}
 
 export interface FileTreePanelProps {
   className?: string;
@@ -24,6 +42,16 @@ export interface FileTreePanelProps {
 export const FileTreePanel = function FileTreePanel({ className }: FileTreePanelProps) {
   const { projectName } = useProjectContext();
   const { tree, fetchState, retry, projectRoot } = useFileTree(projectName);
+  const { save } = useFileSave(projectName);
+
+  const handleTabSave = useCallback(
+    async (filePath: string): Promise<boolean> => {
+      const cachedContent = contentCache.get(filePath);
+      if (cachedContent === undefined) return false;
+      return save(filePath, cachedContent);
+    },
+    [save],
+  );
 
   return (
     <div className={cn('flex h-full', className)}>
@@ -55,11 +83,12 @@ export const FileTreePanel = function FileTreePanel({ className }: FileTreePanel
         />
       </div>
 
-      {/* Editor placeholder */}
-      <div className="flex-1 min-w-0 flex items-center justify-center">
-        <span className="text-sm text-muted-foreground">
-          Select a file to view
-        </span>
+      {/* Editor area */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <EditorTabs onSave={handleTabSave} />
+        <Suspense fallback={<EditorSkeleton />}>
+          <LazyCodeEditor />
+        </Suspense>
       </div>
     </div>
   );
