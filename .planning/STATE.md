@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
-status: completed
-stopped_at: Completed 24-03-PLAN.md (diff view and tool card file links) -- Phase 24 complete
-last_updated: "2026-03-11T00:52:47.014Z"
-last_activity: 2026-03-11 -- Completed 24-03 diff view and tool card file links (DiffEditor, useOpenInEditor)
+status: in_progress
+stopped_at: Completed 25-01-PLAN.md (terminal infrastructure)
+last_updated: "2026-03-11T01:19:29Z"
+last_activity: 2026-03-11 -- Completed 25-01 terminal infrastructure (xterm deps, shell types, WS client, theme)
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_plans: 16
+  completed_plans: 14
+  percent: 87
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 24 Complete -- Next: Phase 25 (Terminal)
+**Current focus:** Phase 25 (Terminal) -- Plan 01 complete, Plan 02 next
 
 ## Current Position
 
-Phase: 24 of 26 (Code Editor) -- PHASE COMPLETE
-Plan: 3 of 3 in current phase
-Status: Phase 24 Complete
-Last activity: 2026-03-11 -- Completed 24-03 diff view and tool card file links (DiffEditor, useOpenInEditor)
+Phase: 25 of 26 (Terminal)
+Plan: 1 of 3 in current phase
+Status: In Progress
+Last activity: 2026-03-11 -- Completed 25-01 terminal infrastructure (xterm deps, shell types, WS client, theme)
 
-Progress: [█████████████] 100% (13/13 plans complete)
+Progress: [█████████████████] 100% (14/16 plans complete)
 
 ## Performance Metrics
 
@@ -93,6 +93,9 @@ See PROJECT.md Key Decisions table.
 - 24-03: FetchState pattern (same as useFileContent) for useFileDiff -- avoids setState-in-effect lint violations
 - 24-03: No default export on DiffEditor -- uses named export remapping pattern for React.lazy
 - 24-03: useOpenInEditor as shared hook for file-opening from any component
+- 25-01: Null-check (== null) ref init pattern for ShellWebSocketClient in useShellWebSocket -- avoids refs-during-render lint violation
+- 25-01: addEventListener/removeEventListener on shell WS (not onopen/onclose) for cleaner cleanup
+- 25-01: Shell WS per-instance (not singleton) -- each terminal panel gets its own ShellWebSocketClient
 
 ### Pending Todos
 
@@ -104,6 +107,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T00:36:09Z
-Stopped at: Completed 24-03-PLAN.md (diff view and tool card file links) -- Phase 24 complete
-Resume: Next phase. `/gsd:plan-phase 25` (Terminal)
+Last session: 2026-03-11T01:19:29Z
+Stopped at: Completed 25-01-PLAN.md (terminal infrastructure)
+Resume: Next plan. `/gsd:execute-phase 25` (Plan 02 - TerminalView)
