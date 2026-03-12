@@ -52,7 +52,7 @@ export function CommitComposer({
     if (!canGenerate) return;
     setIsGenerating(true);
     try {
-      const message = await ops.generateCommitMessage();
+      const message = await ops.generateCommitMessage([...stagedFiles]);
       setCommitMessage(message);
     } catch (err: unknown) {
       console.error('Failed to generate commit message:', err);

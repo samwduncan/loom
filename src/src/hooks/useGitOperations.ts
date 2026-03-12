@@ -20,7 +20,7 @@ interface GitOperations {
   createBranch: (name: string) => Promise<void>;
   discard: (file: string) => Promise<void>;
   deleteUntracked: (file: string) => Promise<void>;
-  generateCommitMessage: () => Promise<string>;
+  generateCommitMessage: (files: string[]) => Promise<string>;
 }
 
 export function useGitOperations(projectName: string): GitOperations {
@@ -56,8 +56,8 @@ export function useGitOperations(projectName: string): GitOperations {
       deleteUntracked: (file: string) =>
         post('/api/git/delete-untracked', { file }),
 
-      generateCommitMessage: () =>
-        post<{ message: string }>('/api/git/generate-commit-message', {}).then((r) => r.message),
+      generateCommitMessage: (files: string[]) =>
+        post<{ message: string }>('/api/git/generate-commit-message', { files }).then((r) => r.message),
     };
   }, [projectName]);
 }
