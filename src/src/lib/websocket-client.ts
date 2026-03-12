@@ -69,6 +69,16 @@ export class WebSocketClient {
   }
 
   /**
+   * Attempt to reconnect using the stored token.
+   * No-op if no token is stored (never connected before).
+   * Used by ConnectionBanner's manual reconnect button.
+   */
+  tryReconnect(): void {
+    if (!this.token) return;
+    this.reconnect();
+  }
+
+  /**
    * Cleanly close the WebSocket connection. Clears reconnection timers.
    */
   disconnect(): void {

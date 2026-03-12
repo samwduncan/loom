@@ -1,0 +1,9 @@
+/**
+ * Connection Banner CSS — animations and backdrop for connection status overlays.
+ * Uses design tokens only (Constitution 3.1).
+ */
+
+.connection-banner-backdrop {
+  background: oklch(0 0 0 / 0.4);
+  backdrop-filter: blur(4px);
+}
