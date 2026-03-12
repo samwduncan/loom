@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
-status: ready_to_plan
-stopped_at: Roadmap created, ready to plan Phase 28
-last_updated: "2026-03-12"
-last_activity: 2026-03-12 -- Roadmap created with 10 phases (28-37), 37 requirements mapped
+status: executing
+stopped_at: Completed 28-01-PLAN.md
+last_updated: "2026-03-12T15:42:46.802Z"
+last_activity: 2026-03-12 -- Completed 28-01 Connection Health UI
 progress:
   total_phases: 10
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 ## Current Position
 
 Phase: 28 of 37 (Error & Connection Resilience)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-12 -- Roadmap created
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-03-12 -- Completed 28-01 Connection Health UI
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -48,8 +48,11 @@ Progress: [░░░░░░░░░░] 0%
 - Daily-driver work comes first to enable real usage feedback before visual polish decisions
 - Foundational fixes (error, session) prioritized before feature additions (composer, UX)
 - A11y and perf are cross-cutting -- scheduled last so they audit ALL new features
+- Used tryReconnect() on WebSocketClient instead of re-bootstrapping auth for manual reconnect
+- Connection banner uses fixed positioning with z-toast to overlay entire app shell
 
 See PROJECT.md Key Decisions table for full history.
+- [Phase 28]: Used tryReconnect() on WebSocketClient for manual reconnect button
 
 ### Pending Todos
 
@@ -61,6 +64,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-12
-Stopped at: Roadmap created with 10 phases, 37 requirements mapped
-Resume: `/gsd:plan-phase 28`
+Last session: 2026-03-12T15:42:46.800Z
+Stopped at: Completed 28-01-PLAN.md
+Resume: `/gsd:execute-phase 28` (plan 02)

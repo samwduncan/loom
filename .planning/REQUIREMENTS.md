@@ -9,11 +9,11 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 
 ### Error & Resilience
 
-- [ ] **ERR-01**: User sees an error banner when the backend process crashes or exits unexpectedly
-- [ ] **ERR-02**: User sees a reconnection skeleton overlay when WebSocket connection drops
+- [x] **ERR-01**: User sees an error banner when the backend process crashes or exits unexpectedly
+- [x] **ERR-02**: User sees a reconnection skeleton overlay when WebSocket connection drops
 - [ ] **ERR-03**: WebSocket automatically reconnects with exponential backoff after disconnection
 - [ ] **ERR-04**: User is warned before navigating away from an active streaming session
-- [ ] **ERR-05**: User sees connection status indicator (connected/reconnecting/disconnected)
+- [x] **ERR-05**: User sees connection status indicator (connected/reconnecting/disconnected)
 
 ### File Tree & Editor
 
@@ -96,11 +96,11 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ERR-01 | Phase 28 | Pending |
-| ERR-02 | Phase 28 | Pending |
+| ERR-01 | Phase 28 | Complete |
+| ERR-02 | Phase 28 | Complete |
 | ERR-03 | Phase 28 | Pending |
 | ERR-04 | Phase 28 | Pending |
-| ERR-05 | Phase 28 | Pending |
+| ERR-05 | Phase 28 | Complete |
 | FTE-01 | Phase 30 | Pending |
 | FTE-02 | Phase 30 | Pending |
 | FTE-03 | Phase 31 | Pending |
