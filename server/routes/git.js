@@ -200,7 +200,7 @@ router.get('/diff', async (req, res) => {
     await validateGitRepository(projectPath);
     
     // Check if file is untracked or deleted
-    const { stdout: statusOutput } = await execAsync(`git status --porcelain "${file}"`, { cwd: projectPath });
+    const { stdout: statusOutput } = await spawnAsync('git', ['status', '--porcelain', file], { cwd: projectPath });
     const isUntracked = statusOutput.startsWith('??');
     const isDeleted = statusOutput.trim().startsWith('D ') || statusOutput.trim().startsWith(' D');
 
@@ -221,21 +221,21 @@ router.get('/diff', async (req, res) => {
       }
     } else if (isDeleted) {
       // For deleted files, show the entire file content from HEAD as deletions
-      const { stdout: fileContent } = await execAsync(`git show HEAD:"${file}"`, { cwd: projectPath });
+      const { stdout: fileContent } = await spawnAsync('git', ['show', `HEAD:${file}`], { cwd: projectPath });
       const lines = fileContent.split('\n');
       diff = `--- a/${file}\n+++ /dev/null\n@@ -1,${lines.length} +0,0 @@\n` +
              lines.map(line => `-${line}`).join('\n');
     } else {
       // Get diff for tracked files
       // First check for unstaged changes (working tree vs index)
-      const { stdout: unstagedDiff } = await execAsync(`git diff -- "${file}"`, { cwd: projectPath });
+      const { stdout: unstagedDiff } = await spawnAsync('git', ['diff', '--', file], { cwd: projectPath });
 
       if (unstagedDiff) {
         // Show unstaged changes if they exist
         diff = stripDiffHeaders(unstagedDiff);
       } else {
         // If no unstaged changes, check for staged changes (index vs HEAD)
-        const { stdout: stagedDiff } = await execAsync(`git diff --cached -- "${file}"`, { cwd: projectPath });
+        const { stdout: stagedDiff } = await spawnAsync('git', ['diff', '--cached', '--', file], { cwd: projectPath });
         diff = stripDiffHeaders(stagedDiff) || '';
       }
     }
@@ -262,7 +262,7 @@ router.get('/file-with-diff', async (req, res) => {
     await validateGitRepository(projectPath);
 
     // Check file status
-    const { stdout: statusOutput } = await execAsync(`git status --porcelain "${file}"`, { cwd: projectPath });
+    const { stdout: statusOutput } = await spawnAsync('git', ['status', '--porcelain', file], { cwd: projectPath });
     const isUntracked = statusOutput.startsWith('??');
     const isDeleted = statusOutput.trim().startsWith('D ') || statusOutput.trim().startsWith(' D');
 
@@ -271,7 +271,7 @@ router.get('/file-with-diff', async (req, res) => {
 
     if (isDeleted) {
       // For deleted files, get content from HEAD
-      const { stdout: headContent } = await execAsync(`git show HEAD:"${file}"`, { cwd: projectPath });
+      const { stdout: headContent } = await spawnAsync('git', ['show', `HEAD:${file}`], { cwd: projectPath });
       oldContent = headContent;
       currentContent = headContent; // Show the deleted content in editor
     } else {
@@ -289,7 +289,7 @@ router.get('/file-with-diff', async (req, res) => {
       if (!isUntracked) {
         // Get the old content from HEAD for tracked files
         try {
-          const { stdout: headContent } = await execAsync(`git show HEAD:"${file}"`, { cwd: projectPath });
+          const { stdout: headContent } = await spawnAsync('git', ['show', `HEAD:${file}`], { cwd: projectPath });
           oldContent = headContent;
         } catch (error) {
           // File might be newly added to git (staged but not committed)
@@ -370,11 +370,11 @@ router.post('/commit', async (req, res) => {
     
     // Stage selected files
     for (const file of files) {
-      await execAsync(`git add "${file}"`, { cwd: projectPath });
+      await spawnAsync('git', ['add', file], { cwd: projectPath });
     }
-    
+
     // Commit with message
-    const { stdout } = await execAsync(`git commit -m "${message.replace(/"/g, '\\"')}"`, { cwd: projectPath });
+    const { stdout } = await spawnAsync('git', ['commit', '-m', message], { cwd: projectPath });
     
     res.json({ success: true, output: stdout });
   } catch (error) {
@@ -437,7 +437,7 @@ router.post('/checkout', async (req, res) => {
     const projectPath = await getActualProjectPath(project);
     
     // Checkout the branch
-    const { stdout } = await execAsync(`git checkout "${branch}"`, { cwd: projectPath });
+    const { stdout } = await spawnAsync('git', ['checkout', branch], { cwd: projectPath });
     
     res.json({ success: true, output: stdout });
   } catch (error) {
@@ -458,7 +458,7 @@ router.post('/create-branch', async (req, res) => {
     const projectPath = await getActualProjectPath(project);
     
     // Create and checkout new branch
-    const { stdout } = await execAsync(`git checkout -b "${branch}"`, { cwd: projectPath });
+    const { stdout } = await spawnAsync('git', ['checkout', '-b', branch], { cwd: projectPath });
     
     res.json({ success: true, output: stdout });
   } catch (error) {
@@ -507,8 +507,8 @@ router.get('/commits', async (req, res) => {
     // Get stats for each commit
     for (const commit of commits) {
       try {
-        const { stdout: stats } = await execAsync(
-          `git show --stat --format='' ${commit.hash}`,
+        const { stdout: stats } = await spawnAsync(
+          'git', ['show', '--stat', '--format=', commit.hash],
           { cwd: projectPath }
         );
         commit.stats = stats.trim().split('\n').pop(); // Get the summary line
@@ -536,8 +536,8 @@ router.get('/commit-diff', async (req, res) => {
     const projectPath = await getActualProjectPath(project);
     
     // Get diff for the commit
-    const { stdout } = await execAsync(
-      `git show ${commit}`,
+    const { stdout } = await spawnAsync(
+      'git', ['show', commit],
       { cwd: projectPath }
     );
     
@@ -568,8 +568,8 @@ router.post('/generate-commit-message', async (req, res) => {
     let diffContext = '';
     for (const file of files) {
       try {
-        const { stdout } = await execAsync(
-          `git diff HEAD -- "${file}"`,
+        const { stdout } = await spawnAsync(
+          'git', ['diff', 'HEAD', '--', file],
           { cwd: projectPath }
         );
         if (stdout) {
@@ -1077,7 +1077,7 @@ router.post('/discard', async (req, res) => {
     await validateGitRepository(projectPath);
 
     // Check file status to determine correct discard command
-    const { stdout: statusOutput } = await execAsync(`git status --porcelain "${file}"`, { cwd: projectPath });
+    const { stdout: statusOutput } = await spawnAsync('git', ['status', '--porcelain', file], { cwd: projectPath });
     
     if (!statusOutput.trim()) {
       return res.status(400).json({ error: 'No changes to discard for this file' });
@@ -1097,10 +1097,10 @@ router.post('/discard', async (req, res) => {
       }
     } else if (status.includes('M') || status.includes('D')) {
       // Modified or deleted file - restore from HEAD
-      await execAsync(`git restore "${file}"`, { cwd: projectPath });
+      await spawnAsync('git', ['restore', file], { cwd: projectPath });
     } else if (status.includes('A')) {
       // Added file - unstage it
-      await execAsync(`git reset HEAD "${file}"`, { cwd: projectPath });
+      await spawnAsync('git', ['reset', 'HEAD', file], { cwd: projectPath });
     }
     
     res.json({ success: true, message: `Changes discarded for ${file}` });
@@ -1123,7 +1123,7 @@ router.post('/delete-untracked', async (req, res) => {
     await validateGitRepository(projectPath);
 
     // Check if file is actually untracked
-    const { stdout: statusOutput } = await execAsync(`git status --porcelain "${file}"`, { cwd: projectPath });
+    const { stdout: statusOutput } = await spawnAsync('git', ['status', '--porcelain', file], { cwd: projectPath });
     
     if (!statusOutput.trim()) {
       return res.status(400).json({ error: 'File is not untracked or does not exist' });
