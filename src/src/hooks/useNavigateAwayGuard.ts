@@ -17,11 +17,9 @@ export function useNavigateAwayGuard(): void {
   useEffect(() => {
     if (!isStreaming) return;
 
-    function handleBeforeUnload(event: BeforeUnloadEvent): string {
-      const message =
+    function handleBeforeUnload(event: BeforeUnloadEvent): void {
+      event.returnValue =
         'You have an active streaming session. Are you sure you want to leave?';
-      event.returnValue = message;
-      return message;
     }
 
     window.addEventListener('beforeunload', handleBeforeUnload);

@@ -5,22 +5,21 @@
  * Shows error banner (red) when disconnected with error (ERR-01: backend crash).
  * Shows reconnection overlay with attempt count when reconnecting (ERR-02).
  * Shows "Connection lost" with manual reconnect button when disconnected without error.
- *
- * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6),
- * selector-only store access (4.2), z-index from dictionary (3.3).
  */
 
 import { memo } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/utils/cn';
 import { useConnectionStore } from '@/stores/connection';
 import { wsClient } from '@/lib/websocket-client';
-import './connection-banner.css';
 
 export const ConnectionBanner = memo(function ConnectionBanner() {
-  const status = useConnectionStore((s) => s.providers.claude.status);
-  const error = useConnectionStore((s) => s.providers.claude.error);
-  const reconnectAttempts = useConnectionStore(
-    (s) => s.providers.claude.reconnectAttempts,
+  const { status, error, reconnectAttempts } = useConnectionStore(
+    useShallow((s) => ({
+      status: s.providers.claude.status,
+      error: s.providers.claude.error,
+      reconnectAttempts: s.providers.claude.reconnectAttempts,
+    })),
   );
 
   // No banner when connected or initially connecting
@@ -49,10 +48,11 @@ export const ConnectionBanner = memo(function ConnectionBanner() {
   if (status === 'reconnecting') {
     return (
       <div
+        role="alert"
         className={cn(
           'fixed inset-0 z-[var(--z-overlay)]',
           'flex items-center justify-center',
-          'connection-banner-backdrop',
+          'bg-[var(--backdrop-overlay)] backdrop-blur-sm',
         )}
       >
         <div

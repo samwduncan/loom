@@ -70,11 +70,23 @@ export class WebSocketClient {
 
   /**
    * Attempt to reconnect using the stored token.
-   * No-op if no token is stored (never connected before).
+   * No-op if no token is stored or already connected/connecting.
+   * Cancels any pending auto-reconnect timer and resets backoff.
    * Used by ConnectionBanner's manual reconnect button.
    */
   tryReconnect(): void {
     if (!this.token) return;
+    if (this.state === 'connected' || this.state === 'connecting') return;
+
+    // Cancel pending auto-reconnect timer to prevent duplicate connections
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+
+    // Reset backoff so next failure starts from 1s, not stale penalty
+    this.reconnectAttempts = 0;
+
     this.reconnect();
   }
 
@@ -244,13 +256,13 @@ export class WebSocketClient {
   private reconnect(): void {
     if (!this.token) return;
 
-    // Null out old WS handlers before creating new connection to prevent
-    // ghost handlers on stale reference if GC is slow
+    // Close old socket and null handlers before creating new connection
     if (this.ws) {
       this.ws.onopen = null;
       this.ws.onclose = null;
       this.ws.onerror = null;
       this.ws.onmessage = null;
+      this.ws.close();
     }
 
     this.setState('connecting');
