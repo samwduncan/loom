@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
-status: defining_requirements
-stopped_at: Defining requirements
+status: ready_to_plan
+stopped_at: Roadmap created, ready to plan Phase 28
 last_updated: "2026-03-12"
-last_activity: 2026-03-12 -- Milestone v1.3 started
+last_activity: 2026-03-12 -- Roadmap created with 10 phases (28-37), 37 requirements mapped
 progress:
-  total_phases: 0
+  total_phases: 10
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Milestone v1.3 "The Refinery" — daily-driver UX + a11y + perf
+**Current focus:** Phase 28 - Error & Connection Resilience
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-12 — Milestone v1.3 started
+Phase: 28 of 37 (Error & Connection Resilience)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-03-12 -- Roadmap created
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -44,7 +46,8 @@ Last activity: 2026-03-12 — Milestone v1.3 started
 
 - Split original M4 "The Polish" into v1.3 "The Refinery" (daily-driver) + v1.4 "The Polish" (visual effects)
 - Daily-driver work comes first to enable real usage feedback before visual polish decisions
-- WebGL effects (Aurora, Grainient, LiquidChrome) deferred to v1.4 with GPU feasibility gate
+- Foundational fixes (error, session) prioritized before feature additions (composer, UX)
+- A11y and perf are cross-cutting -- scheduled last so they audit ALL new features
 
 See PROJECT.md Key Decisions table for full history.
 
@@ -59,5 +62,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-12
-Stopped at: Defining requirements for v1.3
-Resume: Continue requirements definition
+Stopped at: Roadmap created with 10 phases, 37 requirements mapped
+Resume: `/gsd:plan-phase 28`

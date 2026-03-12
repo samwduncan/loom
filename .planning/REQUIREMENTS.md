@@ -5,7 +5,7 @@
 
 ## v1.3 Requirements
 
-Requirements for v1.3 "The Refinery" — daily-driver UX, V1 feature parity, accessibility, and performance.
+Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, accessibility, and performance.
 
 ### Error & Resilience
 
@@ -96,49 +96,49 @@ Requirements for v1.3 "The Refinery" — daily-driver UX, V1 feature parity, acc
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ERR-01 | — | Pending |
-| ERR-02 | — | Pending |
-| ERR-03 | — | Pending |
-| ERR-04 | — | Pending |
-| ERR-05 | — | Pending |
-| FTE-01 | — | Pending |
-| FTE-02 | — | Pending |
-| FTE-03 | — | Pending |
-| FTE-04 | — | Pending |
-| FTE-05 | — | Pending |
-| SESS-01 | — | Pending |
-| SESS-02 | — | Pending |
-| SESS-03 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| COMP-04 | — | Pending |
-| COMP-05 | — | Pending |
-| COMP-06 | — | Pending |
-| UXR-01 | — | Pending |
-| UXR-02 | — | Pending |
-| UXR-03 | — | Pending |
-| UXR-04 | — | Pending |
-| UXR-05 | — | Pending |
-| UXR-06 | — | Pending |
-| UXR-07 | — | Pending |
-| A11Y-01 | — | Pending |
-| A11Y-02 | — | Pending |
-| A11Y-03 | — | Pending |
-| A11Y-04 | — | Pending |
-| A11Y-05 | — | Pending |
-| A11Y-06 | — | Pending |
-| PERF-01 | — | Pending |
-| PERF-02 | — | Pending |
-| PERF-03 | — | Pending |
-| PERF-04 | — | Pending |
-| PERF-05 | — | Pending |
+| ERR-01 | Phase 28 | Pending |
+| ERR-02 | Phase 28 | Pending |
+| ERR-03 | Phase 28 | Pending |
+| ERR-04 | Phase 28 | Pending |
+| ERR-05 | Phase 28 | Pending |
+| FTE-01 | Phase 30 | Pending |
+| FTE-02 | Phase 30 | Pending |
+| FTE-03 | Phase 31 | Pending |
+| FTE-04 | Phase 31 | Pending |
+| FTE-05 | Phase 31 | Pending |
+| SESS-01 | Phase 29 | Pending |
+| SESS-02 | Phase 29 | Pending |
+| SESS-03 | Phase 29 | Pending |
+| COMP-01 | Phase 32 | Pending |
+| COMP-02 | Phase 32 | Pending |
+| COMP-03 | Phase 32 | Pending |
+| COMP-04 | Phase 33 | Pending |
+| COMP-05 | Phase 33 | Pending |
+| COMP-06 | Phase 33 | Pending |
+| UXR-01 | Phase 34 | Pending |
+| UXR-02 | Phase 34 | Pending |
+| UXR-03 | Phase 34 | Pending |
+| UXR-04 | Phase 34 | Pending |
+| UXR-05 | Phase 35 | Pending |
+| UXR-06 | Phase 35 | Pending |
+| UXR-07 | Phase 35 | Pending |
+| A11Y-01 | Phase 36 | Pending |
+| A11Y-02 | Phase 36 | Pending |
+| A11Y-03 | Phase 36 | Pending |
+| A11Y-04 | Phase 36 | Pending |
+| A11Y-05 | Phase 36 | Pending |
+| A11Y-06 | Phase 36 | Pending |
+| PERF-01 | Phase 37 | Pending |
+| PERF-02 | Phase 37 | Pending |
+| PERF-03 | Phase 37 | Pending |
+| PERF-04 | Phase 37 | Pending |
+| PERF-05 | Phase 37 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 37 total
-- Mapped to phases: 0
-- Unmapped: 37 ⚠️
+- Mapped to phases: 37
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-12*
-*Last updated: 2026-03-12 after initial definition*
+*Last updated: 2026-03-12 after roadmap creation*
