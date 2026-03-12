@@ -101,6 +101,57 @@
 
 ---
 
+## Milestone: v1.2 — The Workspace
+
+**Shipped:** 2026-03-12
+**Phases:** 8 | **Plans:** 20
+
+### What Was Built
+- CSS show/hide tab system (Chat/Files/Shell/Git) with mount-once pattern preserving all panel state
+- Full settings modal with 5 tabs (Agents, API Keys, Appearance, Git, MCP) and 14 shadcn primitives
+- Command palette (Cmd+K) with fuzzy search via cmdk + fuse.js across sessions, files, and 7 command groups
+- Hierarchical file tree with type icons, context menus, search filter, and image lightbox
+- CodeMirror 6 code editor with OKLCH theme, multi-tab editing, diff view via @codemirror/merge, Cmd+S save
+- xterm.js terminal with separate /shell WebSocket, OKLCH color scheme, connection state management
+- Git panel with Changes/History views, client-side staging, commit with AI message generation, branch ops, push/pull/fetch
+- Cross-phase integration wiring: DiffEditor connected to git panel, "Open in Terminal" in file tree, keyboard escape guards
+- 39,363 LOC across 145 commits in 3 days
+
+### What Worked
+- **Velocity still increasing** — 10 plans/day (M1: 7, M2: 8.7). The 5-store architecture and established patterns made new panels predictable.
+- **Milestone audit caught real integration gaps** — 3 cross-phase wiring issues (DiffEditor orphaned, Open in Terminal missing, keyboard escape guards unwired) were caught and fixed via Phase 27 gap closure. Without the audit, these would have shipped broken.
+- **shadcn primitives investment in Phase 21** — installing 14 primitives early meant Phases 22-26 could use Dialog, AlertDialog, ContextMenu, etc. without pausing. Good decision to batch the install.
+- **Constitution ESLint rules still holding** — zero violations across 448 total commits. Rules written in Phase 2 caught issues in CodeMirror theme (inline styles), terminal colors, and git panel styling.
+- **Module-level ref pattern** — discovered in Phase 24 for CodeEditor save, reused in Phase 27 for shell input. Clean imperative IO without refs-during-render lint violations.
+
+### What Was Inefficient
+- **Phase 27 gap closure** — shouldn't have been needed. Three integration wiring gaps (ED-15, GIT-06, FT-09) were marked as "deferred" or "complete" by individual phase verifications but were actually just orphaned code. The milestone audit caught what per-phase verification missed.
+- **Summaries still lack one_liner** — third milestone in a row where `summary-extract --fields one_liner` returns null. Need to fix the frontmatter format.
+- **Phase 26 was too large** — 4 plans covering git panel + navigation. Could have been split into two phases. The 4th plan (session rename/delete) was unrelated to git.
+- **SET-07 backend limitation** — discovered during implementation that backend API key schema lacks provider column. Worked around it but it's tech debt.
+
+### Patterns Established
+- **5th Zustand store (file store)** — file tree, open tabs, active file, dirty tracking, diff state. Constitution amended.
+- **CSS show/hide for all panels** — mount-once with display:none/block. Terminal sessions, scroll positions, editor content all preserved.
+- **AlertDialog sibling pattern** — Radix Dialog focus trap conflicts with nested AlertDialog. Solution: render AlertDialog as sibling, not child. Used in Phases 21, 24, and 26.
+- **FetchState const object** — shared across hooks for loading/error/success states. Avoids enum (erasableSyntaxOnly) and prevents duplication.
+- **useApiFetch<T> generic hook** — replaced duplicated fetch machinery across git hooks with single reusable hook.
+- **Module-level register/deregister** — for imperative cross-component communication (shell input, editor save).
+
+### Key Lessons
+1. **Per-phase verification misses integration gaps** — individual phases verify their own scope but can't check cross-phase wiring. Milestone audit is essential for catching orphaned components.
+2. **Install UI primitives early** — batching shadcn installs in one phase prevented "pause to install a dep" interruptions in later phases. Worth the upfront investment.
+3. **CodeMirror 6 > Monaco for this use case** — ~200KB vs ~1MB, modular extensions, OKLCH theme via CSS var() just worked. No regrets on this decision.
+4. **Separate WebSocket for terminal** — kept /shell completely independent from /ws chat. Zero message interleaving, independent lifecycle. Right call.
+5. **Client-side staging is acceptable tech debt** — no /api/git/stage endpoint means staging is a Set<string> in the frontend. Works fine for the use case but diverges from real git semantics.
+
+### Cost Observations
+- Model mix: ~70% Opus, ~25% Sonnet (subagents), ~5% Haiku (subagents)
+- Total execution time: ~2 hours across 20 plans
+- Notable: Plan execution averaging 6 min. Integration wiring plan (Phase 27) took only 6 min — wiring existing code is fast.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -109,6 +160,7 @@
 |-----------|--------|-------|---------------|------------|
 | v1.0 | 10 | 21 | 7 min | Strict dependency chain + automated enforcement from commit #1 |
 | v1.1 | 9 | 26 | 5 min | Research spikes per phase, adversarial reviews, M3 scope pull-forward |
+| v1.2 | 8 | 20 | 6 min | Milestone audit gap closure phase, shadcn batch install, module-level ref pattern |
 
 ### Cumulative Quality
 
@@ -116,10 +168,12 @@
 |-----------|-------|-----|---------|----------|
 | v1.0 | 359+ | 14,423 | 145 | 7 plans/day |
 | v1.1 | 700+ | 24,786 | 303 | 8.7 plans/day |
+| v1.2 | 1,023 | 39,363 | 448 | 10 plans/day |
 
 ### Top Lessons (Verified Across Milestones)
 
-1. Automated enforcement prevents quality rot — 9 ESLint rules caught every banned pattern across 303 commits without modification
-2. Integration audits catch what unit tests miss — mandatory milestone audit before archival (both milestones)
-3. Foundation investment compounds — M1's strict architecture made M2 faster (higher velocity with more complex features)
-4. Research spikes before implementation pay off — both milestones benefited from upfront research, reducing mid-implementation pivots
+1. Automated enforcement prevents quality rot — 9 ESLint rules caught every banned pattern across 448 commits without modification
+2. Integration audits catch what unit tests miss — mandatory milestone audit before archival (all 3 milestones). v1.2 audit found 3 orphaned-component gaps.
+3. Foundation investment compounds — each milestone faster than the last (7 → 8.7 → 10 plans/day)
+4. Research spikes before implementation pay off — all milestones benefited from upfront research, reducing mid-implementation pivots
+5. Batch install shared dependencies early — v1.2's Phase 21 shadcn batch install prevented interruptions in 5 subsequent phases

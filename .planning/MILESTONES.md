@@ -1,5 +1,43 @@
 # Loom V2: Milestone Master Plan
 
+## v1.2 The Workspace (Shipped: 2026-03-12)
+
+**Status:** SHIPPED
+**Shipped:** 2026-03-12
+**Phases:** 8 (20-27) | **Plans:** 20 | **Tasks:** 43 | **Commits:** 145
+**LOC:** 39,363 TypeScript + CSS (+40,039 / -46,179 from v1.1)
+**Timeline:** 3 days (2026-03-09 to 2026-03-12)
+**Archive:** `milestones/v1.2-ROADMAP.md`, `milestones/v1.2-REQUIREMENTS.md`
+
+**Delivered:** Full workspace making Loom a usable daily-driver with CSS show/hide tab system (Chat/Files/Shell/Git), 5-tab settings modal with shadcn primitives, Cmd+K command palette with fuzzy search across 7 command groups, hierarchical file tree with context menus, CodeMirror 6 code editor with OKLCH theme and diff view, xterm.js terminal with separate /shell WebSocket, git panel with staging/commit/branch ops/push-pull-fetch, and cross-phase integration wiring.
+
+**Key Accomplishments:**
+1. Content layout with CSS show/hide tab system — all panels mount once and preserve state across switches
+2. Full settings panel — 5-tab modal (Agents, API Keys, Appearance, Git, MCP) with live preview, 14 shadcn primitives installed
+3. Command palette — Cmd+K with fuzzy search (fuse.js + cmdk) across sessions, files, and 7 command groups
+4. File tree + code editor — hierarchical browser with type icons, CodeMirror 6 with OKLCH theme, multi-tab editing, diff view via @codemirror/merge
+5. Integrated terminal — xterm.js with separate /shell WebSocket, OKLCH colors, connection state, copy/paste
+6. Git panel — Changes/History views, client-side staging, commit with AI message generation, branch selector, push/pull/fetch with loading states
+
+**Known Gaps (accepted as tech debt):**
+- CMD-14: Recent/frequent commands on empty search (deferred — needs command registry for re-execution)
+- SET-07: API key add form has name field only (backend limitation — no key/provider columns)
+- GIT-04: Client-side staging Set<string> instead of immediate API call (intentional deviation — no /api/git/stage endpoint)
+
+**Gate Criteria:**
+- [x] Can switch between Chat/Files/Shell/Git tabs without losing state
+- [x] Settings modal opens from sidebar gear icon and Cmd+K
+- [x] Command palette fuzzy-searches sessions, files, and commands
+- [x] File tree browses project structure with context menus
+- [x] CodeMirror editor opens files with syntax highlighting and saves with Cmd+S
+- [x] Terminal runs shell commands with ANSI color support
+- [x] Git panel shows changes, commits, and handles branch operations
+- [x] Cross-phase integration: diff view from git panel, Open in Terminal from file tree, keyboard escape guards
+- [x] 120/121 requirements satisfied (1 formally deferred)
+- [x] All M1 + M2 + M3 tests pass (1,023 tests across 104 files)
+
+---
+
 ## M2: "The Chat" — Complete Conversation Loop — SHIPPED 2026-03-09
 
 **Status:** SHIPPED
@@ -101,7 +139,7 @@ This document captures the full development vision across all milestones. It per
 
 ---
 
-## M3: "The Polish" — 10/10 Visual Quality
+## M4: "The Polish" — 10/10 Visual Quality
 
 **Goal**: Transform the functional chat into a visually stunning, award-winning interface. Every interaction should feel satisfying.
 
@@ -138,7 +176,7 @@ After M3 phases complete, pause for a holistic visual review of every surface.
 
 ---
 
-## M4: "The Power" — Multi-Agent + Management
+## M5: "The Power" — Multi-Agent + Management
 
 **Goal**: Enable simultaneous work with multiple AI providers and manage the tooling ecosystem from within the app.
 
@@ -162,7 +200,7 @@ After M3 phases complete, pause for a holistic visual review of every surface.
 
 ---
 
-## M5: "The Vision" — Integrations + Extras
+## M6: "The Vision" — Integrations + Extras
 
 **Goal**: Add the unique features that make Loom a one-of-a-kind tool — visual build pipeline, file integration, companions.
 
