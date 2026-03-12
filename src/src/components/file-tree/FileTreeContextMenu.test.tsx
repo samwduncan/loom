@@ -7,8 +7,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { toast } from 'sonner';
 import { FileContextMenu, DirContextMenu } from './FileTreeContextMenu';
 import { useFileStore } from '@/stores/file';
+import { useUIStore } from '@/stores/ui';
+import * as shellInput from '@/lib/shell-input';
 import type { FileTreeNode } from '@/types/file';
 
 // Mock toast
@@ -56,6 +59,7 @@ describe('FileContextMenu', () => {
     expect(screen.getByText('Copy Path')).toBeInTheDocument();
     expect(screen.getByText('Copy Relative Path')).toBeInTheDocument();
     expect(screen.getByText('Open in Editor')).toBeInTheDocument();
+    expect(screen.getByText('Open in Terminal')).toBeInTheDocument();
   });
 
   it('Copy Path copies absolute path to clipboard', async () => {
@@ -101,6 +105,40 @@ describe('FileContextMenu', () => {
     await user.click(screen.getByText('Copy Relative Path'));
 
     expect(clipboardSpy).toHaveBeenCalledWith('/home/project/src/main.ts');
+  });
+
+  it('Open in Terminal switches to shell tab and sends cd command', async () => {
+    const { user } = setupWithClipboardSpy();
+    const sendToShellSpy = vi.spyOn(shellInput, 'sendToShell').mockReturnValue(true);
+    const setActiveTabSpy = vi.spyOn(useUIStore.getState(), 'setActiveTab');
+
+    render(
+      <FileContextMenu filePath="/home/project/src/main.ts" projectRoot="/home/project">
+        <span>Right-click me</span>
+      </FileContextMenu>,
+    );
+
+    await user.pointer({ keys: '[MouseRight]', target: screen.getByText('Right-click me') });
+    await user.click(screen.getByText('Open in Terminal'));
+
+    expect(setActiveTabSpy).toHaveBeenCalledWith('shell');
+    expect(sendToShellSpy).toHaveBeenCalledWith("cd '/home/project/src'\r");
+  });
+
+  it('Open in Terminal shows error toast when terminal not connected', async () => {
+    const { user } = setupWithClipboardSpy();
+    vi.spyOn(shellInput, 'sendToShell').mockReturnValue(false);
+
+    render(
+      <FileContextMenu filePath="/home/project/src/main.ts" projectRoot="/home/project">
+        <span>Right-click me</span>
+      </FileContextMenu>,
+    );
+
+    await user.pointer({ keys: '[MouseRight]', target: screen.getByText('Right-click me') });
+    await user.click(screen.getByText('Open in Terminal'));
+
+    expect(toast.error).toHaveBeenCalledWith('Terminal not connected');
   });
 });
 

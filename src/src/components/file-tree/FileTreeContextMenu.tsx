@@ -11,7 +11,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { Copy, FileText, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
+import { Copy, FileText, Terminal, ChevronsUpDown, ChevronsDownUp } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   ContextMenu,
@@ -21,6 +21,8 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { useFileStore } from '@/stores/file';
+import { useUIStore } from '@/stores/ui';
+import { sendToShell } from '@/lib/shell-input';
 import type { FileTreeNode } from '@/types/file';
 
 export interface FileContextMenuProps {
@@ -76,6 +78,7 @@ export const FileContextMenu = function FileContextMenu({
   projectRoot,
 }: FileContextMenuProps) {
   const openFile = useFileStore((s) => s.openFile);
+  const setActiveTab = useUIStore((s) => s.setActiveTab);
 
   const handleCopyPath = () => {
     copyToClipboard(filePath);
@@ -87,6 +90,16 @@ export const FileContextMenu = function FileContextMenu({
 
   const handleOpenInEditor = () => {
     openFile(filePath);
+  };
+
+  const handleOpenInTerminal = () => {
+    const dirPath = filePath.slice(0, filePath.lastIndexOf('/'));
+    setActiveTab('shell');
+    const escaped = dirPath.replace(/'/g, "'\\''");
+    const sent = sendToShell(`cd '${escaped}'\r`);
+    if (!sent) {
+      toast.error('Terminal not connected');
+    }
   };
 
   return (
@@ -105,6 +118,11 @@ export const FileContextMenu = function FileContextMenu({
         <ContextMenuItem onSelect={handleOpenInEditor}>
           <FileText size={14} />
           Open in Editor
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem onSelect={handleOpenInTerminal}>
+          <Terminal size={14} />
+          Open in Terminal
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>

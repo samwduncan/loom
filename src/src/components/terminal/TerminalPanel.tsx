@@ -11,6 +11,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useShellWebSocket } from '@/hooks/useShellWebSocket';
 import { useProjectContext } from '@/hooks/useProjectContext';
+import { registerShellInput, unregisterShellInput } from '@/lib/shell-input';
 import { TerminalHeader } from './TerminalHeader';
 import { TerminalView } from './TerminalView';
 import { TerminalOverlay } from './TerminalOverlay';
@@ -60,6 +61,12 @@ export const TerminalPanel = function TerminalPanel() {
     }
   }, [isLoading, projectPath, connect]);
 
+  // Register sendInput for cross-component terminal access
+  useEffect(() => {
+    registerShellInput(sendInput);
+    return () => unregisterShellInput();
+  }, [sendInput]);
+
   // User keystrokes from terminal -> WS
   const handleData = useCallback(
     (data: string) => {
@@ -77,7 +84,7 @@ export const TerminalPanel = function TerminalPanel() {
   );
 
   return (
-    <div className="flex h-full flex-col">
+    <div data-terminal="" className="flex h-full flex-col">
       <TerminalHeader
         state={state}
         onRestart={restart}
