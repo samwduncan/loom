@@ -88,11 +88,11 @@
   3. A persistent connection status indicator shows connected/reconnecting/disconnected state at all times
   4. Attempting to close or navigate away during active streaming shows a browser confirmation dialog
   5. After successful reconnection, the user can continue working without refreshing the page
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 28-01: TBD
-- [ ] 28-02: TBD
+- [ ] 28-01-PLAN.md -- Connection status indicator + error/reconnection banner UI
+- [ ] 28-02-PLAN.md -- Navigate-away guard + WebSocket reconnect hardening
 
 ### Phase 29: Session Hardening
 **Goal**: Users can work with long conversations reliably and see real-time session activity
@@ -236,7 +236,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 1-10 | v1.0 | 21/21 | Complete | 2026-03-07 |
 | 11-19 | v1.1 | 26/26 | Complete | 2026-03-09 |
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
-| 28. Error & Connection Resilience | v1.3 | 0/? | Not started | - |
+| 28. Error & Connection Resilience | v1.3 | 0/2 | Planned | - |
 | 29. Session Hardening | v1.3 | 0/? | Not started | - |
 | 30. File Tree Git Integration | v1.3 | 0/? | Not started | - |
 | 31. Editor & Tool Enhancements | v1.3 | 0/? | Not started | - |
@@ -253,4 +253,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-12 after v1.3 roadmap created*
+*Last updated: 2026-03-12 after Phase 28 planning*
