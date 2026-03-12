@@ -65,7 +65,7 @@
 - Integer phases (28, 29, 30...): Planned milestone work
 - Decimal phases (28.1, 28.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 28: Error & Connection Resilience** - Crash detection, reconnection overlay, connection status, and navigate-away protection
+- [x] **Phase 28: Error & Connection Resilience** - Crash detection, reconnection overlay, connection status, and navigate-away protection (completed 2026-03-12)
 - [ ] **Phase 29: Session Hardening** - Paginated history, streaming indicators, and temporary ID lifecycle
 - [ ] **Phase 30: File Tree Git Integration** - Git change indicators on file tree nodes with live updates
 - [ ] **Phase 31: Editor & Tool Enhancements** - Editor minimap and "Run in Terminal" bridge from Bash tool cards
@@ -236,7 +236,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 1-10 | v1.0 | 21/21 | Complete | 2026-03-07 |
 | 11-19 | v1.1 | 26/26 | Complete | 2026-03-09 |
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
-| 28. Error & Connection Resilience | 1/2 | In Progress|  | - |
+| 28. Error & Connection Resilience | 2/2 | Complete   | 2026-03-12 | - |
 | 29. Session Hardening | v1.3 | 0/? | Not started | - |
 | 30. File Tree Git Integration | v1.3 | 0/? | Not started | - |
 | 31. Editor & Tool Enhancements | v1.3 | 0/? | Not started | - |

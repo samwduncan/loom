@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
-status: executing
-stopped_at: Completed 28-01-PLAN.md
-last_updated: "2026-03-12T15:42:46.802Z"
-last_activity: 2026-03-12 -- Completed 28-01 Connection Health UI
+status: phase_complete
+stopped_at: Completed 28-02-PLAN.md (Phase 28 complete)
+last_updated: "2026-03-12T15:45:30Z"
+last_activity: 2026-03-12 -- Completed 28-02 WS Reconnect Hardening & Navigate-Away Guard
 progress:
   total_phases: 10
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 ## Current Position
 
 Phase: 28 of 37 (Error & Connection Resilience)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-12 -- Completed 28-01 Connection Health UI
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase 28 Complete
+Last activity: 2026-03-12 -- Completed 28-02 WS Reconnect & Navigate-Away Guard
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -53,6 +53,8 @@ Progress: [█████░░░░░] 50%
 
 See PROJECT.md Key Decisions table for full history.
 - [Phase 28]: Used tryReconnect() on WebSocketClient for manual reconnect button
+- [Phase 28]: Defensive null-out of old WS handlers before reconnect to prevent ghost callbacks
+- [Phase 28]: useNavigateAwayGuard uses beforeunload + Zustand isStreaming selector
 
 ### Pending Todos
 
@@ -64,6 +66,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-12T15:42:46.800Z
-Stopped at: Completed 28-01-PLAN.md
-Resume: `/gsd:execute-phase 28` (plan 02)
+Last session: 2026-03-12T15:45:30Z
+Stopped at: Phase 28 complete (all 2 plans)
+Resume: `/gsd:plan-phase 29` or `/gsd:discuss-phase 29`
