@@ -53,7 +53,7 @@ export function DiffEditor({ oldContent, newContent, filePath }: DiffEditorProps
   if (langExtension) sharedExtensions.push(langExtension);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div data-codemirror="" className="flex flex-col h-full overflow-hidden">
       <EditorBreadcrumb filePath={filePath} />
       {/* Diff badge */}
       <div className="flex items-center px-3 py-1 border-b border-border/8 text-xs">

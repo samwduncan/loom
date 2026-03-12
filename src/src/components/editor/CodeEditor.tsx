@@ -209,7 +209,7 @@ export function CodeEditor() {
   const displayContent = contentCache.get(activeFilePath) ?? content ?? '';
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div data-codemirror="" className="flex flex-col h-full overflow-hidden">
       <EditorBreadcrumb filePath={activeFilePath} />
       {/* Toolbar strip */}
       <div className="flex items-center justify-between px-3 py-1 border-b border-border/8 text-xs text-muted-foreground">
