@@ -212,6 +212,28 @@ describe('auto-reconnect', () => {
     expect(MockWebSocket.instances.length).toBe(countBefore + 1); // reconnected at 30s
   });
 
+  it('nulls out old WS handlers before creating new connection', () => {
+    client.connect('test-token');
+    getLastWS().simulateOpen();
+
+    const oldWs = getLastWS();
+    getLastWS().simulateClose(1006);
+
+    vi.advanceTimersByTime(1000); // trigger reconnect
+
+    // Old WS instance should have handlers nulled out
+    expect(oldWs.onopen).toBeNull();
+    expect(oldWs.onclose).toBeNull();
+    expect(oldWs.onerror).toBeNull();
+    expect(oldWs.onmessage).toBeNull();
+
+    // New WS instance should have handlers set
+    const newWs = getLastWS();
+    expect(newWs).not.toBe(oldWs);
+    expect(newWs.onopen).not.toBeNull();
+    expect(newWs.onclose).not.toBeNull();
+  });
+
   it('resets reconnect attempts on successful connect', () => {
     client.connect('test-token');
     getLastWS().simulateOpen();

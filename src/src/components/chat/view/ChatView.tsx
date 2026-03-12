@@ -21,6 +21,7 @@ import { useSessionSwitch } from '@/hooks/useSessionSwitch';
 import { useMessageSearch } from '@/hooks/useMessageSearch';
 import { useTimelineStore } from '@/stores/timeline';
 import { useUIStore } from '@/stores/ui';
+import { useNavigateAwayGuard } from '@/hooks/useNavigateAwayGuard';
 import { ChatEmptyState } from '@/components/chat/view/ChatEmptyState';
 import { MessageList } from '@/components/chat/view/MessageList';
 import { MessageListSkeleton } from '@/components/chat/view/MessageListSkeleton';
@@ -36,6 +37,7 @@ import type { Message } from '@/types/message';
 const EMPTY_MESSAGES: Message[] = [];
 
 export function ChatView() {
+  useNavigateAwayGuard();
   const { sessionId } = useParams<{ sessionId: string }>();
   const { projectName } = useProjectContext();
   const { switchSession, isLoadingMessages } = useSessionSwitch();

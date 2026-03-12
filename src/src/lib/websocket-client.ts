@@ -244,6 +244,15 @@ export class WebSocketClient {
   private reconnect(): void {
     if (!this.token) return;
 
+    // Null out old WS handlers before creating new connection to prevent
+    // ghost handlers on stale reference if GC is slow
+    if (this.ws) {
+      this.ws.onopen = null;
+      this.ws.onclose = null;
+      this.ws.onerror = null;
+      this.ws.onmessage = null;
+    }
+
     this.setState('connecting');
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
