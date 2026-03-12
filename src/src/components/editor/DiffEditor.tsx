@@ -4,9 +4,7 @@
  * Renders old (original) and new (modified) content in a read-only
  * merge view with OKLCH theme and diff-colored backgrounds.
  *
- * Not wired into the main CodeEditor yet -- will be activated by the
- * git panel in Phase 26. Exported as both named and default for
- * potential lazy loading.
+ * Activated by the git panel via DiffEditorWrapper when diffFilePath is set.
  *
  * Constitution: Named export (2.2), design tokens (7.14), no inline styles.
  */

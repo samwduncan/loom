@@ -73,10 +73,7 @@ export const useFileStore = create<FileStore>()((set) => ({
   },
 
   setActiveFile: (path: string | null) => {
-    set((state) => ({
-      activeFilePath: path,
-      diffFilePath: path !== state.diffFilePath ? null : state.diffFilePath,
-    }));
+    set({ activeFilePath: path });
   },
 
   openDiff: (path: string) => {
