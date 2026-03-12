@@ -70,7 +70,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **FT-06**: Clicking a file opens it in the code editor panel (right side of Files tab)
 - [x] **FT-07**: Currently open file is highlighted in the tree
 - [x] **FT-08**: Search/filter input at top of tree panel filters visible files/folders by fuzzy match as user types
-- [ ] **FT-09**: Right-click context menu on files with actions: Copy Path, Copy Relative Path, Open in Editor, Open Containing Folder in Terminal
+- [x] **FT-09**: Right-click context menu on files with actions: Copy Path, Copy Relative Path, Open in Editor, Open Containing Folder in Terminal
 - [x] **FT-10**: Right-click context menu on directories with actions: Copy Path, Expand All, Collapse All
 - [x] **FT-11**: Image files (png, jpg, gif, svg, webp) open in lightbox preview instead of code editor
 - [x] **FT-12**: File tree shows loading skeleton on initial fetch
@@ -95,7 +95,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **ED-12**: Cmd+F / Ctrl+F opens CodeMirror's built-in search within active file
 - [x] **ED-13**: User can toggle word wrap via button in editor header
 - [x] **ED-14**: Editor supports diff view mode -- shows unified or side-by-side diff using @codemirror/merge
-- [ ] **ED-15**: Diff view activated when opening files from git panel's changed files list
+- [x] **ED-15**: Diff view activated when opening files from git panel's changed files list
 - [x] **ED-16**: Clicking a file path in a chat tool card (Read, Edit, Write) switches to Files tab and opens that file in the editor
 - [x] **ED-17**: Editor is lazy-loaded via React.lazy() + Suspense with loading skeleton -- not in initial bundle
 - [x] **ED-18**: Binary files show "Binary file -- cannot display" message instead of editor
@@ -127,7 +127,7 @@ Requirements for M3 "The Workspace" milestone. Each maps to roadmap phases.
 - [x] **GIT-03**: Each file row shows: status icon (M/A/D/?), filename, relative path, checkbox for staging
 - [x] **GIT-04**: Clicking checkbox stages/unstages the file (immediate API call)
 - [x] **GIT-05**: "Select All" and "Deselect All" buttons above the file list
-- [ ] **GIT-06**: Clicking a changed file opens its diff in the code editor (switches to Files tab, activates diff view)
+- [x] **GIT-06**: Clicking a changed file opens its diff in the code editor (switches to Files tab, activates diff view)
 - [x] **GIT-07**: Commit composer at bottom: auto-resize textarea for message, "Commit" button disabled when nothing staged or message empty
 - [x] **GIT-08**: Successful commit shows toast, clears message, refreshes changes list
 - [x] **GIT-09**: Failed commit shows error toast with reason
@@ -268,7 +268,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FT-06 | Phase 23 | Complete |
 | FT-07 | Phase 23 | Complete |
 | FT-08 | Phase 23 | Complete |
-| FT-09 | Phase 27 | Pending |
+| FT-09 | Phase 27 | Complete |
 | FT-10 | Phase 23 | Complete |
 | FT-11 | Phase 23 | Complete |
 | FT-12 | Phase 23 | Complete |
@@ -290,7 +290,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ED-12 | Phase 24 | Complete |
 | ED-13 | Phase 24 | Complete |
 | ED-14 | Phase 24 | Complete |
-| ED-15 | Phase 27 | Pending |
+| ED-15 | Phase 27 | Complete |
 | ED-16 | Phase 24 | Complete |
 | ED-17 | Phase 24 | Complete |
 | ED-18 | Phase 24 | Complete |
@@ -316,7 +316,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GIT-03 | Phase 26 | Complete |
 | GIT-04 | Phase 26 | Complete |
 | GIT-05 | Phase 26 | Complete |
-| GIT-06 | Phase 27 | Pending |
+| GIT-06 | Phase 27 | Complete |
 | GIT-07 | Phase 26 | Complete |
 | GIT-08 | Phase 26 | Complete |
 | GIT-09 | Phase 26 | Complete |

@@ -54,7 +54,7 @@
 - [x] **Phase 24: Code Editor** - CodeMirror 6 with syntax highlighting, file tabs, read/write, diff view, OKLCH theme (completed 2026-03-11)
 - [x] **Phase 25: Terminal** - xterm.js terminal with separate /shell WebSocket, auto-resize, connection state (completed 2026-03-11)
 - [x] **Phase 26: Git Panel + Navigation** - Changes/history views, staging, commit, branch ops, session management (completed 2026-03-11)
-- [ ] **Phase 27: Cross-Phase Integration Wiring** - Wire DiffEditor to git panel, add Open in Terminal menu item, add keyboard escape guard attributes (gap closure)
+- [x] **Phase 27: Cross-Phase Integration Wiring** - Wire DiffEditor to git panel, add Open in Terminal menu item, add keyboard escape guard attributes (gap closure) (completed 2026-03-12)
 
 ## Phase Details
 
@@ -205,7 +205,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26 -> 27
 | 24. Code Editor | 3/3 | Complete    | 2026-03-11 | - |
 | 25. Terminal | 2/2 | Complete   | 2026-03-11 | - |
 | 26. Git Panel + Navigation | 4/4 | Complete   | 2026-03-11 | - |
-| 27. Cross-Phase Integration Wiring | 0/1 | Pending   | - | - |
+| 27. Cross-Phase Integration Wiring | 1/1 | Complete   | 2026-03-12 | - |
 
 ## Backlog (Future Milestones)
 

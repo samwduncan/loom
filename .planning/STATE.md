@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: "The Workspace"
-status: completed
-stopped_at: Completed 26-03-PLAN.md (Header + History)
-last_updated: "2026-03-11T02:58:00Z"
-last_activity: 2026-03-11 -- Plan 26-03 complete (GitPanelHeader + HistoryView)
+status: in-progress
+stopped_at: Phase 27 Plan 01 complete -- integration wiring done
+last_updated: "2026-03-12T01:05:29Z"
+last_activity: 2026-03-12 -- Phase 27 Plan 01 cross-phase integration wiring executed
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 7
-  total_plans: 19
-  completed_plans: 19
+  total_plans: 21
+  completed_plans: 21
   percent: 100
 ---
 
@@ -21,24 +21,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 26 (Git Panel) -- next phase
+**Current focus:** M3 "The Workspace" -- Phase 27 gap closure in progress
 
 ## Current Position
 
-Phase: 26 of 26 (Git Panel)
-Plan: 4 of 4
-Status: Plan 26-04 complete
-Last activity: 2026-03-11 -- Plan 26-04 complete (session rename + delete confirmation)
+Phase: 27 of 27 (Cross-Phase Integration Wiring)
+Plan: 1 of 1
+Status: Plan 01 complete, phase ready for verification
+Last activity: 2026-03-12 -- Phase 27 Plan 01 executed (3 tasks, 3 commits)
 
-Progress: [████████████████████] 100% (20/20 plans complete)
+Progress: [████████████████████] 100% (21/21 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
 - M1: 21 plans in 3 days (7 plans/day)
 - M2: 26 plans in 3 days (8.7 plans/day)
-- Total: 47 plans in 6 days
-- M3 estimate: 18 plans at ~8 plans/day = ~2.3 days
+- M3: 20 plans in 2 days (10 plans/day)
+- Phase 27: 1 plan in 6 min
+- Total: 68 plans in 8 days
 
 ## Accumulated Context
 
@@ -74,7 +75,6 @@ See PROJECT.md Key Decisions table.
 - 23-01: createElement over JSX for dynamic icon rendering (avoids react-hooks/static-components lint violation)
 - 23-01: file-icons.ts separated from FileIcon.tsx for react-refresh compatibility
 - 23-01: useState (not useRef) for prev-projectName tracking in adjust-state-during-rendering pattern
-- [Phase 23]: createElement over JSX for dynamic icon rendering (avoids react-hooks/static-components)
 - 23-02: FileNode subscribes to store slices per-instance (isExpanded, isActive) for minimal re-renders
 - 23-02: matchesFilter recursive helper for search filtering in both FileNode and FileTree
 - 23-02: Loading skeleton uses file-node CSS class with --depth instead of inline marginLeft (Constitution compliance)
@@ -106,10 +106,12 @@ See PROJECT.md Key Decisions table.
 - 26-04: SessionItem inline edit: local isEditing + isEditing prop for context menu trigger; blur confirms
 - 26-04: AlertDialog sibling pattern for delete confirmation (consistent with Phase 21/24)
 - [Phase 26]: Client-side staging model (Set<string>) rather than server-side git staging area
-- 26-03: Outside-click mousedown listener for branch dropdown (no shadcn Popover dependency)
-- 26-03: Per-button loading state (pushing/pulling/fetching) for independent remote operation tracking
-- 26-03: CommitRow diff fetched on expand from /api/git/commit-diff, displayed as raw pre/code
-- 26-03: formatRelativeDate inline utility in CommitRow (m/h/d ago format)
+- [Phase 26]: useApiFetch<T> generic hook replaces duplicated FetchState machinery across git hooks
+- [Phase 26]: Single activeOp union state for push/pull/fetch (prevents concurrent remote ops)
+- [Phase 26]: activeHashRef pattern for race condition protection in HistoryView diff fetching
+- 27-01: Module-level ref pattern for shell-input (same as CodeEditor _saveFn) -- imperative IO, not reactive state
+- 27-01: DiffEditorWrapper as thin data-fetching layer between file store and DiffEditor
+- 27-01: diffFilePath === activeFilePath guard for diff mode activation in FileTreePanel
 
 ### Pending Todos
 
@@ -121,6 +123,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-11T02:58:00Z
-Stopped at: Completed 26-03-PLAN.md (Header + History)
-Resume: Plan 26-04 or phase verification
+Last session: 2026-03-12T01:05:29Z
+Stopped at: Phase 27 Plan 01 complete
+Resume: /gsd:verify-work or next plan if phase has more plans
