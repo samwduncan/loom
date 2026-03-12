@@ -4,7 +4,7 @@
 
 - v1.0 "The Skeleton" - Phases 1-10 (shipped 2026-03-07)
 - v1.1 "The Chat" - Phases 11-19 (shipped 2026-03-09)
-- **v1.2 "The Workspace"** - Phases 20-26 (in progress)
+- **v1.2 "The Workspace"** - Phases 20-27 (in progress)
 
 ## Phases
 
@@ -54,6 +54,7 @@
 - [x] **Phase 24: Code Editor** - CodeMirror 6 with syntax highlighting, file tabs, read/write, diff view, OKLCH theme (completed 2026-03-11)
 - [x] **Phase 25: Terminal** - xterm.js terminal with separate /shell WebSocket, auto-resize, connection state (completed 2026-03-11)
 - [x] **Phase 26: Git Panel + Navigation** - Changes/history views, staging, commit, branch ops, session management (completed 2026-03-11)
+- [ ] **Phase 27: Cross-Phase Integration Wiring** - Wire DiffEditor to git panel, add Open in Terminal menu item, add keyboard escape guard attributes (gap closure)
 
 ## Phase Details
 
@@ -174,10 +175,24 @@ Plans:
 - [ ] 26-03-PLAN.md -- GitPanelHeader with branch selector + push/pull/fetch, HistoryView with commit list + click-to-diff
 - [ ] 26-04-PLAN.md -- Session rename (double-click inline edit) and delete confirmation dialog
 
+### Phase 27: Cross-Phase Integration Wiring
+**Goal**: Close all cross-phase integration gaps identified by milestone audit — wire existing components that were built but never connected
+**Depends on**: Phase 24, Phase 25, Phase 26
+**Requirements**: ED-15, GIT-06, FT-09
+**Gap Closure**: Closes gaps from v1.2 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Clicking a changed file in the git panel's Changes view opens that file in DiffEditor (side-by-side diff), not regular CodeEditor
+  2. Right-clicking a file in the file tree shows "Open in Terminal" menu item; clicking it switches to Shell tab
+  3. Keyboard shortcuts (Cmd+1-4, Cmd+K) do NOT fire when the user is typing in the terminal or code editor
+**Plans**: 1 plan
+
+Plans:
+- [ ] 27-01-PLAN.md -- Wire DiffEditor to ChangesView, add Open in Terminal menu item, add data-terminal/data-codemirror escape guard attributes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
+Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26 -> 27
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -190,6 +205,7 @@ Phases execute in numeric order: 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 26
 | 24. Code Editor | 3/3 | Complete    | 2026-03-11 | - |
 | 25. Terminal | 2/2 | Complete   | 2026-03-11 | - |
 | 26. Git Panel + Navigation | 4/4 | Complete   | 2026-03-11 | - |
+| 27. Cross-Phase Integration Wiring | 0/1 | Pending   | - | - |
 
 ## Backlog (Future Milestones)
 
