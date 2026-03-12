@@ -1087,7 +1087,10 @@ router.post('/discard', async (req, res) => {
 
     if (status === '??') {
       // Untracked file or directory - delete it
-      const filePath = path.join(projectPath, file);
+      const filePath = path.resolve(projectPath, file);
+      if (!filePath.startsWith(projectPath + path.sep) && filePath !== projectPath) {
+        return res.status(400).json({ error: 'Invalid file path' });
+      }
       const stats = await fs.stat(filePath);
 
       if (stats.isDirectory()) {
@@ -1136,7 +1139,10 @@ router.post('/delete-untracked', async (req, res) => {
     }
 
     // Delete the untracked file or directory
-    const filePath = path.join(projectPath, file);
+    const filePath = path.resolve(projectPath, file);
+    if (!filePath.startsWith(projectPath + path.sep) && filePath !== projectPath) {
+      return res.status(400).json({ error: 'Invalid file path' });
+    }
     const stats = await fs.stat(filePath);
 
     if (stats.isDirectory()) {
