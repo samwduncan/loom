@@ -14,6 +14,7 @@ import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import { Sidebar } from '@/components/sidebar/Sidebar';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { ConnectionBanner } from '@/components/shared/ConnectionBanner';
 import { ContentArea } from '@/components/content-area/view/ContentArea';
 
 const LazySettingsModal = lazy(() =>
@@ -33,6 +34,7 @@ export const AppShell = memo(function AppShell() {
 
   return (
     <>
+    <ConnectionBanner />
     <div
       data-testid="app-shell"
       data-sidebar-state={sidebarOpen ? 'expanded' : 'collapsed-hidden'}

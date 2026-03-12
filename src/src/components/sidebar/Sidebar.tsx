@@ -12,9 +12,10 @@
  */
 
 import { memo } from 'react';
-import { Settings } from 'lucide-react';
+import { Settings, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
+import { ConnectionStatusIndicator } from '@/components/shared/ConnectionStatusIndicator';
 import { NewChatButton } from './NewChatButton';
 import { SessionList } from './SessionList';
 
@@ -37,20 +38,7 @@ export const Sidebar = memo(function Sidebar() {
         aria-label="Expand sidebar"
         type="button"
       >
-        {/* Chevron right */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="9 18 15 12 9 6" />
-        </svg>
+        <ChevronRight size={16} />
       </button>
     );
   }
@@ -65,7 +53,10 @@ export const Sidebar = memo(function Sidebar() {
       )}
     >
       <header className="flex items-center justify-between p-4 border-b border-border">
-        <span className="font-serif italic text-lg text-foreground">Loom</span>
+        <span className="flex items-center gap-2">
+          <span className="font-serif italic text-lg text-foreground">Loom</span>
+          <ConnectionStatusIndicator />
+        </span>
         <button
           onClick={toggleSidebar}
           className={cn(
@@ -76,20 +67,7 @@ export const Sidebar = memo(function Sidebar() {
           aria-label="Collapse sidebar"
           type="button"
         >
-          {/* Chevron left */}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <ChevronLeft size={16} />
         </button>
       </header>
       <div className="px-2 py-2 border-b border-border">
@@ -98,7 +76,7 @@ export const Sidebar = memo(function Sidebar() {
       <SessionList />
       <footer className="mt-auto p-3 border-t border-border">
         <button
-          onClick={() => openModal({ type: 'settings', props: {} })}
+          onClick={() => openModal({ type: 'settings' })}
           className={cn(
             'p-2 rounded-md',
             'text-muted hover:text-foreground',
