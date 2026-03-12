@@ -25,6 +25,8 @@ import { useOpenDiff } from '@/hooks/useOpenDiff';
 import { ChangedFileRow } from '@/components/git/ChangedFileRow';
 import { CommitComposer } from '@/components/git/CommitComposer';
 import { toast } from 'sonner';
+import { evictFileCache } from '@/components/editor/content-cache';
+import { useFileStore } from '@/stores/file';
 import type { GitFileChange, GitFileStatus } from '@/types/git';
 
 export interface ChangesViewProps {
@@ -105,6 +107,8 @@ export function ChangesView({ files, refetchStatus }: ChangesViewProps) {
       } else {
         await ops.discard(discardTarget.path);
       }
+      evictFileCache(discardTarget.path);
+      useFileStore.getState().setDirty(discardTarget.path, false);
       refetchStatus();
     } catch (err: unknown) {
       toast.error(`Discard failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
