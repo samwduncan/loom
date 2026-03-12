@@ -38,21 +38,21 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Active
 
-**Next Milestone: v1.3 "The Polish"**
+**Current Milestone: v1.3 "The Refinery"**
 
-**Goal:** Transform functional workspace into a visually stunning, award-winning interface with spring physics, glass effects, accessibility, and performance optimization.
+**Goal:** Make Loom a daily-driver by filling UX gaps, triaging V1 feature backlog, hardening accessibility, and auditing performance.
 
 **Target features:**
-- [ ] Spring physics animations on all interactions
-- [ ] Aurora/ambient overlay during streaming
-- [ ] Glass surface effects for modals and overlays
-- [ ] Sidebar slim collapse mode (icon-only rail)
+- [ ] V1 feature backlog triage and implementation (highest-impact items)
+- [ ] File change indicators from git status on file tree nodes
+- [ ] Error banner system (crash/exit detection, reconnect handling)
+- [ ] Session protection (navigate-away warning)
 - [ ] Full accessibility pass (ARIA roles, keyboard nav, screen reader)
 - [ ] Performance audit (FPS during streaming, memory profiling)
-- [ ] File change indicators from git status on file tree nodes
 - [ ] Editor minimap, "Run in Terminal" on Bash tool cards
 
 **Future milestones:**
+- v1.4 "The Polish" — Springs, aurora, glass, sidebar slim, motion refinement, visual effects
 - M5 "The Power" — Multi-provider tabs, MCP management
 - M6 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
 
@@ -135,4 +135,4 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 | DiffEditorWrapper data-fetching layer | Keeps DiffEditor pure (props-only), wrapper handles useFileDiff | Good — clean separation |
 
 ---
-*Last updated: 2026-03-12 after v1.2 milestone*
+*Last updated: 2026-03-12 after v1.3 milestone started*
