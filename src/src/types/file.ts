@@ -18,6 +18,7 @@ export interface FileState {
   selectedPath: string | null;
   openTabs: FileTab[];
   activeFilePath: string | null;
+  diffFilePath: string | null;
 }
 
 export interface FileActions {
@@ -27,6 +28,8 @@ export interface FileActions {
   closeFile: (path: string) => void;
   setDirty: (path: string, isDirty: boolean) => void;
   setActiveFile: (path: string | null) => void;
+  openDiff: (path: string) => void;
+  closeDiff: () => void;
   expandDirs: (paths: string[]) => void;
   collapseDirs: (paths: string[]) => void;
   reset: () => void;

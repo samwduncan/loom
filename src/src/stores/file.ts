@@ -15,6 +15,7 @@ const INITIAL_FILE_STATE: FileState = {
   selectedPath: null,
   openTabs: [],
   activeFilePath: null,
+  diffFilePath: null,
 };
 
 export const useFileStore = create<FileStore>()((set) => ({
@@ -58,6 +59,7 @@ export const useFileStore = create<FileStore>()((set) => ({
         activeFilePath: isClosingActive
           ? (remaining[remaining.length - 1]?.filePath ?? null)
           : state.activeFilePath,
+        diffFilePath: state.diffFilePath === path ? null : state.diffFilePath,
       };
     });
   },
@@ -71,7 +73,18 @@ export const useFileStore = create<FileStore>()((set) => ({
   },
 
   setActiveFile: (path: string | null) => {
-    set({ activeFilePath: path });
+    set((state) => ({
+      activeFilePath: path,
+      diffFilePath: path !== state.diffFilePath ? null : state.diffFilePath,
+    }));
+  },
+
+  openDiff: (path: string) => {
+    set({ diffFilePath: path });
+  },
+
+  closeDiff: () => {
+    set({ diffFilePath: null });
   },
 
   expandDirs: (paths: string[]) => {

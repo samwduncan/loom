@@ -27,10 +27,10 @@ vi.mock('@/hooks/useGitOperations', () => ({
   }),
 }));
 
-// Mock useOpenInEditor
-const mockOpenInEditor = vi.fn();
-vi.mock('@/hooks/useOpenInEditor', () => ({
-  useOpenInEditor: () => mockOpenInEditor,
+// Mock useOpenDiff
+const mockOpenDiff = vi.fn();
+vi.mock('@/hooks/useOpenDiff', () => ({
+  useOpenDiff: () => mockOpenDiff,
 }));
 
 // Mock sonner toast
@@ -118,14 +118,14 @@ describe('ChangesView', () => {
     checkboxes.forEach((cb) => expect(cb).not.toBeChecked());
   });
 
-  it('clicking file row calls openInEditor', async () => {
+  it('clicking file row calls openDiff', async () => {
     const user = userEvent.setup();
     render(<ChangesView files={mockFiles} refetchStatus={mockRefetch} />);
 
     // Click the file name text (not checkbox)
     await user.click(screen.getByText('app.tsx'));
 
-    expect(mockOpenInEditor).toHaveBeenCalledWith('src/app.tsx');
+    expect(mockOpenDiff).toHaveBeenCalledWith('src/app.tsx');
   });
 
   it('discard button shows confirmation dialog', async () => {

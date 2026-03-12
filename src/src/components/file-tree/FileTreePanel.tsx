@@ -16,6 +16,7 @@ import { cn } from '@/utils/cn';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useFileTree } from '@/hooks/useFileTree';
 import { useFileSave } from '@/hooks/useFileSave';
+import { useFileStore } from '@/stores/file';
 import { EditorTabs } from '@/components/editor/EditorTabs';
 import { contentCache } from '@/components/editor/content-cache';
 import { FileTree } from './FileTree';
@@ -24,6 +25,12 @@ import './styles/file-tree.css';
 const LazyCodeEditor = lazy(() =>
   import('@/components/editor/CodeEditor').then((mod) => ({
     default: mod.CodeEditor,
+  })),
+);
+
+const LazyDiffEditorWrapper = lazy(() =>
+  import('@/components/editor/DiffEditorWrapper').then((mod) => ({
+    default: mod.DiffEditorWrapper,
   })),
 );
 
@@ -43,6 +50,9 @@ export const FileTreePanel = function FileTreePanel({ className }: FileTreePanel
   const { projectName } = useProjectContext();
   const { tree, fetchState, retry, projectRoot } = useFileTree(projectName);
   const { save } = useFileSave(projectName);
+  const activeFilePath = useFileStore((s) => s.activeFilePath);
+  const diffFilePath = useFileStore((s) => s.diffFilePath);
+  const isDiffMode = diffFilePath != null && diffFilePath === activeFilePath;
 
   const handleTabSave = useCallback(
     async (filePath: string): Promise<boolean> => {
@@ -87,7 +97,11 @@ export const FileTreePanel = function FileTreePanel({ className }: FileTreePanel
       <div className="flex-1 min-w-0 flex flex-col">
         <EditorTabs onSave={handleTabSave} />
         <Suspense fallback={<EditorSkeleton />}>
-          <LazyCodeEditor />
+          {isDiffMode ? (
+            <LazyDiffEditorWrapper filePath={activeFilePath} />
+          ) : (
+            <LazyCodeEditor />
+          )}
         </Suspense>
       </div>
     </div>

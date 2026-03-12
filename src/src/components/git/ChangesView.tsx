@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useGitOperations } from '@/hooks/useGitOperations';
-import { useOpenInEditor } from '@/hooks/useOpenInEditor';
+import { useOpenDiff } from '@/hooks/useOpenDiff';
 import { ChangedFileRow } from '@/components/git/ChangedFileRow';
 import { CommitComposer } from '@/components/git/CommitComposer';
 import { toast } from 'sonner';
@@ -43,7 +43,7 @@ const SECTIONS: { status: GitFileStatus; label: string }[] = [
 export function ChangesView({ files, refetchStatus }: ChangesViewProps) {
   const { projectName } = useProjectContext();
   const ops = useGitOperations(projectName);
-  const openInEditor = useOpenInEditor();
+  const openDiff = useOpenDiff();
 
   const [stagedFiles, setStagedFiles] = useState<Set<string>>(new Set());
   const [discardTarget, setDiscardTarget] = useState<GitFileChange | null>(null);
@@ -87,9 +87,9 @@ export function ChangesView({ files, refetchStatus }: ChangesViewProps) {
 
   const handleClickFile = useCallback(
     (path: string) => {
-      openInEditor(path);
+      openDiff(path);
     },
-    [openInEditor],
+    [openDiff],
   );
 
   const handleRequestDiscard = useCallback((file: GitFileChange) => {
