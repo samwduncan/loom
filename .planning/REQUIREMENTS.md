@@ -1,0 +1,144 @@
+# Requirements: Loom V2
+
+**Defined:** 2026-03-12
+**Core Value:** Make AI agent work visible, beautiful, and controllable
+
+## v1.3 Requirements
+
+Requirements for v1.3 "The Refinery" — daily-driver UX, V1 feature parity, accessibility, and performance.
+
+### Error & Resilience
+
+- [ ] **ERR-01**: User sees an error banner when the backend process crashes or exits unexpectedly
+- [ ] **ERR-02**: User sees a reconnection skeleton overlay when WebSocket connection drops
+- [ ] **ERR-03**: WebSocket automatically reconnects with exponential backoff after disconnection
+- [ ] **ERR-04**: User is warned before navigating away from an active streaming session
+- [ ] **ERR-05**: User sees connection status indicator (connected/reconnecting/disconnected)
+
+### File Tree & Editor
+
+- [ ] **FTE-01**: File tree nodes display git change indicators (modified/added/untracked/deleted)
+- [ ] **FTE-02**: Git status indicators update when git panel operations complete
+- [ ] **FTE-03**: Code editor displays a minimap in the right gutter
+- [ ] **FTE-04**: Bash tool cards have a "Run in Terminal" action button
+- [ ] **FTE-05**: "Run in Terminal" opens the terminal tab and executes the command
+
+### Session Management
+
+- [ ] **SESS-01**: User can load earlier messages in long conversations (paginated history)
+- [ ] **SESS-02**: Sidebar shows a processing indicator on sessions with active streaming
+- [ ] **SESS-03**: New sessions use a temporary ID that's replaced by the backend-assigned ID after first response
+
+### Composer
+
+- [ ] **COMP-01**: User can type @ to trigger a file mention picker with fuzzy search
+- [ ] **COMP-02**: Selected file mentions display as inline chips in the composer
+- [ ] **COMP-03**: File mentions are sent as context attachments with the message
+- [ ] **COMP-04**: User can type / to trigger a slash command menu
+- [ ] **COMP-05**: Slash commands include at minimum: /clear, /help, /compact, /model
+- [ ] **COMP-06**: Slash command menu supports keyboard navigation (arrow keys, enter, escape)
+
+### UX Refinement
+
+- [ ] **UXR-01**: Older conversation turns auto-collapse when scrolled out of viewport (IntersectionObserver)
+- [ ] **UXR-02**: Auto-collapsed turns expand on click or scroll-back
+- [ ] **UXR-03**: Each assistant turn displays a usage footer (input/output/cache tokens, cost)
+- [ ] **UXR-04**: Usage footer is collapsible or subtle (doesn't dominate the message)
+- [ ] **UXR-05**: Quick settings panel is accessible from sidebar or keyboard shortcut
+- [ ] **UXR-06**: Quick settings includes toggles: auto-expand tools, show thinking, show raw params
+- [ ] **UXR-07**: Quick settings changes apply immediately without page reload
+
+### Accessibility
+
+- [ ] **A11Y-01**: All interactive elements have appropriate ARIA roles and labels
+- [ ] **A11Y-02**: Full keyboard navigation works across all panels (chat, files, terminal, git, settings)
+- [ ] **A11Y-03**: Focus management: modals trap focus, panels restore focus on close
+- [ ] **A11Y-04**: Screen reader announcements for streaming status, tool completion, errors
+- [ ] **A11Y-05**: prefers-reduced-motion disables all animations (existing + new)
+- [ ] **A11Y-06**: Color contrast meets WCAG AA across all surfaces
+
+### Performance
+
+- [ ] **PERF-01**: Streaming maintains 55+ FPS with 200+ messages in conversation
+- [ ] **PERF-02**: content-visibility: auto applied and stress-tested on message list
+- [ ] **PERF-03**: Memory profiling shows no leaks across session switches (10+ switches)
+- [ ] **PERF-04**: Initial page load under 2s on dev server
+- [ ] **PERF-05**: Bundle size audit with recommendations for any > 50KB chunks
+
+## Future Requirements (v1.4 "The Polish")
+
+### Visual Effects
+
+- **VFX-01**: Spring physics animations on all interactions
+- **VFX-02**: Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
+- **VFX-03**: Glass surface effects for modals and overlays
+- **VFX-04**: Sidebar slim collapse mode (icon-only rail)
+- **VFX-05**: DecryptedText reveals for session titles and model names
+- **VFX-06**: StarBorder accents on focused/active elements
+- **VFX-07**: Motion refinement across all surfaces
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Multi-provider model selection UI | M5 "The Power" scope |
+| Provider switching in composer | M5 "The Power" scope |
+| TaskMaster integration panel | M6 "The Vision" scope |
+| Companion sprites | M6 "The Vision" scope |
+| Mobile bottom navigation | Responsive layout sufficient for mobile access |
+| PWA safe area support | Not a native app; web-first |
+| Whisper/dictation | Hidden in V1, low priority |
+| Preview tab | Empty in V1, undefined purpose |
+| Cross-tab sync for preferences | Single-tab use case dominant |
+| Version check + upgrade modal | Backend handles versioning |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| ERR-01 | — | Pending |
+| ERR-02 | — | Pending |
+| ERR-03 | — | Pending |
+| ERR-04 | — | Pending |
+| ERR-05 | — | Pending |
+| FTE-01 | — | Pending |
+| FTE-02 | — | Pending |
+| FTE-03 | — | Pending |
+| FTE-04 | — | Pending |
+| FTE-05 | — | Pending |
+| SESS-01 | — | Pending |
+| SESS-02 | — | Pending |
+| SESS-03 | — | Pending |
+| COMP-01 | — | Pending |
+| COMP-02 | — | Pending |
+| COMP-03 | — | Pending |
+| COMP-04 | — | Pending |
+| COMP-05 | — | Pending |
+| COMP-06 | — | Pending |
+| UXR-01 | — | Pending |
+| UXR-02 | — | Pending |
+| UXR-03 | — | Pending |
+| UXR-04 | — | Pending |
+| UXR-05 | — | Pending |
+| UXR-06 | — | Pending |
+| UXR-07 | — | Pending |
+| A11Y-01 | — | Pending |
+| A11Y-02 | — | Pending |
+| A11Y-03 | — | Pending |
+| A11Y-04 | — | Pending |
+| A11Y-05 | — | Pending |
+| A11Y-06 | — | Pending |
+| PERF-01 | — | Pending |
+| PERF-02 | — | Pending |
+| PERF-03 | — | Pending |
+| PERF-04 | — | Pending |
+| PERF-05 | — | Pending |
+
+**Coverage:**
+- v1.3 requirements: 37 total
+- Mapped to phases: 0
+- Unmapped: 37 ⚠️
+
+---
+*Requirements defined: 2026-03-12*
+*Last updated: 2026-03-12 after initial definition*
