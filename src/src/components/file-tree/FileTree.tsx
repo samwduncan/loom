@@ -15,6 +15,7 @@ import { FileNode } from './FileNode';
 import { FileTreeSearch } from './FileTreeSearch';
 import { matchesFilter, filterHiddenNodes } from './file-utils';
 import type { FileTreeNode } from '@/types/file';
+import type { GitFileStatus } from '@/types/git';
 
 export interface FileTreeProps {
   className?: string;
@@ -23,6 +24,7 @@ export interface FileTreeProps {
   retry: () => void;
   projectRoot: string | null;
   projectName: string;
+  gitStatusMap?: Map<string, GitFileStatus>;
 }
 
 export const FileTree = function FileTree({
@@ -32,6 +34,7 @@ export const FileTree = function FileTree({
   retry,
   projectRoot,
   projectName,
+  gitStatusMap,
 }: FileTreeProps) {
   const [filter, setFilter] = useState('');
   const showHidden = false;
@@ -97,7 +100,7 @@ export const FileTree = function FileTree({
         <div className="px-1 py-0.5">
           {hasFilteredResults ? (
             visibleTree.map((node) => (
-              <FileNode key={node.path} node={node} depth={0} filter={filter || undefined} projectRoot={projectRoot} projectName={projectName} />
+              <FileNode key={node.path} node={node} depth={0} filter={filter || undefined} projectRoot={projectRoot} projectName={projectName} gitStatusMap={gitStatusMap} />
             ))
           ) : (
             <p className="px-2 py-3 text-center text-xs text-muted-foreground">

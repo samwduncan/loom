@@ -13,6 +13,7 @@ import userEvent from '@testing-library/user-event';
 import { FileTree } from './FileTree';
 import type { FileTreeNode } from '@/types/file';
 import type { FileTreeProps } from './FileTree';
+import type { GitFileStatus } from '@/types/git';
 
 const mockRetry = vi.fn();
 
@@ -121,6 +122,23 @@ describe('FileTree', () => {
     expect(screen.getByText('index.ts')).toBeInTheDocument();
     expect(screen.queryByText('README.md')).not.toBeInTheDocument();
     expect(screen.queryByText('app.tsx')).not.toBeInTheDocument();
+  });
+
+  it('passes gitStatusMap to FileNode children (status dot renders)', () => {
+    const gitStatusMap: Map<string, GitFileStatus> = new Map([
+      ['/project/README.md', 'modified'],
+    ]);
+    render(
+      <FileTree
+        {...defaultProps}
+        fetchState="success"
+        tree={[makeFile('README.md', '/project/README.md')]}
+        projectRoot="/project"
+        gitStatusMap={gitStatusMap}
+      />,
+    );
+    const dot = screen.getByTestId('file-node-status');
+    expect(dot).toHaveAttribute('data-status', 'modified');
   });
 
   it('shows empty filter message when no nodes match search', async () => {

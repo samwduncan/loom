@@ -16,6 +16,8 @@ import { cn } from '@/utils/cn';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useFileTree } from '@/hooks/useFileTree';
 import { useFileSave } from '@/hooks/useFileSave';
+import { useGitStatus } from '@/hooks/useGitStatus';
+import { useGitFileMap } from '@/hooks/useGitFileMap';
 import { useFileStore } from '@/stores/file';
 import { EditorTabs } from '@/components/editor/EditorTabs';
 import { contentCache } from '@/components/editor/content-cache';
@@ -50,6 +52,8 @@ export const FileTreePanel = function FileTreePanel({ className }: FileTreePanel
   const { projectName } = useProjectContext();
   const { tree, fetchState, retry, projectRoot } = useFileTree(projectName);
   const { save } = useFileSave(projectName);
+  const gitStatus = useGitStatus(projectName);
+  const gitStatusMap = useGitFileMap(gitStatus.data?.files);
   const activeFilePath = useFileStore((s) => s.activeFilePath);
   const diffFilePath = useFileStore((s) => s.diffFilePath);
   const isDiffMode = diffFilePath != null && diffFilePath === activeFilePath;
@@ -90,6 +94,7 @@ export const FileTreePanel = function FileTreePanel({ className }: FileTreePanel
           retry={retry}
           projectRoot={projectRoot}
           projectName={projectName}
+          gitStatusMap={gitStatusMap}
         />
       </div>
 

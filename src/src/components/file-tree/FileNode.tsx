@@ -23,6 +23,7 @@ import { FileContextMenu, DirContextMenu } from './FileTreeContextMenu';
 import { ImagePreview } from './ImagePreview';
 import { isImageFile, matchesFilter } from './file-utils';
 import type { FileTreeNode } from '@/types/file';
+import type { GitFileStatus } from '@/types/git';
 import './styles/file-tree.css';
 
 export interface FileNodeProps {
@@ -31,9 +32,10 @@ export interface FileNodeProps {
   filter?: string;
   projectRoot?: string | null;
   projectName?: string;
+  gitStatusMap?: Map<string, GitFileStatus>;
 }
 
-export const FileNode = memo(function FileNode({ node, depth, filter, projectRoot, projectName }: FileNodeProps) {
+export const FileNode = memo(function FileNode({ node, depth, filter, projectRoot, projectName, gitStatusMap }: FileNodeProps) {
   const isExpanded = useFileStore((s) => s.expandedDirs.has(node.path));
   const isActive = useFileStore((s) => s.activeFilePath === node.path);
   const toggleDir = useFileStore((s) => s.toggleDir);
@@ -43,6 +45,7 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
 
   const isDirectory = node.type === 'directory';
   const isImage = !isDirectory && isImageFile(node.name);
+  const gitStatus = gitStatusMap?.get(node.path);
 
   const handleClick = useCallback(() => {
     if (isDirectory) {
@@ -93,6 +96,15 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
       />
 
       <span className="truncate text-foreground">{node.name}</span>
+
+      {gitStatus && (
+        <span
+          className="file-node-status"
+          data-status={gitStatus}
+          data-testid="file-node-status"
+          aria-label={`Git status: ${gitStatus}`}
+        />
+      )}
     </button>
   );
 
@@ -130,6 +142,7 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
           filter={filter}
           projectRoot={projectRoot}
           projectName={projectName}
+          gitStatusMap={gitStatusMap}
         />
       ))}
     </>

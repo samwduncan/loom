@@ -107,6 +107,54 @@ describe('FileNode', () => {
     const row = screen.getByText('deep.ts').closest('[data-testid="file-node-row"]');
     expect(row).toHaveStyle({ '--depth': '2' });
   });
+
+  describe('git status indicators', () => {
+    it('renders status dot when file is in gitStatusMap', () => {
+      const node = makeFile('index.ts', 'src/index.ts');
+      const gitStatusMap = new Map([['src/index.ts', 'modified' as const]]);
+      render(<FileNode node={node} depth={0} gitStatusMap={gitStatusMap} />);
+      const dot = screen.getByTestId('file-node-status');
+      expect(dot).toBeInTheDocument();
+      expect(dot).toHaveAttribute('data-status', 'modified');
+    });
+
+    it('does not render status dot when file is not in gitStatusMap', () => {
+      const node = makeFile('clean.ts', 'src/clean.ts');
+      const gitStatusMap = new Map([['src/other.ts', 'modified' as const]]);
+      render(<FileNode node={node} depth={0} gitStatusMap={gitStatusMap} />);
+      expect(screen.queryByTestId('file-node-status')).not.toBeInTheDocument();
+    });
+
+    it('does not render status dot when gitStatusMap is undefined', () => {
+      const node = makeFile('app.ts', 'src/app.ts');
+      render(<FileNode node={node} depth={0} />);
+      expect(screen.queryByTestId('file-node-status')).not.toBeInTheDocument();
+    });
+
+    it('renders status dot for directory with aggregate status', () => {
+      const child = makeFile('index.ts', 'src/lib/index.ts');
+      const node = makeDir('lib', 'src/lib', [child]);
+      const gitStatusMap = new Map([
+        ['src/lib/index.ts', 'added' as const],
+        ['src/lib', 'added' as const],
+      ]);
+      render(<FileNode node={node} depth={0} gitStatusMap={gitStatusMap} />);
+      const dot = screen.getByTestId('file-node-status');
+      expect(dot).toHaveAttribute('data-status', 'added');
+    });
+
+    it('renders correct data-status for each git status type', () => {
+      const statuses = ['modified', 'added', 'deleted', 'untracked'] as const;
+      for (const status of statuses) {
+        const node = makeFile(`${status}.ts`, `src/${status}.ts`);
+        const gitStatusMap = new Map([[`src/${status}.ts`, status]]);
+        const { unmount } = render(<FileNode node={node} depth={0} gitStatusMap={gitStatusMap} />);
+        const dot = screen.getByTestId('file-node-status');
+        expect(dot).toHaveAttribute('data-status', status);
+        unmount();
+      }
+    });
+  });
 });
 
 describe('FileTreeSearch', () => {
