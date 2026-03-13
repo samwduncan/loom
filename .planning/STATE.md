@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
-status: completed
-stopped_at: Phase 28 complete (all 2 plans)
-last_updated: "2026-03-12T16:01:23.620Z"
-last_activity: 2026-03-12 -- Completed 28-02 WS Reconnect & Navigate-Away Guard
+status: executing
+stopped_at: Completed 29-01-PLAN.md
+last_updated: "2026-03-13T21:56:34.811Z"
+last_activity: 2026-03-13 -- Completed 29-01 Streaming Indicator & Stub ID Hardening
 progress:
   total_phases: 10
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_plans: 4
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 28 - Error & Connection Resilience
+**Current focus:** Phase 29 - Session Hardening
 
 ## Current Position
 
-Phase: 28 of 37 (Error & Connection Resilience)
-Plan: 2 of 2 in current phase (COMPLETE)
-Status: Phase 28 Complete
-Last activity: 2026-03-12 -- Completed 28-02 WS Reconnect & Navigate-Away Guard
+Phase: 29 of 37 (Session Hardening)
+Plan: 1 of 2 in current phase (Plan 01 COMPLETE)
+Status: Phase 29 In Progress
+Last activity: 2026-03-13 -- Completed 29-01 Streaming Indicator & Stub ID Hardening
 
-Progress: [██████████] 100%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -55,6 +55,9 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 28]: Used tryReconnect() on WebSocketClient for manual reconnect button
 - [Phase 28]: Defensive null-out of old WS handlers before reconnect to prevent ghost callbacks
 - [Phase 28]: useNavigateAwayGuard uses beforeunload + Zustand isStreaming selector
+- [Phase 29]: Streaming dot takes visual priority over draft dot when both active
+- [Phase 29]: onActiveSessions clears stale streaming state on reconnect
+- [Phase 29]: Draft key migration from stub to real ID is best-effort (silent failure)
 
 ### Pending Todos
 
@@ -66,6 +69,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-12T15:45:30Z
-Stopped at: Phase 28 complete (all 2 plans)
-Resume: `/gsd:plan-phase 29` or `/gsd:discuss-phase 29`
+Last session: 2026-03-13T21:56:34.810Z
+Stopped at: Completed 29-01-PLAN.md
+Resume: `/gsd:execute-plan .planning/phases/29-session-hardening/29-02-PLAN.md`
