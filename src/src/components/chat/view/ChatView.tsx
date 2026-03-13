@@ -41,8 +41,8 @@ export function ChatView() {
   useNavigateAwayGuard();
   const { sessionId } = useParams<{ sessionId: string }>();
   const { projectName } = useProjectContext();
-  const effectiveSessionId_early = (sessionId?.startsWith('stub-') ? null : sessionId) ?? null;
-  const pagination = usePaginatedMessages(projectName, effectiveSessionId_early);
+  const paginationSessionId = (sessionId?.startsWith('stub-') ? null : sessionId) ?? null;
+  const pagination = usePaginatedMessages(projectName, paginationSessionId);
   const { switchSession, isLoadingMessages } = useSessionSwitch(pagination.setInitialPaginationState);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const search = useMessageSearch();

@@ -13,16 +13,9 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { apiFetch } from '@/lib/api-client';
-import { transformBackendMessages, type BackendEntry } from '@/lib/transformMessages';
+import { transformBackendMessages } from '@/lib/transformMessages';
 import { useTimelineStore } from '@/stores/timeline';
-
-interface PaginatedMessagesResponse {
-  messages: BackendEntry[];
-  total: number;
-  hasMore: boolean;
-  offset: number;
-  limit: number;
-}
+import type { PaginatedMessagesResponse } from '@/types/api';
 
 export function usePaginatedMessages(
   projectName: string | null,

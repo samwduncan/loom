@@ -18,18 +18,11 @@
 import { useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiFetch } from '@/lib/api-client';
-import { transformBackendMessages, type BackendEntry } from '@/lib/transformMessages';
+import { transformBackendMessages } from '@/lib/transformMessages';
 import { useTimelineStore } from '@/stores/timeline';
 import { useStreamStore } from '@/stores/stream';
 import { wsClient } from '@/lib/websocket-client';
-
-interface PaginatedMessagesResponse {
-  messages: BackendEntry[];
-  total: number;
-  hasMore: boolean;
-  offset: number;
-  limit: number;
-}
+import type { PaginatedMessagesResponse } from '@/types/api';
 
 export function useSessionSwitch(
   onPaginationInit?: (hasMore: boolean, total: number) => void,
@@ -99,11 +92,9 @@ export function useSessionSwitch(
         );
 
         const messages = transformBackendMessages(data.messages);
-        // eslint-disable-next-line loom/no-external-store-mutation -- infrastructure hook adds messages after fetch
-        const store = useTimelineStore.getState();
-        for (const msg of messages) {
-          store.addMessage(sessionId, msg);
-        }
+        // Batch: single store update instead of 100 individual addMessage calls
+        // eslint-disable-next-line loom/no-external-store-mutation -- infrastructure hook sets messages after fetch
+        useTimelineStore.getState().prependMessages(sessionId, messages);
 
         // Initialize pagination state for usePaginatedMessages
         onPaginationInit?.(data.hasMore, data.total);

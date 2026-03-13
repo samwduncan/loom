@@ -85,10 +85,11 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
   // --- Entrance animation tracking ---
   // Uses React "adjust state during rendering" pattern to track which messages
   // are "new" (appended after initial render or session switch).
-  // Initial load and session switches suppress animations to avoid cascade.
+  // Initial load, session switches, and prepends suppress animations.
   const [animationState, setAnimationState] = useState({
     prevCount: messages.length,
     prevSessionId: sessionId,
+    prevFirstId: messages[0]?.id ?? null,
     newStartIndex: messages.length, // Start with all "old" (no animations on mount)
   });
 
@@ -100,16 +101,21 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     setAnimationState({
       prevCount: messages.length,
       prevSessionId: sessionId,
+      prevFirstId: messages[0]?.id ?? null,
       newStartIndex: messages.length,
     });
   } else if (messages.length !== animationState.prevCount) {
-    // Same session, new messages: animate messages at index >= previous count
+    const firstId = messages[0]?.id ?? null;
+    const isPrepend = firstId !== animationState.prevFirstId && messages.length > animationState.prevCount;
     setAnimationState({
       prevCount: messages.length,
       prevSessionId: sessionId,
-      newStartIndex: messages.length > animationState.prevCount
-        ? animationState.prevCount
-        : messages.length, // Count decreased (unlikely) -- no animations
+      prevFirstId: firstId,
+      newStartIndex: isPrepend
+        ? messages.length // Prepend: suppress all animations (no visible entrance)
+        : messages.length > animationState.prevCount
+          ? animationState.prevCount // Append: animate new messages at end
+          : messages.length, // Count decreased (unlikely) -- no animations
     });
   }
 
@@ -196,7 +202,8 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     prevScrollHeightRef.current = el.scrollHeight;
     prevFirstMsgIdRef.current = firstId;
     prevPrependCountRef.current = messages.length;
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- messages.length is intentional: we detect prepends via ref tracking, not full array identity
+  }, [messages.length, scrollRef]);
 
   // Combined scroll-to-bottom + reset unread handler for pill click
   const handlePillClick = useCallback(() => {
