@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 29-02-PLAN.md (Phase 29 complete)
-last_updated: "2026-03-13T22:18:23.478Z"
-last_activity: 2026-03-13 -- Completed 29-02 Paginated Message Loading
+stopped_at: Completed 30-01-PLAN.md
+last_updated: "2026-03-13T22:50:40.665Z"
+last_activity: 2026-03-13 -- Completed 30-01 File Tree Git Status Indicators
 progress:
   total_phases: 10
-  completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  completed_phases: 3
+  total_plans: 5
+  completed_plans: 5
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 29 Complete - Session Hardening
+**Current focus:** Phase 30 - File Tree Git Integration
 
 ## Current Position
 
-Phase: 29 of 37 (Session Hardening) -- COMPLETE
-Plan: 2 of 2 in current phase (All plans COMPLETE)
-Status: Phase 29 Complete
-Last activity: 2026-03-13 -- Completed 29-02 Paginated Message Loading
+Phase: 30 of 37 (File Tree Git Integration) -- IN PROGRESS
+Plan: 1 of 1 in current phase (30-01 COMPLETE)
+Status: Phase 30 Plan 01 Complete
+Last activity: 2026-03-13 -- Completed 30-01 File Tree Git Status Indicators
 
 Progress: [██████████] 100%
 
@@ -59,6 +59,9 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 29]: onActiveSessions clears stale streaming state on reconnect
 - [Phase 29]: Draft key migration from stub to real ID is best-effort (silent failure)
 - [Phase 29]: Consolidated pagination state into single useState object with trackedSessionId for render-time reset pattern
+- [Phase 30]: Used data-status attribute + CSS for git status dot coloring (no inline styles)
+- [Phase 30]: Directory aggregation uses numeric priority map for O(1) comparison
+- [Phase 30]: Used data-status attribute + CSS for git status dot coloring
 
 ### Pending Todos
 
@@ -70,6 +73,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-13T22:04:36.280Z
-Stopped at: Completed 29-02-PLAN.md (Phase 29 complete)
-Resume: `/gsd:execute-plan .planning/phases/29-session-hardening/29-02-PLAN.md`
+Last session: 2026-03-13T22:50:40.074Z
+Stopped at: Completed 30-01-PLAN.md
+Resume: Next plan in phase 30 or start phase 31
