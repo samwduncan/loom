@@ -27,6 +27,7 @@ export interface SessionItemProps {
   updatedAt: string;
   providerId: ProviderId;
   isActive: boolean;
+  isStreaming?: boolean;
   hasDraft?: boolean;
   isEditing?: boolean;
   onClick: () => void;
@@ -40,6 +41,7 @@ export function SessionItem({
   updatedAt,
   providerId,
   isActive,
+  isStreaming,
   hasDraft,
   isEditing: isEditingProp,
   onClick,
@@ -139,7 +141,10 @@ export function SessionItem({
             {title}
           </div>
         )}
-        {hasDraft && !isEditing && (
+        {isStreaming && !isEditing && (
+          <span className="session-streaming-dot" aria-label="Streaming" />
+        )}
+        {hasDraft && !isStreaming && !isEditing && (
           <span
             className="w-1.5 h-1.5 rounded-full bg-primary opacity-60 shrink-0"
             aria-label="Has unsent draft"

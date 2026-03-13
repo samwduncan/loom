@@ -32,6 +32,15 @@ vi.mock('@/lib/api-client', () => ({
   apiFetch: vi.fn().mockResolvedValue({}),
 }));
 
+// Mock stream store for streaming indicator
+const mockStreamState = {
+  isStreaming: false,
+  activeSessionId: null as string | null,
+};
+vi.mock('@/stores/stream', () => ({
+  useStreamStore: (selector: (s: typeof mockStreamState) => unknown) => selector(mockStreamState),
+}));
+
 function renderSessionList() {
   return render(
     <MemoryRouter>
@@ -43,6 +52,8 @@ function renderSessionList() {
 describe('SessionList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockStreamState.isStreaming = false;
+    mockStreamState.activeSessionId = null;
     useTimelineStore.setState({
       sessions: [],
       activeSessionId: null,
@@ -146,6 +157,45 @@ describe('SessionList', () => {
 
     expect(mockNavigate).toHaveBeenCalledWith('/chat/sess-nav');
     // SessionList only navigates — ChatView coordinates session switching via URL
+  });
+
+  // -- Streaming indicator --
+
+  it('passes isStreaming prop based on stream store activeSessionId', () => {
+    mockStreamState.isStreaming = true;
+    mockStreamState.activeSessionId = 'sess-streaming';
+
+    useTimelineStore.setState({
+      sessions: [
+        {
+          id: 'sess-streaming',
+          title: 'Streaming Session',
+          messages: [],
+          providerId: 'claude',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+        },
+        {
+          id: 'sess-idle',
+          title: 'Idle Session',
+          messages: [],
+          providerId: 'claude',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+        },
+      ],
+      activeSessionId: null,
+      activeProviderId: 'claude',
+    });
+
+    renderSessionList();
+
+    // Streaming session should have the streaming dot
+    expect(screen.getByLabelText('Streaming')).toBeInTheDocument();
+    // Only one streaming dot
+    expect(screen.getAllByLabelText('Streaming')).toHaveLength(1);
   });
 
   // -- Delete confirmation dialog tests --

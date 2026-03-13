@@ -53,6 +53,28 @@
   color: var(--status-error);
 }
 
+/* Streaming pulse animation for active session indicator */
+@keyframes session-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.session-streaming-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+  animation: session-pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-streaming-dot {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
 /* Inline rename input -- transparent background, same font, accent underline */
 .session-rename-input {
   width: 100%;

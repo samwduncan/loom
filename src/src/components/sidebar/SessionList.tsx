@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/utils/cn';
 import { useTimelineStore } from '@/stores/timeline';
+import { useStreamStore } from '@/stores/stream';
 import { useSessionList } from '@/hooks/useSessionList';
 import { groupSessionsByDate } from '@/lib/formatTime';
 import { apiFetch } from '@/lib/api-client';
@@ -64,6 +65,7 @@ export function SessionList() {
   const activeSessionId = useTimelineStore((s) => s.activeSessionId);
   const removeSession = useTimelineStore((s) => s.removeSession);
   const updateSessionTitle = useTimelineStore((s) => s.updateSessionTitle);
+  const streamingSessionId = useStreamStore((s) => s.isStreaming ? s.activeSessionId : null);
   const { isLoading, error } = useSessionList();
   const { projectName } = useProjectContext();
 
@@ -219,6 +221,7 @@ export function SessionList() {
                 updatedAt={session.updatedAt}
                 providerId={session.providerId}
                 isActive={session.id === activeSessionId}
+                isStreaming={session.id === streamingSessionId}
                 hasDraft={draftSessionIds.has(session.id)}
                 isEditing={editingSessionId === session.id}
                 onClick={() => handleSessionClick(session.id)}

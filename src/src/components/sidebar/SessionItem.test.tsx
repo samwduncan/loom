@@ -81,6 +81,39 @@ describe('SessionItem', () => {
     expect(screen.getByRole('option')).toHaveAttribute('aria-selected', 'true');
   });
 
+  // -- Streaming indicator --
+
+  describe('streaming indicator', () => {
+    it('renders streaming dot when isStreaming is true', () => {
+      render(<SessionItem {...defaultProps} isStreaming={true} />);
+      const dot = screen.getByLabelText('Streaming');
+      expect(dot).toBeInTheDocument();
+      expect(dot.className).toContain('session-streaming-dot');
+    });
+
+    it('does not render streaming dot when isStreaming is false', () => {
+      render(<SessionItem {...defaultProps} isStreaming={false} />);
+      expect(screen.queryByLabelText('Streaming')).not.toBeInTheDocument();
+    });
+
+    it('does not render streaming dot when isStreaming is undefined', () => {
+      render(<SessionItem {...defaultProps} />);
+      expect(screen.queryByLabelText('Streaming')).not.toBeInTheDocument();
+    });
+
+    it('streaming dot has aria-label="Streaming"', () => {
+      render(<SessionItem {...defaultProps} isStreaming={true} />);
+      const dot = screen.getByLabelText('Streaming');
+      expect(dot).toHaveAttribute('aria-label', 'Streaming');
+    });
+
+    it('shows streaming dot instead of draft dot when both are true', () => {
+      render(<SessionItem {...defaultProps} isStreaming={true} hasDraft={true} />);
+      expect(screen.getByLabelText('Streaming')).toBeInTheDocument();
+      expect(screen.queryByLabelText('Has unsent draft')).not.toBeInTheDocument();
+    });
+  });
+
   // -- Inline rename tests --
 
   describe('inline rename', () => {
