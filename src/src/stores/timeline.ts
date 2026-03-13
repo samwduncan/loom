@@ -119,6 +119,10 @@ export const useTimelineStore = create<TimelineState>()(
 
       replaceSessionId: (oldId: string, newId: string) => {
         set((state) => {
+          if (state.sessions.some((s) => s.id === newId)) {
+            console.warn(`replaceSessionId: newId "${newId}" already exists, aborting`);
+            return;
+          }
           const session = state.sessions.find((s) => s.id === oldId);
           if (session) {
             session.id = newId;

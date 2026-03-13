@@ -409,7 +409,9 @@ describe('initializeWebSocket', () => {
       expect(drafts['real-draft-id']).toBe('my draft text');
       expect(drafts['stub-draft123']).toBeUndefined();
       expect(drafts['other-session']).toBe('other draft');
+    });
 
+    afterEach(() => {
       localStorage.removeItem('loom-composer-drafts');
     });
 

@@ -144,10 +144,10 @@ export async function initializeWebSocket(): Promise<void> {
           clearTimeout(stubCleanupTimer);
         }
         stubCleanupTimer = setTimeout(() => {
-          const currentSessions = useTimelineStore.getState().sessions;
-          for (const s of currentSessions) {
+          const store = useTimelineStore.getState();
+          for (const s of store.sessions) {
             if (s.id.startsWith('stub-')) {
-              useTimelineStore.getState().removeSession(s.id);
+              store.removeSession(s.id);
             }
           }
           stubCleanupTimer = null;
@@ -180,13 +180,17 @@ export async function initializeWebSocket(): Promise<void> {
     },
 
     onActiveSessions: (sessions) => {
-      // Parse active session IDs from all providers
-      const typedSessions = sessions as { claude?: string[]; codex?: string[]; gemini?: string[] };
-      const allActiveIds = [
-        ...(typedSessions.claude ?? []),
-        ...(typedSessions.codex ?? []),
-        ...(typedSessions.gemini ?? []),
-      ];
+      // Parse active session IDs from all providers with validation
+      const typedSessions = sessions as Record<string, unknown>;
+      const allActiveIds: string[] = [];
+      for (const provider of ['claude', 'codex', 'gemini'] as const) {
+        const arr = typedSessions[provider];
+        if (Array.isArray(arr)) {
+          for (const id of arr) {
+            if (typeof id === 'string') allActiveIds.push(id);
+          }
+        }
+      }
       activeStreamingSessions = new Set(allActiveIds);
 
       // On reconnect: if we thought we were streaming but the active session
@@ -194,6 +198,10 @@ export async function initializeWebSocket(): Promise<void> {
       if (isCurrentlyStreaming) {
         const currentActiveSessionId = streamStore().activeSessionId;
         if (currentActiveSessionId && !activeStreamingSessions.has(currentActiveSessionId)) {
+          if (activityDebounceTimer !== null) {
+            clearTimeout(activityDebounceTimer);
+            activityDebounceTimer = null;
+          }
           isCurrentlyStreaming = false;
           streamStore().endStream();
         }
