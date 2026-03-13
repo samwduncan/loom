@@ -25,7 +25,7 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 
 ### Session Management
 
-- [ ] **SESS-01**: User can load earlier messages in long conversations (paginated history)
+- [x] **SESS-01**: User can load earlier messages in long conversations (paginated history)
 - [x] **SESS-02**: Sidebar shows a processing indicator on sessions with active streaming
 - [x] **SESS-03**: New sessions use a temporary ID that's replaced by the backend-assigned ID after first response
 
@@ -106,7 +106,7 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | FTE-03 | Phase 31 | Pending |
 | FTE-04 | Phase 31 | Pending |
 | FTE-05 | Phase 31 | Pending |
-| SESS-01 | Phase 29 | Pending |
+| SESS-01 | Phase 29 | Complete |
 | SESS-02 | Phase 29 | Complete |
 | SESS-03 | Phase 29 | Complete |
 | COMP-01 | Phase 32 | Pending |
