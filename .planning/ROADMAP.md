@@ -57,7 +57,7 @@
 
 </details>
 
-### 🚧 v1.3 "The Refinery" (In Progress)
+### v1.3 "The Refinery" (In Progress)
 
 **Milestone Goal:** Make Loom a daily-driver by hardening error handling, filling UX gaps, adding composer intelligence, and auditing accessibility and performance.
 
@@ -102,11 +102,11 @@ Plans:
   1. Opening a conversation with 500+ messages loads quickly, with earlier messages loading on demand as the user scrolls up
   2. Sessions with active streaming show a visible pulse/spinner indicator in the sidebar session list
   3. New conversations use a local temporary ID that seamlessly transitions to the backend-assigned ID after first response with no URL break or flash
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 29-01: TBD
-- [ ] 29-02: TBD
+- [ ] 29-01-PLAN.md -- Streaming indicator + stub-to-real session ID hardening
+- [ ] 29-02-PLAN.md -- Paginated message history with scroll-up loading
 
 ### Phase 30: File Tree Git Integration
 **Goal**: Users can see file modification status at a glance without switching to the git panel
@@ -237,7 +237,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 11-19 | v1.1 | 26/26 | Complete | 2026-03-09 |
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
 | 28. Error & Connection Resilience | 2/2 | Complete    | 2026-03-12 | - |
-| 29. Session Hardening | v1.3 | 0/? | Not started | - |
+| 29. Session Hardening | v1.3 | 0/2 | Not started | - |
 | 30. File Tree Git Integration | v1.3 | 0/? | Not started | - |
 | 31. Editor & Tool Enhancements | v1.3 | 0/? | Not started | - |
 | 32. File Mentions | v1.3 | 0/? | Not started | - |
@@ -253,4 +253,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-12 after Phase 28 planning*
+*Last updated: 2026-03-13 after Phase 29 planning*
