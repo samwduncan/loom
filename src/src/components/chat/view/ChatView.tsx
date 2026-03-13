@@ -18,6 +18,7 @@ import { useParams } from 'react-router-dom';
 import { Brain, Search, Download } from 'lucide-react';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useSessionSwitch } from '@/hooks/useSessionSwitch';
+import { usePaginatedMessages } from '@/hooks/usePaginatedMessages';
 import { useMessageSearch } from '@/hooks/useMessageSearch';
 import { useTimelineStore } from '@/stores/timeline';
 import { useUIStore } from '@/stores/ui';
@@ -40,7 +41,9 @@ export function ChatView() {
   useNavigateAwayGuard();
   const { sessionId } = useParams<{ sessionId: string }>();
   const { projectName } = useProjectContext();
-  const { switchSession, isLoadingMessages } = useSessionSwitch();
+  const effectiveSessionId_early = (sessionId?.startsWith('stub-') ? null : sessionId) ?? null;
+  const pagination = usePaginatedMessages(projectName, effectiveSessionId_early);
+  const { switchSession, isLoadingMessages } = useSessionSwitch(pagination.setInitialPaginationState);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const search = useMessageSearch();
   const [exportOpen, setExportOpen] = useState(false);
@@ -229,6 +232,9 @@ export function ChatView() {
           scrollContainerRef={scrollContainerRef}
           searchQuery={search.debouncedQuery}
           highlightText={search.highlightText}
+          hasMore={pagination.hasMore}
+          isFetchingMore={pagination.isFetchingMore}
+          onLoadMore={pagination.loadMore}
         />
       )}
       <StatusLine />

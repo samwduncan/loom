@@ -41,14 +41,21 @@ export interface MessageListProps {
   searchQuery?: string;
   /** Highlight function to wrap matching text in <mark> elements */
   highlightText?: (text: string) => ReactNode;
+  /** Whether older messages are available for loading */
+  hasMore?: boolean;
+  /** Whether a pagination fetch is currently in flight */
+  isFetchingMore?: boolean;
+  /** Callback to trigger loading older messages */
+  onLoadMore?: () => void;
 }
 
-export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText }: MessageListProps) {
+export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText, hasMore, isFetchingMore, onLoadMore }: MessageListProps) {
   const internalScrollRef = useRef<HTMLDivElement>(null);
   // Use external ref if provided (for composer scroll stability), otherwise internal
   const scrollRef = scrollContainerRef ?? internalScrollRef;
   const assignRef = scrollContainerRef ?? internalScrollRef;
   const isStreaming = useStreamStore((state) => state.isStreaming);
+  const topSentinelRef = useRef<HTMLDivElement>(null);
 
   // ActiveMessage must stay mounted through finalization fade (200ms).
   // showActiveMessage turns ON when streaming starts, OFF only when
@@ -149,6 +156,48 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     }
   }, [messages.length, showPill, incrementUnread]);
 
+  // --- Pagination: IntersectionObserver for scroll-up loading ---
+  useEffect(() => {
+    if (!topSentinelRef.current || !hasMore || !onLoadMore) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && !isFetchingMore) {
+          onLoadMore();
+        }
+      },
+      { root: scrollRef.current, rootMargin: '200px 0px 0px 0px' },
+    );
+    observer.observe(topSentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, isFetchingMore, onLoadMore, scrollRef]);
+
+  // --- Pagination: Scroll position preservation on prepend ---
+  // When older messages are prepended, scrollHeight increases but scrollTop
+  // stays the same, causing a visual jump. This compensates by adding the
+  // height delta to scrollTop immediately after DOM commit.
+  const prevScrollHeightRef = useRef(0);
+  const prevFirstMsgIdRef = useRef<string | null>(null);
+  const prevPrependCountRef = useRef(messages.length);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const firstId = messages[0]?.id ?? null;
+    // Detect prepend: first message ID changed AND count increased
+    if (
+      prevFirstMsgIdRef.current !== null &&
+      firstId !== prevFirstMsgIdRef.current &&
+      messages.length > prevPrependCountRef.current
+    ) {
+      const delta = el.scrollHeight - prevScrollHeightRef.current;
+      el.scrollTop += delta;
+    }
+    prevScrollHeightRef.current = el.scrollHeight;
+    prevFirstMsgIdRef.current = firstId;
+    prevPrependCountRef.current = messages.length;
+  });
+
   // Combined scroll-to-bottom + reset unread handler for pill click
   const handlePillClick = useCallback(() => {
     scrollToBottom();
@@ -184,6 +233,14 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
         </div>
       ) : (
       <div className="mx-auto max-w-3xl flex flex-col py-4">
+        {hasMore && (
+          <div ref={topSentinelRef} className="h-px" aria-hidden="true" data-testid="pagination-sentinel" />
+        )}
+        {isFetchingMore && (
+          <div className="flex justify-center py-2" data-testid="pagination-spinner">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted border-t-accent-primary" />
+          </div>
+        )}
         {messages.map((msg, idx) => (
           <MessageErrorBoundary key={msg.id}>
             <div className={cn(
