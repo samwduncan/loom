@@ -238,7 +238,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
 | 28. Error & Connection Resilience | 2/2 | Complete    | 2026-03-12 | - |
 | 29. Session Hardening | 2/2 | Complete    | 2026-03-13 | - |
-| 30. File Tree Git Integration | 1/1 | Complete   | 2026-03-13 | - |
+| 30. File Tree Git Integration | 1/1 | Complete    | 2026-03-13 | - |
 | 31. Editor & Tool Enhancements | v1.3 | 0/? | Not started | - |
 | 32. File Mentions | v1.3 | 0/? | Not started | - |
 | 33. Slash Commands | v1.3 | 0/? | Not started | - |
