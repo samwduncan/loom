@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGitFileMap } from './useGitFileMap';
-import type { GitFileChange } from '@/types/git';
+import type { GitFileChange, GitFileStatus } from '@/types/git';
 
 describe('useGitFileMap', () => {
   it('returns an empty Map for undefined input', () => {
@@ -95,5 +95,41 @@ describe('useGitFileMap', () => {
     expect(result.current.get('src/components')).toBe('modified');
     expect(result.current.get('src')).toBe('modified');
     expect(result.current.size).toBe(4); // 1 file + 3 directories
+  });
+
+  it('skips unknown git statuses without crashing', () => {
+    // Simulate backend returning a status not in our priority map
+    const files: GitFileChange[] = [
+      { path: 'src/a.ts', status: 'renamed' as GitFileStatus },
+      { path: 'src/b.ts', status: 'modified' },
+    ];
+    const { result } = renderHook(() => useGitFileMap(files));
+    // Renamed file is skipped, only modified file + its directory
+    expect(result.current.has('src/a.ts')).toBe(false);
+    expect(result.current.get('src/b.ts')).toBe('modified');
+    expect(result.current.get('src')).toBe('modified');
+  });
+
+  it('returns same Map reference when new array has identical content', () => {
+    const files1: GitFileChange[] = [{ path: 'a.ts', status: 'added' }];
+    const files2: GitFileChange[] = [{ path: 'a.ts', status: 'added' }];
+    let files = files1;
+    const { result, rerender } = renderHook(() => useGitFileMap(files));
+    const first = result.current;
+    files = files2; // new reference, same content
+    rerender();
+    expect(result.current).toBe(first);
+  });
+
+  it('early-exits directory walk when parent already has higher priority', () => {
+    const files: GitFileChange[] = [
+      { path: 'a/b/c/high.ts', status: 'modified' },
+      { path: 'a/b/c/low.ts', status: 'untracked' },
+    ];
+    const { result } = renderHook(() => useGitFileMap(files));
+    // All directories should show 'modified' (highest priority)
+    expect(result.current.get('a/b/c')).toBe('modified');
+    expect(result.current.get('a/b')).toBe('modified');
+    expect(result.current.get('a')).toBe('modified');
   });
 });

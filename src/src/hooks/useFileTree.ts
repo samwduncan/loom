@@ -109,7 +109,8 @@ export function useFileTree(projectName: string): UseFileTreeResult {
     window.addEventListener('loom:projects-updated', handleProjectsUpdated);
 
     return () => {
-      controller.abort();
+      // Abort whichever controller is current (may have been replaced by handleProjectsUpdated)
+      abortRef.current?.abort();
       window.removeEventListener('loom:projects-updated', handleProjectsUpdated);
     };
   }, [projectName, fetchTrigger, doFetch]);

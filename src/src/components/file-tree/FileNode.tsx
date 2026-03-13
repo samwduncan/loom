@@ -21,7 +21,7 @@ import { cn } from '@/utils/cn';
 import { FileIcon } from './FileIcon';
 import { FileContextMenu, DirContextMenu } from './FileTreeContextMenu';
 import { ImagePreview } from './ImagePreview';
-import { isImageFile, matchesFilter } from './file-utils';
+import { isImageFile } from './file-utils';
 import type { FileTreeNode } from '@/types/file';
 import type { GitFileStatus } from '@/types/git';
 import './styles/file-tree.css';
@@ -56,11 +56,6 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
       openFile(node.path, node.size);
     }
   }, [isDirectory, node.path, node.size, toggleDir, openFile, isImage]);
-
-  // Filter check: skip this node if it doesn't match
-  if (filter && !matchesFilter(node, filter)) {
-    return null;
-  }
 
   const rowContent = (
     <button
@@ -99,6 +94,7 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
 
       {gitStatus && (
         <span
+          role="img"
           className="file-node-status"
           data-status={gitStatus}
           data-testid="file-node-status"

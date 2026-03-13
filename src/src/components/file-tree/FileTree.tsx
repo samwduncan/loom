@@ -37,20 +37,13 @@ export const FileTree = function FileTree({
   gitStatusMap,
 }: FileTreeProps) {
   const [filter, setFilter] = useState('');
-  const showHidden = false;
 
-  // Filter: remove dotfiles recursively if !showHidden, then apply search filter
+  // Filter: remove dotfiles recursively, then apply search filter
   const visibleTree = useMemo(() => {
-    let filtered = tree;
+    const filtered = filterHiddenNodes(tree);
 
-    // Hide dotfiles at all nesting levels
-    if (!showHidden) {
-      filtered = filterHiddenNodes(filtered);
-    }
-
-    // Apply search filter
     if (filter) {
-      filtered = filtered.filter((node) => matchesFilter(node, filter));
+      return filtered.filter((node) => matchesFilter(node, filter));
     }
 
     return filtered;
