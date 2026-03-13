@@ -116,10 +116,10 @@ Plans:
   1. File tree nodes display colored indicators (modified, added, untracked, deleted) matching standard git color conventions
   2. After committing, staging, or discarding changes in the git panel, file tree indicators update automatically
   3. Directories containing changed files show an aggregate change indicator
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 30-01: TBD
+- [ ] 30-01-PLAN.md -- Git status indicators on file tree nodes with directory aggregation
 
 ### Phase 31: Editor & Tool Enhancements
 **Goal**: Users can navigate large files with a minimap and execute Bash tool outputs directly in the terminal
@@ -238,7 +238,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
 | 28. Error & Connection Resilience | 2/2 | Complete    | 2026-03-12 | - |
 | 29. Session Hardening | 2/2 | Complete    | 2026-03-13 | - |
-| 30. File Tree Git Integration | v1.3 | 0/? | Not started | - |
+| 30. File Tree Git Integration | v1.3 | 0/1 | Not started | - |
 | 31. Editor & Tool Enhancements | v1.3 | 0/? | Not started | - |
 | 32. File Mentions | v1.3 | 0/? | Not started | - |
 | 33. Slash Commands | v1.3 | 0/? | Not started | - |
@@ -253,4 +253,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-13 after Phase 29 planning*
+*Last updated: 2026-03-13 after Phase 30 planning*
