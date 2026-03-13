@@ -25,9 +25,25 @@ let isInitialized = false;
 /** Module-scoped debounce timer for activity text updates (200ms) */
 let activityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+/** Module-scoped timer for cleaning up stale stub sessions */
+let stubCleanupTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Module-scoped set of session IDs with active streams (from backend sync) */
+let activeStreamingSessions = new Set<string>();
+
+/** Get the current set of actively streaming session IDs. */
+export function getActiveStreamingSessions(): ReadonlySet<string> {
+  return activeStreamingSessions;
+}
+
 /** Reset the init guard — for tests only. */
 export function _resetInitForTesting(): void {
   isInitialized = false;
+  if (stubCleanupTimer !== null) {
+    clearTimeout(stubCleanupTimer);
+    stubCleanupTimer = null;
+  }
+  activeStreamingSessions = new Set<string>();
 }
 
 /**
@@ -100,33 +116,42 @@ export async function initializeWebSocket(): Promise<void> {
       // Check if there's a stub session to reconcile
       const stubSession = sessions.find((s) => s.id.startsWith('stub-'));
       if (stubSession) {
-        // Copy stub's messages to the real session
-        const stubMessages = stubSession.messages;
-        const stubTitle = stubSession.title;
+        const stubId = stubSession.id;
 
-        // Add real session with copied data
-        if (!sessions.some((s) => s.id === sid)) {
-          timelineStore().addSession({
-            id: sid,
-            title: stubTitle,
-            messages: [],
-            providerId: 'claude',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-          });
-        }
-
-        // Copy messages from stub to real session
-        for (const msg of stubMessages) {
-          timelineStore().addMessage(sid, msg);
-        }
-
-        // Remove the stub session
-        timelineStore().removeSession(stubSession.id);
+        // Atomic swap: replace stub ID with real ID in-place (preserves messages, title, metadata)
+        timelineStore().replaceSessionId(stubId, sid);
 
         // Update URL without triggering React Router navigation (avoids double-fetch)
         window.history.replaceState(null, '', `/chat/${sid}`);
+
+        // Migrate draft persistence key from stub ID to real ID
+        try {
+          const draftsRaw = localStorage.getItem('loom-composer-drafts');
+          if (draftsRaw) {
+            const drafts = JSON.parse(draftsRaw) as Record<string, unknown>;
+            if (stubId in drafts) {
+              drafts[sid] = drafts[stubId];
+              delete drafts[stubId];
+              localStorage.setItem('loom-composer-drafts', JSON.stringify(drafts));
+            }
+          }
+        } catch {
+          // Draft migration is best-effort
+        }
+
+        // Schedule cleanup for any remaining stale stub sessions
+        if (stubCleanupTimer !== null) {
+          clearTimeout(stubCleanupTimer);
+        }
+        stubCleanupTimer = setTimeout(() => {
+          const currentSessions = useTimelineStore.getState().sessions;
+          for (const s of currentSessions) {
+            if (s.id.startsWith('stub-')) {
+              useTimelineStore.getState().removeSession(s.id);
+            }
+          }
+          stubCleanupTimer = null;
+        }, 30_000);
       } else {
         // No stub -- add session normally (Phase 8 behavior)
         if (!sessions.some((s) => s.id === sid)) {
@@ -154,8 +179,25 @@ export async function initializeWebSocket(): Promise<void> {
       // Log for now
     },
 
-    onActiveSessions: (_sessions) => {
-      // Phase 8 will sync sessions from this data
+    onActiveSessions: (sessions) => {
+      // Parse active session IDs from all providers
+      const typedSessions = sessions as { claude?: string[]; codex?: string[]; gemini?: string[] };
+      const allActiveIds = [
+        ...(typedSessions.claude ?? []),
+        ...(typedSessions.codex ?? []),
+        ...(typedSessions.gemini ?? []),
+      ];
+      activeStreamingSessions = new Set(allActiveIds);
+
+      // On reconnect: if we thought we were streaming but the active session
+      // is no longer in the backend's active set, clear stale streaming state
+      if (isCurrentlyStreaming) {
+        const currentActiveSessionId = streamStore().activeSessionId;
+        if (currentActiveSessionId && !activeStreamingSessions.has(currentActiveSessionId)) {
+          isCurrentlyStreaming = false;
+          streamStore().endStream();
+        }
+      }
     },
 
     onTokenBudget: (_used, _total, _sessionId) => {

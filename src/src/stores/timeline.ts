@@ -32,6 +32,8 @@ interface TimelineState {
     updates: Partial<Message>,
   ) => void;
   clearSession: (sessionId: string) => void;
+  replaceSessionId: (oldId: string, newId: string) => void;
+  prependMessages: (sessionId: string, messages: Message[]) => void;
   updateSessionTitle: (sessionId: string, title: string) => void;
   reset: () => void;
 }
@@ -111,6 +113,27 @@ export const useTimelineStore = create<TimelineState>()(
           const session = state.sessions.find((s) => s.id === sessionId);
           if (session) {
             session.messages = [];
+          }
+        });
+      },
+
+      replaceSessionId: (oldId: string, newId: string) => {
+        set((state) => {
+          const session = state.sessions.find((s) => s.id === oldId);
+          if (session) {
+            session.id = newId;
+          }
+          if (state.activeSessionId === oldId) {
+            state.activeSessionId = newId;
+          }
+        });
+      },
+
+      prependMessages: (sessionId: string, messages: Message[]) => {
+        set((state) => {
+          const session = state.sessions.find((s) => s.id === sessionId);
+          if (session) {
+            session.messages.unshift(...messages);
           }
         });
       },

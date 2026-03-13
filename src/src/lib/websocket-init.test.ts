@@ -95,6 +95,7 @@ const mockRemoveSession = vi.fn();
 const mockSetActiveSession = vi.fn();
 const mockAddMessage = vi.fn();
 const mockUpdateSessionTitle = vi.fn();
+const mockReplaceSessionId = vi.fn();
 
 interface MockSession {
   id: string;
@@ -117,6 +118,7 @@ vi.mock('@/stores/timeline', () => ({
       setActiveSession: mockSetActiveSession,
       addMessage: mockAddMessage,
       updateSessionTitle: mockUpdateSessionTitle,
+      replaceSessionId: mockReplaceSessionId,
     }),
   },
 }));
@@ -336,26 +338,24 @@ describe('initializeWebSocket', () => {
   });
 
   describe('stub session reconciliation', () => {
-    it('reconciles stub session with real session on session-created', async () => {
+    function extractCallbacks() {
+      const configCall = mockConfigure.mock.calls[0] as [{ onMessage: (msg: ServerMessage) => void; onStateChange: (state: ConnectionState) => void }];
+      const onMessage = configCall[0].onMessage;
+      const dummyMsg: ServerMessage = { type: 'error', error: 'test' };
+      onMessage(dummyMsg);
+      const callArgs = mockRouteServerMessage.mock.calls[0] as [unknown, {
+        onSessionCreated: (sid: string) => void;
+        onActiveSessions: (sessions: unknown) => void;
+      }, unknown];
+      return callArgs[1];
+    }
+
+    it('uses replaceSessionId for atomic stub-to-real swap (not addSession+removeSession)', async () => {
       const replaceStateSpy = vi.spyOn(window.history, 'replaceState');
 
       await initializeWebSocket();
+      const callbacks = extractCallbacks();
 
-      // Extract the callbacks from routeServerMessage mock
-      // First, trigger a message to capture callbacks
-      const configCall = mockConfigure.mock.calls[0] as [{ onMessage: (msg: ServerMessage) => void; onStateChange: (state: ConnectionState) => void }];
-      const onMessage = configCall[0].onMessage;
-
-      // Send a dummy message to capture the callbacks object
-      const dummyMsg: ServerMessage = { type: 'error', error: 'test' };
-      onMessage(dummyMsg);
-
-      const callArgs = mockRouteServerMessage.mock.calls[0] as [unknown, {
-        onSessionCreated: (sid: string) => void;
-      }, unknown];
-      const callbacks = callArgs[1];
-
-      // Set up a stub session in the mock timeline
       mockTimelineSessions.push({
         id: 'stub-abc123',
         title: 'Hello world',
@@ -366,30 +366,70 @@ describe('initializeWebSocket', () => {
         metadata: {},
       });
 
-      // Fire onSessionCreated with a real session ID
       callbacks.onSessionCreated('real-session-id');
 
-      // Verify: real session was added
-      expect(mockAddSession).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'real-session-id', title: 'Hello world' }),
-      );
+      // Verify: atomic replaceSessionId called (NOT addSession+removeSession)
+      expect(mockReplaceSessionId).toHaveBeenCalledWith('stub-abc123', 'real-session-id');
+      expect(mockAddSession).not.toHaveBeenCalled();
+      expect(mockRemoveSession).not.toHaveBeenCalled();
+      expect(mockAddMessage).not.toHaveBeenCalled();
 
-      // Verify: stub messages were copied to real session
-      expect(mockAddMessage).toHaveBeenCalledWith(
-        'real-session-id',
-        expect.objectContaining({ id: 'msg-1', role: 'user', content: 'Hello world' }),
-      );
-
-      // Verify: stub session was removed
-      expect(mockRemoveSession).toHaveBeenCalledWith('stub-abc123');
-
-      // Verify: URL was updated via replaceState (not navigate)
+      // Verify: URL was updated via replaceState
       expect(replaceStateSpy).toHaveBeenCalledWith(null, '', '/chat/real-session-id');
 
       // Verify: active session set to real ID
       expect(mockSetActiveSession).toHaveBeenCalledWith('real-session-id');
 
       replaceStateSpy.mockRestore();
+    });
+
+    it('migrates draft key from stub ID to real ID in localStorage', async () => {
+      await initializeWebSocket();
+      const callbacks = extractCallbacks();
+
+      // Set up stub session and draft
+      mockTimelineSessions.push({
+        id: 'stub-draft123',
+        title: 'Draft Chat',
+        messages: [],
+        providerId: 'claude',
+        createdAt: '2026-01-01',
+        updatedAt: '2026-01-01',
+        metadata: {},
+      });
+
+      localStorage.setItem('loom-composer-drafts', JSON.stringify({
+        'stub-draft123': 'my draft text',
+        'other-session': 'other draft',
+      }));
+
+      callbacks.onSessionCreated('real-draft-id');
+
+      const drafts = JSON.parse(localStorage.getItem('loom-composer-drafts') ?? '{}');
+      expect(drafts['real-draft-id']).toBe('my draft text');
+      expect(drafts['stub-draft123']).toBeUndefined();
+      expect(drafts['other-session']).toBe('other draft');
+
+      localStorage.removeItem('loom-composer-drafts');
+    });
+
+    it('onActiveSessions populates the active streaming sessions set', async () => {
+      const { getActiveStreamingSessions } = await import('@/lib/websocket-init');
+
+      await initializeWebSocket();
+      const callbacks = extractCallbacks();
+
+      callbacks.onActiveSessions({
+        claude: ['sess-1', 'sess-2'],
+        codex: ['sess-3'],
+        gemini: [],
+      });
+
+      const activeSet = getActiveStreamingSessions();
+      expect(activeSet.has('sess-1')).toBe(true);
+      expect(activeSet.has('sess-2')).toBe(true);
+      expect(activeSet.has('sess-3')).toBe(true);
+      expect(activeSet.size).toBe(3);
     });
   });
 

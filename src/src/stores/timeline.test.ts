@@ -213,6 +213,97 @@ describe('useTimelineStore', () => {
     expect(useTimelineStore.getState().activeProviderId).toBe('claude');
   });
 
+  // -- replaceSessionId --
+  it('replaceSessionId swaps session ID correctly', () => {
+    const session = createTestSession({ id: 'stub-abc', title: 'My Chat' });
+    useTimelineStore.getState().addSession(session);
+    useTimelineStore.getState().replaceSessionId('stub-abc', 'real-123');
+
+    const state = useTimelineStore.getState();
+    expect(state.sessions).toHaveLength(1);
+    expect(state.sessions[0]?.id).toBe('real-123');
+    expect(state.sessions.find((s) => s.id === 'stub-abc')).toBeUndefined();
+  });
+
+  it('replaceSessionId updates activeSessionId if it matched the old ID', () => {
+    const session = createTestSession({ id: 'stub-abc' });
+    useTimelineStore.getState().addSession(session);
+    useTimelineStore.getState().setActiveSession('stub-abc');
+    useTimelineStore.getState().replaceSessionId('stub-abc', 'real-123');
+
+    expect(useTimelineStore.getState().activeSessionId).toBe('real-123');
+  });
+
+  it('replaceSessionId preserves messages and metadata', () => {
+    const msg1 = createTestMessage({ id: 'msg-1', content: 'Hello' });
+    const msg2 = createTestMessage({ id: 'msg-2', content: 'World' });
+    const session = createTestSession({
+      id: 'stub-abc',
+      title: 'Preserved Title',
+      messages: [msg1, msg2],
+      metadata: createTestSessionMetadata({ totalCost: 0.05 }),
+    });
+    useTimelineStore.getState().addSession(session);
+    useTimelineStore.getState().replaceSessionId('stub-abc', 'real-123');
+
+    const found = useTimelineStore.getState().sessions.find((s) => s.id === 'real-123');
+    expect(found?.title).toBe('Preserved Title');
+    expect(found?.messages).toHaveLength(2);
+    expect(found?.messages[0]?.id).toBe('msg-1');
+    expect(found?.messages[1]?.id).toBe('msg-2');
+    expect(found?.metadata.totalCost).toBe(0.05);
+  });
+
+  it('replaceSessionId is a no-op for non-existent oldId', () => {
+    const session = createTestSession({ id: 'sess-1' });
+    useTimelineStore.getState().addSession(session);
+    useTimelineStore.getState().replaceSessionId('nonexistent', 'real-123');
+
+    const state = useTimelineStore.getState();
+    expect(state.sessions).toHaveLength(1);
+    expect(state.sessions[0]?.id).toBe('sess-1');
+  });
+
+  // -- prependMessages --
+  it('prependMessages inserts messages at beginning of session messages array', () => {
+    const existing = createTestMessage({ id: 'msg-existing', content: 'Existing' });
+    const session = createTestSession({ id: 'sess-1', messages: [existing] });
+    useTimelineStore.getState().addSession(session);
+
+    const older1 = createTestMessage({ id: 'msg-old-1', content: 'Older 1' });
+    const older2 = createTestMessage({ id: 'msg-old-2', content: 'Older 2' });
+    useTimelineStore.getState().prependMessages('sess-1', [older1, older2]);
+
+    const found = useTimelineStore.getState().sessions.find((s) => s.id === 'sess-1');
+    expect(found?.messages).toHaveLength(3);
+    expect(found?.messages[0]?.id).toBe('msg-old-1');
+    expect(found?.messages[1]?.id).toBe('msg-old-2');
+    expect(found?.messages[2]?.id).toBe('msg-existing');
+  });
+
+  it('prependMessages is a no-op for non-existent sessionId', () => {
+    const msg = createTestMessage({ id: 'msg-1' });
+    expect(() => {
+      useTimelineStore.getState().prependMessages('nonexistent', [msg]);
+    }).not.toThrow();
+    expect(useTimelineStore.getState().sessions).toHaveLength(0);
+  });
+
+  it('prependMessages preserves existing messages', () => {
+    const existing1 = createTestMessage({ id: 'msg-e1', content: 'E1' });
+    const existing2 = createTestMessage({ id: 'msg-e2', content: 'E2' });
+    const session = createTestSession({ id: 'sess-1', messages: [existing1, existing2] });
+    useTimelineStore.getState().addSession(session);
+
+    const older = createTestMessage({ id: 'msg-old', content: 'Old' });
+    useTimelineStore.getState().prependMessages('sess-1', [older]);
+
+    const found = useTimelineStore.getState().sessions.find((s) => s.id === 'sess-1');
+    expect(found?.messages).toHaveLength(3);
+    expect(found?.messages[1]?.id).toBe('msg-e1');
+    expect(found?.messages[2]?.id).toBe('msg-e2');
+  });
+
   // -- STATE-02: Message metadata and providerContext fields --
   it('Message objects have metadata and providerContext fields (STATE-02)', () => {
     const session = createTestSession({ id: 'sess-1' });
@@ -259,6 +350,8 @@ describe('useTimelineStore', () => {
       addMessage: () => {},
       updateMessage: () => {},
       clearSession: () => {},
+      replaceSessionId: () => {},
+      prependMessages: () => {},
       updateSessionTitle: () => {},
       reset: () => {},
     };
