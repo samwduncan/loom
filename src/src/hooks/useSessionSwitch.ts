@@ -23,11 +23,17 @@ import { useTimelineStore } from '@/stores/timeline';
 import { useStreamStore } from '@/stores/stream';
 import { wsClient } from '@/lib/websocket-client';
 
-interface MessagesResponse {
+interface PaginatedMessagesResponse {
   messages: BackendEntry[];
+  total: number;
+  hasMore: boolean;
+  offset: number;
+  limit: number;
 }
 
-export function useSessionSwitch() {
+export function useSessionSwitch(
+  onPaginationInit?: (hasMore: boolean, total: number) => void,
+) {
   const abortRef = useRef<AbortController | null>(null);
   const navigate = useNavigate();
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
@@ -84,10 +90,10 @@ export function useSessionSwitch() {
         });
       }
 
-      // 6. Fetch messages with abort signal
+      // 6. Fetch messages with abort signal (paginated: most recent 100 first)
       try {
-        const data = await apiFetch<MessagesResponse>(
-          `/api/projects/${projectName}/sessions/${sessionId}/messages`,
+        const data = await apiFetch<PaginatedMessagesResponse>(
+          `/api/projects/${projectName}/sessions/${sessionId}/messages?limit=100&offset=0`,
           {},
           abortRef.current.signal,
         );
@@ -98,6 +104,10 @@ export function useSessionSwitch() {
         for (const msg of messages) {
           store.addMessage(sessionId, msg);
         }
+
+        // Initialize pagination state for usePaginatedMessages
+        onPaginationInit?.(data.hasMore, data.total);
+
         setIsLoadingMessages(false);
       } catch (err) {
         if (err instanceof DOMException && err.name === 'AbortError') {
@@ -108,7 +118,7 @@ export function useSessionSwitch() {
         setIsLoadingMessages(false);
       }
     },
-    [navigate],
+    [navigate, onPaginationInit],
   );
 
   return { switchSession, isLoadingMessages };

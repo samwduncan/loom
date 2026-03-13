@@ -128,7 +128,7 @@ describe('useSessionSwitch', () => {
     });
 
     expect(mockApiFetch).toHaveBeenCalledWith(
-      '/api/projects/my-project/sessions/empty-session/messages',
+      '/api/projects/my-project/sessions/empty-session/messages?limit=100&offset=0',
       {},
       expect.any(AbortSignal),
     );
