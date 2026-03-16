@@ -147,8 +147,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 32-01: TBD
-- [ ] 32-02: TBD
+- [ ] 32-01-PLAN.md -- File mention picker popup + useFileMentions hook
+- [ ] 32-02-PLAN.md -- Mention chips in composer + wire to send
 
 ### Phase 33: Slash Commands
 **Goal**: Users can execute common actions quickly via keyboard-driven slash commands
@@ -241,7 +241,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 29. Session Hardening | 2/2 | Complete    | 2026-03-13 | - |
 | 30. File Tree Git Integration | 1/1 | Complete    | 2026-03-13 | - |
 | 31. Editor & Tool Enhancements | 2/2 | Complete    | 2026-03-16 | - |
-| 32. File Mentions | v1.3 | 0/? | Not started | - |
+| 32. File Mentions | v1.3 | 0/2 | Not started | - |
 | 33. Slash Commands | v1.3 | 0/? | Not started | - |
 | 34. Conversation UX | v1.3 | 0/? | Not started | - |
 | 35. Quick Settings | v1.3 | 0/? | Not started | - |
@@ -254,4 +254,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-13 after Phase 30 planning*
+*Last updated: 2026-03-16 after Phase 32 planning*
