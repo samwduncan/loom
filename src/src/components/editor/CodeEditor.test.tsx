@@ -1,128 +1,47 @@
 /**
- * CodeEditor tests -- minimap extension presence and configuration.
+ * Minimap extension tests -- verifies threshold logic directly.
  *
- * Strategy: Mock @uiw/react-codemirror to capture the `extensions` prop.
- * Verify that showMinimap.compute is included in the extensions array.
- * Actual canvas rendering is untestable in jsdom.
+ * Tests the pure computeMinimapConfig function without mocking CodeMirror.
+ * Canvas rendering is untestable in jsdom, but the conditional display
+ * logic (50-line threshold) is the important contract to verify.
  */
 
-import { render } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { computeMinimapConfig, MINIMAP_LINE_THRESHOLD } from './minimap-extension';
 
-// vi.hoisted runs before vi.mock hoisting -- safe to reference in mock factories
-const { capturedExtensionsRef, MINIMAP_SENTINEL, mockCompute } = vi.hoisted(() => {
-  const capturedExtensionsRef = { current: [] as unknown[] };
-  const MINIMAP_SENTINEL = '__minimap_extension__';
-  const mockCompute = vi.fn(() => MINIMAP_SENTINEL);
-  return { capturedExtensionsRef, MINIMAP_SENTINEL, mockCompute };
-});
-
-vi.mock('@uiw/react-codemirror', () => ({
-  __esModule: true,
-  default: (props: { extensions?: unknown[] }) => {
-    capturedExtensionsRef.current = props.extensions ?? [];
-    return <div data-testid="codemirror-mock" />;
-  },
-}));
-
-vi.mock('@replit/codemirror-minimap', () => ({
-  showMinimap: {
-    compute: mockCompute,
-  },
-}));
-
-// Mock hooks and stores
-vi.mock('@/hooks/useFileContent', () => ({
-  useFileContent: () => ({
-    content: 'const x = 1;',
-    loading: false,
-    error: null,
-    isBinary: false,
-    isLarge: false,
-    proceed: vi.fn(),
-  }),
-}));
-
-vi.mock('@/hooks/useFileSave', () => ({
-  useFileSave: () => ({ save: vi.fn().mockResolvedValue(true) }),
-}));
-
-vi.mock('@/hooks/useProjectContext', () => ({
-  useProjectContext: () => ({ projectName: 'test-project' }),
-}));
-
-let mockActiveFilePath: string | null = '/src/index.ts';
-
-vi.mock('@/stores/file', () => ({
-  useFileStore: Object.assign(
-    (selector: (s: Record<string, unknown>) => unknown) =>
-      selector({
-        activeFilePath: mockActiveFilePath,
-        openTabs: mockActiveFilePath
-          ? [{ filePath: mockActiveFilePath, isDirty: false, fileSize: 1024 }]
-          : [],
-        setActiveFile: vi.fn(),
-      }),
-    { getState: () => ({ activeFilePath: mockActiveFilePath, setDirty: vi.fn() }) },
-  ),
-}));
-
-vi.mock('@/stores/ui', () => ({
-  useUIStore: (selector: (s: Record<string, unknown>) => unknown) =>
-    selector({ theme: { fontSize: 14 } }),
-}));
-
-// Mock subcomponents to avoid their dependencies
-vi.mock('@/components/editor/EditorBreadcrumb', () => ({
-  EditorBreadcrumb: () => <div data-testid="breadcrumb" />,
-}));
-
-vi.mock('@/components/editor/loom-dark-theme', () => ({
-  loomDarkTheme: [],
-}));
-
-vi.mock('@/components/editor/language-loader', () => ({
-  loadLanguageForFile: vi.fn().mockResolvedValue(null),
-}));
-
-vi.mock('@/components/editor/content-cache', () => ({
-  contentCache: new Map(),
-  originalCache: new Map(),
-}));
-
-vi.mock('@codemirror/search', () => ({
-  search: () => Symbol('search'),
-}));
-
-vi.mock('@codemirror/view', () => ({
-  EditorView: {
-    updateListener: { of: () => Symbol('updateListener') },
-    domEventHandlers: () => Symbol('domEventHandlers'),
-    lineWrapping: Symbol('lineWrapping'),
-  },
-  ViewUpdate: {},
-}));
-
-vi.mock('@codemirror/state', () => ({
-  Extension: {},
-}));
-
-// Import after mocks
-import { CodeEditor } from './CodeEditor';
-
-describe('CodeEditor minimap', () => {
-  beforeEach(() => {
-    capturedExtensionsRef.current = [];
-    mockActiveFilePath = '/src/index.ts';
+describe('computeMinimapConfig', () => {
+  it('returns null for files shorter than threshold', () => {
+    const state = { doc: { lines: 10 } };
+    expect(computeMinimapConfig(state)).toBeNull();
   });
 
-  it('includes minimap extension in CodeMirror extensions array', () => {
-    render(<CodeEditor />);
-    expect(capturedExtensionsRef.current).toContain(MINIMAP_SENTINEL);
+  it('returns null at exactly threshold - 1 lines', () => {
+    const state = { doc: { lines: MINIMAP_LINE_THRESHOLD - 1 } };
+    expect(computeMinimapConfig(state)).toBeNull();
   });
 
-  it('uses showMinimap.compute facet for minimap configuration', () => {
-    render(<CodeEditor />);
-    expect(mockCompute).toHaveBeenCalled();
+  it('returns config at exactly threshold lines', () => {
+    const state = { doc: { lines: MINIMAP_LINE_THRESHOLD } };
+    const config = computeMinimapConfig(state);
+    expect(config).not.toBeNull();
+    expect(config!.displayText).toBe('blocks'); // ASSERT: config is non-null (checked above)
+    expect(config!.showOverlay).toBe('always'); // ASSERT: config is non-null (checked above)
+  });
+
+  it('returns config for files much longer than threshold', () => {
+    const state = { doc: { lines: 500 } };
+    const config = computeMinimapConfig(state);
+    expect(config).not.toBeNull();
+  });
+
+  it('create() returns a DOM element', () => {
+    const state = { doc: { lines: 100 } };
+    const config = computeMinimapConfig(state)!; // ASSERT: 100 lines exceeds threshold so config is non-null
+    const result = config.create();
+    expect(result.dom).toBeInstanceOf(HTMLDivElement);
+  });
+
+  it('threshold constant is 50', () => {
+    expect(MINIMAP_LINE_THRESHOLD).toBe(50);
   });
 });

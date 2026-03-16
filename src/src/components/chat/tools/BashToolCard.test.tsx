@@ -53,9 +53,8 @@ describe('BashToolCard', () => {
     expect(container.textContent).toContain('output-49');
     expect(container.textContent).not.toContain('output-50');
 
-    const button = container.querySelector('button');
-    expect(button).not.toBeNull();
-    expect(button?.textContent).toBe('Show 30 more lines');
+    const showMoreBtn = screen.getByRole('button', { name: /show 30 more lines/i });
+    expect(showMoreBtn).not.toBeNull();
   });
 
   it('expands to show all lines after clicking Show more', () => {
@@ -63,8 +62,8 @@ describe('BashToolCard', () => {
     const { container } = render(
       <BashToolCard {...makeProps({ output: lines.join('\n') })} />,
     );
-    const button = container.querySelector('button');
-    fireEvent.click(button!); // ASSERT: button exists because output exceeds threshold
+    const showMoreBtn = screen.getByRole('button', { name: /show 30 more lines/i });
+    fireEvent.click(showMoreBtn);
     expect(container.textContent).toContain('output-79');
   });
 

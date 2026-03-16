@@ -39,14 +39,8 @@ export const BashToolCard = memo(function BashToolCard({
   const handleRunInTerminal = useCallback(() => {
     if (!command) return;
     setActiveTab('shell');
-    // rAF ensures tab switch CSS visibility triggers before send
-    requestAnimationFrame(() => {
-      const sent = sendToShell(command + '\n');
-      if (!sent) {
-        // Terminal not yet connected -- retry once after mount
-        setTimeout(() => sendToShell(command + '\n'), 500);
-      }
-    });
+    // sendToShell queues internally if terminal not yet connected
+    sendToShell(command + '\n');
   }, [command, setActiveTab]);
 
   return (
@@ -87,11 +81,11 @@ export const BashToolCard = memo(function BashToolCard({
 
       {/* Run in Terminal action */}
       {status === 'resolved' && command && (
-        <div className="flex items-center justify-end px-3 py-1.5 border-t border-[var(--border-subtle)]">
+        <div className="flex items-center justify-end px-3 py-1.5 border-t border-border/8">
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 text-xs gap-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+            className="h-6 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
             onClick={handleRunInTerminal}
           >
             <Play className="w-3 h-3" />

@@ -11,8 +11,13 @@ describe('shell-input', () => {
     unregisterShellInput();
   });
 
-  it('sendToShell returns false when no function is registered', () => {
+  it('sendToShell returns false and queues when no function is registered', () => {
     expect(sendToShell('test')).toBe(false);
+    // Command is queued; registering drains it
+    const mockFn = vi.fn();
+    registerShellInput(mockFn);
+    expect(mockFn).toHaveBeenCalledWith('test');
+    unregisterShellInput();
   });
 
   it('sendToShell returns true and calls the registered function', () => {
