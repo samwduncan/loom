@@ -2,10 +2,21 @@
  * BashToolCard tests -- covers TOOL-10 BashToolCard rendering.
  */
 
-import { describe, it, expect } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent, screen } from '@testing-library/react';
 import { BashToolCard } from './BashToolCard';
 import type { ToolCardProps } from '@/lib/tool-registry';
+import { useUIStore } from '@/stores/ui';
+
+vi.mock('@/lib/shell-input', () => ({
+  sendToShell: vi.fn(() => true),
+}));
+
+vi.mock('@/stores/ui', () => ({
+  useUIStore: {
+    getState: vi.fn(() => ({ setActiveTab: vi.fn() })),
+  },
+}));
 
 function makeProps(overrides: Partial<ToolCardProps> = {}): ToolCardProps {
   return {
@@ -100,5 +111,52 @@ describe('BashToolCard', () => {
     expect(container.querySelector('script')).toBeNull();
     // Should show escaped text
     expect(container.textContent).toContain('<script>alert("xss")</script>');
+  });
+
+  describe('Run in Terminal button', () => {
+    it('renders when status is resolved and command is non-empty', () => {
+      render(<BashToolCard {...makeProps()} />);
+      expect(
+        screen.getByRole('button', { name: /run in terminal/i }),
+      ).toBeTruthy();
+    });
+
+    it('does NOT render when status is invoked', () => {
+      render(<BashToolCard {...makeProps({ status: 'invoked' })} />);
+      expect(
+        screen.queryByRole('button', { name: /run in terminal/i }),
+      ).toBeNull();
+    });
+
+    it('does NOT render when status is executing', () => {
+      render(<BashToolCard {...makeProps({ status: 'executing' })} />);
+      expect(
+        screen.queryByRole('button', { name: /run in terminal/i }),
+      ).toBeNull();
+    });
+
+    it('does NOT render when command is empty', () => {
+      render(
+        <BashToolCard
+          {...makeProps({ input: { command: '' } })}
+        />,
+      );
+      expect(
+        screen.queryByRole('button', { name: /run in terminal/i }),
+      ).toBeNull();
+    });
+
+    it('calls setActiveTab("shell") and sendToShell on click', () => {
+      const mockSetActiveTab = vi.fn();
+      vi.mocked(useUIStore.getState).mockReturnValue({
+        setActiveTab: mockSetActiveTab,
+      } as unknown as ReturnType<typeof useUIStore.getState>);
+
+      render(<BashToolCard {...makeProps()} />);
+      const button = screen.getByRole('button', { name: /run in terminal/i });
+      fireEvent.click(button);
+
+      expect(mockSetActiveTab).toHaveBeenCalledWith('shell');
+    });
   });
 });
