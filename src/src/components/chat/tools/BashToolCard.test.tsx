@@ -6,6 +6,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/react';
 import { BashToolCard } from './BashToolCard';
 import type { ToolCardProps } from '@/lib/tool-registry';
+import { sendToShell } from '@/lib/shell-input';
+
 vi.mock('@/lib/shell-input', () => ({
   sendToShell: vi.fn(() => true),
 }));
@@ -141,13 +143,15 @@ describe('BashToolCard', () => {
       ).toBeNull();
     });
 
-    it('calls setActiveTab("shell") on click', () => {
+    it('calls setActiveTab("shell") and sendToShell on click', () => {
       mockSetActiveTab.mockClear();
+      vi.mocked(sendToShell).mockClear();
       render(<BashToolCard {...makeProps()} />);
       const button = screen.getByRole('button', { name: /run in terminal/i });
       fireEvent.click(button);
 
       expect(mockSetActiveTab).toHaveBeenCalledWith('shell');
+      expect(sendToShell).toHaveBeenCalledWith('echo hello\n');
     });
   });
 });
