@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: executing
-stopped_at: Completed 31-01-PLAN.md
+stopped_at: Completed 31-02-PLAN.md
 last_updated: "2026-03-16"
-last_activity: 2026-03-16 -- Completed 31-01-PLAN.md (editor minimap)
+last_activity: 2026-03-16 -- Completed 31-02-PLAN.md (run in terminal)
 progress:
   total_phases: 10
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
-  percent: 85
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 
 ## Current Position
 
-Phase: 31 of 37 (Editor & Tool Enhancements) -- IN PROGRESS
-Plan: 1 of 2 (31-01 minimap complete)
-Status: executing
-Last activity: 2026-03-16 -- Completed 31-01-PLAN.md (editor minimap)
+Phase: 31 of 37 (Editor & Tool Enhancements) -- COMPLETE
+Plan: 2 of 2 (all plans complete)
+Status: Phase 31 complete -- both plans executed
+Last activity: 2026-03-16 -- Completed 31-02-PLAN.md (run in terminal button)
 
-Progress: [████████░░] 85%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -63,6 +63,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 30]: Directory aggregation uses numeric priority map for O(1) comparison
 - [Phase 30]: Used data-status attribute + CSS for git status dot coloring
 - [Phase 31]: Module-level minimap constant with showMinimap.compute facet for conditional display (50+ lines)
+- [Phase 31]: Used useUIStore selector pattern (not getState()) for store actions in tool card components
+- [Phase 31]: rAF delay + 500ms retry for sendToShell after tab switch to handle CSS show/hide panel mount timing
 
 ### Pending Todos
 
@@ -74,6 +76,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T15:59:04Z
-Stopped at: Completed 31-01-PLAN.md
-Resume: Execute 31-02-PLAN.md (run-in-terminal)
+Last session: 2026-03-16T16:01:00Z
+Stopped at: Completed 31-02-PLAN.md
+Resume: Phase 31 complete -- start phase 32 or next milestone task

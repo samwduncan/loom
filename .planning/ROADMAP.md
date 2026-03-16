@@ -68,7 +68,7 @@
 - [x] **Phase 28: Error & Connection Resilience** - Crash detection, reconnection overlay, connection status, and navigate-away protection (completed 2026-03-12)
 - [x] **Phase 29: Session Hardening** - Paginated history, streaming indicators, and temporary ID lifecycle (completed 2026-03-13)
 - [x] **Phase 30: File Tree Git Integration** - Git change indicators on file tree nodes with live updates (completed 2026-03-13)
-- [ ] **Phase 31: Editor & Tool Enhancements** - Editor minimap and "Run in Terminal" bridge from Bash tool cards
+- [x] **Phase 31: Editor & Tool Enhancements** - Editor minimap and "Run in Terminal" bridge from Bash tool cards (completed 2026-03-16)
 - [ ] **Phase 32: File Mentions** - @-mention file picker with fuzzy search, inline chips, and context attachments
 - [ ] **Phase 33: Slash Commands** - /-trigger command menu with keyboard navigation and built-in commands
 - [ ] **Phase 34: Conversation UX** - Auto-collapsing old turns and per-turn usage footers
@@ -240,7 +240,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 28. Error & Connection Resilience | 2/2 | Complete    | 2026-03-12 | - |
 | 29. Session Hardening | 2/2 | Complete    | 2026-03-13 | - |
 | 30. File Tree Git Integration | 1/1 | Complete    | 2026-03-13 | - |
-| 31. Editor & Tool Enhancements | 1/2 | In Progress|  | - |
+| 31. Editor & Tool Enhancements | 2/2 | Complete   | 2026-03-16 | - |
 | 32. File Mentions | v1.3 | 0/? | Not started | - |
 | 33. Slash Commands | v1.3 | 0/? | Not started | - |
 | 34. Conversation UX | v1.3 | 0/? | Not started | - |

@@ -20,8 +20,8 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 - [x] **FTE-01**: File tree nodes display git change indicators (modified/added/untracked/deleted)
 - [x] **FTE-02**: Git status indicators update when git panel operations complete
 - [x] **FTE-03**: Code editor displays a minimap in the right gutter
-- [ ] **FTE-04**: Bash tool cards have a "Run in Terminal" action button
-- [ ] **FTE-05**: "Run in Terminal" opens the terminal tab and executes the command
+- [x] **FTE-04**: Bash tool cards have a "Run in Terminal" action button
+- [x] **FTE-05**: "Run in Terminal" opens the terminal tab and executes the command
 
 ### Session Management
 
@@ -104,8 +104,8 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | FTE-01 | Phase 30 | Complete |
 | FTE-02 | Phase 30 | Complete |
 | FTE-03 | Phase 31 | Complete |
-| FTE-04 | Phase 31 | Pending |
-| FTE-05 | Phase 31 | Pending |
+| FTE-04 | Phase 31 | Complete |
+| FTE-05 | Phase 31 | Complete |
 | SESS-01 | Phase 29 | Complete |
 | SESS-02 | Phase 29 | Complete |
 | SESS-03 | Phase 29 | Complete |
