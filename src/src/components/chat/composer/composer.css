@@ -98,3 +98,35 @@
 .mention-picker-item[data-selected="true"] {
   background: var(--surface-hover);
 }
+
+/* ─── Mention chips ─────────────────────────────────────────── */
+
+.mention-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  background: var(--surface-sunken);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  max-width: 200px;
+}
+
+.mention-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mention-chip-remove {
+  flex-shrink: 0;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.mention-chip-remove:hover {
+  opacity: 1;
+}

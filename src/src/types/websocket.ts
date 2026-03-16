@@ -176,6 +176,7 @@ export interface ClaudeCommandOptions {
     skipPermissions: boolean;
   };
   images?: Array<{ data: string }>;
+  fileMentions?: string[];
 }
 
 export interface CodexCommandOptions {
