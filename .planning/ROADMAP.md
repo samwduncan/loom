@@ -129,10 +129,11 @@ Plans:
   1. Code editor shows a minimap in the right gutter for files longer than the viewport
   2. Bash tool cards in the chat display a "Run in Terminal" action button
   3. Clicking "Run in Terminal" switches to the terminal tab and executes the command, with output visible in the terminal
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 31-01: TBD
+- [ ] 31-01-PLAN.md -- CodeMirror minimap extension for large files
+- [ ] 31-02-PLAN.md -- Run in Terminal button on Bash tool cards
 
 ### Phase 32: File Mentions
 **Goal**: Users can reference project files in their messages for precise context
@@ -143,7 +144,7 @@ Plans:
   2. Selecting a file inserts an inline chip that is visually distinct from regular text
   3. Sending a message with file mentions includes those files as context attachments in the API request
   4. File picker is dismissable with Escape and navigable with arrow keys
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 32-01: TBD
@@ -158,7 +159,7 @@ Plans:
   2. Menu includes at minimum: /clear, /help, /compact, /model
   3. Arrow keys navigate the menu, Enter selects, Escape dismisses
   4. Selected commands execute their action immediately (e.g., /clear clears the conversation)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 33-01: TBD
@@ -172,7 +173,7 @@ Plans:
   2. Clicking a collapsed turn or scrolling back to it expands it to full content
   3. Each assistant turn displays token usage (input/output/cache) and estimated cost in a footer
   4. Usage footer is subtle by default and expandable for detail -- it does not dominate the message
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 34-01: TBD
@@ -186,7 +187,7 @@ Plans:
   1. Quick settings panel is accessible from the sidebar and via keyboard shortcut
   2. Panel includes toggles for: auto-expand tools, show thinking, show raw params
   3. Toggling any setting applies immediately to the current view without page reload
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 35-01: TBD
@@ -202,7 +203,7 @@ Plans:
   4. Screen readers announce streaming start/stop, tool completion events, and error banners via live regions
   5. With prefers-reduced-motion enabled, zero CSS/JS animations play
   6. All text and interactive elements pass WCAG AA contrast ratios (4.5:1 normal text, 3:1 large text)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 36-01: TBD
@@ -219,7 +220,7 @@ Plans:
   3. Switching between 10+ sessions in sequence shows no memory growth trend in heap snapshots
   4. Initial page load completes in under 2 seconds on the dev server
   5. Bundle analysis report exists with actionable recommendations for any chunk exceeding 50KB
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 37-01: TBD
@@ -239,7 +240,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 28. Error & Connection Resilience | 2/2 | Complete    | 2026-03-12 | - |
 | 29. Session Hardening | 2/2 | Complete    | 2026-03-13 | - |
 | 30. File Tree Git Integration | 1/1 | Complete    | 2026-03-13 | - |
-| 31. Editor & Tool Enhancements | v1.3 | 0/? | Not started | - |
+| 31. Editor & Tool Enhancements | v1.3 | 0/2 | Not started | - |
 | 32. File Mentions | v1.3 | 0/? | Not started | - |
 | 33. Slash Commands | v1.3 | 0/? | Not started | - |
 | 34. Conversation UX | v1.3 | 0/? | Not started | - |
