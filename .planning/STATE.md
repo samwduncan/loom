@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
-status: completed
-stopped_at: Completed 30-01-PLAN.md
-last_updated: "2026-03-13T23:16:29.691Z"
-last_activity: 2026-03-13 -- Completed 30-01 File Tree Git Status Indicators
+status: executing
+stopped_at: Completed 31-01-PLAN.md
+last_updated: "2026-03-16"
+last_activity: 2026-03-16 -- Completed 31-01-PLAN.md (editor minimap)
 progress:
   total_phases: 10
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_plans: 7
+  completed_plans: 6
+  percent: 85
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 30 - File Tree Git Integration
+**Current focus:** Phase 31 - Editor & Tool Enhancements
 
 ## Current Position
 
-Phase: 30 of 37 (File Tree Git Integration) -- IN PROGRESS
-Plan: 1 of 1 in current phase (30-01 COMPLETE)
-Status: Phase 30 Plan 01 Complete
-Last activity: 2026-03-13 -- Completed 30-01 File Tree Git Status Indicators
+Phase: 31 of 37 (Editor & Tool Enhancements) -- IN PROGRESS
+Plan: 1 of 2 (31-01 minimap complete)
+Status: executing
+Last activity: 2026-03-16 -- Completed 31-01-PLAN.md (editor minimap)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 85%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 30]: Used data-status attribute + CSS for git status dot coloring (no inline styles)
 - [Phase 30]: Directory aggregation uses numeric priority map for O(1) comparison
 - [Phase 30]: Used data-status attribute + CSS for git status dot coloring
+- [Phase 31]: Module-level minimap constant with showMinimap.compute facet for conditional display (50+ lines)
 
 ### Pending Todos
 
@@ -73,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-13T22:50:40.074Z
-Stopped at: Completed 30-01-PLAN.md
-Resume: Next plan in phase 30 or start phase 31
+Last session: 2026-03-16T15:59:04Z
+Stopped at: Completed 31-01-PLAN.md
+Resume: Execute 31-02-PLAN.md (run-in-terminal)
