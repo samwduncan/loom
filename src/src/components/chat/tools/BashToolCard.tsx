@@ -7,9 +7,13 @@
  * Constitution: Named exports only (2.2), cn() for classNames (3.6), memo() wrapped.
  */
 
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
+import { Play } from 'lucide-react';
 import { parseAnsi } from '@/lib/ansi-parser';
+import { sendToShell } from '@/lib/shell-input';
+import { useUIStore } from '@/stores/ui';
 import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 import { TruncatedContent } from './TruncatedContent';
 import type { ToolCardProps } from '@/lib/tool-registry';
 import './tool-cards.css';
@@ -20,14 +24,30 @@ export const BashToolCard = memo(function BashToolCard({
   input,
   output,
   isError,
+  status,
 }: ToolCardProps) {
   const command =
     typeof input.command === 'string' ? input.command : '';
+
+  const setActiveTab = useUIStore((s) => s.setActiveTab);
 
   const outputLines = useMemo(() => {
     if (output == null) return null;
     return output.split('\n');
   }, [output]);
+
+  const handleRunInTerminal = useCallback(() => {
+    if (!command) return;
+    setActiveTab('shell');
+    // rAF ensures tab switch CSS visibility triggers before send
+    requestAnimationFrame(() => {
+      const sent = sendToShell(command + '\n');
+      if (!sent) {
+        // Terminal not yet connected -- retry once after mount
+        setTimeout(() => sendToShell(command + '\n'), 500);
+      }
+    });
+  }, [command, setActiveTab]);
 
   return (
     <div
@@ -62,6 +82,21 @@ export const BashToolCard = memo(function BashToolCard({
             unit="lines"
             renderItem={renderOutputLine}
           />
+        </div>
+      )}
+
+      {/* Run in Terminal action */}
+      {status === 'resolved' && command && (
+        <div className="flex items-center justify-end px-3 py-1.5 border-t border-[var(--border-subtle)]">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-xs gap-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+            onClick={handleRunInTerminal}
+          >
+            <Play className="w-3 h-3" />
+            Run in Terminal
+          </Button>
         </div>
       )}
     </div>

@@ -6,16 +6,15 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/react';
 import { BashToolCard } from './BashToolCard';
 import type { ToolCardProps } from '@/lib/tool-registry';
-import { useUIStore } from '@/stores/ui';
-
 vi.mock('@/lib/shell-input', () => ({
   sendToShell: vi.fn(() => true),
 }));
 
+const mockSetActiveTab = vi.fn();
 vi.mock('@/stores/ui', () => ({
-  useUIStore: {
-    getState: vi.fn(() => ({ setActiveTab: vi.fn() })),
-  },
+  useUIStore: vi.fn((selector: (s: Record<string, unknown>) => unknown) =>
+    selector({ setActiveTab: mockSetActiveTab }),
+  ),
 }));
 
 function makeProps(overrides: Partial<ToolCardProps> = {}): ToolCardProps {
@@ -81,14 +80,11 @@ describe('BashToolCard', () => {
   });
 
   it('renders no output area when output is null', () => {
-    const { container } = render(
-      <BashToolCard {...makeProps({ output: null })} />,
-    );
+    render(<BashToolCard {...makeProps({ output: null })} />);
     // Command header should be present
-    expect(container.textContent).toContain('$ echo hello');
-    // No output lines or truncation button
-    const button = container.querySelector('button');
-    expect(button).toBeNull();
+    expect(screen.getByText('echo hello')).toBeTruthy();
+    // No truncation "Show more" button (Run in Terminal may still appear)
+    expect(screen.queryByRole('button', { name: /show.*more/i })).toBeNull();
   });
 
   it('has error styling when isError is true', () => {
@@ -146,12 +142,8 @@ describe('BashToolCard', () => {
       ).toBeNull();
     });
 
-    it('calls setActiveTab("shell") and sendToShell on click', () => {
-      const mockSetActiveTab = vi.fn();
-      vi.mocked(useUIStore.getState).mockReturnValue({
-        setActiveTab: mockSetActiveTab,
-      } as unknown as ReturnType<typeof useUIStore.getState>);
-
+    it('calls setActiveTab("shell") on click', () => {
+      mockSetActiveTab.mockClear();
       render(<BashToolCard {...makeProps()} />);
       const button = screen.getByRole('button', { name: /run in terminal/i });
       fireEvent.click(button);
