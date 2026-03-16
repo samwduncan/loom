@@ -8,7 +8,7 @@
  * Constitution: Named exports (2.2), design tokens only (3.1), cn() (3.6).
  */
 
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 import { cn } from '@/utils/cn';
 import type { FileMention } from '@/types/mention';
 
@@ -17,7 +17,6 @@ interface MentionPickerProps {
   selectedIndex: number;
   isLoading: boolean;
   onSelect: (file: FileMention) => void;
-  onClose: () => void;
 }
 
 /**
@@ -30,7 +29,7 @@ function getDirectory(path: string): string {
   return path.slice(0, lastSlash + 1);
 }
 
-export function MentionPicker({ results, selectedIndex, isLoading, onSelect, onClose }: MentionPickerProps) {
+export function MentionPicker({ results, selectedIndex, isLoading, onSelect }: MentionPickerProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
   // Scroll selected item into view (guard for jsdom which lacks scrollIntoView)
@@ -40,23 +39,11 @@ export function MentionPicker({ results, selectedIndex, isLoading, onSelect, onC
     }
   }, []);
 
-  // Close on Escape (in case focus is on the picker)
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        onClose();
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown, true);
-    return () => document.removeEventListener('keydown', handleKeyDown, true);
-  }, [onClose]);
-
   // Empty states
   if (results.length === 0) {
     return (
-      <div className="mention-picker" data-testid="mention-picker">
-        <div className="px-3 py-4 text-center text-xs text-muted">
+      <div className="mention-picker" data-testid="mention-picker" role="listbox" id="mention-picker-list">
+        <div className="px-3 py-4 text-center text-xs text-muted" role="option" aria-selected={false}>
           {isLoading ? 'Loading files...' : 'No files found'}
         </div>
       </div>
@@ -64,7 +51,7 @@ export function MentionPicker({ results, selectedIndex, isLoading, onSelect, onC
   }
 
   return (
-    <div className="mention-picker" data-testid="mention-picker" ref={listRef}>
+    <div className="mention-picker" data-testid="mention-picker" ref={listRef} role="listbox" id="mention-picker-list">
       {results.map((file, index) => {
         const isSelected = index === selectedIndex;
         const directory = getDirectory(file.path);

@@ -7,10 +7,10 @@
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Fuse from 'fuse.js';
 import { apiFetch } from '@/lib/api-client';
-import type { FileEntry } from '@/components/command-palette/hooks/useCommandSearch';
+import type { FileEntry } from '@/types/file';
 import type { FileMention } from '@/types/mention';
 
 const FUSE_OPTIONS = {
@@ -63,36 +63,42 @@ export function useFileMentions(options: { enabled: boolean; projectName: string
 } {
   const { enabled, projectName } = options;
   const [files, setFiles] = useState<FileEntry[]>([]);
-  const [fetchDone, setFetchDone] = useState(false);
+  const [fetchState, setFetchState] = useState<'idle' | 'loading' | 'done'>('idle');
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const mountedRef = useRef(true);
 
-  // Derive isLoading from fetch state (no setState in effect body)
-  const isLoading = enabled && !!projectName && !fetchDone;
+  // Derive isLoading from fetch state
+  const isLoading = fetchState === 'loading';
 
-  // Fetch files on mount when enabled
+  // Fetch files when enabled/projectName changes. Local cancelled flag per effect run
+  // prevents stale writes from previous fetches (matches useCommandSearch pattern).
   useEffect(() => {
-    mountedRef.current = true;
-
     if (!enabled || !projectName) return;
+
+    let cancelled = false;
+
+    // Defer state update to avoid synchronous setState in effect body
+    Promise.resolve().then(() => {
+      if (!cancelled) setFetchState('loading');
+    });
 
     apiFetch<FileEntry[]>(`/api/projects/${encodeURIComponent(projectName)}/files`)
       .then((data) => {
-        if (mountedRef.current) {
+        if (!cancelled) {
           setFiles(data);
-          setFetchDone(true);
+          setFetchState('done');
         }
       })
       .catch(() => {
-        if (mountedRef.current) {
-          setFetchDone(true);
+        if (!cancelled) {
+          setFetchState('done');
         }
       });
 
     return () => {
-      mountedRef.current = false;
+      cancelled = true;
+      setFetchState('idle');
     };
   }, [enabled, projectName]);
 

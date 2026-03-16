@@ -13,12 +13,7 @@ import { useTimelineStore } from '@/stores/timeline';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { apiFetch } from '@/lib/api-client';
 import type { Session } from '@/types/session';
-
-export interface FileEntry {
-  path: string;
-  name: string;
-  type: 'file' | 'directory';
-}
+import type { FileEntry } from '@/types/file';
 
 export interface UseCommandSearchReturn {
   sessionResults: Session[];

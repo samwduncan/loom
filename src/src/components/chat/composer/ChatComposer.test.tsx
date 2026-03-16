@@ -442,7 +442,6 @@ describe('ChatComposer', () => {
         options: {
           projectPath: 'test-proj',
           sessionId: 'sess-1',
-          fileMentions: ['src/utils/cn.ts'],
         },
       });
     });

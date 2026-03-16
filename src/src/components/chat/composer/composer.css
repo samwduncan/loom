@@ -11,19 +11,19 @@
   border-radius: 0.75rem;
   background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 2px 8px oklch(0 0 0 / 0.15);
+  box-shadow: 0 2px 8px var(--shadow-light);
   transition:
     border-color var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .composer-pill:focus-within {
-  border-color: oklch(0.63 0.14 20 / 0.3);
-  box-shadow: 0 2px 12px oklch(0 0 0 / 0.2);
+  border-color: var(--accent-primary-border);
+  box-shadow: 0 2px 12px var(--shadow-medium);
 }
 
 .composer-pill[data-streaming="true"] {
-  border-color: oklch(0.63 0.14 20 / 0.4);
+  border-color: var(--accent-primary-border-strong);
 }
 
 /* ─── Grid-based crossfade for send/stop buttons ──────────────── */
@@ -85,7 +85,7 @@
   border-radius: 0.5rem;
   background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 -4px 16px oklch(0 0 0 / 0.15);
+  box-shadow: 0 -4px 16px var(--shadow-light);
 }
 
 .mention-picker-item {

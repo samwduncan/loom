@@ -53,6 +53,8 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
   const [input, setInput] = useState('');
   const [mentions, setMentions] = useState<FileMention[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef(input);
+  inputRef.current = input;
   const pendingTitleRef = useRef<string | null>(null);
   const hasMessageSentRef = useRef(false);
   const prevSessionIdRef = useRef<string | null>(sessionId);
@@ -194,12 +196,13 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         return [...prev, file];
       });
 
-      // Remove the @query text from input
+      // Remove the @query text from input (read from ref to avoid stale closure)
       const textarea = textareaRef.current;
       if (textarea) {
         const cursorPos = textarea.selectionStart;
-        const before = input.slice(0, cursorPos);
-        const after = input.slice(cursorPos);
+        const currentInput = inputRef.current;
+        const before = currentInput.slice(0, cursorPos);
+        const after = currentInput.slice(cursorPos);
 
         // Find the @ position by scanning backward
         const atIndex = before.lastIndexOf('@');
@@ -212,7 +215,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       closeMentionPicker();
       requestAnimationFrame(() => textareaRef.current?.focus());
     },
-    [input, closeMentionPicker],
+    [closeMentionPicker],
   );
 
   // Remove a mention chip
@@ -220,25 +223,15 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     setMentions((prev) => prev.filter((m) => m.path !== path));
   }, []);
 
-  /**
-   * Build command text with file mention prefix when mentions are present.
-   * Format: "[Files referenced: path1, path2]\n\n{message}"
-   */
-  const buildCommandText = useCallback(
-    (trimmed: string): string => {
-      if (mentions.length === 0) return trimmed;
-      const paths = mentions.map((m) => m.path).join(', ');
-      return `[Files referenced: ${paths}]\n\n${trimmed}`;
-    },
-    [mentions],
-  );
-
   const handleSend = useCallback(async () => {
     const trimmed = input.trim();
     const hasImages = attachments.length > 0;
     if (!trimmed && !hasImages) return;
 
-    const commandText = buildCommandText(trimmed);
+    // Build command text with file mention prefix when mentions are present
+    const commandText = mentions.length === 0
+      ? trimmed
+      : `[Files referenced: ${mentions.map((m) => m.path).join(', ')}]\n\n${trimmed}`;
 
     // Message queuing during streaming: send immediately, add optimistic with queued flag
     if (isStreaming) {
@@ -251,11 +244,6 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       // Include images if attached (convert to base64)
       if (hasImages) {
         options.images = await getBase64ForSend();
-      }
-
-      // Include file mentions for future backend support
-      if (mentions.length > 0) {
-        options.fileMentions = mentions.map((m) => m.path);
       }
 
       wsClient.send({
@@ -329,11 +317,6 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       options.images = await getBase64ForSend();
     }
 
-    // Include file mentions for future backend support
-    if (mentions.length > 0) {
-      options.fileMentions = mentions.map((m) => m.path);
-    }
-
     // Store pending title for new chats
     if (!sessionId) {
       pendingTitleRef.current = trimmed.slice(0, 50);
@@ -375,7 +358,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     if (effectiveSessionId) clearDraft(effectiveSessionId);
     if (hasImages) clearImages();
     requestAnimationFrame(() => textareaRef.current?.focus());
-  }, [input, mentions, attachments, isStreaming, canSend, projectName, sessionId, streamSessionId, addMessage, addSession, navigate, dispatch, clearDraft, getBase64ForSend, clearImages, buildCommandText]);
+  }, [input, mentions, attachments, isStreaming, canSend, projectName, sessionId, streamSessionId, addMessage, addSession, navigate, dispatch, clearDraft, getBase64ForSend, clearImages]);
 
   const handleStop = useCallback(() => {
     if (!canStop) return;
@@ -468,13 +451,12 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         }}
       >
         {/* Mention picker popup (above composer) */}
-        {mentionPickerOpen && (mentionResults.length > 0 || mentionLoading) && (
+        {mentionPickerOpen && (
           <MentionPicker
             results={mentionResults}
             selectedIndex={mentionSelectedIndex}
             isLoading={mentionLoading}
             onSelect={handleMentionSelect}
-            onClose={closeMentionPicker}
           />
         )}
 
@@ -506,6 +488,8 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
           onPaste={addFromClipboard}
           placeholder="Send a message..."
           aria-label="Message input"
+          aria-expanded={mentionPickerOpen}
+          aria-controls={mentionPickerOpen ? 'mention-picker-list' : undefined}
           rows={1}
           className={cn(
             'w-full resize-none overflow-y-hidden bg-transparent text-sm text-foreground',

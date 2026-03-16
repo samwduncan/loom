@@ -25,7 +25,6 @@ describe('MentionPicker', () => {
         selectedIndex={0}
         isLoading={false}
         onSelect={vi.fn()}
-        onClose={vi.fn()}
       />,
     );
 
@@ -46,7 +45,6 @@ describe('MentionPicker', () => {
         selectedIndex={1}
         isLoading={false}
         onSelect={vi.fn()}
-        onClose={vi.fn()}
       />,
     );
 
@@ -67,7 +65,6 @@ describe('MentionPicker', () => {
         selectedIndex={0}
         isLoading={false}
         onSelect={onSelect}
-        onClose={vi.fn()}
       />,
     );
 
@@ -83,7 +80,6 @@ describe('MentionPicker', () => {
         selectedIndex={0}
         isLoading={false}
         onSelect={vi.fn()}
-        onClose={vi.fn()}
       />,
     );
 
@@ -97,7 +93,6 @@ describe('MentionPicker', () => {
         selectedIndex={0}
         isLoading={true}
         onSelect={vi.fn()}
-        onClose={vi.fn()}
       />,
     );
 

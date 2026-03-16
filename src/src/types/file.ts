@@ -38,6 +38,18 @@ export interface FileActions {
 export type FileStore = FileState & FileActions;
 
 /**
+ * FileEntry -- flat file reference from project file search endpoints.
+ *
+ * Used by command palette search, file mention picker, and any feature
+ * that works with the flat /api/projects/:name/files listing.
+ */
+export interface FileEntry {
+  path: string;
+  name: string;
+  type: 'file' | 'directory';
+}
+
+/**
  * FileTreeNode -- matches backend response shape from
  * GET /api/projects/:projectName/files
  *

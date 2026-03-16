@@ -13,7 +13,7 @@ import { useCallback } from 'react';
 import { CommandPaletteItem } from '../CommandPaletteItem';
 import { useUIStore } from '@/stores/ui';
 import { useFileStore } from '@/stores/file';
-import type { FileEntry } from '../hooks/useCommandSearch';
+import type { FileEntry } from '@/types/file';
 
 export interface FileGroupProps {
   files: FileEntry[];

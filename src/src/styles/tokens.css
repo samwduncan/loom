@@ -9,6 +9,7 @@
    * Chroma decreases at higher lightness to preserve warmth.
    * No box-shadow for elevation — distinction via lightness only.
    */
+  --surface-sunken: oklch(0.17 0.010 32);
   --surface-base: oklch(0.20 0.010 32);
   --surface-raised: oklch(0.23 0.008 32);
   --surface-overlay: oklch(0.27 0.007 32);
@@ -26,6 +27,8 @@
   --accent-primary: oklch(0.63 0.14 20);
   --accent-primary-hover: oklch(0.68 0.15 20);
   --accent-primary-muted: oklch(0.63 0.14 20 / 0.15);
+  --accent-primary-border: oklch(0.63 0.14 20 / 0.3);
+  --accent-primary-border-strong: oklch(0.63 0.14 20 / 0.4);
   --accent-primary-fg: oklch(0.20 0.01 32);
 
   /* ─── Secondary Accent — Amber/Gold ───────────────────────────────
@@ -139,6 +142,8 @@
    * Backdrop overlays, drop shadows, and edge highlights
    */
   --backdrop-overlay: oklch(0 0 0 / 0.5);
+  --shadow-light: oklch(0 0 0 / 0.15);
+  --shadow-medium: oklch(0 0 0 / 0.2);
   --shadow-heavy: oklch(0 0 0 / 0.5);
   --shadow-edge: oklch(1 0 0 / 0.05);
   --surface-active: oklch(1 0 0 / 0.05);
