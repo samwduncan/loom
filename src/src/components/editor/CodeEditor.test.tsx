@@ -9,22 +9,25 @@
 import { render } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Track extensions passed to CodeMirror
-let capturedExtensions: unknown[] = [];
+// vi.hoisted runs before vi.mock hoisting -- safe to reference in mock factories
+const { capturedExtensionsRef, MINIMAP_SENTINEL, mockCompute } = vi.hoisted(() => {
+  const capturedExtensionsRef = { current: [] as unknown[] };
+  const MINIMAP_SENTINEL = '__minimap_extension__';
+  const mockCompute = vi.fn(() => MINIMAP_SENTINEL);
+  return { capturedExtensionsRef, MINIMAP_SENTINEL, mockCompute };
+});
 
 vi.mock('@uiw/react-codemirror', () => ({
   __esModule: true,
   default: (props: { extensions?: unknown[] }) => {
-    capturedExtensions = props.extensions ?? [];
+    capturedExtensionsRef.current = props.extensions ?? [];
     return <div data-testid="codemirror-mock" />;
   },
 }));
 
-// Mock showMinimap so we can identify it in the extensions array
-const mockMinimapExtension = Symbol('minimap-extension');
 vi.mock('@replit/codemirror-minimap', () => ({
   showMinimap: {
-    compute: vi.fn(() => mockMinimapExtension),
+    compute: mockCompute,
   },
 }));
 
@@ -109,18 +112,17 @@ import { CodeEditor } from './CodeEditor';
 
 describe('CodeEditor minimap', () => {
   beforeEach(() => {
-    capturedExtensions = [];
+    capturedExtensionsRef.current = [];
     mockActiveFilePath = '/src/index.ts';
   });
 
   it('includes minimap extension in CodeMirror extensions array', () => {
     render(<CodeEditor />);
-    expect(capturedExtensions).toContain(mockMinimapExtension);
+    expect(capturedExtensionsRef.current).toContain(MINIMAP_SENTINEL);
   });
 
-  it('uses showMinimap.compute facet for minimap configuration', async () => {
-    const { showMinimap } = await import('@replit/codemirror-minimap');
+  it('uses showMinimap.compute facet for minimap configuration', () => {
     render(<CodeEditor />);
-    expect(showMinimap.compute).toHaveBeenCalled();
+    expect(mockCompute).toHaveBeenCalled();
   });
 });

@@ -38,6 +38,20 @@
 }
 
 /* ----------------------------------------------------------------
+ * Minimap -- code overview in right gutter
+ * Uses design tokens only (Constitution 7.14)
+ * ---------------------------------------------------------------- */
+
+.cm-minimap {
+  background: var(--surface-raised);
+  border-left: 1px solid var(--border-subtle);
+}
+
+.cm-minimap .cm-minimap-inner canvas {
+  opacity: 0.7;
+}
+
+/* ----------------------------------------------------------------
  * DiffEditor -- merge view diff coloring
  * Uses OKLCH diff tokens from tokens.css
  * ---------------------------------------------------------------- */

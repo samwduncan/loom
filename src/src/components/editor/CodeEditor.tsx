@@ -18,6 +18,7 @@ import { type Extension } from '@codemirror/state';
 import { type ViewUpdate } from '@codemirror/view';
 import { EditorView } from '@codemirror/view';
 import { search } from '@codemirror/search';
+import { showMinimap } from '@replit/codemirror-minimap';
 import { Keyboard, WrapText } from 'lucide-react';
 
 import { loomDarkTheme } from '@/components/editor/loom-dark-theme';
@@ -56,6 +57,21 @@ const saveKeymapExtension = EditorView.domEventHandlers({
     }
     return false;
   },
+});
+
+/**
+ * Minimap extension -- shows a code overview in the right gutter.
+ * Uses showMinimap.compute facet to conditionally display based on doc length.
+ * Hidden for short files (< 50 lines) where a minimap adds no value.
+ */
+const MINIMAP_LINE_THRESHOLD = 50;
+const minimapExtension = showMinimap.compute(['doc'], (state) => {
+  if (state.doc.lines < MINIMAP_LINE_THRESHOLD) return null;
+  return {
+    create: () => ({ dom: document.createElement('div') }),
+    displayText: 'blocks',
+    showOverlay: 'always',
+  };
 });
 
 export function CodeEditor() {
@@ -156,6 +172,7 @@ export function CodeEditor() {
     search(),
     saveKeymapExtension,
     EditorView.updateListener.of(handleUpdate),
+    minimapExtension,
   ];
   if (lineWrap) extensions.push(EditorView.lineWrapping);
   if (langExtension) extensions.push(langExtension);
