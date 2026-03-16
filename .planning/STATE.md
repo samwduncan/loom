@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
-status: completed
-stopped_at: Completed 31-02-PLAN.md
-last_updated: "2026-03-16T16:14:00.378Z"
-last_activity: 2026-03-16 -- Completed 31-02-PLAN.md (run in terminal button)
+status: in_progress
+stopped_at: Completed 32-01-PLAN.md
+last_updated: "2026-03-16T16:43:00Z"
+last_activity: 2026-03-16 -- Completed 32-01-PLAN.md (file mention picker + hook)
 progress:
   total_phases: 10
   completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_plans: 9
+  completed_plans: 8
+  percent: 89
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 31 - Editor & Tool Enhancements
+**Current focus:** Phase 32 - File Mentions
 
 ## Current Position
 
-Phase: 31 of 37 (Editor & Tool Enhancements) -- COMPLETE
-Plan: 2 of 2 (all plans complete)
-Status: Phase 31 complete -- both plans executed
-Last activity: 2026-03-16 -- Completed 31-02-PLAN.md (run in terminal button)
+Phase: 32 of 37 (File Mentions) -- IN PROGRESS
+Plan: 1 of 2 (32-01 complete)
+Status: Plan 01 complete -- mention picker + hook ready, plan 02 next (composer integration)
+Last activity: 2026-03-16 -- Completed 32-01-PLAN.md (file mention picker + hook)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 89%
 
 ## Performance Metrics
 
@@ -65,6 +65,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 31]: Module-level minimap constant with showMinimap.compute facet for conditional display (50+ lines)
 - [Phase 31]: Used useUIStore selector pattern (not getState()) for store actions in tool card components
 - [Phase 31]: rAF delay + 500ms retry for sendToShell after tab switch to handle CSS show/hide panel mount timing
+- [Phase 32]: Derived isLoading from fetchDone boolean to satisfy React 19 set-state-in-effect lint rule
+- [Phase 32]: Guard scrollIntoView with typeof check for jsdom compatibility in tests
 
 ### Pending Todos
 
@@ -76,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T16:01:00Z
-Stopped at: Completed 31-02-PLAN.md
-Resume: Phase 31 complete -- start phase 32 or next milestone task
+Last session: 2026-03-16T16:43:00Z
+Stopped at: Completed 32-01-PLAN.md
+Resume: Plan 32-02 next -- wire MentionPicker into ChatComposer

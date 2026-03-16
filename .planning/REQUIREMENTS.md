@@ -31,7 +31,7 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 
 ### Composer
 
-- [ ] **COMP-01**: User can type @ to trigger a file mention picker with fuzzy search
+- [x] **COMP-01**: User can type @ to trigger a file mention picker with fuzzy search
 - [ ] **COMP-02**: Selected file mentions display as inline chips in the composer
 - [ ] **COMP-03**: File mentions are sent as context attachments with the message
 - [ ] **COMP-04**: User can type / to trigger a slash command menu
@@ -109,7 +109,7 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | SESS-01 | Phase 29 | Complete |
 | SESS-02 | Phase 29 | Complete |
 | SESS-03 | Phase 29 | Complete |
-| COMP-01 | Phase 32 | Pending |
+| COMP-01 | Phase 32 | Complete |
 | COMP-02 | Phase 32 | Pending |
 | COMP-03 | Phase 32 | Pending |
 | COMP-04 | Phase 33 | Pending |
