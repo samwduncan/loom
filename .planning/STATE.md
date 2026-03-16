@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: in_progress
-stopped_at: Completed 32-01-PLAN.md
-last_updated: "2026-03-16T16:43:00Z"
-last_activity: 2026-03-16 -- Completed 32-01-PLAN.md (file mention picker + hook)
+stopped_at: Completed 32-02-PLAN.md
+last_updated: "2026-03-16T16:52:34Z"
+last_activity: 2026-03-16 -- Completed 32-02-PLAN.md (composer mention integration)
 progress:
   total_phases: 10
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 9
-  completed_plans: 8
-  percent: 89
+  completed_plans: 9
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 
 ## Current Position
 
-Phase: 32 of 37 (File Mentions) -- IN PROGRESS
-Plan: 1 of 2 (32-01 complete)
-Status: Plan 01 complete -- mention picker + hook ready, plan 02 next (composer integration)
-Last activity: 2026-03-16 -- Completed 32-01-PLAN.md (file mention picker + hook)
+Phase: 32 of 37 (File Mentions) -- COMPLETE
+Plan: 2 of 2 (all complete)
+Status: Phase 32 complete -- full @ file mention flow in composer
+Last activity: 2026-03-16 -- Completed 32-02-PLAN.md (composer mention integration)
 
-Progress: [████████░░] 89%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -67,6 +67,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 31]: rAF delay + 500ms retry for sendToShell after tab switch to handle CSS show/hide panel mount timing
 - [Phase 32]: Derived isLoading from fetchDone boolean to satisfy React 19 set-state-in-effect lint rule
 - [Phase 32]: Guard scrollIntoView with typeof check for jsdom compatibility in tests
+- [Phase 32]: Mock useFileMentions in ChatComposer tests for controlled integration testing
+- [Phase 32]: Prepend file references as text prefix until backend fileMentions option is supported
 
 ### Pending Todos
 
@@ -78,6 +80,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T16:43:00Z
-Stopped at: Completed 32-01-PLAN.md
-Resume: Plan 32-02 next -- wire MentionPicker into ChatComposer
+Last session: 2026-03-16T16:52:34Z
+Stopped at: Completed 32-02-PLAN.md
+Resume: Phase 32 complete -- next phase ready
