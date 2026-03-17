@@ -277,7 +277,9 @@ export async function initializeWebSocket(): Promise<void> {
           // If was streaming, preserve partial content (per CONTEXT.md decision)
           if (isCurrentlyStreaming) {
             isCurrentlyStreaming = false;
-            // Don't call endStream -- keep partial content visible
+            // Don't call endStream() -- keep partial content (tool calls, thinking) visible
+            // Only clear isStreaming so sidebar pulse dot stops
+            useStreamStore.setState({ isStreaming: false });
             connectionStore().setProviderError(
               'claude',
               'Connection lost during response',
