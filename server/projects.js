@@ -1666,7 +1666,13 @@ async function deleteCodexSession(sessionId) {
 }
 
 async function updateSessionTitle(projectName, sessionId, title) {
-  const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
+  const baseDir = path.join(os.homedir(), '.claude', 'projects');
+  const projectDir = path.resolve(baseDir, projectName);
+
+  // Path traversal guard: resolved path must stay within base directory
+  if (!projectDir.startsWith(baseDir + path.sep)) {
+    throw new Error('Invalid project name');
+  }
 
   try {
     const files = await fs.readdir(projectDir);

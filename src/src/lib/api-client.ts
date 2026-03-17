@@ -33,6 +33,9 @@ export async function apiFetch<T>(
   if (res.status === 401) {
     // Attempt token refresh and retry once
     await refreshAuth();
+    if (signal?.aborted) {
+      throw new DOMException('Aborted', 'AbortError');
+    }
     const retryRes = await doFetch();
     if (!retryRes.ok) {
       throw new Error(`API error ${retryRes.status}: ${retryRes.statusText}`);

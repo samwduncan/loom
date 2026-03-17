@@ -550,6 +550,13 @@ app.patch('/api/projects/:projectName/sessions/:sessionId', authenticateToken, a
         const { projectName, sessionId } = req.params;
         const { title } = req.body;
 
+        // Sanitize path params to prevent traversal
+        const safeProjectName = String(projectName).replace(/[^a-zA-Z0-9._-]/g, '');
+        const safeSessionId = String(sessionId).replace(/[^a-zA-Z0-9._-]/g, '');
+        if (!safeProjectName || !safeSessionId) {
+            return res.status(400).json({ error: 'Invalid project name or session ID' });
+        }
+
         if (!title || typeof title !== 'string' || title.trim().length === 0) {
             return res.status(400).json({ error: 'Title is required and must be a non-empty string' });
         }
@@ -558,9 +565,9 @@ app.patch('/api/projects/:projectName/sessions/:sessionId', authenticateToken, a
         }
 
         const trimmedTitle = title.trim();
-        console.log(`[API] Updating session title: ${sessionId} in project: ${projectName} to "${trimmedTitle}"`);
-        await updateSessionTitle(projectName, sessionId, trimmedTitle);
-        console.log(`[API] Session ${sessionId} title updated successfully`);
+        console.log(`[API] Updating session title: ${safeSessionId} in project: ${safeProjectName} to "${trimmedTitle}"`);
+        await updateSessionTitle(safeProjectName, safeSessionId, trimmedTitle);
+        console.log(`[API] Session ${safeSessionId} title updated successfully`);
         res.json({ success: true, title: trimmedTitle });
     } catch (error) {
         console.error(`[API] Error updating session title ${req.params.sessionId}:`, error);

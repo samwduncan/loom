@@ -68,7 +68,7 @@ export async function bootstrapAuth(): Promise<string> {
   }
 
   const statusRes = await fetch('/api/auth/status');
-  const status = (await statusRes.json()) as { needsSetup: boolean };
+  const status = (await statusRes.json()) as { needsSetup: boolean }; // ASSERT: /api/auth/status returns { needsSetup }
 
   if (status.needsSetup) {
     const res = await fetch('/api/auth/register', {
@@ -76,7 +76,10 @@ export async function bootstrapAuth(): Promise<string> {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
-    const data = (await res.json()) as { token: string };
+    if (!res.ok) {
+      throw new Error('Auto-registration failed');
+    }
+    const data = (await res.json()) as { token: string }; // ASSERT: register endpoint returns { token } on success
     setToken(data.token);
     return data.token;
   }
@@ -91,7 +94,7 @@ export async function bootstrapAuth(): Promise<string> {
     throw new Error('Auto-auth failed -- manual login required');
   }
 
-  const data = (await res.json()) as { token: string };
+  const data = (await res.json()) as { token: string }; // ASSERT: login endpoint returns { token } on success
   setToken(data.token);
   return data.token;
 }

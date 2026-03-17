@@ -28,6 +28,10 @@ let activityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 /** Module-scoped timer for cleaning up stale stub sessions */
 let stubCleanupTimer: ReturnType<typeof setTimeout> | null = null;
 
+/** Counter for 4401 auth recovery attempts — caps at 3 to prevent infinite loops */
+let authRecoveryAttempts = 0;
+const MAX_AUTH_RECOVERY_ATTEMPTS = 3;
+
 /** Module-scoped set of session IDs with active streams (from backend sync) */
 let activeStreamingSessions = new Set<string>();
 
@@ -287,17 +291,20 @@ export async function initializeWebSocket(): Promise<void> {
           }
 
           // Auth failure recovery: if WS closed with 4401 (auth rejected),
-          // refresh the token and reconnect automatically
+          // refresh the token and reconnect automatically (max 3 attempts)
           {
             const closeCode = wsClient.getLastCloseCode();
-            if (closeCode === 4401) {
+            if (closeCode === 4401 && authRecoveryAttempts < MAX_AUTH_RECOVERY_ATTEMPTS) {
+              authRecoveryAttempts++;
               refreshAuth()
-                .then(() => {
-                  wsClient.tryReconnect();
-                })
+                .then(() => wsClient.tryReconnect())
                 .catch((err) => {
                   console.warn('[WebSocket] Auth refresh failed after 4401:', err);
+                  connectionStore().setProviderError('claude', 'Authentication failed — please reload');
                 });
+            } else if (closeCode === 4401) {
+              console.warn('[WebSocket] Max auth recovery attempts reached');
+              connectionStore().setProviderError('claude', 'Authentication failed — please reload');
             }
           }
           break;
