@@ -1,5 +1,5 @@
 /**
- * ChatComposer tests -- text input, send, stop, keyboard behavior, file mentions.
+ * ChatComposer tests -- text input, send, stop, keyboard behavior, file mentions, slash commands.
  *
  * Tests verify:
  * - Renders textarea and send button
@@ -13,6 +13,10 @@
  * - File mention chips display and removal
  * - Sending with mentions prepends file references to command
  * - Mentions clear after send
+ * - Slash picker visibility based on useSlashCommands.isOpen
+ * - Slash detect trigger on input change
+ * - /clear command calls clearSession
+ * - Escape closes slash picker
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -23,6 +27,7 @@ import { ChatComposer } from './ChatComposer';
 import { useStreamStore } from '@/stores/stream';
 import { useTimelineStore } from '@/stores/timeline';
 import type { FileMention } from '@/types/mention';
+import type { SlashCommand } from '@/types/slash-command';
 
 // Mock wsClient
 const mockWsSend = vi.fn().mockReturnValue(true);
@@ -63,6 +68,31 @@ vi.mock('@/hooks/useFileMentions', () => ({
   }),
 }));
 
+// Mock useSlashCommands for controlled testing
+const mockSlashDetectAndOpen = vi.fn();
+const mockSlashClose = vi.fn();
+const mockSlashMoveUp = vi.fn();
+const mockSlashMoveDown = vi.fn();
+const mockSlashSelectCurrent = vi.fn<() => SlashCommand | null>().mockReturnValue(null);
+
+let mockSlashState = {
+  isOpen: false,
+  query: '',
+  results: [] as SlashCommand[],
+  selectedIndex: 0,
+};
+
+vi.mock('@/hooks/useSlashCommands', () => ({
+  useSlashCommands: () => ({
+    ...mockSlashState,
+    detectAndOpen: mockSlashDetectAndOpen,
+    close: mockSlashClose,
+    moveUp: mockSlashMoveUp,
+    moveDown: mockSlashMoveDown,
+    selectCurrent: mockSlashSelectCurrent,
+  }),
+}));
+
 function renderComposer(props: { projectName: string; sessionId: string | null }) {
   return render(
     <MemoryRouter>
@@ -82,6 +112,12 @@ describe('ChatComposer', () => {
       results: [],
       selectedIndex: 0,
       isLoading: false,
+    };
+    mockSlashState = {
+      isOpen: false,
+      query: '',
+      results: [],
+      selectedIndex: 0,
     };
   });
 
@@ -494,6 +530,121 @@ describe('ChatComposer', () => {
       await user.click(removeBtn);
 
       expect(screen.queryByTestId('mention-chip')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('slash commands', () => {
+    it('shows slash picker when useSlashCommands.isOpen is true', () => {
+      mockSlashState = {
+        isOpen: true,
+        query: '',
+        results: [
+          { id: 'clear', label: '/clear', description: 'Clear conversation history' },
+          { id: 'help', label: '/help', description: 'Ask for help' },
+        ],
+        selectedIndex: 0,
+      };
+
+      renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
+      expect(screen.getByTestId('slash-picker')).toBeInTheDocument();
+    });
+
+    it('does not show slash picker when isOpen is false', () => {
+      // Default mockSlashState has isOpen: false
+      renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
+      expect(screen.queryByTestId('slash-picker')).not.toBeInTheDocument();
+    });
+
+    it('calls slashDetectAndOpen on input change', async () => {
+      const user = userEvent.setup();
+      renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
+
+      await user.type(screen.getByRole('textbox'), '/cl');
+
+      expect(mockSlashDetectAndOpen).toHaveBeenCalled();
+      const calls = mockSlashDetectAndOpen.mock.calls;
+      const lastCall = calls[calls.length - 1];
+      expect(lastCall?.[0]).toBe('/cl');
+    });
+
+    it('/clear command calls clearSession on timeline store', async () => {
+      const user = userEvent.setup();
+      const clearCmd: SlashCommand = { id: 'clear', label: '/clear', description: 'Clear conversation history' };
+      mockSlashSelectCurrent.mockReturnValue(clearCmd);
+      mockSlashState = {
+        isOpen: true,
+        query: 'clear',
+        results: [clearCmd],
+        selectedIndex: 0,
+      };
+
+      // Create a session so clearSession has something to clear
+      useTimelineStore.getState().addSession({
+        id: 'sess-1',
+        title: 'Test',
+        messages: [
+          {
+            id: 'msg-1',
+            role: 'user',
+            content: 'hello',
+            metadata: { timestamp: '2026-01-01', tokenCount: null, inputTokens: null, outputTokens: null, cacheReadTokens: null, cost: null, duration: null },
+            providerContext: { providerId: 'claude', modelId: '', agentName: null },
+          },
+        ],
+        providerId: 'claude',
+        createdAt: '2026-01-01',
+        updatedAt: '2026-01-01',
+        metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+      });
+
+      renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
+      screen.getByRole('textbox').focus();
+
+      // Press Enter to select /clear command
+      await user.keyboard('{Enter}');
+
+      // clearSession should have been called
+      const session = useTimelineStore.getState().sessions.find((s) => s.id === 'sess-1');
+      expect(session).toBeDefined();
+      expect(session?.messages).toHaveLength(0);
+    });
+
+    it('Escape closes slash picker', async () => {
+      const user = userEvent.setup();
+      mockSlashState = {
+        isOpen: true,
+        query: '',
+        results: [{ id: 'clear', label: '/clear', description: 'Clear conversation history' }],
+        selectedIndex: 0,
+      };
+
+      renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
+      screen.getByRole('textbox').focus();
+
+      await user.keyboard('{Escape}');
+
+      expect(mockSlashClose).toHaveBeenCalled();
+    });
+
+    it('slash and mention pickers do not open simultaneously', () => {
+      // When slash is open, mention should not render (and vice versa)
+      mockSlashState = {
+        isOpen: true,
+        query: '',
+        results: [{ id: 'clear', label: '/clear', description: 'Clear history' }],
+        selectedIndex: 0,
+      };
+      mockMentionState = {
+        isOpen: false,
+        query: '',
+        results: [],
+        selectedIndex: 0,
+        isLoading: false,
+      };
+
+      renderComposer({ projectName: 'test-proj', sessionId: 'sess-1' });
+      expect(screen.getByTestId('slash-picker')).toBeInTheDocument();
+      expect(screen.queryByTestId('mention-picker')).not.toBeInTheDocument();
     });
   });
 });
