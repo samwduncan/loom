@@ -3,12 +3,13 @@
  *
  * Tests verify:
  * - observeRef creates IntersectionObserver per message
- * - Messages within collapseThreshold (last 10) are never collapsed
  * - isCollapsed returns correct state after IO fires
  * - toggleExpand pins a message open (not re-collapsed by IO)
- * - toggleExpand again unpins and allows re-collapse
+ * - toggleExpand again unpins and immediately collapses
  * - Cleanup disconnects all observers on unmount
  * - Collapse is debounced (300ms), expand is immediate
+ * - Ref callbacks are stable across renders (no observer churn)
+ * - Observer not created when scrollContainerRef is null
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -70,14 +71,13 @@ describe('useAutoCollapse', () => {
     vi.useRealTimers();
   });
 
-  it('observeRef creates an IntersectionObserver for eligible messages', () => {
+  it('observeRef creates an IntersectionObserver for a message', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
-    // Message at index 0 (far from bottom, eligible: 0 < 20 - 10)
     const el = document.createElement('div');
     act(() => {
-      const refCallback = result.current.observeRef('msg-0', 0);
+      const refCallback = result.current.observeRef('msg-0');
       refCallback(el);
     });
 
@@ -85,35 +85,42 @@ describe('useAutoCollapse', () => {
     expect(firstIO().observe).toHaveBeenCalledWith(el);
   });
 
-  it('does NOT create observer for messages within collapseThreshold (last 10)', () => {
+  it('passes scrollContainerRef as IO root', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
-    // Index 15 >= 20 - 10 = 10, so it IS protected
-    const el = document.createElement('div');
     act(() => {
-      const refCallback = result.current.observeRef('msg-15', 15);
-      refCallback(el);
+      result.current.observeRef('msg-0')(document.createElement('div'));
     });
 
-    // No observer should be created for protected messages
+    expect(firstIO().options?.root).toBe(scrollRef.current);
+  });
+
+  it('does NOT create observer when scrollContainerRef is null', () => {
+    const scrollRef = { current: null };
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
+
+    act(() => {
+      result.current.observeRef('msg-0')(document.createElement('div'));
+    });
+
     expect(ioInstances.length).toBe(0);
   });
 
   it('isCollapsed returns false by default', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
     expect(result.current.isCollapsed('msg-0')).toBe(false);
   });
 
   it('marks a message as collapsed when IO fires !isIntersecting (after debounce)', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
     const el = document.createElement('div');
     act(() => {
-      result.current.observeRef('msg-0', 0)(el);
+      result.current.observeRef('msg-0')(el);
     });
 
     // Fire IO: message leaves viewport
@@ -134,11 +141,11 @@ describe('useAutoCollapse', () => {
 
   it('expands immediately when IO fires isIntersecting (no debounce)', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
     const el = document.createElement('div');
     act(() => {
-      result.current.observeRef('msg-0', 0)(el);
+      result.current.observeRef('msg-0')(el);
     });
 
     // Collapse first
@@ -157,11 +164,11 @@ describe('useAutoCollapse', () => {
 
   it('toggleExpand pins a message open (not re-collapsed by IO)', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
     const el = document.createElement('div');
     act(() => {
-      result.current.observeRef('msg-0', 0)(el);
+      result.current.observeRef('msg-0')(el);
     });
 
     // Collapse via IO
@@ -185,16 +192,16 @@ describe('useAutoCollapse', () => {
     expect(result.current.isCollapsed('msg-0')).toBe(false);
   });
 
-  it('toggleExpand again unpins and allows re-collapse', () => {
+  it('toggleExpand again unpins and immediately collapses', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
     const el = document.createElement('div');
     act(() => {
-      result.current.observeRef('msg-0', 0)(el);
+      result.current.observeRef('msg-0')(el);
     });
 
-    // Collapse, pin, unpin
+    // Collapse, then pin
     act(() => {
       fireIO(firstIO(), false);
       vi.advanceTimersByTime(300);
@@ -202,26 +209,23 @@ describe('useAutoCollapse', () => {
     act(() => {
       result.current.toggleExpand('msg-0'); // pin
     });
+    expect(result.current.isCollapsed('msg-0')).toBe(false);
+
+    // Unpin: should immediately collapse (not wait for IO)
     act(() => {
       result.current.toggleExpand('msg-0'); // unpin
-    });
-
-    // IO fires !isIntersecting -- should collapse now (unpinned)
-    act(() => {
-      fireIO(firstIO(), false);
-      vi.advanceTimersByTime(300);
     });
     expect(result.current.isCollapsed('msg-0')).toBe(true);
   });
 
   it('cleanup disconnects all observers on unmount', () => {
     const scrollRef = makeScrollRef();
-    const { result, unmount } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result, unmount } = renderHook(() => useAutoCollapse(scrollRef));
 
     // Create two observers
     act(() => {
-      result.current.observeRef('msg-0', 0)(document.createElement('div'));
-      result.current.observeRef('msg-1', 1)(document.createElement('div'));
+      result.current.observeRef('msg-0')(document.createElement('div'));
+      result.current.observeRef('msg-1')(document.createElement('div'));
     });
 
     expect(ioInstances.length).toBe(2);
@@ -235,11 +239,11 @@ describe('useAutoCollapse', () => {
 
   it('cancels pending collapse timeout on expand', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
     const el = document.createElement('div');
     act(() => {
-      result.current.observeRef('msg-0', 0)(el);
+      result.current.observeRef('msg-0')(el);
     });
 
     // Start collapse (fires IO, starts 300ms debounce)
@@ -262,33 +266,25 @@ describe('useAutoCollapse', () => {
     expect(result.current.isCollapsed('msg-0')).toBe(false);
   });
 
-  it('uses custom collapseThreshold', () => {
+  it('returns stable ref callbacks for the same messageId', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20, 5));
+    const { result, rerender } = renderHook(() => useAutoCollapse(scrollRef));
 
-    // Index 14 < 20 - 5 = 15, so NOT protected -- eligible
-    const el1 = document.createElement('div');
-    act(() => {
-      result.current.observeRef('msg-14', 14)(el1);
-    });
-    expect(ioInstances.length).toBe(1);
+    const cb1 = result.current.observeRef('msg-0');
+    rerender();
+    const cb2 = result.current.observeRef('msg-0');
 
-    // Index 16 >= 15, so IS protected
-    const el2 = document.createElement('div');
-    act(() => {
-      result.current.observeRef('msg-16', 16)(el2);
-    });
-    expect(ioInstances.length).toBe(1); // No new observer
+    expect(cb1).toBe(cb2);
   });
 
   it('cleans up observer when ref callback receives null', () => {
     const scrollRef = makeScrollRef();
-    const { result } = renderHook(() => useAutoCollapse(scrollRef, 20));
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
     const el = document.createElement('div');
     let refCb: (el: HTMLElement | null) => void;
     act(() => {
-      refCb = result.current.observeRef('msg-0', 0);
+      refCb = result.current.observeRef('msg-0');
       refCb(el);
     });
 

@@ -8,7 +8,7 @@
  * Constitution: Named export (2.2), no inline styles (7.14), design tokens only.
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { MessageMetadata } from '@/types/message';
@@ -62,10 +62,10 @@ export function TokenUsage({ metadata }: TokenUsageProps) {
   const hasTokens = metadata.inputTokens !== null || metadata.outputTokens !== null;
   const hasCost = metadata.cost !== null && metadata.cost > 0;
 
-  if (!hasTokens && !hasCost) return null;
-
-  const summary = buildSummary(metadata);
+  const summary = useMemo(() => buildSummary(metadata), [metadata]);
   const showCacheRow = metadata.cacheReadTokens != null && metadata.cacheReadTokens > 0;
+
+  if (!hasTokens && !hasCost) return null;
 
   return (
     <div className="mt-1">
@@ -85,7 +85,7 @@ export function TokenUsage({ metadata }: TokenUsageProps) {
       {expanded && (
         <dl
           data-testid="token-usage-detail"
-          className="text-muted bg-surface-secondary mt-1 rounded px-3 py-2 text-xs"
+          className="text-muted bg-surface-raised mt-1 rounded px-3 py-2 text-xs"
         >
           {hasTokens && (
             <>

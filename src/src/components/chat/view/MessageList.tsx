@@ -59,7 +59,6 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
   const internalScrollRef = useRef<HTMLDivElement>(null);
   // Use external ref if provided (for composer scroll stability), otherwise internal
   const scrollRef = scrollContainerRef ?? internalScrollRef;
-  const assignRef = scrollContainerRef ?? internalScrollRef;
   const isStreaming = useStreamStore((state) => state.isStreaming);
   const topSentinelRef = useRef<HTMLDivElement>(null);
 
@@ -89,7 +88,8 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
   } = useScrollAnchor(scrollRef);
 
   // --- Auto-collapse: old messages collapse when scrolled out of viewport ---
-  const { observeRef, isCollapsed, toggleExpand } = useAutoCollapse(scrollRef, messages.length);
+  const COLLAPSE_THRESHOLD = 10;
+  const { observeRef, isCollapsed, toggleExpand } = useAutoCollapse(scrollRef);
 
   // --- Entrance animation tracking ---
   // Uses React "adjust state during rendering" pattern to track which messages
@@ -238,7 +238,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
 
   return (
     <div
-      ref={assignRef}
+      ref={scrollRef}
       className="flex-1 overflow-y-auto"
       data-testid="message-list-scroll"
     >
@@ -257,24 +257,29 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted border-t-accent-primary" />
           </div>
         )}
-        {messages.map((msg, idx) => (
-          <MessageErrorBoundary key={msg.id}>
-            <div
-              ref={observeRef(msg.id, idx)}
-              className={cn(
-                idx >= newStartIndex && 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 duration-200'
-              )}
-            >
-              <CollapsibleMessage
-                message={msg}
-                isCollapsed={isCollapsed(msg.id)}
-                onToggle={() => toggleExpand(msg.id)}
+        {messages.map((msg, idx) => {
+          const isProtected = idx >= messages.length - COLLAPSE_THRESHOLD;
+          return (
+            <MessageErrorBoundary key={msg.id}>
+              <div
+                ref={isProtected ? undefined : observeRef(msg.id)}
+                className={cn(
+                  idx >= newStartIndex && 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 duration-200'
+                )}
               >
-                {renderMessage(msg)}
-              </CollapsibleMessage>
-            </div>
-          </MessageErrorBoundary>
-        ))}
+                <CollapsibleMessage
+                  role={msg.role}
+                  content={msg.content}
+                  toolCallCount={msg.toolCalls?.length ?? 0}
+                  isCollapsed={isCollapsed(msg.id)}
+                  onToggle={() => toggleExpand(msg.id)}
+                >
+                  {renderMessage(msg)}
+                </CollapsibleMessage>
+              </div>
+            </MessageErrorBoundary>
+          );
+        })}
         {showActiveMessage && (
           <ActiveMessage
             sessionId={sessionId}

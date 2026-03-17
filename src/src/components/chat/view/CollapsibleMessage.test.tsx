@@ -5,43 +5,27 @@
  * - Collapsed state renders summary with role label, truncated content, tool count
  * - Expanded state renders children normally
  * - Click on collapsed summary calls onToggle
- * - Tool count badge shown when toolCalls present
+ * - Tool count badge shown when toolCallCount > 0
  * - Content truncated to 80 chars with ellipsis
- * - CSS grid wrapper has correct data-testid
+ * - Children unmounted when collapsed (no hidden DOM trees)
  */
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CollapsibleMessage } from './CollapsibleMessage';
-import type { Message } from '@/types/message';
 
-function makeMessage(overrides: Partial<Message> = {}): Message {
-  return {
-    id: 'msg-1',
-    role: 'assistant',
-    content: 'This is a test message with some content that we want to see truncated when collapsed.',
-    metadata: {
-      timestamp: new Date().toISOString(),
-      tokenCount: null,
-      inputTokens: null,
-      outputTokens: null,
-      cacheReadTokens: null,
-      cost: null,
-      duration: null,
-    },
-    providerContext: { providerId: 'claude', modelId: '', agentName: null },
-    ...overrides,
-  };
-}
+const defaultProps = {
+  role: 'assistant',
+  content: 'This is a test message with some content that we want to see truncated when collapsed.',
+  toolCallCount: 0,
+  isCollapsed: false,
+  onToggle: vi.fn(),
+};
 
 describe('CollapsibleMessage', () => {
   it('renders children when expanded', () => {
     render(
-      <CollapsibleMessage
-        message={makeMessage()}
-        isCollapsed={false}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} isCollapsed={false}>
         <div data-testid="child-content">Full message content</div>
       </CollapsibleMessage>,
     );
@@ -52,27 +36,19 @@ describe('CollapsibleMessage', () => {
 
   it('renders collapsed summary when isCollapsed is true', () => {
     render(
-      <CollapsibleMessage
-        message={makeMessage()}
-        isCollapsed={true}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} isCollapsed={true}>
         <div data-testid="child-content">Full message content</div>
       </CollapsibleMessage>,
     );
 
-    const summary = screen.getByTestId('collapsed-summary');
-    expect(summary).toBeInTheDocument();
-    // Children should be hidden (grid-template-rows: 0fr)
+    expect(screen.getByTestId('collapsed-summary')).toBeInTheDocument();
+    // Children should NOT be in the DOM when collapsed
+    expect(screen.queryByTestId('child-content')).not.toBeInTheDocument();
   });
 
   it('shows "You" label for user messages', () => {
     render(
-      <CollapsibleMessage
-        message={makeMessage({ role: 'user' })}
-        isCollapsed={true}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} role="user" isCollapsed={true}>
         <div>content</div>
       </CollapsibleMessage>,
     );
@@ -82,11 +58,7 @@ describe('CollapsibleMessage', () => {
 
   it('shows "Claude" label for assistant messages', () => {
     render(
-      <CollapsibleMessage
-        message={makeMessage({ role: 'assistant' })}
-        isCollapsed={true}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} role="assistant" isCollapsed={true}>
         <div>content</div>
       </CollapsibleMessage>,
     );
@@ -97,11 +69,7 @@ describe('CollapsibleMessage', () => {
   it('truncates content to 80 chars with ellipsis', () => {
     const longContent = 'A'.repeat(120);
     render(
-      <CollapsibleMessage
-        message={makeMessage({ content: longContent })}
-        isCollapsed={true}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} content={longContent} isCollapsed={true}>
         <div>content</div>
       </CollapsibleMessage>,
     );
@@ -115,36 +83,19 @@ describe('CollapsibleMessage', () => {
 
   it('does not add ellipsis for short content', () => {
     render(
-      <CollapsibleMessage
-        message={makeMessage({ content: 'Short' })}
-        isCollapsed={true}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} content="Short" isCollapsed={true}>
         <div>content</div>
       </CollapsibleMessage>,
     );
 
     const summary = screen.getByTestId('collapsed-summary');
     expect(summary.textContent).toContain('Short');
-    // No ellipsis for short content
     expect(summary.textContent).not.toContain('...');
   });
 
-  it('shows tool count badge when toolCalls present', () => {
-    const message = makeMessage({
-      toolCalls: [
-        { id: 't1', toolName: 'Read', input: {}, output: null, isError: false, parentToolUseId: null },
-        { id: 't2', toolName: 'Edit', input: {}, output: null, isError: false, parentToolUseId: null },
-        { id: 't3', toolName: 'Bash', input: {}, output: null, isError: false, parentToolUseId: null },
-      ],
-    });
-
+  it('shows tool count badge when toolCallCount > 0', () => {
     render(
-      <CollapsibleMessage
-        message={message}
-        isCollapsed={true}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} toolCallCount={3} isCollapsed={true}>
         <div>content</div>
       </CollapsibleMessage>,
     );
@@ -155,11 +106,7 @@ describe('CollapsibleMessage', () => {
   it('calls onToggle when collapsed summary is clicked', () => {
     const onToggle = vi.fn();
     render(
-      <CollapsibleMessage
-        message={makeMessage()}
-        isCollapsed={true}
-        onToggle={onToggle}
-      >
+      <CollapsibleMessage {...defaultProps} isCollapsed={true} onToggle={onToggle}>
         <div>content</div>
       </CollapsibleMessage>,
     );
@@ -170,11 +117,7 @@ describe('CollapsibleMessage', () => {
 
   it('has collapsible-wrapper data-testid on outer div', () => {
     render(
-      <CollapsibleMessage
-        message={makeMessage()}
-        isCollapsed={false}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} isCollapsed={false}>
         <div>content</div>
       </CollapsibleMessage>,
     );
@@ -184,11 +127,7 @@ describe('CollapsibleMessage', () => {
 
   it('uses first line only (before newline) for summary', () => {
     render(
-      <CollapsibleMessage
-        message={makeMessage({ content: 'First line\nSecond line\nThird line' })}
-        isCollapsed={true}
-        onToggle={vi.fn()}
-      >
+      <CollapsibleMessage {...defaultProps} content={'First line\nSecond line\nThird line'} isCollapsed={true}>
         <div>content</div>
       </CollapsibleMessage>,
     );

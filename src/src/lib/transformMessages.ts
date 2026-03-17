@@ -117,33 +117,57 @@ function isToolResultEntry(entry: BackendEntry): boolean {
 /**
  * Transform raw backend JSONL entries into internal Message types.
  *
- * Filters out non-chat entry types (progress, system, queue-operation, etc.).
- * Filters out pure tool_result entries (rendered as blank user bubbles otherwise).
- * Merges consecutive entries from the same assistant turn (same message.id)
- * into a single Message to prevent fragmented bubbles.
+ * Single-pass algorithm that:
+ * - Filters out non-chat entry types (progress, queue-operation, etc.)
+ * - Filters out pure tool_result entries (rendered as blank user bubbles otherwise)
+ * - Merges consecutive entries from the same assistant turn (same message.id)
+ * - Attaches token usage from result entries to the preceding assistant message
  *
  * Uses Math.random() for IDs (not crypto.randomUUID -- HTTP dev server safety).
  */
 export function transformBackendMessages(entries: BackendEntry[]): Message[] {
   const messages: Message[] = [];
+  // Track last assistant message index for result entry attribution
+  let lastAssistantMsgIdx = -1;
+  // Track merged apiIds to skip duplicate entries in the main loop
+  const mergedApiIds = new Set<string>();
 
-  // Only process displayable entry types (user/assistant/error/system/task_notification)
-  const chatEntries = entries.filter((entry) => {
-    if (!CHAT_ENTRY_TYPES.has(entry.type)) return false;
-    if (!entry.message?.role) return false;
-    if (isToolResultEntry(entry)) return false;
-    return true;
-  });
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i]!; // ASSERT: bounded by entries.length loop guard
 
-  for (let i = 0; i < chatEntries.length; i++) {
-    const entry = chatEntries[i]!; // ASSERT: bounded by chatEntries.length loop guard
-    const role = entry.message!.role; // ASSERT: chatEntries filter guarantees message.role exists
+    // --- Result entries: attach token data to preceding assistant message ---
+    if (entry.type === 'result' && lastAssistantMsgIdx >= 0) {
+      const msg = messages[lastAssistantMsgIdx];
+      if (msg) {
+        if (entry.total_cost_usd != null) {
+          msg.metadata.cost = entry.total_cost_usd;
+        }
+        if (entry.modelUsage) {
+          const modelKeys = Object.keys(entry.modelUsage);
+          if (modelKeys.length > 0) {
+            const usage = entry.modelUsage[modelKeys[0]!]; // ASSERT: length check guarantees index 0
+            if (usage) {
+              msg.metadata.inputTokens = usage.inputTokens ?? usage.cumulativeInputTokens ?? null;
+              msg.metadata.outputTokens = usage.outputTokens ?? usage.cumulativeOutputTokens ?? null;
+              msg.metadata.cacheReadTokens = usage.cacheReadInputTokens ?? null;
+            }
+          }
+        }
+      }
+      continue;
+    }
 
-    // For non-chat message types (error, system, task_notification),
-    // create simple Message objects with string content only
+    // --- Skip non-chat entries ---
+    if (!CHAT_ENTRY_TYPES.has(entry.type)) continue;
+    if (!entry.message?.role) continue;
+    if (isToolResultEntry(entry)) continue;
+
+    const role = entry.message.role;
+
+    // --- Non-user/assistant types (error, system, task_notification) ---
     if (role !== 'user' && role !== 'assistant') {
-      const content = typeof entry.message!.content === 'string' // ASSERT: chatEntries filter guarantees message exists
-        ? entry.message!.content // ASSERT: same guard as above
+      const content = typeof entry.message.content === 'string'
+        ? entry.message.content
         : '';
       messages.push({
         id: entry.uuid ?? Math.random().toString(36).slice(2, 10),
@@ -168,30 +192,33 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
     }
 
     const { text, toolCalls } = extractContent(entry);
-
-    // For assistant messages, merge consecutive entries that share the same
-    // message.id (Claude sends text + tool_use as separate JSONL lines
-    // within one API response).
     const messageApiId = entry.message?.id;
 
     if (role === 'assistant' && messageApiId) {
+      // Skip if already merged into a previous message
+      if (mergedApiIds.has(messageApiId)) continue;
+      mergedApiIds.add(messageApiId);
+
       // Look ahead and merge all entries with the same message.id
+      // (Claude sends text + tool_use as separate JSONL lines within one API response)
       let mergedText = text;
       const mergedToolCalls = [...toolCalls];
 
-      while (i + 1 < chatEntries.length) {
-        const next = chatEntries[i + 1]!; // ASSERT: bounded by chatEntries.length loop guard
-        const nextApiId = next.message?.id;
-        if (next.message?.role !== 'assistant' || nextApiId !== messageApiId) break;
+      for (let j = i + 1; j < entries.length; j++) {
+        const next = entries[j]!; // ASSERT: bounded by entries.length loop guard
+        // Skip non-chat entries between same-apiId assistant entries
+        if (!CHAT_ENTRY_TYPES.has(next.type)) continue;
+        if (next.message?.role !== 'assistant' || next.message?.id !== messageApiId) break;
 
         const nextContent = extractContent(next);
         if (nextContent.text) {
           mergedText += mergedText ? '\n' + nextContent.text : nextContent.text;
         }
         mergedToolCalls.push(...nextContent.toolCalls);
-        i++; // Skip merged entry
+        mergedApiIds.add(messageApiId);
       }
 
+      lastAssistantMsgIdx = messages.length;
       messages.push({
         id: entry.uuid ?? Math.random().toString(36).slice(2, 10),
         role: 'assistant',
@@ -217,6 +244,8 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
       // Skip user messages with empty content (system injections, reminders)
       if (role === 'user' && !text.trim()) continue;
 
+      if (role === 'assistant') lastAssistantMsgIdx = messages.length;
+
       messages.push({
         id: entry.uuid ?? Math.random().toString(36).slice(2, 10),
         role,
@@ -237,61 +266,6 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
           agentName: null,
         },
       });
-    }
-  }
-
-  // Second pass: extract token data from result entries and attach to preceding assistant messages.
-  // Walk the original entries array, tracking which built message each chat entry maps to.
-  // Merged assistant entries (same message.id) must be counted as one built message.
-  let lastAssistantIdx = -1;
-  let builtMessageIdx = -1;
-  const seenAssistantApiIds = new Set<string>();
-
-  for (const entry of entries) {
-    // Track chat entries that produced messages
-    if (CHAT_ENTRY_TYPES.has(entry.type) && entry.message?.role) {
-      if (isToolResultEntry(entry)) continue;
-
-      const role = entry.message.role;
-      // Skip non-displayable entries (same logic as first pass)
-      if (role === 'user' && !entry.message.content) continue;
-      if (role === 'user' && typeof entry.message.content === 'string' && !entry.message.content.trim()) continue;
-
-      // For assistant entries with same message.id, only count first occurrence
-      const apiId = entry.message.id;
-      if (role === 'assistant' && apiId && seenAssistantApiIds.has(apiId)) {
-        continue; // Merged entry -- already counted
-      }
-      if (role === 'assistant' && apiId) {
-        seenAssistantApiIds.add(apiId);
-      }
-
-      builtMessageIdx++;
-
-      if (role === 'assistant') {
-        lastAssistantIdx = builtMessageIdx;
-      }
-    } else if (entry.type === 'result' && lastAssistantIdx >= 0) {
-      const msg = messages[lastAssistantIdx];
-      if (!msg) continue;
-
-      // Extract cost (always attach if present, even without modelUsage)
-      if (entry.total_cost_usd != null) {
-        msg.metadata.cost = entry.total_cost_usd;
-      }
-
-      // Extract token data from modelUsage (take first model's data)
-      if (entry.modelUsage) {
-        const modelKeys = Object.keys(entry.modelUsage);
-        if (modelKeys.length > 0) {
-          const usage = entry.modelUsage[modelKeys[0]!]; // ASSERT: length check guarantees index 0
-          if (usage) {
-            msg.metadata.inputTokens = usage.inputTokens ?? usage.cumulativeInputTokens ?? null;
-            msg.metadata.outputTokens = usage.outputTokens ?? usage.cumulativeOutputTokens ?? null;
-            msg.metadata.cacheReadTokens = usage.cacheReadInputTokens ?? null;
-          }
-        }
-      }
     }
   }
 
