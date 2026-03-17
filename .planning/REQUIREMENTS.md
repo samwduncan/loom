@@ -59,11 +59,11 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 
 ### Performance
 
-- [ ] **PERF-01**: Streaming maintains 55+ FPS with 200+ messages in conversation
+- [x] **PERF-01**: Streaming maintains 55+ FPS with 200+ messages in conversation
 - [ ] **PERF-02**: content-visibility: auto applied and stress-tested on message list
-- [ ] **PERF-03**: Memory profiling shows no leaks across session switches (10+ switches)
-- [ ] **PERF-04**: Initial page load under 2s on dev server
-- [ ] **PERF-05**: Bundle size audit with recommendations for any > 50KB chunks
+- [x] **PERF-03**: Memory profiling shows no leaks across session switches (10+ switches)
+- [x] **PERF-04**: Initial page load under 2s on dev server
+- [x] **PERF-05**: Bundle size audit with recommendations for any > 50KB chunks
 
 ## Future Requirements (v1.4 "The Polish")
 
@@ -128,11 +128,11 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | A11Y-04 | Phase 36 | Complete |
 | A11Y-05 | Phase 36 | Complete |
 | A11Y-06 | Phase 36 | Complete |
-| PERF-01 | Phase 37 | Pending |
+| PERF-01 | Phase 37 | Complete |
 | PERF-02 | Phase 37 | Pending |
-| PERF-03 | Phase 37 | Pending |
-| PERF-04 | Phase 37 | Pending |
-| PERF-05 | Phase 37 | Pending |
+| PERF-03 | Phase 37 | Complete |
+| PERF-04 | Phase 37 | Complete |
+| PERF-05 | Phase 37 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 37 total

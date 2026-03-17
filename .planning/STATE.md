@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 36-03-PLAN.md
-last_updated: "2026-03-17T03:40:13.232Z"
-last_activity: 2026-03-17 -- Completed 36-03-PLAN.md (reduced motion + contrast audit)
+stopped_at: Completed 37-01-PLAN.md
+last_updated: "2026-03-17T16:03:30.569Z"
+last_activity: 2026-03-17 -- Completed 37-01-PLAN.md (bundle optimization + cache bounding)
 progress:
   total_phases: 10
   completed_phases: 9
-  total_plans: 18
-  completed_plans: 18
-  percent: 100
+  total_plans: 20
+  completed_plans: 19
+  percent: 95
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 36 - Accessibility
+**Current focus:** Phase 37 - Performance
 
 ## Current Position
 
-Phase: 36 of 37 (Accessibility)
-Plan: 3 of 3
-Status: Completed 36-03-PLAN.md -- reduced motion override + WCAG AA contrast audit
-Last activity: 2026-03-17 -- Completed 36-03-PLAN.md (reduced motion + contrast audit)
+Phase: 37 of 37 (Performance)
+Plan: 1 of 2
+Status: Completed 37-01-PLAN.md -- bundle optimization + cache bounding + observer consolidation
+Last activity: 2026-03-17 -- Completed 37-01-PLAN.md (bundle optimization + cache bounding)
 
-Progress: [██████████] 100%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
@@ -86,6 +86,9 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 36]: rAF delay for TabBar panel focus after CSS show/hide tab switch
 - [Phase 36]: Sidebar aria-label changed from "Chat sessions" to "Sidebar navigation" for broader scope
 - [Phase 36]: TabBar roving tabindex with ArrowLeft/Right wrap-around and Home/End per WAI-ARIA Tabs
+- [Phase 37]: 5 vendor chunk groups (react, markdown, shiki, radix, zustand) -- broad groups to avoid circular deps
+- [Phase 37]: LRU eviction via Map iteration order (oldest-first delete) -- zero-dependency, O(1)
+- [Phase 37]: Single shared IntersectionObserver with Element->messageId map replaces per-message observers
 
 ### Pending Todos
 
@@ -97,6 +100,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T03:15:46.052Z
-Stopped at: Completed 36-03-PLAN.md
-Resume: Phase 36 complete (all 3 plans). Phase 37 next.
+Last session: 2026-03-17T16:03:30.568Z
+Stopped at: Completed 37-01-PLAN.md
+Resume: Phase 37 plan 1 complete. Plan 2 next.
