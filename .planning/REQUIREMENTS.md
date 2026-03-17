@@ -24,7 +24,7 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 - [ ] **FIX-01**: @-mention file picker sends fileMentions array over WebSocket so file context reaches the AI
 - [ ] **FIX-02**: Search highlighting works in assistant message markdown bodies (not just user messages and thinking blocks)
 - [ ] **FIX-03**: rehypeToolMarkers dead code removed from codebase (plugin file + MarkdownRenderer import)
-- [ ] **FIX-04**: NaN reconnect attempts display fixed via persist merge function and defensive guard (ALREADY DONE — verify in tests)
+- [x] **FIX-04**: NaN reconnect attempts display fixed via persist merge function and defensive guard (ALREADY DONE — verify in tests)
 
 ### Backend Hardening
 
@@ -35,8 +35,8 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 
 ### Persist Layer Audit
 
-- [ ] **PERS-01**: All 5 Zustand stores audited for shallow-merge rehydration bugs (timeline, stream, ui, connection, file)
-- [ ] **PERS-02**: Any stores using persist + partialize have proper deep merge functions
+- [x] **PERS-01**: All 5 Zustand stores audited for shallow-merge rehydration bugs (timeline, stream, ui, connection, file)
+- [x] **PERS-02**: Any stores using persist + partialize have proper deep merge functions
 
 ### E2E Verification
 
@@ -92,13 +92,13 @@ Deferred to "The Polish" milestone. Visual transformation.
 | FIX-01 | Phase 38 | Pending |
 | FIX-02 | Phase 38 | Pending |
 | FIX-03 | Phase 38 | Pending |
-| FIX-04 | Phase 38 | Pending |
+| FIX-04 | Phase 38 | Complete |
 | BACK-01 | Phase 39 | Pending |
 | BACK-02 | Phase 39 | Pending |
 | BACK-03 | Phase 43 | Pending |
 | BACK-04 | Phase 39 | Pending |
-| PERS-01 | Phase 38 | Pending |
-| PERS-02 | Phase 38 | Pending |
+| PERS-01 | Phase 38 | Complete |
+| PERS-02 | Phase 38 | Complete |
 | E2E-01 | Phase 43 | Pending |
 | E2E-02 | Phase 43 | Pending |
 | E2E-03 | Phase 43 | Pending |

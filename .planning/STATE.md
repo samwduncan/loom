@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
-status: defining_requirements
-stopped_at: Defining requirements
-last_updated: "2026-03-17T22:30:00Z"
-last_activity: 2026-03-17 -- Milestone v1.4 started
+status: executing
+stopped_at: "Completed 38-02-PLAN.md"
+last_updated: "2026-03-17T23:05:00Z"
+last_activity: 2026-03-17 — Completed persist rehydration audit (38-02)
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-03-17)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-17 — Milestone v1.4 started
+Phase: 38-broken-fixes-persist-audit
+Plan: 02 of 02 (complete)
+Status: Executing
+Last activity: 2026-03-17 — Completed persist rehydration audit (38-02)
 
 ## Performance Metrics
 
@@ -43,6 +42,8 @@ Last activity: 2026-03-17 — Milestone v1.4 started
 
 ### Decisions
 
+- [38-02] Deep merge for ui store theme object to preserve nested defaults like codeFontFamily
+- [38-02] Nullish coalescing for scalar fields in persist merge to allow false to persist correctly
 See PROJECT.md Key Decisions table for full history.
 
 ### Pending Todos
@@ -56,5 +57,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-17
-Stopped at: Defining requirements for v1.4
-Resume: Continue requirements definition
+Stopped at: Completed 38-02-PLAN.md (persist rehydration audit)
+Resume: Phase 38 complete, proceed to next phase
