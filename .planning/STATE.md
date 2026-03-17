@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 32-02-PLAN.md
-last_updated: "2026-03-16T17:21:04.933Z"
-last_activity: 2026-03-16 -- Completed 32-02-PLAN.md (composer mention integration)
+stopped_at: Completed 33-01-PLAN.md
+last_updated: "2026-03-17T00:17:23.124Z"
+last_activity: 2026-03-17 -- Completed 33-01-PLAN.md (slash command foundation)
 progress:
   total_phases: 10
   completed_phases: 5
-  total_plans: 9
-  completed_plans: 9
-  percent: 90
+  total_plans: 11
+  completed_plans: 10
+  percent: 91
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 32 - File Mentions
+**Current focus:** Phase 33 - Slash Commands
 
 ## Current Position
 
-Phase: 32 of 37 (File Mentions) -- COMPLETE
-Plan: 2 of 2 (all complete)
-Status: Phase 32 complete -- full @ file mention flow in composer
-Last activity: 2026-03-16 -- Completed 32-02-PLAN.md (composer mention integration)
+Phase: 33 of 37 (Slash Commands) -- IN PROGRESS
+Plan: 1 of 2 (plan 01 complete)
+Status: Slash command foundation complete -- types, registry, hook, picker ready for integration
+Last activity: 2026-03-17 -- Completed 33-01-PLAN.md (slash command foundation)
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 32]: Guard scrollIntoView with typeof check for jsdom compatibility in tests
 - [Phase 32]: Mock useFileMentions in ChatComposer tests for controlled integration testing
 - [Phase 32]: Prepend file references as text prefix until backend fileMentions option is supported
+- [Phase 33]: Corrected plan test: /cl filters to clear only (not compact) since includes matching on id is correct
 
 ### Pending Todos
 
@@ -80,6 +81,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T16:52:34Z
-Stopped at: Completed 32-02-PLAN.md
-Resume: Phase 32 complete -- next phase ready
+Last session: 2026-03-17T00:17:23.122Z
+Stopped at: Completed 33-01-PLAN.md
+Resume: Plan 33-02 next -- wire slash commands into ChatComposer

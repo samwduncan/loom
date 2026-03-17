@@ -34,9 +34,9 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 - [x] **COMP-01**: User can type @ to trigger a file mention picker with fuzzy search
 - [x] **COMP-02**: Selected file mentions display as inline chips in the composer
 - [x] **COMP-03**: File mentions are sent as context attachments with the message
-- [ ] **COMP-04**: User can type / to trigger a slash command menu
-- [ ] **COMP-05**: Slash commands include at minimum: /clear, /help, /compact, /model
-- [ ] **COMP-06**: Slash command menu supports keyboard navigation (arrow keys, enter, escape)
+- [x] **COMP-04**: User can type / to trigger a slash command menu
+- [x] **COMP-05**: Slash commands include at minimum: /clear, /help, /compact, /model
+- [x] **COMP-06**: Slash command menu supports keyboard navigation (arrow keys, enter, escape)
 
 ### UX Refinement
 
@@ -112,9 +112,9 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | COMP-01 | Phase 32 | Complete |
 | COMP-02 | Phase 32 | Complete |
 | COMP-03 | Phase 32 | Complete |
-| COMP-04 | Phase 33 | Pending |
-| COMP-05 | Phase 33 | Pending |
-| COMP-06 | Phase 33 | Pending |
+| COMP-04 | Phase 33 | Complete |
+| COMP-05 | Phase 33 | Complete |
+| COMP-06 | Phase 33 | Complete |
 | UXR-01 | Phase 34 | Pending |
 | UXR-02 | Phase 34 | Pending |
 | UXR-03 | Phase 34 | Pending |
