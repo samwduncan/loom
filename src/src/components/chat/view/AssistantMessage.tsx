@@ -77,7 +77,13 @@ export function AssistantMessage({ message, highlightText }: AssistantMessagePro
           highlightText={highlightText}
         />
       )}
-      <MarkdownRenderer content={message.content} />
+      {highlightText ? (
+        <div className="markdown-body text-foreground text-sm leading-relaxed whitespace-pre-wrap">
+          {highlightText(message.content)}
+        </div>
+      ) : (
+        <MarkdownRenderer content={message.content} />
+      )}
       {partitions.map((partition, i) =>
         partition.type === 'group' ? (
           <ToolCallGroup

@@ -114,6 +114,64 @@ describe('useConnectionStore', () => {
     expect(useConnectionStore.getState().providers.claude.status).toBe('disconnected');
   });
 
+  // -- persist rehydration (NaN bug) --
+  it('incrementReconnectAttempts never produces NaN after persist rehydration', () => {
+    // Simulate what persist rehydration does: shallow merge with partialize'd
+    // state that only contains modelId, clobbering ephemeral fields.
+    // The merge function should prevent this, but if it's missing/broken,
+    // reconnectAttempts would be undefined and undefined + 1 = NaN.
+    useConnectionStore.setState({
+      providers: {
+        claude: { modelId: 'claude-sonnet' } as never,
+        codex: { modelId: null } as never,
+        gemini: { modelId: null } as never,
+      },
+    });
+
+    // Without the merge fix, this would produce NaN
+    useConnectionStore.getState().incrementReconnectAttempts('claude');
+    const attempts =
+      useConnectionStore.getState().providers.claude.reconnectAttempts;
+    expect(attempts).not.toBeNaN();
+    // After the clobber, incrementing undefined + 1 = NaN; the store actions
+    // should still produce a valid number thanks to the merge function
+    // preventing the clobber in the first place. This test validates the
+    // action is defensive regardless.
+    expect(typeof attempts).toBe('number');
+  });
+
+  // -- persist rehydration safety --
+  it('rehydration with only modelId preserves all ephemeral defaults', () => {
+    const merge = useConnectionStore.persist.getOptions().merge;
+    if (!merge) {
+      throw new Error('merge function not found on connection store');
+    }
+
+    // Simulate what partialize saves: only modelId per provider
+    const persistedState = {
+      providers: {
+        claude: { modelId: 'claude-sonnet' },
+        codex: { modelId: null },
+        gemini: { modelId: null },
+      },
+    };
+
+    const currentState = useConnectionStore.getState();
+    const merged = merge(persistedState, currentState);
+
+    // All ephemeral fields should come from currentState defaults
+    expect(merged.providers.claude.status).toBe('disconnected');
+    expect(merged.providers.claude.error).toBeNull();
+    expect(merged.providers.claude.reconnectAttempts).toBe(0);
+    expect(merged.providers.claude.lastConnected).toBeNull();
+    // Persisted modelId should be applied
+    expect(merged.providers.claude.modelId).toBe('claude-sonnet');
+
+    // Other providers also intact
+    expect(merged.providers.codex.status).toBe('disconnected');
+    expect(merged.providers.gemini.reconnectAttempts).toBe(0);
+  });
+
   // -- reset --
   it('reset() restores initial state with all providers at defaults', () => {
     // Dirty up the state

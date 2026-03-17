@@ -325,6 +325,59 @@ describe('useTimelineStore', () => {
     expect(stored?.providerContext.agentName).toBe('test-agent');
   });
 
+  // -- Persist rehydration safety --
+  describe('persist rehydration safety', () => {
+    it('rehydration with sessions lacking messages array produces sessions with empty messages', () => {
+      const merge = useTimelineStore.persist.getOptions().merge;
+      if (!merge) {
+        throw new Error('merge function not found on timeline store');
+      }
+
+      // Simulate persisted state (partialize strips messages)
+      const persistedState = {
+        sessions: [
+          {
+            id: 'sess-1',
+            title: 'Old Session',
+            providerId: 'claude',
+            createdAt: '2026-03-05T12:00:00Z',
+            updatedAt: '2026-03-05T12:00:00Z',
+            metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+          },
+        ],
+        activeSessionId: 'sess-1',
+        activeProviderId: 'claude',
+      };
+
+      const currentState = useTimelineStore.getState();
+      const merged = merge(persistedState, currentState);
+
+      expect(merged.sessions).toHaveLength(1);
+      const session = merged.sessions[0]!; // ASSERT: toHaveLength(1) verified above
+      expect(session).toBeDefined();
+      expect(session.id).toBe('sess-1');
+      // Messages should be an empty array, not undefined
+      expect(Array.isArray(session.messages)).toBe(true);
+      expect(session.messages).toHaveLength(0);
+    });
+
+    it('rehydration with empty persisted state does not crash', () => {
+      const merge = useTimelineStore.persist.getOptions().merge;
+      if (!merge) {
+        throw new Error('merge function not found on timeline store');
+      }
+
+      // Simulate undefined/empty persisted state
+      const currentState = useTimelineStore.getState();
+      const merged = merge({}, currentState);
+
+      // Should fall back to current state
+      expect(merged.sessions).toHaveLength(0);
+      expect(merged.activeSessionId).toBeNull();
+      expect(merged.activeProviderId).toBe('claude');
+    });
+  });
+
   // -- STATE-05: Persistence partialize excludes messages --
   it('persistence partialize output contains session metadata but NOT messages', () => {
     const partialize = useTimelineStore.persist.getOptions().partialize;

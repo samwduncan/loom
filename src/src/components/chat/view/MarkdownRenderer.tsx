@@ -18,7 +18,6 @@ import { useState, useMemo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { rehypeToolMarkers } from '@/lib/rehype-tool-markers';
 import { ToolChip } from '@/components/chat/tools/ToolChip';
 import { ImageLightbox } from '@/components/chat/view/ImageLightbox';
 import { CodeBlock } from './CodeBlock';
@@ -224,7 +223,7 @@ export function MarkdownRenderer({ content, toolCalls }: MarkdownRendererProps) 
     <div className="markdown-body text-foreground text-sm leading-relaxed">
       <Markdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeToolMarkers]}
+        rehypePlugins={[rehypeRaw]}
         components={componentsWithImg}
       >
         {content}
