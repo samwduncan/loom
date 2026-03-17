@@ -70,7 +70,7 @@
 - [x] **Phase 30: File Tree Git Integration** - Git change indicators on file tree nodes with live updates (completed 2026-03-13)
 - [x] **Phase 31: Editor & Tool Enhancements** - Editor minimap and "Run in Terminal" bridge from Bash tool cards (completed 2026-03-16)
 - [x] **Phase 32: File Mentions** - @-mention file picker with fuzzy search, inline chips, and context attachments (completed 2026-03-16)
-- [ ] **Phase 33: Slash Commands** - /-trigger command menu with keyboard navigation and built-in commands
+- [x] **Phase 33: Slash Commands** - /-trigger command menu with keyboard navigation and built-in commands (completed 2026-03-17)
 - [ ] **Phase 34: Conversation UX** - Auto-collapsing old turns and per-turn usage footers
 - [ ] **Phase 35: Quick Settings** - Quick settings panel with live-updating behavior toggles
 - [ ] **Phase 36: Accessibility** - ARIA roles, keyboard navigation, focus management, screen reader support, and contrast audit
