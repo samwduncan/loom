@@ -205,12 +205,12 @@ Plans:
   4. Screen readers announce streaming start/stop, tool completion events, and error banners via live regions
   5. With prefers-reduced-motion enabled, zero CSS/JS animations play
   6. All text and interactive elements pass WCAG AA contrast ratios (4.5:1 normal text, 3:1 large text)
-**Plans**: 2 plans
+**Plans**: 3 plans
 
 Plans:
-- [ ] 36-01: TBD
-- [ ] 36-02: TBD
-- [ ] 36-03: TBD
+- [ ] 36-01-PLAN.md -- ARIA labels/roles audit + skip-to-content link + TabBar roving tabindex
+- [ ] 36-02-PLAN.md -- Focus management (panel switch, focus restore) + screen reader live region announcements
+- [ ] 36-03-PLAN.md -- Global reduced-motion override + WCAG AA contrast ratio audit
 
 ### Phase 37: Performance
 **Goal**: Loom runs smoothly under real workload conditions with no regressions
@@ -247,7 +247,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 33. Slash Commands | 2/2 | Complete    | 2026-03-17 | - |
 | 34. Conversation UX | 2/2 | Complete    | 2026-03-17 | - |
 | 35. Quick Settings | 2/2 | Complete    | 2026-03-17 | - |
-| 36. Accessibility | v1.3 | 0/? | Not started | - |
+| 36. Accessibility | v1.3 | 0/3 | Not started | - |
 | 37. Performance | v1.3 | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
@@ -256,4 +256,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-17 after Phase 35 planning*
+*Last updated: 2026-03-17 after Phase 36 planning*
