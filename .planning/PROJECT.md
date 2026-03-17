@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Loom is a premium web interface for AI coding agents (Claude Code, Gemini, Codex) that transforms the black-box CLI experience into a visually stunning, multi-agent workspace. Built on a from-scratch React frontend with a 10/10 quality standard, consuming the existing CloudCLI Node.js backend. The full conversation experience is shipped — rich markdown with Shiki syntax highlighting, 6 purpose-built tool cards with state machines, streaming at 60fps, auto-resize composer with image attachments, permission banners, activity status, and CSS visual effects.
+Loom is a premium web interface for AI coding agents (Claude Code, Gemini, Codex) that transforms the black-box CLI experience into a visually stunning, multi-agent workspace. Built on a from-scratch React frontend with a 10/10 quality standard, consuming the existing CloudCLI Node.js backend. The full conversation experience is shipped with rich markdown, Shiki syntax highlighting, 6 purpose-built tool cards, streaming at 60fps, auto-resize composer, permission banners, activity status, and CSS visual effects. Now a daily-driver with error resilience, composer intelligence (@-mentions, slash commands), full accessibility compliance, and performance-optimized rendering.
 
 ## Core Value
 
@@ -36,25 +36,36 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - ✓ v1.2 Git Panel (GIT-01 through GIT-23) — changes/history, staging, commit, branch ops, push/pull/fetch — v1.2
 - ✓ v1.2 Navigation (NAV-01 through NAV-03) — session rename, delete, context menus — v1.2
 
+### Validated (v1.3)
+
+- ✓ Error & connection resilience (ERR-01 through ERR-05) — crash banner, reconnect overlay, status indicator, navigate-away guard — v1.3
+- ✓ Session hardening (SESS-01 through SESS-03) — paginated history, streaming indicators, temp ID lifecycle — v1.3
+- ✓ File tree git integration (FTE-01, FTE-02) — git change indicators with directory aggregation — v1.3
+- ✓ Editor & tool enhancements (FTE-03 through FTE-05) — minimap, "Run in Terminal" bridge — v1.3
+- ✓ File mentions (COMP-01 through COMP-03) — @-mention file picker, inline chips, context attachments — v1.3
+- ✓ Slash commands (COMP-04 through COMP-06) — command menu with keyboard navigation — v1.3
+- ✓ Conversation UX (UXR-01 through UXR-07) — auto-collapse, usage footers, quick settings — v1.3
+- ✓ Accessibility (A11Y-01 through A11Y-06) — ARIA, keyboard nav, focus management, screen reader, contrast — v1.3
+- ✓ Performance (PERF-01 through PERF-05) — vendor chunks, content-visibility, memory profiling, bundle analysis — v1.3
+
 ### Active
 
-**Current Milestone: v1.3 "The Refinery"**
+**Next Milestone: v1.4 "The Polish"**
 
-**Goal:** Make Loom a daily-driver by filling UX gaps, triaging V1 feature backlog, hardening accessibility, and auditing performance.
+**Goal:** Transform the functional daily-driver into a visually stunning, award-winning interface.
 
 **Target features:**
-- [ ] V1 feature backlog triage and implementation (highest-impact items)
-- [ ] File change indicators from git status on file tree nodes
-- [ ] Error banner system (crash/exit detection, reconnect handling)
-- [ ] Session protection (navigate-away warning)
-- [ ] Full accessibility pass (ARIA roles, keyboard nav, screen reader)
-- [ ] Performance audit (FPS during streaming, memory profiling)
-- [ ] Editor minimap, "Run in Terminal" on Bash tool cards
+- [ ] Spring physics animations on all interactions
+- [ ] Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
+- [ ] Glass surface effects for modals and overlays
+- [ ] Sidebar slim collapse mode (icon-only rail)
+- [ ] DecryptedText reveals for session titles and model names
+- [ ] StarBorder accents on focused/active elements
+- [ ] Motion refinement across all surfaces
 
 **Future milestones:**
-- v1.4 "The Polish" — Springs, aurora, glass, sidebar slim, motion refinement, visual effects
-- M5 "The Power" — Multi-provider tabs, MCP management
-- M6 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
+- v2.0 "The Power" — Multi-provider tabs, MCP management
+- v3.0 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
 
 ### Out of Scope
 
@@ -69,24 +80,26 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (post v1.2):**
-- 39,363 LOC TypeScript + CSS across 27 phases, 67 plans (3 milestones)
+**Current State (post v1.3):**
+- 46,501 LOC TypeScript + CSS across 37 phases, 87 plans (4 milestones)
 - Tech stack: Vite + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- 448 commits (145 M1 + 158 M2 + 145 M3), 8-day total build (2026-03-04 to 2026-03-12)
-- 1,023 tests passing across 104 test files, Playwright E2E suite, 9 custom ESLint rules
+- 551 commits (145 M1 + 158 M2 + 145 M3 + 103 M4), 14-day total build (2026-03-04 to 2026-03-17)
+- 1,023+ tests passing, Playwright E2E suite, 9 custom ESLint rules
 - Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui (14 primitives), tailwindcss-animate, cmdk, fuse.js, @codemirror/*, @xterm/*
 - Frontend at `src/`, backend at `server/` (port 5555)
 - Dev server: port 5184
-- Full workspace: chat, file tree, code editor, terminal, git panel, settings, command palette
+- Full workspace with: chat, file tree, code editor, terminal, git panel, settings, command palette, @-mentions, slash commands, quick settings, accessibility, performance optimizations
+- WCAG AA contrast compliance, full keyboard navigation, screen reader support
 
 **Known Tech Debt:**
 - rehypeToolMarkers plugin runs as no-op (tools render as React components post-markdown)
-- highlightText not threaded into MarkdownRenderer for assistant body content (search filtering works, visual highlighting deferred)
+- highlightText not threaded into MarkdownRenderer for assistant body content
 - CMD-14 deferred: recent commands need command registry for re-execution
-- SET-07 backend limitation: API key add form has name field only (no key/provider columns in DB)
-- GIT-04 intentional: client-side staging Set<string> instead of immediate API call (no /api/git/stage endpoint)
-- Minor terminal resize rendering glitches (M4 polish scope)
-- CSS custom property via inline style workaround in CodeEditor (documented Constitution exception)
+- SET-07 backend limitation: API key add form has name field only
+- GIT-04 intentional: client-side staging Set<string> (no /api/git/stage endpoint)
+- fileMentions WS field sent but backend ignores (text prefix workaround)
+- PERF-01: Live 55+ FPS benchmark with 200+ messages not measured (code-path verified only)
+- Phase 31 minimap/terminal features need human verification (jsdom limitations)
 
 **Prior Work:**
 - V1 frontend rated 5.5/10 in audits, archived to `.planning/v1-archive/`
@@ -96,7 +109,7 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 ## Constraints
 
 - **Backend**: Keep existing CloudCLI Node.js server — no backend rewrite
-- **Tech Stack**: Vite + React 19 + TypeScript, Tailwind v4, Zustand (4 stores), Vitest
+- **Tech Stack**: Vite + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
 - **Quality Bar**: 10/10 or iterate. Automated enforcement from commit #1.
 - **Design**: No hardcoded colors, no inline styles for static values, all animations through defined tokens. Constitution enforced via ESLint.
 
@@ -133,6 +146,15 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 | Client-side staging (Set<string>) | No /api/git/stage endpoint; staging model is client-only | Acceptable — works but diverges from real git staging |
 | Module-level ref pattern | Imperative IO (shell input, editor save) via register/deregister | Good — avoids refs-during-render lint violations |
 | DiffEditorWrapper data-fetching layer | Keeps DiffEditor pure (props-only), wrapper handles useFileDiff | Good — clean separation |
+| tryReconnect() on existing WebSocketClient | Reuses singleton instance instead of re-bootstrapping auth | Good — simpler, no race conditions |
+| Connection banner with z-toast fixed positioning | Overlays entire app shell for maximum visibility | Good — always visible |
+| Streaming dot priority over draft dot | Visual clarity when both states active | Good — clear signal |
+| data-status attribute + CSS for git indicators | No inline styles, Constitution compliant | Good — clean styling |
+| Single shared IntersectionObserver | Element→messageId map replaces per-message observers | Good — O(1) overhead vs O(n) |
+| 5 vendor chunk groups (react, markdown, shiki, radix, zustand) | Broad groups avoid circular deps while enabling caching | Good — improved cache hits |
+| LRU eviction via Map iteration order | Zero-dependency, O(1) oldest-first delete for Shiki cache | Good — simple and effective |
+| 0.01ms reduced-motion override (not 0ms) | Preserves JS animationend/transitionend events | Good — no broken event handlers |
+| useSyncExternalStore for LiveAnnouncer | Satisfies React 19 lint rules for external state | Good — correct React pattern |
 
 ---
-*Last updated: 2026-03-12 after v1.3 milestone started*
+*Last updated: 2026-03-17 after v1.3 milestone completion*

@@ -1,5 +1,50 @@
 # Loom V2: Milestone Master Plan
 
+## v1.3 The Refinery (Shipped: 2026-03-17)
+
+**Status:** SHIPPED
+**Shipped:** 2026-03-17
+**Phases:** 10 (28-37) | **Plans:** 20 | **Commits:** 103
+**LOC:** 46,501 TypeScript + CSS (+18,372 / -421 from v1.2)
+**Timeline:** 6 days (2026-03-12 to 2026-03-17)
+**Archive:** `milestones/v1.3-ROADMAP.md`, `milestones/v1.3-REQUIREMENTS.md`
+
+**Delivered:** Daily-driver refinement making Loom production-ready with error/connection resilience (crash banners, reconnect overlay, status indicator), session hardening (paginated history, streaming indicators, temp ID lifecycle), composer intelligence (@-mention file picker, slash commands with keyboard nav), conversation UX (auto-collapsing turns, token usage footers, quick settings), full accessibility audit (ARIA, keyboard nav, focus management, screen reader, WCAG AA contrast), and performance optimization (vendor chunk splitting, content-visibility, memory profiling, bundle analysis).
+
+**Key Accomplishments:**
+1. Error & connection resilience — crash detection banner, reconnect overlay with exponential backoff, connection status indicator, navigate-away guard
+2. Session hardening — paginated message history for long conversations, streaming pulse indicator, stub-to-real session ID lifecycle
+3. Composer intelligence — @-mention file picker with fuzzy search + inline chips, slash command menu with keyboard navigation, context attachments
+4. Conversation UX — auto-collapsing old turns via IntersectionObserver, per-turn token usage/cost footers, quick settings panel with live toggles
+5. Full accessibility audit — ARIA roles/labels across all surfaces, keyboard navigation for all panels, focus trapping/restoration, screen reader live regions, reduced-motion override, WCAG AA contrast compliance
+6. Performance optimization — 5 vendor chunk groups, Shiki LRU cache, shared IntersectionObserver, content-visibility on message list, bundle analysis with actionable recommendations
+
+**Known Tech Debt (from audit):**
+- PERF-01: Code-path verified for 55+ FPS but live benchmark with 200+ messages not measured (requires active backend with long session)
+- Phase 31: Minimap/terminal features need human verification (jsdom limitations)
+- Phase 32: fileMentions WS field sent but backend ignores it (pending backend support)
+- Phase 37: Some perf measurements are code-path verified only (jsdom doesn't support real rendering metrics)
+
+**Gate Criteria:**
+- [x] Error banner appears on backend crash within 3 seconds
+- [x] WebSocket reconnects automatically with exponential backoff
+- [x] Paginated history loads on scroll-up in long conversations
+- [x] @-mention picker opens on @ with fuzzy file search
+- [x] Slash commands work with keyboard navigation
+- [x] Auto-collapse hides old turns, expand on click/scroll
+- [x] Quick settings apply immediately without reload
+- [x] All interactive elements have ARIA roles and labels
+- [x] Full keyboard navigation across all panels
+- [x] Screen reader announcements for streaming/tool/error events
+- [x] prefers-reduced-motion disables all animations
+- [x] WCAG AA contrast compliance across all surfaces
+- [x] content-visibility applied and stress-tested on message list
+- [x] Bundle analysis with vendor chunk splitting complete
+- [x] 37/37 requirements satisfied (all checked off)
+- [x] All M1 + M2 + M3 + M4 tests pass (1,023+ tests)
+
+---
+
 ## v1.2 The Workspace (Shipped: 2026-03-12)
 
 **Status:** SHIPPED
@@ -139,44 +184,33 @@ This document captures the full development vision across all milestones. It per
 
 ---
 
-## M4: "The Polish" — 10/10 Visual Quality
+## v1.4: "The Polish" — 10/10 Visual Quality
 
-**Goal**: Transform the functional chat into a visually stunning, award-winning interface. Every interaction should feel satisfying.
+**Goal**: Transform the functional daily-driver into a visually stunning, award-winning interface. Every interaction should feel satisfying.
 
-**Phases**: ~4-6
-
-**Note:** Several M3 deliverables were pulled forward into M2 (scroll-to-bottom pill, message entrance animations, tool call accordion, CSS effects). Remaining scope:
+**Status:** Planned (next milestone)
 
 **Deliverables**:
-- Aurora/ambient overlay during streaming
-- Spring physics animations on interactions
+- Spring physics animations on all interactions
+- Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
+- Glass surface effects for modals and overlays
 - Sidebar slim collapse mode (icon-only rail)
-- Cmd+K omnibar for project/session switching
-- Settings panel (extensible architecture for future integration settings)
-- Full accessibility pass (ARIA roles, keyboard nav, prefers-reduced-motion)
-- Performance audit (FPS during streaming, memory profiling)
+- DecryptedText reveals for session titles and model names
+- StarBorder accents on focused/active elements
+- Motion refinement across all surfaces
 
-**Already completed in M2:**
-- ~~Scroll physics (scroll-to-bottom pill, ResizeObserver bottom lock, content-visibility)~~
-- ~~Message entrance animations (fade + slide-from-bottom)~~
-- ~~Execution chain grouping (consecutive tool calls → accordion)~~
-- ~~CSS effects (SpotlightCard, ShinyText, ElectricBorder)~~
-- ~~prefers-reduced-motion respected~~
+**Reference:** `.planning/M3-POLISH-DEFERRED-CONTEXT.md` — all visual polish research, gap analysis, deferred ideas
 
 **Gate Criteria**:
 - [ ] Streaming at 100 tokens/sec with zero visible jitter
 - [ ] All animations use defined motion tokens
-- [ ] Keyboard navigation works throughout
 - [ ] FPS stays above 55 during heavy streaming
-- [ ] All M1 + M2 + M3 tests pass (regression)
+- [ ] All M1-M4 tests pass (regression)
 - [ ] User spot check: "Would a harsh, experienced developer rate this 10/10?"
-
-**Design Review Checkpoint** (MANDATORY before M4):
-After M3 phases complete, pause for a holistic visual review of every surface.
 
 ---
 
-## M5: "The Power" — Multi-Agent + Management
+## v2.0: "The Power" — Multi-Agent + Management
 
 **Goal**: Enable simultaneous work with multiple AI providers and manage the tooling ecosystem from within the app.
 
@@ -200,7 +234,7 @@ After M3 phases complete, pause for a holistic visual review of every surface.
 
 ---
 
-## M6: "The Vision" — Integrations + Extras
+## v3.0: "The Vision" — Integrations + Extras
 
 **Goal**: Add the unique features that make Loom a one-of-a-kind tool — visual build pipeline, file integration, companions.
 
@@ -295,4 +329,4 @@ interface Session {
 
 ---
 *Created: 2026-03-04*
-*Last updated: 2026-03-09 after v1.1 milestone completion*
+*Last updated: 2026-03-17 after v1.3 milestone completion*

@@ -138,6 +138,14 @@ None - no external service configuration required.
 - Ready for 36-02 (focus management) and 36-03 (contrast/motion) audits
 - 9 new tests provide regression coverage for ARIA semantics
 
+## Self-Check: PASSED
+
+- FOUND: src/src/components/a11y/SkipLink.tsx
+- FOUND: src/src/tests/a11y-audit.test.tsx
+- FOUND: .planning/phases/36-accessibility/36-01-SUMMARY.md
+- FOUND: commit 57d31c6
+- FOUND: commit 32cf467
+
 ---
 *Phase: 36-accessibility*
 *Completed: 2026-03-17*

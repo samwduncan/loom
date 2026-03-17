@@ -152,6 +152,59 @@
 
 ---
 
+## Milestone: v1.3 — The Refinery
+
+**Shipped:** 2026-03-17
+**Phases:** 10 | **Plans:** 20
+
+### What Was Built
+- Error & connection resilience: crash detection banner, reconnect overlay with exponential backoff, connection status indicator, navigate-away guard
+- Session hardening: paginated message history with scroll-up loading, streaming pulse indicator in sidebar, stub-to-real session ID lifecycle
+- File tree git integration: git change indicators (modified/added/untracked/deleted) with directory aggregation and live updates
+- Editor & tool enhancements: CodeMirror minimap extension, "Run in Terminal" bridge from Bash tool cards
+- Composer intelligence: @-mention file picker with fuzzy search (fuse.js), inline mention chips, slash command menu with keyboard navigation
+- Conversation UX: auto-collapsing old turns via IntersectionObserver, per-turn token usage/cost footers, quick settings panel with live behavior toggles
+- Full accessibility audit: ARIA roles/labels across all surfaces, keyboard navigation for all panels, focus trapping/restoration, screen reader live regions, reduced-motion override, WCAG AA contrast compliance
+- Performance optimization: 5 vendor chunk groups, Shiki LRU cache, shared IntersectionObserver, content-visibility on message list, bundle analysis
+- 46,501 LOC across 103 commits in 6 days
+
+### What Worked
+- **Milestone restructuring paid off** — splitting original "The Polish" into "The Refinery" (daily-driver UX) + "The Polish" (visual effects) was the right call. Fixed real usability issues before aesthetics.
+- **Foundational fixes first** — error/connection resilience (Phase 28) and session hardening (Phase 29) before composer/UX features prevented building on shaky foundations.
+- **Cross-cutting phases last** — accessibility (Phase 36) and performance (Phase 37) scheduled after all feature work meant they audited EVERYTHING, not just early phases.
+- **Adversarial review caught real issues every phase** — continued pattern from M2. ~40% false positive rate but genuine bugs found in every review (stale state, missing cleanup, contrast violations).
+- **Constitution ESLint rules still holding** — zero violations across 551 total commits. Rules written in Phase 2 caught issues in new components (mention picker, slash commands, settings) without modification.
+- **Milestone audit caught ERR-02/SESS-02 stale pulse dot** — integration gap between Phase 28 reconnect and Phase 29 stream store. Fixed with single commit clearing isStreaming on disconnect.
+
+### What Was Inefficient
+- **Velocity dropped to 3.3 plans/day** — M1-M3 were 7-10 plans/day. M4 had more research-heavy phases (accessibility standards, performance profiling) and was spread across 6 days instead of 3.
+- **Summaries STILL lack one_liner field** — fourth milestone in a row. The YAML frontmatter format doesn't include it.
+- **PERF-01 live benchmark not measured** — code-path verified for 55+ FPS but never ran actual Chrome DevTools Performance recording with 200+ messages. Requires active backend with long session, which is hard to automate in CI.
+- **fileMentions backend gap** — implemented @-mention UI with WS field, but backend ignores it. Had to use text prefix workaround. Should have checked backend support first.
+- **Phase 31 jsdom limitations** — minimap and terminal features can't be fully tested in jsdom (no real rendering). 4 manual test cases documented but not automated.
+
+### Patterns Established
+- **data-status + CSS for state-driven styling** — git indicators, connection status dots all use data attributes instead of className or inline styles
+- **Callback-based shortcut hooks** — useQuickSettingsShortcut accepts callback so component owns state, not the hook
+- **useSyncExternalStore + ref for external state** — LiveAnnouncer pattern for React 19 lint compliance
+- **0.01ms reduced-motion override** — not 0ms, to preserve JS animationend/transitionend events
+- **Single shared IntersectionObserver** — Element→messageId map for O(1) overhead instead of per-message observers
+- **LRU via Map iteration order** — zero-dependency cache eviction using JS Map's insertion-order guarantee
+
+### Key Lessons
+1. **Daily-driver testing reveals real issues** — building error resilience, session hardening, and accessibility exposed gaps that feature development alone would have missed.
+2. **Accessibility is a cross-cutting concern** — scheduling it after all features meant auditing the complete surface area. WCAG AA contrast required adjusting 2 OKLCH tokens (error lightness, border-interactive alpha).
+3. **Performance optimization is mostly about avoiding work** — shared observers, LRU caches, content-visibility, and vendor chunk splitting all reduce unnecessary computation rather than making computation faster.
+4. **Integration gaps compound** — the stale pulse dot bug affected both ERR-02 and SESS-02 because they shared the same root cause (streamStore.activeSessionId not cleared on disconnect). Milestone audit caught it.
+5. **React 19 patterns continue to diverge from React 18** — useSyncExternalStore, capture-refs-in-cleanup, and adjust-state-during-render are all M4-new patterns forced by stricter lint rules.
+
+### Cost Observations
+- Model mix: ~70% Opus, ~25% Sonnet (subagents), ~5% Haiku (subagents)
+- Sessions: ~15 across 6 days
+- Notable: Research phases and accessibility audit were the most context-heavy. Performance phase was fastest (code changes small, most work was analysis/verification).
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -161,6 +214,7 @@
 | v1.0 | 10 | 21 | 7 min | Strict dependency chain + automated enforcement from commit #1 |
 | v1.1 | 9 | 26 | 5 min | Research spikes per phase, adversarial reviews, M3 scope pull-forward |
 | v1.2 | 8 | 20 | 6 min | Milestone audit gap closure phase, shadcn batch install, module-level ref pattern |
+| v1.3 | 10 | 20 | 8 min | Cross-cutting a11y/perf last, milestone restructuring, research-heavy phases |
 
 ### Cumulative Quality
 
@@ -169,11 +223,14 @@
 | v1.0 | 359+ | 14,423 | 145 | 7 plans/day |
 | v1.1 | 700+ | 24,786 | 303 | 8.7 plans/day |
 | v1.2 | 1,023 | 39,363 | 448 | 10 plans/day |
+| v1.3 | 1,023+ | 46,501 | 551 | 3.3 plans/day |
 
 ### Top Lessons (Verified Across Milestones)
 
-1. Automated enforcement prevents quality rot — 9 ESLint rules caught every banned pattern across 448 commits without modification
-2. Integration audits catch what unit tests miss — mandatory milestone audit before archival (all 3 milestones). v1.2 audit found 3 orphaned-component gaps.
-3. Foundation investment compounds — each milestone faster than the last (7 → 8.7 → 10 plans/day)
+1. Automated enforcement prevents quality rot — 9 ESLint rules caught every banned pattern across 551 commits without modification
+2. Integration audits catch what unit tests miss — mandatory milestone audit before archival (all 4 milestones). v1.3 audit found stale pulse dot integration gap.
+3. Foundation investment compounds — M1-M3 velocity increased each milestone (7 → 8.7 → 10 plans/day). M4 slower (3.3) due to research-heavy cross-cutting concerns.
 4. Research spikes before implementation pay off — all milestones benefited from upfront research, reducing mid-implementation pivots
 5. Batch install shared dependencies early — v1.2's Phase 21 shadcn batch install prevented interruptions in 5 subsequent phases
+6. Cross-cutting concerns (a11y, perf) should be scheduled last — they audit the full surface area, catching issues that per-feature phases miss
+7. Milestone restructuring works — splitting M4 scope into daily-driver + polish milestones kept each focused and achievable
