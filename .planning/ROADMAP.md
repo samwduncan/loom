@@ -162,7 +162,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 33-01: TBD
+- [ ] 33-01-PLAN.md -- Slash command types, registry, useSlashCommands hook, SlashCommandPicker component
+- [ ] 33-02-PLAN.md -- Composer integration + command execution + tests
 
 ### Phase 34: Conversation UX
 **Goal**: Long conversations remain readable and users can track AI usage per turn
@@ -242,7 +243,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 30. File Tree Git Integration | 1/1 | Complete    | 2026-03-13 | - |
 | 31. Editor & Tool Enhancements | 2/2 | Complete    | 2026-03-16 | - |
 | 32. File Mentions | 2/2 | Complete    | 2026-03-16 | - |
-| 33. Slash Commands | v1.3 | 0/? | Not started | - |
+| 33. Slash Commands | v1.3 | 0/2 | Not started | - |
 | 34. Conversation UX | v1.3 | 0/? | Not started | - |
 | 35. Quick Settings | v1.3 | 0/? | Not started | - |
 | 36. Accessibility | v1.3 | 0/? | Not started | - |
@@ -254,4 +255,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-16 after Phase 32 planning*
+*Last updated: 2026-03-17 after Phase 33 planning*
