@@ -96,21 +96,14 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
                 />
               )}
               <span className="truncate max-w-[120px]">{filename}</span>
-              <span
-                role="button"
-                tabIndex={0}
+              <button
+                type="button"
                 className="ml-1 p-0.5 rounded-sm hover:bg-[var(--surface-overlay)] transition-colors"
                 aria-label={`Close ${filename}`}
                 onClick={(e) => handleClose(e, tab)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleClose(e, tab);
-                  }
-                }}
               >
                 <X size={12} />
-              </span>
+              </button>
             </button>
           );
         })}

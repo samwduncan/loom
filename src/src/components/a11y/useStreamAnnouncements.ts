@@ -9,9 +9,9 @@
  *
  * Does NOT announce streaming text chunks (would flood screen reader).
  *
- * Uses useSyncExternalStore + useEffect to satisfy both:
- * - react-hooks/set-state-in-effect (no setState in effects)
- * - react-hooks/refs (no ref access during render)
+ * Uses ref + useSyncExternalStore because the react-hooks/set-state-in-effect
+ * lint rule forbids synchronous setState in effects. This hook needs synchronous
+ * state mutations in response to Zustand selector changes.
  *
  * Constitution: Named export (2.2), selector-only store access (4.2).
  */

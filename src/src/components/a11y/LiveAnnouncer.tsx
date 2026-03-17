@@ -10,15 +10,16 @@
 
 import { useRef, useEffect, useSyncExternalStore, useCallback } from 'react';
 
-interface LiveAnnouncerProps {
+export interface LiveAnnouncerProps {
   message: string;
 }
 
 /**
  * Screen reader announcement region. Mount once, update `message` to announce.
  *
- * Uses a ref + useSyncExternalStore pattern to avoid the react-hooks/set-state-in-effect
- * lint rule while still clearing and re-setting the text for re-announcement.
+ * Uses a ref + useSyncExternalStore pattern because the react-hooks/set-state-in-effect
+ * lint rule forbids synchronous setState in effects, and this component needs to
+ * synchronously clear then asynchronously re-set text for aria-live re-announcement.
  */
 export function LiveAnnouncer({ message }: LiveAnnouncerProps) {
   const textRef = useRef('');
