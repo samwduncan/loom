@@ -28,13 +28,16 @@ import { useComposerState } from './useComposerState';
 import { useDraftPersistence } from './useDraftPersistence';
 import { useImageAttachments } from './useImageAttachments';
 import { useFileMentions } from '@/hooks/useFileMentions';
+import { useSlashCommands } from '@/hooks/useSlashCommands';
 import { ComposerKeyboardHints } from './ComposerKeyboardHints';
 import { ImagePreviewRow } from './ImagePreviewRow';
 import { MentionChipRow } from './MentionChipRow';
 import { MentionPicker } from './MentionPicker';
+import { SlashCommandPicker } from './SlashCommandPicker';
 import { DragOverlay } from './DragOverlay';
 import { ElectricBorder } from '@/components/effects/ElectricBorder';
 import type { FileMention } from '@/types/mention';
+import type { SlashCommand } from '@/types/slash-command';
 import type { Message } from '@/types/message';
 import type { ClaudeCommandOptions } from '@/types/websocket';
 import './composer.css';
@@ -70,6 +73,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
   const addMessage = useTimelineStore((s) => s.addMessage);
   const addSession = useTimelineStore((s) => s.addSession);
   const updateSessionTitle = useTimelineStore((s) => s.updateSessionTitle);
+  const clearSession = useTimelineStore((s) => s.clearSession);
 
   // FSM
   const { state: composerState, dispatch, canSend, canStop } = useComposerState();
@@ -96,6 +100,18 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     moveDown: mentionMoveDown,
     selectCurrent: mentionSelectCurrent,
   } = useFileMentions({ enabled: true, projectName });
+
+  // Slash commands
+  const {
+    isOpen: slashPickerOpen,
+    results: slashResults,
+    selectedIndex: slashSelectedIndex,
+    detectAndOpen: slashDetectAndOpen,
+    close: closeSlashPicker,
+    moveUp: slashMoveUp,
+    moveDown: slashMoveDown,
+    selectCurrent: slashSelectCurrent,
+  } = useSlashCommands();
 
   // Drag-and-drop overlay state (dragCounter pattern prevents flicker)
   const [isDragOver, setIsDragOver] = useState(false);
@@ -216,6 +232,64 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       requestAnimationFrame(() => textareaRef.current?.focus());
     },
     [closeMentionPicker],
+  );
+
+  // Handle slash command selection: execute the command action
+  const handleSlashSelect = useCallback(
+    (cmd: SlashCommand | null) => {
+      if (!cmd) return;
+
+      // Clear the slash command text from input
+      setInput('');
+
+      // Execute the command action
+      switch (cmd.id) {
+        case 'clear': {
+          const effectiveId = sessionId ?? streamSessionId;
+          if (effectiveId) {
+            clearSession(effectiveId);
+          }
+          break;
+        }
+        case 'compact': {
+          const effectiveId = sessionId ?? streamSessionId;
+          if (effectiveId) {
+            wsClient.send({
+              type: 'claude-command',
+              command: '/compact',
+              options: { projectPath: projectName, sessionId: effectiveId },
+            });
+          }
+          break;
+        }
+        case 'help': {
+          const effectiveId = sessionId ?? streamSessionId;
+          if (effectiveId) {
+            wsClient.send({
+              type: 'claude-command',
+              command: '/help',
+              options: { projectPath: projectName, sessionId: effectiveId },
+            });
+          }
+          break;
+        }
+        case 'model': {
+          const effectiveId = sessionId ?? streamSessionId;
+          if (effectiveId) {
+            wsClient.send({
+              type: 'claude-command',
+              command: '/model',
+              options: { projectPath: projectName, sessionId: effectiveId },
+            });
+          }
+          break;
+        }
+      }
+
+      closeSlashPicker();
+      requestAnimationFrame(() => textareaRef.current?.focus());
+    },
+    [sessionId, streamSessionId, projectName, clearSession, closeSlashPicker],
   );
 
   // Remove a mention chip
@@ -375,6 +449,35 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
+      // When slash picker is open, intercept navigation/selection keys
+      if (slashPickerOpen) {
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          slashMoveUp();
+          return;
+        }
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          slashMoveDown();
+          return;
+        }
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleSlashSelect(slashSelectCurrent());
+          return;
+        }
+        if (e.key === 'Tab') {
+          e.preventDefault();
+          handleSlashSelect(slashSelectCurrent());
+          return;
+        }
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          closeSlashPicker();
+          return;
+        }
+      }
+
       // When mention picker is open, intercept navigation/selection keys
       if (mentionPickerOpen) {
         if (e.key === 'ArrowUp') {
@@ -418,7 +521,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         }
       }
     },
-    [mentionPickerOpen, handleSend, input, mentionMoveUp, mentionMoveDown, mentionSelectCurrent, handleMentionSelect, closeMentionPicker],
+    [slashPickerOpen, slashMoveUp, slashMoveDown, slashSelectCurrent, handleSlashSelect, closeSlashPicker, mentionPickerOpen, handleSend, input, mentionMoveUp, mentionMoveDown, mentionSelectCurrent, handleMentionSelect, closeMentionPicker],
   );
 
   const isStreamingState = composerState === 'active' || composerState === 'aborting';
@@ -450,6 +553,15 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
           addFromDrop(e);
         }}
       >
+        {/* Slash command picker popup (above composer) */}
+        {slashPickerOpen && (
+          <SlashCommandPicker
+            results={slashResults}
+            selectedIndex={slashSelectedIndex}
+            onSelect={handleSlashSelect}
+          />
+        )}
+
         {/* Mention picker popup (above composer) */}
         {mentionPickerOpen && (
           <MentionPicker
@@ -483,13 +595,20 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
             // Detect @ mention trigger
             detectAndOpen(e.target.value, e.target.selectionStart ?? e.target.value.length);
+
+            // Detect / slash command trigger
+            slashDetectAndOpen(e.target.value, e.target.selectionStart ?? e.target.value.length);
           }}
           onKeyDown={handleKeyDown}
           onPaste={addFromClipboard}
           placeholder="Send a message..."
           aria-label="Message input"
-          aria-expanded={mentionPickerOpen}
-          aria-controls={mentionPickerOpen ? 'mention-picker-list' : undefined}
+          aria-expanded={mentionPickerOpen || slashPickerOpen}
+          aria-controls={
+            slashPickerOpen ? 'slash-picker-list' :
+            mentionPickerOpen ? 'mention-picker-list' :
+            undefined
+          }
           rows={1}
           className={cn(
             'w-full resize-none overflow-y-hidden bg-transparent text-sm text-foreground',
