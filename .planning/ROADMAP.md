@@ -111,11 +111,11 @@ Plans:
   2. PATCH /api/projects/:name/sessions/:id endpoint accepts a title field and persists it as a summary entry in the session JSONL file
   3. Backend runs as a systemd service (or pm2 process) that auto-starts on boot and auto-restarts on crash
   4. WebSocket connection sends periodic ping/pong keepalive frames, and the frontend detects silent disconnects within 30 seconds
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 39-01: TBD
-- [ ] 39-02: TBD
+- [ ] 39-01-PLAN.md -- Auth auto-retry on 401 and WebSocket ping/pong heartbeat
+- [ ] 39-02-PLAN.md -- Session title PATCH endpoint and systemd service
 
 ### Phase 40: Session Titles & Rename
 **Goal**: Every session has a meaningful title that persists across browsers and cache clears
@@ -210,7 +210,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
 | 28-37 | v1.3 | 20/20 | Complete | 2026-03-17 |
 | 38. Broken Fixes & Persist Audit | 2/2 | Complete    | 2026-03-17 | - |
-| 39. Backend Hardening | v1.4 | 0/? | Not started | - |
+| 39. Backend Hardening | v1.4 | 0/2 | Not started | - |
 | 40. Session Titles & Rename | v1.4 | 0/? | Not started | - |
 | 41. Session Organization | v1.4 | 0/? | Not started | - |
 | 42. Session Discovery | v1.4 | 0/? | Not started | - |
@@ -222,4 +222,4 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-17 after Phase 38 planning*
+*Last updated: 2026-03-17 after Phase 39 planning*
