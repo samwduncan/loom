@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: "The Refinery"
-status: archived
-stopped_at: Milestone v1.3 archived
-last_updated: "2026-03-17T21:00:00Z"
-last_activity: 2026-03-17 -- Milestone v1.3 "The Refinery" archived
+milestone: v1.4
+milestone_name: "The Navigator"
+status: defining_requirements
+stopped_at: Defining requirements
+last_updated: "2026-03-17T22:30:00Z"
+last_activity: 2026-03-17 -- Milestone v1.4 started
 progress:
-  total_phases: 10
-  completed_phases: 10
-  total_plans: 20
-  completed_plans: 20
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,12 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-17)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Planning next milestone (v1.4 "The Polish")
+**Current focus:** v1.4 "The Navigator" — fix broken features, session management, daily-driver readiness
 
 ## Current Position
 
-Milestone v1.3 "The Refinery" archived.
-Next: `/gsd:new-milestone` for v1.4 "The Polish"
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-17 — Milestone v1.4 started
 
 ## Performance Metrics
 
@@ -54,5 +56,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-17
-Stopped at: Milestone v1.3 archived
-Resume: Start `/gsd:new-milestone` for v1.4 "The Polish"
+Stopped at: Defining requirements for v1.4
+Resume: Continue requirements definition

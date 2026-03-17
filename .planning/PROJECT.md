@@ -50,20 +50,26 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Active
 
-**Next Milestone: v1.4 "The Polish"**
+**Current Milestone: v1.4 "The Navigator"**
 
-**Goal:** Transform the functional daily-driver into a visually stunning, award-winning interface.
+**Goal:** Fix every broken feature, make sessions findable and manageable, and verify everything works end-to-end with real daily use.
 
 **Target features:**
-- [ ] Spring physics animations on all interactions
-- [ ] Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
-- [ ] Glass surface effects for modals and overlays
-- [ ] Sidebar slim collapse mode (icon-only rail)
-- [ ] DecryptedText reveals for session titles and model names
-- [ ] StarBorder accents on focused/active elements
-- [ ] Motion refinement across all surfaces
+- [ ] Auto-generated session titles (smart extraction, skip system prompts/XML)
+- [ ] Project-based sidebar grouping (collapsible project groups, GSD session chaining)
+- [ ] Backend session rename endpoint (persist renames to JSONL)
+- [ ] Junk session filtering (hide notification classifier/system sessions)
+- [ ] Session search in sidebar + pinning
+- [ ] @-mentions actually send file context to AI (fix broken fileMentions)
+- [ ] Search highlighting in assistant message bodies (complete existing feature)
+- [ ] Auth resilience (auto-retry, clear error messaging)
+- [ ] Connection heartbeat + backend auto-start
+- [ ] Dead code removal (rehypeToolMarkers no-op)
+- [ ] Persist layer audit (prevent NaN-class bugs across all stores)
+- [ ] E2E verification of all M1-M4 features with real backend
 
 **Future milestones:**
+- v1.5 "The Polish" — Springs, aurora, glass, sidebar slim, motion refinement
 - v2.0 "The Power" — Multi-provider tabs, MCP management
 - v3.0 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
 
