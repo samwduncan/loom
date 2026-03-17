@@ -84,6 +84,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 36]: useSyncExternalStore + ref pattern for LiveAnnouncer/useStreamAnnouncements to satisfy React 19 lint rules
 - [Phase 36]: ImageLightbox uses Radix Dialog (no custom focus trap needed)
 - [Phase 36]: rAF delay for TabBar panel focus after CSS show/hide tab switch
+- [Phase 36]: Sidebar aria-label changed from "Chat sessions" to "Sidebar navigation" for broader scope
+- [Phase 36]: TabBar roving tabindex with ArrowLeft/Right wrap-around and Home/End per WAI-ARIA Tabs
 
 ### Pending Todos
 
