@@ -81,6 +81,9 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 35]: ToolCallGroup reads autoExpandTools from store directly (not prop-threaded from AssistantMessage)
 - [Phase 36]: Used 0.01ms (not 0ms) for reduced-motion override to preserve JS animationend/transitionend events
 - [Phase 36]: Adjusted --status-error lightness 0.58->0.65 and --border-interactive alpha 0.15->0.34 for WCAG AA
+- [Phase 36]: useSyncExternalStore + ref pattern for LiveAnnouncer/useStreamAnnouncements to satisfy React 19 lint rules
+- [Phase 36]: ImageLightbox uses Radix Dialog (no custom focus trap needed)
+- [Phase 36]: rAF delay for TabBar panel focus after CSS show/hide tab switch
 
 ### Pending Todos
 

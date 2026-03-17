@@ -52,8 +52,8 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 
 - [ ] **A11Y-01**: All interactive elements have appropriate ARIA roles and labels
 - [ ] **A11Y-02**: Full keyboard navigation works across all panels (chat, files, terminal, git, settings)
-- [ ] **A11Y-03**: Focus management: modals trap focus, panels restore focus on close
-- [ ] **A11Y-04**: Screen reader announcements for streaming status, tool completion, errors
+- [x] **A11Y-03**: Focus management: modals trap focus, panels restore focus on close
+- [x] **A11Y-04**: Screen reader announcements for streaming status, tool completion, errors
 - [x] **A11Y-05**: prefers-reduced-motion disables all animations (existing + new)
 - [x] **A11Y-06**: Color contrast meets WCAG AA across all surfaces
 
@@ -124,8 +124,8 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | UXR-07 | Phase 35 | Complete |
 | A11Y-01 | Phase 36 | Pending |
 | A11Y-02 | Phase 36 | Pending |
-| A11Y-03 | Phase 36 | Pending |
-| A11Y-04 | Phase 36 | Pending |
+| A11Y-03 | Phase 36 | Complete |
+| A11Y-04 | Phase 36 | Complete |
 | A11Y-05 | Phase 36 | Complete |
 | A11Y-06 | Phase 36 | Complete |
 | PERF-01 | Phase 37 | Pending |
