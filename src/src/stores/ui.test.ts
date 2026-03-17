@@ -63,13 +63,13 @@ describe('useUIStore', () => {
 
   // -- openModal / closeModal --
   it('openModal sets modalState', () => {
-    const modal: ModalState = { type: 'settings', props: { tab: 'appearance' } };
+    const modal: ModalState = { type: 'settings', initialTab: 'appearance' };
     useUIStore.getState().openModal(modal);
     expect(useUIStore.getState().modalState).toEqual(modal);
   });
 
   it('closeModal clears modalState', () => {
-    const modal: ModalState = { type: 'settings', props: {} };
+    const modal: ModalState = { type: 'settings' };
     useUIStore.getState().openModal(modal);
     useUIStore.getState().closeModal();
     expect(useUIStore.getState().modalState).toBeNull();
@@ -97,7 +97,7 @@ describe('useUIStore', () => {
   it('reset() restores initial state', () => {
     useUIStore.getState().toggleSidebar();
     useUIStore.getState().setActiveTab('files');
-    useUIStore.getState().openModal({ type: 'test', props: {} });
+    useUIStore.getState().openModal({ type: 'settings' });
     useUIStore.getState().setTheme({ fontSize: 20 });
 
     useUIStore.getState().reset();
@@ -119,5 +119,43 @@ describe('useUIStore', () => {
   // -- Initial sidebarOpen --
   it('initial sidebarOpen is true', () => {
     expect(useUIStore.getState().sidebarOpen).toBe(true);
+  });
+
+  // -- autoExpandTools --
+  it('autoExpandTools defaults to false', () => {
+    expect(useUIStore.getState().autoExpandTools).toBe(false);
+  });
+
+  it('toggleAutoExpandTools flips autoExpandTools', () => {
+    expect(useUIStore.getState().autoExpandTools).toBe(false);
+    useUIStore.getState().toggleAutoExpandTools();
+    expect(useUIStore.getState().autoExpandTools).toBe(true);
+    useUIStore.getState().toggleAutoExpandTools();
+    expect(useUIStore.getState().autoExpandTools).toBe(false);
+  });
+
+  // -- showRawParams --
+  it('showRawParams defaults to false', () => {
+    expect(useUIStore.getState().showRawParams).toBe(false);
+  });
+
+  it('toggleShowRawParams flips showRawParams', () => {
+    expect(useUIStore.getState().showRawParams).toBe(false);
+    useUIStore.getState().toggleShowRawParams();
+    expect(useUIStore.getState().showRawParams).toBe(true);
+    useUIStore.getState().toggleShowRawParams();
+    expect(useUIStore.getState().showRawParams).toBe(false);
+  });
+
+  // -- reset includes new fields --
+  it('reset() resets autoExpandTools and showRawParams to false', () => {
+    useUIStore.getState().toggleAutoExpandTools();
+    useUIStore.getState().toggleShowRawParams();
+    expect(useUIStore.getState().autoExpandTools).toBe(true);
+    expect(useUIStore.getState().showRawParams).toBe(true);
+
+    useUIStore.getState().reset();
+    expect(useUIStore.getState().autoExpandTools).toBe(false);
+    expect(useUIStore.getState().showRawParams).toBe(false);
   });
 });

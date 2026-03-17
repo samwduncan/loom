@@ -29,6 +29,8 @@ interface UIState {
   companionState: CompanionState | null;
   theme: ThemeConfig;
   thinkingExpanded: boolean;
+  autoExpandTools: boolean;
+  showRawParams: boolean;
 
   // Actions
   toggleSidebar: () => void;
@@ -38,10 +40,12 @@ interface UIState {
   toggleCommandPalette: () => void;
   setTheme: (theme: Partial<ThemeConfig>) => void;
   toggleThinking: () => void;
+  toggleAutoExpandTools: () => void;
+  toggleShowRawParams: () => void;
   reset: () => void;
 }
 
-const INITIAL_UI_STATE: Pick<UIState, 'sidebarOpen' | 'activeTab' | 'modalState' | 'commandPaletteOpen' | 'companionState' | 'theme' | 'thinkingExpanded'> = {
+const INITIAL_UI_STATE: Pick<UIState, 'sidebarOpen' | 'activeTab' | 'modalState' | 'commandPaletteOpen' | 'companionState' | 'theme' | 'thinkingExpanded' | 'autoExpandTools' | 'showRawParams'> = {
   sidebarOpen: true,
   activeTab: 'chat',
   modalState: null,
@@ -49,6 +53,8 @@ const INITIAL_UI_STATE: Pick<UIState, 'sidebarOpen' | 'activeTab' | 'modalState'
   companionState: null,
   theme: { fontSize: 14, density: 'comfortable', codeFontFamily: 'JetBrains Mono' },
   thinkingExpanded: true,
+  autoExpandTools: false,
+  showRawParams: false,
 };
 
 export const useUIStore = create<UIState>()(
@@ -86,17 +92,27 @@ export const useUIStore = create<UIState>()(
         set((state) => ({ thinkingExpanded: !state.thinkingExpanded }));
       },
 
+      toggleAutoExpandTools: () => {
+        set((state) => ({ autoExpandTools: !state.autoExpandTools }));
+      },
+
+      toggleShowRawParams: () => {
+        set((state) => ({ showRawParams: !state.showRawParams }));
+      },
+
       reset: () => {
         set({ ...INITIAL_UI_STATE });
       },
     }),
     {
       name: 'loom-ui',
-      version: 5,
+      version: 6,
       partialize: (state) => ({
         theme: state.theme,
         sidebarOpen: state.sidebarOpen,
         thinkingExpanded: state.thinkingExpanded,
+        autoExpandTools: state.autoExpandTools,
+        showRawParams: state.showRawParams,
       }),
       migrate: (persistedState: unknown, version: number) => {
         // ASSERT: persistedState is the partialize output from a previous version
@@ -115,6 +131,10 @@ export const useUIStore = create<UIState>()(
           // v5: Added codeFontFamily to ThemeConfig.
           const theme = (s['theme'] as Record<string, unknown>) ?? {};
           s = { ...s, theme: { ...theme, codeFontFamily: 'JetBrains Mono' } };
+        }
+        if (version < 6) {
+          // v6: Added quick settings fields.
+          s = { ...s, autoExpandTools: false, showRawParams: false };
         }
         return s;
       },
