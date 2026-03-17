@@ -8,7 +8,7 @@
  * token-based styling (3.1).
  */
 
-import { useCallback } from 'react';
+import { useCallback, type KeyboardEvent } from 'react';
 import { MessageSquare, FolderTree, Terminal, GitBranch, type LucideIcon } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
@@ -45,10 +45,40 @@ export function TabBar() {
     [setActiveTab],
   );
 
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLElement>) => {
+      const currentIndex = TABS.findIndex((t) => t.id === activeTab);
+      let nextIndex: number | null = null;
+
+      if (e.key === 'ArrowRight') {
+        nextIndex = (currentIndex + 1) % TABS.length;
+      } else if (e.key === 'ArrowLeft') {
+        nextIndex = (currentIndex - 1 + TABS.length) % TABS.length;
+      } else if (e.key === 'Home') {
+        nextIndex = 0;
+      } else if (e.key === 'End') {
+        nextIndex = TABS.length - 1;
+      }
+
+      if (nextIndex !== null) {
+        e.preventDefault();
+        const nextTab = TABS[nextIndex]; // ASSERT: nextIndex is bounded by TABS.length
+        if (nextTab) {
+          handleTabClick(nextTab.id);
+          requestAnimationFrame(() => {
+            document.getElementById(`tab-${nextTab.id}`)?.focus();
+          });
+        }
+      }
+    },
+    [activeTab, handleTabClick],
+  );
+
   return (
     <nav
       role="tablist"
       aria-label="Workspace panels"
+      onKeyDown={handleKeyDown}
       className={cn(
         'hidden md:flex items-center gap-0.5 px-2',
         'h-10 border-b border-border/8 bg-surface-base',
@@ -63,6 +93,7 @@ export function TabBar() {
             id={`tab-${id}`}
             aria-selected={isActive}
             aria-controls={`panel-${id}`}
+            tabIndex={isActive ? 0 : -1}
             onClick={() => handleTabClick(id)}
             className={cn(
               'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',

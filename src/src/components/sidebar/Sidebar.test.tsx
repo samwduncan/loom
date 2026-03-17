@@ -53,11 +53,11 @@ describe('Sidebar', () => {
     expect(wordmark.className).toContain('italic');
   });
 
-  it('has role="complementary" and aria-label="Chat sessions"', () => {
+  it('has role="complementary" and aria-label="Sidebar navigation"', () => {
     renderSidebar();
     const aside = screen.getByRole('complementary');
     expect(aside).toBeInTheDocument();
-    expect(aside).toHaveAttribute('aria-label', 'Chat sessions');
+    expect(aside).toHaveAttribute('aria-label', 'Sidebar navigation');
   });
 
   it('has a collapse toggle button that is accessible', () => {

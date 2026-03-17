@@ -47,7 +47,7 @@ export const Sidebar = memo(function Sidebar() {
   return (
     <aside
       role="complementary"
-      aria-label="Chat sessions"
+      aria-label="Sidebar navigation"
       className={cn(
         'bg-surface-raised border-r border-border',
         'overflow-hidden flex flex-col h-full',

@@ -16,6 +16,7 @@ import { Sidebar } from '@/components/sidebar/Sidebar';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ConnectionBanner } from '@/components/shared/ConnectionBanner';
 import { ContentArea } from '@/components/content-area/view/ContentArea';
+import { SkipLink } from '@/components/a11y/SkipLink';
 
 const LazySettingsModal = lazy(() =>
   import('@/components/settings/SettingsModal').then((m) => ({
@@ -34,6 +35,7 @@ export const AppShell = memo(function AppShell() {
 
   return (
     <>
+    <SkipLink />
     <ConnectionBanner />
     <div
       data-testid="app-shell"
@@ -51,7 +53,7 @@ export const AppShell = memo(function AppShell() {
         </PanelErrorBoundary>
       </div>
 
-      <main role="main" className="overflow-hidden min-w-0">
+      <main role="main" id="main-content" className="overflow-hidden min-w-0">
         <PanelErrorBoundary panelName="content">
           <ContentArea />
         </PanelErrorBoundary>
