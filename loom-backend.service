@@ -1,0 +1,20 @@
+[Unit]
+Description=Loom AI Backend
+After=network.target
+
+[Service]
+Type=simple
+User=swd
+WorkingDirectory=/home/swd/loom
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+Environment=PORT=5555
+EnvironmentFile=-/home/swd/loom/.env
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=loom-backend
+
+[Install]
+WantedBy=multi-user.target

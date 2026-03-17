@@ -1665,6 +1665,54 @@ async function deleteCodexSession(sessionId) {
   }
 }
 
+async function updateSessionTitle(projectName, sessionId, title) {
+  const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
+
+  try {
+    const files = await fs.readdir(projectDir);
+    const jsonlFiles = files.filter(file => file.endsWith('.jsonl'));
+
+    if (jsonlFiles.length === 0) {
+      throw new Error('No session files found for this project');
+    }
+
+    // Check all JSONL files to find which one contains the session
+    for (const file of jsonlFiles) {
+      const jsonlFile = path.join(projectDir, file);
+      const content = await fs.readFile(jsonlFile, 'utf8');
+      const lines = content.split('\n').filter(line => line.trim());
+
+      const hasSession = lines.some(line => {
+        try {
+          const data = JSON.parse(line);
+          return data.sessionId === sessionId;
+        } catch {
+          return false;
+        }
+      });
+
+      if (hasSession) {
+        // Append a summary entry to the JSONL file (append-only, no read-write-replace)
+        const entry = JSON.stringify({
+          type: 'summary',
+          sessionId,
+          summary: title,
+          timestamp: new Date().toISOString()
+        }) + '\n';
+        await fs.appendFile(jsonlFile, entry);
+        return true;
+      }
+    }
+
+    throw new Error(`Session ${sessionId} not found in any JSONL file`);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      throw new Error(`Project ${projectName} not found`);
+    }
+    throw error;
+  }
+}
+
 export {
   getProjects,
   getSessions,
@@ -1672,6 +1720,7 @@ export {
   parseJsonlSessions,
   renameProject,
   deleteSession,
+  updateSessionTitle,
   isProjectEmpty,
   deleteProject,
   addProjectManually,

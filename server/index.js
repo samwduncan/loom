@@ -44,7 +44,7 @@ import pty from 'node-pty';
 import fetch from 'node-fetch';
 import mime from 'mime-types';
 
-import { getProjects, getSessions, getSessionMessages, renameProject, deleteSession, deleteProject, addProjectManually, extractProjectDirectory, clearProjectDirectoryCache } from './projects.js';
+import { getProjects, getSessions, getSessionMessages, renameProject, deleteSession, updateSessionTitle, deleteProject, addProjectManually, extractProjectDirectory, clearProjectDirectoryCache } from './projects.js';
 import { queryClaudeSDK, abortClaudeSDKSession, isClaudeSDKSessionActive, getActiveClaudeSDKSessions, resolveToolApproval } from './claude-sdk.js';
 import { queryCodex, abortCodexSession, isCodexSessionActive, getActiveCodexSessions } from './openai-codex.js';
 import { spawnGemini, abortGeminiSession, isGeminiSessionActive, getActiveGeminiSessions } from './gemini-cli.js';
@@ -540,6 +540,33 @@ app.delete('/api/projects/:projectName/sessions/:sessionId', authenticateToken, 
         res.json({ success: true });
     } catch (error) {
         console.error(`[API] Error deleting session ${req.params.sessionId}:`, error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Update session title endpoint
+app.patch('/api/projects/:projectName/sessions/:sessionId', authenticateToken, async (req, res) => {
+    try {
+        const { projectName, sessionId } = req.params;
+        const { title } = req.body;
+
+        if (!title || typeof title !== 'string' || title.trim().length === 0) {
+            return res.status(400).json({ error: 'Title is required and must be a non-empty string' });
+        }
+        if (title.trim().length > 200) {
+            return res.status(400).json({ error: 'Title must be 200 characters or fewer' });
+        }
+
+        const trimmedTitle = title.trim();
+        console.log(`[API] Updating session title: ${sessionId} in project: ${projectName} to "${trimmedTitle}"`);
+        await updateSessionTitle(projectName, sessionId, trimmedTitle);
+        console.log(`[API] Session ${sessionId} title updated successfully`);
+        res.json({ success: true, title: trimmedTitle });
+    } catch (error) {
+        console.error(`[API] Error updating session title ${req.params.sessionId}:`, error);
+        if (error.message.includes('not found')) {
+            return res.status(404).json({ error: error.message });
+        }
         res.status(500).json({ error: error.message });
     }
 });
