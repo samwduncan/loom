@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
 status: executing
-stopped_at: Completed 38-01-PLAN.md
-last_updated: "2026-03-17T23:17:25.417Z"
-last_activity: 2026-03-17 — Completed persist rehydration audit (38-02)
+stopped_at: Completed 39-02-PLAN.md
+last_updated: "2026-03-17T23:34:00Z"
+last_activity: 2026-03-17 — Completed session title endpoint and systemd service (39-02)
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-03-17)
 
 ## Current Position
 
-Phase: 38-broken-fixes-persist-audit
+Phase: 39-backend-hardening
 Plan: 02 of 02 (complete)
 Status: Executing
-Last activity: 2026-03-17 — Completed persist rehydration audit (38-02)
+Last activity: 2026-03-17 — Completed session title endpoint and systemd service (39-02)
 
 ## Performance Metrics
 
@@ -47,6 +47,8 @@ Last activity: 2026-03-17 — Completed persist rehydration audit (38-02)
 See PROJECT.md Key Decisions table for full history.
 - [Phase 38]: fileMentions sent as WS options field, backend reads files and prepends XML-wrapped content to prompt
 - [Phase 38]: Search highlighting uses plain text fallback during active search rather than injecting into markdown AST
+- [39-02] Append-only fs.appendFile for JSONL title updates to avoid race conditions
+- [39-02] systemd as primary process manager, pm2 as documented fallback
 
 ### Pending Todos
 
@@ -58,6 +60,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T23:05:56.873Z
-Stopped at: Completed 38-01-PLAN.md
-Resume: Phase 38 complete, proceed to next phase
+Last session: 2026-03-17T23:34:00Z
+Stopped at: Completed 39-02-PLAN.md
+Resume: Phase 39 plan 02 complete, proceed to next plan or phase

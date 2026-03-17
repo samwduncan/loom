@@ -210,7 +210,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
 | 28-37 | v1.3 | 20/20 | Complete | 2026-03-17 |
 | 38. Broken Fixes & Persist Audit | 2/2 | Complete    | 2026-03-17 | - |
-| 39. Backend Hardening | v1.4 | 0/2 | Not started | - |
+| 39. Backend Hardening | 1/2 | In Progress|  | - |
 | 40. Session Titles & Rename | v1.4 | 0/? | Not started | - |
 | 41. Session Organization | v1.4 | 0/? | Not started | - |
 | 42. Session Discovery | v1.4 | 0/? | Not started | - |
