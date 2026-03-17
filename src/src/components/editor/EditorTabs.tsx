@@ -74,10 +74,10 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
           const isActive = tab.filePath === activeFilePath;
 
           return (
-            <button
+            <div
               key={tab.filePath}
-              type="button"
               role="tab"
+              tabIndex={isActive ? 0 : -1}
               aria-selected={isActive}
               aria-label={filename}
               className={cn(
@@ -88,6 +88,12 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
               )}
               title={tab.filePath}
               onClick={() => setActiveFile(tab.filePath)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveFile(tab.filePath);
+                }
+              }}
             >
               {tab.isDirty && (
                 <span
@@ -104,7 +110,7 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
               >
                 <X size={12} />
               </button>
-            </button>
+            </div>
           );
         })}
       </div>

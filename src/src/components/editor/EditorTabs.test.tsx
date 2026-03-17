@@ -54,10 +54,10 @@ describe('EditorTabs', () => {
     mockActiveFilePath = '/src/App.tsx';
     render(<EditorTabs onSave={mockOnSave} />);
 
-    const activeTab = screen.getByText('App.tsx').closest('button');
+    const activeTab = screen.getByText('App.tsx').closest('[role="tab"]');
     expect(activeTab?.className).toContain('surface-raised');
 
-    const inactiveTab = screen.getByText('utils.ts').closest('button');
+    const inactiveTab = screen.getByText('utils.ts').closest('[role="tab"]');
     expect(inactiveTab?.className).toContain('muted-foreground');
   });
 
@@ -95,7 +95,7 @@ describe('EditorTabs', () => {
     mockOpenTabs = [{ filePath: '/src/components/App.tsx', isDirty: false }];
     render(<EditorTabs onSave={mockOnSave} />);
 
-    const tab = screen.getByText('App.tsx').closest('button');
+    const tab = screen.getByText('App.tsx').closest('[role="tab"]');
     expect(tab).toHaveAttribute('title', '/src/components/App.tsx');
   });
 
