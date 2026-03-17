@@ -31,6 +31,8 @@ import { PermissionBanner } from '@/components/chat/tools/PermissionBanner';
 import { SearchBar } from '@/components/chat/view/SearchBar';
 import { StatusLine } from '@/components/chat/view/StatusLine';
 import { exportAsMarkdown, exportAsJSON } from '@/lib/export-conversation';
+import { LiveAnnouncer } from '@/components/a11y/LiveAnnouncer';
+import { useStreamAnnouncements } from '@/components/a11y/useStreamAnnouncements';
 import { cn } from '@/utils/cn';
 import type { Message } from '@/types/message';
 
@@ -124,6 +126,9 @@ export function ChatView() {
   // Search: filter messages when search is active
   const displayMessages = search.isOpen ? search.filterMessages(messages) : messages;
 
+  // Screen reader announcements for streaming and tool events
+  const announcement = useStreamAnnouncements();
+
   // Suggestion chip handler: sets composer input text via state
   const [suggestionText, setSuggestionText] = useState<string | null>(null);
   const handleSuggestionClick = useCallback((text: string) => {
@@ -133,6 +138,8 @@ export function ChatView() {
   }, []);
 
   return (
+    <>
+    <LiveAnnouncer message={announcement} />
     <div
       className={cn(
         'relative grid h-full',
@@ -246,5 +253,6 @@ export function ChatView() {
         suggestionText={suggestionText}
       />
     </div>
+    </>
   );
 }
