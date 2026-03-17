@@ -191,7 +191,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 35-01: TBD
+- [ ] 35-01-PLAN.md -- UI store extension, QuickSettingsPanel popover, Cmd+, shortcut, sidebar integration
+- [ ] 35-02-PLAN.md -- Wire autoExpandTools to ToolCallGroup/ToolChip, showRawParams to ToolCardShell
 
 ### Phase 36: Accessibility
 **Goal**: Users with assistive technology can operate every feature of Loom
@@ -245,7 +246,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 32. File Mentions | 2/2 | Complete    | 2026-03-16 | - |
 | 33. Slash Commands | 2/2 | Complete    | 2026-03-17 | - |
 | 34. Conversation UX | 2/2 | Complete    | 2026-03-17 | - |
-| 35. Quick Settings | v1.3 | 0/? | Not started | - |
+| 35. Quick Settings | v1.3 | 0/2 | Not started | - |
 | 36. Accessibility | v1.3 | 0/? | Not started | - |
 | 37. Performance | v1.3 | 0/? | Not started | - |
 
@@ -255,4 +256,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-17 after Phase 34 planning*
+*Last updated: 2026-03-17 after Phase 35 planning*
