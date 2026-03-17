@@ -82,40 +82,40 @@ Deferred to "The Polish" milestone. Visual transformation.
 |-------------|-------|--------|
 | SESS-01 | TBD | Pending |
 | SESS-02 | TBD | Pending |
-| SESS-03 | TBD | Pending |
-| SESS-04 | TBD | Pending |
-| SESS-05 | TBD | Pending |
-| SESS-06 | TBD | Pending |
-| SESS-07 | TBD | Pending |
-| SESS-08 | TBD | Pending |
-| SESS-09 | TBD | Pending |
-| FIX-01 | TBD | Pending |
-| FIX-02 | TBD | Pending |
-| FIX-03 | TBD | Pending |
-| FIX-04 | TBD | Pending |
-| BACK-01 | TBD | Pending |
-| BACK-02 | TBD | Pending |
-| BACK-03 | TBD | Pending |
-| BACK-04 | TBD | Pending |
-| PERS-01 | TBD | Pending |
-| PERS-02 | TBD | Pending |
-| E2E-01 | TBD | Pending |
-| E2E-02 | TBD | Pending |
-| E2E-03 | TBD | Pending |
-| E2E-04 | TBD | Pending |
-| E2E-05 | TBD | Pending |
-| E2E-06 | TBD | Pending |
-| E2E-07 | TBD | Pending |
-| E2E-08 | TBD | Pending |
-| E2E-09 | TBD | Pending |
-| E2E-10 | TBD | Pending |
-| E2E-11 | TBD | Pending |
+| SESS-03 | Phase 40 | Pending |
+| SESS-04 | Phase 41 | Pending |
+| SESS-05 | Phase 41 | Pending |
+| SESS-06 | Phase 40 | Pending |
+| SESS-07 | Phase 42 | Pending |
+| SESS-08 | Phase 42 | Pending |
+| SESS-09 | Phase 42 | Pending |
+| FIX-01 | Phase 38 | Pending |
+| FIX-02 | Phase 38 | Pending |
+| FIX-03 | Phase 38 | Pending |
+| FIX-04 | Phase 38 | Pending |
+| BACK-01 | Phase 39 | Pending |
+| BACK-02 | Phase 39 | Pending |
+| BACK-03 | Phase 43 | Pending |
+| BACK-04 | Phase 39 | Pending |
+| PERS-01 | Phase 38 | Pending |
+| PERS-02 | Phase 38 | Pending |
+| E2E-01 | Phase 43 | Pending |
+| E2E-02 | Phase 43 | Pending |
+| E2E-03 | Phase 43 | Pending |
+| E2E-04 | Phase 43 | Pending |
+| E2E-05 | Phase 43 | Pending |
+| E2E-06 | Phase 43 | Pending |
+| E2E-07 | Phase 43 | Pending |
+| E2E-08 | Phase 43 | Pending |
+| E2E-09 | Phase 43 | Pending |
+| E2E-10 | Phase 43 | Pending |
+| E2E-11 | Phase 43 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30 ⚠️
+- Mapped to phases: 30
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-17*
-*Last updated: 2026-03-17 after initial definition*
+*Last updated: 2026-03-17 after roadmap creation*
