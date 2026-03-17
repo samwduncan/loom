@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 33-01-PLAN.md
-last_updated: "2026-03-17T00:17:23.124Z"
-last_activity: 2026-03-17 -- Completed 33-01-PLAN.md (slash command foundation)
+stopped_at: Completed 33-02-PLAN.md
+last_updated: "2026-03-17T00:22:52Z"
+last_activity: 2026-03-17 -- Completed 33-02-PLAN.md (composer integration + command execution)
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 11
-  completed_plans: 10
-  percent: 91
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 33 - Slash Commands
+**Current focus:** Phase 34 - Conversation UX
 
 ## Current Position
 
-Phase: 33 of 37 (Slash Commands) -- IN PROGRESS
-Plan: 1 of 2 (plan 01 complete)
-Status: Slash command foundation complete -- types, registry, hook, picker ready for integration
-Last activity: 2026-03-17 -- Completed 33-01-PLAN.md (slash command foundation)
+Phase: 33 of 37 (Slash Commands) -- COMPLETE
+Plan: 2 of 2 (all plans complete)
+Status: Phase 33 complete -- slash commands fully integrated in ChatComposer
+Last activity: 2026-03-17 -- Completed 33-02-PLAN.md (composer integration + command execution)
 
 Progress: [█████████░] 91%
 
@@ -70,6 +70,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 32]: Mock useFileMentions in ChatComposer tests for controlled integration testing
 - [Phase 32]: Prepend file references as text prefix until backend fileMentions option is supported
 - [Phase 33]: Corrected plan test: /cl filters to clear only (not compact) since includes matching on id is correct
+- [Phase 33]: Slash picker keyboard handling runs BEFORE mention picker to take priority when open
+- [Phase 33]: Both slash and mention detection run on every onChange -- mutually exclusive by design
 
 ### Pending Todos
 
@@ -81,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T00:17:23.122Z
-Stopped at: Completed 33-01-PLAN.md
-Resume: Plan 33-02 next -- wire slash commands into ChatComposer
+Last session: 2026-03-17T00:22:52Z
+Stopped at: Completed 33-02-PLAN.md
+Resume: Phase 33 complete. Phase 34 (Conversation UX) next.
