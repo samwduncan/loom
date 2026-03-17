@@ -14,6 +14,10 @@
  * fade-out before unmounting. showActiveMessage is driven by
  * onFinalizationComplete, NOT by isStreaming going false.
  *
+ * Auto-collapse: messages scrolled far above viewport collapse to a compact
+ * summary line. Clicking or scrolling back expands them. Last 10 messages
+ * are always protected from collapsing.
+ *
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
@@ -25,9 +29,11 @@ import { ErrorMessage } from '@/components/chat/view/ErrorMessage';
 import { SystemMessage } from '@/components/chat/view/SystemMessage';
 import { TaskNotificationMessage } from '@/components/chat/view/TaskNotificationMessage';
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
+import { CollapsibleMessage } from '@/components/chat/view/CollapsibleMessage';
 import { ScrollToBottomPill } from '@/components/chat/view/ScrollToBottomPill';
 import { MessageErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useScrollAnchor } from '@/hooks/useScrollAnchor';
+import { useAutoCollapse } from '@/hooks/useAutoCollapse';
 import { useStreamStore } from '@/stores/stream';
 import type { Message } from '@/types/message';
 import type { ReactNode } from 'react';
@@ -81,6 +87,9 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     restoreScrollPosition,
     incrementUnread,
   } = useScrollAnchor(scrollRef);
+
+  // --- Auto-collapse: old messages collapse when scrolled out of viewport ---
+  const { observeRef, isCollapsed, toggleExpand } = useAutoCollapse(scrollRef, messages.length);
 
   // --- Entrance animation tracking ---
   // Uses React "adjust state during rendering" pattern to track which messages
@@ -250,10 +259,19 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
         )}
         {messages.map((msg, idx) => (
           <MessageErrorBoundary key={msg.id}>
-            <div className={cn(
-              idx >= newStartIndex && 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 duration-200'
-            )}>
-              {renderMessage(msg)}
+            <div
+              ref={observeRef(msg.id, idx)}
+              className={cn(
+                idx >= newStartIndex && 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 duration-200'
+              )}
+            >
+              <CollapsibleMessage
+                message={msg}
+                isCollapsed={isCollapsed(msg.id)}
+                onToggle={() => toggleExpand(msg.id)}
+              >
+                {renderMessage(msg)}
+              </CollapsibleMessage>
             </div>
           </MessageErrorBoundary>
         ))}

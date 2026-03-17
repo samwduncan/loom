@@ -1,13 +1,16 @@
 /**
- * TokenUsage -- displays formatted token count and cost below assistant messages.
+ * TokenUsage -- expandable token usage footer below assistant messages.
  *
- * Shows "X in / Y out . $Z" format with comma-separated numbers.
- * If cache read tokens are present: "X in (N cached) / Y out . $Z".
- * Renders nothing when no token data is available.
+ * Shows compact "X in / Y out . $Z" by default. Clicking expands to a
+ * detailed breakdown card with labeled rows for input, output, cache, cost.
+ * Uses CSS grid transition for smooth expand/collapse.
  *
- * Constitution: Named export (2.2), no inline styles (7.14).
+ * Constitution: Named export (2.2), no inline styles (7.14), design tokens only.
  */
 
+import { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
+import { cn } from '@/utils/cn';
 import type { MessageMetadata } from '@/types/message';
 
 interface TokenUsageProps {
@@ -26,13 +29,13 @@ function formatCost(cost: number): string {
   return `$${cost.toFixed(3)}`;
 }
 
-export function TokenUsage({ metadata }: TokenUsageProps) {
+/**
+ * Build the compact one-liner summary string.
+ */
+function buildSummary(metadata: MessageMetadata): string {
+  const parts: string[] = [];
   const hasTokens = metadata.inputTokens !== null || metadata.outputTokens !== null;
   const hasCost = metadata.cost !== null && metadata.cost > 0;
-
-  if (!hasTokens && !hasCost) return null;
-
-  const parts: string[] = [];
 
   if (hasTokens) {
     const input = (metadata.inputTokens ?? 0).toLocaleString();
@@ -47,12 +50,69 @@ export function TokenUsage({ metadata }: TokenUsageProps) {
   }
 
   if (hasCost) {
-    parts.push(formatCost(metadata.cost!)); // ASSERT: hasCost guards non-null
+    parts.push(formatCost(metadata.cost!)); // ASSERT: hasCost guards non-null check above
   }
 
+  return parts.join(' \u00B7 ');
+}
+
+export function TokenUsage({ metadata }: TokenUsageProps) {
+  const [expanded, setExpanded] = useState(false);
+
+  const hasTokens = metadata.inputTokens !== null || metadata.outputTokens !== null;
+  const hasCost = metadata.cost !== null && metadata.cost > 0;
+
+  if (!hasTokens && !hasCost) return null;
+
+  const summary = buildSummary(metadata);
+  const showCacheRow = metadata.cacheReadTokens != null && metadata.cacheReadTokens > 0;
+
   return (
-    <div className="text-muted text-xs mt-1">
-      {parts.join(' \u00B7 ')}
+    <div className="mt-1">
+      <button
+        type="button"
+        data-testid="token-usage-summary"
+        className="text-muted flex cursor-pointer items-center gap-1 text-xs transition-colors hover:text-foreground"
+        onClick={() => setExpanded((prev) => !prev)}
+      >
+        <ChevronRight
+          size={12}
+          className={cn('transition-transform duration-200', expanded && 'rotate-90')}
+        />
+        {summary}
+      </button>
+
+      {expanded && (
+        <dl
+          data-testid="token-usage-detail"
+          className="text-muted bg-surface-secondary mt-1 rounded px-3 py-2 text-xs"
+        >
+          {hasTokens && (
+            <>
+              <div className="flex justify-between gap-4">
+                <dt>Input tokens</dt>
+                <dd>{(metadata.inputTokens ?? 0).toLocaleString()}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt>Output tokens</dt>
+                <dd>{(metadata.outputTokens ?? 0).toLocaleString()}</dd>
+              </div>
+              {showCacheRow && (
+                <div className="flex justify-between gap-4">
+                  <dt>Cache read</dt>
+                  <dd>{(metadata.cacheReadTokens ?? 0).toLocaleString()}</dd>
+                </div>
+              )}
+            </>
+          )}
+          {hasCost && (
+            <div className="flex justify-between gap-4">
+              <dt>Cost</dt>
+              <dd>{formatCost(metadata.cost ?? 0)}</dd>
+            </div>
+          )}
+        </dl>
+      )}
     </div>
   );
 }
