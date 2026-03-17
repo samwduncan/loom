@@ -225,8 +225,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 37-01: TBD
-- [ ] 37-02: TBD
+- [ ] 37-01-PLAN.md -- Bundle analysis, vendor chunk splitting, shiki LRU cache, observer consolidation
+- [ ] 37-02-PLAN.md -- Content-visibility test + Chrome DevTools stress verification (FPS, memory, load time)
 
 ## Progress
 
