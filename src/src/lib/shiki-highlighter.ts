@@ -101,12 +101,36 @@ let highlighterPromise: Promise<HighlighterCore> | null = null;
 /** Maximum cache entries before LRU eviction */
 export const MAX_CACHE_SIZE = 500;
 
-/** Cache: key = `${lang}:${code}`, value = highlighted HTML */
+/**
+ * FNV-1a hash for cache keys — avoids storing full code strings as Map keys.
+ * Returns a hex string. Collisions are theoretically possible but negligible
+ * for a 500-entry cache with 32-bit hash space.
+ */
+function fnv1aHash(str: string): string {
+  let hash = 0x811c9dc5; // FNV offset basis
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = (hash * 0x01000193) >>> 0; // FNV prime, keep as uint32
+  }
+  return hash.toString(16);
+}
+
+/** Cache: key = fnv1a hash of `${lang}\0${code}`, value = highlighted HTML */
 const cache = new Map<string, string>();
 
 /** Returns current cache size (exported for testing) */
 export function getCacheSize(): number {
   return cache.size;
+}
+
+/** Clears the highlight cache (exported for testing) */
+export function clearCache(): void {
+  cache.clear();
+}
+
+/** Build a cache key from lang + code using hash to bound memory */
+function makeCacheKey(lang: string, code: string): string {
+  return fnv1aHash(`${lang}\0${code}`);
 }
 
 /** Insert into cache with LRU eviction (Map iteration order = insertion order) */
@@ -149,7 +173,7 @@ export async function preloadLanguages(): Promise<void> {
       const importer = LANG_IMPORTS[lang];
       if (!importer) return;
       const mod = await importer();
-      await h.loadLanguage(mod as Parameters<typeof h.loadLanguage>[0]);
+      await h.loadLanguage(mod as Parameters<typeof h.loadLanguage>[0]); // ASSERT: shiki dynamic import returns compatible module
     }),
   );
 }
@@ -163,7 +187,7 @@ export async function highlightCode(
   lang: string,
   code: string,
 ): Promise<string> {
-  const cacheKey = `${lang}:${code}`;
+  const cacheKey = makeCacheKey(lang, code);
   const cached = cache.get(cacheKey);
   if (cached) return cached;
 
@@ -175,7 +199,7 @@ export async function highlightCode(
       const importer = LANG_IMPORTS[lang];
       if (importer) {
         const mod = await importer();
-        await h.loadLanguage(mod as Parameters<typeof h.loadLanguage>[0]);
+        await h.loadLanguage(mod as Parameters<typeof h.loadLanguage>[0]); // ASSERT: shiki dynamic import returns compatible module
       } else {
         // Dynamic import for languages not in the static map
         const mod = await import(`shiki/langs/${lang}.mjs`);

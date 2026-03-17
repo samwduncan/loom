@@ -122,7 +122,17 @@ export function useAutoCollapse(
           messageElementRef.current.delete(messageId);
         }
 
-        if (!el) return;
+        if (!el) {
+          // Cancel any pending collapse timeout for unmounted element
+          const pending = timeoutsRef.current.get(messageId);
+          if (pending != null) {
+            clearTimeout(pending);
+            timeoutsRef.current.delete(messageId);
+          }
+          // Evict cached callback — message unmounted, callback not needed again
+          refCallbacksRef.current.delete(messageId);
+          return;
+        }
 
         const observer = getObserver();
         if (!observer) return;

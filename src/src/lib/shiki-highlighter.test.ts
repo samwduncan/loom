@@ -6,6 +6,7 @@ import {
   getLanguageFromPath,
   MAX_CACHE_SIZE,
   getCacheSize,
+  clearCache,
 } from './shiki-highlighter';
 
 describe('shiki-highlighter', () => {
@@ -60,6 +61,10 @@ describe('shiki-highlighter', () => {
       await preloadLanguages();
     });
 
+    beforeEach(() => {
+      clearCache();
+    });
+
     it('exports MAX_CACHE_SIZE as 500', () => {
       expect(MAX_CACHE_SIZE).toBe(500);
     });
@@ -73,16 +78,14 @@ describe('shiki-highlighter', () => {
     });
 
     it('evicts oldest entry when cache is full', async () => {
-      // Fill cache to capacity with known entries
-      // The cache already has entries from previous test, so we just verify
-      // that after inserting one more, the size stays at MAX_CACHE_SIZE
-      const sizeBefore = getCacheSize();
-      await highlightCode('typescript', `const eviction_test = "unique_${Date.now()}";`);
-      expect(getCacheSize()).toBeLessThanOrEqual(MAX_CACHE_SIZE);
-      // If cache was full, size should not have increased
-      if (sizeBefore >= MAX_CACHE_SIZE) {
-        expect(getCacheSize()).toBe(MAX_CACHE_SIZE);
+      // Fill cache to exactly MAX_CACHE_SIZE
+      for (let i = 0; i < MAX_CACHE_SIZE; i++) {
+        await highlightCode('typescript', `const fill_${i} = ${i};`);
       }
+      expect(getCacheSize()).toBe(MAX_CACHE_SIZE);
+      // Insert one more — size should stay at MAX_CACHE_SIZE
+      await highlightCode('typescript', `const eviction_test = "overflow";`);
+      expect(getCacheSize()).toBe(MAX_CACHE_SIZE);
     });
   });
 
