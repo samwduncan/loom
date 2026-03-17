@@ -244,7 +244,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 31. Editor & Tool Enhancements | 2/2 | Complete    | 2026-03-16 | - |
 | 32. File Mentions | 2/2 | Complete    | 2026-03-16 | - |
 | 33. Slash Commands | 2/2 | Complete    | 2026-03-17 | - |
-| 34. Conversation UX | 2/2 | Complete   | 2026-03-17 | - |
+| 34. Conversation UX | 2/2 | Complete    | 2026-03-17 | - |
 | 35. Quick Settings | v1.3 | 0/? | Not started | - |
 | 36. Accessibility | v1.3 | 0/? | Not started | - |
 | 37. Performance | v1.3 | 0/? | Not started | - |
