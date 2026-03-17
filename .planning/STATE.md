@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 33-02-PLAN.md
-last_updated: "2026-03-17T00:34:17.189Z"
-last_activity: 2026-03-17 -- Completed 33-02-PLAN.md (composer integration + command execution)
+stopped_at: Completed 34-02-PLAN.md
+last_updated: "2026-03-17T01:31:57.522Z"
+last_activity: 2026-03-17 -- Completed 34-02-PLAN.md (token usage footers + JSONL result extraction)
 progress:
   total_phases: 10
-  completed_phases: 6
-  total_plans: 11
-  completed_plans: 11
-  percent: 91
+  completed_phases: 7
+  total_plans: 13
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 
 ## Current Position
 
-Phase: 33 of 37 (Slash Commands) -- COMPLETE
+Phase: 34 of 37 (Conversation UX) -- COMPLETE
 Plan: 2 of 2 (all plans complete)
-Status: Phase 33 complete -- slash commands fully integrated in ChatComposer
-Last activity: 2026-03-17 -- Completed 33-02-PLAN.md (composer integration + command execution)
+Status: Phase 34 complete -- token usage footers with JSONL result extraction + expandable detail
+Last activity: 2026-03-17 -- Completed 34-02-PLAN.md (token usage footers + JSONL result extraction)
 
-Progress: [█████████░] 91%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -72,6 +72,11 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 33]: Corrected plan test: /cl filters to clear only (not compact) since includes matching on id is correct
 - [Phase 33]: Slash picker keyboard handling runs BEFORE mention picker to take priority when open
 - [Phase 33]: Both slash and mention detection run on every onChange -- mutually exclusive by design
+- [Phase 34]: useEffect (not render-time) for ref updates to satisfy react-hooks/refs ESLint rule
+- [Phase 34]: Capture refs inside useEffect cleanup to satisfy exhaustive-deps for ref cleanup patterns
+- [Phase 34]: Second-pass result entry extraction over original entries array (not chatEntries) for token data
+- [Phase 34]: seenAssistantApiIds Set to track merged assistant entries in second pass index mapping
+- [Phase 34]: Nullish coalescing in JSX instead of non-null assertions (custom lint rule incompatible with JSX comments)
 
 ### Pending Todos
 
@@ -83,6 +88,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T00:22:52Z
-Stopped at: Completed 33-02-PLAN.md
-Resume: Phase 33 complete. Phase 34 (Conversation UX) next.
+Last session: 2026-03-17T01:31:57.520Z
+Stopped at: Completed 34-02-PLAN.md
+Resume: Phase 34 complete. Phase 35 (Accessibility) next.

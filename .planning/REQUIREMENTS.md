@@ -40,10 +40,10 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 
 ### UX Refinement
 
-- [ ] **UXR-01**: Older conversation turns auto-collapse when scrolled out of viewport (IntersectionObserver)
-- [ ] **UXR-02**: Auto-collapsed turns expand on click or scroll-back
-- [ ] **UXR-03**: Each assistant turn displays a usage footer (input/output/cache tokens, cost)
-- [ ] **UXR-04**: Usage footer is collapsible or subtle (doesn't dominate the message)
+- [x] **UXR-01**: Older conversation turns auto-collapse when scrolled out of viewport (IntersectionObserver)
+- [x] **UXR-02**: Auto-collapsed turns expand on click or scroll-back
+- [x] **UXR-03**: Each assistant turn displays a usage footer (input/output/cache tokens, cost)
+- [x] **UXR-04**: Usage footer is collapsible or subtle (doesn't dominate the message)
 - [ ] **UXR-05**: Quick settings panel is accessible from sidebar or keyboard shortcut
 - [ ] **UXR-06**: Quick settings includes toggles: auto-expand tools, show thinking, show raw params
 - [ ] **UXR-07**: Quick settings changes apply immediately without page reload
@@ -115,10 +115,10 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | COMP-04 | Phase 33 | Complete |
 | COMP-05 | Phase 33 | Complete |
 | COMP-06 | Phase 33 | Complete |
-| UXR-01 | Phase 34 | Pending |
-| UXR-02 | Phase 34 | Pending |
-| UXR-03 | Phase 34 | Pending |
-| UXR-04 | Phase 34 | Pending |
+| UXR-01 | Phase 34 | Complete |
+| UXR-02 | Phase 34 | Complete |
+| UXR-03 | Phase 34 | Complete |
+| UXR-04 | Phase 34 | Complete |
 | UXR-05 | Phase 35 | Pending |
 | UXR-06 | Phase 35 | Pending |
 | UXR-07 | Phase 35 | Pending |
