@@ -382,7 +382,7 @@ function ToolChipFromStore({ toolCallId }: { toolCallId: string }) {
  * ToolCallGroupFromStore — subscribes to multiple tool calls and renders
  * them inside a ToolCallGroup container during streaming.
  *
- * Groups start expanded (defaultExpanded=true) so users can see tool
+ * Groups start expanded (forceExpanded) so users can see tool
  * activity in real time. Error tools are extracted from the group.
  */
 function ToolCallGroupFromStore({ toolCallIds }: { toolCallIds: string[] }) {
@@ -414,5 +414,5 @@ function ToolCallGroupFromStore({ toolCallIds }: { toolCallIds: string[] }) {
   }
 
   // During streaming, show group expanded so user sees what's happening
-  return <ToolCallGroup tools={nonErrors} errors={errors} defaultExpanded />;
+  return <ToolCallGroup tools={nonErrors} errors={errors} forceExpanded />;
 }

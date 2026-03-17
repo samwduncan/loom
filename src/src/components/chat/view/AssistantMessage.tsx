@@ -56,7 +56,6 @@ function toToolCallStates(
 
 export function AssistantMessage({ message, highlightText }: AssistantMessageProps) {
   const thinkingExpanded = useUIStore((state) => state.thinkingExpanded);
-  const autoExpandTools = useUIStore((state) => state.autoExpandTools);
   const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
   const hasThinking = message.thinkingBlocks && message.thinkingBlocks.length > 0;
 
@@ -85,10 +84,9 @@ export function AssistantMessage({ message, highlightText }: AssistantMessagePro
             key={`group-${i}`}
             tools={partition.tools}
             errors={partition.errors}
-            defaultExpanded={autoExpandTools}
           />
         ) : (
-          <ToolChip key={partition.tool.id} toolCall={partition.tool} defaultExpanded={autoExpandTools || undefined} />
+          <ToolChip key={partition.tool.id} toolCall={partition.tool} />
         ),
       )}
       <TokenUsage metadata={message.metadata} />

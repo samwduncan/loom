@@ -45,7 +45,7 @@ interface UIState {
   reset: () => void;
 }
 
-const INITIAL_UI_STATE: Pick<UIState, 'sidebarOpen' | 'activeTab' | 'modalState' | 'commandPaletteOpen' | 'companionState' | 'theme' | 'thinkingExpanded' | 'autoExpandTools' | 'showRawParams'> = {
+const INITIAL_UI_STATE: Omit<UIState, 'toggleSidebar' | 'setActiveTab' | 'openModal' | 'closeModal' | 'toggleCommandPalette' | 'setTheme' | 'toggleThinking' | 'toggleAutoExpandTools' | 'toggleShowRawParams' | 'reset'> = {
   sidebarOpen: true,
   activeTab: 'chat',
   modalState: null,

@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
@@ -21,12 +22,18 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
-export function QuickSettingsPanel() {
+export type QuickSettingsPanelProps = Record<string, never>;
+
+export function QuickSettingsPanel(_props: QuickSettingsPanelProps) {
   const [open, setOpen] = useState(false);
 
-  const thinkingExpanded = useUIStore((s) => s.thinkingExpanded);
-  const autoExpandTools = useUIStore((s) => s.autoExpandTools);
-  const showRawParams = useUIStore((s) => s.showRawParams);
+  const { thinkingExpanded, autoExpandTools, showRawParams } = useUIStore(
+    useShallow((s) => ({
+      thinkingExpanded: s.thinkingExpanded,
+      autoExpandTools: s.autoExpandTools,
+      showRawParams: s.showRawParams,
+    })),
+  );
   const toggleThinking = useUIStore((s) => s.toggleThinking);
   const toggleAutoExpandTools = useUIStore((s) => s.toggleAutoExpandTools);
   const toggleShowRawParams = useUIStore((s) => s.toggleShowRawParams);
@@ -64,48 +71,26 @@ export function QuickSettingsPanel() {
       >
         <h3 className="text-sm font-medium text-foreground mb-3">Quick Settings</h3>
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col gap-0.5">
-              <Label htmlFor="qs-thinking" className="text-sm cursor-pointer">
-                Show thinking
-              </Label>
-              <span className="text-xs text-muted">Expand thinking blocks by default</span>
+          {([
+            { id: 'qs-thinking', label: 'Show thinking', desc: 'Expand thinking blocks by default', checked: thinkingExpanded, onChange: toggleThinking },
+            { id: 'qs-auto-expand', label: 'Auto-expand tools', desc: 'Show tool call details automatically', checked: autoExpandTools, onChange: toggleAutoExpandTools },
+            { id: 'qs-raw-params', label: 'Show raw params', desc: 'Display raw JSON parameters', checked: showRawParams, onChange: toggleShowRawParams },
+          ] as const).map((toggle) => (
+            <div key={toggle.id} className="flex items-center justify-between">
+              <div className="flex flex-col gap-0.5">
+                <Label htmlFor={toggle.id} className="text-sm cursor-pointer">
+                  {toggle.label}
+                </Label>
+                <span className="text-xs text-muted">{toggle.desc}</span>
+              </div>
+              <Switch
+                id={toggle.id}
+                checked={toggle.checked}
+                onCheckedChange={toggle.onChange}
+                aria-label={toggle.label}
+              />
             </div>
-            <Switch
-              id="qs-thinking"
-              checked={thinkingExpanded}
-              onCheckedChange={toggleThinking}
-              aria-label="Show thinking"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col gap-0.5">
-              <Label htmlFor="qs-auto-expand" className="text-sm cursor-pointer">
-                Auto-expand tools
-              </Label>
-              <span className="text-xs text-muted">Show tool call details automatically</span>
-            </div>
-            <Switch
-              id="qs-auto-expand"
-              checked={autoExpandTools}
-              onCheckedChange={toggleAutoExpandTools}
-              aria-label="Auto-expand tools"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col gap-0.5">
-              <Label htmlFor="qs-raw-params" className="text-sm cursor-pointer">
-                Show raw params
-              </Label>
-              <span className="text-xs text-muted">Display raw JSON parameters</span>
-            </div>
-            <Switch
-              id="qs-raw-params"
-              checked={showRawParams}
-              onCheckedChange={toggleShowRawParams}
-              aria-label="Show raw params"
-            />
-          </div>
+          ))}
         </div>
       </PopoverContent>
     </Popover>

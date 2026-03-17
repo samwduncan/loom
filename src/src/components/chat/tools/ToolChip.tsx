@@ -14,6 +14,7 @@
 import { memo, useState } from 'react';
 import { getToolConfig } from '@/lib/tool-registry';
 import { useElapsedTime } from '@/hooks/useElapsedTime';
+import { useUIStore } from '@/stores/ui';
 import { ToolCardShell } from './ToolCardShell';
 import { cn } from '@/utils/cn';
 import type { ToolCallState } from '@/types/stream';
@@ -26,9 +27,18 @@ export interface ToolChipProps {
 }
 
 export const ToolChip = memo(function ToolChip({ toolCall, defaultExpanded }: ToolChipProps) {
-  const [isExpanded, setIsExpanded] = useState(
+  const autoExpandTools = useUIStore((state) => state.autoExpandTools);
+  const [userToggled, setUserToggled] = useState(false);
+  const [localExpanded, setLocalExpanded] = useState(
     defaultExpanded ?? (toolCall.isError && toolCall.status === 'rejected'),
   );
+
+  // Reactive: store controls expansion until user manually toggles or defaultExpanded overrides
+  const isExpanded = userToggled
+    ? localExpanded
+    : defaultExpanded !== undefined
+      ? localExpanded
+      : autoExpandTools || localExpanded;
   const config = getToolConfig(toolCall.toolName);
   const chipLabel = config.getChipLabel(toolCall.input);
   const Icon = config.icon;
@@ -40,7 +50,7 @@ export const ToolChip = memo(function ToolChip({ toolCall, defaultExpanded }: To
   if (toolCall.status !== prevStatus) {
     setPrevStatus(toolCall.status);
     if (toolCall.status === 'rejected') {
-      setIsExpanded(true);
+      setLocalExpanded(true);
     }
   }
 
@@ -49,7 +59,10 @@ export const ToolChip = memo(function ToolChip({ toolCall, defaultExpanded }: To
       <button
         type="button"
         className={cn('tool-chip', `tool-chip--${toolCall.status}`)}
-        onClick={() => setIsExpanded((prev) => !prev)}
+        onClick={() => {
+          setUserToggled(true);
+          setLocalExpanded((prev) => !prev);
+        }}
         aria-expanded={isExpanded}
       >
         <span
@@ -72,7 +85,10 @@ export const ToolChip = memo(function ToolChip({ toolCall, defaultExpanded }: To
         toolCall={toolCall}
         config={config}
         isExpanded={isExpanded}
-        onToggle={() => setIsExpanded((prev) => !prev)}
+        onToggle={() => {
+          setUserToggled(true);
+          setLocalExpanded((prev) => !prev);
+        }}
       >
         <CardComponent
           toolName={toolCall.toolName}

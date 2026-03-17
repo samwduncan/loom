@@ -94,7 +94,17 @@ export const ToolCardShell = memo(function ToolCardShell({
                 <summary className="text-xs text-muted cursor-pointer select-none">
                   Raw Parameters
                 </summary>
-                <pre className="mt-1 overflow-x-auto p-2 bg-surface-sunken rounded text-mono text-xs whitespace-pre-wrap break-all" data-testid="raw-params">{JSON.stringify(toolCall.input, null, 2)}</pre>
+                <pre
+                  className={cn(
+                    'mt-1 overflow-x-auto p-2',
+                    'bg-surface-sunken rounded',
+                    'font-mono text-xs',
+                    'whitespace-pre-wrap break-all',
+                  )}
+                  data-testid="raw-params"
+                >
+                  {JSON.stringify(toolCall.input, null, 2)}
+                </pre>
               </details>
             )}
           </div>

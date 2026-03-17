@@ -22,7 +22,8 @@ import './ToolCallGroup.css';
 export interface ToolCallGroupProps {
   tools: ToolCallState[];
   errors: ToolCallState[];
-  defaultExpanded?: boolean;
+  /** Force expanded regardless of store setting (used during streaming) */
+  forceExpanded?: boolean;
 }
 
 /**
@@ -44,11 +45,15 @@ function buildTypeSummary(tools: ToolCallState[]): string {
 export const ToolCallGroup = memo(function ToolCallGroup({
   tools,
   errors,
-  defaultExpanded = false,
+  forceExpanded = false,
 }: ToolCallGroupProps) {
   const autoExpandTools = useUIStore((state) => state.autoExpandTools);
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded || autoExpandTools);
+  const [userToggled, setUserToggled] = useState(false);
+  const [localExpanded, setLocalExpanded] = useState(false);
   const [expandAllCounter, setExpandAllCounter] = useState(0);
+
+  // Reactive: forceExpanded (streaming) > user toggle > store setting
+  const isExpanded = forceExpanded || (userToggled ? localExpanded : autoExpandTools);
 
   const totalCount = tools.length;
   const summary = buildTypeSummary(tools);
@@ -61,11 +66,15 @@ export const ToolCallGroup = memo(function ToolCallGroup({
         data-testid="tool-group-header"
         role="button"
         tabIndex={0}
-        onClick={() => setIsExpanded((prev) => !prev)}
+        onClick={() => {
+          setUserToggled(true);
+          setLocalExpanded((prev) => !prev);
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setIsExpanded((prev) => !prev);
+            setUserToggled(true);
+            setLocalExpanded((prev) => !prev);
           }
         }}
         aria-expanded={isExpanded}
@@ -109,7 +118,7 @@ export const ToolCallGroup = memo(function ToolCallGroup({
               <ToolChip
                 key={tool.id + '-' + expandAllCounter}
                 toolCall={tool}
-                defaultExpanded={autoExpandTools || expandAllCounter > 0 ? true : undefined}
+                defaultExpanded={expandAllCounter > 0 ? true : undefined}
               />
             ))}
           </div>
