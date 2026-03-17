@@ -2,11 +2,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    // Bundle analysis: generates dist/bundle-report.html when ANALYZE=true
+    ...(process.env.ANALYZE
+      ? [
+          visualizer({
+            filename: 'dist/bundle-report.html',
+            gzipSize: true,
+            template: 'treemap',
+          }),
+        ]
+      : []),
   ],
   resolve: {
     alias: {
@@ -30,6 +41,42 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('/node_modules/')) {
+            // React core
+            if (
+              id.includes('/react/') ||
+              id.includes('/react-dom/') ||
+              id.includes('/react-router-dom/')
+            ) {
+              return 'vendor-react';
+            }
+            // Markdown rendering
+            if (
+              id.includes('/react-markdown/') ||
+              id.includes('/remark-gfm/') ||
+              id.includes('/rehype-raw/')
+            ) {
+              return 'vendor-markdown';
+            }
+            // Syntax highlighting
+            if (id.includes('/shiki/')) {
+              return 'vendor-shiki';
+            }
+            // Radix UI primitives
+            if (id.includes('/@radix-ui/') || id.includes('/radix-ui/')) {
+              return 'vendor-radix';
+            }
+            // State management
+            if (id.includes('/zustand/') || id.includes('/immer/')) {
+              return 'vendor-zustand';
+            }
+          }
+        },
+      },
+    },
   },
   test: {
     globals: true,
