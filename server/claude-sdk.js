@@ -473,9 +473,27 @@ async function queryClaudeSDK(command, options = {}, ws) {
 
     // Handle images - save to temp files and modify prompt
     const imageResult = await handleImages(command, options.images, options.cwd);
-    const finalCommand = imageResult.modifiedCommand;
+    let finalCommand = imageResult.modifiedCommand;
     tempImagePaths = imageResult.tempImagePaths;
     tempDir = imageResult.tempDir;
+
+    // Handle file mentions - read files and prepend content to prompt
+    if (options.fileMentions && options.fileMentions.length > 0) {
+      const projectDir = options.projectPath || options.cwd || process.cwd();
+      const fileContents = [];
+      for (const filePath of options.fileMentions) {
+        try {
+          const absPath = path.isAbsolute(filePath) ? filePath : path.join(projectDir, filePath);
+          const content = await fs.readFile(absPath, 'utf-8');
+          fileContents.push(`<file path="${filePath}">\n${content}\n</file>`);
+        } catch (err) {
+          fileContents.push(`<file path="${filePath}" error="Could not read: ${err.message}" />`);
+        }
+      }
+      if (fileContents.length > 0) {
+        finalCommand = `${fileContents.join('\n\n')}\n\n${finalCommand}`;
+      }
+    }
 
     sdkOptions.canUseTool = async (toolName, input, context) => {
       const requiresInteraction = TOOLS_REQUIRING_INTERACTION.has(toolName);

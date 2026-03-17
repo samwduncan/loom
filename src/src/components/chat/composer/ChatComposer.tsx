@@ -273,10 +273,9 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     const hasImages = attachments.length > 0;
     if (!trimmed && !hasImages) return;
 
-    // Build command text with file mention prefix when mentions are present
-    const commandText = mentions.length === 0
-      ? trimmed
-      : `[Files referenced: ${mentions.map((m) => m.path).join(', ')}]\n\n${trimmed}`;
+    // Command text is always the user's raw input — file content injection
+    // happens server-side via the fileMentions field in options.
+    const commandText = trimmed;
 
     // Message queuing during streaming: send immediately, add optimistic with queued flag
     if (isStreaming) {
@@ -289,6 +288,11 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       // Include images if attached (convert to base64)
       if (hasImages) {
         options.images = await getBase64ForSend();
+      }
+
+      // Include file mentions for server-side content injection
+      if (mentions.length > 0) {
+        options.fileMentions = mentions.map((m) => m.path);
       }
 
       wsClient.send({
@@ -360,6 +364,11 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     // Convert images to base64 for WebSocket transport (async)
     if (hasImages) {
       options.images = await getBase64ForSend();
+    }
+
+    // Include file mentions for server-side content injection
+    if (mentions.length > 0) {
+      options.fileMentions = mentions.map((m) => m.path);
     }
 
     // Store pending title for new chats

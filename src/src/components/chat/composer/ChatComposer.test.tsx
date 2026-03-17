@@ -11,7 +11,7 @@
  * - Escape clears input, then blurs
  * - Suggestion text populates input
  * - File mention chips display and removal
- * - Sending with mentions prepends file references to command
+ * - Sending with mentions includes fileMentions in WS options
  * - Mentions clear after send
  * - Slash picker visibility based on useSlashCommands.isOpen
  * - Slash detect trigger on input change
@@ -444,7 +444,7 @@ describe('ChatComposer', () => {
       expect(mockClose).toHaveBeenCalled();
     });
 
-    it('sends with file references prefix when mentions are present', async () => {
+    it('sends fileMentions in options when mentions are present', async () => {
       const user = userEvent.setup();
       mockMentionState = {
         isOpen: true,
@@ -474,10 +474,11 @@ describe('ChatComposer', () => {
 
       expect(mockWsSend).toHaveBeenCalledWith({
         type: 'claude-command',
-        command: '[Files referenced: src/utils/cn.ts]\n\ncheck this file',
+        command: 'check this file',
         options: {
           projectPath: 'test-proj',
           sessionId: 'sess-1',
+          fileMentions: ['src/utils/cn.ts'],
         },
       });
     });
