@@ -73,6 +73,8 @@ export function TokenUsage({ metadata }: TokenUsageProps) {
         type="button"
         data-testid="token-usage-summary"
         className="text-muted flex cursor-pointer items-center gap-1 text-xs transition-colors hover:text-foreground"
+        aria-expanded={expanded}
+        aria-label="Toggle token usage details"
         onClick={() => setExpanded((prev) => !prev)}
       >
         <ChevronRight

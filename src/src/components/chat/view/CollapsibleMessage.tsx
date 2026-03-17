@@ -66,6 +66,7 @@ export function CollapsibleMessage({
           type="button"
           data-testid="collapsed-summary"
           className="flex w-full items-center gap-2 rounded px-2 py-1 text-xs text-muted transition-colors hover:bg-surface-raised"
+          aria-label={`Expand collapsed message from ${label}`}
           onClick={onToggle}
         >
           <ChevronRight className="h-3 w-3 shrink-0" />

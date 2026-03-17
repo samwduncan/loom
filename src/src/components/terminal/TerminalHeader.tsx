@@ -49,6 +49,7 @@ export const TerminalHeader = function TerminalHeader({
       <button
         type="button"
         title="Restart"
+        aria-label="Restart terminal"
         onClick={onRestart}
         disabled={state === 'connecting'}
         className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)] disabled:pointer-events-none disabled:opacity-40"
@@ -59,6 +60,7 @@ export const TerminalHeader = function TerminalHeader({
       <button
         type="button"
         title="Disconnect"
+        aria-label="Disconnect terminal"
         onClick={onDisconnect}
         disabled={state === 'disconnected' || state === 'connecting'}
         className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)] disabled:pointer-events-none disabled:opacity-40"

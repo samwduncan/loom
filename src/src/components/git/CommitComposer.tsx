@@ -93,6 +93,7 @@ export function CommitComposer({
         value={commitMessage}
         onChange={(e) => setCommitMessage(e.target.value)}
         rows={rows}
+        aria-label="Commit message"
       />
 
       <button
@@ -100,6 +101,7 @@ export function CommitComposer({
         className="git-commit-btn"
         onClick={handleCommit}
         disabled={!canCommit}
+        aria-label="Create commit"
       >
         {isCommitting ? (
           <>

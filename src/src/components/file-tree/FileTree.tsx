@@ -90,7 +90,7 @@ export const FileTree = function FileTree({
         <FileTreeSearch value={filter} onChange={setFilter} />
       </div>
       <ScrollArea className="flex-1">
-        <div className="px-1 py-0.5">
+        <div className="px-1 py-0.5" role="tree" aria-label="Project files">
           {hasFilteredResults ? (
             visibleTree.map((node) => (
               <FileNode key={node.path} node={node} depth={0} filter={filter || undefined} projectRoot={projectRoot} projectName={projectName} gitStatusMap={gitStatusMap} />

@@ -67,6 +67,7 @@ export function ThinkingDisclosure({
         type="button"
         className="thinking-disclosure-trigger"
         aria-expanded={isExpanded}
+        aria-label="Toggle thinking content"
         onClick={() => setUserToggled((prev) => prev === null ? !defaultExpanded : !prev)}
       >
         {isStreaming ? (

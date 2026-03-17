@@ -47,7 +47,7 @@ describe('CommitComposer', () => {
       />,
     );
 
-    const commitBtn = screen.getByRole('button', { name: /^commit \(/i });
+    const commitBtn = screen.getByRole('button', { name: /create commit/i });
     expect(commitBtn).toBeDisabled();
   });
 
@@ -60,7 +60,7 @@ describe('CommitComposer', () => {
       />,
     );
 
-    const commitBtn = screen.getByRole('button', { name: /^commit \(/i });
+    const commitBtn = screen.getByRole('button', { name: /create commit/i });
     expect(commitBtn).toBeDisabled();
   });
 
@@ -77,7 +77,7 @@ describe('CommitComposer', () => {
     const textarea = screen.getByPlaceholderText('Commit message...');
     await user.type(textarea, 'fix: some bug');
 
-    const commitBtn = screen.getByRole('button', { name: /^commit \(/i });
+    const commitBtn = screen.getByRole('button', { name: /create commit/i });
     expect(commitBtn).not.toBeDisabled();
   });
 
@@ -93,7 +93,7 @@ describe('CommitComposer', () => {
 
     const textarea = screen.getByPlaceholderText('Commit message...');
     await user.type(textarea, 'fix: some bug');
-    await user.click(screen.getByRole('button', { name: /^commit \(/i }));
+    await user.click(screen.getByRole('button', { name: /create commit/i }));
 
     expect(mockCommit).toHaveBeenCalledWith('fix: some bug', ['src/app.tsx', 'src/utils.ts']);
     expect(toast.success).toHaveBeenCalledWith('Changes committed');
@@ -115,7 +115,7 @@ describe('CommitComposer', () => {
 
     const textarea = screen.getByPlaceholderText('Commit message...');
     await user.type(textarea, 'fix: something');
-    await user.click(screen.getByRole('button', { name: /^commit \(/i }));
+    await user.click(screen.getByRole('button', { name: /create commit/i }));
 
     expect(toast.error).toHaveBeenCalledWith('Branch is protected');
     expect(mockOnCommitSuccess).not.toHaveBeenCalled();

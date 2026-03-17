@@ -68,7 +68,7 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
 
   return (
     <>
-      <div className="flex items-center gap-0 border-b border-border/8 bg-[var(--surface-base)] overflow-x-auto">
+      <div className="flex items-center gap-0 border-b border-border/8 bg-[var(--surface-base)] overflow-x-auto" role="tablist" aria-label="Open files">
         {openTabs.map((tab) => {
           const filename = tab.filePath.slice(tab.filePath.lastIndexOf('/') + 1);
           const isActive = tab.filePath === activeFilePath;
@@ -77,6 +77,9 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
             <button
               key={tab.filePath}
               type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-label={filename}
               className={cn(
                 'px-3 py-1.5 text-xs font-[family-name:var(--font-mono)] flex items-center gap-1.5 cursor-pointer shrink-0 border-r border-border/8 transition-colors',
                 isActive

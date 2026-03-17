@@ -64,6 +64,7 @@ export const ToolChip = memo(function ToolChip({ toolCall, defaultExpanded }: To
           setLocalExpanded((prev) => !prev);
         }}
         aria-expanded={isExpanded}
+        aria-label={`Tool: ${config.displayName} ${chipLabel} - ${toolCall.status}`}
       >
         <span
           className={cn(

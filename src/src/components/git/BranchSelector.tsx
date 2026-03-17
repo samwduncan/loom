@@ -109,6 +109,9 @@ export function BranchSelector({ currentBranch, projectName, onBranchChange }: B
         data-testid="branch-trigger"
         onClick={() => setIsOpen(!isOpen)}
         disabled={operationLoading}
+        aria-label="Branch selector"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
       >
         <GitBranch size={14} />
         <span>{currentBranch}</span>

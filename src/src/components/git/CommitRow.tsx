@@ -33,6 +33,8 @@ export function CommitRow({ commit, isExpanded, onClick, diffContent, diffLoadin
       onClick={onClick}
       role="button"
       tabIndex={0}
+      aria-expanded={isExpanded}
+      aria-label={`Commit ${commit.hash.slice(0, 7)}: ${truncateMessage(commit.message)}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();

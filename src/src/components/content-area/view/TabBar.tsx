@@ -8,6 +8,7 @@
  * token-based styling (3.1).
  */
 
+import { useCallback } from 'react';
 import { MessageSquare, FolderTree, Terminal, GitBranch, type LucideIcon } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
@@ -31,6 +32,19 @@ export function TabBar() {
   const activeTab = useUIStore((s) => s.activeTab);
   const setActiveTab = useUIStore((s) => s.setActiveTab);
 
+  const handleTabClick = useCallback(
+    (id: TabId) => {
+      setActiveTab(id);
+      // Focus the newly active panel so keyboard users land inside it.
+      // The mount-once CSS show/hide pattern means panels stay in DOM;
+      // without this, focus can get stuck in a visually hidden panel.
+      requestAnimationFrame(() => {
+        document.getElementById(`panel-${id}`)?.focus();
+      });
+    },
+    [setActiveTab],
+  );
+
   return (
     <nav
       role="tablist"
@@ -49,7 +63,7 @@ export function TabBar() {
             id={`tab-${id}`}
             aria-selected={isActive}
             aria-controls={`panel-${id}`}
-            onClick={() => setActiveTab(id)}
+            onClick={() => handleTabClick(id)}
             className={cn(
               'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
               isActive

@@ -102,6 +102,7 @@ export function SessionItem({
     <div
       role="option"
       aria-selected={isActive}
+      aria-label={title}
       tabIndex={0}
       onClick={isEditing ? undefined : onClick}
       onContextMenu={onContextMenu}

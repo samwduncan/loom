@@ -95,8 +95,9 @@ export const ContentArea = function ContentArea() {
             key={id}
             id={`panel-${id}`}
             role="tabpanel"
+            tabIndex={-1}
             aria-labelledby={`tab-${id}`}
-            className={activeTab === id ? 'h-full' : 'hidden'}
+            className={activeTab === id ? 'h-full outline-none' : 'hidden'}
           >
             <PanelErrorBoundary panelName={id} resetKeys={activeTab === id ? [activeTab] : []}>
               {content}

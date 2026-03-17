@@ -78,6 +78,7 @@ export const ToolCallGroup = memo(function ToolCallGroup({
           }
         }}
         aria-expanded={isExpanded}
+        aria-label={`${totalCount} tool call${totalCount !== 1 ? 's' : ''}: ${summary}`}
       >
         <ChevronRight
           size={14}

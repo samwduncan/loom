@@ -34,6 +34,7 @@ export function NewChatButton() {
         'cursor-pointer',
       )}
       type="button"
+      aria-label="New chat"
     >
       {/* Plus icon */}
       <svg

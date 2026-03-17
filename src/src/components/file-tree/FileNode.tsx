@@ -61,6 +61,10 @@ export const FileNode = memo(function FileNode({ node, depth, filter, projectRoo
     <button
       type="button"
       data-testid="file-node-row"
+      role="treeitem"
+      aria-selected={isActive}
+      aria-expanded={isDirectory ? isExpanded : undefined}
+      aria-label={isDirectory ? `${node.name} folder` : node.name}
       className={cn(
         'file-node flex w-full items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-left text-xs',
         isActive && 'file-node-active',

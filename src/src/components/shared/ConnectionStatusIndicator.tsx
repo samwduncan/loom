@@ -28,7 +28,7 @@ export const ConnectionStatusIndicator = memo(function ConnectionStatusIndicator
   const config = STATUS_CONFIG[status];
 
   return (
-    <span title={config.label} className="inline-flex items-center">
+    <span title={config.label} className="inline-flex items-center" aria-label={`Connection status: ${config.label.toLowerCase()}`} role="status">
       <span
         className={cn(
           'inline-block size-2 rounded-full',
