@@ -44,8 +44,8 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 - [x] **UXR-02**: Auto-collapsed turns expand on click or scroll-back
 - [x] **UXR-03**: Each assistant turn displays a usage footer (input/output/cache tokens, cost)
 - [x] **UXR-04**: Usage footer is collapsible or subtle (doesn't dominate the message)
-- [ ] **UXR-05**: Quick settings panel is accessible from sidebar or keyboard shortcut
-- [ ] **UXR-06**: Quick settings includes toggles: auto-expand tools, show thinking, show raw params
+- [x] **UXR-05**: Quick settings panel is accessible from sidebar or keyboard shortcut
+- [x] **UXR-06**: Quick settings includes toggles: auto-expand tools, show thinking, show raw params
 - [ ] **UXR-07**: Quick settings changes apply immediately without page reload
 
 ### Accessibility
@@ -119,8 +119,8 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | UXR-02 | Phase 34 | Complete |
 | UXR-03 | Phase 34 | Complete |
 | UXR-04 | Phase 34 | Complete |
-| UXR-05 | Phase 35 | Pending |
-| UXR-06 | Phase 35 | Pending |
+| UXR-05 | Phase 35 | Complete |
+| UXR-06 | Phase 35 | Complete |
 | UXR-07 | Phase 35 | Pending |
 | A11Y-01 | Phase 36 | Pending |
 | A11Y-02 | Phase 36 | Pending |

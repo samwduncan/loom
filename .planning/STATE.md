@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 34-02-PLAN.md
-last_updated: "2026-03-17T01:49:43.739Z"
-last_activity: 2026-03-17 -- Completed 34-02-PLAN.md (token usage footers + JSONL result extraction)
+stopped_at: Completed 35-01-PLAN.md
+last_updated: "2026-03-17T02:24:48.768Z"
+last_activity: 2026-03-17 -- Completed 35-01-PLAN.md (quick settings panel)
 progress:
   total_phases: 10
   completed_phases: 7
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_plans: 15
+  completed_plans: 14
+  percent: 93
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 34 - Conversation UX
+**Current focus:** Phase 35 - Quick Settings
 
 ## Current Position
 
-Phase: 34 of 37 (Conversation UX) -- COMPLETE
-Plan: 2 of 2 (all plans complete)
-Status: Phase 34 complete -- token usage footers with JSONL result extraction + expandable detail
-Last activity: 2026-03-17 -- Completed 34-02-PLAN.md (token usage footers + JSONL result extraction)
+Phase: 35 of 37 (Quick Settings)
+Plan: 1 of 2
+Status: Completed 35-01-PLAN.md -- quick settings popover with three toggles and Cmd+, shortcut
+Last activity: 2026-03-17 -- Completed 35-01-PLAN.md (quick settings panel)
 
-Progress: [██████████] 100%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 34]: Second-pass result entry extraction over original entries array (not chatEntries) for token data
 - [Phase 34]: seenAssistantApiIds Set to track merged assistant entries in second pass index mapping
 - [Phase 34]: Nullish coalescing in JSX instead of non-null assertions (custom lint rule incompatible with JSX comments)
+- [Phase 35]: Callback-based shortcut hook: useQuickSettingsShortcut accepts callback so component owns popover state
 
 ### Pending Todos
 
@@ -88,6 +89,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T01:31:57.520Z
-Stopped at: Completed 34-02-PLAN.md
+Last session: 2026-03-17T02:24:48.766Z
+Stopped at: Completed 35-01-PLAN.md
 Resume: Phase 34 complete. Phase 35 (Accessibility) next.
