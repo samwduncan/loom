@@ -98,8 +98,31 @@ export function getLanguageFromPath(filePath: string): string {
 
 let highlighterPromise: Promise<HighlighterCore> | null = null;
 
+/** Maximum cache entries before LRU eviction */
+export const MAX_CACHE_SIZE = 500;
+
 /** Cache: key = `${lang}:${code}`, value = highlighted HTML */
 const cache = new Map<string, string>();
+
+/** Returns current cache size (exported for testing) */
+export function getCacheSize(): number {
+  return cache.size;
+}
+
+/** Insert into cache with LRU eviction (Map iteration order = insertion order) */
+function cacheSet(key: string, value: string): void {
+  // If key already exists, delete first to refresh insertion order
+  if (cache.has(key)) {
+    cache.delete(key);
+  } else if (cache.size >= MAX_CACHE_SIZE) {
+    // Evict oldest entry (first key in Map iteration order)
+    const oldestKey = cache.keys().next().value;
+    if (oldestKey !== undefined) {
+      cache.delete(oldestKey);
+    }
+  }
+  cache.set(key, value);
+}
 
 /**
  * Returns the singleton Shiki highlighter instance.
@@ -160,7 +183,7 @@ export async function highlightCode(
       }
     } catch {
       // Unknown language -- return raw code
-      cache.set(cacheKey, code);
+      cacheSet(cacheKey, code);
       return code;
     }
   }
@@ -170,6 +193,6 @@ export async function highlightCode(
     theme: 'loom-dark',
   });
 
-  cache.set(cacheKey, html);
+  cacheSet(cacheKey, html);
   return html;
 }

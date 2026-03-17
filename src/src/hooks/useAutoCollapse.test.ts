@@ -2,11 +2,11 @@
  * useAutoCollapse tests -- IntersectionObserver-based message collapse detection.
  *
  * Tests verify:
- * - observeRef creates IntersectionObserver per message
+ * - Single shared IntersectionObserver for all messages
  * - isCollapsed returns correct state after IO fires
  * - toggleExpand pins a message open (not re-collapsed by IO)
  * - toggleExpand again unpins and immediately collapses
- * - Cleanup disconnects all observers on unmount
+ * - Cleanup disconnects the single observer on unmount
  * - Collapse is debounced (300ms), expand is immediate
  * - Ref callbacks are stable across renders (no observer churn)
  * - Observer not created when scrollContainerRef is null
@@ -53,10 +53,10 @@ function firstIO(): IOInstance {
   return ioInstances[0] as IOInstance;
 }
 
-/** Simulate IO firing for a specific instance */
-function fireIO(instance: IOInstance, isIntersecting: boolean) {
+/** Simulate IO firing for a specific instance with target element */
+function fireIO(instance: IOInstance, isIntersecting: boolean, target: Element) {
   instance.callback(
-    [{ isIntersecting, target: {} } as unknown as IntersectionObserverEntry],
+    [{ isIntersecting, target } as unknown as IntersectionObserverEntry],
     {} as IntersectionObserver,
   );
 }
@@ -125,7 +125,7 @@ describe('useAutoCollapse', () => {
 
     // Fire IO: message leaves viewport
     act(() => {
-      fireIO(firstIO(), false);
+      fireIO(firstIO(), false, el);
     });
 
     // Before debounce: still not collapsed
@@ -150,14 +150,14 @@ describe('useAutoCollapse', () => {
 
     // Collapse first
     act(() => {
-      fireIO(firstIO(), false);
+      fireIO(firstIO(), false, el);
       vi.advanceTimersByTime(300);
     });
     expect(result.current.isCollapsed('msg-0')).toBe(true);
 
     // Expand: should be immediate
     act(() => {
-      fireIO(firstIO(), true);
+      fireIO(firstIO(), true, el);
     });
     expect(result.current.isCollapsed('msg-0')).toBe(false);
   });
@@ -173,7 +173,7 @@ describe('useAutoCollapse', () => {
 
     // Collapse via IO
     act(() => {
-      fireIO(firstIO(), false);
+      fireIO(firstIO(), false, el);
       vi.advanceTimersByTime(300);
     });
     expect(result.current.isCollapsed('msg-0')).toBe(true);
@@ -186,7 +186,7 @@ describe('useAutoCollapse', () => {
 
     // IO fires !isIntersecting again -- should NOT collapse (pinned)
     act(() => {
-      fireIO(firstIO(), false);
+      fireIO(firstIO(), false, el);
       vi.advanceTimersByTime(300);
     });
     expect(result.current.isCollapsed('msg-0')).toBe(false);
@@ -203,7 +203,7 @@ describe('useAutoCollapse', () => {
 
     // Collapse, then pin
     act(() => {
-      fireIO(firstIO(), false);
+      fireIO(firstIO(), false, el);
       vi.advanceTimersByTime(300);
     });
     act(() => {
@@ -218,23 +218,37 @@ describe('useAutoCollapse', () => {
     expect(result.current.isCollapsed('msg-0')).toBe(true);
   });
 
-  it('cleanup disconnects all observers on unmount', () => {
+  it('uses a single shared IntersectionObserver for all messages', () => {
+    const scrollRef = makeScrollRef();
+    const { result } = renderHook(() => useAutoCollapse(scrollRef));
+
+    // Observe multiple messages
+    act(() => {
+      result.current.observeRef('msg-0')(document.createElement('div'));
+      result.current.observeRef('msg-1')(document.createElement('div'));
+      result.current.observeRef('msg-2')(document.createElement('div'));
+    });
+
+    // Should create exactly 1 IntersectionObserver regardless of message count
+    expect(ioInstances.length).toBe(1);
+    // That single observer should have observed all 3 elements
+    expect(firstIO().observe).toHaveBeenCalledTimes(3);
+  });
+
+  it('cleanup disconnects the single observer on unmount', () => {
     const scrollRef = makeScrollRef();
     const { result, unmount } = renderHook(() => useAutoCollapse(scrollRef));
 
-    // Create two observers
     act(() => {
       result.current.observeRef('msg-0')(document.createElement('div'));
       result.current.observeRef('msg-1')(document.createElement('div'));
     });
 
-    expect(ioInstances.length).toBe(2);
+    expect(ioInstances.length).toBe(1);
 
     unmount();
 
-    for (const inst of ioInstances) {
-      expect(inst.disconnect).toHaveBeenCalled();
-    }
+    expect(firstIO().disconnect).toHaveBeenCalled();
   });
 
   it('cancels pending collapse timeout on expand', () => {
@@ -248,13 +262,13 @@ describe('useAutoCollapse', () => {
 
     // Start collapse (fires IO, starts 300ms debounce)
     act(() => {
-      fireIO(firstIO(), false);
+      fireIO(firstIO(), false, el);
     });
 
     // Before debounce completes, IO fires expand
     act(() => {
       vi.advanceTimersByTime(100);
-      fireIO(firstIO(), true);
+      fireIO(firstIO(), true, el);
     });
 
     // Advance past original debounce time
@@ -277,7 +291,7 @@ describe('useAutoCollapse', () => {
     expect(cb1).toBe(cb2);
   });
 
-  it('cleans up observer when ref callback receives null', () => {
+  it('unobserves element when ref callback receives null', () => {
     const scrollRef = makeScrollRef();
     const { result } = renderHook(() => useAutoCollapse(scrollRef));
 
@@ -289,12 +303,13 @@ describe('useAutoCollapse', () => {
     });
 
     expect(ioInstances.length).toBe(1);
+    expect(firstIO().observe).toHaveBeenCalledWith(el);
 
-    // React calls ref callback with null on unmount
+    // React calls ref callback with null on unmount -- should unobserve, not disconnect
     act(() => {
       refCb(null);
     });
 
-    expect(firstIO().disconnect).toHaveBeenCalled();
+    expect(firstIO().unobserve).toHaveBeenCalledWith(el);
   });
 });
