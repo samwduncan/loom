@@ -239,54 +239,25 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     (cmd: SlashCommand | null) => {
       if (!cmd) return;
 
-      // Clear the slash command text from input
       setInput('');
+      closeSlashPicker();
 
-      // Execute the command action
-      switch (cmd.id) {
-        case 'clear': {
-          const effectiveId = sessionId ?? streamSessionId;
-          if (effectiveId) {
-            clearSession(effectiveId);
-          }
-          break;
-        }
-        case 'compact': {
-          const effectiveId = sessionId ?? streamSessionId;
-          if (effectiveId) {
-            wsClient.send({
-              type: 'claude-command',
-              command: '/compact',
-              options: { projectPath: projectName, sessionId: effectiveId },
-            });
-          }
-          break;
-        }
-        case 'help': {
-          const effectiveId = sessionId ?? streamSessionId;
-          if (effectiveId) {
-            wsClient.send({
-              type: 'claude-command',
-              command: '/help',
-              options: { projectPath: projectName, sessionId: effectiveId },
-            });
-          }
-          break;
-        }
-        case 'model': {
-          const effectiveId = sessionId ?? streamSessionId;
-          if (effectiveId) {
-            wsClient.send({
-              type: 'claude-command',
-              command: '/model',
-              options: { projectPath: projectName, sessionId: effectiveId },
-            });
-          }
-          break;
-        }
+      const effectiveId = sessionId ?? streamSessionId;
+      if (!effectiveId) {
+        requestAnimationFrame(() => textareaRef.current?.focus());
+        return;
       }
 
-      closeSlashPicker();
+      if (cmd.id === 'clear') {
+        clearSession(effectiveId);
+      } else {
+        wsClient.send({
+          type: 'claude-command',
+          command: `/${cmd.id}`,
+          options: { projectPath: projectName, sessionId: effectiveId },
+        });
+      }
+
       requestAnimationFrame(() => textareaRef.current?.focus());
     },
     [sessionId, streamSessionId, projectName, clearSession, closeSlashPicker],
@@ -593,11 +564,15 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
             setInput(e.target.value);
             if (sessionId) saveDraft(sessionId, e.target.value);
 
-            // Detect @ mention trigger
-            detectAndOpen(e.target.value, e.target.selectionStart ?? e.target.value.length);
-
-            // Detect / slash command trigger
-            slashDetectAndOpen(e.target.value, e.target.selectionStart ?? e.target.value.length);
+            // Detect pickers (mutually exclusive — slash only at position 0, mention elsewhere)
+            const cursorPos = e.target.selectionStart ?? e.target.value.length;
+            const val = e.target.value;
+            if (val.startsWith('/') && !mentionPickerOpen) {
+              slashDetectAndOpen(val, cursorPos);
+            } else {
+              if (slashPickerOpen) closeSlashPicker();
+              detectAndOpen(val, cursorPos);
+            }
           }}
           onKeyDown={handleKeyDown}
           onPaste={addFromClipboard}

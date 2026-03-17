@@ -8,8 +8,7 @@
  * Constitution: Named exports (2.2), design tokens only (3.1), cn() (3.6).
  */
 
-import { useCallback, useRef } from 'react';
-import { cn } from '@/utils/cn';
+import { useCallback } from 'react';
 import type { SlashCommand } from '@/types/slash-command';
 
 interface SlashCommandPickerProps {
@@ -19,8 +18,6 @@ interface SlashCommandPickerProps {
 }
 
 export function SlashCommandPicker({ results, selectedIndex, onSelect }: SlashCommandPickerProps) {
-  const listRef = useRef<HTMLDivElement>(null);
-
   // Scroll selected item into view (guard for jsdom which lacks scrollIntoView)
   const selectedRef = useCallback((node: HTMLDivElement | null) => {
     if (node && typeof node.scrollIntoView === 'function') {
@@ -40,7 +37,7 @@ export function SlashCommandPicker({ results, selectedIndex, onSelect }: SlashCo
   }
 
   return (
-    <div className="slash-picker" data-testid="slash-picker" ref={listRef} role="listbox" id="slash-picker-list">
+    <div className="slash-picker" data-testid="slash-picker" role="listbox" id="slash-picker-list">
       {results.map((cmd, index) => {
         const isSelected = index === selectedIndex;
 
@@ -49,7 +46,7 @@ export function SlashCommandPicker({ results, selectedIndex, onSelect }: SlashCo
             key={cmd.id}
             ref={isSelected ? selectedRef : undefined}
             data-selected={isSelected ? 'true' : undefined}
-            className={cn('slash-picker-item')}
+            className="slash-picker-item"
             onClick={() => onSelect(cmd)}
             role="option"
             aria-selected={isSelected}

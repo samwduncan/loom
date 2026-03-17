@@ -1,13 +1,12 @@
 /**
  * useSlashCommands -- hook managing / slash command trigger detection, filtering, and picker state.
  *
- * Mirrors the useFileMentions pattern: detectSlashQuery detects / at position 0,
- * hook manages open/close, query filtering, keyboard navigation, and selection.
+ * Detects / at position 0, filters the static command list, manages keyboard navigation.
  *
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState } from 'react';
 import { SLASH_COMMANDS } from '@/lib/slash-commands';
 import type { SlashCommand } from '@/types/slash-command';
 
@@ -32,9 +31,13 @@ export function detectSlashQuery(text: string, cursorPos: number): string | null
   return query;
 }
 
+function filterCommands(query: string): SlashCommand[] {
+  if (!query) return SLASH_COMMANDS;
+  return SLASH_COMMANDS.filter((cmd) => cmd.id.includes(query.toLowerCase()));
+}
+
 export function useSlashCommands(): {
   isOpen: boolean;
-  query: string;
   results: SlashCommand[];
   selectedIndex: number;
   detectAndOpen: (text: string, cursorPos: number) => void;
@@ -47,60 +50,49 @@ export function useSlashCommands(): {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Filter commands by query (simple includes match -- only 4 items, no fuse needed)
-  const results = useMemo(() => {
-    if (!isOpen) return [];
-    if (!query) return SLASH_COMMANDS;
-    return SLASH_COMMANDS.filter((cmd) => cmd.id.includes(query.toLowerCase()));
-  }, [isOpen, query]);
+  const results = isOpen ? filterCommands(query) : [];
 
-  const detectAndOpen = useCallback(
-    (text: string, cursorPos: number) => {
-      const detected = detectSlashQuery(text, cursorPos);
-      if (detected !== null) {
-        setIsOpen(true);
-        setQuery(detected);
-        setSelectedIndex(0);
-      } else {
-        setIsOpen(false);
-        setQuery('');
-        setSelectedIndex(0);
-      }
-    },
-    [],
-  );
+  function detectAndOpen(text: string, cursorPos: number) {
+    const detected = detectSlashQuery(text, cursorPos);
+    if (detected !== null) {
+      setIsOpen(true);
+      setQuery(detected);
+      setSelectedIndex(0);
+    } else {
+      setIsOpen(false);
+      setQuery('');
+      setSelectedIndex(0);
+    }
+  }
 
-  const close = useCallback(() => {
+  function close() {
     setIsOpen(false);
     setQuery('');
     setSelectedIndex(0);
-  }, []);
+  }
 
-  const moveDown = useCallback(() => {
+  function moveDown() {
     setSelectedIndex((prev) => {
-      const len = results.length;
-      if (len === 0) return 0;
-      return (prev + 1) % len;
+      if (results.length === 0) return 0;
+      return (prev + 1) % results.length;
     });
-  }, [results.length]);
+  }
 
-  const moveUp = useCallback(() => {
+  function moveUp() {
     setSelectedIndex((prev) => {
-      const len = results.length;
-      if (len === 0) return 0;
-      return (prev - 1 + len) % len;
+      if (results.length === 0) return 0;
+      return (prev - 1 + results.length) % results.length;
     });
-  }, [results.length]);
+  }
 
-  const selectCurrent = useCallback((): SlashCommand | null => {
+  function selectCurrent(): SlashCommand | null {
     if (results.length === 0) return null;
     const idx = Math.min(selectedIndex, results.length - 1);
     return results[idx] ?? null;
-  }, [results, selectedIndex]);
+  }
 
   return {
     isOpen,
-    query,
     results,
     selectedIndex,
     detectAndOpen,

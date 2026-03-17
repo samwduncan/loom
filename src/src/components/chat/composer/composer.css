@@ -72,9 +72,10 @@
   pointer-events: none;
 }
 
-/* ─── Mention picker popup ───────────────────────────────────── */
+/* ─── Shared picker popup base ──────────────────────────────── */
 
-.mention-picker {
+.mention-picker,
+.slash-picker {
   position: absolute;
   bottom: calc(100% + 4px);
   left: 0;
@@ -88,15 +89,18 @@
   box-shadow: 0 -4px 16px var(--shadow-light);
 }
 
-.mention-picker-item {
-  padding: 6px 12px;
+.mention-picker-item,
+.slash-picker-item {
+  padding: 8px 12px;
   cursor: pointer;
   transition: background var(--duration-fast) var(--ease-out);
 }
 
 .mention-picker-item:hover,
-.mention-picker-item[data-selected="true"] {
-  background: var(--surface-hover);
+.mention-picker-item[data-selected="true"],
+.slash-picker-item:hover,
+.slash-picker-item[data-selected="true"] {
+  background: var(--surface-active);
 }
 
 /* ─── Mention chips ─────────────────────────────────────────── */
@@ -129,31 +133,4 @@
 
 .mention-chip-remove:hover {
   opacity: 1;
-}
-
-/* ─── Slash command picker popup ────────────────────────────── */
-
-.slash-picker {
-  position: absolute;
-  bottom: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: var(--z-popover);
-  max-height: 240px;
-  overflow-y: auto;
-  border-radius: 0.5rem;
-  background: var(--surface-raised);
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 -4px 16px var(--shadow-light);
-}
-
-.slash-picker-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out);
-}
-
-.slash-picker-item:hover,
-.slash-picker-item[data-selected="true"] {
-  background: var(--surface-hover);
 }
