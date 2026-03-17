@@ -28,8 +28,11 @@ export class WebSocketClient {
   private state: ConnectionState = 'disconnected';
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private pongTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastCloseCode: number | undefined = undefined;
   private token: string | null = null;
   private readonly maxReconnectDelay = 30_000;
+  private readonly pongTimeout = 30_000;
 
   // Callback injection -- set once during app init
   private onMessageCb: ((msg: ServerMessage) => void) | null = null;
@@ -98,6 +101,7 @@ export class WebSocketClient {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.clearPongTimer();
 
     this.token = null;
 
@@ -129,6 +133,14 @@ export class WebSocketClient {
    */
   getState(): ConnectionState {
     return this.state;
+  }
+
+  /**
+   * Get the close code from the most recent WebSocket close event.
+   * Returns undefined if no close has occurred yet.
+   */
+  getLastCloseCode(): number | undefined {
+    return this.lastCloseCode;
   }
 
   /**
@@ -190,6 +202,24 @@ export class WebSocketClient {
   // Private handlers
   // ---------------------------------------------------------------------------
 
+  private resetPongTimer(): void {
+    if (this.pongTimer !== null) {
+      clearTimeout(this.pongTimer);
+    }
+    this.pongTimer = setTimeout(() => {
+      if (this.state === 'connected') {
+        this.ws?.close(4000, 'pong timeout');
+      }
+    }, this.pongTimeout);
+  }
+
+  private clearPongTimer(): void {
+    if (this.pongTimer !== null) {
+      clearTimeout(this.pongTimer);
+      this.pongTimer = null;
+    }
+  }
+
   private setState(newState: ConnectionState): void {
     this.state = newState;
     this.onStateChangeCb?.(newState);
@@ -198,12 +228,16 @@ export class WebSocketClient {
   private handleOpen(): void {
     this.setState('connected');
     this.reconnectAttempts = 0;
+    this.resetPongTimer();
 
     // Sync state with backend on every connect/reconnect
     this.send({ type: 'get-active-sessions' });
   }
 
   private handleClose(event: CloseEvent): void {
+    this.lastCloseCode = event.code;
+    this.clearPongTimer();
+
     const shouldReconnect =
       event.code !== 1000 &&
       this.token !== null &&
@@ -236,6 +270,7 @@ export class WebSocketClient {
       return;
     }
 
+    this.resetPongTimer();
     this.onMessageCb?.(parsed);
   }
 

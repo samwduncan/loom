@@ -19,6 +19,8 @@ const mockSend = vi.fn().mockReturnValue(true);
 const mockEmitContent = vi.fn();
 const mockStartContentStream = vi.fn();
 const mockEndContentStream = vi.fn();
+const mockGetLastCloseCode = vi.fn().mockReturnValue(undefined);
+const mockTryReconnect = vi.fn();
 
 vi.mock('@/lib/websocket-client', () => ({
   wsClient: {
@@ -28,6 +30,8 @@ vi.mock('@/lib/websocket-client', () => ({
     emitContent: (...args: unknown[]) => mockEmitContent(...args),
     startContentStream: (...args: unknown[]) => mockStartContentStream(...args),
     endContentStream: (...args: unknown[]) => mockEndContentStream(...args),
+    getLastCloseCode: () => mockGetLastCloseCode(),
+    tryReconnect: () => mockTryReconnect(),
   },
 }));
 
@@ -81,9 +85,11 @@ vi.mock('@/stores/connection', () => ({
 
 // Mock auth
 const mockBootstrapAuth = vi.fn().mockResolvedValue('test-token');
+const mockRefreshAuth = vi.fn().mockResolvedValue('refreshed-token');
 
 vi.mock('@/lib/auth', () => ({
   bootstrapAuth: () => mockBootstrapAuth(),
+  refreshAuth: () => mockRefreshAuth(),
 }));
 
 // Mock multiplexer (we test multiplexer separately -- here we test wiring)
@@ -484,6 +490,53 @@ describe('initializeWebSocket', () => {
 
       callbacks.onPermissionCancelled('pr-1');
       expect(mockClearPermissionRequest).toHaveBeenCalled();
+    });
+  });
+
+  describe('WS auth failure recovery', () => {
+    let onStateChange: (state: ConnectionState) => void;
+
+    beforeEach(async () => {
+      await initializeWebSocket();
+      const configCall = mockConfigure.mock.calls[0] as [{ onMessage: (msg: ServerMessage) => void; onStateChange: (state: ConnectionState) => void }];
+      onStateChange = configCall[0].onStateChange;
+    });
+
+    it('calls refreshAuth and tryReconnect on 4401 close code', async () => {
+      mockGetLastCloseCode.mockReturnValue(4401);
+
+      onStateChange('disconnected');
+
+      // Wait for the async refreshAuth to resolve
+      await vi.waitFor(() => {
+        expect(mockRefreshAuth).toHaveBeenCalledTimes(1);
+      });
+      expect(mockTryReconnect).toHaveBeenCalledTimes(1);
+    });
+
+    it('does NOT call refreshAuth on normal disconnect (non-4401)', () => {
+      mockGetLastCloseCode.mockReturnValue(1006);
+
+      onStateChange('disconnected');
+
+      expect(mockRefreshAuth).not.toHaveBeenCalled();
+      expect(mockTryReconnect).not.toHaveBeenCalled();
+    });
+
+    it('does NOT call tryReconnect if refreshAuth fails', async () => {
+      mockGetLastCloseCode.mockReturnValue(4401);
+      mockRefreshAuth.mockRejectedValueOnce(new Error('Auth failed'));
+
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      onStateChange('disconnected');
+
+      await vi.waitFor(() => {
+        expect(warnSpy).toHaveBeenCalled();
+      });
+      expect(mockTryReconnect).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
     });
   });
 

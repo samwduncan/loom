@@ -13,7 +13,7 @@ import {
   routeServerMessage,
 } from '@/lib/stream-multiplexer';
 import type { MultiplexerCallbacks } from '@/lib/stream-multiplexer';
-import { bootstrapAuth } from '@/lib/auth';
+import { bootstrapAuth, refreshAuth } from '@/lib/auth';
 import { useConnectionStore } from '@/stores/connection';
 import { useStreamStore } from '@/stores/stream';
 import { useTimelineStore } from '@/stores/timeline';
@@ -284,6 +284,21 @@ export async function initializeWebSocket(): Promise<void> {
               'claude',
               'Connection lost during response',
             );
+          }
+
+          // Auth failure recovery: if WS closed with 4401 (auth rejected),
+          // refresh the token and reconnect automatically
+          {
+            const closeCode = wsClient.getLastCloseCode();
+            if (closeCode === 4401) {
+              refreshAuth()
+                .then(() => {
+                  wsClient.tryReconnect();
+                })
+                .catch((err) => {
+                  console.warn('[WebSocket] Auth refresh failed after 4401:', err);
+                });
+            }
           }
           break;
       }

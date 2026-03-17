@@ -906,6 +906,25 @@ app.get('/api/projects/:projectName/files', authenticateToken, async (req, res) 
     }
 });
 
+// WebSocket heartbeat: ping all clients every 15s, terminate dead ones after 30s (2 missed pongs)
+const WS_PING_INTERVAL = 15_000;
+const wsPingInterval = setInterval(() => {
+    for (const ws of wss.clients) {
+        if (ws.isAlive === false) {
+            console.log('[INFO] Terminating unresponsive WebSocket client');
+            ws.terminate();
+            continue;
+        }
+        ws.isAlive = false;
+        ws.ping();
+    }
+}, WS_PING_INTERVAL);
+
+// Clean up ping interval on server close
+wss.on('close', () => {
+    clearInterval(wsPingInterval);
+});
+
 // WebSocket connection handler that routes based on URL path
 wss.on('connection', (ws, request) => {
     const url = request.url;
@@ -954,6 +973,10 @@ class WebSocketWriter {
 // Handle chat WebSocket connections
 function handleChatConnection(ws) {
     console.log('[INFO] Chat WebSocket connected');
+
+    // Heartbeat: mark alive on connect and on pong
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
 
     // Add to connected clients for project updates
     connectedClients.add(ws);
@@ -1068,6 +1091,11 @@ function handleChatConnection(ws) {
 // Handle shell WebSocket connections
 function handleShellConnection(ws) {
     console.log('🐚 Shell client connected');
+
+    // Heartbeat: mark alive on connect and on pong
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
+
     let shellProcess = null;
     let ptySessionKey = null;
     let urlDetectionBuffer = '';

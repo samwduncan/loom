@@ -511,3 +511,92 @@ describe('error handling', () => {
     expect(onStateChange).toHaveBeenCalledWith('connecting');
   });
 });
+
+// ---------------------------------------------------------------------------
+// Pong timeout (heartbeat)
+// ---------------------------------------------------------------------------
+describe('pong timeout (heartbeat)', () => {
+  it('resets pong timer on handleMessage', () => {
+    client.connect('test-token');
+    getLastWS().simulateOpen();
+
+    // Advance 25s -- no timeout yet (30s threshold)
+    vi.advanceTimersByTime(25_000);
+    expect(client.getState()).toBe('connected');
+
+    // Simulate a message to reset timer
+    getLastWS().simulateMessage({ type: 'session-created', sessionId: 'abc' });
+
+    // Advance another 25s -- still no timeout because timer was reset
+    vi.advanceTimersByTime(25_000);
+    expect(client.getState()).toBe('connected');
+  });
+
+  it('triggers close after 30s silence when connected', () => {
+    client.connect('test-token');
+    getLastWS().simulateOpen();
+
+    // Advance 30s without any message
+    vi.advanceTimersByTime(30_000);
+
+    // Should have called close on the ws
+    const ws = getLastWS();
+    expect(ws.closedWith).not.toBeNull();
+    expect(ws.closedWith?.code).toBe(4000);
+  });
+
+  it('does not trigger close when disconnected', () => {
+    client.connect('test-token');
+    getLastWS().simulateOpen();
+
+    // Disconnect cleanly
+    client.disconnect();
+
+    // Advance 30s -- no close should happen
+    vi.advanceTimersByTime(30_000);
+
+    // The ws was closed by disconnect, not by pong timeout
+    expect(getLastWS().closedWith?.code).toBe(1000);
+  });
+
+  it('clears pong timer on disconnect', () => {
+    client.connect('test-token');
+    getLastWS().simulateOpen();
+
+    client.disconnect();
+
+    // Advance well past the timeout -- nothing should happen
+    const instanceCount = MockWebSocket.instances.length;
+    vi.advanceTimersByTime(60_000);
+    expect(MockWebSocket.instances.length).toBe(instanceCount);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Last close code
+// ---------------------------------------------------------------------------
+describe('getLastCloseCode', () => {
+  it('returns undefined before any close', () => {
+    expect(client.getLastCloseCode()).toBeUndefined();
+  });
+
+  it('returns close code after close event', () => {
+    client.connect('test-token');
+    getLastWS().simulateOpen();
+    getLastWS().simulateClose(4401, 'Auth failed');
+
+    expect(client.getLastCloseCode()).toBe(4401);
+  });
+
+  it('returns most recent close code', () => {
+    client.connect('test-token');
+    getLastWS().simulateOpen();
+    getLastWS().simulateClose(1006);
+
+    vi.advanceTimersByTime(1000); // reconnect
+    getLastWS().simulateOpen();
+    getLastWS().simulateClose(4401);
+
+    expect(client.getLastCloseCode()).toBe(4401);
+  });
+});
