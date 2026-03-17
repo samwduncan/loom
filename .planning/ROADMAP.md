@@ -177,8 +177,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 34-01: TBD
-- [ ] 34-02: TBD
+- [ ] 34-01-PLAN.md -- Auto-collapse hook + CollapsibleMessage component + MessageList integration
+- [ ] 34-02-PLAN.md -- JSONL result extraction for historical token data + expandable TokenUsage
 
 ### Phase 35: Quick Settings
 **Goal**: Users can tune display preferences without opening the full settings modal
@@ -244,7 +244,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 31. Editor & Tool Enhancements | 2/2 | Complete    | 2026-03-16 | - |
 | 32. File Mentions | 2/2 | Complete    | 2026-03-16 | - |
 | 33. Slash Commands | 2/2 | Complete    | 2026-03-17 | - |
-| 34. Conversation UX | v1.3 | 0/? | Not started | - |
+| 34. Conversation UX | v1.3 | 0/2 | Not started | - |
 | 35. Quick Settings | v1.3 | 0/? | Not started | - |
 | 36. Accessibility | v1.3 | 0/? | Not started | - |
 | 37. Performance | v1.3 | 0/? | Not started | - |
@@ -255,4 +255,4 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-17 after Phase 33 planning*
+*Last updated: 2026-03-17 after Phase 34 planning*
