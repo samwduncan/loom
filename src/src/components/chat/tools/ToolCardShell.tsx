@@ -11,6 +11,7 @@ import { memo } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useElapsedTime } from '@/hooks/useElapsedTime';
+import { useUIStore } from '@/stores/ui';
 import { SpotlightCard } from '@/components/effects/SpotlightCard';
 import type { ToolCallState, ToolCallStatus } from '@/types/stream';
 import type { ToolConfig } from '@/lib/tool-registry';
@@ -38,6 +39,7 @@ export const ToolCardShell = memo(function ToolCardShell({
   onToggle,
   children,
 }: ToolCardShellProps) {
+  const showRawParams = useUIStore((state) => state.showRawParams);
   const elapsed = useElapsedTime(toolCall.startedAt, toolCall.completedAt);
   const Icon = config.icon;
   const isError = toolCall.status === 'rejected';
@@ -87,6 +89,14 @@ export const ToolCardShell = memo(function ToolCardShell({
         <div>
           <div className="tool-card-shell-body-inner">
             {children}
+            {showRawParams && toolCall.input && (
+              <details className="mt-2 border-t border-border pt-2">
+                <summary className="text-xs text-muted cursor-pointer select-none">
+                  Raw Parameters
+                </summary>
+                <pre className="mt-1 overflow-x-auto p-2 bg-surface-sunken rounded text-mono text-xs whitespace-pre-wrap break-all" data-testid="raw-params">{JSON.stringify(toolCall.input, null, 2)}</pre>
+              </details>
+            )}
           </div>
         </div>
       </div>

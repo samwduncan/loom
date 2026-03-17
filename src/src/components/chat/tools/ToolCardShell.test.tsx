@@ -3,9 +3,10 @@
  * error state treatment, and children rendering.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ToolCardShell } from '@/components/chat/tools/ToolCardShell';
+import { useUIStore } from '@/stores/ui';
 import type { ToolCallState, ToolCallStatus } from '@/types/stream';
 import type { ToolConfig } from '@/lib/tool-registry';
 
@@ -43,6 +44,10 @@ function makeConfig(overrides: Partial<ToolConfig> = {}): ToolConfig {
 }
 
 describe('ToolCardShell', () => {
+  beforeEach(() => {
+    useUIStore.setState({ showRawParams: false });
+  });
+
   it('renders header with tool name and status label', () => {
     render(
       <ToolCardShell
@@ -196,5 +201,73 @@ describe('ToolCardShell', () => {
     );
 
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
+  });
+
+  it('does not render raw params section when showRawParams is false', () => {
+    useUIStore.setState({ showRawParams: false });
+    render(
+      <ToolCardShell
+        toolCall={makeToolCall({ input: { command: 'ls -la' } })}
+        config={makeConfig()}
+        isExpanded={true}
+      >
+        <div>content</div>
+      </ToolCardShell>,
+    );
+
+    expect(screen.queryByTestId('raw-params')).toBeNull();
+    expect(screen.queryByText('Raw Parameters')).toBeNull();
+  });
+
+  it('renders raw params section when showRawParams is true and card expanded', () => {
+    useUIStore.setState({ showRawParams: true });
+    render(
+      <ToolCardShell
+        toolCall={makeToolCall({ input: { command: 'ls -la' } })}
+        config={makeConfig()}
+        isExpanded={true}
+      >
+        <div>content</div>
+      </ToolCardShell>,
+    );
+
+    expect(screen.getByText('Raw Parameters')).toBeInTheDocument();
+    expect(screen.getByTestId('raw-params')).toBeInTheDocument();
+  });
+
+  it('raw params contains stringified toolCall.input', () => {
+    useUIStore.setState({ showRawParams: true });
+    const input = { command: 'ls -la', timeout: 5000 };
+    render(
+      <ToolCardShell
+        toolCall={makeToolCall({ input })}
+        config={makeConfig()}
+        isExpanded={true}
+      >
+        <div>content</div>
+      </ToolCardShell>,
+    );
+
+    const rawParams = screen.getByTestId('raw-params');
+    expect(rawParams.textContent).toBe(JSON.stringify(input, null, 2));
+  });
+
+  it('raw params is inside a details/summary element', () => {
+    useUIStore.setState({ showRawParams: true });
+    render(
+      <ToolCardShell
+        toolCall={makeToolCall({ input: { command: 'echo hi' } })}
+        config={makeConfig()}
+        isExpanded={true}
+      >
+        <div>content</div>
+      </ToolCardShell>,
+    );
+
+    const details = screen.getByTestId('raw-params').closest('details');
+    expect(details).toBeInTheDocument();
+    const summary = details?.querySelector('summary');
+    expect(summary).toBeInTheDocument();
+    expect(summary?.textContent).toBe('Raw Parameters');
   });
 });
