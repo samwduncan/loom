@@ -2,10 +2,11 @@
  * ToolCallGroup -- component tests for collapsible tool call group.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToolCallGroup } from './ToolCallGroup';
+import { useUIStore } from '@/stores/ui';
 import type { ToolCallState } from '@/types/stream';
 
 function makeTool(overrides: Partial<ToolCallState> = {}): ToolCallState {
@@ -23,6 +24,10 @@ function makeTool(overrides: Partial<ToolCallState> = {}): ToolCallState {
 }
 
 describe('ToolCallGroup', () => {
+  beforeEach(() => {
+    useUIStore.setState({ autoExpandTools: false });
+  });
+
   it('renders collapsed header with correct tool count', () => {
     const tools = [
       makeTool({ id: 'a', toolName: 'Read' }),
@@ -92,5 +97,45 @@ describe('ToolCallGroup', () => {
     expect(errorSection).toBeInTheDocument();
     const errorChips = within(errorSection).getAllByTestId('tool-chip');
     expect(errorChips).toHaveLength(1);
+  });
+
+  it('starts expanded when autoExpandTools store is true', () => {
+    useUIStore.setState({ autoExpandTools: true });
+    const tools = [
+      makeTool({ id: 'a', toolName: 'Read' }),
+      makeTool({ id: 'b', toolName: 'Edit' }),
+    ];
+    render(<ToolCallGroup tools={tools} errors={[]} />);
+
+    const header = screen.getByTestId('tool-group-header');
+    expect(header).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('starts collapsed when autoExpandTools store is false', () => {
+    useUIStore.setState({ autoExpandTools: false });
+    const tools = [
+      makeTool({ id: 'a', toolName: 'Read' }),
+      makeTool({ id: 'b', toolName: 'Edit' }),
+    ];
+    render(<ToolCallGroup tools={tools} errors={[]} />);
+
+    const header = screen.getByTestId('tool-group-header');
+    expect(header).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('child ToolChips have cards expanded when autoExpandTools is true', () => {
+    useUIStore.setState({ autoExpandTools: true });
+    const tools = [
+      makeTool({ id: 'a', toolName: 'Read' }),
+      makeTool({ id: 'b', toolName: 'Edit' }),
+    ];
+    render(<ToolCallGroup tools={tools} errors={[]} />);
+
+    // When autoExpandTools is true and group is expanded, child chips should also be expanded
+    const chips = screen.getAllByTestId('tool-chip');
+    for (const chip of chips) {
+      const button = chip.querySelector('button[aria-expanded]');
+      expect(button).toHaveAttribute('aria-expanded', 'true');
+    }
   });
 });

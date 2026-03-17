@@ -14,6 +14,7 @@ import { memo, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { ToolChip } from './ToolChip';
 import { getToolConfig } from '@/lib/tool-registry';
+import { useUIStore } from '@/stores/ui';
 import { cn } from '@/utils/cn';
 import type { ToolCallState } from '@/types/stream';
 import './ToolCallGroup.css';
@@ -45,7 +46,8 @@ export const ToolCallGroup = memo(function ToolCallGroup({
   errors,
   defaultExpanded = false,
 }: ToolCallGroupProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const autoExpandTools = useUIStore((state) => state.autoExpandTools);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded || autoExpandTools);
   const [expandAllCounter, setExpandAllCounter] = useState(0);
 
   const totalCount = tools.length;
@@ -107,7 +109,7 @@ export const ToolCallGroup = memo(function ToolCallGroup({
               <ToolChip
                 key={tool.id + '-' + expandAllCounter}
                 toolCall={tool}
-                defaultExpanded={expandAllCounter > 0 ? true : undefined}
+                defaultExpanded={autoExpandTools || expandAllCounter > 0 ? true : undefined}
               />
             ))}
           </div>
