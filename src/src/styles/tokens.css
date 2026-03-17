@@ -42,7 +42,7 @@
    * Warm-tinted, high readability against dark surfaces
    */
   --status-success: oklch(0.65 0.15 145);
-  --status-error: oklch(0.58 0.18 25);
+  --status-error: oklch(0.65 0.18 25); /* Adjusted for WCAG AA: was 0.58, now 0.65 */
   --status-warning: oklch(0.72 0.14 70);
   --status-info: oklch(0.65 0.12 240);
 
@@ -68,7 +68,7 @@
    * Two tiers: subtle (content separations) and interactive (cards, inputs)
    */
   --border-subtle: oklch(1 0 0 / 0.07);
-  --border-interactive: oklch(1 0 0 / 0.15);
+  --border-interactive: oklch(1 0 0 / 0.34); /* Adjusted for WCAG AA 3:1: was 0.15 */
 
   /* ─── Motion Tokens (DS-02) ───────────────────────────────────────
    * CSS easing curves and durations. Spring physics in motion.ts.
