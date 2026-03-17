@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 35-02-PLAN.md
-last_updated: "2026-03-17T02:46:58.835Z"
-last_activity: 2026-03-17 -- Completed 35-02-PLAN.md (quick settings consumers)
+stopped_at: Completed 36-03-PLAN.md
+last_updated: "2026-03-17T03:15:46.053Z"
+last_activity: 2026-03-17 -- Completed 36-03-PLAN.md (reduced motion + contrast audit)
 progress:
   total_phases: 10
   completed_phases: 8
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 18
+  completed_plans: 16
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-12)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 35 - Quick Settings
+**Current focus:** Phase 36 - Accessibility
 
 ## Current Position
 
-Phase: 35 of 37 (Quick Settings)
-Plan: 2 of 2
-Status: Completed 35-02-PLAN.md -- quick settings consumers wired to tool components
-Last activity: 2026-03-17 -- Completed 35-02-PLAN.md (quick settings consumers)
+Phase: 36 of 37 (Accessibility)
+Plan: 3 of 3
+Status: Completed 36-03-PLAN.md -- reduced motion override + WCAG AA contrast audit
+Last activity: 2026-03-17 -- Completed 36-03-PLAN.md (reduced motion + contrast audit)
 
 Progress: [██████████] 100%
 
@@ -79,6 +79,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 34]: Nullish coalescing in JSX instead of non-null assertions (custom lint rule incompatible with JSX comments)
 - [Phase 35]: Callback-based shortcut hook: useQuickSettingsShortcut accepts callback so component owns popover state
 - [Phase 35]: ToolCallGroup reads autoExpandTools from store directly (not prop-threaded from AssistantMessage)
+- [Phase 36]: Used 0.01ms (not 0ms) for reduced-motion override to preserve JS animationend/transitionend events
+- [Phase 36]: Adjusted --status-error lightness 0.58->0.65 and --border-interactive alpha 0.15->0.34 for WCAG AA
 
 ### Pending Todos
 
@@ -90,6 +92,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T02:31:02Z
-Stopped at: Completed 35-02-PLAN.md
-Resume: Phase 35 complete (all 2 plans). Phase 36 next.
+Last session: 2026-03-17T03:15:46.052Z
+Stopped at: Completed 36-03-PLAN.md
+Resume: Phase 36 complete (all 3 plans). Phase 37 next.

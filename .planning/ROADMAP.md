@@ -247,7 +247,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 33. Slash Commands | 2/2 | Complete    | 2026-03-17 | - |
 | 34. Conversation UX | 2/2 | Complete    | 2026-03-17 | - |
 | 35. Quick Settings | 2/2 | Complete    | 2026-03-17 | - |
-| 36. Accessibility | v1.3 | 0/3 | Not started | - |
+| 36. Accessibility | 1/3 | In Progress|  | - |
 | 37. Performance | v1.3 | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
