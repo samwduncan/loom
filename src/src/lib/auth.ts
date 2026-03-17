@@ -10,6 +10,9 @@
 
 const TOKEN_KEY = 'loom-jwt';
 
+/** In-flight refresh promise for deduplication of concurrent 401 retries. */
+let refreshPromise: Promise<string> | null = null;
+
 export function getToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
@@ -20,6 +23,26 @@ export function setToken(token: string): void {
 
 export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
+}
+
+/**
+ * Force-refresh auth: clears the current token and re-bootstraps.
+ * Deduplicates concurrent calls -- if a refresh is already in-flight,
+ * subsequent calls return the same promise.
+ */
+export async function refreshAuth(): Promise<string> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    clearToken();
+    return bootstrapAuth();
+  })();
+
+  try {
+    return await refreshPromise;
+  } finally {
+    refreshPromise = null;
+  }
 }
 
 /**

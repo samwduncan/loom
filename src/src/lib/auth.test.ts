@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { getToken, setToken, clearToken, bootstrapAuth } from '@/lib/auth';
+import { getToken, setToken, clearToken, bootstrapAuth, refreshAuth } from '@/lib/auth';
 
 // ---------------------------------------------------------------------------
 // Mock localStorage
@@ -152,5 +152,74 @@ describe('bootstrapAuth', () => {
       'Auto-auth failed -- manual login required',
     );
     expect(getToken()).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// refreshAuth
+// ---------------------------------------------------------------------------
+describe('refreshAuth', () => {
+  it('clears existing token and re-bootstraps', async () => {
+    setToken('stale-token');
+
+    // Mock /api/auth/status
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ needsSetup: false }), { status: 200 }),
+    );
+    // Mock /api/auth/login
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ token: 'fresh-token' }), { status: 200 }),
+    );
+
+    const token = await refreshAuth();
+
+    expect(token).toBe('fresh-token');
+    expect(getToken()).toBe('fresh-token');
+    // clearToken was called (localStorage.removeItem)
+    expect(localStorageMock.removeItem).toHaveBeenCalledWith('loom-jwt');
+  });
+
+  it('throws after bootstrapAuth fails (no infinite loop)', async () => {
+    setToken('stale-token');
+
+    // Mock /api/auth/status
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ needsSetup: false }), { status: 200 }),
+    );
+    // Mock /api/auth/login failure
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ error: 'fail' }), { status: 401 }),
+    );
+
+    await expect(refreshAuth()).rejects.toThrow();
+  });
+
+  it('deduplicates concurrent calls (single in-flight promise)', async () => {
+    setToken('stale-token');
+
+    let resolveStatus: ((v: Response) => void) | null = null;
+    // First call to /api/auth/status will block
+    mockFetch.mockImplementationOnce(
+      () => new Promise<Response>((resolve) => { resolveStatus = resolve; }),
+    );
+
+    // Start two concurrent refreshAuth calls
+    const p1 = refreshAuth();
+    const p2 = refreshAuth();
+
+    // Both should share the same promise -- only 1 fetch call so far
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    // Now resolve the status call
+    resolveStatus!(new Response(JSON.stringify({ needsSetup: false }), { status: 200 })); // ASSERT: resolveStatus is set by mockImplementationOnce callback above
+
+    // Mock login response
+    mockFetch.mockResolvedValueOnce(
+      new Response(JSON.stringify({ token: 'deduped-token' }), { status: 200 }),
+    );
+
+    const [t1, t2] = await Promise.all([p1, p2]);
+    expect(t1).toBe('deduped-token');
+    expect(t2).toBe('deduped-token');
   });
 });
