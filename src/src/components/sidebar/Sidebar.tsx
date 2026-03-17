@@ -18,6 +18,7 @@ import { useUIStore } from '@/stores/ui';
 import { ConnectionStatusIndicator } from '@/components/shared/ConnectionStatusIndicator';
 import { NewChatButton } from './NewChatButton';
 import { SessionList } from './SessionList';
+import { QuickSettingsPanel } from './QuickSettingsPanel';
 
 export const Sidebar = memo(function Sidebar() {
   const isSidebarOpen = useUIStore((state) => state.sidebarOpen);
@@ -75,18 +76,21 @@ export const Sidebar = memo(function Sidebar() {
       </div>
       <SessionList />
       <footer className="mt-auto p-3 border-t border-border">
-        <button
-          onClick={() => openModal({ type: 'settings' })}
-          className={cn(
-            'p-2 rounded-md',
-            'text-muted hover:text-foreground',
-            'transition-colors',
-          )}
-          aria-label="Open settings"
-          type="button"
-        >
-          <Settings size={18} />
-        </button>
+        <div className="flex items-center gap-1">
+          <QuickSettingsPanel />
+          <button
+            onClick={() => openModal({ type: 'settings' })}
+            className={cn(
+              'p-2 rounded-md',
+              'text-muted hover:text-foreground',
+              'transition-colors',
+            )}
+            aria-label="Open settings"
+            type="button"
+          >
+            <Settings size={18} />
+          </button>
+        </div>
       </footer>
     </aside>
   );
