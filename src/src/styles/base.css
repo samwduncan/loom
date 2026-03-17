@@ -63,3 +63,19 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ─── Reduced Motion: Global Override (A11Y-05) ────────────────────
+ * Disables ALL animations and transitions when user prefers reduced motion.
+ * Uses 0.01ms (not 0ms) to preserve animationend/transitionend event firing
+ * for JS logic that depends on those events (e.g., ActiveMessage crossfade).
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

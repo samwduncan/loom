@@ -53,3 +53,8 @@ export const DURATION = {
   slow: 400,
   spring: 500,
 } as const;
+
+/** Check if user prefers reduced motion. Use for JS-driven animations (framer-motion). */
+export function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
