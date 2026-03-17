@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: "The Refinery"
 status: completed
-stopped_at: Completed 35-01-PLAN.md
-last_updated: "2026-03-17T02:24:48.768Z"
-last_activity: 2026-03-17 -- Completed 35-01-PLAN.md (quick settings panel)
+stopped_at: Completed 35-02-PLAN.md
+last_updated: "2026-03-17T02:31:02Z"
+last_activity: 2026-03-17 -- Completed 35-02-PLAN.md (quick settings consumers)
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 15
-  completed_plans: 14
-  percent: 93
+  completed_plans: 15
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-12)
 ## Current Position
 
 Phase: 35 of 37 (Quick Settings)
-Plan: 1 of 2
-Status: Completed 35-01-PLAN.md -- quick settings popover with three toggles and Cmd+, shortcut
-Last activity: 2026-03-17 -- Completed 35-01-PLAN.md (quick settings panel)
+Plan: 2 of 2
+Status: Completed 35-02-PLAN.md -- quick settings consumers wired to tool components
+Last activity: 2026-03-17 -- Completed 35-02-PLAN.md (quick settings consumers)
 
-Progress: [█████████░] 93%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 34]: seenAssistantApiIds Set to track merged assistant entries in second pass index mapping
 - [Phase 34]: Nullish coalescing in JSX instead of non-null assertions (custom lint rule incompatible with JSX comments)
 - [Phase 35]: Callback-based shortcut hook: useQuickSettingsShortcut accepts callback so component owns popover state
+- [Phase 35]: ToolCallGroup reads autoExpandTools from store directly (not prop-threaded from AssistantMessage)
 
 ### Pending Todos
 
@@ -89,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T02:24:48.766Z
-Stopped at: Completed 35-01-PLAN.md
-Resume: Phase 34 complete. Phase 35 (Accessibility) next.
+Last session: 2026-03-17T02:31:02Z
+Stopped at: Completed 35-02-PLAN.md
+Resume: Phase 35 complete (all 2 plans). Phase 36 next.

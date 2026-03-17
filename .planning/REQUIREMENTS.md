@@ -46,7 +46,7 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 - [x] **UXR-04**: Usage footer is collapsible or subtle (doesn't dominate the message)
 - [x] **UXR-05**: Quick settings panel is accessible from sidebar or keyboard shortcut
 - [x] **UXR-06**: Quick settings includes toggles: auto-expand tools, show thinking, show raw params
-- [ ] **UXR-07**: Quick settings changes apply immediately without page reload
+- [x] **UXR-07**: Quick settings changes apply immediately without page reload
 
 ### Accessibility
 
@@ -121,7 +121,7 @@ Requirements for v1.3 "The Refinery" -- daily-driver UX, V1 feature parity, acce
 | UXR-04 | Phase 34 | Complete |
 | UXR-05 | Phase 35 | Complete |
 | UXR-06 | Phase 35 | Complete |
-| UXR-07 | Phase 35 | Pending |
+| UXR-07 | Phase 35 | Complete |
 | A11Y-01 | Phase 36 | Pending |
 | A11Y-02 | Phase 36 | Pending |
 | A11Y-03 | Phase 36 | Pending |
