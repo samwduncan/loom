@@ -74,7 +74,7 @@
 - [x] **Phase 34: Conversation UX** - Auto-collapsing old turns and per-turn usage footers (completed 2026-03-17)
 - [x] **Phase 35: Quick Settings** - Quick settings panel with live-updating behavior toggles (completed 2026-03-17)
 - [x] **Phase 36: Accessibility** - ARIA roles, keyboard navigation, focus management, screen reader support, and contrast audit (completed 2026-03-17)
-- [ ] **Phase 37: Performance** - FPS profiling, content-visibility stress test, memory leak audit, load time, and bundle analysis
+- [x] **Phase 37: Performance** - FPS profiling, content-visibility stress test, memory leak audit, load time, and bundle analysis (completed 2026-03-17)
 
 ## Phase Details
 
@@ -248,7 +248,7 @@ Phases 30 and 35 can run in parallel with 29 (independent dependencies).
 | 34. Conversation UX | 2/2 | Complete    | 2026-03-17 | - |
 | 35. Quick Settings | 2/2 | Complete    | 2026-03-17 | - |
 | 36. Accessibility | 3/3 | Complete    | 2026-03-17 | - |
-| 37. Performance | 1/2 | In Progress|  | - |
+| 37. Performance | 2/2 | Complete   | 2026-03-17 | - |
 
 ## Backlog (Future Milestones)
 
