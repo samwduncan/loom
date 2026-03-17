@@ -158,4 +158,80 @@ describe('useUIStore', () => {
     expect(useUIStore.getState().autoExpandTools).toBe(false);
     expect(useUIStore.getState().showRawParams).toBe(false);
   });
+
+  // -- Persist rehydration safety --
+  describe('persist rehydration safety', () => {
+    it('rehydration with stale localStorage (missing new fields) preserves current defaults', () => {
+      const merge = useUIStore.persist.getOptions().merge;
+      if (!merge) {
+        throw new Error('merge function not found on ui store — this is the bug');
+      }
+
+      // Simulate stale localStorage that only has theme + sidebarOpen (pre-v6 shape)
+      const stalePersistedState = {
+        theme: { fontSize: 14, density: 'comfortable', codeFontFamily: 'JetBrains Mono' },
+        sidebarOpen: false,
+      };
+
+      const currentState = useUIStore.getState();
+      const merged = merge(stalePersistedState, currentState);
+
+      // New fields should fall back to currentState defaults, not become undefined
+      expect(merged.autoExpandTools).toBe(false);
+      expect(merged.showRawParams).toBe(false);
+      expect(merged.thinkingExpanded).toBe(true);
+      // Persisted field should be applied
+      expect(merged.sidebarOpen).toBe(false);
+    });
+
+    it('rehydration with theme missing codeFontFamily preserves default font', () => {
+      const merge = useUIStore.persist.getOptions().merge;
+      if (!merge) {
+        throw new Error('merge function not found on ui store — this is the bug');
+      }
+
+      // Simulate theme that was saved before codeFontFamily existed
+      const stalePersistedState = {
+        theme: { fontSize: 16, density: 'compact' },
+        sidebarOpen: true,
+        thinkingExpanded: true,
+        autoExpandTools: false,
+        showRawParams: false,
+      };
+
+      const currentState = useUIStore.getState();
+      const merged = merge(stalePersistedState, currentState);
+
+      // Deep merge should preserve codeFontFamily from currentState defaults
+      expect(merged.theme.codeFontFamily).toBe('JetBrains Mono');
+      // Persisted theme fields should be applied
+      expect(merged.theme.fontSize).toBe(16);
+      expect(merged.theme.density).toBe('compact');
+    });
+
+    it('partialize output contains only expected keys (no actions, no ephemeral state)', () => {
+      const partialize = useUIStore.persist.getOptions().partialize;
+      if (!partialize) {
+        throw new Error('partialize function not found on ui store');
+      }
+
+      const output = partialize(useUIStore.getState());
+      const keys = Object.keys(output).sort();
+
+      expect(keys).toEqual([
+        'autoExpandTools',
+        'showRawParams',
+        'sidebarOpen',
+        'theme',
+        'thinkingExpanded',
+      ]);
+
+      // No actions or ephemeral state should leak through
+      expect(output).not.toHaveProperty('toggleSidebar');
+      expect(output).not.toHaveProperty('modalState');
+      expect(output).not.toHaveProperty('commandPaletteOpen');
+      expect(output).not.toHaveProperty('activeTab');
+      expect(output).not.toHaveProperty('companionState');
+    });
+  });
 });

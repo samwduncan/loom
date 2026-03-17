@@ -114,6 +114,26 @@ export const useUIStore = create<UIState>()(
         autoExpandTools: state.autoExpandTools,
         showRawParams: state.showRawParams,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<{
+          theme: Partial<typeof currentState.theme>;
+          sidebarOpen: boolean;
+          thinkingExpanded: boolean;
+          autoExpandTools: boolean;
+          showRawParams: boolean;
+        }>;
+        return {
+          ...currentState,
+          sidebarOpen: persisted.sidebarOpen ?? currentState.sidebarOpen,
+          thinkingExpanded: persisted.thinkingExpanded ?? currentState.thinkingExpanded,
+          autoExpandTools: persisted.autoExpandTools ?? currentState.autoExpandTools,
+          showRawParams: persisted.showRawParams ?? currentState.showRawParams,
+          theme: {
+            ...currentState.theme,
+            ...(persisted.theme ?? {}),
+          },
+        };
+      },
       migrate: (persistedState: unknown, version: number) => {
         // ASSERT: persistedState is the partialize output from a previous version
         // Migrations are chained sequentially — no early returns — so all applicable transforms run.
