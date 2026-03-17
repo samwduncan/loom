@@ -96,11 +96,11 @@
   2. Searching for a term highlights matches inside assistant message markdown bodies (not just user messages and thinking blocks)
   3. rehypeToolMarkers plugin file and all imports are completely removed from the codebase
   4. Clearing localStorage and reloading does not produce NaN values or broken UI in any store's rehydrated state
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 38-01: TBD
-- [ ] 38-02: TBD
+- [ ] 38-01-PLAN.md -- Fix @-mention file delivery, search highlighting, dead code removal
+- [ ] 38-02-PLAN.md -- Persist layer audit and NaN fix verification
 
 ### Phase 39: Backend Hardening
 **Goal**: Backend is resilient, self-recovering, and provides the infrastructure needed for session management features
@@ -209,7 +209,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 11-19 | v1.1 | 26/26 | Complete | 2026-03-09 |
 | 20-27 | v1.2 | 20/20 | Complete | 2026-03-12 |
 | 28-37 | v1.3 | 20/20 | Complete | 2026-03-17 |
-| 38. Broken Fixes & Persist Audit | v1.4 | 0/? | Not started | - |
+| 38. Broken Fixes & Persist Audit | v1.4 | 0/2 | Not started | - |
 | 39. Backend Hardening | v1.4 | 0/? | Not started | - |
 | 40. Session Titles & Rename | v1.4 | 0/? | Not started | - |
 | 41. Session Organization | v1.4 | 0/? | Not started | - |
@@ -222,4 +222,4 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-17 after v1.4 roadmap creation*
+*Last updated: 2026-03-17 after Phase 38 planning*
