@@ -30,10 +30,21 @@ const CHAT_ENTRY_TYPES = new Set<string>([
   'user', 'assistant', 'error', 'system', 'task_notification',
 ]);
 
+/** Model usage data from a result entry */
+interface ModelUsageData {
+  inputTokens?: number;
+  outputTokens?: number;
+  cacheReadInputTokens?: number;
+  cacheCreationInputTokens?: number;
+  cumulativeInputTokens?: number;
+  cumulativeOutputTokens?: number;
+}
+
 /** Raw JSONL entry shape from backend API */
 export interface BackendEntry {
   type: string;
   message?: {
+    id?: string;
     role: MessageRole;
     content: string | ContentBlock[];
   };
@@ -43,6 +54,10 @@ export interface BackendEntry {
   parentUuid?: string | null;
   toolUseResult?: { agentId?: string };
   subagentTools?: unknown[];
+  /** Present on type='result' entries -- per-model token usage */
+  modelUsage?: Record<string, ModelUsageData>;
+  /** Present on type='result' entries -- total cost in USD */
+  total_cost_usd?: number;
 }
 
 /** Backend session shape from GET /api/projects/:name/sessions */
@@ -157,7 +172,7 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
     // For assistant messages, merge consecutive entries that share the same
     // message.id (Claude sends text + tool_use as separate JSONL lines
     // within one API response).
-    const messageApiId = (entry.message as { id?: string })?.id;
+    const messageApiId = entry.message?.id;
 
     if (role === 'assistant' && messageApiId) {
       // Look ahead and merge all entries with the same message.id
@@ -166,7 +181,7 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
 
       while (i + 1 < chatEntries.length) {
         const next = chatEntries[i + 1]!; // ASSERT: bounded by chatEntries.length loop guard
-        const nextApiId = (next.message as { id?: string })?.id;
+        const nextApiId = next.message?.id;
         if (next.message?.role !== 'assistant' || nextApiId !== messageApiId) break;
 
         const nextContent = extractContent(next);
@@ -222,6 +237,61 @@ export function transformBackendMessages(entries: BackendEntry[]): Message[] {
           agentName: null,
         },
       });
+    }
+  }
+
+  // Second pass: extract token data from result entries and attach to preceding assistant messages.
+  // Walk the original entries array, tracking which built message each chat entry maps to.
+  // Merged assistant entries (same message.id) must be counted as one built message.
+  let lastAssistantIdx = -1;
+  let builtMessageIdx = -1;
+  const seenAssistantApiIds = new Set<string>();
+
+  for (const entry of entries) {
+    // Track chat entries that produced messages
+    if (CHAT_ENTRY_TYPES.has(entry.type) && entry.message?.role) {
+      if (isToolResultEntry(entry)) continue;
+
+      const role = entry.message.role;
+      // Skip non-displayable entries (same logic as first pass)
+      if (role === 'user' && !entry.message.content) continue;
+      if (role === 'user' && typeof entry.message.content === 'string' && !entry.message.content.trim()) continue;
+
+      // For assistant entries with same message.id, only count first occurrence
+      const apiId = entry.message.id;
+      if (role === 'assistant' && apiId && seenAssistantApiIds.has(apiId)) {
+        continue; // Merged entry -- already counted
+      }
+      if (role === 'assistant' && apiId) {
+        seenAssistantApiIds.add(apiId);
+      }
+
+      builtMessageIdx++;
+
+      if (role === 'assistant') {
+        lastAssistantIdx = builtMessageIdx;
+      }
+    } else if (entry.type === 'result' && lastAssistantIdx >= 0) {
+      const msg = messages[lastAssistantIdx];
+      if (!msg) continue;
+
+      // Extract cost (always attach if present, even without modelUsage)
+      if (entry.total_cost_usd != null) {
+        msg.metadata.cost = entry.total_cost_usd;
+      }
+
+      // Extract token data from modelUsage (take first model's data)
+      if (entry.modelUsage) {
+        const modelKeys = Object.keys(entry.modelUsage);
+        if (modelKeys.length > 0) {
+          const usage = entry.modelUsage[modelKeys[0]!]; // ASSERT: length check guarantees index 0
+          if (usage) {
+            msg.metadata.inputTokens = usage.inputTokens ?? usage.cumulativeInputTokens ?? null;
+            msg.metadata.outputTokens = usage.outputTokens ?? usage.cumulativeOutputTokens ?? null;
+            msg.metadata.cacheReadTokens = usage.cacheReadInputTokens ?? null;
+          }
+        }
+      }
     }
   }
 

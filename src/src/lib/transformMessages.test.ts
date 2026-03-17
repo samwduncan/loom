@@ -276,6 +276,217 @@ describe('transformBackendMessages', () => {
   });
 });
 
+describe('transformBackendMessages result entry extraction', () => {
+  it('attaches token data from result entry to preceding assistant message', () => {
+    const entries: BackendEntry[] = [
+      {
+        type: 'user',
+        message: { role: 'user' as const, content: 'Hello' },
+        sessionId: 'sess-1',
+        uuid: 'msg-u1',
+      },
+      {
+        type: 'assistant',
+        message: {
+          id: 'api-1',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'Hi there' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'msg-a1',
+      },
+      {
+        type: 'result',
+        sessionId: 'sess-1',
+        modelUsage: {
+          'claude-sonnet-4-20250514': {
+            inputTokens: 1000,
+            outputTokens: 200,
+            cacheReadInputTokens: 500,
+            cacheCreationInputTokens: 50,
+          },
+        },
+        total_cost_usd: 0.0123,
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(2); // user + assistant, no result message
+    const assistant = messages[1]!; // ASSERT: toHaveLength(2) guarantees index 1 exists
+    expect(assistant.role).toBe('assistant');
+    expect(assistant.metadata.inputTokens).toBe(1000);
+    expect(assistant.metadata.outputTokens).toBe(200);
+    expect(assistant.metadata.cacheReadTokens).toBe(500);
+    expect(assistant.metadata.cost).toBe(0.0123);
+  });
+
+  it('attaches separate result data to multiple assistant messages', () => {
+    const entries: BackendEntry[] = [
+      {
+        type: 'user',
+        message: { role: 'user' as const, content: 'First question' },
+        sessionId: 'sess-1',
+        uuid: 'msg-u1',
+      },
+      {
+        type: 'assistant',
+        message: {
+          id: 'api-1',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'First answer' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'msg-a1',
+      },
+      {
+        type: 'result',
+        sessionId: 'sess-1',
+        modelUsage: {
+          'claude-sonnet-4-20250514': {
+            inputTokens: 500,
+            outputTokens: 100,
+            cacheReadInputTokens: 0,
+          },
+        },
+        total_cost_usd: 0.005,
+      },
+      {
+        type: 'user',
+        message: { role: 'user' as const, content: 'Second question' },
+        sessionId: 'sess-1',
+        uuid: 'msg-u2',
+      },
+      {
+        type: 'assistant',
+        message: {
+          id: 'api-2',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'Second answer' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'msg-a2',
+      },
+      {
+        type: 'result',
+        sessionId: 'sess-1',
+        modelUsage: {
+          'claude-sonnet-4-20250514': {
+            inputTokens: 800,
+            outputTokens: 300,
+            cacheReadInputTokens: 200,
+          },
+        },
+        total_cost_usd: 0.012,
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(4); // ASSERT: 2 user + 2 assistant, indices 0-3 valid
+    expect(messages[1]!.metadata.inputTokens).toBe(500); // ASSERT: length verified above
+    expect(messages[1]!.metadata.cost).toBe(0.005); // ASSERT: length verified above
+    expect(messages[3]!.metadata.inputTokens).toBe(800); // ASSERT: length verified above
+    expect(messages[3]!.metadata.cost).toBe(0.012); // ASSERT: length verified above
+  });
+
+  it('keeps null metadata when no result entry exists for assistant message', () => {
+    const entries: BackendEntry[] = [
+      {
+        type: 'assistant',
+        message: {
+          id: 'api-1',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'No result entry' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'msg-a1',
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1); // ASSERT: single message, index 0 valid
+    expect(messages[0]!.metadata.inputTokens).toBeNull(); // ASSERT: length verified above
+    expect(messages[0]!.metadata.outputTokens).toBeNull(); // ASSERT: length verified above
+    expect(messages[0]!.metadata.cacheReadTokens).toBeNull(); // ASSERT: length verified above
+    expect(messages[0]!.metadata.cost).toBeNull(); // ASSERT: length verified above
+  });
+
+  it('skips result entry with missing modelUsage', () => {
+    const entries: BackendEntry[] = [
+      {
+        type: 'assistant',
+        message: {
+          id: 'api-1',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'Answer' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'msg-a1',
+      },
+      {
+        type: 'result',
+        sessionId: 'sess-1',
+        total_cost_usd: 0.01,
+        // no modelUsage
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(1); // ASSERT: single message, index 0 valid
+    // cost should still be attached even without modelUsage
+    expect(messages[0]!.metadata.cost).toBe(0.01); // ASSERT: length verified above
+    expect(messages[0]!.metadata.inputTokens).toBeNull(); // ASSERT: length verified above
+  });
+
+  it('uses cumulativeInputTokens as fallback for inputTokens', () => {
+    const entries: BackendEntry[] = [
+      {
+        type: 'assistant',
+        message: {
+          id: 'api-1',
+          role: 'assistant' as const,
+          content: [{ type: 'text' as const, text: 'Answer' }],
+        },
+        sessionId: 'sess-1',
+        uuid: 'msg-a1',
+      },
+      {
+        type: 'result',
+        sessionId: 'sess-1',
+        modelUsage: {
+          'claude-sonnet-4-20250514': {
+            cumulativeInputTokens: 2000,
+            outputTokens: 400,
+          },
+        },
+        total_cost_usd: 0.02,
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages[0]!.metadata.inputTokens).toBe(2000); // ASSERT: single result, index 0 valid
+    expect(messages[0]!.metadata.outputTokens).toBe(400); // ASSERT: single result, index 0 valid
+  });
+
+  it('does not include result entries as messages in the output', () => {
+    const entries: BackendEntry[] = [
+      {
+        type: 'result',
+        sessionId: 'sess-1',
+        modelUsage: {
+          'claude-sonnet-4-20250514': {
+            inputTokens: 100,
+            outputTokens: 50,
+          },
+        },
+        total_cost_usd: 0.001,
+      },
+    ];
+
+    const messages = transformBackendMessages(entries);
+    expect(messages).toHaveLength(0);
+  });
+});
+
 describe('transformBackendSession', () => {
   it('maps backend session shape to frontend Session type', () => {
     const backend = {
