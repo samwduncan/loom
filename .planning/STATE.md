@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
 status: executing
-stopped_at: Completed 39-02-PLAN.md
-last_updated: "2026-03-17T23:34:00Z"
+stopped_at: Completed 39-01-PLAN.md
+last_updated: "2026-03-17T23:39:14.252Z"
 last_activity: 2026-03-17 — Completed session title endpoint and systemd service (39-02)
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -49,6 +49,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 38]: Search highlighting uses plain text fallback during active search rather than injecting into markdown AST
 - [39-02] Append-only fs.appendFile for JSONL title updates to avoid race conditions
 - [39-02] systemd as primary process manager, pm2 as documented fallback
+- [Phase 39-01]: refreshAuth uses module-level promise dedup to prevent concurrent 401 retries
+- [Phase 39-01]: Server WS ping interval 15s with 2-missed-pong termination; client pong timeout 30s
 
 ### Pending Todos
 
@@ -60,6 +62,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17T23:34:00Z
-Stopped at: Completed 39-02-PLAN.md
+Last session: 2026-03-17T23:39:14.250Z
+Stopped at: Completed 39-01-PLAN.md
 Resume: Phase 39 plan 02 complete, proceed to next plan or phase

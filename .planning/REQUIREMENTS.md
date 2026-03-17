@@ -28,10 +28,10 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 
 ### Backend Hardening
 
-- [ ] **BACK-01**: Auth auto-retry on failure with clear error messaging; graceful re-registration if DB is reset
+- [x] **BACK-01**: Auth auto-retry on failure with clear error messaging; graceful re-registration if DB is reset
 - [x] **BACK-02**: Backend session title PATCH endpoint at `/api/projects/:name/sessions/:id` writing summary entry to JSONL
 - [x] **BACK-03**: systemd service or pm2 config for automatic backend startup and crash recovery
-- [ ] **BACK-04**: WebSocket connection heartbeat (ping/pong keepalive) with silent disconnect detection
+- [x] **BACK-04**: WebSocket connection heartbeat (ping/pong keepalive) with silent disconnect detection
 
 ### Persist Layer Audit
 
@@ -93,10 +93,10 @@ Deferred to "The Polish" milestone. Visual transformation.
 | FIX-02 | Phase 38 | Complete |
 | FIX-03 | Phase 38 | Complete |
 | FIX-04 | Phase 38 | Complete |
-| BACK-01 | Phase 39 | Pending |
+| BACK-01 | Phase 39 | Complete |
 | BACK-02 | Phase 39 | Complete |
 | BACK-03 | Phase 43 | Complete |
-| BACK-04 | Phase 39 | Pending |
+| BACK-04 | Phase 39 | Complete |
 | PERS-01 | Phase 38 | Complete |
 | PERS-02 | Phase 38 | Complete |
 | E2E-01 | Phase 43 | Pending |
