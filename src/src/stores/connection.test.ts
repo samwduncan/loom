@@ -122,9 +122,9 @@ describe('useConnectionStore', () => {
     // reconnectAttempts would be undefined and undefined + 1 = NaN.
     useConnectionStore.setState({
       providers: {
-        claude: { modelId: 'claude-sonnet' } as never,
-        codex: { modelId: null } as never,
-        gemini: { modelId: null } as never,
+        claude: { modelId: 'claude-sonnet' } as never, // SAFETY: simulating corrupt rehydration state with only modelId
+        codex: { modelId: null } as never, // SAFETY: simulating corrupt rehydration state
+        gemini: { modelId: null } as never, // SAFETY: simulating corrupt rehydration state
       },
     });
 

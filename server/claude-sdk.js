@@ -26,6 +26,10 @@ const TOOL_APPROVAL_TIMEOUT_MS = parseInt(process.env.CLAUDE_TOOL_APPROVAL_TIMEO
 
 const TOOLS_REQUIRING_INTERACTION = new Set(['AskUserQuestion']);
 
+function escapeXml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function createRequestId() {
   if (typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
@@ -479,15 +483,24 @@ async function queryClaudeSDK(command, options = {}, ws) {
 
     // Handle file mentions - read files and prepend content to prompt
     if (options.fileMentions && options.fileMentions.length > 0) {
-      const projectDir = options.projectPath || options.cwd || process.cwd();
+      const projectDir = path.resolve(options.projectPath || options.cwd || process.cwd());
       const fileContents = [];
-      for (const filePath of options.fileMentions) {
+      for (const rawPath of options.fileMentions) {
+        // Security: reject absolute paths and resolve relative paths against projectDir
+        if (path.isAbsolute(rawPath)) {
+          fileContents.push(`<file path="${escapeXml(rawPath)}" error="Absolute paths not allowed" />`);
+          continue;
+        }
+        const resolved = path.resolve(projectDir, rawPath);
+        if (!resolved.startsWith(projectDir + path.sep) && resolved !== projectDir) {
+          fileContents.push(`<file path="${escapeXml(rawPath)}" error="Path outside project directory" />`);
+          continue;
+        }
         try {
-          const absPath = path.isAbsolute(filePath) ? filePath : path.join(projectDir, filePath);
-          const content = await fs.readFile(absPath, 'utf-8');
-          fileContents.push(`<file path="${filePath}">\n${content}\n</file>`);
+          const content = await fs.readFile(resolved, 'utf-8');
+          fileContents.push(`<file path="${escapeXml(rawPath)}">\n${content}\n</file>`);
         } catch (err) {
-          fileContents.push(`<file path="${filePath}" error="Could not read: ${err.message}" />`);
+          fileContents.push(`<file path="${escapeXml(rawPath)}" error="Could not read: ${escapeXml(err.message)}" />`);
         }
       }
       if (fileContents.length > 0) {

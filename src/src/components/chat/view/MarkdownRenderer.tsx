@@ -18,16 +18,12 @@ import { useState, useMemo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { ToolChip } from '@/components/chat/tools/ToolChip';
 import { ImageLightbox } from '@/components/chat/view/ImageLightbox';
 import { CodeBlock } from './CodeBlock';
 import type { Components } from 'react-markdown';
-import type { ToolCallState } from '@/types/stream';
 
 interface MarkdownRendererProps {
   content: string;
-  /** Optional tool calls for inline tool-marker rendering */
-  toolCalls?: ToolCallState[];
 }
 
 const components: Components = {
@@ -164,49 +160,14 @@ const components: Components = {
   ),
 };
 
-/**
- * ToolMarkerInline — renders an inline tool chip from a tool-marker element.
- * Looks up the toolCallId in the provided toolCalls array.
- */
-function ToolMarkerInline({
-  toolCallId,
-  toolCalls,
-}: {
-  toolCallId: string;
-  toolCalls: ToolCallState[];
-}) {
-  const toolCall = toolCalls.find((tc) => tc.id === toolCallId);
-  if (!toolCall) return null;
-  return <ToolChip toolCall={toolCall} />;
-}
-
-/**
- * Build component overrides that include tool-marker rendering.
- * Returns a stable reference when no toolCalls are provided.
- */
-function buildComponents(toolCalls?: ToolCallState[]): Components {
-  if (!toolCalls || toolCalls.length === 0) return components;
-
-  return {
-    ...components,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    'tool-marker': (props: any) => { // ANY: react-markdown passes arbitrary DOM props for custom elements
-      const toolId = props['data-id'] as string | undefined;
-      if (!toolId) return null;
-      return <ToolMarkerInline toolCallId={toolId} toolCalls={toolCalls} />;
-    },
-  } as Components;
-}
-
-export function MarkdownRenderer({ content, toolCalls }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   // Memoize components to prevent react-markdown from remounting custom elements
   // on parent re-renders. Without this, ToolChip loses expanded state on every render.
   const componentsWithImg = useMemo<Components>(() => {
-    const resolved = buildComponents(toolCalls);
     return {
-      ...resolved,
+      ...components,
       img: ({ src, alt, ...props }) => (
         <img
           src={src}
@@ -217,7 +178,7 @@ export function MarkdownRenderer({ content, toolCalls }: MarkdownRendererProps) 
         />
       ),
     };
-  }, [toolCalls]);
+  }, []);
 
   return (
     <div className="markdown-body text-foreground text-sm leading-relaxed">

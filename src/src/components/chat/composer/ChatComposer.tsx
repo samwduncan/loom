@@ -634,7 +634,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
               data-visible={isStreamingState ? 'true' : 'false'}
               className={cn(
                 'flex h-8 w-8 items-center justify-center rounded-lg',
-                'bg-status-error text-foreground',
+                'bg-destructive text-foreground',
                 'disabled:opacity-40 disabled:cursor-not-allowed',
                 'hover:opacity-80 transition-opacity',
               )}
