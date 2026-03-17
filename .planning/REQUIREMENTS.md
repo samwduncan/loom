@@ -21,9 +21,9 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 
 ### Broken Feature Fixes
 
-- [ ] **FIX-01**: @-mention file picker sends fileMentions array over WebSocket so file context reaches the AI
-- [ ] **FIX-02**: Search highlighting works in assistant message markdown bodies (not just user messages and thinking blocks)
-- [ ] **FIX-03**: rehypeToolMarkers dead code removed from codebase (plugin file + MarkdownRenderer import)
+- [x] **FIX-01**: @-mention file picker sends fileMentions array over WebSocket so file context reaches the AI
+- [x] **FIX-02**: Search highlighting works in assistant message markdown bodies (not just user messages and thinking blocks)
+- [x] **FIX-03**: rehypeToolMarkers dead code removed from codebase (plugin file + MarkdownRenderer import)
 - [x] **FIX-04**: NaN reconnect attempts display fixed via persist merge function and defensive guard (ALREADY DONE — verify in tests)
 
 ### Backend Hardening
@@ -89,9 +89,9 @@ Deferred to "The Polish" milestone. Visual transformation.
 | SESS-07 | Phase 42 | Pending |
 | SESS-08 | Phase 42 | Pending |
 | SESS-09 | Phase 42 | Pending |
-| FIX-01 | Phase 38 | Pending |
-| FIX-02 | Phase 38 | Pending |
-| FIX-03 | Phase 38 | Pending |
+| FIX-01 | Phase 38 | Complete |
+| FIX-02 | Phase 38 | Complete |
+| FIX-03 | Phase 38 | Complete |
 | FIX-04 | Phase 38 | Complete |
 | BACK-01 | Phase 39 | Pending |
 | BACK-02 | Phase 39 | Pending |

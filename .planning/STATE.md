@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
 status: executing
-stopped_at: "Completed 38-02-PLAN.md"
-last_updated: "2026-03-17T23:05:00Z"
+stopped_at: Completed 38-01-PLAN.md
+last_updated: "2026-03-17T23:05:56.874Z"
 last_activity: 2026-03-17 — Completed persist rehydration audit (38-02)
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -45,6 +45,8 @@ Last activity: 2026-03-17 — Completed persist rehydration audit (38-02)
 - [38-02] Deep merge for ui store theme object to preserve nested defaults like codeFontFamily
 - [38-02] Nullish coalescing for scalar fields in persist merge to allow false to persist correctly
 See PROJECT.md Key Decisions table for full history.
+- [Phase 38]: fileMentions sent as WS options field, backend reads files and prepends XML-wrapped content to prompt
+- [Phase 38]: Search highlighting uses plain text fallback during active search rather than injecting into markdown AST
 
 ### Pending Todos
 
@@ -56,6 +58,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-17
-Stopped at: Completed 38-02-PLAN.md (persist rehydration audit)
+Last session: 2026-03-17T23:05:56.873Z
+Stopped at: Completed 38-01-PLAN.md
 Resume: Phase 38 complete, proceed to next phase
