@@ -7,11 +7,11 @@
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6).
  */
 
-import type { DateGroup } from '@/lib/formatTime';
+import type { SessionDateGroup } from '@/types/session';
 import { cn } from '@/utils/cn';
 
 interface DateGroupHeaderProps {
-  label: DateGroup;
+  label: SessionDateGroup;
 }
 
 export function DateGroupHeader({ label }: DateGroupHeaderProps) {
