@@ -168,11 +168,11 @@ Plans:
   3. Image paste/drag-drop into composer sends the image and it displays in the conversation
   4. Conversation export produces a valid downloadable file, message retry re-sends the last user message
   5. Git operations (push/pull/fetch, diff view, branch create/switch/delete) all complete successfully with status feedback
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 43-01: TBD
-- [ ] 43-02: TBD
+- [ ] 43-01-PLAN.md -- Chat E2E: permission banners, token usage, image attachments, export, retry
+- [ ] 43-02-PLAN.md -- Git & UX E2E: git operations, quick settings, auto-collapse, navigate guard
 
 ### v1.5 "The Polish" (Planned)
 
@@ -213,7 +213,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 40. Session Titles & Rename | 1/1 | Complete    | 2026-03-18 | - |
 | 41. Session Organization | 2/2 | Complete    | 2026-03-18 | - |
 | 42. Session Discovery | 2/2 | Complete    | 2026-03-18 | - |
-| 43. E2E Verification | v1.4 | 0/? | Not started | - |
+| 43. E2E Verification | v1.4 | 0/2 | Not started | - |
 
 ## Backlog (Future Milestones)
 
@@ -221,4 +221,4 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-18 after Phase 42 planning*
+*Last updated: 2026-03-18 after Phase 43 planning*
