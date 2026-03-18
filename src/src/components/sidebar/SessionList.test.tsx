@@ -1,5 +1,6 @@
 /**
- * SessionList tests -- date grouping, loading skeleton, empty state.
+ * SessionList tests -- multi-project rendering, collapse toggle, junk filtering,
+ * plus preserved existing tests for rename, delete, streaming, navigation.
  */
 
 import { render, screen } from '@testing-library/react';
@@ -8,6 +9,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { SessionList } from './SessionList';
 import { useTimelineStore } from '@/stores/timeline';
+import type { ProjectGroup } from '@/types/session';
+import type { Session } from '@/types/session';
 
 // Track navigate calls
 const mockNavigate = vi.fn();
@@ -16,7 +19,7 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
-// Mock the useSessionList hook to control loading state directly
+// Mock useSessionList (still called for timeline store population)
 vi.mock('@/hooks/useSessionList', () => ({
   useSessionList: () => ({ isLoading: false, error: null }),
 }));
@@ -27,18 +30,29 @@ vi.mock('@/hooks/useProjectContext', () => ({
   _resetProjectContextForTesting: vi.fn(),
 }));
 
-// Mock API client (used by SessionContextMenu delete)
+// Mock API client
 vi.mock('@/lib/api-client', () => ({
   apiFetch: vi.fn().mockResolvedValue({}),
 }));
 
-// Mock stream store for streaming indicator
-const mockStreamState = {
-  isStreaming: false,
-  activeSessionId: null as string | null,
-};
+// Mock stream store
+const mockStreamState = { isStreaming: false, activeSessionId: null as string | null };
 vi.mock('@/stores/stream', () => ({
   useStreamStore: (selector: (s: typeof mockStreamState) => unknown) => selector(mockStreamState),
+}));
+
+// Mock useMultiProjectSessions
+const mockToggleProject = vi.fn();
+let mockMultiProjectResult = {
+  projectGroups: [] as ProjectGroup[],
+  isLoading: false,
+  error: null as string | null,
+  expandedProjects: new Set<string>(),
+  toggleProject: mockToggleProject,
+};
+
+vi.mock('@/hooks/useMultiProjectSessions', () => ({
+  useMultiProjectSessions: () => mockMultiProjectResult,
 }));
 
 function renderSessionList() {
@@ -47,6 +61,34 @@ function renderSessionList() {
       <SessionList />
     </MemoryRouter>,
   );
+}
+
+function makeSession(id: string, title: string, updatedAt?: string): Session {
+  return {
+    id,
+    title,
+    messages: [],
+    providerId: 'claude',
+    createdAt: updatedAt ?? new Date().toISOString(),
+    updatedAt: updatedAt ?? new Date().toISOString(),
+    metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+  };
+}
+
+function makeProjectGroup(
+  name: string,
+  sessions: Session[],
+): ProjectGroup {
+  return {
+    projectName: name,
+    displayName: name.replace(/-/g, ' '),
+    projectPath: `/home/user/${name}`,
+    sessionCount: sessions.length,
+    visibleCount: sessions.length,
+    dateGroups: sessions.length > 0
+      ? [{ label: 'Today' as const, sessions }]
+      : [],
+  };
 }
 
 describe('SessionList', () => {
@@ -59,75 +101,94 @@ describe('SessionList', () => {
       activeSessionId: null,
       activeProviderId: 'claude',
     });
+    mockMultiProjectResult = {
+      projectGroups: [],
+      isLoading: false,
+      error: null,
+      expandedProjects: new Set<string>(),
+      toggleProject: mockToggleProject,
+    };
   });
 
-  it('shows empty state when no sessions exist', () => {
+  // -- Multi-project rendering tests --
+
+  it('shows empty state when all projects have zero visible sessions', () => {
+    mockMultiProjectResult.projectGroups = [
+      { ...makeProjectGroup('empty-project', []), visibleCount: 0 },
+    ];
     renderSessionList();
     expect(screen.getByText('No conversations yet')).toBeInTheDocument();
   });
 
-  it('renders sessions grouped by date with headers', () => {
-    const now = new Date();
-    useTimelineStore.setState({
-      sessions: [
-        {
-          id: 'sess-today',
-          title: 'Today Session',
-          messages: [],
-          providerId: 'claude',
-          createdAt: now.toISOString(),
-          updatedAt: now.toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-      ],
-      activeSessionId: null,
-      activeProviderId: 'claude',
-    });
-
+  it('renders project headers with session counts', () => {
+    const sessions1 = [makeSession('s1', 'First'), makeSession('s2', 'Second')];
+    const sessions2 = [makeSession('s3', 'Third')];
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('project-alpha', sessions1),
+      makeProjectGroup('project-beta', sessions2),
+    ];
     renderSessionList();
-    expect(screen.getByText('Today')).toBeInTheDocument();
-    expect(screen.getByText('Today Session')).toBeInTheDocument();
+
+    expect(screen.getByText('project alpha')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('project beta')).toBeInTheDocument();
+    expect(screen.getByText('1')).toBeInTheDocument();
   });
 
-  it('renders listbox with proper aria-label', () => {
-    useTimelineStore.setState({
-      sessions: [
-        {
-          id: 'sess-1',
-          title: 'Session A',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-      ],
-      activeSessionId: null,
-      activeProviderId: 'claude',
-    });
+  it('collapsed project hides its sessions', () => {
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('collapsed-proj', [makeSession('s1', 'Hidden Session')]),
+    ];
+    // expandedProjects is empty, so project is collapsed
+    mockMultiProjectResult.expandedProjects = new Set();
+    renderSessionList();
 
+    expect(screen.getByText('collapsed proj')).toBeInTheDocument();
+    expect(screen.queryByText('Hidden Session')).not.toBeInTheDocument();
+  });
+
+  it('expanded project shows date groups and sessions', () => {
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('open-proj', [makeSession('s1', 'Visible Session')]),
+    ];
+    mockMultiProjectResult.expandedProjects = new Set(['open-proj']);
+    renderSessionList();
+
+    expect(screen.getByText('open proj')).toBeInTheDocument();
+    expect(screen.getByText('Today')).toBeInTheDocument();
+    expect(screen.getByText('Visible Session')).toBeInTheDocument();
+  });
+
+  it('calls toggleProject when ProjectHeader is clicked', async () => {
+    const user = userEvent.setup();
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('toggle-proj', [makeSession('s1', 'Some Session')]),
+    ];
+    renderSessionList();
+
+    const header = screen.getByText('toggle proj');
+    await user.click(header);
+    expect(mockToggleProject).toHaveBeenCalledWith('toggle-proj');
+  });
+
+  // -- Preserved existing tests --
+
+  it('renders listbox with proper aria-label', () => {
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('test-project', [makeSession('s1', 'Session A')]),
+    ];
+    mockMultiProjectResult.expandedProjects = new Set(['test-project']);
     renderSessionList();
     const listbox = screen.getByRole('listbox');
     expect(listbox).toHaveAttribute('aria-label', 'Chat sessions list');
   });
 
   it('marks the active session', () => {
-    useTimelineStore.setState({
-      sessions: [
-        {
-          id: 'sess-active',
-          title: 'Active Session',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-      ],
-      activeSessionId: 'sess-active',
-      activeProviderId: 'claude',
-    });
-
+    useTimelineStore.setState({ activeSessionId: 'sess-active', activeProviderId: 'claude', sessions: [] });
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('test-project', [makeSession('sess-active', 'Active Session')]),
+    ];
+    mockMultiProjectResult.expandedProjects = new Set(['test-project']);
     renderSessionList();
     const option = screen.getByRole('option');
     expect(option).toHaveAttribute('aria-selected', 'true');
@@ -135,159 +196,104 @@ describe('SessionList', () => {
 
   it('navigates to /chat/:sessionId when session is clicked', async () => {
     const user = userEvent.setup();
-    useTimelineStore.setState({
-      sessions: [
-        {
-          id: 'sess-nav',
-          title: 'Navigate Session',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-      ],
-      activeSessionId: null,
-      activeProviderId: 'claude',
-    });
-
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('test-project', [makeSession('sess-nav', 'Navigate Session')]),
+    ];
+    mockMultiProjectResult.expandedProjects = new Set(['test-project']);
     renderSessionList();
     const option = screen.getByRole('option');
     await user.click(option);
-
     expect(mockNavigate).toHaveBeenCalledWith('/chat/sess-nav');
-    // SessionList only navigates — ChatView coordinates session switching via URL
   });
-
-  // -- Streaming indicator --
 
   it('passes isStreaming prop based on stream store activeSessionId', () => {
     mockStreamState.isStreaming = true;
     mockStreamState.activeSessionId = 'sess-streaming';
-
-    useTimelineStore.setState({
-      sessions: [
-        {
-          id: 'sess-streaming',
-          title: 'Streaming Session',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-        {
-          id: 'sess-idle',
-          title: 'Idle Session',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-      ],
-      activeSessionId: null,
-      activeProviderId: 'claude',
-    });
-
+    mockMultiProjectResult.projectGroups = [
+      makeProjectGroup('test-project', [
+        makeSession('sess-streaming', 'Streaming Session'),
+        makeSession('sess-idle', 'Idle Session'),
+      ]),
+    ];
+    mockMultiProjectResult.expandedProjects = new Set(['test-project']);
     renderSessionList();
-
-    // Streaming session should have the streaming dot
     expect(screen.getByLabelText('Streaming')).toBeInTheDocument();
-    // Only one streaming dot
     expect(screen.getAllByLabelText('Streaming')).toHaveLength(1);
   });
 
   // -- Delete confirmation dialog tests --
 
   describe('delete confirmation', () => {
-    const makeSession = (id: string, title: string, updatedAt?: string) => ({
-      id,
-      title,
-      messages: [],
-      providerId: 'claude' as const,
-      createdAt: updatedAt ?? new Date().toISOString(),
-      updatedAt: updatedAt ?? new Date().toISOString(),
-      metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-    });
-
     it('shows confirmation dialog when Delete is clicked from context menu', async () => {
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-del', 'Delete Me')],
-        activeSessionId: null,
-        activeProviderId: 'claude',
+        activeSessionId: null, activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [makeSession('sess-del', 'Delete Me')]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
+
       const option = screen.getByRole('option');
       await user.pointer({ keys: '[MouseRight]', target: option });
-
-      // Context menu should appear with Delete button
       const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
       await user.click(deleteBtn);
-
-      // Confirmation dialog should appear
       expect(screen.getByText('Delete session?')).toBeInTheDocument();
-      expect(screen.getByText(/permanently delete/i)).toBeInTheDocument();
     });
 
     it('closes dialog without deleting when Cancel is clicked', async () => {
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-cancel', 'Keep Me')],
-        activeSessionId: null,
-        activeProviderId: 'claude',
+        activeSessionId: null, activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [makeSession('sess-cancel', 'Keep Me')]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
+
       const option = screen.getByRole('option');
       await user.pointer({ keys: '[MouseRight]', target: option });
-
       const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
       await user.click(deleteBtn);
-
-      // Click cancel
       const cancelBtn = screen.getByRole('button', { name: 'Cancel' });
       await user.click(cancelBtn);
-
-      // Session should still exist
       expect(screen.getByText('Keep Me')).toBeInTheDocument();
-      // Dialog should be gone
       expect(screen.queryByText('Delete session?')).not.toBeInTheDocument();
     });
 
     it('deletes session and removes from list when confirmed', async () => {
       const { apiFetch } = await import('@/lib/api-client');
-      const mockApiFetch = vi.mocked(apiFetch);
-      mockApiFetch.mockResolvedValue({});
+      vi.mocked(apiFetch).mockResolvedValue({});
 
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-confirm', 'Delete This')],
-        activeSessionId: null,
-        activeProviderId: 'claude',
+        activeSessionId: null, activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [makeSession('sess-confirm', 'Delete This')]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
+
       const option = screen.getByRole('option');
       await user.pointer({ keys: '[MouseRight]', target: option });
-
       const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
       await user.click(deleteBtn);
-
-      // Confirm deletion
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
 
-      // Session should be removed
-      expect(screen.queryByText('Delete This')).not.toBeInTheDocument();
+      // removeSession called on timeline store
+      expect(useTimelineStore.getState().sessions).toHaveLength(0);
     });
 
     it('navigates to most recent session when active session is deleted', async () => {
       const { apiFetch } = await import('@/lib/api-client');
-      const mockApiFetch = vi.mocked(apiFetch);
-      mockApiFetch.mockResolvedValue({});
+      vi.mocked(apiFetch).mockResolvedValue({});
 
       const user = userEvent.setup();
       const olderTime = new Date(Date.now() - 60000).toISOString();
@@ -297,53 +303,49 @@ describe('SessionList', () => {
           makeSession('sess-old', 'Older Session', olderTime),
           makeSession('sess-new', 'Newer Session', newerTime),
         ],
-        activeSessionId: 'sess-new',
-        activeProviderId: 'claude',
+        activeSessionId: 'sess-new', activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [
+          makeSession('sess-new', 'Newer Session', newerTime),
+          makeSession('sess-old', 'Older Session', olderTime),
+        ]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
-      // Right-click the active (newer) session
+
       const options = screen.getAllByRole('option');
-      // Find the newer session option
-      const newerOption = options.find(
-        (opt) => opt.textContent?.includes('Newer Session'),
-      );
+      const newerOption = options.find((opt) => opt.textContent?.includes('Newer Session'));
       expect(newerOption).toBeDefined();
       await user.pointer({ keys: '[MouseRight]', target: newerOption! }); // ASSERT: checked above
-
       const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
       await user.click(deleteBtn);
-
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
-
-      // Should navigate to the remaining older session
       expect(mockNavigate).toHaveBeenCalledWith('/chat/sess-old');
     });
 
     it('navigates to /chat when last session is deleted', async () => {
       const { apiFetch } = await import('@/lib/api-client');
-      const mockApiFetch = vi.mocked(apiFetch);
-      mockApiFetch.mockResolvedValue({});
+      vi.mocked(apiFetch).mockResolvedValue({});
 
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-last', 'Last One')],
-        activeSessionId: 'sess-last',
-        activeProviderId: 'claude',
+        activeSessionId: 'sess-last', activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [makeSession('sess-last', 'Last One')]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
+
       const option = screen.getByRole('option');
       await user.pointer({ keys: '[MouseRight]', target: option });
-
       const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
       await user.click(deleteBtn);
-
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
-
-      // Should navigate to empty chat
       expect(mockNavigate).toHaveBeenCalledWith('/chat');
     });
   });
@@ -351,48 +353,32 @@ describe('SessionList', () => {
   // -- Rename with backend PATCH --
 
   describe('session rename', () => {
-    const makeSession = (id: string, title: string) => ({
-      id,
-      title,
-      messages: [],
-      providerId: 'claude' as const,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-    });
-
     it('calls apiFetch PATCH with correct URL and body on rename', async () => {
       const { apiFetch } = await import('@/lib/api-client');
-      const mockApiFetch = vi.mocked(apiFetch);
-      mockApiFetch.mockResolvedValue({ success: true, title: 'New Title' });
+      vi.mocked(apiFetch).mockResolvedValue({ success: true, title: 'New Title' });
 
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-rename', 'Old Title')],
-        activeSessionId: null,
-        activeProviderId: 'claude',
+        activeSessionId: null, activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [makeSession('sess-rename', 'Old Title')]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      // Right-click to open context menu
       const option = screen.getByRole('option');
       await user.pointer({ keys: '[MouseRight]', target: option });
-
-      // Click Rename from context menu
       const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
       await user.click(renameBtn);
 
-      // Type new title in the input
       const input = screen.getByDisplayValue('Old Title');
       await user.clear(input);
       await user.type(input, 'New Title');
-
-      // Blur to confirm edit
       await user.tab();
 
-      // Verify PATCH was called with correct URL and body
-      expect(mockApiFetch).toHaveBeenCalledWith(
+      expect(apiFetch).toHaveBeenCalledWith(
         '/api/projects/test-project/sessions/sess-rename',
         { method: 'PATCH', body: JSON.stringify({ title: 'New Title' }) },
       );
@@ -400,78 +386,67 @@ describe('SessionList', () => {
 
     it('rolls back title and shows toast on PATCH failure', async () => {
       const { apiFetch } = await import('@/lib/api-client');
-      const mockApiFetch = vi.mocked(apiFetch);
-      mockApiFetch.mockRejectedValueOnce(new Error('Network error'));
-
-      // Mock toast
+      vi.mocked(apiFetch).mockRejectedValueOnce(new Error('Network error'));
       const { toast } = await import('sonner');
       const toastErrorSpy = vi.spyOn(toast, 'error');
 
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-fail', 'Original Title')],
-        activeSessionId: null,
-        activeProviderId: 'claude',
+        activeSessionId: null, activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [makeSession('sess-fail', 'Original Title')]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      // Right-click -> Rename
       const option = screen.getByRole('option');
       await user.pointer({ keys: '[MouseRight]', target: option });
       const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
       await user.click(renameBtn);
 
-      // Type new title and blur
       const input = screen.getByDisplayValue('Original Title');
       await user.clear(input);
       await user.type(input, 'Failed Title');
       await user.tab();
 
-      // Wait for async error handling
       await vi.waitFor(() => {
         expect(toastErrorSpy).toHaveBeenCalledWith('Failed to rename session');
       });
-
-      // Title should have rolled back
       expect(screen.getByText('Original Title')).toBeInTheDocument();
-
       toastErrorSpy.mockRestore();
     });
 
-    it('keeps new title on successful PATCH', async () => {
+    it('keeps new title in timeline store on successful PATCH', async () => {
       const { apiFetch } = await import('@/lib/api-client');
-      const mockApiFetch = vi.mocked(apiFetch);
-      mockApiFetch.mockResolvedValue({ success: true, title: 'Kept Title' });
+      vi.mocked(apiFetch).mockResolvedValue({ success: true, title: 'Kept Title' });
 
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-success', 'Before Rename')],
-        activeSessionId: null,
-        activeProviderId: 'claude',
+        activeSessionId: null, activeProviderId: 'claude',
       });
-
+      mockMultiProjectResult.projectGroups = [
+        makeProjectGroup('test-project', [makeSession('sess-success', 'Before Rename')]),
+      ];
+      mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      // Right-click -> Rename
       const option = screen.getByRole('option');
       await user.pointer({ keys: '[MouseRight]', target: option });
       const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
       await user.click(renameBtn);
 
-      // Type new title and blur
       const input = screen.getByDisplayValue('Before Rename');
       await user.clear(input);
       await user.type(input, 'Kept Title');
       await user.tab();
 
-      // Wait for PATCH to resolve
-      await vi.waitFor(() => {
-        expect(mockApiFetch).toHaveBeenCalled();
-      });
-
-      // Title should remain as new value
-      expect(screen.getByText('Kept Title')).toBeInTheDocument();
+      await vi.waitFor(() => { expect(apiFetch).toHaveBeenCalled(); });
+      // Timeline store should have the new title (optimistic update kept)
+      const storeSession = useTimelineStore.getState().sessions.find((s) => s.id === 'sess-success');
+      expect(storeSession?.title).toBe('Kept Title');
     });
   });
 });

@@ -31,6 +31,18 @@ vi.mock('@/hooks/useProjectContext', () => ({
   _resetProjectContextForTesting: vi.fn(),
 }));
 
+// Mock useMultiProjectSessions for multi-project rendering
+const mockMultiProjectResult = {
+  projectGroups: [] as import('@/types/session').ProjectGroup[],
+  isLoading: false,
+  error: null as string | null,
+  expandedProjects: new Set<string>(),
+  toggleProject: vi.fn(),
+};
+vi.mock('@/hooks/useMultiProjectSessions', () => ({
+  useMultiProjectSessions: () => mockMultiProjectResult,
+}));
+
 // Mock API client
 vi.mock('@/lib/api-client', () => ({
   apiFetch: vi.fn().mockResolvedValue({}),
@@ -195,21 +207,29 @@ describe('All buttons have accessible names', () => {
 
 describe('SessionItem listbox semantics', () => {
   beforeEach(() => {
+    const session = {
+      id: 'session-1',
+      title: 'Test Session',
+      messages: [],
+      providerId: 'claude' as const,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+    };
     useTimelineStore.setState({
-      sessions: [
-        {
-          id: 'session-1',
-          title: 'Test Session',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-      ],
+      sessions: [session],
       activeSessionId: 'session-1',
       activeProviderId: 'claude',
     });
+    mockMultiProjectResult.projectGroups = [{
+      projectName: 'test-project',
+      displayName: 'test project',
+      projectPath: '/home/user/test-project',
+      sessionCount: 1,
+      visibleCount: 1,
+      dateGroups: [{ label: 'Today' as const, sessions: [session] }],
+    }];
+    mockMultiProjectResult.expandedProjects = new Set(['test-project']);
   });
 
   it('session list has listbox role and session items have option role with aria-selected', () => {

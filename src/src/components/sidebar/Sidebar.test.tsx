@@ -27,6 +27,18 @@ vi.mock('@/lib/api-client', () => ({
   apiFetch: vi.fn().mockResolvedValue({}),
 }));
 
+// Mock useMultiProjectSessions for multi-project rendering
+const mockMultiProjectResult = {
+  projectGroups: [] as import('@/types/session').ProjectGroup[],
+  isLoading: false,
+  error: null as string | null,
+  expandedProjects: new Set<string>(),
+  toggleProject: vi.fn(),
+};
+vi.mock('@/hooks/useMultiProjectSessions', () => ({
+  useMultiProjectSessions: () => mockMultiProjectResult,
+}));
+
 function renderSidebar() {
   return render(
     <MemoryRouter>
@@ -37,12 +49,17 @@ function renderSidebar() {
 
 describe('Sidebar', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     useUIStore.setState({ sidebarOpen: true });
     useTimelineStore.setState({
       sessions: [],
       activeSessionId: null,
       activeProviderId: 'claude',
     });
+    mockMultiProjectResult.projectGroups = [];
+    mockMultiProjectResult.isLoading = false;
+    mockMultiProjectResult.error = null;
+    mockMultiProjectResult.expandedProjects = new Set();
   });
 
   it('renders "Loom" wordmark in Instrument Serif italic font', () => {
@@ -101,21 +118,29 @@ describe('Sidebar', () => {
   });
 
   it('renders session list when sessions exist', () => {
+    const session = {
+      id: 'sess-1',
+      title: 'Test Session',
+      messages: [],
+      providerId: 'claude' as const,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+    };
     useTimelineStore.setState({
-      sessions: [
-        {
-          id: 'sess-1',
-          title: 'Test Session',
-          messages: [],
-          providerId: 'claude',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
-        },
-      ],
+      sessions: [session],
       activeSessionId: null,
       activeProviderId: 'claude',
     });
+    mockMultiProjectResult.projectGroups = [{
+      projectName: 'test-project',
+      displayName: 'test project',
+      projectPath: '/home/user/test-project',
+      sessionCount: 1,
+      visibleCount: 1,
+      dateGroups: [{ label: 'Today' as const, sessions: [session] }],
+    }];
+    mockMultiProjectResult.expandedProjects = new Set(['test-project']);
     renderSidebar();
     expect(screen.getByText('Test Session')).toBeInTheDocument();
   });
