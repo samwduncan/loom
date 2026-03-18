@@ -152,11 +152,11 @@ Plans:
   1. Typing in the sidebar search bar instantly filters sessions by title across all project groups, showing matching results with the search term highlighted
   2. User can pin a session and it appears at the top of its project group, persisting across page reloads
   3. User can select multiple sessions via checkboxes and delete them all in one action with a confirmation dialog
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 42-01: TBD
-- [ ] 42-02: TBD
+- [ ] 42-01-PLAN.md -- Search filtering hook, pin persistence hook, grouping update, SearchInput component
+- [ ] 42-02-PLAN.md -- Selection hook, bulk delete, UI wiring (SessionList, SessionItem, context menu, BulkActionBar)
 
 ### Phase 43: E2E Verification
 **Goal**: Every feature shipped in M1 through M4 works correctly with a real backend in daily-driver conditions
@@ -212,7 +212,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 39. Backend Hardening | 2/2 | Complete    | 2026-03-17 | - |
 | 40. Session Titles & Rename | 1/1 | Complete    | 2026-03-18 | - |
 | 41. Session Organization | 2/2 | Complete    | 2026-03-18 | - |
-| 42. Session Discovery | v1.4 | 0/? | Not started | - |
+| 42. Session Discovery | v1.4 | 0/2 | Not started | - |
 | 43. E2E Verification | v1.4 | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
@@ -221,4 +221,4 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-18 after Phase 41 planning*
+*Last updated: 2026-03-18 after Phase 42 planning*
