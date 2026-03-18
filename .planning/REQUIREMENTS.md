@@ -40,11 +40,11 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 
 ### E2E Verification
 
-- [ ] **E2E-01**: Permission banners display with countdown timer and Y/N keyboard shortcuts work
-- [ ] **E2E-02**: Token usage/cost footers show accurate data in conversation turns
-- [ ] **E2E-03**: Image paste/drag-drop into composer sends image and displays in conversation
-- [ ] **E2E-04**: Conversation export produces valid downloadable output
-- [ ] **E2E-05**: Message retry button re-sends the last user message
+- [x] **E2E-01**: Permission banners display with countdown timer and Y/N keyboard shortcuts work
+- [x] **E2E-02**: Token usage/cost footers show accurate data in conversation turns
+- [x] **E2E-03**: Image paste/drag-drop into composer sends image and displays in conversation
+- [x] **E2E-04**: Conversation export produces valid downloadable output
+- [x] **E2E-05**: Message retry button re-sends the last user message
 - [ ] **E2E-06**: Git push/pull/fetch operations complete successfully with status feedback
 - [ ] **E2E-07**: Diff view opens from git panel changed file click
 - [ ] **E2E-08**: Branch create/switch/delete work from git panel
@@ -99,11 +99,11 @@ Deferred to "The Polish" milestone. Visual transformation.
 | BACK-04 | Phase 39 | Complete |
 | PERS-01 | Phase 38 | Complete |
 | PERS-02 | Phase 38 | Complete |
-| E2E-01 | Phase 43 | Pending |
-| E2E-02 | Phase 43 | Pending |
-| E2E-03 | Phase 43 | Pending |
-| E2E-04 | Phase 43 | Pending |
-| E2E-05 | Phase 43 | Pending |
+| E2E-01 | Phase 43 | Complete |
+| E2E-02 | Phase 43 | Complete |
+| E2E-03 | Phase 43 | Complete |
+| E2E-04 | Phase 43 | Complete |
+| E2E-05 | Phase 43 | Complete |
 | E2E-06 | Phase 43 | Pending |
 | E2E-07 | Phase 43 | Pending |
 | E2E-08 | Phase 43 | Pending |

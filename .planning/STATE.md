@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
-status: completed
-stopped_at: Completed 42-02-PLAN.md
-last_updated: "2026-03-18T01:56:55.010Z"
-last_activity: "2026-03-18 — Session discovery UI: search filtering, pin management, bulk delete (42-02)"
+status: in-progress
+stopped_at: Completed 43-01-PLAN.md
+last_updated: "2026-03-18T02:47:00Z"
+last_activity: "2026-03-18 — Chat E2E tests: permission banner, token usage, image attachment, export, retry (43-01)"
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 5
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-03-17)
 
 ## Current Position
 
-Phase: 42-session-discovery
-Plan: 02 of 02 (complete)
-Status: Phase complete
-Last activity: 2026-03-18 — Session discovery UI: search filtering, pin management, bulk delete (42-02)
+Phase: 43-e2e-verification
+Plan: 01 of 02
+Status: Plan 01 complete
+Last activity: 2026-03-18 — Chat E2E tests: permission banner, token usage, image attachment, export, retry (43-01)
 
 ## Performance Metrics
 
@@ -37,6 +37,10 @@ Last activity: 2026-03-18 — Session discovery UI: search filtering, pin manage
 - M3: 20 plans in 3 days (6.7 plans/day)
 - M4: 20 plans in 6 days (3.3 plans/day)
 - Total: 87 plans in 14 days (6.2 plans/day)
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 43    | 01   | 38m      | 2     | 10    |
 
 ## Accumulated Context
 
@@ -63,6 +67,9 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 42-01]: filterProjectGroups as pure function export for direct unit testing without React rendering
 - [Phase 42-02]: Pin hoisting as post-process in SessionList to avoid coupling useMultiProjectSessions to pin state
 - [Phase 42-02]: deleteTarget state with type discriminant (single/bulk) to unify delete dialog for both flows
+- [Phase 43-01]: Synthetic store injection for deterministic E2E permission banner tests
+- [Phase 43-01]: DragEvent over ClipboardEvent for image attachment (Chromium clipboardData read-only)
+- [Phase 43-01]: Dev-mode window exposure for Zustand stores (tree-shaken in production)
 
 ### Pending Todos
 
@@ -74,6 +81,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T01:42:16Z
-Stopped at: Completed 42-02-PLAN.md
-Resume: Phase 42 complete. All session discovery features (search, pins, bulk delete) shipped.
+Last session: 2026-03-18T02:47:00Z
+Stopped at: Completed 43-01-PLAN.md
+Resume: Plan 01 complete. 12 E2E tests across 5 spec files. Two bugs fixed (displaySessionId stub handling, endStream resultTokens preservation). Continue with 43-02.
