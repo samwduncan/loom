@@ -200,3 +200,8 @@ export const useTimelineStore = create<TimelineState>()(
     },
   ),
 );
+
+// Expose store on window in dev mode for E2E testing (Playwright).
+if (import.meta.env.DEV) {
+  (window as unknown as Record<string, unknown>).__ZUSTAND_TIMELINE_STORE__ = useTimelineStore;
+}

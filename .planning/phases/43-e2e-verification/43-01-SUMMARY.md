@@ -98,7 +98,7 @@ E2E test suite with store injection pattern for deterministic UI verification pl
 - **Issue:** Permission banner tests required injecting synthetic permission requests. AI model behavior is non-deterministic (Claude may answer without using Bash tool). Store injection provides deterministic E2E testing.
 - **Fix:** Added `if (import.meta.env.DEV) { window.__ZUSTAND_*_STORE__ = store }` to stream and timeline stores
 - **Files modified:** `src/src/stores/stream.ts`, `src/src/stores/timeline.ts`
-- **Commits:** 616acd6, 3505d3e
+- **Commits:** 616acd6, 54d62f0
 
 ## Decisions Made
 
@@ -115,7 +115,7 @@ E2E test suite with store injection pattern for deterministic UI verification pl
 | Task | Commit  | Description                                       |
 | ---- | ------- | ------------------------------------------------- |
 | 1    | 616acd6 | Permission banner, token usage, image attachment   |
-| 2    | 3505d3e | Export conversation and message retry              |
+| 2    | 54d62f0 | Export conversation and message retry              |
 
 ## Self-Check: PASSED
 
