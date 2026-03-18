@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
-status: in-progress
-stopped_at: Completed 43-01-PLAN.md
-last_updated: "2026-03-18T02:47:00Z"
-last_activity: "2026-03-18 — Chat E2E tests: permission banner, token usage, image attachment, export, retry (43-01)"
+status: completed
+stopped_at: Completed 43-02-PLAN.md
+last_updated: "2026-03-18T03:10:17Z"
+last_activity: "2026-03-18 — Git ops, quick settings, auto-collapse, navigate-guard E2E tests (43-02)"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-03-17)
 ## Current Position
 
 Phase: 43-e2e-verification
-Plan: 01 of 02
-Status: Plan 01 complete
-Last activity: 2026-03-18 — Chat E2E tests: permission banner, token usage, image attachment, export, retry (43-01)
+Plan: 02 of 02 (complete)
+Status: Phase complete
+Last activity: 2026-03-18 — Git ops, quick settings, auto-collapse, navigate-guard E2E tests (43-02)
 
 ## Performance Metrics
 
@@ -41,6 +41,7 @@ Last activity: 2026-03-18 — Chat E2E tests: permission banner, token usage, im
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 43    | 01   | 38m      | 2     | 10    |
+| 43    | 02   | 61m      | 2     | 8     |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 43-01]: Synthetic store injection for deterministic E2E permission banner tests
 - [Phase 43-01]: DragEvent over ClipboardEvent for image attachment (Chromium clipboardData read-only)
 - [Phase 43-01]: Dev-mode window exposure for Zustand stores (tree-shaken in production)
+- [Phase 43-02]: addInitScript fetch override for project selection in E2E (avoids Playwright route handler lifecycle issues)
+- [Phase 43-02]: Auto-collapse E2E tests infrastructure presence rather than forcing viewport-dependent IO triggers
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T02:47:00Z
-Stopped at: Completed 43-01-PLAN.md
-Resume: Plan 01 complete. 12 E2E tests across 5 spec files. Two bugs fixed (displaySessionId stub handling, endStream resultTokens preservation). Continue with 43-02.
+Last session: 2026-03-18T03:10:17Z
+Stopped at: Completed 43-02-PLAN.md
+Resume: Phase 43 complete. 18 E2E tests across 9 spec files. 6 bugs fixed across both plans (useGitStatus, useGitBranches, useGitOperations param, Toaster mount, displaySessionId, endStream).

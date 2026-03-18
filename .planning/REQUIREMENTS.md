@@ -45,12 +45,12 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 - [x] **E2E-03**: Image paste/drag-drop into composer sends image and displays in conversation
 - [x] **E2E-04**: Conversation export produces valid downloadable output
 - [x] **E2E-05**: Message retry button re-sends the last user message
-- [ ] **E2E-06**: Git push/pull/fetch operations complete successfully with status feedback
-- [ ] **E2E-07**: Diff view opens from git panel changed file click
-- [ ] **E2E-08**: Branch create/switch/delete work from git panel
-- [ ] **E2E-09**: Quick settings toggles apply immediately and persist across page reload
-- [ ] **E2E-10**: Auto-collapse old turns via IntersectionObserver works reliably
-- [ ] **E2E-11**: Navigate-away guard prevents accidental navigation during active streaming
+- [x] **E2E-06**: Git push/pull/fetch operations complete successfully with status feedback
+- [x] **E2E-07**: Diff view opens from git panel changed file click
+- [x] **E2E-08**: Branch create/switch/delete work from git panel
+- [x] **E2E-09**: Quick settings toggles apply immediately and persist across page reload
+- [x] **E2E-10**: Auto-collapse old turns via IntersectionObserver works reliably
+- [x] **E2E-11**: Navigate-away guard prevents accidental navigation during active streaming
 
 ## v1.5 Requirements
 
@@ -104,12 +104,12 @@ Deferred to "The Polish" milestone. Visual transformation.
 | E2E-03 | Phase 43 | Complete |
 | E2E-04 | Phase 43 | Complete |
 | E2E-05 | Phase 43 | Complete |
-| E2E-06 | Phase 43 | Pending |
-| E2E-07 | Phase 43 | Pending |
-| E2E-08 | Phase 43 | Pending |
-| E2E-09 | Phase 43 | Pending |
-| E2E-10 | Phase 43 | Pending |
-| E2E-11 | Phase 43 | Pending |
+| E2E-06 | Phase 43 | Complete |
+| E2E-07 | Phase 43 | Complete |
+| E2E-08 | Phase 43 | Complete |
+| E2E-09 | Phase 43 | Complete |
+| E2E-10 | Phase 43 | Complete |
+| E2E-11 | Phase 43 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 30 total
