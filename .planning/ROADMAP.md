@@ -125,11 +125,10 @@ Plans:
   1. New sessions automatically display a title derived from the first real user message (not "New Session" or system prompt text)
   2. User can rename a session in the sidebar, and the new title persists after clearing browser cache and reloading
   3. Title extraction skips system prompts, XML wrapper tags, task-notification content, and objective blocks
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 40-01: TBD
-- [ ] 40-02: TBD
+- [ ] 40-01-PLAN.md -- Title extraction utility, ChatComposer integration, and backend-persisted rename
 
 ### Phase 41: Session Organization
 **Goal**: Sidebar presents sessions in a structured, navigable hierarchy instead of a flat chronological list
@@ -211,7 +210,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 28-37 | v1.3 | 20/20 | Complete | 2026-03-17 |
 | 38. Broken Fixes & Persist Audit | 2/2 | Complete    | 2026-03-17 | - |
 | 39. Backend Hardening | 2/2 | Complete    | 2026-03-17 | - |
-| 40. Session Titles & Rename | v1.4 | 0/? | Not started | - |
+| 40. Session Titles & Rename | v1.4 | 0/1 | Planning | - |
 | 41. Session Organization | v1.4 | 0/? | Not started | - |
 | 42. Session Discovery | v1.4 | 0/? | Not started | - |
 | 43. E2E Verification | v1.4 | 0/? | Not started | - |
@@ -222,4 +221,4 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-17 after Phase 39 planning*
+*Last updated: 2026-03-18 after Phase 40 planning*
