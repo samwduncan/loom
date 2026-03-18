@@ -13,6 +13,25 @@ export interface SessionMetadata {
   tokenBudget: number | null;
   contextWindowUsed: number | null;
   totalCost: number | null;
+  /** Message count from backend -- used for junk session detection. */
+  messageCount?: number | null;
+}
+
+/** Date bucket labels for session grouping within a project. */
+export type SessionDateGroup = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Older';
+
+export interface ProjectSessionGroup {
+  label: SessionDateGroup;
+  sessions: Session[];
+}
+
+export interface ProjectGroup {
+  projectName: string;        // encoded name for API calls
+  displayName: string;        // human-readable
+  projectPath: string;        // filesystem path
+  sessionCount: number;       // total sessions (including junk, for accurate count)
+  visibleCount: number;       // sessions after junk filtering
+  dateGroups: ProjectSessionGroup[];
 }
 
 export interface Session {

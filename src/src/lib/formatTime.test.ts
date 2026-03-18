@@ -62,7 +62,7 @@ describe('groupSessionsByDate', () => {
     vi.useRealTimers();
   });
 
-  it('groups sessions into Today/Yesterday/Previous 7 Days/Older', () => {
+  it('groups sessions into Today/Yesterday/This Week/This Month/Older', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-03-06T15:00:00Z'));
 
@@ -70,16 +70,18 @@ describe('groupSessionsByDate', () => {
       makeSession({ updatedAt: '2026-03-06T14:00:00Z', title: 'Today session' }),
       makeSession({ updatedAt: '2026-03-05T10:00:00Z', title: 'Yesterday session' }),
       makeSession({ updatedAt: '2026-03-02T10:00:00Z', title: 'This week session' }),
-      makeSession({ updatedAt: '2026-02-20T10:00:00Z', title: 'Old session' }),
+      makeSession({ updatedAt: '2026-02-15T10:00:00Z', title: 'This month session' }),
+      makeSession({ updatedAt: '2026-01-10T10:00:00Z', title: 'Old session' }),
     ];
 
     const groups = groupSessionsByDate(sessions);
-    expect(groups).toHaveLength(4);
+    expect(groups).toHaveLength(5);
     expect(groups[0]?.label).toBe('Today');
     expect(groups[0]?.sessions[0]?.title).toBe('Today session');
     expect(groups[1]?.label).toBe('Yesterday');
-    expect(groups[2]?.label).toBe('Previous 7 Days');
-    expect(groups[3]?.label).toBe('Older');
+    expect(groups[2]?.label).toBe('This Week');
+    expect(groups[3]?.label).toBe('This Month');
+    expect(groups[4]?.label).toBe('Older');
   });
 
   it('omits empty groups from result', () => {

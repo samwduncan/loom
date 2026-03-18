@@ -288,6 +288,7 @@ export function transformBackendSession(backend: BackendSessionData): Session {
       tokenBudget: null,
       contextWindowUsed: null,
       totalCost: null,
+      messageCount: backend.messageCount ?? null,
     },
   };
 }

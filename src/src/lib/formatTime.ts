@@ -8,7 +8,7 @@
 
 import type { Session } from '@/types/session';
 
-export type DateGroup = 'Today' | 'Yesterday' | 'Previous 7 Days' | 'Older';
+export type DateGroup = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Older';
 
 /**
  * Format a date string as a relative time from now.
@@ -34,7 +34,7 @@ export function formatRelativeTime(dateStr: string): string {
 /**
  * Group sessions into date categories based on updatedAt field.
  * Uses midnight boundaries (not 24h rolling).
- * Returns array of non-empty groups in order: Today, Yesterday, Previous 7 Days, Older.
+ * Returns array of non-empty groups in order: Today, Yesterday, This Week, This Month, Older.
  * Sessions within each group sorted by updatedAt descending (most recent first).
  */
 export function groupSessionsByDate(
@@ -44,11 +44,13 @@ export function groupSessionsByDate(
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterdayStart = new Date(todayStart.getTime() - 86_400_000);
   const weekStart = new Date(todayStart.getTime() - 7 * 86_400_000);
+  const monthStart = new Date(todayStart.getTime() - 30 * 86_400_000);
 
   const groups: Record<DateGroup, Session[]> = {
     'Today': [],
     'Yesterday': [],
-    'Previous 7 Days': [],
+    'This Week': [],
+    'This Month': [],
     'Older': [],
   };
 
@@ -59,7 +61,9 @@ export function groupSessionsByDate(
     } else if (date >= yesterdayStart) {
       groups['Yesterday'].push(session);
     } else if (date >= weekStart) {
-      groups['Previous 7 Days'].push(session);
+      groups['This Week'].push(session);
+    } else if (date >= monthStart) {
+      groups['This Month'].push(session);
     } else {
       groups['Older'].push(session);
     }
@@ -69,7 +73,7 @@ export function groupSessionsByDate(
   const sortDesc = (a: Session, b: Session) =>
     new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
 
-  const orderedLabels: DateGroup[] = ['Today', 'Yesterday', 'Previous 7 Days', 'Older'];
+  const orderedLabels: DateGroup[] = ['Today', 'Yesterday', 'This Week', 'This Month', 'Older'];
 
   return orderedLabels
     .filter((label) => groups[label].length > 0)
