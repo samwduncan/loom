@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
-status: completed
-stopped_at: Completed 41-02-PLAN.md (phase 41 complete)
-last_updated: "2026-03-18T01:14:58.296Z"
-last_activity: 2026-03-18 — Session organization UI layer with ProjectHeader and multi-project SessionList (41-02)
+status: in-progress
+stopped_at: Completed 42-01-PLAN.md
+last_updated: "2026-03-18T01:34:00Z"
+last_activity: 2026-03-18 — Session search/pin data layer with filterProjectGroups, useSessionPins, SearchInput (42-01)
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-03-17)
 
 ## Current Position
 
-Phase: 41-session-organization (complete)
-Plan: 02 of 02 (complete)
-Status: Phase complete
-Last activity: 2026-03-18 — Session organization UI layer with ProjectHeader and multi-project SessionList (41-02)
+Phase: 42-session-discovery
+Plan: 01 of 02 (complete)
+Status: In progress
+Last activity: 2026-03-18 — Session search/pin data layer with filterProjectGroups, useSessionPins, SearchInput (42-01)
 
 ## Performance Metrics
 
@@ -59,6 +59,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 41-02]: Keep useSessionList() alongside useMultiProjectSessions -- timeline store still needed by ChatView
 - [Phase 41-02]: Extract DeleteSessionDialog to stay under 200-line Constitution limit
 - [Phase 41-02]: Conditional rendering for collapsed projects with rAF scroll position restoration
+- [Phase 42-01]: Local DateBucketLabel type in groupIntoDateBuckets to avoid Record<SessionDateGroup> requiring Pinned key
+- [Phase 42-01]: filterProjectGroups as pure function export for direct unit testing without React rendering
 
 ### Pending Todos
 
@@ -70,6 +72,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T01:02:09Z
-Stopped at: Completed 41-02-PLAN.md (phase 41 complete)
-Resume: Phase 41 complete, all plans executed. Proceed to next phase.
+Last session: 2026-03-18T01:29:30Z
+Stopped at: Completed 42-01-PLAN.md
+Resume: Plan 01 complete, proceed to 42-02-PLAN.md to wire hooks into SessionList UI.

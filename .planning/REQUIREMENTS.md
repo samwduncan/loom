@@ -15,8 +15,8 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 - [x] **SESS-04**: Sidebar groups sessions by project with collapsible project headings showing session count
 - [x] **SESS-05**: Date subgroups within each project group (Today, Yesterday, This Week, This Month, Older)
 - [x] **SESS-06**: Junk sessions filtered from sidebar (notification classifier, system utility, blank "New Session" with no real messages)
-- [ ] **SESS-07**: Sidebar has inline search/filter bar that filters sessions by title across all projects
-- [ ] **SESS-08**: User can pin sessions to the top of their project group
+- [x] **SESS-07**: Sidebar has inline search/filter bar that filters sessions by title across all projects
+- [x] **SESS-08**: User can pin sessions to the top of their project group
 - [ ] **SESS-09**: User can select multiple sessions and delete them in bulk
 
 ### Broken Feature Fixes
@@ -86,8 +86,8 @@ Deferred to "The Polish" milestone. Visual transformation.
 | SESS-04 | Phase 41 | Complete |
 | SESS-05 | Phase 41 | Complete |
 | SESS-06 | Phase 40 | Complete |
-| SESS-07 | Phase 42 | Pending |
-| SESS-08 | Phase 42 | Pending |
+| SESS-07 | Phase 42 | Complete |
+| SESS-08 | Phase 42 | Complete |
 | SESS-09 | Phase 42 | Pending |
 | FIX-01 | Phase 38 | Complete |
 | FIX-02 | Phase 38 | Complete |
