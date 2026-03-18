@@ -15,19 +15,28 @@ export interface SpringConfig {
   mass?: number;
 }
 
-/** Gentle spring — sidebar slide, panel transitions */
+/**
+ * Gentle spring -- sidebar slide, panel transitions.
+ * CSS equivalents: --ease-spring-gentle and --duration-spring-gentle in tokens.css
+ */
 export const SPRING_GENTLE: SpringConfig = {
   stiffness: 120,
   damping: 14,
 };
 
-/** Snappy spring — button press, toggle snap, micro-interactions */
+/**
+ * Snappy spring -- button press, toggle snap, micro-interactions.
+ * CSS equivalents: --ease-spring-snappy and --duration-spring-snappy in tokens.css
+ */
 export const SPRING_SNAPPY: SpringConfig = {
   stiffness: 300,
   damping: 20,
 };
 
-/** Bouncy spring — playful entrance, notification pop, celebratory */
+/**
+ * Bouncy spring -- playful entrance, notification pop, celebratory.
+ * CSS equivalents: --ease-spring-bouncy and --duration-spring-bouncy in tokens.css
+ */
 export const SPRING_BOUNCY: SpringConfig = {
   stiffness: 180,
   damping: 12,

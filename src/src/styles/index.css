@@ -74,6 +74,14 @@
   /* Rose accent utilities */
   --color-rose: var(--rose-accent);
   --color-rose-text: var(--rose-text);
+
+  /* Spring easing utilities: ease-spring-gentle, ease-spring-snappy, ease-spring-bouncy */
+  --ease-spring-gentle: var(--ease-spring-gentle);
+  --ease-spring-snappy: var(--ease-spring-snappy);
+  --ease-spring-bouncy: var(--ease-spring-bouncy);
+  --duration-spring-gentle: var(--duration-spring-gentle);
+  --duration-spring-snappy: var(--duration-spring-snappy);
+  --duration-spring-bouncy: var(--duration-spring-bouncy);
 }
 
 /* Spacing base for Tailwind v4 (p-1 = 4px, p-2 = 8px, etc.) */

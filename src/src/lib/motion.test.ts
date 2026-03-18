@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import {
   SPRING_GENTLE,
   SPRING_SNAPPY,
@@ -50,5 +52,41 @@ describe('motion.ts DURATION values', () => {
     expect(DURATION.fast).toBeLessThan(DURATION.normal);
     expect(DURATION.normal).toBeLessThan(DURATION.slow);
     expect(DURATION.slow).toBeLessThan(DURATION.spring);
+  });
+});
+
+describe('CSS spring easing tokens in tokens.css', () => {
+  const tokensPath = resolve(__dirname, '../styles/tokens.css');
+  const tokensCss = readFileSync(tokensPath, 'utf-8');
+
+  const springs = ['gentle', 'snappy', 'bouncy'] as const;
+
+  for (const name of springs) {
+    it(`contains --ease-spring-${name} with a linear() value`, () => {
+      const pattern = new RegExp(`--ease-spring-${name}:\\s*linear\\(`);
+      expect(tokensCss).toMatch(pattern);
+    });
+
+    it(`contains --duration-spring-${name} with an ms value`, () => {
+      const pattern = new RegExp(`--duration-spring-${name}:\\s*\\d+(\\.\\d+)?ms`);
+      expect(tokensCss).toMatch(pattern);
+    });
+
+    it(`--ease-spring-${name} linear() has at least 30 comma-separated points`, () => {
+      const match = tokensCss.match(
+        new RegExp(`--ease-spring-${name}:\\s*linear\\(([^)]+)\\)`)
+      );
+      expect(match).not.toBeNull();
+      const captured = match![1]; // ASSERT: match verified not null by preceding assertion
+      expect(captured).toBeDefined();
+      const points = captured!.split(','); // ASSERT: captured verified defined by preceding assertion
+      expect(points.length).toBeGreaterThanOrEqual(30);
+    });
+  }
+
+  it('SPRING_GENTLE, SPRING_SNAPPY, SPRING_BOUNCY JS configs still export correctly (regression)', () => {
+    expect(SPRING_GENTLE).toEqual({ stiffness: 120, damping: 14 });
+    expect(SPRING_SNAPPY).toEqual({ stiffness: 300, damping: 20 });
+    expect(SPRING_BOUNCY).toEqual({ stiffness: 180, damping: 12 });
   });
 });
