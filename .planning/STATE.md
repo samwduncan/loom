@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
 status: in-progress
-stopped_at: Completed 42-01-PLAN.md
+stopped_at: Completed 42-02-PLAN.md
 last_updated: "2026-03-18T01:34:00Z"
-last_activity: 2026-03-18 — Session search/pin data layer with filterProjectGroups, useSessionPins, SearchInput (42-01)
+last_activity: 2026-03-18 — Session discovery UI: search, pins, bulk delete wired into sidebar (42-02)
 progress:
   total_phases: 6
   completed_phases: 4
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-03-17)
 ## Current Position
 
 Phase: 42-session-discovery
-Plan: 01 of 02 (complete)
-Status: In progress
-Last activity: 2026-03-18 — Session search/pin data layer with filterProjectGroups, useSessionPins, SearchInput (42-01)
+Plan: 02 of 02 (complete)
+Status: Phase complete
+Last activity: 2026-03-18 — Session discovery UI: search filtering, pin management, bulk delete (42-02)
 
 ## Performance Metrics
 
@@ -61,6 +61,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 41-02]: Conditional rendering for collapsed projects with rAF scroll position restoration
 - [Phase 42-01]: Local DateBucketLabel type in groupIntoDateBuckets to avoid Record<SessionDateGroup> requiring Pinned key
 - [Phase 42-01]: filterProjectGroups as pure function export for direct unit testing without React rendering
+- [Phase 42-02]: Pin hoisting as post-process in SessionList to avoid coupling useMultiProjectSessions to pin state
+- [Phase 42-02]: deleteTarget state with type discriminant (single/bulk) to unify delete dialog for both flows
 
 ### Pending Todos
 
@@ -72,6 +74,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T01:29:30Z
-Stopped at: Completed 42-01-PLAN.md
-Resume: Plan 01 complete, proceed to 42-02-PLAN.md to wire hooks into SessionList UI.
+Last session: 2026-03-18T01:42:16Z
+Stopped at: Completed 42-02-PLAN.md
+Resume: Phase 42 complete. All session discovery features (search, pins, bulk delete) shipped.
