@@ -80,7 +80,7 @@
 
 - [x] **Phase 38: Broken Fixes & Persist Audit** - Fix @-mentions, search highlighting, dead code removal, and audit all Zustand persist layers (completed 2026-03-17)
 - [x] **Phase 39: Backend Hardening** - Auth resilience, session title endpoint, systemd service, WebSocket heartbeat (completed 2026-03-17)
-- [ ] **Phase 40: Session Titles & Rename** - Auto-generated titles from first real message, frontend rename persistence via backend endpoint
+- [x] **Phase 40: Session Titles & Rename** - Auto-generated titles from first real message, frontend rename persistence via backend endpoint (completed 2026-03-18)
 - [ ] **Phase 41: Session Organization** - Project-based sidebar grouping with date subgroups and junk session filtering
 - [ ] **Phase 42: Session Discovery** - Sidebar search, session pinning, and bulk delete
 - [ ] **Phase 43: E2E Verification** - End-to-end verification of all M1-M4 features with real backend
@@ -210,7 +210,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 28-37 | v1.3 | 20/20 | Complete | 2026-03-17 |
 | 38. Broken Fixes & Persist Audit | 2/2 | Complete    | 2026-03-17 | - |
 | 39. Backend Hardening | 2/2 | Complete    | 2026-03-17 | - |
-| 40. Session Titles & Rename | v1.4 | 0/1 | Planning | - |
+| 40. Session Titles & Rename | 1/1 | Complete   | 2026-03-18 | - |
 | 41. Session Organization | v1.4 | 0/? | Not started | - |
 | 42. Session Discovery | v1.4 | 0/? | Not started | - |
 | 43. E2E Verification | v1.4 | 0/? | Not started | - |
