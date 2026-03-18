@@ -221,29 +221,49 @@ This document captures the full development vision across all milestones. It per
 
 ---
 
-## v1.5: "The Polish" — 10/10 Visual Quality
+## v1.5: "The Craft" — Production Quality
 
-**Goal**: Transform the functional daily-driver into a visually stunning, award-winning interface. Every interaction should feel satisfying.
+**Goal**: Make every pixel intentional. Fix every rough edge, nail every detail, add visual personality. When someone opens Loom, they should feel the care that went into it — like a team of five spent months on this.
 
 **Status:** Planned (next milestone)
 
-**Deliverables**:
-- Spring physics animations on all interactions
-- Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
-- Glass surface effects for modals and overlays
-- Sidebar slim collapse mode (icon-only rail)
-- DecryptedText reveals for session titles and model names
-- StarBorder accents on focused/active elements
-- Motion refinement across all surfaces
+**Three layers:**
 
-**Reference:** `.planning/M3-POLISH-DEFERRED-CONTEXT.md` — all visual polish research, gap analysis, deferred ideas
+*Layer 1 — Fix what's broken:*
+- Land in-progress settings refactor (useSettingsData generic hook, connection store persist, ModalState type safety)
+- Comprehensive UI audit: every component checked for loading states, error states, empty states
+- Dead UI removal, type safety fixes, code quality cleanup
+
+*Layer 2 — Attention to detail:*
+- Sidebar slim mode (icon-only rail)
+- Every state transition is smooth (loading → content, tab switches, modal open/close)
+- Empty states that feel designed, not forgotten
+- Consistent focus rings, hover states on every interactive element
+- Spacing and typography audit (tokens used consistently everywhere)
+- Error states that feel helpful, not broken
+
+*Layer 3 — Visual personality:*
+- Spring physics on key interactions (sidebar, modals, panels, tool cards — not "all interactions")
+- Glass surface on modals and command palette
+- DecryptedText reveals for session titles and model names
+- StarBorder accents on active/focused elements
+- Motion refinement (every animation uses motion tokens, nothing is jarring)
+
+**Reference:** `.planning/M3-POLISH-DEFERRED-CONTEXT.md` — visual research, gap analysis, component adoption map
+
+**Explicitly deferred to v2.1:**
+- Aurora/WebGL (GPU feasibility risk on 780M iGPU; needs spike, not full phase)
+- Tier 2/3 effects (Iridescence, LiquidChrome, Border Beam, Shimmer Button, etc.)
+- "Spring physics on ALL interactions" — diminishing returns; do key surfaces only
 
 **Gate Criteria**:
-- [ ] Streaming at 100 tokens/sec with zero visible jitter
+- [ ] Zero loading flashes — every component has skeleton/loading state
+- [ ] Zero dead UI — no placeholder fields, no fake data, no unused controls
 - [ ] All animations use defined motion tokens
+- [ ] Consistent hover/focus/disabled states across all interactive elements
 - [ ] FPS stays above 55 during heavy streaming
 - [ ] All M1-M5 tests pass (regression)
-- [ ] User spot check: "Would a harsh, experienced developer rate this 10/10?"
+- [ ] User spot check: "Does this feel like a real product built by a real team?"
 
 ---
 
@@ -266,8 +286,32 @@ This document captures the full development vision across all milestones. It per
 - [ ] Background tab notifications work
 - [ ] Gemini tab can access Claude conversation context
 - [ ] MCP servers can be enabled/disabled from UI
-- [ ] All M1-M5 tests pass (regression)
+- [ ] All M1-M6 tests pass (regression)
 - [ ] User spot check: "Can I effectively work with multiple agents?"
+
+---
+
+## v2.1: "The Polish" — Full Visual Transformation
+
+**Goal**: Comprehensive visual effects pass on the complete, final surface. Aurora, advanced effects, and exhaustive motion refinement.
+
+**Phases**: ~3-5
+
+**Deliverables**:
+- Aurora/ambient WebGL overlay during streaming (GPU feasibility gated on 780M iGPU)
+- Comprehensive spring physics across ALL interactions (surface is now final)
+- Tier 2 effects: GlassSurface displacement, Iridescence sidebar accent, LiquidChrome settings
+- Tier 3 effects: Border Beam, Shimmer Button, Dot Pattern, Meteors, Sparkles, Lamp Effect, Text Generate
+- Empty state enhancements (Background Beams, Lamp Effect for welcome screen)
+- OKLCH-to-Hex bridge for WebGL components consuming design tokens
+- Performance-gated activation pattern for all GPU effects
+
+**Gate Criteria**:
+- [ ] Streaming at 100 tokens/sec with zero visible jitter
+- [ ] Aurora active during streaming with FPS > 55 on 780M iGPU
+- [ ] All effects respect prefers-reduced-motion
+- [ ] All M1-M7 tests pass (regression)
+- [ ] User spot check: "Would a harsh, experienced developer rate this 10/10?"
 
 ---
 
@@ -282,13 +326,12 @@ This document captures the full development vision across all milestones. It per
 - Nextcloud integration (file picker, screenshot upload, file browser)
 - Companion system (animated pixel-art characters — CONDITIONAL on feasibility gate)
 - CodeRabbit integration (PR review, local code review)
-- Final polish pass across entire app
 
 **Gate Criteria**:
 - [ ] GSD dashboard shows real phase/task data
 - [ ] Can attach Nextcloud files to chat messages
 - [ ] Companion responds to system events (if feasibility passes)
-- [ ] All M1-M5 tests pass (regression)
+- [ ] All previous tests pass (regression)
 - [ ] User spot check: "Is this the complete dream app?"
 
 **Feasibility Gates**:

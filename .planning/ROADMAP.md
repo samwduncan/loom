@@ -7,8 +7,9 @@
 - ✅ **v1.2 "The Workspace"** -- Phases 20-27 (shipped 2026-03-12)
 - ✅ **v1.3 "The Refinery"** -- Phases 28-37 (shipped 2026-03-17)
 - ✅ **v1.4 "The Navigator"** -- Phases 38-43 (shipped 2026-03-18)
-- 📋 **v1.5 "The Polish"** -- (planned)
+- 📋 **v1.5 "The Craft"** -- (planned)
 - 📋 **v2.0 "The Power"** -- (planned)
+- 📋 **v2.1 "The Polish"** -- (planned)
 - 📋 **v3.0 "The Vision"** -- (planned)
 
 ## Phases
@@ -86,21 +87,30 @@
 
 </details>
 
-### v1.5 "The Polish" (Planned)
+### v1.5 "The Craft" (Planned)
 
-- [ ] Spring physics animations on all interactions
-- [ ] Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
-- [ ] Glass surface effects for modals and overlays
-- [ ] Sidebar slim collapse mode (icon-only rail)
-- [ ] DecryptedText reveals for session titles and model names
-- [ ] StarBorder accents on focused/active elements
-- [ ] Motion refinement across all surfaces
+- [ ] Land settings refactor + connection store persist fix
+- [ ] Comprehensive UI audit (loading/error/empty states)
+- [ ] Sidebar slim mode (icon-only rail)
+- [ ] State transition smoothness across all surfaces
+- [ ] Hover/focus/disabled state consistency
+- [ ] Spacing and typography audit
+- [ ] Spring physics on key interactions
+- [ ] Glass surface on modals and command palette
+- [ ] DecryptedText + StarBorder visual personality
 
 ### v2.0 "The Power" (Planned)
 
 - [ ] Multi-provider tabbed workspaces (Claude, Gemini, Codex)
 - [ ] MCP server management UI
 - [ ] Plugin/skill management UI
+
+### v2.1 "The Polish" (Planned)
+
+- [ ] Aurora/WebGL ambient overlay (GPU feasibility gated)
+- [ ] Comprehensive spring physics on all interactions
+- [ ] Tier 2/3 visual effects (Iridescence, LiquidChrome, Border Beam, etc.)
+- [ ] Full motion refinement pass
 
 ### v3.0 "The Vision" (Planned)
 

@@ -58,21 +58,26 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Active
 
-**Current Milestone: v1.5 "The Polish"**
+**Current Milestone: v1.5 "The Craft"**
 
-**Goal:** Transform the functional daily-driver into a visually stunning, award-winning interface. Every interaction should feel satisfying.
+**Goal:** Make every pixel intentional. Fix every rough edge, nail every detail, add visual personality. Feel like a real product built by a real team.
 
 **Target features:**
-- [ ] Spring physics animations on all interactions
-- [ ] Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
-- [ ] Glass surface effects for modals and overlays
-- [ ] Sidebar slim collapse mode (icon-only rail)
+- [ ] Land settings refactor (generic useFetch hook, connection store persist fix, ModalState type safety)
+- [ ] Comprehensive UI audit: loading states, error states, empty states for every component
+- [ ] Dead UI removal and code quality cleanup
+- [ ] Sidebar slim mode (icon-only rail)
+- [ ] Smooth state transitions across all surfaces
+- [ ] Consistent hover/focus/disabled states
+- [ ] Spacing and typography consistency audit
+- [ ] Spring physics on key interactions (sidebar, modals, panels, tool cards)
+- [ ] Glass surface on modals and command palette
 - [ ] DecryptedText reveals for session titles and model names
-- [ ] StarBorder accents on focused/active elements
-- [ ] Motion refinement across all surfaces
+- [ ] StarBorder accents on active/focused elements
 
 **Future milestones:**
 - v2.0 "The Power" — Multi-provider tabs, MCP management
+- v2.1 "The Polish" — Full visual transformation (aurora, advanced effects, comprehensive springs)
 - v3.0 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
 
 ### Out of Scope

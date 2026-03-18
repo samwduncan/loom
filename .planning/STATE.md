@@ -1,7 +1,7 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.5
-milestone_name: "The Polish"
+milestone_name: "The Craft"
 status: not_started
 stopped_at: null
 last_updated: "2026-03-18T20:30:00.000Z"
@@ -20,7 +20,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** v1.5 "The Polish" — springs, aurora, glass, sidebar slim, motion refinement
+**Current focus:** v1.5 "The Craft" — production quality, every pixel intentional, visual personality
 
 ## Current Position
 
@@ -57,4 +57,4 @@ None.
 
 Last session: 2026-03-18
 Stopped at: Milestone v1.4 archived
-Resume: Run `/gsd:new-milestone` to start v1.5 "The Polish" — questioning, research, requirements, roadmap.
+Resume: Run `/gsd:new-milestone` to start v1.5 "The Craft" — questioning, research, requirements, roadmap.
