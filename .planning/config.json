@@ -5,11 +5,14 @@
   "commit_docs": true,
   "model_profile": "quality",
   "workflow": {
-    "research": true,
+    "research": false,
     "plan_check": true,
     "verifier": true,
     "nyquist_validation": true,
     "adversarial_review": true,
-    "_auto_chain_active": false
+    "_auto_chain_active": false,
+    "coderabbit_review": true,
+    "coderabbit_planning": true,
+    "research_enabled": true
   }
 }

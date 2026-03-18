@@ -48,28 +48,30 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - ✓ Accessibility (A11Y-01 through A11Y-06) — ARIA, keyboard nav, focus management, screen reader, contrast — v1.3
 - ✓ Performance (PERF-01 through PERF-05) — vendor chunks, content-visibility, memory profiling, bundle analysis — v1.3
 
+### Validated (v1.4)
+
+- ✓ Session intelligence (SESS-01 through SESS-09) — auto-titles, project grouping, date subgroups, junk filtering, search, pinning, bulk delete — v1.4
+- ✓ Broken feature fixes (FIX-01 through FIX-04) — @-mention file context, search highlighting, dead code removal, persist NaN — v1.4
+- ✓ Backend hardening (BACK-01 through BACK-04) — auth auto-retry, session title endpoint, systemd service, WebSocket heartbeat — v1.4
+- ✓ Persist layer audit (PERS-01, PERS-02) — deep merge functions, rehydration safety tests — v1.4
+- ✓ E2E verification (E2E-01 through E2E-11) — 18 Playwright specs covering permissions, tokens, images, export, retry, git, settings, collapse, navigate guard — v1.4
+
 ### Active
 
-**Current Milestone: v1.4 "The Navigator"**
+**Current Milestone: v1.5 "The Polish"**
 
-**Goal:** Fix every broken feature, make sessions findable and manageable, and verify everything works end-to-end with real daily use.
+**Goal:** Transform the functional daily-driver into a visually stunning, award-winning interface. Every interaction should feel satisfying.
 
 **Target features:**
-- [ ] Auto-generated session titles (smart extraction, skip system prompts/XML)
-- [ ] Project-based sidebar grouping (collapsible project groups, GSD session chaining)
-- [ ] Backend session rename endpoint (persist renames to JSONL)
-- [ ] Junk session filtering (hide notification classifier/system sessions)
-- [ ] Session search in sidebar + pinning
-- [ ] @-mentions actually send file context to AI (fix broken fileMentions)
-- [ ] Search highlighting in assistant message bodies (complete existing feature)
-- [ ] Auth resilience (auto-retry, clear error messaging)
-- [ ] Connection heartbeat + backend auto-start
-- [ ] Dead code removal (rehypeToolMarkers no-op)
-- [ ] Persist layer audit (prevent NaN-class bugs across all stores)
-- [ ] E2E verification of all M1-M4 features with real backend
+- [ ] Spring physics animations on all interactions
+- [ ] Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
+- [ ] Glass surface effects for modals and overlays
+- [ ] Sidebar slim collapse mode (icon-only rail)
+- [ ] DecryptedText reveals for session titles and model names
+- [ ] StarBorder accents on focused/active elements
+- [ ] Motion refinement across all surfaces
 
 **Future milestones:**
-- v1.5 "The Polish" — Springs, aurora, glass, sidebar slim, motion refinement
 - v2.0 "The Power" — Multi-provider tabs, MCP management
 - v3.0 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
 
@@ -86,24 +88,24 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (post v1.3):**
-- 46,501 LOC TypeScript + CSS across 37 phases, 87 plans (4 milestones)
+**Current State (post v1.4):**
+- 49,216 LOC TypeScript + CSS across 43 phases, 98 plans (5 milestones)
 - Tech stack: Vite + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- 551 commits (145 M1 + 158 M2 + 145 M3 + 103 M4), 14-day total build (2026-03-04 to 2026-03-17)
-- 1,023+ tests passing, Playwright E2E suite, 9 custom ESLint rules
-- Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui (14 primitives), tailwindcss-animate, cmdk, fuse.js, @codemirror/*, @xterm/*
+- 609 commits (145 M1 + 158 M2 + 145 M3 + 103 M4 + 58 M5), 15-day total build (2026-03-04 to 2026-03-18)
+- 150 test files (135 unit + 15 E2E Playwright specs), 9 custom ESLint rules
+- Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui (15 primitives), tailwindcss-animate, cmdk, fuse.js, @codemirror/*, @xterm/*
 - Frontend at `src/`, backend at `server/` (port 5555)
 - Dev server: port 5184
 - Full workspace with: chat, file tree, code editor, terminal, git panel, settings, command palette, @-mentions, slash commands, quick settings, accessibility, performance optimizations
+- Session intelligence: auto-titles, project grouping, search, pins, bulk delete
 - WCAG AA contrast compliance, full keyboard navigation, screen reader support
+- Backend: auth auto-retry, WebSocket heartbeat, systemd auto-start
 
 **Known Tech Debt:**
-- rehypeToolMarkers plugin runs as no-op (tools render as React components post-markdown)
-- highlightText not threaded into MarkdownRenderer for assistant body content
 - CMD-14 deferred: recent commands need command registry for re-execution
 - SET-07 backend limitation: API key add form has name field only
 - GIT-04 intentional: client-side staging Set<string> (no /api/git/stage endpoint)
-- fileMentions WS field sent but backend ignores (text prefix workaround)
+- fileMentions WS field sent but backend reads files server-side (text prefix workaround)
 - PERF-01: Live 55+ FPS benchmark with 200+ messages not measured (code-path verified only)
 - Phase 31 minimap/terminal features need human verification (jsdom limitations)
 
@@ -163,4 +165,4 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 | useSyncExternalStore for LiveAnnouncer | Satisfies React 19 lint rules for external state | Good — correct React pattern |
 
 ---
-*Last updated: 2026-03-17 after v1.3 milestone completion*
+*Last updated: 2026-03-18 after v1.4 milestone completion*

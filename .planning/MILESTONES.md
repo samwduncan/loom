@@ -1,5 +1,42 @@
 # Loom V2: Milestone Master Plan
 
+## v1.4 The Navigator (Shipped: 2026-03-18)
+
+**Status:** SHIPPED
+**Shipped:** 2026-03-18
+**Phases:** 6 (38-43) | **Plans:** 11 | **Tasks:** 17 | **Commits:** 58
+**LOC:** 49,216 TypeScript + CSS (+10,987 / -871 from v1.3)
+**Timeline:** ~5 hours (2026-03-17 22:38 to 2026-03-18 03:25)
+**Archive:** `milestones/v1.4-ROADMAP.md`, `milestones/v1.4-REQUIREMENTS.md`
+
+**Delivered:** Session intelligence and daily-driver hardening — fixed all known broken features (@-mention file context, search highlighting, persist layer bugs), hardened backend (auth auto-retry, WebSocket heartbeat, systemd service, session title endpoint), built smart session titles with XML/system-prompt stripping, project-based sidebar grouping with date subgroups and junk filtering, session search/pin/bulk-delete, and a full Playwright E2E verification suite covering 11 features across 9 spec files.
+
+**Key Accomplishments:**
+1. Fixed all broken features — @-mention file context delivery via fileMentions WS field, search highlighting in assistant messages, rehypeToolMarkers dead code removal, persist layer NaN bugs
+2. Backend hardened for daily driving — auth auto-retry on 401 with promise dedup, WebSocket ping/pong heartbeat (15s/30s), systemd auto-start service, session title PATCH endpoint with JSONL persistence
+3. Smart session titles — auto-generated from first real user message with XML/system-prompt/task-wrapper stripping, backend-persisted rename with optimistic rollback
+4. Project-based session organization — collapsible project groups with date subgroups (Today/Yesterday/This Week/This Month/Older), junk session filtering, scroll position preservation
+5. Session discovery — inline search across all projects with match highlighting, session pinning with localStorage persistence, multi-select bulk delete with confirmation dialog
+6. E2E verification suite — 18 Playwright specs across 9 files covering permissions, tokens, images, export, retry, git ops, quick settings, auto-collapse, navigate guard; found and fixed 6 bugs during verification
+
+**Gate Criteria:**
+- [x] @-mention file context reaches AI via WebSocket fileMentions field
+- [x] Search highlighting works in assistant message markdown bodies
+- [x] All dead code removed (rehypeToolMarkers)
+- [x] Persist layer rehydrates safely across all stores
+- [x] Auth auto-retries on 401 without infinite loop
+- [x] WebSocket heartbeat detects silent disconnects within 30s
+- [x] Backend runs as systemd service with auto-restart
+- [x] Session titles auto-generated from first real user message
+- [x] Project-based sidebar grouping with date subgroups
+- [x] Junk sessions filtered from sidebar
+- [x] Session search, pinning, and bulk delete work
+- [x] All 11 E2E requirements verified with Playwright specs
+- [x] 30/30 v1.4 requirements satisfied
+- [x] All M1 + M2 + M3 + M4 + M5 tests pass (150 test files)
+
+---
+
 ## v1.3 The Refinery (Shipped: 2026-03-17)
 
 **Status:** SHIPPED
@@ -184,7 +221,7 @@ This document captures the full development vision across all milestones. It per
 
 ---
 
-## v1.4: "The Polish" — 10/10 Visual Quality
+## v1.5: "The Polish" — 10/10 Visual Quality
 
 **Goal**: Transform the functional daily-driver into a visually stunning, award-winning interface. Every interaction should feel satisfying.
 
@@ -205,7 +242,7 @@ This document captures the full development vision across all milestones. It per
 - [ ] Streaming at 100 tokens/sec with zero visible jitter
 - [ ] All animations use defined motion tokens
 - [ ] FPS stays above 55 during heavy streaming
-- [ ] All M1-M4 tests pass (regression)
+- [ ] All M1-M5 tests pass (regression)
 - [ ] User spot check: "Would a harsh, experienced developer rate this 10/10?"
 
 ---
@@ -229,7 +266,7 @@ This document captures the full development vision across all milestones. It per
 - [ ] Background tab notifications work
 - [ ] Gemini tab can access Claude conversation context
 - [ ] MCP servers can be enabled/disabled from UI
-- [ ] All M1-M4 tests pass (regression)
+- [ ] All M1-M5 tests pass (regression)
 - [ ] User spot check: "Can I effectively work with multiple agents?"
 
 ---
@@ -329,4 +366,4 @@ interface Session {
 
 ---
 *Created: 2026-03-04*
-*Last updated: 2026-03-17 after v1.3 milestone completion*
+*Last updated: 2026-03-18 after v1.4 milestone completion*
