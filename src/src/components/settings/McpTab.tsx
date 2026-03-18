@@ -63,6 +63,16 @@ function parseArgs(text: string): string[] {
     .filter(Boolean);
 }
 
+interface ProviderSectionProps {
+  provider: 'claude' | 'codex';
+  servers: McpServer[];
+  isLoading: boolean;
+  error: string | null;
+  addServer: (data: { name: string; type: 'stdio' | 'http' | 'sse'; config: Record<string, unknown> }) => Promise<void>;
+  refetch: () => void;
+  onRemoveRequest: (server: ServerToRemove) => void;
+}
+
 function ProviderSection({
   provider,
   servers,
@@ -71,15 +81,7 @@ function ProviderSection({
   addServer,
   refetch,
   onRemoveRequest,
-}: {
-  provider: 'claude' | 'codex';
-  servers: McpServer[];
-  isLoading: boolean;
-  error: string | null;
-  addServer: (data: { name: string; type: 'stdio' | 'http' | 'sse'; config: Record<string, unknown> }) => Promise<void>;
-  refetch: () => void;
-  onRemoveRequest: (server: ServerToRemove) => void;
-}) {
+}: ProviderSectionProps) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<AddFormState>(EMPTY_FORM);
   const [isAdding, setIsAdding] = useState(false);
@@ -282,7 +284,7 @@ export function McpTab() {
         refetch={claude.refetch}
         onRemoveRequest={setServerToRemove}
       />
-      <div className="border-t" />
+      <div className="h-px bg-border/8" />
       <ProviderSection
         provider="codex"
         servers={codex.data}

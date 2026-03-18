@@ -15,7 +15,11 @@ import { SettingsTabSkeleton } from './SettingsTabSkeleton';
 import { cn } from '@/utils/cn';
 import type { ProviderStatus } from '@/types/settings';
 
-function StatusDot({ status }: { status: ProviderStatus }) {
+interface StatusDotProps {
+  status: ProviderStatus;
+}
+
+function StatusDot({ status }: StatusDotProps) {
   const color = status.error
     ? 'bg-[var(--color-warning)]'
     : status.authenticated

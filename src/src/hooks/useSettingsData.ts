@@ -112,16 +112,13 @@ export function useAgentStatuses() {
     )
       .then((statuses) => {
         if (!controller.signal.aborted) {
-          setState({ data: statuses, isLoading: false, error: null });
-        }
-      })
-      .catch((err) => {
-        if (!controller.signal.aborted) {
-          setState((prev) => ({
-            ...prev,
+          // Surface top-level error when ALL providers failed
+          const allFailed = statuses.every((s) => s.error);
+          setState({
+            data: statuses,
             isLoading: false,
-            error: err instanceof Error ? err.message : 'Fetch failed',
-          }));
+            error: allFailed ? 'All providers failed to connect' : null,
+          });
         }
       });
   }, []);

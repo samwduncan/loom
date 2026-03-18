@@ -2,7 +2,7 @@
  * SettingsModal tests -- open/close behavior, tab navigation, content rendering.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { SettingsModal } from './SettingsModal';
@@ -70,12 +70,12 @@ describe('SettingsModal', () => {
     expect(agentsTab).toHaveAttribute('data-state', 'inactive');
   });
 
-  it('close button calls closeModal', () => {
+  it('close button calls closeModal', async () => {
     useUIStore.getState().openModal({ type: 'settings' });
     render(<SettingsModal />);
 
     const closeButton = screen.getByRole('button', { name: /close/i });
-    fireEvent.click(closeButton);
+    await userEvent.click(closeButton);
 
     expect(useUIStore.getState().modalState).toBeNull();
   });

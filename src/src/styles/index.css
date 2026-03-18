@@ -75,7 +75,10 @@
   --color-rose: var(--rose-accent);
   --color-rose-text: var(--rose-text);
 
-  /* Spring easing utilities: ease-spring-gentle, ease-spring-snappy, ease-spring-bouncy */
+  /* Spring easing utilities — Tailwind v4 @theme inline registration.
+   * Identity mappings (--X: var(--X)) tell Tailwind "this property exists, generate
+   * utilities for it." Actual values live in tokens.css :root (unlayered, wins by cascade).
+   * Safe: Tailwind utilities emit `var(--ease-spring-gentle)` which resolves from :root. */
   --ease-spring-gentle: var(--ease-spring-gentle);
   --ease-spring-snappy: var(--ease-spring-snappy);
   --ease-spring-bouncy: var(--ease-spring-bouncy);

@@ -132,7 +132,7 @@ export const useConnectionStore = create<ConnectionState>()(
             ...state.providers,
             [providerId]: {
               ...state.providers[providerId],
-              status: 'connecting' as ConnectionStatus,
+              status: 'connecting',
               error: null,
               reconnectAttempts: 0,
             },
@@ -146,7 +146,7 @@ export const useConnectionStore = create<ConnectionState>()(
             ...state.providers,
             [providerId]: {
               ...state.providers[providerId],
-              status: 'disconnected' as ConnectionStatus,
+              status: 'disconnected',
             },
           },
         }));
@@ -176,25 +176,25 @@ export const useConnectionStore = create<ConnectionState>()(
       merge: (persistedState, currentState) => {
         const persisted = persistedState as {
           providers?: Partial<
-            Record<ProviderId, Partial<ProviderConnection>>
+            Record<ProviderId, { modelId?: string | null }>
           >;
         };
-        // Deep-merge providers so partialize'd modelId doesn't clobber
-        // ephemeral fields (status, reconnectAttempts, error, etc.)
+        // Only restore modelId from persistence — ephemeral fields
+        // (status, error, reconnectAttempts) always start fresh.
         return {
           ...currentState,
           providers: {
             claude: {
               ...currentState.providers.claude,
-              ...(persisted.providers?.claude ?? {}),
+              modelId: persisted.providers?.claude?.modelId ?? currentState.providers.claude.modelId,
             },
             codex: {
               ...currentState.providers.codex,
-              ...(persisted.providers?.codex ?? {}),
+              modelId: persisted.providers?.codex?.modelId ?? currentState.providers.codex.modelId,
             },
             gemini: {
               ...currentState.providers.gemini,
-              ...(persisted.providers?.gemini ?? {}),
+              modelId: persisted.providers?.gemini?.modelId ?? currentState.providers.gemini.modelId,
             },
           },
         };
