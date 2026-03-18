@@ -48,7 +48,7 @@ export function useGitOperations(projectName: string): GitOperations {
         post('/api/git/checkout', { branch }),
 
       createBranch: (name: string) =>
-        post('/api/git/create-branch', { name }),
+        post('/api/git/create-branch', { branch: name }),
 
       discard: (file: string) =>
         post('/api/git/discard', { file }),

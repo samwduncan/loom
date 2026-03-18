@@ -15,6 +15,7 @@ import { TokenPreview } from '@/components/dev/TokenPreview';
 import { ProofOfLife } from '@/components/dev/ProofOfLife';
 import { AppShell } from '@/components/app-shell/AppShell';
 import { AppErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { Toaster } from '@/components/ui/sonner';
 
 /** Route structure without BrowserRouter -- for testing with MemoryRouter */
 export function AppRoutes() {
@@ -37,6 +38,7 @@ export function App() {
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
+      <Toaster />
     </AppErrorBoundary>
   );
 }

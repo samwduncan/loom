@@ -16,15 +16,28 @@ import type { GitStatusResponse, GitStatusData, GitFileChange } from '@/types/gi
 
 /** Flatten backend arrays into a single GitFileChange[] */
 function flattenStatus(response: GitStatusResponse): GitStatusData {
+  // Backend may return {error, details} on failure with 200 status (not a proper HTTP error).
+  // Detect this and throw so useApiFetch routes it to the error handler.
+  const errResponse = response as unknown as { error?: string; details?: string };
+  if (errResponse.error && !response.branch) {
+    throw new Error(errResponse.details ?? errResponse.error);
+  }
+
+  // Guard against partially-populated responses
+  const modified = response.modified ?? [];
+  const added = response.added ?? [];
+  const deleted = response.deleted ?? [];
+  const untracked = response.untracked ?? [];
+
   const files: GitFileChange[] = [
-    ...response.modified.map((path) => ({ path, status: 'modified' as const })),
-    ...response.added.map((path) => ({ path, status: 'added' as const })),
-    ...response.deleted.map((path) => ({ path, status: 'deleted' as const })),
-    ...response.untracked.map((path) => ({ path, status: 'untracked' as const })),
+    ...modified.map((path) => ({ path, status: 'modified' as const })),
+    ...added.map((path) => ({ path, status: 'added' as const })),
+    ...deleted.map((path) => ({ path, status: 'deleted' as const })),
+    ...untracked.map((path) => ({ path, status: 'untracked' as const })),
   ];
   return {
-    branch: response.branch,
-    hasCommits: response.hasCommits,
+    branch: response.branch ?? 'unknown',
+    hasCommits: response.hasCommits ?? false,
     files,
   };
 }
