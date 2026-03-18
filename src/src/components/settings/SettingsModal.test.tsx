@@ -27,7 +27,7 @@ describe('SettingsModal', () => {
   });
 
   it('renders when modalState.type === "settings"', () => {
-    useUIStore.getState().openModal({ type: 'settings', props: {} });
+    useUIStore.getState().openModal({ type: 'settings' });
     render(<SettingsModal />);
 
     expect(screen.getByTestId('settings-modal')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('SettingsModal', () => {
   });
 
   it('all 5 tab triggers are present with correct labels', () => {
-    useUIStore.getState().openModal({ type: 'settings', props: {} });
+    useUIStore.getState().openModal({ type: 'settings' });
     render(<SettingsModal />);
 
     expect(screen.getByTestId('settings-tab-agents')).toHaveTextContent('Agents');
@@ -53,7 +53,7 @@ describe('SettingsModal', () => {
 
   it('clicking a tab switches active state via data attribute', async () => {
     const user = userEvent.setup();
-    useUIStore.getState().openModal({ type: 'settings', props: {} });
+    useUIStore.getState().openModal({ type: 'settings' });
     render(<SettingsModal />);
 
     const agentsTab = screen.getByTestId('settings-tab-agents');
@@ -71,7 +71,7 @@ describe('SettingsModal', () => {
   });
 
   it('close button calls closeModal', () => {
-    useUIStore.getState().openModal({ type: 'settings', props: {} });
+    useUIStore.getState().openModal({ type: 'settings' });
     render(<SettingsModal />);
 
     const closeButton = screen.getByRole('button', { name: /close/i });

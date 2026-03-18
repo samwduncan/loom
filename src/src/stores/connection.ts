@@ -108,7 +108,7 @@ export const useConnectionStore = create<ConnectionState>()(
             [providerId]: {
               ...state.providers[providerId],
               reconnectAttempts:
-                state.providers[providerId].reconnectAttempts + 1,
+                (state.providers[providerId].reconnectAttempts ?? 0) + 1,
             },
           },
         }));
@@ -173,6 +173,32 @@ export const useConnectionStore = create<ConnectionState>()(
           gemini: { modelId: state.providers.gemini.modelId },
         },
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as {
+          providers?: Partial<
+            Record<ProviderId, Partial<ProviderConnection>>
+          >;
+        };
+        // Deep-merge providers so partialize'd modelId doesn't clobber
+        // ephemeral fields (status, reconnectAttempts, error, etc.)
+        return {
+          ...currentState,
+          providers: {
+            claude: {
+              ...currentState.providers.claude,
+              ...(persisted.providers?.claude ?? {}),
+            },
+            codex: {
+              ...currentState.providers.codex,
+              ...(persisted.providers?.codex ?? {}),
+            },
+            gemini: {
+              ...currentState.providers.gemini,
+              ...(persisted.providers?.gemini ?? {}),
+            },
+          },
+        };
+      },
       migrate: (persistedState: unknown, _version: number) => {
         // Version 1: initial schema, no migration needed
         return persistedState as {

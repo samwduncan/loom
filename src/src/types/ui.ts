@@ -4,12 +4,12 @@
  * All types defined here are consumed by the UIStore and UI components.
  */
 
+import type { SettingsTabId } from './settings';
+
 export type TabId = 'chat' | 'files' | 'shell' | 'git';
 
-export interface ModalState {
-  type: string;
-  props: Record<string, unknown>;
-}
+export type ModalState =
+  | { type: 'settings'; initialTab?: SettingsTabId };
 
 export interface CompanionAnimation {
   state: 'idle' | 'thinking' | 'celebrating' | 'alarmed' | 'sleeping';

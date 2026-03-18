@@ -32,7 +32,7 @@ describe('AgentsTab', () => {
   it('renders 3 provider rows when loaded', () => {
     mockUseAgentStatuses.mockReturnValue({
       data: [
-        { provider: 'claude', authenticated: true, email: 'user@test.com', defaultModel: 'Sonnet' },
+        { provider: 'claude', authenticated: true, email: 'user@test.com' },
         { provider: 'codex', authenticated: false, email: null },
         { provider: 'gemini', authenticated: false, email: null },
       ],
@@ -48,10 +48,10 @@ describe('AgentsTab', () => {
     expect(screen.getByTestId('provider-row-gemini')).toBeInTheDocument();
   });
 
-  it('connected provider shows green dot, email, and default model name', () => {
+  it('connected provider shows green dot and email', () => {
     mockUseAgentStatuses.mockReturnValue({
       data: [
-        { provider: 'claude', authenticated: true, email: 'user@test.com', defaultModel: 'Sonnet' },
+        { provider: 'claude', authenticated: true, email: 'user@test.com' },
       ],
       isLoading: false,
       error: null,
@@ -64,7 +64,6 @@ describe('AgentsTab', () => {
     expect(dot).toHaveClass('bg-[var(--color-success)]');
     expect(screen.getByText('Connected')).toBeInTheDocument();
     expect(screen.getByText('user@test.com')).toBeInTheDocument();
-    expect(screen.getByTestId('model-claude')).toHaveTextContent('Model: Sonnet');
   });
 
   it('disconnected provider shows red dot and "Disconnected"', () => {

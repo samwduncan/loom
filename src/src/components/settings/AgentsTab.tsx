@@ -9,6 +9,7 @@
 
 import { Bot } from 'lucide-react';
 import { useAgentStatuses } from '@/hooks/useSettingsData';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SettingsTabSkeleton } from './SettingsTabSkeleton';
 import { cn } from '@/utils/cn';
@@ -36,10 +37,21 @@ const PROVIDER_LABELS: Record<string, string> = {
 };
 
 export function AgentsTab() {
-  const { data: statuses, isLoading } = useAgentStatuses();
+  const { data: statuses, isLoading, error, refetch } = useAgentStatuses();
 
   if (isLoading) {
     return <SettingsTabSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-2 p-1" data-testid="agents-tab-error">
+        <p className="text-sm text-destructive">{error}</p>
+        <Button variant="outline" size="sm" onClick={refetch}>
+          Retry
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -70,12 +82,6 @@ export function AgentsTab() {
 
                 {status.authenticated && status.email && (
                   <p className="text-muted-foreground text-sm mt-0.5">{status.email}</p>
-                )}
-
-                {status.authenticated && status.defaultModel && (
-                  <p className="text-muted-foreground text-xs mt-0.5" data-testid={`model-${status.provider}`}>
-                    Model: {status.defaultModel}
-                  </p>
                 )}
 
                 {status.error && (

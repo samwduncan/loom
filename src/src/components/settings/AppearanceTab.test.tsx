@@ -59,19 +59,14 @@ describe('AppearanceTab', () => {
     render(<AppearanceTab />);
     const preview = screen.getByTestId('code-font-preview');
     expect(preview).toHaveTextContent('const hello = "world";');
-    // Font applied via CSS variable --font-code (set on mount and on change)
-    expect(document.documentElement.style.getPropertyValue('--font-code')).toBe('JetBrains Mono');
-  });
-
-  it('shows density as read-only text', () => {
-    render(<AppearanceTab />);
-    expect(screen.getByTestId('density-value')).toHaveTextContent('comfortable');
+    // Font applied via CSS variable --font-code with quotes for multi-word names
+    expect(document.documentElement.style.getPropertyValue('--font-code')).toBe('"JetBrains Mono"');
   });
 
   it('applies CSS custom properties on mount', () => {
     render(<AppearanceTab />);
     expect(document.documentElement.style.getPropertyValue('--text-body')).toBe('0.875rem');
-    expect(document.documentElement.style.getPropertyValue('--font-code')).toBe('JetBrains Mono');
+    expect(document.documentElement.style.getPropertyValue('--font-code')).toBe('"JetBrains Mono"');
   });
 
   it('slider renders with correct min/max range labels', () => {

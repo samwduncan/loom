@@ -65,12 +65,21 @@ function parseArgs(text: string): string[] {
 
 function ProviderSection({
   provider,
+  servers,
+  isLoading,
+  error,
+  addServer,
+  refetch,
   onRemoveRequest,
 }: {
   provider: 'claude' | 'codex';
+  servers: McpServer[];
+  isLoading: boolean;
+  error: string | null;
+  addServer: (data: { name: string; type: 'stdio' | 'http' | 'sse'; config: Record<string, unknown> }) => Promise<void>;
+  refetch: () => void;
   onRemoveRequest: (server: ServerToRemove) => void;
 }) {
-  const { data: servers, isLoading, error, addServer, refetch } = useMcpServers(provider);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<AddFormState>(EMPTY_FORM);
   const [isAdding, setIsAdding] = useState(false);
@@ -139,10 +148,10 @@ function ProviderSection({
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-foreground">{server.name}</span>
-                  <span className="rounded bg-surface-raised px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                  <span className="rounded bg-surface-raised px-1.5 py-0.5 text-xs uppercase text-muted-foreground">
                     {server.type}
                   </span>
-                  <span className="rounded bg-surface-raised px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                  <span className="rounded bg-surface-raised px-1.5 py-0.5 text-xs uppercase text-muted-foreground">
                     {server.scope}
                   </span>
                 </div>
@@ -211,7 +220,7 @@ function ProviderSection({
             <Label htmlFor={`mcp-${provider}-env`}>Environment (KEY=VALUE, one per line)</Label>
             <textarea
               id={`mcp-${provider}-env`}
-              className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-hidden"
+              className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-hidden"
               value={form.env}
               onChange={(e) => setForm((f) => ({ ...f, env: e.target.value }))}
               placeholder={"NODE_ENV=production\nDEBUG=true"}
@@ -246,12 +255,12 @@ function ProviderSection({
 
 export function McpTab() {
   const [serverToRemove, setServerToRemove] = useState<ServerToRemove | null>(null);
-  const claudeHook = useMcpServers('claude');
-  const codexHook = useMcpServers('codex');
+  const claude = useMcpServers('claude');
+  const codex = useMcpServers('codex');
 
   async function handleRemove() {
     if (!serverToRemove) return;
-    const hook = serverToRemove.provider === 'claude' ? claudeHook : codexHook;
+    const hook = serverToRemove.provider === 'claude' ? claude : codex;
     try {
       await hook.removeServer(serverToRemove.name);
       toast.success(`MCP server "${serverToRemove.name}" removed`);
@@ -264,9 +273,25 @@ export function McpTab() {
 
   return (
     <div className="space-y-6 p-1" data-testid="mcp-tab">
-      <ProviderSection provider="claude" onRemoveRequest={setServerToRemove} />
+      <ProviderSection
+        provider="claude"
+        servers={claude.data}
+        isLoading={claude.isLoading}
+        error={claude.error}
+        addServer={claude.addServer}
+        refetch={claude.refetch}
+        onRemoveRequest={setServerToRemove}
+      />
       <div className="border-t" />
-      <ProviderSection provider="codex" onRemoveRequest={setServerToRemove} />
+      <ProviderSection
+        provider="codex"
+        servers={codex.data}
+        isLoading={codex.isLoading}
+        error={codex.error}
+        addServer={codex.addServer}
+        refetch={codex.refetch}
+        onRemoveRequest={setServerToRemove}
+      />
 
       {/* AlertDialog as sibling — same pattern as ApiKeysTab for Radix focus trap avoidance */}
       <AlertDialog

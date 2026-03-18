@@ -66,19 +66,6 @@ describe('useAgentStatuses', () => {
     });
   });
 
-  it('populates defaultModel field for each provider', async () => {
-    mockApiFetch.mockResolvedValue({ authenticated: true, email: 'a@b.com' });
-
-    const { result } = renderHook(() => useAgentStatuses());
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    const models = result.current.data.map((s) => s.defaultModel);
-    expect(models).toEqual(['Sonnet', 'GPT-5.3 Codex', 'Gemini 3.1 Pro']);
-  });
-
   it('aborts on unmount (cleanup)', async () => {
     const abortSpy = vi.spyOn(AbortController.prototype, 'abort');
     mockApiFetch.mockResolvedValue({ authenticated: false, email: null });

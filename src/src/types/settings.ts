@@ -59,13 +59,11 @@ export interface McpConfigReadResponse {
   servers: McpServer[];
 }
 
-/** Provider status with optional client-side defaultModel (not from API). */
 export interface ProviderStatus {
   provider: 'claude' | 'codex' | 'gemini';
   authenticated: boolean;
   email: string | null;
   error?: string;
-  defaultModel?: string;
 }
 
 export type SettingsTabId = 'agents' | 'api-keys' | 'appearance' | 'git' | 'mcp';

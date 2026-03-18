@@ -32,6 +32,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/utils/cn';
+import { SettingsTabSkeleton } from './SettingsTabSkeleton';
 
 export function CredentialsSection() {
   const { data: credentials, isLoading, addCredential, deleteCredential } = useCredentials();
@@ -80,7 +81,7 @@ export function CredentialsSection() {
     }
   }
 
-  if (isLoading) return null;
+  if (isLoading) return <SettingsTabSkeleton />;
 
   return (
     <div className="space-y-4" data-testid="credentials-section">

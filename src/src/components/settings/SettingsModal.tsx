@@ -37,6 +37,7 @@ export function SettingsModal() {
   const closeModal = useUIStore((state) => state.closeModal);
 
   const isOpen = modalState?.type === 'settings';
+  const initialTab = (modalState?.type === 'settings' && modalState.initialTab) || 'agents';
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
@@ -49,7 +50,7 @@ export function SettingsModal() {
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="agents" className="flex-1 min-h-0">
+        <Tabs defaultValue={initialTab} key={initialTab} className="flex-1 min-h-0">
           <TabsList className="w-full justify-start" data-testid="settings-tabs-list">
             {SETTINGS_TABS.map((tab) => (
               <TabsTrigger key={tab.id} value={tab.id} data-testid={`settings-tab-${tab.id}`}>

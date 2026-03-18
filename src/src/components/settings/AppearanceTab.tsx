@@ -32,20 +32,18 @@ export function AppearanceTab() {
   const theme = useUIStore((state) => state.theme);
   const setTheme = useUIStore((state) => state.setTheme);
 
-  // Apply current theme values to CSS variables on mount (for page refresh persistence)
+  // Apply current theme values to CSS variables when theme changes (including rehydration)
   useEffect(() => {
     document.documentElement.style.setProperty('--text-body', `${theme.fontSize / 16}rem`);
-    document.documentElement.style.setProperty('--font-code', theme.codeFontFamily);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- Only on mount; slider/select handle live updates
+    document.documentElement.style.setProperty('--font-code', `"${theme.codeFontFamily}"`);
+  }, [theme.fontSize, theme.codeFontFamily]);
 
   function handleFontSizeChange(value: number[]) {
     const size = value[0] ?? theme.fontSize; // ASSERT: Slider always returns at least one value
-    document.documentElement.style.setProperty('--text-body', `${size / 16}rem`);
     setTheme({ fontSize: size });
   }
 
   function handleCodeFontChange(value: string) {
-    document.documentElement.style.setProperty('--font-code', value);
     setTheme({ codeFontFamily: value });
   }
 
@@ -97,13 +95,6 @@ export function AppearanceTab() {
         </div>
       </div>
 
-      {/* Density (read-only) */}
-      <div className="space-y-2">
-        <Label>Density</Label>
-        <p className="text-sm text-muted-foreground capitalize" data-testid="density-value">
-          {theme.density}
-        </p>
-      </div>
     </div>
   );
 }
