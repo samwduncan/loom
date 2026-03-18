@@ -1,14 +1,11 @@
 /**
- * Time formatting utilities -- relative time display and date grouping.
+ * Time formatting utilities -- relative time display.
  *
  * Pure functions, no external dependencies. Uses Date arithmetic only.
+ * Date grouping lives in sessionGrouping.ts (single source of truth).
  *
  * Constitution: Named exports only (2.2), no default export.
  */
-
-import type { Session } from '@/types/session';
-
-export type DateGroup = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Older';
 
 /**
  * Format a date string as a relative time from now.
@@ -29,56 +26,4 @@ export function formatRelativeTime(dateStr: string): string {
   if (diffHr < 24) return `${diffHr}h ago`;
   if (diffDay < 7) return `${diffDay}d ago`;
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-}
-
-/**
- * Group sessions into date categories based on updatedAt field.
- * Uses midnight boundaries (not 24h rolling).
- * Returns array of non-empty groups in order: Today, Yesterday, This Week, This Month, Older.
- * Sessions within each group sorted by updatedAt descending (most recent first).
- */
-export function groupSessionsByDate(
-  sessions: Session[],
-): Array<{ label: DateGroup; sessions: Session[] }> {
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterdayStart = new Date(todayStart.getTime() - 86_400_000);
-  const weekStart = new Date(todayStart.getTime() - 7 * 86_400_000);
-  const monthStart = new Date(todayStart.getTime() - 30 * 86_400_000);
-
-  const groups: Record<DateGroup, Session[]> = {
-    'Today': [],
-    'Yesterday': [],
-    'This Week': [],
-    'This Month': [],
-    'Older': [],
-  };
-
-  for (const session of sessions) {
-    const date = new Date(session.updatedAt);
-    if (date >= todayStart) {
-      groups['Today'].push(session);
-    } else if (date >= yesterdayStart) {
-      groups['Yesterday'].push(session);
-    } else if (date >= weekStart) {
-      groups['This Week'].push(session);
-    } else if (date >= monthStart) {
-      groups['This Month'].push(session);
-    } else {
-      groups['Older'].push(session);
-    }
-  }
-
-  // Sort within each group by updatedAt descending (most recent first)
-  const sortDesc = (a: Session, b: Session) =>
-    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-
-  const orderedLabels: DateGroup[] = ['Today', 'Yesterday', 'This Week', 'This Month', 'Older'];
-
-  return orderedLabels
-    .filter((label) => groups[label].length > 0)
-    .map((label) => ({
-      label,
-      sessions: groups[label].sort(sortDesc),
-    }));
 }

@@ -84,15 +84,20 @@ export function useMultiProjectSessions(): UseMultiProjectSessionsResult {
     expandedRef.current = expandedProjects;
   }, [expandedProjects]);
 
-  const currentProjectRef = useRef(currentProject);
-  useEffect(() => {
-    currentProjectRef.current = currentProject;
-  }, [currentProject]);
+  // Abort controller ref for cancelling in-flight fetches on refetch
+  const fetchControllerRef = useRef<AbortController | null>(null);
 
   /** Fetch all projects and their sessions. */
   const fetchProjects = useCallback(async (opts?: { signal?: AbortSignal }) => {
+    // Cancel any in-flight fetch before starting a new one
+    fetchControllerRef.current?.abort();
+    const controller = new AbortController();
+    fetchControllerRef.current = controller;
+    const signal = opts?.signal ?? controller.signal;
+
+    setIsLoading(true);
     try {
-      const projects = await apiFetch<BackendProject[]>('/api/projects', {}, opts?.signal);
+      const projects = await apiFetch<BackendProject[]>('/api/projects', {}, signal);
 
       // For each project with hasMore, fetch full session list if expanded
       const projectInputs = await Promise.all(
@@ -104,7 +109,7 @@ export function useMultiProjectSessions(): UseMultiProjectSessionsResult {
               const fullData = await apiFetch<{ sessions: BackendSessionData[]; total: number; hasMore: boolean }>(
                 `/api/projects/${encodeURIComponent(project.name)}/sessions?limit=999`,
                 {},
-                opts?.signal,
+                signal,
               );
               sessions = fullData.sessions;
             } catch {
@@ -139,9 +144,8 @@ export function useMultiProjectSessions(): UseMultiProjectSessionsResult {
 
   // Initial fetch on mount
   useEffect(() => {
-    const controller = new AbortController();
-    void fetchProjects({ signal: controller.signal });
-    return () => { controller.abort(); };
+    void fetchProjects();
+    return () => { fetchControllerRef.current?.abort(); };
   }, [fetchProjects]);
 
   // Listen for projects-updated event to refetch
@@ -159,15 +163,24 @@ export function useMultiProjectSessions(): UseMultiProjectSessionsResult {
   const toggleProject = useCallback((name: string) => {
     setExpandedProjects((prev) => {
       const next = new Set(prev);
-      if (next.has(name)) {
-        next.delete(name);
-      } else {
+      const isExpanding = !next.has(name);
+      if (isExpanding) {
         next.add(name);
+      } else {
+        next.delete(name);
       }
       saveExpanded(next);
+
+      // Refetch when expanding — a newly expanded project may need full session data
+      if (isExpanding) {
+        // Update the ref immediately so fetchProjects sees the new expanded state
+        expandedRef.current = next;
+        void fetchProjects();
+      }
+
       return next;
     });
-  }, []);
+  }, [fetchProjects]);
 
   return { projectGroups, isLoading, error, expandedProjects, toggleProject };
 }

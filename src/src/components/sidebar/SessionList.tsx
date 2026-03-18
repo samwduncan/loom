@@ -118,7 +118,7 @@ export function SessionList() {
     const wasActive = deleteSessionId === activeSessionId;
     try {
       await apiFetch(
-        `/api/projects/${encodeURIComponent(projectName)}/sessions/${deleteSessionId}`,
+        `/api/projects/${encodeURIComponent(projectName)}/sessions/${encodeURIComponent(deleteSessionId)}`,
         { method: 'DELETE' },
       );
       removeSession(deleteSessionId);
