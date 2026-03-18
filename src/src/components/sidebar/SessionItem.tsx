@@ -9,14 +9,18 @@
  * Inline rename: double-click title (or isEditing prop) enters edit mode.
  * Enter confirms, Escape cancels, blur confirms. Empty/unchanged values are ignored.
  *
+ * Supports: search highlight, pin indicator, selection mode with checkbox.
+ *
  * Receives data as props (NOT subscribing to store per-item).
  *
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6).
  */
 
-import { useState, useCallback, type MouseEvent, type KeyboardEvent } from 'react';
+import { useState, useCallback, type MouseEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { Pin } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { formatRelativeTime } from '@/lib/formatTime';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ProviderLogo } from './ProviderLogo';
 import type { ProviderId } from '@/types/provider';
 import './sidebar.css';
@@ -30,9 +34,31 @@ export interface SessionItemProps {
   isStreaming?: boolean;
   hasDraft?: boolean;
   isEditing?: boolean;
+  searchQuery?: string;
+  isPinned?: boolean;
+  isSelecting?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
   onClick: () => void;
   onContextMenu: (e: MouseEvent<HTMLDivElement>) => void;
   onRename: (id: string, newTitle: string) => void;
+}
+
+/** Highlight matching substring with <mark> tag. */
+function highlightMatch(text: string, query: string): ReactNode {
+  if (!query) return text;
+  const lower = text.toLowerCase();
+  const idx = lower.indexOf(query.toLowerCase());
+  if (idx === -1) return text;
+  return (
+    <>
+      {text.slice(0, idx)}
+      <mark className="bg-accent-primary/20 text-foreground rounded-sm px-0.5">
+        {text.slice(idx, idx + query.length)}
+      </mark>
+      {text.slice(idx + query.length)}
+    </>
+  );
 }
 
 export function SessionItem({
@@ -44,6 +70,11 @@ export function SessionItem({
   isStreaming,
   hasDraft,
   isEditing: isEditingProp,
+  searchQuery,
+  isPinned,
+  isSelecting,
+  isSelected,
+  onToggleSelect,
   onClick,
   onContextMenu,
   onRename,
@@ -98,29 +129,48 @@ export function SessionItem({
     setIsEditingLocal(true);
   }
 
+  const handleClick = useCallback(() => {
+    if (isEditing) return;
+    if (isSelecting && onToggleSelect) {
+      onToggleSelect();
+    } else {
+      onClick();
+    }
+  }, [isEditing, isSelecting, onToggleSelect, onClick]);
+
   return (
     <div
       role="option"
       aria-selected={isActive}
       aria-label={title}
       tabIndex={0}
-      onClick={isEditing ? undefined : onClick}
+      onClick={handleClick}
       onContextMenu={onContextMenu}
       onKeyDown={(e) => {
         if (!isEditing && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
-          onClick();
+          handleClick();
         }
       }}
       className={cn(
         'px-3 py-2 cursor-pointer',
         'transition-[background-color] duration-[var(--duration-fast)]',
         'session-item-hover',
-        isActive && 'session-item-active',
+        isActive && !isSelecting && 'session-item-active',
+        isSelected && 'bg-accent-primary/10',
       )}
     >
-      {/* Line 1: title + draft dot */}
+      {/* Line 1: checkbox (selection mode) + title + pin/draft/streaming dots */}
       <div className="flex items-center gap-1.5">
+        {isSelecting && (
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={() => onToggleSelect?.()}
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Select ${title}`}
+            className="shrink-0"
+          />
+        )}
         {isEditing ? (
           <input
             type="text"
@@ -139,8 +189,11 @@ export function SessionItem({
             )}
             onDoubleClick={handleDoubleClick}
           >
-            {title}
+            {searchQuery ? highlightMatch(title, searchQuery) : title}
           </div>
+        )}
+        {isPinned && !isEditing && (
+          <Pin size={12} className="text-muted shrink-0" aria-label="Pinned" />
         )}
         {isStreaming && !isEditing && (
           <span className="session-streaming-dot" aria-label="Streaming" />
@@ -153,7 +206,7 @@ export function SessionItem({
         )}
       </div>
       {/* Line 2: timestamp + provider logo */}
-      <div className="flex items-center gap-1.5 mt-0.5">
+      <div className={cn('flex items-center gap-1.5 mt-0.5', isSelecting && 'ml-[22px]')}>
         <span className="text-[length:0.75rem] text-muted">
           {formatRelativeTime(updatedAt)}
         </span>

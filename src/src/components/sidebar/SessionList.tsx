@@ -1,6 +1,7 @@
 /**
- * SessionList -- multi-project session list with collapsible project groups.
+ * SessionList -- multi-project session list with search, pins, and bulk selection.
  * Consumes useMultiProjectSessions for project > date > session rendering.
+ * Wires useSessionSearch, useSessionPins, and useSessionSelection hooks.
  * Constitution: Named export (2.2), selector-only store access (4.2), cn() (3.6).
  */
 
@@ -12,6 +13,9 @@ import { useTimelineStore } from '@/stores/timeline';
 import { useStreamStore } from '@/stores/stream';
 import { useSessionList } from '@/hooks/useSessionList';
 import { useMultiProjectSessions } from '@/hooks/useMultiProjectSessions';
+import { useSessionSearch } from '@/hooks/useSessionSearch';
+import { useSessionPins } from '@/hooks/useSessionPins';
+import { useSessionSelection } from '@/hooks/useSessionSelection';
 import { apiFetch } from '@/lib/api-client';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { ProjectHeader } from './ProjectHeader';
@@ -21,6 +25,8 @@ import { SessionContextMenu } from './SessionContextMenu';
 import { SessionListSkeleton } from './SessionListSkeleton';
 import { NewChatButton } from './NewChatButton';
 import { DeleteSessionDialog } from './DeleteSessionDialog';
+import { SearchInput } from './SearchInput';
+import { BulkActionBar } from './BulkActionBar';
 import { DRAFTS_CHANGED_EVENT } from '@/components/chat/composer/useDraftPersistence';
 
 const DRAFTS_STORAGE_KEY = 'loom-composer-drafts';
@@ -47,9 +53,18 @@ export function SessionList() {
   useSessionList(); // Populates timeline store (needed by ChatView)
 
   const {
-    projectGroups, isLoading: multiLoading, error: multiError,
+    projectGroups: rawGroups, isLoading: multiLoading, error: multiError,
     expandedProjects, toggleProject,
   } = useMultiProjectSessions();
+
+  const { query, setQuery, filterGroups } = useSessionSearch();
+  const { togglePin, isPinned } = useSessionPins();
+  const selection = useSessionSelection();
+
+  // Apply pin hoisting then search filtering
+  const projectGroups = filterGroups(rawGroups);
+
+  const isSearching = query.trim().length > 0;
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const handleProjectToggle = useCallback((name: string) => {
@@ -71,7 +86,7 @@ export function SessionList() {
   }, []);
 
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
-  const [deleteSessionId, setDeleteSessionId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'single'; id: string } | { type: 'bulk' } | null>(null);
   const [contextMenu, setContextMenu] = useState({
     isOpen: false, position: { x: 0, y: 0 }, sessionId: null as string | null,
   });
@@ -110,11 +125,35 @@ export function SessionList() {
   const handleDelete = useCallback(() => {
     const id = contextMenu.sessionId;
     closeContextMenu();
-    if (id) setDeleteSessionId(id);
-  }, [contextMenu.sessionId, closeContextMenu]);
+    if (id) setDeleteTarget({ type: 'single', id });
+  }, [contextMenu.sessionId, closeContextMenu, setDeleteTarget]);
+
+  const handlePin = useCallback(() => {
+    const id = contextMenu.sessionId;
+    if (id) togglePin(id);
+  }, [contextMenu.sessionId, togglePin]);
+
+  const handleSelectFromMenu = useCallback(() => {
+    const id = contextMenu.sessionId;
+    if (id) selection.toggle(id);
+  }, [contextMenu.sessionId, selection]);
+
+  const handleBulkDeleteRequest = useCallback(() => {
+    setDeleteTarget({ type: 'bulk' });
+  }, [setDeleteTarget]);
 
   const confirmDelete = useCallback(async () => {
-    if (!deleteSessionId || !projectName) { setDeleteSessionId(null); return; }
+    if (!deleteTarget) return;
+
+    if (deleteTarget.type === 'bulk') {
+      await selection.bulkDelete(rawGroups, activeSessionId, navigate, removeSession);
+      setDeleteTarget(null);
+      return;
+    }
+
+    // Single delete
+    const deleteSessionId = deleteTarget.id;
+    if (!projectName) { setDeleteTarget(null); return; }
     const wasActive = deleteSessionId === activeSessionId;
     try {
       await apiFetch(
@@ -132,8 +171,10 @@ export function SessionList() {
       console.error('Failed to delete session:', err);
       toast.error('Failed to delete session');
     }
-    setDeleteSessionId(null);
-  }, [deleteSessionId, projectName, activeSessionId, sessions, removeSession, navigate]);
+    setDeleteTarget(null);
+  }, [deleteTarget, projectName, activeSessionId, sessions, removeSession, navigate, selection, rawGroups, setDeleteTarget]);
+
+  const deleteCount = deleteTarget?.type === 'bulk' ? selection.selectedIds.size : 1;
 
   if (multiLoading) return <SessionListSkeleton />;
   if (multiError) {
@@ -145,7 +186,7 @@ export function SessionList() {
   }
 
   const totalVisible = projectGroups.reduce((sum, p) => sum + p.visibleCount, 0);
-  if (totalVisible === 0) {
+  if (totalVisible === 0 && !isSearching) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 px-4 py-8">
         <p className="text-muted text-[length:var(--text-body)] mb-3">No conversations yet</p>
@@ -156,48 +197,76 @@ export function SessionList() {
 
   return (
     <>
-      <div ref={scrollRef} className={cn('flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list">
-        {projectGroups.map((project) => (
-          <div key={project.projectName}>
-            <ProjectHeader
-              displayName={project.displayName}
-              sessionCount={project.visibleCount}
-              isExpanded={expandedProjects.has(project.projectName)}
-              onToggle={() => handleProjectToggle(project.projectName)}
-              isCurrentProject={project.projectName === projectName}
-            />
-            {expandedProjects.has(project.projectName) && project.dateGroups.map((dateGroup) => (
-              <div key={dateGroup.label}>
-                <DateGroupHeader label={dateGroup.label} />
-                {dateGroup.sessions.map((session) => (
-                  <SessionItem
-                    key={session.id}
-                    id={session.id}
-                    title={session.title}
-                    updatedAt={session.updatedAt}
-                    providerId={session.providerId}
-                    isActive={session.id === activeSessionId}
-                    isStreaming={session.id === streamingSessionId}
-                    hasDraft={draftSessionIds.has(session.id)}
-                    isEditing={editingSessionId === session.id}
-                    onClick={() => handleSessionClick(session.id)}
-                    onContextMenu={(e) => handleContextMenu(e, session.id)}
-                    onRename={handleSessionRename}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        ))}
+      <div className="px-2 py-1.5">
+        <SearchInput value={query} onChange={setQuery} />
       </div>
+      <div ref={scrollRef} className={cn('flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list">
+        {totalVisible === 0 && isSearching && (
+          <div className="px-3 py-8 text-center text-[length:var(--text-body)] text-muted">
+            No matching sessions
+          </div>
+        )}
+        {projectGroups.map((project) => {
+          // During active search, bypass collapsed state to show all matches
+          const isExpanded = isSearching || expandedProjects.has(project.projectName);
+          return (
+            <div key={project.projectName}>
+              <ProjectHeader
+                displayName={project.displayName}
+                sessionCount={project.visibleCount}
+                isExpanded={isExpanded}
+                onToggle={() => handleProjectToggle(project.projectName)}
+                isCurrentProject={project.projectName === projectName}
+              />
+              {isExpanded && project.dateGroups.map((dateGroup) => (
+                <div key={dateGroup.label}>
+                  <DateGroupHeader label={dateGroup.label} />
+                  {dateGroup.sessions.map((session) => (
+                    <SessionItem
+                      key={session.id}
+                      id={session.id}
+                      title={session.title}
+                      updatedAt={session.updatedAt}
+                      providerId={session.providerId}
+                      isActive={session.id === activeSessionId}
+                      isStreaming={session.id === streamingSessionId}
+                      hasDraft={draftSessionIds.has(session.id)}
+                      isEditing={editingSessionId === session.id}
+                      searchQuery={isSearching ? query : undefined}
+                      isPinned={isPinned(session.id)}
+                      isSelecting={selection.isSelecting}
+                      isSelected={selection.selectedIds.has(session.id)}
+                      onToggleSelect={() => selection.toggle(session.id)}
+                      onClick={() => handleSessionClick(session.id)}
+                      onContextMenu={(e) => handleContextMenu(e, session.id)}
+                      onRename={handleSessionRename}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+      {selection.isSelecting && selection.selectedIds.size > 0 && (
+        <BulkActionBar
+          count={selection.selectedIds.size}
+          onDelete={handleBulkDeleteRequest}
+          onCancel={selection.clear}
+        />
+      )}
       <SessionContextMenu
         isOpen={contextMenu.isOpen} position={contextMenu.position}
         onRename={handleRename} onDelete={handleDelete} onClose={closeContextMenu}
+        onPin={handlePin}
+        isPinned={contextMenu.sessionId ? isPinned(contextMenu.sessionId) : false}
+        onSelect={handleSelectFromMenu}
       />
       <DeleteSessionDialog
-        isOpen={deleteSessionId !== null}
-        onOpenChange={(open) => { if (!open) setDeleteSessionId(null); }}
+        isOpen={deleteTarget !== null}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
         onConfirm={() => void confirmDelete()}
+        count={deleteCount}
       />
     </>
   );

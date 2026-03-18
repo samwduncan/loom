@@ -2,7 +2,7 @@
  * SessionContextMenu -- custom context menu portaled to document.body.
  *
  * Positioned at right-click coordinates. Fixed overlay at z-dropdown.
- * Two menu items: Rename and Delete (delete in status-error color).
+ * Menu items: Pin/Unpin, Rename, Select, Delete (delete in status-error color).
  * Click outside or Escape closes.
  *
  * ARCHITECT MANDATE: MUST portal to document.body to avoid overflow:auto
@@ -13,6 +13,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { Pin, PinOff } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import './sidebar.css';
 
@@ -22,6 +23,9 @@ interface SessionContextMenuProps {
   onRename: () => void;
   onDelete: () => void;
   onClose: () => void;
+  onPin?: () => void;
+  isPinned?: boolean;
+  onSelect?: () => void;
 }
 
 export function SessionContextMenu({
@@ -30,6 +34,9 @@ export function SessionContextMenu({
   onRename,
   onDelete,
   onClose,
+  onPin,
+  isPinned,
+  onSelect,
 }: SessionContextMenuProps) {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -69,6 +76,23 @@ export function SessionContextMenu({
       style={{ top: position.y, left: position.x }}
       role="menu"
     >
+      {onPin && (
+        <button
+          className="context-menu-item"
+          onClick={(e) => {
+            e.stopPropagation();
+            onPin();
+            onClose();
+          }}
+          role="menuitem"
+          type="button"
+        >
+          <span className="flex items-center gap-2">
+            {isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+            {isPinned ? 'Unpin' : 'Pin to top'}
+          </span>
+        </button>
+      )}
       <button
         className="context-menu-item"
         onClick={(e) => {
@@ -80,6 +104,20 @@ export function SessionContextMenu({
       >
         Rename
       </button>
+      {onSelect && (
+        <button
+          className="context-menu-item"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect();
+            onClose();
+          }}
+          role="menuitem"
+          type="button"
+        >
+          Select
+        </button>
+      )}
       <button
         className="context-menu-item context-menu-item-danger"
         onClick={(e) => {
