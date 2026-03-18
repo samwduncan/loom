@@ -15,6 +15,7 @@ import { useSessionList } from '@/hooks/useSessionList';
 import { useMultiProjectSessions } from '@/hooks/useMultiProjectSessions';
 import { useSessionSearch } from '@/hooks/useSessionSearch';
 import { useSessionPins } from '@/hooks/useSessionPins';
+import { hoistPinnedSessions } from '@/lib/sessionGrouping';
 import { useSessionSelection } from '@/hooks/useSessionSelection';
 import { apiFetch } from '@/lib/api-client';
 import { useProjectContext } from '@/hooks/useProjectContext';
@@ -58,11 +59,12 @@ export function SessionList() {
   } = useMultiProjectSessions();
 
   const { query, setQuery, filterGroups } = useSessionSearch();
-  const { togglePin, isPinned } = useSessionPins();
+  const { pinnedIds, togglePin, isPinned } = useSessionPins();
   const selection = useSessionSelection();
 
   // Apply pin hoisting then search filtering
-  const projectGroups = filterGroups(rawGroups);
+  const hoisted = hoistPinnedSessions(rawGroups, pinnedIds);
+  const projectGroups = filterGroups(hoisted);
 
   const isSearching = query.trim().length > 0;
 

@@ -91,6 +91,47 @@ function groupIntoDateBuckets(sessions: Session[]): ProjectSessionGroup[] {
     }));
 }
 
+/**
+ * Post-process already-grouped ProjectGroup[] to hoist pinned sessions
+ * into a 'Pinned' pseudo-date-group at the top of each project.
+ * Removes pinned sessions from their original date buckets to prevent duplicates.
+ */
+export function hoistPinnedSessions(
+  groups: ProjectGroup[],
+  pinnedIds: Set<string>,
+): ProjectGroup[] {
+  if (pinnedIds.size === 0) return groups;
+
+  return groups.map((project) => {
+    const pinned: Session[] = [];
+    const filteredDateGroups = project.dateGroups
+      .map((dg) => {
+        const remaining: Session[] = [];
+        for (const session of dg.sessions) {
+          if (pinnedIds.has(session.id)) {
+            pinned.push(session);
+          } else {
+            remaining.push(session);
+          }
+        }
+        return { ...dg, sessions: remaining };
+      })
+      .filter((dg) => dg.sessions.length > 0);
+
+    if (pinned.length === 0) return project;
+
+    // Sort pinned descending by updatedAt (same as date buckets)
+    pinned.sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+
+    return {
+      ...project,
+      dateGroups: [{ label: 'Pinned' as const, sessions: pinned }, ...filteredDateGroups],
+    };
+  });
+}
+
 /** Input shape for groupSessionsByProject -- one entry per project. */
 export interface ProjectSessionInput {
   projectName: string;

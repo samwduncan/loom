@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { isJunkSession, groupSessionsByProject } from './sessionGrouping';
+import { isJunkSession, groupSessionsByProject, hoistPinnedSessions } from './sessionGrouping';
 import type { Session } from '@/types/session';
 
 function makeSession(overrides: Partial<Session> & { updatedAt: string }): Session {
@@ -338,5 +338,55 @@ describe('groupSessionsByProject', () => {
     expect(project).toBeDefined();
     const labels = project?.dateGroups.map((g) => g.label);
     expect(labels).toEqual(['Today', 'Yesterday', 'This Week', 'This Month', 'Older']);
+  });
+});
+
+describe('hoistPinnedSessions', () => {
+  const now = new Date();
+
+  function makeSessionAt(id: string, title: string, hoursAgo: number): Session {
+    const date = new Date(now.getTime() - hoursAgo * 3600_000);
+    return makeSession({ id, title, updatedAt: date.toISOString() });
+  }
+
+  it('returns groups unchanged when pinnedIds is empty', () => {
+    const groups = groupSessionsByProject([{
+      projectName: 'p1', displayName: 'P1', projectPath: '/p1',
+      sessions: [makeSessionAt('s1', 'Chat 1', 1)],
+    }]);
+    const result = hoistPinnedSessions(groups, new Set());
+    expect(result).toBe(groups); // Same reference — no transform
+  });
+
+  it('hoists pinned sessions into a Pinned group at the top', () => {
+    const groups = groupSessionsByProject([{
+      projectName: 'p1', displayName: 'P1', projectPath: '/p1',
+      sessions: [
+        makeSessionAt('s1', 'Unpinned', 1),
+        makeSessionAt('s2', 'Pinned One', 2),
+        makeSessionAt('s3', 'Another Unpinned', 3),
+      ],
+    }]);
+    const result = hoistPinnedSessions(groups, new Set(['s2']));
+    const project = result[0]; // ASSERT: single project in input
+    const labels = project!.dateGroups.map((g) => g.label); // ASSERT: project exists from single input
+    expect(labels[0]).toBe('Pinned');
+    const pinnedGroup = project!.dateGroups[0]; // ASSERT: Pinned group is first after hoisting
+    expect(pinnedGroup!.sessions[0]!.id).toBe('s2'); // ASSERT: s2 is the only pinned session
+  });
+
+  it('removes pinned sessions from their original date bucket', () => {
+    const groups = groupSessionsByProject([{
+      projectName: 'p1', displayName: 'P1', projectPath: '/p1',
+      sessions: [
+        makeSessionAt('s1', 'Chat 1', 1),
+        makeSessionAt('s2', 'Chat 2', 2),
+      ],
+    }]);
+    const result = hoistPinnedSessions(groups, new Set(['s1']));
+    // s1 should only appear in Pinned, not in Today
+    const allSessionIds = result[0]!.dateGroups.flatMap((g) => g.sessions.map((s) => s.id)); // ASSERT: single project in input
+    const s1Count = allSessionIds.filter((id) => id === 's1').length;
+    expect(s1Count).toBe(1);
   });
 });

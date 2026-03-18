@@ -100,8 +100,9 @@ export function useSessionSelection() {
       // Dispatch refetch event
       window.dispatchEvent(new Event('loom:projects-updated'));
 
-      // Navigate if active session was deleted
-      if (activeSessionId && selectedIds.has(activeSessionId)) {
+      // Navigate if active session was in the delete set
+      const deleteSet = new Set(toDelete);
+      if (activeSessionId && deleteSet.has(activeSessionId)) {
         // Collect all remaining sessions (those not in the delete set that succeeded)
         const deletedIds = new Set(
           results

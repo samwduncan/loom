@@ -53,7 +53,7 @@ function highlightMatch(text: string, query: string): ReactNode {
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="bg-accent-primary/20 text-foreground rounded-sm px-0.5">
+      <mark className="bg-primary/20 text-foreground rounded-sm px-0.5">
         {text.slice(idx, idx + query.length)}
       </mark>
       {text.slice(idx + query.length)}
@@ -157,7 +157,7 @@ export function SessionItem({
         'transition-[background-color] duration-[var(--duration-fast)]',
         'session-item-hover',
         isActive && !isSelecting && 'session-item-active',
-        isSelected && 'bg-accent-primary/10',
+        isSelected && 'bg-primary/10',
       )}
     >
       {/* Line 1: checkbox (selection mode) + title + pin/draft/streaming dots */}

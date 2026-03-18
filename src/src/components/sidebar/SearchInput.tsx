@@ -42,7 +42,7 @@ export function SearchInput({ value, onChange }: SearchInputProps) {
           'w-full bg-surface-base border border-border rounded-md',
           'pl-7 pr-7 py-1.5 text-sm',
           'text-foreground placeholder:text-muted',
-          'outline-none focus:ring-1 focus:ring-accent-primary',
+          'outline-none focus:ring-1 focus:ring-primary',
           'transition-colors duration-150',
         )}
       />
