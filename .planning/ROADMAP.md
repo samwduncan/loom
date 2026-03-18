@@ -127,11 +127,11 @@ Plans:
   2. Every component that fetches data has an error state with a clear message and a retry button that actually re-fetches
   3. Terminal panel shows a skeleton component (not a text string) while loading
   4. File tree, git panel (both views), session list, and search results each show a designed empty state with icon, heading, and guidance text
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 45-01: TBD
-- [ ] 45-02: TBD
+- [ ] 45-01-PLAN.md -- Shared primitives (Skeleton, EmptyState, InlineError) + normalize all skeletons to shimmer + wire retry to error states
+- [ ] 45-02-PLAN.md -- Upgrade all bare-text empty states to designed EmptyState components with icons and guidance
 
 ### Phase 46: Interactive State Consistency
 **Goal**: Every clickable, focusable, and disableable element in the application behaves consistently -- the app feels like one designer touched every surface
@@ -232,4 +232,4 @@ Phases execute in numeric order: 44 -> 44.1 -> 45 -> 45.1 -> ... -> 49
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-18 after Phase 44 planning*
+*Last updated: 2026-03-18 after Phase 45 planning*
