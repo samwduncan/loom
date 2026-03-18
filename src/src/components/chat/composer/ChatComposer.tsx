@@ -28,6 +28,7 @@ import { useComposerState } from './useComposerState';
 import { useDraftPersistence } from './useDraftPersistence';
 import { useImageAttachments } from './useImageAttachments';
 import { useFileMentions } from '@/hooks/useFileMentions';
+import { extractSessionTitle } from '@/lib/extract-session-title';
 import { useSlashCommands } from '@/hooks/useSlashCommands';
 import { ComposerKeyboardHints } from './ComposerKeyboardHints';
 import { ImagePreviewRow } from './ImagePreviewRow';
@@ -344,7 +345,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       const stubId = 'stub-' + Math.random().toString(36).slice(2, 10);
       addSession({
         id: stubId,
-        title: trimmed.slice(0, 50),
+        title: extractSessionTitle(trimmed) || 'New Chat',
         messages: [],
         providerId: 'claude',
         createdAt: new Date().toISOString(),
@@ -373,7 +374,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
     // Store pending title for new chats
     if (!sessionId) {
-      pendingTitleRef.current = trimmed.slice(0, 50);
+      pendingTitleRef.current = extractSessionTitle(trimmed) || 'New Chat';
     }
 
     wsClient.send({

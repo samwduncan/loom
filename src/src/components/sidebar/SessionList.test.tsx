@@ -347,4 +347,131 @@ describe('SessionList', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/chat');
     });
   });
+
+  // -- Rename with backend PATCH --
+
+  describe('session rename', () => {
+    const makeSession = (id: string, title: string) => ({
+      id,
+      title,
+      messages: [],
+      providerId: 'claude' as const,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
+    });
+
+    it('calls apiFetch PATCH with correct URL and body on rename', async () => {
+      const { apiFetch } = await import('@/lib/api-client');
+      const mockApiFetch = vi.mocked(apiFetch);
+      mockApiFetch.mockResolvedValue({ success: true, title: 'New Title' });
+
+      const user = userEvent.setup();
+      useTimelineStore.setState({
+        sessions: [makeSession('sess-rename', 'Old Title')],
+        activeSessionId: null,
+        activeProviderId: 'claude',
+      });
+
+      renderSessionList();
+
+      // Right-click to open context menu
+      const option = screen.getByRole('option');
+      await user.pointer({ keys: '[MouseRight]', target: option });
+
+      // Click Rename from context menu
+      const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
+      await user.click(renameBtn);
+
+      // Type new title in the input
+      const input = screen.getByDisplayValue('Old Title');
+      await user.clear(input);
+      await user.type(input, 'New Title');
+
+      // Blur to confirm edit
+      await user.tab();
+
+      // Verify PATCH was called with correct URL and body
+      expect(mockApiFetch).toHaveBeenCalledWith(
+        '/api/projects/test-project/sessions/sess-rename',
+        { method: 'PATCH', body: JSON.stringify({ title: 'New Title' }) },
+      );
+    });
+
+    it('rolls back title and shows toast on PATCH failure', async () => {
+      const { apiFetch } = await import('@/lib/api-client');
+      const mockApiFetch = vi.mocked(apiFetch);
+      mockApiFetch.mockRejectedValueOnce(new Error('Network error'));
+
+      // Mock toast
+      const { toast } = await import('sonner');
+      const toastErrorSpy = vi.spyOn(toast, 'error');
+
+      const user = userEvent.setup();
+      useTimelineStore.setState({
+        sessions: [makeSession('sess-fail', 'Original Title')],
+        activeSessionId: null,
+        activeProviderId: 'claude',
+      });
+
+      renderSessionList();
+
+      // Right-click -> Rename
+      const option = screen.getByRole('option');
+      await user.pointer({ keys: '[MouseRight]', target: option });
+      const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
+      await user.click(renameBtn);
+
+      // Type new title and blur
+      const input = screen.getByDisplayValue('Original Title');
+      await user.clear(input);
+      await user.type(input, 'Failed Title');
+      await user.tab();
+
+      // Wait for async error handling
+      await vi.waitFor(() => {
+        expect(toastErrorSpy).toHaveBeenCalledWith('Failed to rename session');
+      });
+
+      // Title should have rolled back
+      expect(screen.getByText('Original Title')).toBeInTheDocument();
+
+      toastErrorSpy.mockRestore();
+    });
+
+    it('keeps new title on successful PATCH', async () => {
+      const { apiFetch } = await import('@/lib/api-client');
+      const mockApiFetch = vi.mocked(apiFetch);
+      mockApiFetch.mockResolvedValue({ success: true, title: 'Kept Title' });
+
+      const user = userEvent.setup();
+      useTimelineStore.setState({
+        sessions: [makeSession('sess-success', 'Before Rename')],
+        activeSessionId: null,
+        activeProviderId: 'claude',
+      });
+
+      renderSessionList();
+
+      // Right-click -> Rename
+      const option = screen.getByRole('option');
+      await user.pointer({ keys: '[MouseRight]', target: option });
+      const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
+      await user.click(renameBtn);
+
+      // Type new title and blur
+      const input = screen.getByDisplayValue('Before Rename');
+      await user.clear(input);
+      await user.type(input, 'Kept Title');
+      await user.tab();
+
+      // Wait for PATCH to resolve
+      await vi.waitFor(() => {
+        expect(mockApiFetch).toHaveBeenCalled();
+      });
+
+      // Title should remain as new value
+      expect(screen.getByText('Kept Title')).toBeInTheDocument();
+    });
+  });
 });

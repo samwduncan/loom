@@ -128,11 +128,29 @@ export function SessionList() {
   }, [contextMenu.sessionId, closeContextMenu]);
 
   const handleSessionRename = useCallback(
-    (sessionId: string, newTitle: string) => {
+    async (sessionId: string, newTitle: string) => {
+      // Capture previous title for rollback
+      const previousTitle = sessions.find((s) => s.id === sessionId)?.title;
+
+      // Optimistic update
       updateSessionTitle(sessionId, newTitle);
       setEditingSessionId(null);
+
+      // Persist to backend
+      try {
+        await apiFetch(
+          `/api/projects/${encodeURIComponent(projectName)}/sessions/${sessionId}`,
+          { method: 'PATCH', body: JSON.stringify({ title: newTitle }) },
+        );
+      } catch {
+        // Rollback on failure
+        if (previousTitle !== undefined) {
+          updateSessionTitle(sessionId, previousTitle);
+        }
+        toast.error('Failed to rename session');
+      }
     },
-    [updateSessionTitle],
+    [sessions, updateSessionTitle, projectName],
   );
 
   const handleDelete = useCallback(() => {
