@@ -58,13 +58,9 @@ async function ensureLoomProject(page: import('@playwright/test').Page) {
 async function setupGitPanel(page: import('@playwright/test').Page): Promise<boolean> {
   await ensureLoomProject(page);
 
-  const wsPromise = page.waitForEvent('websocket', {
-    predicate: (ws) => ws.url().includes('/ws?token='),
-  });
   await page.goto('/chat');
-  await wsPromise;
 
-  // Wait for app to be ready (composer visible = project context resolved)
+  // Wait for app to be ready (composer visible = auth + project context resolved, WS connected)
   await expect(page.locator('[aria-label="Message input"]')).toBeVisible({
     timeout: 15_000,
   });
@@ -210,6 +206,7 @@ test.describe('Git operations', () => {
     const originalBranchItem = dropdownAfterCreate.locator('.git-branch-item', {
       hasText: originalBranch,
     });
+    await expect(originalBranchItem).toBeVisible({ timeout: 5_000 });
     await originalBranchItem.click();
 
     // Wait for switch-back toast
