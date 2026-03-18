@@ -41,6 +41,7 @@ async function injectPermission(
 ) {
   return page.evaluate(
     ({ requestId, toolName, input, sessionId }) => {
+      // ASSERT: dev-mode window exposure of Zustand store for E2E testing
       const store = (window as Record<string, unknown>).__ZUSTAND_STREAM_STORE__ as {
         getState: () => {
           setPermissionRequest: (req: Record<string, unknown>) => void;

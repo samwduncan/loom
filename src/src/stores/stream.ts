@@ -50,7 +50,6 @@ interface StreamState {
   setPermissionRequest: (request: PermissionRequest) => void;
   clearPermissionRequest: () => void;
   setResultData: (tokens: ResultTokens, cost: number) => void;
-  clearResultData: () => void;
   reset: () => void;
 }
 
@@ -77,13 +76,19 @@ export const useStreamStore = create<StreamState>()((set) => ({
   },
 
   endStream: () => {
-    // Preserve resultTokens/resultCost — they're read by ActiveMessage's
-    // handleFlush AFTER isStreaming transitions false. Cleaned on startStream.
-    set((state) => ({
-      ...INITIAL_STREAM_STATE,
-      resultTokens: state.resultTokens,
-      resultCost: state.resultCost,
-    }));
+    // Explicitly reset each field — preserving resultTokens/resultCost which
+    // are read by ActiveMessage's handleFlush AFTER isStreaming transitions false.
+    // Cleaned on next startStream. Explicit fields prevent silent zeroing if
+    // new state fields are added later.
+    set({
+      isStreaming: false,
+      activeToolCalls: [],
+      thinkingState: null,
+      activityText: '',
+      activePermissionRequest: null,
+      activeSessionId: null,
+      // resultTokens and resultCost intentionally preserved for handleFlush
+    });
   },
 
   addToolCall: (toolCall: ToolCallState) => {
@@ -120,10 +125,6 @@ export const useStreamStore = create<StreamState>()((set) => ({
     set({ resultTokens: tokens, resultCost: cost });
   },
 
-  clearResultData: () => {
-    set({ resultTokens: null, resultCost: null });
-  },
-
   reset: () => {
     set({ ...INITIAL_STREAM_STATE });
   },
@@ -132,5 +133,6 @@ export const useStreamStore = create<StreamState>()((set) => ({
 // Expose store on window in dev mode for E2E testing (Playwright).
 // Tree-shaken in production builds.
 if (import.meta.env.DEV) {
+  // ASSERT: dev-only window exposure for E2E testing; tree-shaken in production
   (window as unknown as Record<string, unknown>).__ZUSTAND_STREAM_STORE__ = useStreamStore;
 }

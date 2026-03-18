@@ -6,8 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useStreamStore } from './stream';
-import type { ToolCallState } from '@/types/stream';
-import type { ThinkingState } from '@/types/stream';
+import type { ToolCallState, ThinkingState } from '@/types/stream';
 
 // ---------------------------------------------------------------------------
 // Helpers

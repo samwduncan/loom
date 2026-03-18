@@ -15,7 +15,7 @@ import { test, expect } from '@playwright/test';
  * the ErrorMessage component's integration with the timeline store.
  */
 
-const TEST_SESSION_ID = 'e2e-retry-test';
+const TEST_SESSION_ID = `e2e-retry-test-${Date.now()}`;
 
 /**
  * Set up a session with a user message followed by an error message.
@@ -32,6 +32,7 @@ async function setupErrorSession(page: import('@playwright/test').Page) {
 
   // Inject session with user message + error message into timeline store
   const injected = await page.evaluate((sessionId) => {
+    // ASSERT: dev-mode window exposure of Zustand store for E2E testing
     const store = (window as unknown as Record<string, unknown>).__ZUSTAND_TIMELINE_STORE__ as {
       getState: () => {
         addSession: (session: Record<string, unknown>) => void;

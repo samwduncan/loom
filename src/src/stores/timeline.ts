@@ -180,6 +180,7 @@ export const useTimelineStore = create<TimelineState>()(
         return persistedState as PersistedTimelineState;
       },
       merge: (persistedState, currentState) => {
+        // ASSERT: persist middleware merge receives the shape defined in partialize()
         const persisted = persistedState as Partial<TimelineState> & {
           sessions?: Array<Partial<Session>>;
         };
@@ -189,6 +190,7 @@ export const useTimelineStore = create<TimelineState>()(
         const rehydratedSessions = (persisted.sessions ?? []).map((s) => ({
           ...s,
           messages: [],
+        // ASSERT: map with spread preserves Session shape; messages: [] is the added guarantee
         })) as Session[];
 
         return {
@@ -203,5 +205,6 @@ export const useTimelineStore = create<TimelineState>()(
 
 // Expose store on window in dev mode for E2E testing (Playwright).
 if (import.meta.env.DEV) {
+  // ASSERT: dev-only window exposure for E2E testing; tree-shaken in production
   (window as unknown as Record<string, unknown>).__ZUSTAND_TIMELINE_STORE__ = useTimelineStore;
 }

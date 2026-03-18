@@ -41,14 +41,8 @@ async function dropImageOnComposer(page: import('@playwright/test').Page) {
     const textarea = document.querySelector('[aria-label="Message input"]');
     if (!textarea) return 'no-textarea';
 
-    // Walk up to find the drop target
-    let dropTarget: Element | null = textarea;
-    let parent = textarea.parentElement;
-    // Walk up to the div that has the onDrop handler (composer outer wrapper)
-    while (parent && !parent.getAttribute('class')?.includes('composer')) {
-      parent = parent.parentElement;
-    }
-    if (parent) dropTarget = parent;
+    // Use data-testid to find the composer drop zone reliably
+    const dropTarget = document.querySelector('[data-testid="chat-composer"]') ?? textarea;
 
     // Dispatch drag events to trigger the drop handler
     dropTarget.dispatchEvent(new DragEvent('dragenter', {

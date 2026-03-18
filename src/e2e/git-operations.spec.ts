@@ -34,8 +34,7 @@ async function ensureLoomProject(page: import('@playwright/test').Page) {
         const projects = Array.isArray(body) ? body : body.projects ?? [];
 
         const loomIndex = projects.findIndex(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (p: any) => p.name?.includes('loom') || p.path?.includes('loom'),
+          (p: { name?: string; path?: string }) => p.name?.includes('loom') || p.path?.includes('loom'),
         );
         if (loomIndex > 0) {
           const [loom] = projects.splice(loomIndex, 1);

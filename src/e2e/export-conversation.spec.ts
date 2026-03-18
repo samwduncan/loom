@@ -45,9 +45,9 @@ test.describe('Export conversation', () => {
 
     // Save download to temp path and read content
     const path = await download.path();
-    expect(path).toBeTruthy();
+    if (!path) throw new Error('Download path was null — download failed');
     const fs = await import('fs');
-    const content = fs.readFileSync(path!, 'utf-8');
+    const content = fs.readFileSync(path, 'utf-8');
     expect(content).toContain(testPhrase);
 
     // Should contain User and Assistant headings
@@ -83,9 +83,9 @@ test.describe('Export conversation', () => {
 
     // Save download to temp path and read content
     const path = await download.path();
-    expect(path).toBeTruthy();
+    if (!path) throw new Error('Download path was null — download failed');
     const fs = await import('fs');
-    const content = fs.readFileSync(path!, 'utf-8');
+    const content = fs.readFileSync(path, 'utf-8');
     const data = JSON.parse(content);
 
     // Should have messages array with our content

@@ -44,17 +44,9 @@ test.describe('Navigate-away guard', () => {
       timeout: 30_000,
     });
 
-    // While streaming is active, verify the beforeunload handler is registered
-    const hasBeforeUnload = await page.evaluate(() => {
-      // Check if beforeunload handler is registered by dispatching a test event
-      const event = new Event('beforeunload', { cancelable: true });
-      const prevented = !window.dispatchEvent(event);
-      return prevented;
-    });
-
-    // The handler sets event.returnValue but doesn't call preventDefault()
-    // in modern browsers. Check by attempting navigation.
-    // Use page.goto to trigger beforeunload -- this is the most reliable way.
+    // Trigger real beforeunload by navigating away during streaming.
+    // The useNavigateAwayGuard hook sets event.returnValue (not preventDefault),
+    // which Playwright surfaces as a 'dialog' event.
     try {
       await page.goto('about:blank', { timeout: 5_000 });
     } catch {

@@ -58,10 +58,10 @@ export function ChatView() {
   // Falls back to activeSessionId for streaming-created sessions (no URL yet)
   // or when the URL still has a stub- ID after session reconciliation
   // (replaceState doesn't trigger useParams update until next React render).
-  const displaySessionId = (sessionId?.startsWith('stub-') ? activeSessionId : sessionId) ?? activeSessionId;
+  const effectiveSessionId = (sessionId?.startsWith('stub-') ? activeSessionId : sessionId) ?? activeSessionId;
   const messages = useTimelineStore((state) => {
-    if (!displaySessionId) return EMPTY_MESSAGES;
-    const session = state.sessions.find((s) => s.id === displaySessionId);
+    if (!effectiveSessionId) return EMPTY_MESSAGES;
+    const session = state.sessions.find((s) => s.id === effectiveSessionId);
     return session?.messages ?? EMPTY_MESSAGES;
   });
   // URL sync: when sessionId param changes (direct nav, back/forward, sidebar click).
@@ -77,12 +77,11 @@ export function ChatView() {
 
   // Determine content state.
   const hasSession = Boolean(sessionId || activeSessionId);
-  const effectiveSessionId = (sessionId?.startsWith('stub-') ? activeSessionId : sessionId) ?? activeSessionId;
 
   // Session title for export (selector-only store access per 4.2)
   const sessionTitle = useTimelineStore((state) => {
-    if (!displaySessionId) return 'Conversation';
-    const session = state.sessions.find((s) => s.id === displaySessionId);
+    if (!effectiveSessionId) return 'Conversation';
+    const session = state.sessions.find((s) => s.id === effectiveSessionId);
     return session?.title || 'Conversation';
   });
 
@@ -106,6 +105,7 @@ export function ChatView() {
   useEffect(() => {
     if (!exportOpen) return;
     function handleClick(e: MouseEvent) {
+      // ASSERT: MouseEvent.target is always a Node in DOM event handlers
       if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
         setExportOpen(false);
       }
