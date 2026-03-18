@@ -212,7 +212,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 39. Backend Hardening | 2/2 | Complete    | 2026-03-17 | - |
 | 40. Session Titles & Rename | 1/1 | Complete    | 2026-03-18 | - |
 | 41. Session Organization | 2/2 | Complete    | 2026-03-18 | - |
-| 42. Session Discovery | 2/2 | Complete   | 2026-03-18 | - |
+| 42. Session Discovery | 2/2 | Complete    | 2026-03-18 | - |
 | 43. E2E Verification | v1.4 | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
