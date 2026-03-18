@@ -1,335 +1,275 @@
-# Feature Landscape: M3 "The Workspace"
+# Feature Landscape: M6 v1.5 "The Craft"
 
-**Domain:** AI coding tool workspace -- Settings, Cmd+K, File Tree, Terminal, Git Panel, Code Editor
-**Researched:** 2026-03-09
-**Confidence:** HIGH (V1 code analyzed, backend API contract verified, competitive analysis complete)
+**Domain:** Production polish, visual personality, and micro-interaction quality for a premium dark-theme AI workspace
+**Researched:** 2026-03-18
+**Confidence:** HIGH (existing codebase audited, competitive analysis from 6 products, prior visual effects research from M3 deferred context)
 
-**Scope:** NEW features only. M1+M2 delivered: complete chat with streaming markdown, Shiki highlighting, tool cards, permissions, sidebar with sessions, composer with auto-resize/image attachments/FSM, 4 Zustand stores.
+**Scope:** Polish and visual personality ONLY. All functional features (chat, streaming, file tree, editor, terminal, git, settings, command palette, accessibility, performance) are shipped. This milestone is about making every pixel intentional and every interaction satisfying.
+
+**Existing Foundation:**
+- 3 CSS-only effects adopted: SpotlightCard, ShinyText, ElectricBorder
+- Glass tokens defined: `--glass-blur`, `--glass-saturate`, `--glass-bg-opacity`
+- Motion tokens defined: SPRING_GENTLE/SNAPPY/BOUNCY in motion.ts, CSS easing tokens in tokens.css
+- 3-tier error boundaries: App, Panel, Message (with ErrorFallback UI)
+- 4 skeleton components: MessageListSkeleton, SessionListSkeleton, SettingsTabSkeleton, GitPanelSkeleton
+- 1 empty state: ChatEmptyState (wordmark + suggestion chips)
+- Aurora FX tokens defined: `--fx-aurora-blur`, gradient color tokens
+- `prefers-reduced-motion` handled globally (0.01ms override)
+- Constitution bans: hardcoded colors, inline styles, typewriter effects, full motion bundle
 
 ---
 
 ## Table Stakes
 
-Features users expect from an AI coding tool workspace. Missing = product feels incomplete or unusable as a daily driver.
+Features users expect from software that feels professionally built. Missing any of these = the app feels like a prototype, not a product.
 
-### Settings Panel
+### Loading States
 
-| Feature | Why Expected | Complexity | Dependencies |
-|---------|--------------|------------|--------------|
-| Agent auth status display (Claude/Codex/Gemini) | Can't know which providers are connected without it | Medium | `GET /api/cli/claude/status`, `/codex/status`, `/gemini/status` |
-| API key management (CRUD) | Core security credential management | Low | `GET/POST/DELETE /api/settings/api-keys` |
-| GitHub/GitLab credential management | Required for git operations | Low | `GET/POST/DELETE /api/settings/credentials` |
-| Git user config (name/email) | Commits need author identity | Low | `GET/POST /api/user/git-config` |
-| Appearance: font size, code editor prefs | Every dev tool has customizable appearance | Low | localStorage persistence |
-| Tab-based navigation (5 tabs like V1) | Organized settings are expected | Low | shadcn Tabs (planned in component adoption map) |
-| Modal or full-panel presentation | Settings must be accessible without leaving context | Low | shadcn Dialog (installed) |
+| Feature | Why Expected | Complexity | Dependencies | Current State |
+|---------|--------------|------------|--------------|---------------|
+| Skeleton screens for ALL data-loading surfaces | Every premium app (Claude.ai, ChatGPT, LobeChat) shows content-shaped placeholders during fetch. Blank areas feel broken. | Low | Existing skeleton-shimmer CSS class | 4 of ~8 surfaces covered. Missing: FileTree loading, Editor loading (exists but minimal), Terminal reconnecting, Command Palette initial. |
+| Shimmer animation upgrade | Current skeletons use `animate-pulse` (Tailwind default). Premium apps use directional shimmer sweep (gradient slide). ChatGPT uses `linear-gradient(90deg)` sweep; LobeChat uses 1.5s sweep. | Low | CSS keyframe in sidebar.css already exists as `skeleton-shimmer` | `skeleton-shimmer` class exists but most skeletons use `animate-pulse` instead. Inconsistent. |
+| Progressive content reveal | Session list, file tree, and git history should fade-in rows progressively rather than pop in all at once. Perplexity's staggered card reveal (100ms stagger) is the benchmark. | Medium | CSS `animation-delay` or `@starting-style` | Not implemented anywhere. |
+| Loading indicator for async operations | Commit, push, pull, branch create, file save -- all network operations need visual feedback. "Settings saved" toast exists but git ops lack spinners. | Low | Sonner toast (installed), button loading states | Git operations show toast on complete but no in-progress indicator on the button itself. |
+| Tab content loading during lazy import | Terminal and Git panels use `lazy()` + `Suspense`. The fallback for Terminal is text-only ("Loading terminal..."). Git has `GitPanelSkeleton`. Terminal needs a real skeleton. | Low | React Suspense boundary | TerminalSkeleton is a text string, not a skeleton component. |
 
-### Command Palette (Cmd+K)
+### Error States
 
-| Feature | Why Expected | Complexity | Dependencies |
-|---------|--------------|------------|--------------|
-| Global keyboard shortcut (Cmd+K / Ctrl+K) | Universal convention: VS Code, Linear, Raycast, Claude.ai, ChatGPT | Low | UI store `commandPaletteOpen` already exists |
-| Session search and switching | Primary navigation accelerator | Medium | Timeline store sessions data |
-| Project switching | Multi-project navigation without sidebar | Medium | `GET /api/projects` |
-| Fuzzy search filtering | Users type partial names, expect instant matches | Low | cmdk handles this natively |
-| Keyboard navigation (arrows + Enter + Escape) | Expected from every command palette | Low | cmdk handles this natively |
-| Grouped commands (Navigation, Actions, Settings) | Organization prevents cognitive overload | Low | cmdk CommandGroup |
+| Feature | Why Expected | Complexity | Dependencies | Current State |
+|---------|--------------|------------|--------------|---------------|
+| Inline retry for failed API calls | Network errors on git status, file tree fetch, settings load must show retry affordance at the point of failure, not just a toast. | Medium | Existing PanelErrorBoundary pattern | Error boundaries catch render errors. API fetch errors handled inconsistently -- some toast, some swallow, some show in-panel. |
+| Graceful degradation for partial failures | If git status fails, the git panel should still show commit history tab. If file tree fails, editor should still work with open files. | Medium | Per-section error isolation | Currently panel-level error boundaries. A git status failure crashes the entire git panel. |
+| Error toast with retry action | Toast notifications for async operation failures should include a "Retry" button. Current toasts are informational only. | Low | Sonner toast supports action buttons | Not using Sonner's action API. |
+| Timeout indicators | WebSocket reconnection, long API calls (>5s) should show elapsed time or progress. "Still connecting..." after 5s, "This is taking longer than usual..." after 15s. | Medium | Connection store, timer logic | Connection banner exists but only shows "Reconnecting..." with no elapsed time context. |
+| Network offline detection | Browser going offline should show a persistent banner. Not just WebSocket disconnect -- full offline mode indicator. | Low | `navigator.onLine` + `online`/`offline` events | Not implemented. |
 
-### File Tree Panel
+### Empty States
 
-| Feature | Why Expected | Complexity | Dependencies |
-|---------|--------------|------------|--------------|
-| Hierarchical directory browsing | Core file navigation | Medium | `GET /api/projects/:name/files` |
-| File/folder expand/collapse | Standard tree behavior | Low | Local state |
-| File type icons | Visual differentiation (folder, JS, TS, JSON, etc.) | Low | lucide-react (installed) |
-| Click-to-open in code editor | Primary file opening mechanism | Low | Wires to Code Editor tab/panel |
-| Current project scoping | Tree shows active project only | Low | Timeline store active project context |
-| Loading state | Skeleton/spinner during file tree fetch | Low | shadcn Skeleton |
+| Feature | Why Expected | Complexity | Dependencies | Current State |
+|---------|--------------|------------|--------------|---------------|
+| File tree empty state | "No project open" or "Connect to a project" when file tree has no root. Every IDE handles this. | Low | File store state | FileTree shows nothing when empty. |
+| Git panel empty state | "Not a git repository" when no git root detected. "No changes" when working tree is clean. | Low | Git status API | ChangesView has basic "No changes" text. HistoryView shows nothing when empty. |
+| Session list empty state | "No conversations yet" with a "Start a new chat" CTA. First-run experience matters. | Low | Timeline store | SessionList renders empty space when no sessions. |
+| Search results empty state | "No results found" with suggestion to refine query. For both session search and command palette. | Low | Existing search components | Command palette shows empty list. Session search shows nothing. |
+| Editor empty state | "Select a file to edit" placeholder when no file is open. VS Code shows this. | Low | File store activeFilePath | PanelPlaceholder component exists but is generic. |
 
-### Code Editor
+### State Consistency
 
-| Feature | Why Expected | Complexity | Dependencies |
-|---------|--------------|------------|--------------|
-| Syntax highlighting (50+ languages) | Core editor function | Low | CodeMirror lang-* packages |
-| Read-only file viewing | View files agent is working on | Low | CodeMirror readOnly extension |
-| File save (write-back) | Edit files without leaving Loom | Medium | `PUT /api/projects/:name/file` |
-| Line numbers | Standard editor feature | Low | CodeMirror lineNumbers() |
-| Search within file (Cmd+F) | Basic text search | Low | CodeMirror search extension |
-| File tab bar (open files) | Multiple files open simultaneously | Medium | Local UI state |
-| Markdown preview | View rendered markdown for docs | Medium | react-markdown (installed) |
-| OKLCH-themed syntax colors | Must match Loom design system | Medium | Custom CodeMirror theme using CSS vars |
-
-### Terminal / Shell
-
-| Feature | Why Expected | Complexity | Dependencies |
-|---------|--------------|------------|--------------|
-| Full terminal emulation | Run commands, see output with ANSI colors | Medium | xterm.js + WebSocket `/shell` |
-| Auto-resize to container | Terminal fills available space | Low | @xterm/addon-fit |
-| Clickable URLs in output | Convenience for links in terminal output | Low | @xterm/addon-web-links |
-| Connection state UI (connecting/connected/disconnected) | Users need to know terminal status | Low | Connection store or local state |
-| Project-scoped working directory | Terminal opens in project root | Low | `projectPath` in shell init message |
-| Session persistence (30min buffer) | Reconnect without losing output | Low | Backend already handles this |
-| Restart / disconnect controls | Recovery from stuck terminals | Low | Header buttons |
-
-### Git Panel
-
-| Feature | Why Expected | Complexity | Dependencies |
-|---------|--------------|------------|--------------|
-| Changes view (modified/added/deleted/untracked) | See what agent changed | Medium | `GET /api/git/status` |
-| File staging (checkbox per file) | Selective commit | Medium | Local state + `POST /api/git/commit` with files array |
-| Commit message input | Write commit messages | Low | Auto-resize textarea |
-| Commit action | Commit staged files | Low | `POST /api/git/commit` |
-| Current branch display | Know which branch you are on | Low | From git status response |
-| Diff viewer (per file) | Review changes before committing | High | `GET /api/git/diff` + custom diff renderer |
-| Commit history list | See recent commits | Medium | `GET /api/git/commits` |
+| Feature | Why Expected | Complexity | Dependencies | Current State |
+|---------|--------------|------------|--------------|---------------|
+| Hover/focus/active/disabled states on ALL interactive elements | Material Design, NN/g, and every design system mandate consistent interactive feedback. Missing hover states make elements feel dead. | Medium | Audit of ~51 files with interactive states | ~97 occurrences across 51 files. Coverage is uneven -- shadcn primitives have full states, custom components vary. |
+| Focus-visible ring consistency | Focus rings should use the same accent color, width, and offset across all focusable elements. Currently varies between components. | Low | CSS `focus-visible` rule in base.css | Some components use custom focus styles, others rely on browser defaults. |
+| Disabled state opacity consistency | All disabled elements should use the same opacity (0.5) and cursor (not-allowed). Some custom buttons don't apply disabled styling. | Low | CSS `:disabled` and `aria-disabled` | Inconsistent. shadcn uses `disabled:opacity-50`, custom components vary. |
+| Button press feedback | Active/pressed state should scale slightly (0.98) or darken. Confirms the click was registered. 150-300ms transition. | Low | CSS `:active` pseudo-class | Minimal active state styling across custom buttons. |
 
 ---
 
 ## Differentiators
 
-Features that set Loom apart from typical AI coding tool UIs. Not expected, but valued.
+Features that elevate beyond "good enough" to "this feels like a real product." Not expected, but deeply valued.
 
-### Settings Panel
+### Spring Physics Animations
 
-| Feature | Value Proposition | Complexity | Dependencies |
-|---------|-------------------|------------|--------------|
-| MCP server management (list/add/remove) | Most AI UIs don't expose MCP config visually | High | `GET/POST/DELETE /api/mcp/cli/*` |
-| Per-provider MCP management (Claude + Codex) | Provider-specific server configs | Medium | Separate API routes per provider |
-| Quick Settings overlay (chat prefs) | Instant toggle for auto-expand tools, show thinking, show raw params without opening full settings | Medium | localStorage + Zustand |
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| Sidebar open/close with spring | Physical feel instead of linear CSS slide. LobeChat's sidebar and ChatGPT's sidebar both use physics-based curves. SPRING_GENTLE (stiffness:120, damping:14) is already defined. | Medium | LazyMotion + `m.div` from motion/react (~4.6KB base + 15KB domAnimation). OR pure CSS spring easing (`cubic-bezier(0.34, 1.56, 0.64, 1)`). | CSS spring easing is already in tokens. Start with CSS, upgrade to motion/react only if CSS can't handle exit animations. |
+| Modal/dialog entrance with spring | Settings modal and command palette sliding up with overshoot. Claude.ai uses `cubic-bezier(0.16, 1, 0.3, 1)` (easeOutExpo). ChatGPT uses bounce on sidebar. | Low | CSS spring easing token already defined | Settings dialog currently uses shadcn default animation. Override with Loom spring. |
+| Panel tab switch spring | Content sliding in from the direction of the selected tab. Left tab = slide from left. Right = slide from right. Provides spatial context. | Medium | CSS or motion/react AnimatePresence for exit | Mount-once CSS show/hide pattern may conflict. Need CSS-only approach (opacity + transform on show/hide). |
+| Tool card expand/collapse spring | Tool cards growing with a slight overshoot feels tactile and premium. Already using CSS Grid 0fr/1fr -- add spring easing to the `grid-template-rows` transition. | Low | Existing CSS Grid transition | Currently uses `--duration-normal` (200ms) with standard easing. Swap to spring easing and `--duration-spring` (500ms). |
+| Scroll-to-bottom pill spring | The floating "scroll to bottom" pill should pop in with SPRING_BOUNCY and exit with a quick fade. Currently uses CSS slide with standard timing. | Low | scroll-pill.css already has transition | Upgrade easing curve. |
 
-### Command Palette (Cmd+K)
+### Glass / Frosted Surfaces
 
-| Feature | Value Proposition | Complexity | Dependencies |
-|---------|-------------------|------------|--------------|
-| Slash command execution from palette | Run `/help`, `/model`, `/cost` etc. without typing in composer | Medium | `POST /api/commands/execute` |
-| Recent commands / frequent actions | Personalized command ranking | Low | localStorage history |
-| Quick action: New session | Create session from palette | Low | Existing session creation flow |
-| Quick action: Toggle thinking visibility | Preference toggle without opening settings | Low | UI store `toggleThinking` |
-| Tab switching (Chat/Files/Shell/Git) | Navigate workspace areas without mouse | Low | UI store `setActiveTab` |
-| Fuzzy file search from palette | Cmd+K then type filename, opens in editor | Medium | Compose with file tree data |
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| Command palette glass overlay | `backdrop-filter: blur(16px) saturate(1.4)` on the command palette background. Glass tokens already defined. Apple and LobeChat both use this. 64% of premium SaaS apps now use glassmorphism. | Low | Glass tokens in tokens.css, command-palette.css already has `backdrop-filter: blur(8px)` | Upgrade from 8px to 16px blur and add `saturate(1.4)`. Nearly trivial. |
+| Settings modal glass | Same glass treatment on the settings modal backdrop. Creates depth hierarchy without heavy shadows. | Low | Glass tokens + shadcn Dialog overlay | Override Dialog overlay with glass tokens. |
+| Tooltip glass | Tooltips with slight blur behind them feel premium. Subtle effect, high polish signal. | Low | Glass tokens + shadcn Tooltip component | Add `backdrop-filter` to tooltip styles. |
 
-### File Tree Panel
+### Text Reveal Effects
 
-| Feature | Value Proposition | Complexity | Dependencies |
-|---------|-------------------|------------|--------------|
-| File search/filter with fuzzy matching | Fast file finding in large projects | Medium | Local filter, fuse.js or native |
-| Context menu (copy path, open in editor, open in terminal) | Right-click power user actions | Medium | shadcn Context-menu |
-| Image preview (inline or lightbox) | View screenshots/assets without external tool | Medium | shadcn Dialog for lightbox |
-| File change indicators (dots on modified files) | See which files git says changed, in the tree | Medium | Cross-reference with git status |
-| Detailed view mode (size, modified date) | Extra metadata for power users | Low | Backend already returns file metadata |
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| DecryptedText for session titles | New sessions appear in the sidebar with characters scrambling into the auto-generated title. Distinctive visual signature. Motion's ScrambleText is 1KB and avoids React re-renders. | Medium | Source-copy from React Bits OR use motion/react ScrambleText (1KB) | Must only trigger on first appearance, not every re-render. Needs intersection observer or "isNew" flag. |
+| DecryptedText for model name in status | Model name in the status line decrypting on session switch. Subtle but memorable. | Low | Same component as above | Reuse the same DecryptedText component. |
+| BlurText fade-in for empty state | The "Loom" wordmark and subtitle in ChatEmptyState fading in with per-word blur. Aceternity's "Text Generate" pattern. Better than static text. | Low | CSS `@starting-style` or simple JS stagger | The empty state is shown infrequently, so a richer entrance is worth the impact. |
 
-### Code Editor
+### Animated Border Effects
 
-| Feature | Value Proposition | Complexity | Dependencies |
-|---------|-------------------|------------|--------------|
-| Diff view mode (side-by-side or unified) | Review agent edits in-place | High | @codemirror/merge |
-| Word wrap toggle | Preference for long lines | Low | CodeMirror lineWrapping |
-| "Open file from tool card" flow | Click file path in tool card -> opens in editor | Medium | Event bus or callback from chat to editor |
-| Markdown preview split | Edit + preview side by side | Medium | react-markdown + split pane |
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| StarBorder on active sidebar session | The currently-selected session in the sidebar gets a subtle animated border glow. Differentiates from hover. CSS-only from React Bits. | Low | Source-copy StarBorder (CSS-only, already planned) | Already planned in visual effects audit. No dependencies. |
+| StarBorder on focused composer | The chat input getting an animated border when focused. Signals "this is where you type." More expressive than a static border color change. | Low | Same StarBorder component | Wrap ChatComposer focus state. |
+| ElectricBorder enhancement during streaming | ElectricBorder is already adopted on the composer during streaming. Ensure it's smooth, consistent, and uses the right speed. | Low | ElectricBorder (already in codebase) | Review and tune existing implementation. |
 
-### Terminal / Shell
+### Sidebar Slim Mode
 
-| Feature | Value Proposition | Complexity | Dependencies |
-|---------|-------------------|------------|--------------|
-| Plain shell mode (no AI provider) | Just a terminal, no Claude/Codex/Gemini | Low | `provider: 'plain-shell'` in init |
-| Auth URL detection and display | Auto-handle browser auth flows from CLI | Low | Backend sends `auth_url` messages |
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| Icon-only rail collapse | Sidebar collapses to ~58px icon rail (matches LobeChat pattern). Shows chat icon, file icon, git icon, settings icon. Tooltips on hover. | High | UI store `sidebarCollapsed` state, CSS transition, icon mapping | Major layout change. Needs careful coordination with mount-once panel pattern. The sidebar currently hosts session list, project groups, search, bulk actions -- all need to gracefully hide. |
 
-### Git Panel
+### Spacing & Typography Audit
 
-| Feature | Value Proposition | Complexity | Dependencies |
-|---------|-------------------|------------|--------------|
-| Branch switching | Change branches from UI | Medium | `POST /api/git/checkout` |
-| New branch creation | Create feature branches from UI | Medium | `POST /api/git/create-branch` |
-| Remote status (ahead/behind) | Know if you need to push/pull | Medium | `GET /api/git/remote-status` |
-| Push / Pull / Fetch actions | Full git workflow from UI | Medium | `POST /api/git/push`, `/pull`, `/fetch` |
-| AI-generated commit messages | One-click smart commit messages | Medium | `POST /api/git/generate-commit-message` |
-| Discard changes (per file) | Undo agent modifications | Medium | `POST /api/git/discard` |
-| Commit detail diff view | Click commit to see what changed | Medium | `GET /api/git/commit-diff` |
-| Select all / deselect all for staging | Bulk staging convenience | Low | Local UI state |
+| Feature | Value Proposition | Complexity | Dependencies | Notes |
+|---------|-------------------|------------|--------------|-------|
+| Global spacing consistency pass | Audit every component for consistent use of spacing tokens (4px grid). Fix any hardcoded margins, inconsistent padding. | Medium | Design token system | This is grunt work but high-impact. Inconsistent spacing is the #1 signal of "student project." |
+| Typography hierarchy verification | Verify consistent font sizes, weights, and line-heights across all surfaces. Headings, body, labels, captions should follow a clear scale. | Medium | Font tokens in tokens.css | Currently using Tailwind text utilities directly. May need a stricter type scale. |
+| Border-radius consistency | Every rounded corner should use the same scale: sm (4px), md (8px), lg (12px). No magic numbers. | Low | tokens.css border-radius tokens | Mostly consistent but needs audit. |
 
 ---
 
 ## Anti-Features
 
-Features to explicitly NOT build in M3. These are traps that add complexity without proportional value.
+Features to explicitly NOT build for this milestone. Either too expensive, wrong direction, or counterproductive.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Full IDE replacement (LSP, intellisense, debugging) | Out of scope per PROJECT.md. Loom complements VS Code, doesn't replace it. | Keep editor focused on viewing agent work, light edits, and diffs. |
-| Monaco editor (vs CodeMirror) | Monaco is 5-10MB, poor mobile support, VS Code coupling. CodeMirror 6 is modular (~200KB), mobile-friendly, used by ChatGPT Canvas. | Use @uiw/react-codemirror (same as V1). |
-| Real-time collaborative editing | Single-user tool, no multi-user requirement. | N/A |
-| Git merge conflict resolution UI | Extremely complex, better handled in real IDE. | Show conflicts as diffs, let user resolve in VS Code. |
-| Settings sync across devices | Single-server deployment, one user. | localStorage is sufficient. |
-| File creation/rename/delete from tree | Agent handles file ops. Adding write operations creates dangerous dual-path mutation. | Read-only tree. Agent creates files. |
-| Terminal multiplexer (split panes, tmux-like) | Massive complexity for marginal value in a web UI. | Single terminal is sufficient. |
-| Multiple terminal tabs | Extra complexity for M3, limited value with single terminal. | Single terminal session, consider for M5 if requested. |
-| Inline git blame / annotations | Complex, low value for AI coding workflow. | Show in commit history instead. |
-| Custom keybinding configuration | Enormous complexity, almost no one uses it in web apps. | Hard-code sensible defaults (Cmd+K, Cmd+S, Escape). |
-| Light mode | PROJECT.md: "Dark-only for M1-M3". | Dark mode only. |
-| Aurora/ambient effects | M4 "The Polish" scope per milestone restructuring. | No gradient overlays on panels. |
-| Inline code completion | Requires LSP integration, not Loom's value prop. | Out of scope entirely. |
-| Editor minimap | Visual noise, rarely used in V1 per user feedback. | Omit for M3, add if requested in M4. |
-| Settings import/export | Low value for single-user tool. | Defer indefinitely. |
-| Split editor panes | High complexity, low value for M3 scope. | Single editor, consider for M5. |
-| File search (ripgrep) | Would need new backend endpoint. | Use Cmd+K for file name search only. |
-| Git stash management | Niche feature. | Defer to M5+. |
+| Full Framer Motion bundle | Constitution bans full motion bundle (~34KB). LazyMotion with domAnimation is the ceiling at 15KB. CSS spring easing handles 80% of use cases for free. | Start with CSS `cubic-bezier(0.34, 1.56, 0.64, 1)`. Only add LazyMotion if CSS can't handle exit animations or shared layout. |
+| WebGL background effects (Aurora, Grainient) | ogl dependency (~30KB), GPU concerns on integrated Radeon 780M, and these are visual spectacle -- not production polish. Polish is about details that make things feel right, not effects that make things look flashy. Defer to v2.1 "The Polish". | Focus on micro-interactions and state consistency. Ship the spring physics, glass surfaces, and text reveals. Aurora/Grainient are spectacle for later. |
+| Character-by-character typewriter | Constitution explicitly bans this. Batch rendering via rAF buffer is the established pattern. Typewriter creates janky scroll behavior and is a performance anti-pattern at 100+ tokens/sec. | Keep the existing rAF buffer two-phase renderer. DecryptedText on titles is different -- it's a one-time reveal on a short string, not streaming content. |
+| 3D card tilts / parallax | Too playful for a dev tool. Loom is "surgical laser + old library", not a creative portfolio. LobeChat gets away with it because of its consumer-app positioning. | SpotlightCard's cursor-following gradient is the right level of interactivity. |
+| Cursor followers / trails | Distracting during code work. The mouse is a precision tool in a workspace app. | Nothing. The cursor should be invisible infrastructure. |
+| Animated message entrance (AnimatedList) | Conflicts with scroll-to-bottom behavior, auto-scroll during streaming, and content-visibility optimization. Every competitive product streams content in without entrance animations -- the streaming itself IS the animation. | Messages appear via streaming (active) or instant (historical). No entrance animation needed. |
+| Confetti / sparkles / particles | Too playful. Loom's aesthetic is understated precision, not celebration. | Success feedback through toast messages and icon state changes (checkmark transitions). |
+| Light mode | Out of scope. Dark-only is a deliberate brand decision. Potential future milestone stretch goal. | Ensure dark theme is flawless. Every surface, every scrollbar, every focus ring. |
+| LiquidChrome / Iridescence WebGL | Same reasoning as Aurora -- spectacle, not polish. High risk of looking tacky if not perfectly tuned. | Defer to v2.1. |
+| Sidebar drag-to-resize | Adds significant complexity (drag handler, persist width, min/max constraints) for minimal UX value. Slim mode collapse is the better investment. | Binary collapse/expand with spring animation. Not continuous resize. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Content Layout + Tab System (FOUNDATION -- must exist before any panel renders)
-  |
-  +--> Settings Panel (independent overlay, no panel deps)
-  +--> Terminal / Shell (independent panel, no deps)
-  +--> Cmd+K Command Palette (independent overlay, better after other panels exist)
-  |
-  +--> File Tree -----> Code Editor (tree opens files IN editor)
-  |      |                  |
-  |      v                  v
-  +--> Git Panel -------> Code Editor Diff Mode (diff opens IN editor)
-         |
-         v
-       File Tree + Git Status (change indicators on tree nodes -- OPTIONAL polish)
+Shimmer upgrade ──────────────────────► ALL skeleton components (prerequisite)
+                                         │
+Glass tokens ─────────────────────────► Command palette glass ──► Settings modal glass ──► Tooltip glass
+  (already defined)                      │
+                                         │
+Spring easing tokens ─────────────────► Tool card springs
+  (already defined)                    ► Sidebar springs
+                                       ► Modal springs
+                                       ► Scroll pill springs
+                                         │
+Interactive state audit ──────────────► Hover/focus/active/disabled consistency
+                                         │
+                                         ├──► Button press feedback
+                                         └──► Focus ring consistency
+                                         │
+DecryptedText component ──────────────► Session title reveals ──► Model name reveals
+                                         │
+StarBorder component ─────────────────► Active session indicator ──► Focused composer
+  (planned, not yet adopted)             │
+                                         │
+Empty state components ───────────────► File tree empty ──► Git panel empty ──► Session list empty
+  (need design language)               ► Search empty ──► Editor empty
+                                         │
+Loading state audit ──────────────────► Terminal skeleton ──► FileTree skeleton
+                                       ► Consistent shimmer class usage
+                                         │
+Spacing/typography audit ─────────────► Global consistency pass (no external deps)
+                                         │
+Sidebar slim mode ────────────────────► Icon rail layout ──► Tooltip labels ──► Persist preference
+  (most complex, standalone)             Depends on: spring animations for collapse transition
 ```
 
-**Critical path:** Content Layout + Tab System is the foundation. File Tree must exist before Code Editor is useful. Git Panel benefits from Code Editor for diff view but works standalone for status + commit. Terminal and Settings are fully independent.
+### Critical Path
+
+1. **Shimmer & skeleton consistency** (unblocks visual baseline)
+2. **Interactive state audit** (unblocks hover/focus/disabled consistency)
+3. **Spring easing adoption** (unblocks all animated transitions)
+4. **Glass surface upgrade** (unblocks premium overlay feel)
+5. **Empty state components** (unblocks first-run experience)
+6. **DecryptedText + StarBorder adoption** (visual personality)
+7. **Spacing/typography audit** (final polish pass)
+8. **Sidebar slim mode** (largest standalone feature, can parallel others)
 
 ---
 
 ## MVP Recommendation
 
-**Phase 1 -- Foundation + Independent Panels:**
-1. Content Layout + Tab System (tab bar, active tab routing, keyboard shortcuts Cmd+1/2/3/4)
-2. Settings Panel (Agents, API Keys, Appearance, Git tabs -- modal overlay)
-3. Terminal / Shell (xterm.js + WebSocket -- fully independent)
+Prioritize in this order for maximum perceived quality improvement:
 
-**Phase 2 -- Navigation Acceleration:**
-4. Cmd+K Command Palette (session search, project switching, tab switching, slash commands)
+### Must-Have (Phases 1-3)
 
-**Phase 3 -- File Workspace:**
-5. File Tree (hierarchical browsing, expand/collapse, file type icons, click-to-open)
-6. Code Editor (CodeMirror 6, syntax highlighting, file tabs, read/write, OKLCH theme)
+1. **Settings refactor landing** -- Generic useFetch hook, connection store persist fix, ModalState type safety. Already in-progress work that must land first.
+2. **Shimmer consistency + missing skeletons** -- Upgrade all skeletons to use `skeleton-shimmer` (directional sweep), add TerminalSkeleton and FileTreeSkeleton. Low effort, high visual cohesion.
+3. **Interactive state audit** -- Systematic pass through all custom components for hover/focus/active/disabled consistency. Add `:not(:disabled):hover`, `:not(:disabled):active`, consistent `focus-visible` ring. The single highest-impact polish item.
+4. **Empty states for all surfaces** -- Design a consistent empty state pattern (icon + heading + subtext + optional CTA) and apply to file tree, git panel, session list, search results, editor placeholder.
+5. **Spring easing on key transitions** -- Swap standard easing for spring cubic-bezier on: tool card expand/collapse, sidebar open/close, modal entrance, scroll-to-bottom pill. CSS-only, zero new dependencies.
 
-**Phase 4 -- Git Workflow:**
-7. Git Panel (changes view, staging, commit, branch display, diff viewer, commit history)
+### Should-Have (Phases 4-5)
 
-**Defer to later milestones:**
-- MCP server management UI (complex, M5 "The Power" scope per MILESTONES.md)
-- File change indicators in tree from git status (M4 polish)
-- AI-generated commit messages (convenience, not critical path)
-- Editor minimap (M4 polish if requested)
-- Multiple terminal sessions (M5 if requested)
+6. **Glass surface upgrade** -- Upgrade command palette from blur(8px) to blur(16px)+saturate(1.4). Apply to settings modal overlay. Apply to tooltips.
+7. **Error state hardening** -- Add inline retry to failed API sections (git status, file tree, settings tabs). Add Sonner action buttons for retry. Add timeout escalation messages.
+8. **DecryptedText reveals** -- Source-copy from React Bits or adopt motion/react ScrambleText. Apply to session titles on first appearance and model name on session switch.
+9. **StarBorder adoption** -- Source-copy from React Bits. Apply to active sidebar session and focused composer.
+10. **Spacing and typography audit** -- Systematic pass for 4px grid compliance, type scale consistency, border-radius consistency.
 
----
+### Defer to v2.1 (Phase 6+)
 
-## Panel Layout Strategy
-
-The existing AppShell uses a 3-column CSS Grid: `sidebar | content | artifact (0px)`.
-
-**Recommendation:** The content column should contain a tab-based workspace where Chat, Files, Shell, and Git are tabs. This matches V1's approach and the `activeTab` / `TabId` type already defined in the UI store.
-
-The artifact column (currently 0px) should remain reserved for M5 (multi-provider tabs, artifacts panel). Do NOT use it for workspace panels in M3.
-
-**Tab layout within content area:**
-```
-+------------------------------------------+
-| Tab Bar: [Chat] [Files] [Shell] [Git]    |
-+------------------------------------------+
-| Active Tab Content                        |
-|                                           |
-| (Chat = existing ChatView)               |
-| (Files = File Tree + Code Editor split)  |
-| (Shell = Terminal full-height)           |
-| (Git = Changes + History views)          |
-+------------------------------------------+
-```
-
-The Files tab needs an internal split (tree sidebar + editor main). Use CSS Grid or flexbox with the tree at ~240px and editor taking remaining space.
-
-Settings and Cmd+K are **overlays** (modal/dialog), not tabs. They appear on top of any active tab.
+11. **Sidebar slim mode** -- Complex layout change. Better as a standalone feature with proper research into responsive breakpoints and the mount-once panel interaction.
+12. **Aurora/Grainient WebGL backgrounds** -- Spectacle effects. Need GPU testing, perf gating, reduced-motion handling. Wrong milestone.
+13. **BlurText empty state entrance** -- Nice-to-have. Only seen on infrequent empty state.
+14. **Progressive content reveal (staggered rows)** -- Medium complexity, potential scroll interaction issues. Research needed on interaction with content-visibility.
 
 ---
 
-## Complexity Assessment
+## Competitive Context
 
-| Panel | Estimated Complexity | LOC Estimate | Rationale |
-|-------|---------------------|--------------|-----------|
-| Content Layout + Tabs | Low | 200-400 | Tab bar + route rendering. Foundation for everything. |
-| Settings | Medium | 1500-2500 | 5 tabs, CRUD forms, provider auth status. shadcn primitives handle most UI. |
-| Cmd+K | Low-Medium | 500-800 | cmdk/shadcn Command handles heavy lifting. Custom groups + actions. |
-| File Tree | Medium | 800-1200 | Recursive tree rendering, expand/collapse state, search filter. |
-| Code Editor | Medium-High | 1200-2000 | CodeMirror setup, custom OKLCH theme, file tabs, diff mode, markdown preview. |
-| Terminal | Low-Medium | 400-700 | xterm.js handles emulation; we wire WebSocket + fit addon + connection state. |
-| Git Panel | High | 1500-2500 | Changes view, staging, commit flow, branch mgmt, diff viewer, history list. |
-| **Total** | | **~6100-10100** | Comparable to M2's 10,363 net LOC. |
+What the top products do that Loom currently doesn't:
 
----
-
-## Existing Infrastructure to Leverage
-
-| What Exists | Where | How M3 Uses It |
-|-------------|-------|----------------|
-| `activeTab: TabId` in UI store | `src/src/stores/ui.ts` | Tab switching between Chat/Files/Shell/Git |
-| `commandPaletteOpen` in UI store | `src/src/stores/ui.ts` | Cmd+K toggle state |
-| `modalState: ModalState` in UI store | `src/src/stores/ui.ts` | Settings modal state |
-| `toggleCommandPalette()` action | `src/src/stores/ui.ts` | Cmd+K keyboard shortcut handler |
-| `setActiveTab()` action | `src/src/stores/ui.ts` | Tab navigation from Cmd+K |
-| AppShell 3-column grid | `src/src/components/app-shell/AppShell.tsx` | Content column hosts tab workspace |
-| PanelErrorBoundary | `src/src/components/shared/ErrorBoundary.tsx` | Wrap each panel |
-| shadcn Dialog (installed) | shadcn/ui | Settings modal |
-| shadcn Scroll-area (installed) | shadcn/ui | File tree, commit history scrolling |
-| shadcn Tooltip (installed) | shadcn/ui | Icon button tooltips in panel headers |
-| shadcn Kbd (installed) | shadcn/ui | Keyboard shortcuts in Cmd+K |
-| shadcn Collapsible (installed) | shadcn/ui | File tree directories |
-| react-markdown (installed) | npm | Code editor markdown preview |
-| Shiki (installed) | npm | Code editor syntax highlighting reuse |
-| lucide-react (installed) | npm | File type icons, panel controls |
-| OKLCH design tokens | `src/src/styles/tokens.css` | All panel styling |
-| cn() utility | `src/src/utils/cn.ts` | Class composition |
-| Backend git routes (18 endpoints) | `server/routes/git.js` | Full git workflow API |
-| Backend settings routes (8 endpoints) | `server/routes/settings.js` | API keys, credentials CRUD |
-| Backend MCP routes (6 endpoints) | `server/routes/mcp.js` | MCP server management |
-| Backend shell WebSocket (`/shell`) | `server/index.js` | Terminal PTY sessions |
-| Backend file routes (3 endpoints) | inline in `server/index.js` | File tree + content reading |
-| Backend commands routes (3 endpoints) | `server/routes/commands.js` | Slash commands for Cmd+K |
-| Backend CLI auth routes (3 endpoints) | `server/routes/cli-auth.js` | Agent auth status for settings |
+| Pattern | Claude.ai | ChatGPT | LobeChat | Loom Current | Loom Target |
+|---------|-----------|---------|----------|--------------|-------------|
+| Loading skeletons | Custom shimmer | Subtle pulse | Shiny text sweep | Mix of pulse/shimmer | Consistent directional shimmer |
+| Empty state | Suggestions grid | Personalized greeting + cards | Agent marketplace | Wordmark + 4 chips | Wordmark + chips + subtle blur-in |
+| Spring animations | `cubic-bezier(0.16, 1, 0.3, 1)` on thinking | Bounce on sidebar, 500ms pulse | Full Framer Motion | Tokens defined, not applied | CSS spring on 5+ surfaces |
+| Glass effects | None visible | Glassmorphic tool pills | `blur(36px)` strong glass | 8px blur on command palette | 16px + saturate on 3 surfaces |
+| Text reveals | Staggered fade-in | Word fade 200-250ms | Shiny text shimmer | ShinyText on thinking label | DecryptedText on titles |
+| Active indicators | Simple highlight | Subtle bg tint | Animated glow + scale | Background tint | StarBorder animated glow |
+| Hover consistency | Full coverage | Full coverage | Full coverage with hover-reveal timestamps | ~70% coverage | 100% coverage |
+| Button press feedback | Scale + color | Scale overshoot (~800ms) | CVA variants | Minimal | Scale(0.98) + darken |
+| Error retry | Inline retry | Inline retry + regenerate | Plugin error with debug mode | 3-tier error boundaries | Inline retry at API level |
 
 ---
 
-## Key Competitive Insights
+## Complexity Estimates
 
-**What Cursor/Windsurf have that Loom should match (table stakes for AI coding tools):**
-- File explorer with tree navigation
-- Integrated terminal with AI awareness
-- Git source control panel with diff view
-- Settings accessible via both UI and command palette
-- Cmd+K / Ctrl+Shift+P command palette for everything
-
-**What Loom can do that IDE forks cannot:**
-- Beautiful, opinionated dark-only design (not VS Code's generic theme)
-- OKLCH-based color system with warm charcoal aesthetic
-- Purpose-built tool cards showing exactly what the agent is doing
-- Streaming-first architecture with 60fps rendering
-- Cross-provider support (Claude + Codex + Gemini in one workspace)
-
-**Key lesson from reference analysis:** Claude.ai and ChatGPT keep their workspace panels minimal and focused. These panels exist to support the chat workflow, not replace a real IDE. Build the minimum viable version of each panel, then polish in M4.
+| Feature Group | Items | Total Effort | Risk |
+|---------------|-------|-------------|------|
+| Skeleton/shimmer consistency | 5 items | 1-2 days | Low -- CSS changes, no architecture |
+| Interactive state audit | 4 items | 2-3 days | Low -- systematic CSS pass |
+| Empty states | 5 items | 1-2 days | Low -- new components, simple |
+| Spring easing adoption | 5 items | 1 day | Low -- CSS token swap |
+| Glass surface upgrade | 3 items | 0.5 day | Low -- token adjustment |
+| Error state hardening | 4 items | 2-3 days | Medium -- API error handling patterns |
+| DecryptedText + StarBorder | 4 items | 1-2 days | Low -- source-copy, integrate |
+| Spacing/typography audit | 3 items | 2-3 days | Low -- grunt work |
+| Sidebar slim mode | 1 item | 3-5 days | High -- layout architecture impact |
+| **Total (without sidebar slim)** | **33 items** | **~11-17 days** | |
+| **Total (with sidebar slim)** | **34 items** | **~14-22 days** | |
 
 ---
 
 ## Sources
 
-- V1 Feature Inventory (`.planning/V1_FEATURE_INVENTORY.md`) -- HIGH confidence, source-code verified
-- Backend API Contract (`.planning/BACKEND_API_CONTRACT.md`) -- HIGH confidence, 47+ endpoints documented
-- Component Adoption Map (`.planning/COMPONENT_ADOPTION_MAP.md`) -- HIGH confidence
-- Reference App Analysis (`.planning/reference-app-analysis.md`) -- HIGH confidence, 6 products analyzed
-- M3 Deferred Context (`.planning/M3-POLISH-DEFERRED-CONTEXT.md`) -- HIGH confidence
-- UI Store (`src/src/stores/ui.ts`) -- HIGH confidence, verified in codebase
-- [Cursor Features](https://cursor.com/features) -- MEDIUM confidence
-- [shadcn Command](https://ui.shadcn.com/docs/components/radix/command) -- HIGH confidence
-- [cmdk](https://cmdk.paco.me/) -- HIGH confidence
-- [CodeMirror 6](https://codemirror.net/) -- HIGH confidence
-- [xterm.js](https://xtermjs.org/) -- HIGH confidence
-- [react-codemirror](https://uiwjs.github.io/react-codemirror/) -- HIGH confidence
-- [Windsurf Docs](https://docs.windsurf.com/) -- MEDIUM confidence
+### Primary (HIGH confidence)
+- Codebase audit of `/home/swd/loom/src/src/components/` -- 51 files with interactive states, 4 existing skeletons, 3 adopted effects
+- `.planning/reference-app-analysis.md` -- Competitive analysis of Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat
+- `.planning/chat-interface-standards.md` -- 106 requirements across 16 categories
+- `.planning/COMPONENT_ADOPTION_MAP.md` -- Planned component adoptions
+- `.planning/visual-effects-audit.md` -- React Bits, shadcn, Magic UI evaluation
+- `.planning/M3-POLISH-DEFERRED-CONTEXT.md` -- Deferred polish context from M3 planning
+- `.planning/PROJECT_SOUL.md` -- North star: "surgical laser + old library"
+
+### Secondary (MEDIUM confidence)
+- [Motion.dev LazyMotion docs](https://motion.dev/docs/react-lazy-motion) -- 4.6KB base, domAnimation +15KB
+- [Motion.dev ScrambleText](https://motion.dev/docs/react-scramble-text) -- 1KB scramble component
+- [React Bits DecryptedText](https://www.reactbits.dev/text-animations/decrypted-text) -- Source-copy text animation
+- [Glassmorphism implementation guide](https://playground.halfaccessible.com/blog/glassmorphism-design-trend-implementation-guide) -- 3-5 glass elements negligible perf
+- [NN/g Button States](https://www.nngroup.com/articles/button-states-communicate-interaction/) -- Hover/focus/active/disabled UX research
+- [Empty State UX patterns](https://www.pencilandpaper.io/articles/empty-states) -- Design patterns for empty states
+- [Framer Motion vs React Spring 2025](https://hookedonui.com/animating-react-uis-in-2025-framer-motion-12-vs-react-spring-10/) -- Animation library comparison
+
+### Tertiary (LOW confidence -- verify before adopting)
+- [Dark Glassmorphism 2026 trend](https://medium.com/@developer_89726/dark-glassmorphism-the-aesthetic-that-will-define-ui-in-2026-93aa4153088f) -- 64% SaaS adoption claim (single source)
+- [BadtzUI Border Beam](https://www.badtz-ui.com/docs/components/border-beam) -- Alternative to StarBorder

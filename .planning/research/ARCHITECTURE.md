@@ -1,474 +1,538 @@
-# Architecture Patterns: M3 "The Workspace" Panel Integration
+# Architecture Patterns: v1.5 "The Craft" Visual Polish Integration
 
-**Domain:** Workspace panels (Settings, Cmd+K, File Tree, Code Editor, Terminal, Git Panel) integrating into existing AI chat app
-**Researched:** 2026-03-09
-**Confidence:** HIGH (based on existing V2 source code analysis + V1 feature inventory + backend API contract)
+**Domain:** Spring animations, glass surfaces, visual effects, and UI state polish integrating into existing React 19 + Tailwind v4 workspace app
+**Researched:** 2026-03-18
+**Confidence:** HIGH (based on thorough source code analysis of 49K LOC codebase, existing token/motion infrastructure, and current browser API landscape)
 
 ---
 
 ## Existing Architecture Summary
 
-Before detailing integration points, here is the current V2 architecture that all new panels must integrate with:
+The v1.5 visual polish work builds on top of a mature, well-structured codebase. Understanding the existing patterns is critical because every visual enhancement must respect these constraints.
 
 ### App Shell (CSS Grid)
+
 ```
 grid-template-columns: var(--sidebar-width) 1fr var(--artifact-width, 0px)
 grid-template-rows: 1fr
 ```
-Three columns: **sidebar** | **content (Outlet)** | **artifact (0px reserved)**. The content column renders via React Router `<Outlet />`. The artifact column is at 0px width, reserved but unused.
 
-### Routing (React Router v7)
-```
-<Route element={<AppShell />}>
-  <Route index element={<Navigate to="/chat" />} />
-  <Route path="/chat/:sessionId?" element={<ChatView />} />
-  <Route path="/dashboard" element={<DashboardPlaceholder />} />
-  <Route path="/settings" element={<SettingsPlaceholder />} />
-</Route>
-```
+Three columns: **sidebar** | **content** | **artifact (0px reserved)**. Sidebar width is driven by CSS custom property `--sidebar-width`, toggled via `data-sidebar-state` attribute on the grid container. Current states: `expanded` (280px) and `collapsed-hidden` (0px).
 
-### 4 Zustand Stores
-| Store | Responsibility | Persisted |
-|-------|---------------|-----------|
-| `timeline` | Sessions, messages, active session | No |
-| `stream` | Streaming state, tool calls, thinking | No |
-| `ui` | Sidebar, modals, command palette, theme, activeTab | Partial (theme, sidebarCollapsed, thinkingExpanded) |
-| `connection` | WebSocket status per provider | No |
+**Integration implication:** Sidebar slim mode adds a third state: `collapsed-slim` (~48px icon rail). This is a CSS variable change, not a layout restructure.
 
-### WebSocket Architecture
-- **Chat WS** (`/ws`): Single connection for all AI providers, permissions, session lifecycle
-- **Shell WS** (`/shell`): Separate connection for terminal PTY sessions
-- `WebSocketClient` class (zero React deps) with callback injection pattern
-- Messages typed as discriminated unions (`ServerMessage`, `ClientMessage`)
-- `wsClient` singleton exported from `websocket-client.ts`
+### Mount-Once CSS Show/Hide (ContentArea)
 
-### API Client
-- `apiFetch<T>(path, options, signal)` with JWT auth injection
-- All backend endpoints documented in `BACKEND_API_CONTRACT.md`
-
----
-
-## Recommended Architecture
-
-### Panel Layout Strategy: Content Area Sub-Grid
-
-The current app shell has a single `<Outlet />` in the content column. New workspace panels must coexist with the chat view. Two viable approaches:
-
-**Approach A (RECOMMENDED): Sub-layout within the content column**
-
-The content column gets its own internal layout component that splits into a main view and auxiliary panels. This keeps the outer 3-column grid untouched.
-
-```
-AppShell (3-col grid)
-  Sidebar | ContentLayout | Artifact(0px)
-             |
-             ContentLayout (internal layout)
-               Header (tab bar: Chat | Files | Git | ...)
-               Content area (selected tab content)
-               Bottom panel (resizable: Terminal)
-```
-
-**Why this over Approach B (artifact column):** The artifact column was designed for a side-by-side panel (like Claude.ai's artifacts). Using it for workspace panels would mean only one panel at a time and awkward layouts. A sub-layout in the content column lets us do tabbed panels (Chat, Files, Git) with an optional persistent bottom panel (Terminal), which matches V1's proven UX and every IDE-like workspace pattern.
-
-**Approach B (REJECTED): Repurpose artifact column**
-Would require dynamic grid resizing and only allows one auxiliary panel. V1 used tabbed navigation within the main content area, and that pattern works.
-
-### Content Layout Architecture
+All four workspace panels (Chat, Files, Shell, Git) render simultaneously via `useMemo([], [])`. The active panel gets `className="h-full outline-none"`, inactive panels get `className="hidden"` (Tailwind `display: none`).
 
 ```tsx
-// New component: src/src/components/content-layout/ContentLayout.tsx
-export const ContentLayout = memo(function ContentLayout() {
-  const activeTab = useUIStore(s => s.activeTab);
-  const bottomPanelHeight = useUIStore(s => s.bottomPanelHeight);
-
-  return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <ContentHeader />          {/* Tab bar + project-level controls */}
-      <div className="flex-1 min-h-0 overflow-hidden">
-        <Suspense fallback={<PanelSkeleton />}>
-          {activeTab === 'chat' && <ChatView />}
-          {activeTab === 'files' && <FileTreeWithEditor />}
-          {activeTab === 'git' && <GitPanel />}
-          {activeTab === 'settings' && <SettingsPanel />}
-        </Suspense>
-      </div>
-      {bottomPanelHeight > 0 && (
-        <ResizableBottomPanel height={bottomPanelHeight}>
-          <TerminalPanel />
-        </ResizableBottomPanel>
-      )}
-    </div>
-  );
-});
+// Current pattern — DO NOT change to conditional rendering
+{panels.map(({ id, content }) => (
+  <div className={activeTab === id ? 'h-full outline-none' : 'hidden'}>
+    <PanelErrorBoundary>{content}</PanelErrorBoundary>
+  </div>
+))}
 ```
 
-### Component Boundaries
+**Integration implication:** Spring animations on tab transitions are incompatible with this pattern. The `hidden` class applies `display: none`, which makes CSS transitions impossible (elements go from "not in layout" to "in layout" with no tween). The mount-once pattern is architecturally correct (preserves terminal sessions, scroll positions, editor state), so we do NOT animate tab panel transitions. Polish the *contents within* active panels instead.
 
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| `ContentLayout` | Tab switching, bottom panel management | UI store (activeTab, bottomPanelHeight) |
-| `ContentHeader` | Tab bar rendering, tab click handlers | UI store (activeTab, setActiveTab) |
-| `SettingsPanel` | Settings modal/page, 5-tab CRUD forms | REST API (`/api/settings/*`, `/api/cli/*`, `/api/mcp/*`, `/api/user/*`) |
-| `CommandPalette` | Cmd+K overlay, fuzzy search, actions | UI store (commandPaletteOpen), REST API (`/api/commands/*`), timeline store (sessions) |
-| `FileTreePanel` | File browsing, file selection | REST API (`/api/projects/:name/files`), file store (NEW) |
-| `CodeEditorPanel` | File editing with CodeMirror | REST API (`/api/projects/:name/file`), file store (NEW) |
-| `TerminalPanel` | xterm.js terminal, Shell WS connection | Shell WebSocket (`/shell`), separate from chat WS |
-| `GitPanel` | Git status, staging, commit, history | REST API (`/api/git/*`) |
+### 5 Zustand Stores
 
-### Data Flow
+| Store | Persisted | Relevant to Polish |
+|-------|-----------|-------------------|
+| `useUIStore` | theme, sidebarOpen, thinkingExpanded, autoExpandTools, showRawParams | YES — sidebar state, modal state, theme preferences |
+| `useStreamStore` | None | YES — streaming state drives animation activation |
+| `useTimelineStore` | sessions (messages stripped) | No |
+| `useConnectionStore` | modelId only | No |
+| `useFileStore` | None | No |
 
-```
-User clicks tab
-  --> UI store.setActiveTab('files')
-  --> ContentLayout re-renders selected panel
-  --> Panel fetches data via apiFetch() or WebSocket
+**Integration implication:** No new stores needed. Slim mode is a sidebar state change in `useUIStore`. Glass/spring preferences could be added to `ThemeConfig` if we want user toggles, but the reduced-motion system already handles this globally.
 
-File Tree:
-  GET /api/projects/:name/files --> FileTreePanel renders tree
-  User clicks file --> file store.setActiveFile(path)
-  --> CodeEditorPanel loads via GET /api/projects/:name/file?path=...
+### Motion Infrastructure (Already Exists)
 
-Terminal:
-  New WebSocket('/shell?token=...') --> xterm.js
-  PTY data flows: Shell WS <--> xterm.js (bypasses chat WS entirely)
+The codebase has a complete but underutilized motion system:
 
-Git Panel:
-  GET /api/git/status --> renders file changes
-  POST /api/git/commit --> commits staged files
-  GET /api/git/commits --> renders commit history
+| Asset | Location | Status |
+|-------|----------|--------|
+| Spring configs | `src/lib/motion.ts` | Defined (`SPRING_GENTLE`, `SPRING_SNAPPY`, `SPRING_BOUNCY`) but unused by any component |
+| CSS easing tokens | `tokens.css` (lines 76-82) | `--ease-spring`, `--ease-out`, `--ease-in-out` + 4 duration tokens |
+| FX tokens | `tokens.css` (lines 127-139) | Aurora/gradient/ambient tokens defined but unused |
+| Glass tokens | `tokens.css` (lines 152-156) | `--glass-blur`, `--glass-saturate`, `--glass-bg-opacity` defined, used only in TokenPreview demo |
+| `prefersReducedMotion()` | `src/lib/motion.ts` | Helper exists, used nowhere in production code |
+| Reduced motion CSS | `base.css` (lines 72-81) | Global 0.01ms override — active and correct |
 
-Settings:
-  GET /api/settings/api-keys --> renders key list
-  GET /api/cli/claude/status --> renders auth status
-  POST /api/settings/credentials --> saves credentials
+**Integration implication:** The token infrastructure is ready. The work is connecting existing tokens to actual component animations, not creating new token systems.
 
-Command Palette (Cmd+K):
-  Overlay, reads from timeline store (sessions), commands API, file tree
-  --> dispatches navigation actions (switch session, open file, change tab)
-```
+### Existing CSS Effects (React Bits Source-Copied)
 
----
+| Component | Technique | Used By |
+|-----------|-----------|---------|
+| `SpotlightCard` | CSS `--mouse-x`/`--mouse-y` radial gradient | ToolCardShell (wraps all tool cards) |
+| `ShinyText` | CSS `background-clip: text` gradient animation | Not used in production |
+| `ElectricBorder` | CSS `@keyframes` orbital gradient | Not used in production |
 
-## Integration Points: New vs Modified
+**Integration implication:** SpotlightCard is already integrated into the tool pipeline. ShinyText and ElectricBorder are built but unused — wire them up before adding new effects.
 
-### NEW Components (create from scratch)
+### Current Animation Technique Inventory
 
-| Component | Directory | Dependencies |
+| Technique | Where Used | Performance |
 |-----------|-----------|-------------|
-| `ContentLayout` | `components/content-layout/` | UI store, React Router |
-| `ContentHeader` | `components/content-layout/` | UI store |
-| `ResizableBottomPanel` | `components/content-layout/` | UI store, pointer events |
-| `SettingsPanel` | `components/settings/` | shadcn (tabs, form, input, switch, select, accordion), REST API |
-| `CommandPalette` | `components/command-palette/` | shadcn (command/cmdk), UI store, timeline store |
-| `FileTreePanel` | `components/file-tree/` | REST API, file store, lucide icons |
-| `CodeEditorPanel` | `components/code-editor/` | @uiw/react-codemirror, REST API, file store |
-| `TerminalPanel` | `components/terminal/` | @xterm/xterm, Shell WebSocket |
-| `GitPanel` | `components/git-panel/` | REST API, shadcn (select, checkbox, textarea, alert-dialog) |
-| File store | `stores/file.ts` | NEW 5th Zustand store |
+| CSS `transition` | Hover states everywhere, border colors, opacity | Excellent (GPU composited) |
+| CSS `@keyframes` | Shimmer skeletons, streaming pulse dot, electric border orbits | Good |
+| CSS Grid `0fr/1fr` transition | ToolCardShell expand/collapse, ThinkingDisclosure, ToolCallGroup | Good — proven pattern |
+| `tw-animate-css` `animate-in/out` | Dialog overlay fade, Dialog content zoom | Good (CSS only) |
+| `backdrop-filter: blur()` | Command palette overlay, ConnectionBanner, ScrollToBottomPill | Moderate (GPU intensive, limit count) |
 
-### MODIFIED Existing Code
-
-| File | Change | Reason |
-|------|--------|--------|
-| `App.tsx` | Replace `<Outlet />` route structure with ContentLayout, add Cmd+K overlay | ContentLayout becomes the route outlet content |
-| `stores/ui.ts` | Add `bottomPanelHeight`, `bottomPanelVisible`, `setBottomPanel()`, expand `TabId` union | Terminal panel state, new tab IDs |
-| `types/ui.ts` | Expand `TabId` to include `'files' \| 'git' \| 'terminal'`, add bottom panel types | New panel tabs |
-| `components/app-shell/AppShell.tsx` | Add CommandPalette portal overlay | Cmd+K lives above the grid |
-| `components/sidebar/Sidebar.tsx` | Add tab icons/buttons for new panels | Navigation to new panels |
-| `lib/websocket-client.ts` | No changes needed | Terminal uses separate WS instance |
-
-### UNCHANGED (no modifications needed)
-
-| Area | Why |
-|------|-----|
-| Chat streaming pipeline | Completely independent of workspace panels |
-| Stream multiplexer | Pure functions, no panel awareness |
-| Timeline/stream/connection stores | No workspace panel dependencies |
-| Tool card system | Self-contained within chat view |
-| Composer | Lives within ChatView, no cross-panel deps |
+**Integration implication:** The codebase is 100% CSS animations (Tier 1 and Tier 2 per Constitution 11.1). No framer-motion/motion dependency exists yet. The key architecture decision is whether to add `motion/react` or stay CSS-only.
 
 ---
 
-## Key Architectural Decisions
+## Recommended Architecture: Stay CSS-Only (No motion/react)
 
-### Decision 1: New File Store (5th Zustand Store)
+### Rationale
 
-The file tree and code editor need shared state (active file, open files, dirty state) that doesn't belong in any existing store. Create `stores/file.ts`:
+The Constitution defines three tiers: CSS-only, tailwindcss-animate, and LazyMotion + domAnimation. The Constitution itself notes Tier 3 "[NEEDS REVIEW -- may not be needed if CSS covers all cases]."
 
-```typescript
-interface FileState {
-  // Data
-  activeFilePath: string | null;
-  openFiles: OpenFile[];       // tabs in editor
-  fileTree: FileTreeNode | null;
-  isLoadingTree: boolean;
+After analyzing every planned visual enhancement, CSS covers all cases.
 
-  // Actions
-  setActiveFile: (path: string) => void;
-  openFile: (path: string) => void;
-  closeFile: (path: string) => void;
-  setFileTree: (tree: FileTreeNode) => void;
-  markDirty: (path: string, isDirty: boolean) => void;
-}
+**Why not add motion/react:**
+
+1. **Bundle cost:** Even with LazyMotion + domAnimation, it adds ~15KB (gzip) to the bundle. The `m` component alone is 4.6KB. For a project that currently has zero JS animation library overhead, this is a meaningful regression.
+
+2. **The only thing motion/react does that CSS cannot is true spring physics.** But CSS `linear()` (supported in all major browsers since late 2023, including Safari 17.2+) combined with `spring-easing` or a build-time spring curve generator can produce indistinguishable spring curves at zero runtime cost.
+
+3. **Everything planned is achievable with CSS:**
+   - Sidebar slide: CSS `transition` on `--sidebar-width` + `transform: translateX()`
+   - Modal entrance: Already uses `tw-animate-css` zoom-in/fade-in
+   - Tool card expand: Already uses CSS Grid `0fr/1fr` transition
+   - Glass surfaces: `backdrop-filter: blur()` + opacity (pure CSS)
+   - DecryptedText: CSS `@keyframes` with `clip-path` or character reveal via animation-delay
+   - StarBorder: Already built as `ElectricBorder` (CSS `@keyframes`)
+
+4. **Architecture simplicity:** Zero new runtime dependencies, zero new React context providers (LazyMotion requires a provider), zero new patterns for the team to learn.
+
+**The one exception:** If a future milestone needs gesture-driven animations (drag-to-reorder, pinch-to-zoom), motion/react becomes necessary. That's M7 "The Power" territory, not v1.5.
+
+### CSS Spring Curves via linear()
+
+Instead of runtime spring physics, generate CSS easing curves at build time:
+
+```css
+/* Generated from SPRING_GENTLE: stiffness=120, damping=14 */
+--ease-spring-gentle: linear(
+  0, 0.0068, 0.0274, 0.0614, 0.1082, 0.1671, 0.2372, 0.3172,
+  0.4054, 0.4998, 0.5979, 0.6973, 0.7951, 0.8886, 0.9749,
+  1.0513, 1.1154, 1.1654, 1.2, 1.2186, 1.2213, 1.2089,
+  1.1826, 1.1443, 1.0962, 1.0407, 0.9803, 0.918, 0.8564,
+  0.7981, 0.7454, 0.7002, 0.6638, 0.6372, 0.6208, 0.6147,
+  0.6184, 0.6311, 0.6517, 0.6788, 0.7107, 0.7459, 0.7825,
+  0.819, 0.8538, 0.8857, 0.9137, 0.9373, 0.9563, 0.9705,
+  0.9802, 0.9858, 0.988, 0.9875, 0.985, 0.9813, 0.977,
+  0.9728, 0.9691, 0.9664, 0.965, 0.9651, 0.9667, 0.9697,
+  0.974, 0.9793, 0.9853, 0.9917, 0.998, 1.004, 1.0092,
+  1.0133, 1.016, 1.0172, 1.017, 1.0155, 1.0129, 1.0096,
+  1.006, 1.0023, 0.999, 0.996, 0.9938, 0.9924, 0.9917,
+  0.9918, 0.9925, 0.9938, 0.9954, 0.9972, 0.999, 1.0006,
+  1.0018, 1.0026, 1.003, 1.003, 1.0026, 1.0019, 1.001, 1
+);
 ```
 
-**Why not extend UI store:** The UI store holds ephemeral layout state. File state is data-driven (file contents, tree structure) and has different update patterns. Mixing them violates the single-responsibility principle and would make the UI store's `partialize` logic complex.
+This is computed once (at build time or via a dev script that updates `tokens.css`) and produces the characteristic overshoot and oscillation of real spring physics at zero runtime cost.
 
-**Constitution amendment:** The Constitution says "exactly 4 Zustand stores. No more, no fewer without Constitution amendment." This IS the amendment. A 5th store for file/editor state is justified because:
-1. It has different persistence needs than any existing store
-2. It has different update frequency (low, on user action)
-3. It maps to a clear domain (file operations)
-
-### Decision 2: Terminal Uses Separate WebSocket Instance
-
-The terminal panel opens its own WebSocket connection to `/shell`, completely independent of the chat WebSocket at `/ws`. This matches the V1 architecture and the backend's design (separate handlers for `/ws` and `/shell`).
-
-```typescript
-// Terminal creates its own connection, NOT using wsClient singleton
-const shellWs = new WebSocket(`${protocol}//${host}/shell?token=${token}`);
-```
-
-**Why not multiplex over the chat WS:** The backend has separate WebSocket handlers for `/ws` (chat) and `/shell` (PTY). They serve fundamentally different protocols -- chat is JSON messages, shell is raw terminal byte streams. Trying to multiplex would require backend changes and add complexity for zero benefit.
-
-### Decision 3: Settings as Tab (Not Modal)
-
-V1 used a full-screen modal for settings. For V2, settings should be a tab in the content area:
-
-- **Pro tab:** Consistent navigation pattern, URL-routable (`/settings`), no overlay management, can coexist with terminal panel below
-- **Pro modal:** V1 familiarity, clear "temporary" semantics
-- **Decision:** Tab. The settings route already exists in the router (`/settings` placeholder). A modal would fight the existing routing architecture.
-
-However, the Cmd+K command palette IS a modal/overlay because it's inherently ephemeral and should be accessible from any tab.
-
-### Decision 4: Tab Navigation Lives in Content Header (Not Sidebar)
-
-Tab switching for Chat/Files/Git belongs in a header bar within the content area, not in the sidebar. The sidebar is for session/project navigation. Mixing panel tabs into the sidebar creates confusing hierarchy.
-
-The sidebar MAY have icon shortcuts to switch tabs (like VS Code's activity bar), but the primary tab bar is in the content header.
-
-### Decision 5: Lazy Loading for All New Panels
-
-Every new panel is `React.lazy()` + `<Suspense>`:
-
-```typescript
-const SettingsPanel = lazy(() => import('./settings/SettingsPanel'));
-const FileTreePanel = lazy(() => import('./file-tree/FileTreePanel'));
-const GitPanel = lazy(() => import('./git-panel/GitPanel'));
-const TerminalPanel = lazy(() => import('./terminal/TerminalPanel'));
-```
-
-This is especially critical for CodeMirror (~300KB) and xterm.js (~200KB). These should only load when the user navigates to those tabs.
-
-### Decision 6: Command Palette (Cmd+K) as Portal Overlay
-
-The command palette renders via `ReactDOM.createPortal` to `document.body`, layered above the entire app shell at `z-[var(--z-modal)]`. It reads from multiple stores (timeline for sessions, file store for files) and dispatches navigation actions.
-
-Built on shadcn's `Command` component (wraps cmdk), which provides fuzzy search, keyboard navigation, and grouping out of the box.
+**Implementation:** Write a `generate-spring-curves.ts` script that takes the existing `SPRING_GENTLE`, `SPRING_SNAPPY`, `SPRING_BOUNCY` configs from `motion.ts` and outputs CSS `linear()` values. Add the curves to `tokens.css` alongside existing `--ease-spring`.
 
 ---
 
-## Patterns to Follow
+## Component Boundaries: What Changes, What Doesn't
 
-### Pattern 1: Panel Data Fetching with Hooks
+### Components That Need Modification
 
-Each panel has a dedicated hook for its API data, following the pattern established in chat:
+| Component | Change | Technique |
+|-----------|--------|-----------|
+| **Sidebar** | Add slim mode (icon rail), animate width transitions | CSS transition on `--sidebar-width`, new `collapsed-slim` state |
+| **AppShell** | Support 3 sidebar states in grid template | CSS variable, `data-sidebar-state` attribute |
+| **Dialog (shadcn)** | Add glass surface treatment to overlay + content | `backdrop-filter: blur()` + semi-transparent OKLCH background |
+| **CommandPalette** | Glass overlay already exists; enhance content panel with glass | Extend existing `backdrop-filter: blur(8px)` to content root |
+| **ToolCardShell** | Replace CSS Grid 0fr/1fr easing with spring curve | Swap `--ease-spring` for `--ease-spring-gentle` in `tool-card-shell.css` |
+| **ChatEmptyState** | Add DecryptedText reveal on "Loom" wordmark | New `DecryptedText` component (CSS `@keyframes`) |
+| **SessionItem** | Potential ElectricBorder on active session | Wrap active item with `ElectricBorder isActive={true}` |
+| **ConnectionBanner** | Already has glass; verify it uses glass tokens | Audit existing `backdrop-blur-sm` classes |
+| **ScrollToBottomPill** | Already has glass; verify token compliance | Audit existing `backdrop-blur-[var(--glass-blur)]` |
 
-```typescript
-// hooks/useGitStatus.ts
-export function useGitStatus(projectName: string) {
-  const [status, setStatus] = useState<GitStatus | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+### New Components Needed
 
-  const refresh = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await apiFetch<GitStatus>(
-        `/api/git/status?project=${projectName}`
-      );
-      setStatus(data);
-    } catch (err) {
-      toast.error('Failed to load git status');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [projectName]);
+| Component | Purpose | Technique | Location |
+|-----------|---------|-----------|----------|
+| `DecryptedText` | Character-by-character "decrypt" text reveal | CSS `@keyframes` + `animation-delay` per character | `src/components/effects/DecryptedText.tsx` |
+| `GlassSurface` | Reusable glass wrapper with consistent blur + saturation | CSS utility classes wrapping glass tokens | `src/components/effects/GlassSurface.tsx` |
+| `SidebarSlim` | Icon-only rail variant of sidebar | Renders tab icons + tooltips | `src/components/sidebar/SidebarSlim.tsx` |
 
-  useEffect(() => { refresh(); }, [refresh]);
+### Components That Stay Untouched
 
-  return { status, isLoading, refresh };
-}
-```
-
-### Pattern 2: Resizable Bottom Panel with Pointer Events
-
-The terminal panel needs drag-to-resize. Use pointer events (not mouse events) for touch support:
-
-```typescript
-// Drag handle between content and terminal
-function ResizeHandle({ onResize }: { onResize: (delta: number) => void }) {
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const startY = e.clientY;
-    const onMove = (e: PointerEvent) => onResize(startY - e.clientY);
-    const onUp = () => {
-      document.removeEventListener('pointermove', onMove);
-      document.removeEventListener('pointerup', onUp);
-    };
-    document.addEventListener('pointermove', onMove);
-    document.addEventListener('pointerup', onUp);
-  }, [onResize]);
-
-  return <div className="h-1 cursor-row-resize hover:bg-primary/20" onPointerDown={handlePointerDown} />;
-}
-```
-
-### Pattern 3: Shell WebSocket Lifecycle in Hook
-
-Terminal WebSocket connection managed entirely in a custom hook, matching the chat WS pattern of callback injection:
-
-```typescript
-// hooks/useShellConnection.ts
-export function useShellConnection(projectPath: string) {
-  const wsRef = useRef<WebSocket | null>(null);
-  const [state, setState] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
-
-  const connect = useCallback(() => {
-    const token = getToken();
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(
-      `${protocol}//${window.location.host}/shell?token=${token}`
-    );
-    wsRef.current = ws;
-    setState('connecting');
-
-    ws.onopen = () => {
-      setState('connected');
-      ws.send(JSON.stringify({
-        type: 'init',
-        projectPath,
-        provider: 'plain-shell',
-        isPlainShell: true,
-      }));
-    };
-    // ... onclose, onerror handlers
-  }, [projectPath]);
-
-  return { ws: wsRef, state, connect, disconnect };
-}
-```
-
-### Pattern 4: File Tree as Recursive Component
-
-```typescript
-// Recursive FileNode component with memo
-const FileNode = memo(function FileNode({ node, depth }: FileNodeProps) {
-  const isExpanded = useFileStore(s => s.expandedDirs.has(node.path));
-  const isActive = useFileStore(s => s.activeFilePath === node.path);
-
-  return (
-    <>
-      <button
-        className={cn("flex items-center gap-1 px-2 py-0.5 w-full text-left",
-          isActive && "bg-primary/10 text-primary"
-        )}
-        style={{ paddingLeft: `${depth * 16 + 8}px` }}
-        onClick={() => node.isDirectory ? toggleDir(node.path) : openFile(node.path)}
-      >
-        {node.isDirectory ? (isExpanded ? <ChevronDown /> : <ChevronRight />) : <FileIcon />}
-        <span className="truncate text-sm">{node.name}</span>
-      </button>
-      {node.isDirectory && isExpanded && node.children?.map(child => (
-        <FileNode key={child.path} node={child} depth={depth + 1} />
-      ))}
-    </>
-  );
-});
-```
+| Component | Why |
+|-----------|-----|
+| **ContentArea** | Mount-once pattern is sacred. No animation on tab switch. |
+| **TabBar** | Tab indicator could get a subtle slide animation, but the actual panel switching stays instant. |
+| **ChatView / MessageList** | Streaming performance is the priority. No entrance animations on messages during active streaming. |
+| **Terminal / CodeEditor** | These are third-party embeds (xterm.js, CodeMirror 6). Animate their containers, not their internals. |
+| **ActiveMessage** | The rAF innerHTML streaming path must never be interrupted by animation overhead. |
 
 ---
 
-## Anti-Patterns to Avoid
+## Data Flow for New Visual Features
 
-### Anti-Pattern 1: Cross-Panel Store Coupling
-**What:** Git panel directly importing and reading from the file store, or terminal store reading from stream store.
-**Why bad:** Creates invisible dependencies between panels. Changes to file store break git panel.
-**Instead:** Panels communicate through explicit props or shared hooks that compose store selectors. If git panel needs the active file path, pass it as a prop from ContentLayout, don't reach into the file store.
-
-### Anti-Pattern 2: Single WebSocket for Everything
-**What:** Trying to send terminal data over the chat WebSocket.
-**Why bad:** The backend has separate handlers. Raw terminal bytes are not JSON messages. Different reconnection semantics.
-**Instead:** Terminal creates its own WebSocket to `/shell`. Chat WS stays on `/ws`.
-
-### Anti-Pattern 3: God ContentLayout Component
-**What:** ContentLayout managing all panel state, data fetching, and keyboard shortcuts.
-**Why bad:** Becomes 500+ lines, impossible to test.
-**Instead:** ContentLayout is a thin orchestrator. Each panel manages its own data and state via custom hooks. Keyboard shortcuts registered via a central registry hook.
-
-### Anti-Pattern 4: Eager-Loading Heavy Panels
-**What:** Importing CodeMirror and xterm.js at the top level.
-**Why bad:** Adds ~500KB to initial bundle even if user never opens those panels.
-**Instead:** `React.lazy()` + `<Suspense>` for every panel except Chat (which is the default view).
-
-### Anti-Pattern 5: Inline WebSocket Management in Components
-**What:** Creating WebSocket connections directly in component useEffect.
-**Why bad:** Connection lifecycle doesn't match component lifecycle. Unmount during active session loses state.
-**Instead:** Connection hooks with ref-based WS management, cleanup on unmount, reconnection logic.
-
----
-
-## Build Order (Dependency Chain)
-
-The panels have the following dependency relationships:
+### Sidebar Slim Mode
 
 ```
-1. ContentLayout + Tab System (foundation -- all panels need this)
-   |
-   +--> 2. Settings Panel (no deps on other panels, uses only REST API)
-   |
-   +--> 3. Command Palette (needs tab switching infra from step 1)
-   |
-   +--> 4. File Tree + File Store (needs new store, REST API)
-   |       |
-   |       +--> 5. Code Editor (needs file store from step 4)
-   |
-   +--> 6. Terminal (independent -- separate WS, separate deps)
-   |
-   +--> 7. Git Panel (independent -- REST API only, benefits from file store for "open file" action)
+User clicks collapse → toggleSidebar() in UIStore
+                     ↓
+           sidebarState cycles: expanded → slim → hidden → expanded
+                     ↓
+           data-sidebar-state attribute updates on AppShell grid div
+                     ↓
+           CSS transition on --sidebar-width: 280px → 48px → 0px
+                     ↓
+           Sidebar component reads state, renders full | slim | hidden trigger
 ```
 
-**Recommended phase ordering:**
+**Store change required:** Replace boolean `sidebarOpen` with a 3-state enum:
 
-1. **ContentLayout + UI Store expansion + Tab navigation** -- Enables all subsequent panels. Small scope, high leverage.
-2. **Settings Panel** -- Largest surface area (5 tabs, many forms), but zero dependencies on other panels. Gets the shadcn primitives installed that other panels reuse.
-3. **Command Palette (Cmd+K)** -- Small, self-contained, high UX impact. Uses shadcn Command installed in step 2.
-4. **File Tree + File Store** -- Creates the file store that the code editor depends on.
-5. **Code Editor** -- Requires file store from step 4. Heavy dependency (CodeMirror).
-6. **Terminal** -- Independent, can be built in parallel with 4-5 if resources allow. xterm.js dependency.
-7. **Git Panel** -- Independent, can be built in parallel with 4-6. Benefits from file store (open changed file in editor) but doesn't require it.
+```typescript
+type SidebarState = 'expanded' | 'slim' | 'hidden';
+```
 
-**Parallelizable:** Steps 4+6+7 can run in parallel after step 3 is complete. Steps 2+3 are sequential (settings installs shadcn deps that Cmd+K uses).
+This is a breaking change to the UI store's persisted state. Requires a migration (version 7):
+
+```typescript
+if (version < 7) {
+  // Migrate boolean sidebarOpen to SidebarState enum
+  const wasOpen = s['sidebarOpen'] !== false;
+  delete s['sidebarOpen'];
+  s = { ...s, sidebarState: wasOpen ? 'expanded' : 'hidden' };
+}
+```
+
+**CSS changes:**
+
+```css
+[data-sidebar-state="expanded"] { --sidebar-width: var(--sidebar-expanded-width); }
+[data-sidebar-state="slim"]     { --sidebar-width: 48px; }
+[data-sidebar-state="hidden"]   { --sidebar-width: 0px; }
+
+/* Add transition for smooth width changes */
+[data-sidebar-state] {
+  transition: --sidebar-width var(--duration-slow) var(--ease-spring-gentle);
+}
+```
+
+**Important:** CSS custom property transitions require `@property` registration for interpolation. Without it, the grid column snaps. Alternative: animate `transform: translateX()` on the sidebar element instead of the grid template, which is GPU-composited and doesn't require `@property`.
+
+### Glass Surface Application
+
+```
+Glass tokens already defined in tokens.css:
+  --glass-blur: 16px
+  --glass-saturate: 1.4
+  --glass-bg-opacity: 0.7
+              ↓
+GlassSurface component applies:
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate))
+  background: oklch(from var(--surface-overlay) l c h / var(--glass-bg-opacity))
+              ↓
+Applied to: Dialog overlay, Dialog content, CommandPalette root
+```
+
+**Performance constraint:** Limit to 3-5 simultaneous `backdrop-filter: blur()` elements. Current count:
+- CommandPalette overlay: 1 (existing)
+- ConnectionBanner: 1 (existing, only visible during disconnection)
+- ScrollToBottomPill: 1 (existing, only visible when scrolled up)
+- Dialog overlay: 1 (NEW, only visible when settings/modal open)
+- Dialog content: 1 (NEW, only visible when settings/modal open)
+
+Max simultaneous: 3 (pill + dialog overlay + dialog content). Safe.
+
+**Safari fix:** Add `transform: translateZ(0)` to force GPU compositing layer on elements with `backdrop-filter`. This is already implicitly done by Tailwind's `backdrop-blur-*` utility but must be verified for custom CSS.
+
+### DecryptedText Reveal
+
+No store interaction needed. Pure presentational component:
+
+```
+DecryptedText receives: text string, duration, trigger (on-mount | on-visible)
+              ↓
+Splits text into <span> per character
+              ↓
+Each span has: CSS animation cycling through random characters
+              ↓
+animation-delay staggered: char_index * (duration / text.length)
+              ↓
+After delay, character "locks in" to final value
+              ↓
+prefers-reduced-motion: show text immediately (no animation)
+```
+
+**Usage targets:**
+- ChatEmptyState "Loom" wordmark (on-mount trigger)
+- SessionItem title for newly created sessions (on-visible trigger, once only)
+- Model name display in status line (on-mount trigger)
+
+### Spring Easing on Existing Animations
+
+This is the simplest integration. Swap easing curves in CSS files:
+
+| File | Current | New |
+|------|---------|-----|
+| `tool-card-shell.css` line 83 | `var(--ease-spring)` | `var(--ease-spring-gentle)` |
+| `thinking-disclosure.css` | `var(--ease-spring)` | `var(--ease-spring-gentle)` |
+| `ToolCallGroup.css` | `var(--ease-spring)` | `var(--ease-spring-gentle)` |
+| `dialog.tsx` (shadcn) | `duration-200` | custom spring timing via CSS class |
+
+**No component logic changes.** Only CSS token references change.
 
 ---
 
 ## Scalability Considerations
 
-| Concern | Current (M3) | At Scale (M5+) |
-|---------|-------------|----------------|
-| Panel count | 6 panels, tab-switched | Same panels, possibly split-view |
-| File tree size | Lazy-load children on expand | Virtual list for 10K+ file repos |
-| Terminal sessions | 1 terminal panel | Multiple terminal tabs (M5) |
-| Editor tabs | Basic open/close | Tab overflow, split editor (M5) |
-| Git diff | One file at a time | Multi-file diff viewer (M5) |
+| Concern | Current (v1.4) | After v1.5 | At Scale (v2.0+) |
+|---------|----------------|------------|-------------------|
+| Animation bundle | 0KB (CSS only) | 0KB (CSS only) | May add motion/react if gesture animations needed |
+| backdrop-filter count | 3 max simultaneous | 5 max simultaneous | Monitor; consider reducing blur radius on mobile |
+| CSS custom properties | 70+ tokens | ~75 tokens (+spring curves) | Fine; browsers handle hundreds efficiently |
+| GPU layers | Minimal (CSS transitions) | +2-3 for glass surfaces | Watch `will-change` usage; audit with Layers panel |
+| Reduced motion | Global 0.01ms override | Same + component-level checks for DecryptedText | Same |
+
+---
+
+## Anti-Patterns to Avoid
+
+### Anti-Pattern 1: Animating the CSS Grid Template During Sidebar Transition
+
+**What:** Using `transition` on `grid-template-columns` for sidebar width change.
+**Why bad:** Grid template transitions are not GPU-composited. They trigger layout recalculation on every frame, which competes with the rAF streaming buffer if a chat is active.
+**Instead:** Animate the sidebar container's `width` or `transform: translateX()` within a fixed grid column. The grid column uses the final value immediately; the visual transition is on the element inside.
+
+### Anti-Pattern 2: Adding AnimatePresence to Tab Panel Switching
+
+**What:** Wrapping ContentArea panels in framer-motion's AnimatePresence for enter/exit animations.
+**Why bad:** Defeats the mount-once pattern. AnimatePresence delays unmounting for exit animations, which means panels would remount when switched back. Terminal sessions would die. Editor scroll positions would reset.
+**Instead:** Animate individual elements *within* active panels. The panel container itself switches instantly via `display: hidden/block`.
+
+### Anti-Pattern 3: Glass Effect on Streaming Chat Background
+
+**What:** Applying `backdrop-filter: blur()` to the chat message area or message bubbles.
+**Why bad:** During streaming, the DOM is mutating 10-60 times per second via the rAF innerHTML buffer. `backdrop-filter` forces the browser to re-composite the blur on every paint. This competes directly with streaming performance.
+**Instead:** Glass effects are for overlays (modals, command palette, popover) that render *above* the chat area and are infrequent. Never on the streaming surface itself.
+
+### Anti-Pattern 4: Per-Message Entrance Animations
+
+**What:** Adding fade-in or slide-up animations to each new message in the chat.
+**Why bad:** During a streaming response, messages and tool calls can arrive rapidly. Entrance animations create a queue of overlapping animations that fight with auto-scroll and content-visibility optimization.
+**Instead:** Animate tool card expand/collapse (already done). Animate the transition from streaming HTML to finalized react-markdown (already done as a crossfade in ActiveMessage). Leave message containers as instant layout.
+
+### Anti-Pattern 5: will-change on Hover Transitions
+
+**What:** Adding `will-change: transform` or `will-change: opacity` to elements with hover transitions.
+**Why bad:** Constitution 11.4 explicitly bans this. `will-change` promotes elements to their own compositing layer, consuming GPU memory. For elements that only transition on hover, this is wasteful because the promotion happens before the hover and persists.
+**Instead:** Only use `will-change` on elements with *continuous* animation (shimmer skeletons, streaming pulse dot, aurora background if added later).
+
+---
+
+## Patterns to Follow
+
+### Pattern 1: Token-Driven Glass Surface
+
+**What:** A reusable GlassSurface wrapper that reads all visual values from CSS tokens.
+**When:** Modals, command palette, popover overlays.
+
+```tsx
+export function GlassSurface({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <div
+      className={cn(
+        'glass-surface',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+```
+
+```css
+.glass-surface {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  background: oklch(from var(--surface-overlay) l c h / var(--glass-bg-opacity));
+  transform: translateZ(0); /* Force GPU layer for Safari */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-surface {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--surface-overlay); /* Solid fallback */
+  }
+}
+```
+
+**Why this works:** All tuning happens in `tokens.css` (`--glass-blur`, `--glass-saturate`, `--glass-bg-opacity`). Components never reference blur values directly.
+
+### Pattern 2: CSS Spring Curves as Token Extensions
+
+**What:** Generated `linear()` spring curves added to `tokens.css` alongside existing `--ease-spring`.
+**When:** Any element that currently uses `--ease-spring` (cubic-bezier approximation) and would benefit from real spring oscillation.
+
+```css
+:root {
+  /* Existing cubic-bezier approximation (single overshoot, no oscillation) */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* New: True spring physics via linear() (overshoot + oscillation + settle) */
+  --ease-spring-gentle: linear(0, 0.007, 0.027, ...);   /* SPRING_GENTLE */
+  --ease-spring-snappy: linear(0, 0.012, 0.048, ...);   /* SPRING_SNAPPY */
+  --ease-spring-bouncy: linear(0, 0.009, 0.035, ...);   /* SPRING_BOUNCY */
+}
+```
+
+**Migration path:** Components using `--ease-spring` (the cubic-bezier) can be upgraded to `--ease-spring-gentle` (the `linear()` equivalent). This is a one-token-reference change per component, no logic changes.
+
+### Pattern 3: Sidebar State Machine
+
+**What:** Three-state sidebar instead of boolean toggle.
+**When:** Sidebar always.
+
+```typescript
+// Current (v1.4)
+sidebarOpen: boolean;  // expanded | hidden
+
+// New (v1.5)
+sidebarState: 'expanded' | 'slim' | 'hidden';
+
+// Cycle logic
+toggleSidebar: () => set((state) => ({
+  sidebarState: state.sidebarState === 'expanded' ? 'slim'
+    : state.sidebarState === 'slim' ? 'hidden'
+    : 'expanded',
+})),
+```
+
+**What renders in each state:**
+
+| State | Sidebar Column | Renders |
+|-------|---------------|---------|
+| `expanded` | 280px | Full sidebar: header, session list, footer |
+| `slim` | 48px | Icon rail: tab icons with tooltips, settings icon |
+| `hidden` | 0px | Nothing in column; floating expand trigger |
+
+### Pattern 4: Performance-Gated Visual Effects
+
+**What:** Effects that are expensive (GPU shaders, backdrop-filter) are gated by both reduced-motion preference and a "visual quality" setting.
+**When:** Any GPU-intensive visual effect.
+
+```typescript
+// In component
+const reducedMotion = usePrefersReducedMotion(); // reads matchMedia
+const effectsEnabled = !reducedMotion; // Could later tie to a user preference
+
+// Gate rendering
+{effectsEnabled && <DecryptedText text="Loom" />}
+{effectsEnabled ? <GlassSurface>{children}</GlassSurface> : <div className="bg-surface-overlay">{children}</div>}
+```
+
+The reduced-motion CSS override in `base.css` handles most cases automatically (forces `animation-duration: 0.01ms`). But components with structural changes (like DecryptedText showing/hiding character spans) need explicit JS gates.
+
+---
+
+## Suggested Build Order
+
+The build order is designed to respect dependencies, minimize risk to existing functionality, and deliver visible improvements early.
+
+### Phase A: Foundation (No Visual Changes, Infrastructure Only)
+
+1. **Generate CSS spring curves** — Write `generate-spring-curves.ts` script, add `--ease-spring-gentle/snappy/bouncy` to `tokens.css`
+2. **Land settings refactor** — The pending settings changes (generic useFetch hook, connection store persist fix, ModalState type safety) must land first because they touch the same components we'll modify for glass surfaces
+3. **Dead UI removal** — Remove unused imports, dead branches, and any code identified in prior audits
+
+**Why first:** These are non-visual, non-breaking changes that set a clean foundation. Spring curves in tokens are purely additive. Settings refactor prevents merge conflicts with later glass surface work on Dialog.
+
+### Phase B: Glass & Spring Token Adoption
+
+4. **GlassSurface component** — New `effects/GlassSurface.tsx` + CSS, wiring glass tokens to reusable wrapper
+5. **Apply glass to Dialog** — Modify `ui/dialog.tsx` overlay and content to use glass tokens
+6. **Apply glass to CommandPalette** — Enhance existing `backdrop-filter: blur(8px)` to use glass tokens consistently
+7. **Swap spring curves** — Replace `--ease-spring` references in `tool-card-shell.css`, `thinking-disclosure.css`, `ToolCallGroup.css` with `--ease-spring-gentle`
+
+**Why second:** Glass and springs are the most broadly visible improvements. They touch many surfaces but require minimal logic changes — mostly CSS token swaps.
+
+### Phase C: Sidebar Slim Mode
+
+8. **Store migration** — Upgrade `sidebarOpen: boolean` to `sidebarState: SidebarState` with migration v7
+9. **SidebarSlim component** — New icon rail with tooltips
+10. **Sidebar animation** — CSS transition on sidebar width (likely `transform: translateX()` approach)
+11. **Update AppShell** — Handle three `data-sidebar-state` values in CSS
+
+**Why third:** This is the largest single feature with the most architectural impact (store migration, new component, CSS changes). Glass and springs should land first so they're stable before this work starts.
+
+### Phase D: Visual Effects & Polish
+
+12. **DecryptedText component** — New CSS-animation text reveal effect
+13. **Wire up unused effects** — Apply ShinyText to "Thinking..." indicator, ElectricBorder/StarBorder to active elements
+14. **Loading/error/empty state audit** — Systematic review and improvement of every placeholder, skeleton, and error state across all components
+15. **Hover/focus/disabled state consistency** — Audit and normalize across all interactive elements
+16. **Spacing and typography consistency** — Final visual audit
+
+**Why last:** These are the detail polish items. They benefit from stable glass surfaces and spring curves already being in place, and they're the lowest risk (mostly additive, component-scoped changes).
+
+---
+
+## Files That Will Be Modified
+
+### Store Layer
+- `src/stores/ui.ts` — `sidebarOpen` → `sidebarState`, new migration, new toggle logic
+- `src/types/ui.ts` — Add `SidebarState` type, update `ThemeConfig` if adding visual quality toggle
+
+### CSS / Token Layer
+- `src/styles/tokens.css` — Add `--ease-spring-gentle/snappy/bouncy` via `linear()`
+- `src/styles/index.css` — Add `[data-sidebar-state="slim"]` CSS rule
+- `src/styles/base.css` — Possibly extend reduced-motion rules
+
+### Component Layer (Modified)
+- `src/components/app-shell/AppShell.tsx` — Support 3 sidebar states
+- `src/components/sidebar/Sidebar.tsx` — Render full/slim/hidden variants
+- `src/components/ui/dialog.tsx` — Glass surface on overlay + content
+- `src/components/command-palette/command-palette.css` — Glass tokens
+- `src/components/chat/tools/tool-card-shell.css` — Spring curve easing
+- `src/components/chat/styles/thinking-disclosure.css` — Spring curve easing
+- `src/components/chat/tools/ToolCallGroup.css` — Spring curve easing
+- `src/components/chat/view/ChatEmptyState.tsx` — DecryptedText on wordmark
+
+### Component Layer (New)
+- `src/components/effects/DecryptedText.tsx` — Text reveal animation
+- `src/components/effects/GlassSurface.tsx` — Reusable glass wrapper
+- `src/components/sidebar/SidebarSlim.tsx` — Icon-only rail
+
+### Test Layer
+- Tests for DecryptedText, GlassSurface, SidebarSlim (unit)
+- Tests for sidebar state migration (unit)
+- Update existing Sidebar tests for 3-state model
+- E2E test for sidebar slim mode toggle
+
+### Build Tooling
+- `scripts/generate-spring-curves.ts` — One-time curve generation script
 
 ---
 
 ## Sources
 
-- V2 source code: `src/src/` (direct analysis)
-- Backend API contract: `.planning/BACKEND_API_CONTRACT.md`
-- V1 feature inventory: `.planning/V1_FEATURE_INVENTORY.md`
-- Component adoption map: `.planning/COMPONENT_ADOPTION_MAP.md`
-- Milestone plan: `.planning/MILESTONES.md`
-- V2 Constitution: `.planning/V2_CONSTITUTION.md`
-- UI store types: `src/src/types/ui.ts`
-- WebSocket client: `src/src/lib/websocket-client.ts`
+- Codebase analysis: Direct source code reading of all referenced files
+- [Motion (formerly Framer Motion)](https://motion.dev/) — Bundle size considerations
+- [Motion bundle size guide](https://motion.dev/docs/react-reduce-bundle-size) — LazyMotion + domAnimation sizing
+- [CSS linear() easing function](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/easing-function/linear) — Browser support
+- [CSS linear() on Can I Use](https://caniuse.com/mdn-css_types_easing-function_linear-function) — Safari 17.2+ support confirmed
+- [spring-easing library](https://github.com/okikio/spring-easing) — CSS spring curve generation
+- [CSS Spring Easing Generator](https://www.kvin.me/css-springs) — Interactive tool for generating curves
+- [Josh Comeau: Springs and Bounces in Native CSS](https://www.joshwcomeau.com/animation/linear-timing-function/) — Comprehensive guide to CSS spring animations
+- [Chrome linear() easing guide](https://developer.chrome.com/docs/css-ui/css-linear-easing-function) — Chrome implementation details
+- [Safari backdrop-filter performance](https://graffino.com/til/how-to-fix-filter-blur-performance-issue-in-safari) — GPU compositing fix with translateZ(0)
+- [shadcn/ui backdrop-filter performance issue](https://github.com/shadcn-ui/ui/issues/327) — Community discussion on blur performance
