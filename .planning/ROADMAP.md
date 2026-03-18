@@ -138,11 +138,11 @@ Plans:
   1. Sessions are grouped under collapsible project headings that show session count, and expanding/collapsing preserves scroll position
   2. Within each project group, sessions are organized into date subgroups (Today, Yesterday, This Week, This Month, Older)
   3. Notification-classifier sessions, system utility sessions, and blank "New Session" entries with no real messages are hidden from the sidebar
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 41-01: TBD
-- [ ] 41-02: TBD
+- [ ] 41-01-PLAN.md -- Data layer: types, pure grouping/filtering functions, useMultiProjectSessions hook
+- [ ] 41-02-PLAN.md -- UI layer: ProjectHeader component, SessionList refactor for multi-project rendering
 
 ### Phase 42: Session Discovery
 **Goal**: Users can quickly find, prioritize, and clean up sessions across all projects
@@ -211,7 +211,7 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 | 38. Broken Fixes & Persist Audit | 2/2 | Complete    | 2026-03-17 | - |
 | 39. Backend Hardening | 2/2 | Complete    | 2026-03-17 | - |
 | 40. Session Titles & Rename | 1/1 | Complete    | 2026-03-18 | - |
-| 41. Session Organization | v1.4 | 0/? | Not started | - |
+| 41. Session Organization | v1.4 | 0/2 | Not started | - |
 | 42. Session Discovery | v1.4 | 0/? | Not started | - |
 | 43. E2E Verification | v1.4 | 0/? | Not started | - |
 
@@ -221,4 +221,4 @@ Phases execute in numeric order: 38 -> 39 -> 40 -> 41 -> 42 -> 43
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-18 after Phase 40 planning*
+*Last updated: 2026-03-18 after Phase 41 planning*
