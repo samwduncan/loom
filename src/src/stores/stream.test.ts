@@ -52,11 +52,12 @@ describe('useStreamStore', () => {
   });
 
   // -- endStream --
-  it('endStream resets all fields to initial state', () => {
+  it('endStream resets ephemeral fields but preserves resultTokens', () => {
     useStreamStore.getState().startStream();
     useStreamStore.getState().addToolCall(createTestToolCall());
     useStreamStore.getState().setThinkingState(createTestThinkingState());
     useStreamStore.getState().setActivityText('Running tests...');
+    useStreamStore.getState().setResultData({ input: 100, output: 50 }, 0.005);
 
     useStreamStore.getState().endStream();
 
@@ -65,6 +66,9 @@ describe('useStreamStore', () => {
     expect(state.activeToolCalls).toHaveLength(0);
     expect(state.thinkingState).toBeNull();
     expect(state.activityText).toBe('');
+    // resultTokens/resultCost preserved for ActiveMessage handleFlush
+    expect(state.resultTokens).toEqual({ input: 100, output: 50 });
+    expect(state.resultCost).toBe(0.005);
   });
 
   // -- addToolCall --

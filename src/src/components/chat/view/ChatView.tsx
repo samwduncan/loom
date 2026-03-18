@@ -55,8 +55,10 @@ export function ChatView() {
   const thinkingExpanded = useUIStore((state) => state.thinkingExpanded);
   const toggleThinking = useUIStore((state) => state.toggleThinking);
   // Use URL sessionId as the source of truth for which messages to display.
-  // Falls back to activeSessionId for streaming-created sessions (no URL yet).
-  const displaySessionId = sessionId ?? activeSessionId;
+  // Falls back to activeSessionId for streaming-created sessions (no URL yet)
+  // or when the URL still has a stub- ID after session reconciliation
+  // (replaceState doesn't trigger useParams update until next React render).
+  const displaySessionId = (sessionId?.startsWith('stub-') ? activeSessionId : sessionId) ?? activeSessionId;
   const messages = useTimelineStore((state) => {
     if (!displaySessionId) return EMPTY_MESSAGES;
     const session = state.sessions.find((s) => s.id === displaySessionId);

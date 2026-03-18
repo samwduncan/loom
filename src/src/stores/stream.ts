@@ -77,7 +77,13 @@ export const useStreamStore = create<StreamState>()((set) => ({
   },
 
   endStream: () => {
-    set({ ...INITIAL_STREAM_STATE });
+    // Preserve resultTokens/resultCost — they're read by ActiveMessage's
+    // handleFlush AFTER isStreaming transitions false. Cleaned on startStream.
+    set((state) => ({
+      ...INITIAL_STREAM_STATE,
+      resultTokens: state.resultTokens,
+      resultCost: state.resultCost,
+    }));
   },
 
   addToolCall: (toolCall: ToolCallState) => {
@@ -122,3 +128,9 @@ export const useStreamStore = create<StreamState>()((set) => ({
     set({ ...INITIAL_STREAM_STATE });
   },
 }));
+
+// Expose store on window in dev mode for E2E testing (Playwright).
+// Tree-shaken in production builds.
+if (import.meta.env.DEV) {
+  (window as unknown as Record<string, unknown>).__ZUSTAND_STREAM_STORE__ = useStreamStore;
+}
