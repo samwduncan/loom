@@ -18,7 +18,7 @@ export interface SessionMetadata {
 }
 
 /** Date bucket labels for session grouping within a project. */
-export type SessionDateGroup = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Older';
+export type SessionDateGroup = 'Pinned' | 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Older';
 
 export interface ProjectSessionGroup {
   label: SessionDateGroup;

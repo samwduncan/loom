@@ -5,7 +5,7 @@
  * Constitution: Named exports only (2.2), no default export.
  */
 
-import type { Session, SessionDateGroup, ProjectGroup, ProjectSessionGroup } from '@/types/session';
+import type { Session, ProjectGroup, ProjectSessionGroup } from '@/types/session';
 
 /** Patterns that identify notification-classifier or system-only sessions. */
 const JUNK_TITLE_PATTERNS = [
@@ -53,7 +53,9 @@ function groupIntoDateBuckets(sessions: Session[]): ProjectSessionGroup[] {
   const weekStart = new Date(todayStart.getTime() - 7 * 86_400_000);
   const monthStart = new Date(todayStart.getTime() - 30 * 86_400_000);
 
-  const groups: Record<SessionDateGroup, Session[]> = {
+  /** Date-only bucket labels (excludes 'Pinned' which is handled by the outer function). */
+  type DateBucketLabel = 'Today' | 'Yesterday' | 'This Week' | 'This Month' | 'Older';
+  const groups: Record<DateBucketLabel, Session[]> = {
     'Today': [],
     'Yesterday': [],
     'This Week': [],
@@ -79,7 +81,7 @@ function groupIntoDateBuckets(sessions: Session[]): ProjectSessionGroup[] {
   const sortDesc = (a: Session, b: Session) =>
     new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
 
-  const orderedLabels: SessionDateGroup[] = ['Today', 'Yesterday', 'This Week', 'This Month', 'Older'];
+  const orderedLabels: DateBucketLabel[] = ['Today', 'Yesterday', 'This Week', 'This Month', 'Older'];
 
   return orderedLabels
     .filter((label) => groups[label].length > 0)
@@ -100,18 +102,62 @@ export interface ProjectSessionInput {
 /**
  * Group sessions by project, filter junk, organize into date subgroups.
  * Projects are sorted alphabetically by displayName.
+ *
+ * When pinnedIds is provided with entries, pinned sessions are hoisted into
+ * a 'Pinned' pseudo-date-group at the top of each project (removed from
+ * their original date bucket to prevent duplicates).
  */
-export function groupSessionsByProject(projects: ProjectSessionInput[]): ProjectGroup[] {
+export function groupSessionsByProject(
+  projects: ProjectSessionInput[],
+  pinnedIds?: Set<string>,
+): ProjectGroup[] {
+  const hasPins = pinnedIds != null && pinnedIds.size > 0;
+
   return projects
     .map((project) => {
       const visibleSessions = project.sessions.filter((s) => !isJunkSession(s));
+
+      if (!hasPins) {
+        return {
+          projectName: project.projectName,
+          displayName: project.displayName,
+          projectPath: project.projectPath,
+          sessionCount: project.sessions.length,
+          visibleCount: visibleSessions.length,
+          dateGroups: groupIntoDateBuckets(visibleSessions),
+        };
+      }
+
+      // Partition into pinned and unpinned
+      // ASSERT: pinnedIds is non-null and non-empty when hasPins is true
+      const pinned: Session[] = [];
+      const unpinned: Session[] = [];
+      for (const session of visibleSessions) {
+        if (pinnedIds.has(session.id)) {
+          pinned.push(session);
+        } else {
+          unpinned.push(session);
+        }
+      }
+
+      const dateGroups: ProjectSessionGroup[] = groupIntoDateBuckets(unpinned);
+
+      if (pinned.length > 0) {
+        // Sort pinned descending by updatedAt (same as date buckets)
+        const sortDesc = (a: Session, b: Session) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        pinned.sort(sortDesc);
+
+        dateGroups.unshift({ label: 'Pinned', sessions: pinned });
+      }
+
       return {
         projectName: project.projectName,
         displayName: project.displayName,
         projectPath: project.projectPath,
         sessionCount: project.sessions.length,
         visibleCount: visibleSessions.length,
-        dateGroups: groupIntoDateBuckets(visibleSessions),
+        dateGroups,
       };
     })
     .sort((a, b) => a.displayName.localeCompare(b.displayName));

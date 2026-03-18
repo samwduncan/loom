@@ -197,6 +197,104 @@ describe('groupSessionsByProject', () => {
     expect(project?.sessionCount).toBe(3);
   });
 
+  it('hoists pinned sessions into Pinned pseudo-date-group at top', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-06T15:00:00Z'));
+
+    const pinnedId = 'pinned-session';
+    const result = groupSessionsByProject(
+      [
+        {
+          projectName: 'test',
+          displayName: 'Test',
+          projectPath: '/home/user/test',
+          sessions: [
+            makeSession({
+              id: pinnedId,
+              updatedAt: '2026-03-06T14:00:00Z',
+              title: 'Pinned one',
+              metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null, messageCount: 3 },
+            }),
+            makeSession({
+              updatedAt: '2026-03-06T13:00:00Z',
+              title: 'Normal session',
+              metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null, messageCount: 2 },
+            }),
+          ],
+        },
+      ],
+      new Set([pinnedId]),
+    );
+
+    const project = result[0];
+    expect(project).toBeDefined();
+    expect(project?.dateGroups[0]?.label).toBe('Pinned');
+    expect(project?.dateGroups[0]?.sessions).toHaveLength(1);
+    expect(project?.dateGroups[0]?.sessions[0]?.id).toBe(pinnedId);
+    // Normal session in Today group, not duplicated
+    expect(project?.dateGroups[1]?.label).toBe('Today');
+    expect(project?.dateGroups[1]?.sessions).toHaveLength(1);
+    expect(project?.dateGroups[1]?.sessions[0]?.title).toBe('Normal session');
+  });
+
+  it('behaves identically without pinnedIds parameter', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-06T15:00:00Z'));
+
+    const sessions = [
+      makeSession({
+        updatedAt: '2026-03-06T14:00:00Z',
+        title: 'Session A',
+        metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null, messageCount: 1 },
+      }),
+    ];
+
+    const withoutPins = groupSessionsByProject([
+      { projectName: 'test', displayName: 'Test', projectPath: '/home/user/test', sessions },
+    ]);
+    const withEmptyPins = groupSessionsByProject(
+      [{ projectName: 'test', displayName: 'Test', projectPath: '/home/user/test', sessions }],
+      new Set(),
+    );
+
+    expect(withoutPins).toEqual(withEmptyPins);
+  });
+
+  it('sorts pinned sessions descending by updatedAt', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-03-06T15:00:00Z'));
+
+    const result = groupSessionsByProject(
+      [
+        {
+          projectName: 'test',
+          displayName: 'Test',
+          projectPath: '/home/user/test',
+          sessions: [
+            makeSession({
+              id: 'older-pinned',
+              updatedAt: '2026-03-06T10:00:00Z',
+              title: 'Older pinned',
+              metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null, messageCount: 1 },
+            }),
+            makeSession({
+              id: 'newer-pinned',
+              updatedAt: '2026-03-06T14:00:00Z',
+              title: 'Newer pinned',
+              metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null, messageCount: 1 },
+            }),
+          ],
+        },
+      ],
+      new Set(['older-pinned', 'newer-pinned']),
+    );
+
+    const pinned = result[0]?.dateGroups[0];
+    expect(pinned?.label).toBe('Pinned');
+    expect(pinned?.sessions[0]?.id).toBe('newer-pinned');
+    expect(pinned?.sessions[1]?.id).toBe('older-pinned');
+  });
+
   it('groups sessions into 5 date buckets', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-03-15T15:00:00Z'));
