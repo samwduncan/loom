@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
-status: ready_to_plan
-stopped_at: "Roadmap created, ready to plan Phase 44"
-last_updated: "2026-03-18T21:00:00.000Z"
-last_activity: 2026-03-18 — Created v1.5 roadmap (6 phases, 30 requirements)
+status: phase_complete
+stopped_at: Completed 44-02-PLAN.md (Phase 44 Foundation complete)
+last_updated: "2026-03-18T23:29:50Z"
+last_activity: 2026-03-18 -- Completed Plan 44-02 (CSS spring easing tokens)
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 11
-  completed_plans: 0
+  completed_plans: 2
+  percent: 18
 ---
 
 # Project State
@@ -24,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 
 ## Current Position
 
-Phase: 44 of 49 (Foundation)
-Plan: N/A (phase not yet planned)
-Status: Ready to plan Phase 44
-Last activity: 2026-03-18 -- Created v1.5 roadmap (6 phases, 30 requirements mapped)
+Phase: 44 of 49 (Foundation) -- COMPLETE
+Plan: 2 of 2 complete
+Status: Phase 44 complete, ready for Phase 45
+Last activity: 2026-03-18 -- Completed Plan 44-02 (CSS spring easing tokens)
 
-Progress: [..........] 0%
+Progress: [##........] 18%
 
 ## Performance Metrics
 
@@ -45,7 +46,10 @@ Progress: [..........] 0%
 
 ### Decisions
 
-None (fresh milestone).
+- [44-01] useFetch<T> as generic base hook; useAgentStatuses/useMcpServers keep custom fetch logic (Promise.all / response transform needs)
+- [44-01] SettingsTabSkeleton replaces null loading returns for visible loading feedback
+- [44-02] Used SpringEasing raw frames (64 points) over CSSSpringEasing simplified output for full-fidelity linear() curves
+- [44-02] spring-easing as devDependency only -- zero runtime cost, one-shot generation script
 
 ### Pending Todos
 
@@ -53,11 +57,12 @@ None.
 
 ### Blockers/Concerns
 
-- Research flag: Phase 47 (Springs + Glass) -- `spring-easing` CSSSpringEasing API needs hands-on verification, CSS `@property` + Tailwind v4 integration unverified
+- RESOLVED: spring-easing CSSSpringEasing API verified -- uses SpringEasing raw frames for full fidelity, CSSSpringEasing for duration only
+- Research flag: Phase 47 (Springs + Glass) -- CSS `@property` + Tailwind v4 integration still unverified
 - Research flag: Glass saturation tuning -- `saturate(1.4)` on low-chroma OKLCH may push toward unwanted color shift
 
 ## Session Continuity
 
-Last session: 2026-03-18
-Stopped at: v1.5 roadmap created
-Resume: `/gsd:plan-phase 44`
+Last session: 2026-03-18T23:29:50.174Z
+Stopped at: Completed 44-02-PLAN.md (Phase 44 Foundation complete)
+Resume: `/gsd:plan-phase 45`

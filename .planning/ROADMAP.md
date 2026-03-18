@@ -95,7 +95,7 @@
 - Integer phases (44, 45, 46...): Planned milestone work
 - Decimal phases (44.1, 44.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 44: Foundation** - Settings refactor, CSS spring token generation, dead UI removal
+- [x] **Phase 44: Foundation** - Settings refactor, CSS spring token generation, dead UI removal (completed 2026-03-18)
 - [ ] **Phase 45: Loading, Error & Empty States** - Skeleton shimmers, error retry, designed empty states for every data surface
 - [ ] **Phase 46: Interactive State Consistency** - Hover, focus, disabled, and transition states across all interactive elements
 - [ ] **Phase 47: Spring Physics & Glass Surfaces** - CSS linear() spring easing on key interactions, frosted glass on overlays
@@ -115,8 +115,8 @@
 **Plans**: 2 plans
 
 Plans:
-- [ ] 44-01-PLAN.md -- Land WIP settings refactor + delete dead UI components
-- [ ] 44-02-PLAN.md -- Generate CSS spring easing tokens from motion.ts configs
+- [x] 44-01-PLAN.md -- Land WIP settings refactor + delete dead UI components
+- [x] 44-02-PLAN.md -- Generate CSS spring easing tokens from motion.ts configs
 
 ### Phase 45: Loading, Error & Empty States
 **Goal**: Every async surface communicates its state clearly -- users never see a blank void, a frozen spinner, or an unhelpful error
@@ -219,7 +219,7 @@ Phases execute in numeric order: 44 -> 44.1 -> 45 -> 45.1 -> ... -> 49
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 44. Foundation | 0/2 | Not started | - |
+| 44. Foundation | 2/2 | Complete   | 2026-03-18 |
 | 45. Loading, Error & Empty States | 0/2 | Not started | - |
 | 46. Interactive State Consistency | 0/2 | Not started | - |
 | 47. Spring Physics & Glass Surfaces | 0/2 | Not started | - |

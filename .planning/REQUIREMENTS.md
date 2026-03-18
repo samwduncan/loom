@@ -9,9 +9,9 @@ Requirements for "The Craft" milestone. Production quality -- fix every rough ed
 
 ### Foundation & Code Quality
 
-- [ ] **FOUND-01**: Settings refactor landed -- generic `useFetch<T>` hook eliminates per-hook boilerplate, connection store has deep merge persist function, ModalState uses discriminated union
-- [ ] **FOUND-02**: All dead UI removed -- no placeholder fields, fake data, or unused controls visible to the user
-- [ ] **FOUND-03**: CSS spring tokens generated from existing `SPRING_GENTLE/SNAPPY/BOUNCY` configs and available as `linear()` values in tokens.css
+- [x] **FOUND-01**: Settings refactor landed -- generic `useFetch<T>` hook eliminates per-hook boilerplate, connection store has deep merge persist function, ModalState uses discriminated union
+- [x] **FOUND-02**: All dead UI removed -- no placeholder fields, fake data, or unused controls visible to the user
+- [x] **FOUND-03**: CSS spring tokens generated from existing `SPRING_GENTLE/SNAPPY/BOUNCY` configs and available as `linear()` values in tokens.css
 
 ### Loading & Error States
 
@@ -94,9 +94,9 @@ Deferred to "The Power" milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 44 | Pending |
-| FOUND-02 | Phase 44 | Pending |
-| FOUND-03 | Phase 44 | Pending |
+| FOUND-01 | Phase 44 | Complete |
+| FOUND-02 | Phase 44 | Complete |
+| FOUND-03 | Phase 44 | Complete |
 | LOAD-01 | Phase 45 | Pending |
 | LOAD-02 | Phase 45 | Pending |
 | LOAD-03 | Phase 45 | Pending |
