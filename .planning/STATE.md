@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
-status: phase_complete
+status: completed
 stopped_at: Completed 44-02-PLAN.md (Phase 44 Foundation complete)
-last_updated: "2026-03-18T23:29:50Z"
+last_updated: "2026-03-18T23:44:18.727Z"
 last_activity: 2026-03-18 -- Completed Plan 44-02 (CSS spring easing tokens)
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 11
+  total_plans: 2
   completed_plans: 2
   percent: 18
 ---
