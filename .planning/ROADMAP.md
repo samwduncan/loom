@@ -112,11 +112,11 @@
   1. Settings modal opens with refactored data hooks -- no per-hook boilerplate, connection store persists correctly across reloads, ModalState is a discriminated union
   2. No placeholder fields, fake data, or non-functional controls are visible anywhere in the application
   3. CSS custom properties `--ease-spring-gentle`, `--ease-spring-snappy`, `--ease-spring-bouncy` exist in tokens.css as `linear()` values and can be applied to any `transition-timing-function`
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 44-01: TBD
-- [ ] 44-02: TBD
+- [ ] 44-01-PLAN.md -- Land WIP settings refactor + delete dead UI components
+- [ ] 44-02-PLAN.md -- Generate CSS spring easing tokens from motion.ts configs
 
 ### Phase 45: Loading, Error & Empty States
 **Goal**: Every async surface communicates its state clearly -- users never see a blank void, a frozen spinner, or an unhelpful error
@@ -232,4 +232,4 @@ Phases execute in numeric order: 44 -> 44.1 -> 45 -> 45.1 -> ... -> 49
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-18 after v1.5 roadmap creation*
+*Last updated: 2026-03-18 after Phase 44 planning*
