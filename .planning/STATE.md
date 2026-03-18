@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: "The Navigator"
 status: executing
-stopped_at: Completed 40-01-PLAN.md
-last_updated: "2026-03-18T00:17:37.490Z"
-last_activity: 2026-03-18 — Session title extraction and backend-persisted rename (40-01)
+stopped_at: Completed 41-01-PLAN.md
+last_updated: "2026-03-18T00:54:00.135Z"
+last_activity: 2026-03-18 — Session grouping data layer with types, pure functions, and hook (41-01)
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-03-17)
 
 ## Current Position
 
-Phase: 40-session-titles-rename
-Plan: 01 of 01 (complete)
+Phase: 41-session-organization
+Plan: 01 of 02 (complete)
 Status: Executing
-Last activity: 2026-03-18 — Session title extraction and backend-persisted rename (40-01)
+Last activity: 2026-03-18 — Session grouping data layer with types, pure functions, and hook (41-01)
 
 ## Performance Metrics
 
@@ -53,6 +53,9 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 39-01]: Server WS ping interval 15s with 2-missed-pong termination; client pong timeout 30s
 - [Phase 40]: System prefix detection uses startsWith matching for 8 known prefixes
 - [Phase 40]: Optimistic update with rollback pattern for session rename PATCH
+- [Phase 41-01]: Optional messageCount on SessionMetadata to avoid breaking 18+ existing files
+- [Phase 41-01]: 5 date buckets (This Week, This Month) replacing old 4-bucket scheme
+- [Phase 41-01]: Junk session detection via messageCount, default titles, and notification-classifier regex
 
 ### Pending Todos
 
@@ -64,6 +67,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T00:09:24.887Z
-Stopped at: Completed 40-01-PLAN.md
-Resume: Phase 39 plan 02 complete, proceed to next plan or phase
+Last session: 2026-03-18T00:54:00.134Z
+Stopped at: Completed 41-01-PLAN.md
+Resume: Phase 41 plan 01 complete, proceed to plan 02 (UI layer)

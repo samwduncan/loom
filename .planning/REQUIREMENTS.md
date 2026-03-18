@@ -12,9 +12,9 @@ Requirements for "The Navigator" milestone. Fix broken features, make sessions m
 - [x] **SESS-01**: Sessions have auto-generated titles derived from the first real user message, skipping system prompts, XML tags, task-notification wrappers, and `<objective>` blocks
 - [x] **SESS-02**: Backend provides session title update endpoint (PATCH) that persists renamed titles to JSONL summary entry
 - [x] **SESS-03**: Frontend session rename calls backend endpoint so renames survive cache clear and browser changes
-- [ ] **SESS-04**: Sidebar groups sessions by project with collapsible project headings showing session count
-- [ ] **SESS-05**: Date subgroups within each project group (Today, Yesterday, This Week, This Month, Older)
-- [ ] **SESS-06**: Junk sessions filtered from sidebar (notification classifier, system utility, blank "New Session" with no real messages)
+- [x] **SESS-04**: Sidebar groups sessions by project with collapsible project headings showing session count
+- [x] **SESS-05**: Date subgroups within each project group (Today, Yesterday, This Week, This Month, Older)
+- [x] **SESS-06**: Junk sessions filtered from sidebar (notification classifier, system utility, blank "New Session" with no real messages)
 - [ ] **SESS-07**: Sidebar has inline search/filter bar that filters sessions by title across all projects
 - [ ] **SESS-08**: User can pin sessions to the top of their project group
 - [ ] **SESS-09**: User can select multiple sessions and delete them in bulk
@@ -83,9 +83,9 @@ Deferred to "The Polish" milestone. Visual transformation.
 | SESS-01 | TBD | Complete |
 | SESS-02 | TBD | Complete |
 | SESS-03 | Phase 40 | Complete |
-| SESS-04 | Phase 41 | Pending |
-| SESS-05 | Phase 41 | Pending |
-| SESS-06 | Phase 40 | Pending |
+| SESS-04 | Phase 41 | Complete |
+| SESS-05 | Phase 41 | Complete |
+| SESS-06 | Phase 40 | Complete |
 | SESS-07 | Phase 42 | Pending |
 | SESS-08 | Phase 42 | Pending |
 | SESS-09 | Phase 42 | Pending |
