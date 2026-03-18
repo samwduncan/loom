@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
-status: not_started
-stopped_at: null
-last_updated: "2026-03-18T20:30:00.000Z"
-last_activity: 2026-03-18 — Archived v1.4 "The Navigator" milestone
+status: ready_to_plan
+stopped_at: "Roadmap created, ready to plan Phase 44"
+last_updated: "2026-03-18T21:00:00.000Z"
+last_activity: 2026-03-18 — Created v1.5 roadmap (6 phases, 30 requirements)
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 11
   completed_plans: 0
 ---
 
@@ -20,14 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-18)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** v1.5 "The Craft" — production quality, every pixel intentional, visual personality
+**Current focus:** v1.5 "The Craft" -- production quality, every pixel intentional, visual personality
 
 ## Current Position
 
-Phase: None (milestone not started)
-Plan: N/A
-Status: Between milestones
-Last activity: 2026-03-18 — Archived v1.4 "The Navigator" milestone
+Phase: 44 of 49 (Foundation)
+Plan: N/A (phase not yet planned)
+Status: Ready to plan Phase 44
+Last activity: 2026-03-18 -- Created v1.5 roadmap (6 phases, 30 requirements mapped)
+
+Progress: [..........] 0%
 
 ## Performance Metrics
 
@@ -51,10 +53,11 @@ None.
 
 ### Blockers/Concerns
 
-None.
+- Research flag: Phase 47 (Springs + Glass) -- `spring-easing` CSSSpringEasing API needs hands-on verification, CSS `@property` + Tailwind v4 integration unverified
+- Research flag: Glass saturation tuning -- `saturate(1.4)` on low-chroma OKLCH may push toward unwanted color shift
 
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Milestone v1.4 archived
-Resume: Run `/gsd:new-milestone` to start v1.5 "The Craft" — questioning, research, requirements, roadmap.
+Stopped at: v1.5 roadmap created
+Resume: `/gsd:plan-phase 44`

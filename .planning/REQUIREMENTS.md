@@ -5,12 +5,12 @@
 
 ## v1.5 Requirements
 
-Requirements for "The Craft" milestone. Production quality — fix every rough edge, nail every detail, add visual personality.
+Requirements for "The Craft" milestone. Production quality -- fix every rough edge, nail every detail, add visual personality.
 
 ### Foundation & Code Quality
 
-- [ ] **FOUND-01**: Settings refactor landed — generic `useFetch<T>` hook eliminates per-hook boilerplate, connection store has deep merge persist function, ModalState uses discriminated union
-- [ ] **FOUND-02**: All dead UI removed — no placeholder fields, fake data, or unused controls visible to the user
+- [ ] **FOUND-01**: Settings refactor landed -- generic `useFetch<T>` hook eliminates per-hook boilerplate, connection store has deep merge persist function, ModalState uses discriminated union
+- [ ] **FOUND-02**: All dead UI removed -- no placeholder fields, fake data, or unused controls visible to the user
 - [ ] **FOUND-03**: CSS spring tokens generated from existing `SPRING_GENTLE/SNAPPY/BOUNCY` configs and available as `linear()` values in tokens.css
 
 ### Loading & Error States
@@ -94,42 +94,42 @@ Deferred to "The Power" milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | TBD | Pending |
-| FOUND-02 | TBD | Pending |
-| FOUND-03 | TBD | Pending |
-| LOAD-01 | TBD | Pending |
-| LOAD-02 | TBD | Pending |
-| LOAD-03 | TBD | Pending |
-| EMPTY-01 | TBD | Pending |
-| EMPTY-02 | TBD | Pending |
-| EMPTY-03 | TBD | Pending |
-| EMPTY-04 | TBD | Pending |
-| INTER-01 | TBD | Pending |
-| INTER-02 | TBD | Pending |
-| INTER-03 | TBD | Pending |
-| INTER-04 | TBD | Pending |
-| SPRING-01 | TBD | Pending |
-| SPRING-02 | TBD | Pending |
-| SPRING-03 | TBD | Pending |
-| SPRING-04 | TBD | Pending |
-| SPRING-05 | TBD | Pending |
-| GLASS-01 | TBD | Pending |
-| GLASS-02 | TBD | Pending |
-| GLASS-03 | TBD | Pending |
-| GLASS-04 | TBD | Pending |
-| VIS-01 | TBD | Pending |
-| VIS-02 | TBD | Pending |
-| VIS-03 | TBD | Pending |
-| VIS-04 | TBD | Pending |
-| POLISH-01 | TBD | Pending |
-| POLISH-02 | TBD | Pending |
-| POLISH-03 | TBD | Pending |
+| FOUND-01 | Phase 44 | Pending |
+| FOUND-02 | Phase 44 | Pending |
+| FOUND-03 | Phase 44 | Pending |
+| LOAD-01 | Phase 45 | Pending |
+| LOAD-02 | Phase 45 | Pending |
+| LOAD-03 | Phase 45 | Pending |
+| EMPTY-01 | Phase 45 | Pending |
+| EMPTY-02 | Phase 45 | Pending |
+| EMPTY-03 | Phase 45 | Pending |
+| EMPTY-04 | Phase 45 | Pending |
+| INTER-01 | Phase 46 | Pending |
+| INTER-02 | Phase 46 | Pending |
+| INTER-03 | Phase 46 | Pending |
+| INTER-04 | Phase 46 | Pending |
+| SPRING-01 | Phase 47 | Pending |
+| SPRING-02 | Phase 47 | Pending |
+| SPRING-03 | Phase 47 | Pending |
+| SPRING-04 | Phase 47 | Pending |
+| SPRING-05 | Phase 47 | Pending |
+| GLASS-01 | Phase 47 | Pending |
+| GLASS-02 | Phase 47 | Pending |
+| GLASS-03 | Phase 47 | Pending |
+| GLASS-04 | Phase 47 | Pending |
+| VIS-01 | Phase 48 | Pending |
+| VIS-02 | Phase 48 | Pending |
+| VIS-03 | Phase 48 | Pending |
+| VIS-04 | Phase 48 | Pending |
+| POLISH-01 | Phase 49 | Pending |
+| POLISH-02 | Phase 49 | Pending |
+| POLISH-03 | Phase 49 | Pending |
 
 **Coverage:**
 - v1.5 requirements: 30 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 30
+- Mapped to phases: 30
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-18*
-*Last updated: 2026-03-18 after initial definition*
+*Last updated: 2026-03-18 after roadmap creation*
