@@ -139,7 +139,7 @@ export function SessionList() {
       // Persist to backend
       try {
         await apiFetch(
-          `/api/projects/${encodeURIComponent(projectName)}/sessions/${sessionId}`,
+          `/api/projects/${encodeURIComponent(projectName)}/sessions/${encodeURIComponent(sessionId)}`,
           { method: 'PATCH', body: JSON.stringify({ title: newTitle }) },
         );
       } catch {

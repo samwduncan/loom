@@ -89,6 +89,14 @@ describe('extractSessionTitle', () => {
     ).toBe('Please review these files');
   });
 
+  it('strips XML wrapper tags with attributes', () => {
+    expect(
+      extractSessionTitle(
+        '<objective type="primary">Build a thing</objective>\n\nActual user message',
+      ),
+    ).toBe('Actual user message');
+  });
+
   it('strips multiple XML wrappers sequentially', () => {
     expect(
       extractSessionTitle(

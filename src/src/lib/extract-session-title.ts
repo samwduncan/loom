@@ -59,7 +59,7 @@ export function extractSessionTitle(text: string, maxLength = 80): string {
   // Strip leading XML wrapper blocks (tags from WRAPPER_TAGS list)
   for (const tag of WRAPPER_TAGS) {
     const pattern = new RegExp(
-      `^<${tag}>[\\s\\S]*?</${tag}>\\s*`,
+      `^<${tag}[^>]*>[\\s\\S]*?</${tag}>\\s*`,
     );
     cleaned = cleaned.replace(pattern, '');
   }
