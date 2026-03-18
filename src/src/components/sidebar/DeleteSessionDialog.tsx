@@ -21,16 +21,23 @@ interface DeleteSessionDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  /** Number of sessions to delete. Defaults to 1 (singular text). */
+  count?: number;
 }
 
-export function DeleteSessionDialog({ isOpen, onOpenChange, onConfirm }: DeleteSessionDialogProps) {
+export function DeleteSessionDialog({ isOpen, onOpenChange, onConfirm, count = 1 }: DeleteSessionDialogProps) {
+  const isPlural = count > 1;
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete session?</AlertDialogTitle>
+          <AlertDialogTitle>
+            {isPlural ? `Delete ${count} sessions?` : 'Delete session?'}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete this session and all its messages. This cannot be undone.
+            {isPlural
+              ? `This will permanently delete ${count} sessions and all their messages. This cannot be undone.`
+              : 'This will permanently delete this session and all its messages. This cannot be undone.'}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
