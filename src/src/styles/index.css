@@ -104,6 +104,11 @@
   --sidebar-width: 0px;
 }
 
+/* Sidebar spring transition on app-shell grid columns */
+[data-testid="app-shell"] {
+  transition: grid-template-columns var(--duration-spring-gentle) var(--ease-spring-gentle);
+}
+
 /* Responsive: auto-collapse sidebar below 768px */
 @media (max-width: 767px) {
   [data-sidebar-state] {

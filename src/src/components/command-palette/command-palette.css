@@ -11,7 +11,7 @@
   z-index: var(--z-critical);
   background: var(--backdrop-overlay);
   backdrop-filter: blur(8px);
-  animation: cmdk-overlay-in var(--duration-normal) var(--ease-out);
+  animation: cmdk-overlay-in var(--duration-spring-gentle) var(--ease-spring-gentle);
 }
 
 [cmdk-dialog] {
@@ -34,7 +34,7 @@
     0 16px 70px var(--shadow-heavy),
     0 0 1px var(--shadow-edge);
   overflow: hidden;
-  animation: cmdk-content-in var(--duration-normal) var(--ease-out);
+  animation: cmdk-content-in var(--duration-spring-gentle) var(--ease-spring-gentle);
 }
 
 [cmdk-input] {
