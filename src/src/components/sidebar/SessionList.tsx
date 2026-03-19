@@ -19,6 +19,7 @@ import { hoistPinnedSessions } from '@/lib/sessionGrouping';
 import { useSessionSelection } from '@/hooks/useSessionSelection';
 import { apiFetch } from '@/lib/api-client';
 import { useProjectContext } from '@/hooks/useProjectContext';
+import { InlineError } from '@/components/shared/InlineError';
 import { ProjectHeader } from './ProjectHeader';
 import { DateGroupHeader } from './DateGroupHeader';
 import { SessionItem } from './SessionItem';
@@ -55,7 +56,7 @@ export function SessionList() {
 
   const {
     projectGroups: rawGroups, isLoading: multiLoading, error: multiError,
-    expandedProjects, toggleProject,
+    expandedProjects, toggleProject, refetch,
   } = useMultiProjectSessions();
 
   const { query, setQuery, filterGroups } = useSessionSearch();
@@ -180,11 +181,7 @@ export function SessionList() {
 
   if (multiLoading) return <SessionListSkeleton />;
   if (multiError) {
-    return (
-      <div className="px-3 py-4 text-center text-[length:0.75rem] text-destructive">
-        Failed to load sessions
-      </div>
-    );
+    return <InlineError message="Failed to load sessions" onRetry={refetch} />;
   }
 
   const totalVisible = projectGroups.reduce((sum, p) => sum + p.visibleCount, 0);

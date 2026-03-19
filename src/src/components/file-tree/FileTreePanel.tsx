@@ -21,6 +21,7 @@ import { useGitFileMap } from '@/hooks/useGitFileMap';
 import { useFileStore } from '@/stores/file';
 import { EditorTabs } from '@/components/editor/EditorTabs';
 import { contentCache } from '@/components/editor/content-cache';
+import { Skeleton } from '@/components/shared/Skeleton';
 import { FileTree } from './FileTree';
 import './styles/file-tree.css';
 
@@ -37,9 +38,12 @@ const LazyDiffEditorWrapper = lazy(() =>
 );
 
 function EditorSkeleton() {
+  const widths = ['w-[50%]', 'w-[80%]', 'w-[65%]', 'w-[90%]', 'w-[45%]', 'w-[75%]', 'w-[85%]', 'w-[60%]', 'w-[95%]', 'w-[40%]', 'w-[70%]', 'w-[55%]', 'w-[88%]'];
   return (
-    <div className="flex-1 flex items-center justify-center animate-pulse bg-[var(--surface-base)]">
-      <span className="text-xs text-muted-foreground">Loading editor...</span>
+    <div className="flex-1 p-3 space-y-1.5 bg-[var(--surface-base)]" role="status" aria-label="Loading editor">
+      {widths.map((w, i) => (
+        <Skeleton key={i} className={cn('h-3', w)} />
+      ))}
     </div>
   );
 }

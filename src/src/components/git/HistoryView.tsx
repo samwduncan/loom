@@ -12,13 +12,14 @@ import { toast } from 'sonner';
 import { useGitCommits } from '@/hooks/useGitCommits';
 import { apiFetch } from '@/lib/api-client';
 import { CommitRow } from '@/components/git/CommitRow';
+import { InlineError } from '@/components/shared/InlineError';
 
 export interface HistoryViewProps {
   projectName: string;
 }
 
 export function HistoryView({ projectName }: HistoryViewProps) {
-  const { commits, loading, error } = useGitCommits(projectName);
+  const { commits, loading, error, refetch } = useGitCommits(projectName);
   const [expandedHash, setExpandedHash] = useState<string | null>(null);
   const [diffContent, setDiffContent] = useState<string | null>(null);
   const [diffLoading, setDiffLoading] = useState(false);
@@ -63,11 +64,11 @@ export function HistoryView({ projectName }: HistoryViewProps) {
 
   if (loading) {
     return (
-      <div className="git-history-skeleton" data-testid="history-skeleton">
+      <div className="git-history-skeleton" role="status" aria-label="Loading commit history" data-testid="history-skeleton">
         {Array.from({ length: 5 }, (_, i) => (
           <div key={i} className="git-commit-row-skeleton">
-            <div className="git-skeleton-line git-skeleton-short" />
-            <div className="git-skeleton-line git-skeleton-long" />
+            <div className="git-skeleton-line skeleton-shimmer git-skeleton-short" />
+            <div className="git-skeleton-line skeleton-shimmer git-skeleton-long" />
           </div>
         ))}
       </div>
@@ -77,7 +78,7 @@ export function HistoryView({ projectName }: HistoryViewProps) {
   if (error) {
     return (
       <div className="git-empty-state">
-        <p className="git-empty-message">{error}</p>
+        <InlineError message={error} onRetry={refetch} />
       </div>
     );
   }

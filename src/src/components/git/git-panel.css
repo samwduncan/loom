@@ -425,9 +425,7 @@
 
 .git-skeleton-line {
   height: 12px;
-  background: var(--surface-raised);
   border-radius: var(--radius-sm);
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 .git-skeleton-short {
@@ -436,11 +434,6 @@
 
 .git-skeleton-long {
   width: 80%;
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
 }
 
 /* Changes view */

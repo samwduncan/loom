@@ -38,6 +38,7 @@ interface UseMultiProjectSessionsResult {
   error: string | null;
   expandedProjects: Set<string>;
   toggleProject: (name: string) => void;
+  refetch: () => void;
 }
 
 /** Load expanded projects set from localStorage. */
@@ -182,5 +183,5 @@ export function useMultiProjectSessions(): UseMultiProjectSessionsResult {
     });
   }, [fetchProjects]);
 
-  return { projectGroups, isLoading, error, expandedProjects, toggleProject };
+  return { projectGroups, isLoading, error, expandedProjects, toggleProject, refetch: fetchProjects };
 }

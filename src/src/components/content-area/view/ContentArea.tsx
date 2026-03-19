@@ -14,11 +14,13 @@
  */
 
 import { lazy, Suspense, useMemo, useSyncExternalStore } from 'react';
+import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import type { TabId } from '@/types/ui';
 import { TabBar } from './TabBar';
 import { useTabKeyboardShortcuts } from '../hooks/useTabKeyboardShortcuts';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { Skeleton } from '@/components/shared/Skeleton';
 import { ChatView } from '@/components/chat/view/ChatView';
 import { FileTreePanel } from '@/components/file-tree/FileTreePanel';
 import { GitPanelSkeleton } from '@/components/git/GitPanelSkeleton';
@@ -36,9 +38,12 @@ const LazyGitPanel = lazy(() =>
 );
 
 function TerminalSkeleton() {
+  const widths = ['w-[20%]', 'w-[75%]', 'w-[60%]', 'w-[85%]', 'w-[70%]', 'w-[90%]', 'w-[55%]', 'w-[80%]', 'w-[65%]', 'w-[45%]'];
   return (
-    <div className="flex h-full items-center justify-center text-[var(--text-muted)]">
-      Loading terminal...
+    <div className="h-full p-3 space-y-2 bg-[var(--surface-base)]" role="status" aria-label="Loading terminal">
+      {widths.map((w, i) => (
+        <Skeleton key={i} className={cn('h-3', w)} />
+      ))}
     </div>
   );
 }

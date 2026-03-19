@@ -52,12 +52,12 @@ export const FileTree = function FileTree({
   // Loading skeleton
   if (fetchState === 'idle' || fetchState === 'loading') {
     return (
-      <div data-testid="file-tree-skeleton" className={className}>
+      <div data-testid="file-tree-skeleton" className={className} role="status" aria-label="Loading file tree">
         <div className="px-2 py-1 space-y-1.5">
           {Array.from({ length: 8 }, (_, i) => (
             <div key={i} className="flex items-center gap-1.5">
               <div
-                className="h-3 animate-pulse rounded-sm bg-muted file-node"
+                className="h-3 skeleton-shimmer rounded-sm file-node"
                 style={{ '--depth': Math.min(i % 4, 2), width: i % 3 === 0 ? '60%' : i % 2 === 0 ? '45%' : '70%' } as React.CSSProperties}
               />
             </div>
