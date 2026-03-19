@@ -97,6 +97,7 @@ export function TabBar() {
             onClick={() => handleTabClick(id)}
             className={cn(
               'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               isActive
                 ? 'text-foreground bg-surface-raised'
                 : 'text-muted hover:text-foreground hover:bg-surface-raised/50',

@@ -43,7 +43,7 @@ export function ImageLightbox({ src, alt, open, onClose }: ImageLightboxProps) {
             className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
           />
           <DialogPrimitive.Close
-            className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5 opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:outline-hidden [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            className="absolute top-2 right-2 rounded-full bg-black/60 p-1.5 opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
             <XIcon className="text-white" />
             <span className="sr-only">Close</span>

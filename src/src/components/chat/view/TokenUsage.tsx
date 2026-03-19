@@ -72,7 +72,7 @@ export function TokenUsage({ metadata }: TokenUsageProps) {
       <button
         type="button"
         data-testid="token-usage-summary"
-        className="text-muted flex cursor-pointer items-center gap-1 text-xs transition-colors hover:text-foreground"
+        className="text-muted flex cursor-pointer items-center gap-1 text-xs transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
         aria-expanded={expanded}
         aria-label="Toggle token usage details"
         onClick={() => setExpanded((prev) => !prev)}

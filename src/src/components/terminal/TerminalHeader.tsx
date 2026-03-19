@@ -52,7 +52,7 @@ export const TerminalHeader = function TerminalHeader({
         aria-label="Restart terminal"
         onClick={onRestart}
         disabled={state === 'connecting'}
-        className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)] disabled:pointer-events-none disabled:opacity-40"
+        className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-surface-raised hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
       >
         <RotateCw className="h-4 w-4" />
       </button>
@@ -63,7 +63,7 @@ export const TerminalHeader = function TerminalHeader({
         aria-label="Disconnect terminal"
         onClick={onDisconnect}
         disabled={state === 'disconnected' || state === 'connecting'}
-        className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-overlay)] hover:text-[var(--text-primary)] disabled:pointer-events-none disabled:opacity-40"
+        className="rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-surface-raised hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
       >
         <Unplug className="h-4 w-4" />
       </button>

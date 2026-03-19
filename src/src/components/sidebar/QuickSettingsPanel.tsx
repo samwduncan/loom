@@ -50,7 +50,8 @@ export function QuickSettingsPanel(_props: QuickSettingsPanelProps) {
         <button
           className={cn(
             'p-2 rounded-md',
-            'text-muted hover:text-foreground',
+            'text-muted hover:text-foreground hover:bg-surface-raised/50',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             'transition-colors',
           )}
           aria-label="Quick settings"
