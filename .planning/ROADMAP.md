@@ -130,8 +130,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 45-01-PLAN.md -- Shared primitives (Skeleton, EmptyState, InlineError) + normalize all skeletons to shimmer + wire retry to error states
-- [ ] 45-02-PLAN.md -- Upgrade all bare-text empty states to designed EmptyState components with icons and guidance
+- [x] 45-01-PLAN.md -- Shared primitives (Skeleton, EmptyState, InlineError) + normalize all skeletons to shimmer + wire retry to error states
+- [x] 45-02-PLAN.md -- Upgrade all bare-text empty states to designed EmptyState components with icons and guidance
 
 ### Phase 46: Interactive State Consistency
 **Goal**: Every clickable, focusable, and disableable element in the application behaves consistently -- the app feels like one designer touched every surface
@@ -142,11 +142,11 @@ Plans:
   2. Tabbing through the entire application shows a uniform focus ring (same color, width, offset) on every focusable element
   3. All disabled interactive elements have reduced opacity, no hover effect, and a `not-allowed` cursor
   4. Context menus, tooltips, and popovers all enter and exit with consistent transitions (no instant pop-in or pop-out)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 46-01: TBD
-- [ ] 46-02: TBD
+- [ ] 46-01-PLAN.md -- Standardize hover, focus, and disabled states across all custom interactive elements
+- [ ] 46-02-PLAN.md -- Add enter transitions to command palette, pickers, and branch selector
 
 ### Phase 47: Spring Physics & Glass Surfaces
 **Goal**: Key interactions feel physically grounded with spring easing, and overlay surfaces gain depth through frosted glass -- the app stops feeling like flat rectangles snapping into place
@@ -232,4 +232,4 @@ Phases execute in numeric order: 44 -> 44.1 -> 45 -> 45.1 -> ... -> 49
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-18 after Phase 45 planning*
+*Last updated: 2026-03-19 after Phase 46 planning*
