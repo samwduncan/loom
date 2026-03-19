@@ -21,10 +21,10 @@ Requirements for "The Craft" milestone. Production quality -- fix every rough ed
 
 ### Empty States
 
-- [ ] **EMPTY-01**: File tree shows a designed empty state when no project is selected or project has no files
-- [ ] **EMPTY-02**: Git panel shows designed empty states for both Changes (no changes) and History (no commits) views
-- [ ] **EMPTY-03**: Session list shows a designed empty state when no sessions exist for a project
-- [ ] **EMPTY-04**: Search results show a "no matches" state with contextual guidance
+- [x] **EMPTY-01**: File tree shows a designed empty state when no project is selected or project has no files
+- [x] **EMPTY-02**: Git panel shows designed empty states for both Changes (no changes) and History (no commits) views
+- [x] **EMPTY-03**: Session list shows a designed empty state when no sessions exist for a project
+- [x] **EMPTY-04**: Search results show a "no matches" state with contextual guidance
 
 ### Interactive State Consistency
 
@@ -100,10 +100,10 @@ Deferred to "The Power" milestone.
 | LOAD-01 | Phase 45 | Complete |
 | LOAD-02 | Phase 45 | Complete |
 | LOAD-03 | Phase 45 | Complete |
-| EMPTY-01 | Phase 45 | Pending |
-| EMPTY-02 | Phase 45 | Pending |
-| EMPTY-03 | Phase 45 | Pending |
-| EMPTY-04 | Phase 45 | Pending |
+| EMPTY-01 | Phase 45 | Complete |
+| EMPTY-02 | Phase 45 | Complete |
+| EMPTY-03 | Phase 45 | Complete |
+| EMPTY-04 | Phase 45 | Complete |
 | INTER-01 | Phase 46 | Pending |
 | INTER-02 | Phase 46 | Pending |
 | INTER-03 | Phase 46 | Pending |
