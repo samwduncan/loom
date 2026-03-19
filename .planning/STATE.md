@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
-status: in-progress
-stopped_at: Completed 46-01-PLAN.md
-last_updated: "2026-03-19T01:38:00Z"
-last_activity: 2026-03-19 -- Completed Plan 46-01 (Standardize hover, focus, disabled states)
+status: completed
+stopped_at: Completed 46-02-PLAN.md
+last_updated: "2026-03-19T01:42:57Z"
+last_activity: 2026-03-19 -- Completed Plan 46-02 (Overlay enter transitions)
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
-  percent: 83
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 46 of 49 (Interactive State Consistency)
-Plan: 1 of 2 complete
-Status: Plan 46-01 complete, ready for Plan 46-02
-Last activity: 2026-03-19 -- Completed Plan 46-01 (Standardize hover, focus, disabled states)
+Plan: 2 of 2 complete
+Status: Phase 46 complete, ready for Phase 47
+Last activity: 2026-03-19 -- Completed Plan 46-02 (Overlay enter transitions)
 
-Progress: [████████░░] 83%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -60,6 +60,9 @@ Progress: [████████░░] 83%
 - [Phase 46-01]: focus-visible: over focus: for all ring styles -- keyboard-only indicator is correct a11y pattern
 - [Phase 46-01]: pointer-events-none replaces cursor-not-allowed for disabled -- matches shadcn pattern
 - [Phase 46-01]: SkipLink keeps focus: intentionally -- sr-only/not-sr-only visibility pattern requires it
+- [Phase 46-02]: Enter-only animations (no exit) -- overlays unmount on close, instant dismiss feels snappier
+- [Phase 46-02]: Global base.css prefers-reduced-motion override sufficient -- no per-component media queries needed
+- [Phase 46-02]: BranchSelector uses custom dropdown (not shadcn) -- added matching animation pattern
 
 ### Pending Todos
 
@@ -73,6 +76,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T01:38:00Z
-Stopped at: Completed 46-01-PLAN.md
-Resume: Continue with 46-02-PLAN.md
+Last session: 2026-03-19T01:42:57Z
+Stopped at: Completed 46-02-PLAN.md
+Resume: Phase 46 complete. Continue with Phase 47.

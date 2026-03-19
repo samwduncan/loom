@@ -31,7 +31,7 @@ Requirements for "The Craft" milestone. Production quality -- fix every rough ed
 - [x] **INTER-01**: All custom interactive elements (buttons, cards, list items, tabs) have consistent hover states using design tokens
 - [x] **INTER-02**: All focusable elements have visible, consistent focus rings that match the design system
 - [x] **INTER-03**: All interactive elements have appropriate disabled states (reduced opacity, no hover, cursor change)
-- [ ] **INTER-04**: All context menus, tooltips, and popovers have consistent enter/exit transitions
+- [x] **INTER-04**: All context menus, tooltips, and popovers have consistent enter/exit transitions
 
 ### Spring Physics
 
@@ -107,7 +107,7 @@ Deferred to "The Power" milestone.
 | INTER-01 | Phase 46 | Complete |
 | INTER-02 | Phase 46 | Complete |
 | INTER-03 | Phase 46 | Complete |
-| INTER-04 | Phase 46 | Pending |
+| INTER-04 | Phase 46 | Complete |
 | SPRING-01 | Phase 47 | Pending |
 | SPRING-02 | Phase 47 | Pending |
 | SPRING-03 | Phase 47 | Pending |
