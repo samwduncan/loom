@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
 status: completed
-stopped_at: Completed 47-01-PLAN.md
-last_updated: "2026-03-19T02:36:03.575Z"
-last_activity: 2026-03-19 -- Completed Plan 47-01 (Spring easing on key interactions)
+stopped_at: Completed 47-02-PLAN.md
+last_updated: "2026-03-19T02:40:13.381Z"
+last_activity: 2026-03-19 -- Completed Plan 47-02 (Frosted glass overlays)
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 8
-  completed_plans: 7
-  percent: 88
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 ## Current Position
 
 Phase: 47 of 49 (Spring Physics & Glass Surfaces)
-Plan: 1 of 2 complete
-Status: Plan 47-01 complete, ready for Plan 47-02
-Last activity: 2026-03-19 -- Completed Plan 47-01 (Spring easing on key interactions)
+Plan: 2 of 2 complete
+Status: Phase 47 complete, ready for Phase 48
+Last activity: 2026-03-19 -- Completed Plan 47-02 (Frosted glass overlays)
 
-Progress: [█████████░] 88%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -65,6 +65,9 @@ Progress: [█████████░] 88%
 - [Phase 46-02]: BranchSelector uses custom dropdown (not shadcn) -- added matching animation pattern
 - [Phase 47-01]: Spring easing on open/enter only -- exit stays instant per Phase 46-02 decision
 - [Phase 47-01]: Three spring profiles by surface type: gentle (modals/sidebar/palette), snappy (tool expand/collapse), bouncy (scroll pill)
+- [Phase 47]: [Phase 47-02]: oklch(0 0 0 / 0.35) opacity for glass overlays -- lower than bg-black/50 to let blurred background content bleed through
+- [Phase 47]: [Phase 47-02]: backdrop-filter is static (never animated) -- overlay fade-in handles visual entrance, no GPU cost for animating blur
+- [Phase 47]: [Phase 47-02]: GLASS-04 reduced motion is a no-op -- backdrop-filter is visual not motion, global override only targets animation/transition duration
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T02:36:03.574Z
-Stopped at: Completed 47-01-PLAN.md
-Resume: Plan 47-01 complete. Continue with Plan 47-02 (frosted glass overlays).
+Last session: 2026-03-19T02:40:13.380Z
+Stopped at: Completed 47-02-PLAN.md
+Resume: Phase 47 complete (both plans). Continue with Phase 48 (Visual Personality).

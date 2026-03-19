@@ -98,7 +98,7 @@
 - [x] **Phase 44: Foundation** - Settings refactor, CSS spring token generation, dead UI removal (completed 2026-03-18)
 - [x] **Phase 45: Loading, Error & Empty States** - Skeleton shimmers, error retry, designed empty states for every data surface (completed 2026-03-19)
 - [x] **Phase 46: Interactive State Consistency** - Hover, focus, disabled, and transition states across all interactive elements (completed 2026-03-19)
-- [ ] **Phase 47: Spring Physics & Glass Surfaces** - CSS linear() spring easing on key interactions, frosted glass on overlays
+- [x] **Phase 47: Spring Physics & Glass Surfaces** - CSS linear() spring easing on key interactions, frosted glass on overlays (completed 2026-03-19)
 - [ ] **Phase 48: Visual Personality** - DecryptedText reveals, ElectricBorder/StarBorder accents on active elements
 - [ ] **Phase 49: Spacing & Typography Polish** - Border-radius, spacing, and font size audit against design token scale
 
@@ -161,8 +161,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 47-01-PLAN.md -- Apply spring easing tokens to modals, sidebar, command palette, tool cards, tool groups, and scroll pill
-- [ ] 47-02-PLAN.md -- Add frosted glass overlay to settings modal, command palette, and alert/delete dialogs
+- [x] 47-01-PLAN.md -- Apply spring easing tokens to modals, sidebar, command palette, tool cards, tool groups, and scroll pill
+- [x] 47-02-PLAN.md -- Add frosted glass overlay to settings modal, command palette, and alert/delete dialogs
 
 ### Phase 48: Visual Personality
 **Goal**: Loom has distinctive visual signatures that separate it from generic chat UIs -- text reveals and animated borders create moments of delight
@@ -222,7 +222,7 @@ Phases execute in numeric order: 44 -> 44.1 -> 45 -> 45.1 -> ... -> 49
 | 44. Foundation | 2/2 | Complete    | 2026-03-18 |
 | 45. Loading, Error & Empty States | 2/2 | Complete    | 2026-03-19 |
 | 46. Interactive State Consistency | 2/2 | Complete    | 2026-03-19 |
-| 47. Spring Physics & Glass Surfaces | 1/2 | In Progress|  |
+| 47. Spring Physics & Glass Surfaces | 2/2 | Complete   | 2026-03-19 |
 | 48. Visual Personality | 0/2 | Not started | - |
 | 49. Spacing & Typography Polish | 0/1 | Not started | - |
 

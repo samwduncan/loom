@@ -43,10 +43,10 @@ Requirements for "The Craft" milestone. Production quality -- fix every rough ed
 
 ### Glass Surfaces
 
-- [ ] **GLASS-01**: Settings modal overlay uses frosted glass effect (`backdrop-filter: blur(16px) saturate(1.4)`)
-- [ ] **GLASS-02**: Command palette overlay uses upgraded frosted glass effect
-- [ ] **GLASS-03**: Delete/alert confirmation dialogs use frosted glass effect
-- [ ] **GLASS-04**: Glass effects respect `prefers-reduced-motion` (disabled when reduced motion is active)
+- [x] **GLASS-01**: Settings modal overlay uses frosted glass effect (`backdrop-filter: blur(16px) saturate(1.4)`)
+- [x] **GLASS-02**: Command palette overlay uses upgraded frosted glass effect
+- [x] **GLASS-03**: Delete/alert confirmation dialogs use frosted glass effect
+- [x] **GLASS-04**: Glass effects respect `prefers-reduced-motion` (disabled when reduced motion is active)
 
 ### Visual Personality
 
@@ -113,10 +113,10 @@ Deferred to "The Power" milestone.
 | SPRING-03 | Phase 47 | Complete |
 | SPRING-04 | Phase 47 | Complete |
 | SPRING-05 | Phase 47 | Complete |
-| GLASS-01 | Phase 47 | Pending |
-| GLASS-02 | Phase 47 | Pending |
-| GLASS-03 | Phase 47 | Pending |
-| GLASS-04 | Phase 47 | Pending |
+| GLASS-01 | Phase 47 | Complete |
+| GLASS-02 | Phase 47 | Complete |
+| GLASS-03 | Phase 47 | Complete |
+| GLASS-04 | Phase 47 | Complete |
 | VIS-01 | Phase 48 | Pending |
 | VIS-02 | Phase 48 | Pending |
 | VIS-03 | Phase 48 | Pending |
