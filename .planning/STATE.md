@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
 status: completed
-stopped_at: Completed 46-02-PLAN.md
-last_updated: "2026-03-19T01:58:15.349Z"
-last_activity: 2026-03-19 -- Completed Plan 46-02 (Overlay enter transitions)
+stopped_at: Completed 47-01-PLAN.md
+last_updated: "2026-03-19T02:36:03.575Z"
+last_activity: 2026-03-19 -- Completed Plan 47-01 (Spring easing on key interactions)
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_plans: 8
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 
 ## Current Position
 
-Phase: 46 of 49 (Interactive State Consistency)
-Plan: 2 of 2 complete
-Status: Phase 46 complete, ready for Phase 47
-Last activity: 2026-03-19 -- Completed Plan 46-02 (Overlay enter transitions)
+Phase: 47 of 49 (Spring Physics & Glass Surfaces)
+Plan: 1 of 2 complete
+Status: Plan 47-01 complete, ready for Plan 47-02
+Last activity: 2026-03-19 -- Completed Plan 47-01 (Spring easing on key interactions)
 
-Progress: [██████████] 100%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -63,6 +63,8 @@ Progress: [██████████] 100%
 - [Phase 46-02]: Enter-only animations (no exit) -- overlays unmount on close, instant dismiss feels snappier
 - [Phase 46-02]: Global base.css prefers-reduced-motion override sufficient -- no per-component media queries needed
 - [Phase 46-02]: BranchSelector uses custom dropdown (not shadcn) -- added matching animation pattern
+- [Phase 47-01]: Spring easing on open/enter only -- exit stays instant per Phase 46-02 decision
+- [Phase 47-01]: Three spring profiles by surface type: gentle (modals/sidebar/palette), snappy (tool expand/collapse), bouncy (scroll pill)
 
 ### Pending Todos
 
@@ -76,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T01:42:57Z
-Stopped at: Completed 46-02-PLAN.md
-Resume: Phase 46 complete. Continue with Phase 47.
+Last session: 2026-03-19T02:36:03.574Z
+Stopped at: Completed 47-01-PLAN.md
+Resume: Plan 47-01 complete. Continue with Plan 47-02 (frosted glass overlays).

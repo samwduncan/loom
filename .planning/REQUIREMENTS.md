@@ -35,11 +35,11 @@ Requirements for "The Craft" milestone. Production quality -- fix every rough ed
 
 ### Spring Physics
 
-- [ ] **SPRING-01**: Modal open/close uses spring easing (settings modal, delete confirmations, alert dialogs)
-- [ ] **SPRING-02**: Sidebar expand/collapse uses spring easing
-- [ ] **SPRING-03**: Tool card expand/collapse and tool group accordion use spring easing
-- [ ] **SPRING-04**: Command palette open/close uses spring easing
-- [ ] **SPRING-05**: Scroll-to-bottom pill entrance/exit uses spring easing
+- [x] **SPRING-01**: Modal open/close uses spring easing (settings modal, delete confirmations, alert dialogs)
+- [x] **SPRING-02**: Sidebar expand/collapse uses spring easing
+- [x] **SPRING-03**: Tool card expand/collapse and tool group accordion use spring easing
+- [x] **SPRING-04**: Command palette open/close uses spring easing
+- [x] **SPRING-05**: Scroll-to-bottom pill entrance/exit uses spring easing
 
 ### Glass Surfaces
 
@@ -108,11 +108,11 @@ Deferred to "The Power" milestone.
 | INTER-02 | Phase 46 | Complete |
 | INTER-03 | Phase 46 | Complete |
 | INTER-04 | Phase 46 | Complete |
-| SPRING-01 | Phase 47 | Pending |
-| SPRING-02 | Phase 47 | Pending |
-| SPRING-03 | Phase 47 | Pending |
-| SPRING-04 | Phase 47 | Pending |
-| SPRING-05 | Phase 47 | Pending |
+| SPRING-01 | Phase 47 | Complete |
+| SPRING-02 | Phase 47 | Complete |
+| SPRING-03 | Phase 47 | Complete |
+| SPRING-04 | Phase 47 | Complete |
+| SPRING-05 | Phase 47 | Complete |
 | GLASS-01 | Phase 47 | Pending |
 | GLASS-02 | Phase 47 | Pending |
 | GLASS-03 | Phase 47 | Pending |
