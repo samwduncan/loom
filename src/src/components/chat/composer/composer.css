@@ -87,6 +87,7 @@
   background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
   box-shadow: 0 -4px 16px var(--shadow-light);
+  animation: picker-in var(--duration-normal) var(--ease-out);
 }
 
 .mention-picker-item,
@@ -142,4 +143,20 @@
 .mention-chip-remove:hover {
   opacity: 1;
   background-color: var(--surface-active);
+}
+
+/* ─── Picker Enter Transition (INTER-04) ──────────────────────
+ * Subtle slide-up + fade for inline pickers.
+ * Exit is instant (pickers unmount on close).
+ * Reduced motion handled by global override in base.css.
+ */
+@keyframes picker-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
