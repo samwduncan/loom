@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
-status: completed
-stopped_at: Completed 44-02-PLAN.md (Phase 44 Foundation complete)
-last_updated: "2026-03-18T23:44:18.727Z"
-last_activity: 2026-03-18 -- Completed Plan 44-02 (CSS spring easing tokens)
+status: in-progress
+stopped_at: Completed 45-01-PLAN.md
+last_updated: "2026-03-19T00:14:18.733Z"
+last_activity: 2026-03-19 -- Completed Plan 45-01 (Loading/error primitives and normalization)
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 18
+  total_plans: 4
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 
 ## Current Position
 
-Phase: 44 of 49 (Foundation) -- COMPLETE
-Plan: 2 of 2 complete
-Status: Phase 44 complete, ready for Phase 45
-Last activity: 2026-03-18 -- Completed Plan 44-02 (CSS spring easing tokens)
+Phase: 45 of 49 (Loading/Error/Empty States)
+Plan: 1 of 2 complete
+Status: Plan 45-01 complete, ready for Plan 45-02
+Last activity: 2026-03-19 -- Completed Plan 45-01 (Loading/error primitives and normalization)
 
-Progress: [##........] 18%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -50,6 +50,9 @@ Progress: [##........] 18%
 - [44-01] SettingsTabSkeleton replaces null loading returns for visible loading feedback
 - [44-02] Used SpringEasing raw frames (64 points) over CSSSpringEasing simplified output for full-fidelity linear() curves
 - [44-02] spring-easing as devDependency only -- zero runtime cost, one-shot generation script
+- [Phase 45-01]: Skeleton primitive uses className composition via cn() -- simpler and more flexible than styled variants
+- [Phase 45-01]: InlineError uses shadcn Button variant=outline size=xs for retry -- consistent with existing FileTree retry pattern
+- [Phase 45-01]: TerminalSkeleton 10 lines, EditorSkeleton 13 lines -- varying widths mimic realistic content layout
 
 ### Pending Todos
 
@@ -63,6 +66,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-18T23:29:50.174Z
-Stopped at: Completed 44-02-PLAN.md (Phase 44 Foundation complete)
+Last session: 2026-03-19T00:14:18.731Z
+Stopped at: Completed 45-01-PLAN.md
 Resume: `/gsd:plan-phase 45`

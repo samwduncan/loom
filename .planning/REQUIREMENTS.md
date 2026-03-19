@@ -15,9 +15,9 @@ Requirements for "The Craft" milestone. Production quality -- fix every rough ed
 
 ### Loading & Error States
 
-- [ ] **LOAD-01**: Every async component shows a directional shimmer skeleton during loading (normalized animation across all skeletons)
-- [ ] **LOAD-02**: Every component that fetches data has an error state with a retry button and clear error message
-- [ ] **LOAD-03**: Terminal Suspense fallback uses skeleton component instead of text string
+- [x] **LOAD-01**: Every async component shows a directional shimmer skeleton during loading (normalized animation across all skeletons)
+- [x] **LOAD-02**: Every component that fetches data has an error state with a retry button and clear error message
+- [x] **LOAD-03**: Terminal Suspense fallback uses skeleton component instead of text string
 
 ### Empty States
 
@@ -97,9 +97,9 @@ Deferred to "The Power" milestone.
 | FOUND-01 | Phase 44 | Complete |
 | FOUND-02 | Phase 44 | Complete |
 | FOUND-03 | Phase 44 | Complete |
-| LOAD-01 | Phase 45 | Pending |
-| LOAD-02 | Phase 45 | Pending |
-| LOAD-03 | Phase 45 | Pending |
+| LOAD-01 | Phase 45 | Complete |
+| LOAD-02 | Phase 45 | Complete |
+| LOAD-03 | Phase 45 | Complete |
 | EMPTY-01 | Phase 45 | Pending |
 | EMPTY-02 | Phase 45 | Pending |
 | EMPTY-03 | Phase 45 | Pending |
