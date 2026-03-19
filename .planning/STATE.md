@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: "The Craft"
-status: completed
-stopped_at: Completed 45-02-PLAN.md
-last_updated: "2026-03-19T00:37:42.639Z"
-last_activity: 2026-03-19 -- Completed Plan 45-02 (Empty state adoption across all data surfaces)
+status: in-progress
+stopped_at: Completed 46-01-PLAN.md
+last_updated: "2026-03-19T01:38:00Z"
+last_activity: 2026-03-19 -- Completed Plan 46-01 (Standardize hover, focus, disabled states)
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_plans: 6
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-18)
 
 ## Current Position
 
-Phase: 45 of 49 (Loading/Error/Empty States)
-Plan: 2 of 2 complete
-Status: Phase 45 complete, ready for Phase 46
-Last activity: 2026-03-19 -- Completed Plan 45-02 (Empty state adoption across all data surfaces)
+Phase: 46 of 49 (Interactive State Consistency)
+Plan: 1 of 2 complete
+Status: Plan 46-01 complete, ready for Plan 46-02
+Last activity: 2026-03-19 -- Completed Plan 46-01 (Standardize hover, focus, disabled states)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 83%
 
 ## Performance Metrics
 
@@ -57,6 +57,9 @@ Progress: [██████████] 100%
 - [Phase 45-02]: ChatView search-empty is first in the ternary chain -- takes priority when search.isOpen && search.debouncedQuery && displayMessages.length === 0
 - [Phase 45-02]: CommandPalette test uses vi.resetModules + vi.doMock to null groups for Command.Empty visibility
 - [Phase 45-02]: FileTree no-project empty state triggers on tree.length === 0 && !filter
+- [Phase 46-01]: focus-visible: over focus: for all ring styles -- keyboard-only indicator is correct a11y pattern
+- [Phase 46-01]: pointer-events-none replaces cursor-not-allowed for disabled -- matches shadcn pattern
+- [Phase 46-01]: SkipLink keeps focus: intentionally -- sr-only/not-sr-only visibility pattern requires it
 
 ### Pending Todos
 
@@ -70,6 +73,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T00:23:36.158Z
-Stopped at: Completed 45-02-PLAN.md
-Resume: `/gsd:execute-phase 46`
+Last session: 2026-03-19T01:38:00Z
+Stopped at: Completed 46-01-PLAN.md
+Resume: Continue with 46-02-PLAN.md
