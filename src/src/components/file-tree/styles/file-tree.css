@@ -7,7 +7,7 @@
 
 .file-node {
   padding-left: calc(var(--depth, 0) * 12px);
-  transition: background 100ms ease;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .file-node:hover {

@@ -43,7 +43,7 @@ export function SearchInput({ value, onChange }: SearchInputProps) {
           'pl-7 pr-7 py-1.5 text-sm',
           'text-foreground placeholder:text-muted',
           'outline-none focus-visible:ring-2 focus-visible:ring-ring',
-          'transition-colors duration-150',
+          'transition-colors duration-[var(--duration-fast)]',
         )}
       />
       {value.length > 0 && (
@@ -54,7 +54,7 @@ export function SearchInput({ value, onChange }: SearchInputProps) {
           className={cn(
             'absolute right-2 text-muted hover:text-foreground',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
-            'transition-colors duration-150',
+            'transition-colors duration-[var(--duration-fast)]',
           )}
         >
           <X size={14} />

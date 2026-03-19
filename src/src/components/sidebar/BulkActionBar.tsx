@@ -34,7 +34,7 @@ export function BulkActionBar({ count, onDelete, onCancel }: BulkActionBarProps)
           aria-label={`Delete ${count} selected session${count !== 1 ? 's' : ''}`}
           className={cn(
             'p-1.5 rounded-md text-[var(--status-error)]',
-            'hover:bg-status-error/20',
+            'hover:bg-destructive/20',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
             'transition-colors duration-[var(--duration-fast)]',
           )}

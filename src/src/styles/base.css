@@ -100,22 +100,3 @@ body {
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: var(--space-1);
 }
-
-/* ─── Interactive State: Focus Ring (INTER-02) ─────────────────
- * Canonical focus ring for CSS-styled custom components.
- * Matches shadcn focus-visible:ring-ring pattern.
- */
-.focus-ring:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
-}
-
-/* ─── Interactive State: Disabled (INTER-03) ──────────────────
- * Canonical disabled state for CSS-styled custom components.
- * Matches shadcn disabled:opacity-50 disabled:pointer-events-none.
- */
-.interactive-disabled:disabled,
-.interactive-disabled[aria-disabled="true"] {
-  opacity: 0.5;
-  pointer-events: none;
-}
