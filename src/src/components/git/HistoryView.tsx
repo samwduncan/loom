@@ -8,9 +8,11 @@
  */
 
 import { useState, useRef } from 'react';
+import { GitCommit } from 'lucide-react';
 import { toast } from 'sonner';
 import { useGitCommits } from '@/hooks/useGitCommits';
 import { apiFetch } from '@/lib/api-client';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { CommitRow } from '@/components/git/CommitRow';
 import { InlineError } from '@/components/shared/InlineError';
 
@@ -85,9 +87,12 @@ export function HistoryView({ projectName }: HistoryViewProps) {
 
   if (!commits || commits.length === 0) {
     return (
-      <div className="git-empty-state">
-        <p className="git-empty-message">No commits yet</p>
-      </div>
+      <EmptyState
+        icon={<GitCommit className="size-8" />}
+        heading="No commits yet"
+        description="Make your first commit to see history here"
+        className="h-full"
+      />
     );
   }
 

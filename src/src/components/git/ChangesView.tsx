@@ -19,9 +19,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Check } from 'lucide-react';
 import { useProjectContext } from '@/hooks/useProjectContext';
 import { useGitOperations } from '@/hooks/useGitOperations';
 import { useOpenDiff } from '@/hooks/useOpenDiff';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { ChangedFileRow } from '@/components/git/ChangedFileRow';
 import { CommitComposer } from '@/components/git/CommitComposer';
 import { toast } from 'sonner';
@@ -129,9 +131,12 @@ export function ChangesView({ files, refetchStatus }: ChangesViewProps) {
   // Empty state
   if (files.length === 0) {
     return (
-      <div className="git-empty-state">
-        <p className="git-empty-message">No changes</p>
-      </div>
+      <EmptyState
+        icon={<Check className="size-8" />}
+        heading="No changes"
+        description="Working tree is clean"
+        className="h-full"
+      />
     );
   }
 

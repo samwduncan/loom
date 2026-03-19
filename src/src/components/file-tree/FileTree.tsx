@@ -9,8 +9,10 @@
  */
 
 import { useState, useMemo } from 'react';
+import { Search, FolderOpen } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { FileNode } from './FileNode';
 import { FileTreeSearch } from './FileTreeSearch';
 import { matchesFilter, filterHiddenNodes } from './file-utils';
@@ -81,7 +83,19 @@ export const FileTree = function FileTree({
     );
   }
 
-  // Success state
+  // Success state -- no project selected (empty tree with no active filter)
+  if (tree.length === 0 && !filter) {
+    return (
+      <div className={className}>
+        <EmptyState
+          icon={<FolderOpen className="size-8" />}
+          heading="No project selected"
+          description="Select a project from the sidebar to browse files"
+        />
+      </div>
+    );
+  }
+
   const hasFilteredResults = visibleTree.length > 0;
 
   return (
@@ -96,9 +110,11 @@ export const FileTree = function FileTree({
               <FileNode key={node.path} node={node} depth={0} filter={filter || undefined} projectRoot={projectRoot} projectName={projectName} gitStatusMap={gitStatusMap} />
             ))
           ) : (
-            <p className="px-2 py-3 text-center text-xs text-muted-foreground">
-              No files match filter
-            </p>
+            <EmptyState
+              icon={<Search className="size-8" />}
+              heading="No files match filter"
+              description="Try adjusting your search terms"
+            />
           )}
         </div>
       </ScrollArea>
