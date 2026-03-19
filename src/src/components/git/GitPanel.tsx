@@ -14,6 +14,7 @@ import { GitPanelSkeleton } from '@/components/git/GitPanelSkeleton';
 import { GitPanelHeader } from '@/components/git/GitPanelHeader';
 import { ChangesView } from '@/components/git/ChangesView';
 import { HistoryView } from '@/components/git/HistoryView';
+import { InlineError } from '@/components/shared/InlineError';
 import type { GitSubView } from '@/types/git';
 import './git-panel.css';
 
@@ -57,12 +58,7 @@ export function GitPanel() {
       {loading && <GitPanelSkeleton />}
 
       {error && (
-        <div className="git-error">
-          <p className="git-error-message">{error}</p>
-          <button type="button" className="git-error-retry" onClick={refetch}>
-            Retry
-          </button>
-        </div>
+        <InlineError message={error} onRetry={refetch} className="h-full" />
       )}
 
       {data && !loading && !error && (

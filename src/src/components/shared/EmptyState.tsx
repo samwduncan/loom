@@ -26,7 +26,7 @@ export function EmptyState({ icon, heading, description, action, className }: Em
         className,
       )}
     >
-      <div className="text-[var(--text-muted)]">{icon}</div>
+      <div className="text-[var(--text-muted)]" aria-hidden="true">{icon}</div>
       <h3 className="text-sm font-medium text-[var(--text-secondary)]">{heading}</h3>
       {description && (
         <p className="mt-1 text-xs text-[var(--text-muted)]">{description}</p>

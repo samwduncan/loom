@@ -78,11 +78,7 @@ export function HistoryView({ projectName }: HistoryViewProps) {
   }
 
   if (error) {
-    return (
-      <div className="git-empty-state">
-        <InlineError message={error} onRetry={refetch} />
-      </div>
-    );
+    return <InlineError message={error} onRetry={refetch} className="h-full" />;
   }
 
   if (!commits || commits.length === 0) {

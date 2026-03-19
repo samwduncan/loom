@@ -228,8 +228,14 @@ export function ChatView() {
           resultCount={displayMessages.length}
         />
       )}
-      {search.isOpen && search.debouncedQuery && displayMessages.length === 0 && !isLoadingMessages ? (
-        // Search active with no matching messages
+      {!hasSession ? (
+        // No session selected -- show empty state with suggestion chips
+        <ChatEmptyState onSuggestionClick={handleSuggestionClick} />
+      ) : isLoadingMessages && messages.length === 0 ? (
+        // Loading messages -- show skeleton
+        <MessageListSkeleton />
+      ) : search.isOpen && search.debouncedQuery && displayMessages.length === 0 ? (
+        // Search active with no matching messages (only when session exists)
         <div className="flex-1 flex items-center justify-center">
           <EmptyState
             icon={<Search className="size-8" />}
@@ -237,12 +243,6 @@ export function ChatView() {
             description="Try different search terms"
           />
         </div>
-      ) : !hasSession ? (
-        // No session selected -- show empty state with suggestion chips
-        <ChatEmptyState onSuggestionClick={handleSuggestionClick} />
-      ) : isLoadingMessages && messages.length === 0 ? (
-        // Loading messages -- show skeleton
-        <MessageListSkeleton />
       ) : (
         // Messages loaded (or streaming into empty session)
         <MessageList

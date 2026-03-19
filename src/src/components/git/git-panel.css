@@ -49,37 +49,6 @@
   padding: var(--space-3);
 }
 
-.git-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  height: 100%;
-  padding: var(--space-6);
-  text-align: center;
-}
-
-.git-error-message {
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-}
-
-.git-error-retry {
-  padding: var(--space-1) var(--space-4);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-primary);
-  background: var(--surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out);
-}
-
-.git-error-retry:hover {
-  background: var(--surface-overlay);
-}
 
 /* Header bar -- branch selector, remote status, push/pull/fetch */
 .git-header {
@@ -571,19 +540,6 @@
   color: var(--color-error);
 }
 
-/* Empty state */
-.git-empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: var(--space-6);
-}
-
-.git-empty-message {
-  font-size: var(--text-sm);
-  color: var(--text-muted);
-}
 
 /* Commit composer */
 .git-commit-composer {
