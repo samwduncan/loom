@@ -166,6 +166,7 @@
   --glass-blur: 16px;
   --glass-saturate: 1.4;
   --glass-bg-opacity: 0.7;
+  --glass-overlay-bg: oklch(0 0 0 / 0.35);
 
   /* ─── Rose Accent Variants ────────────────────────────────────────
    * Extended rose palette for focus, selection, and text accents

@@ -105,8 +105,15 @@
 }
 
 /* Sidebar spring transition on app-shell grid columns */
-[data-testid="app-shell"] {
+.app-shell {
   transition: grid-template-columns var(--duration-spring-gentle) var(--ease-spring-gentle);
+}
+
+/* Suppress sidebar spring on initial page load */
+@starting-style {
+  .app-shell {
+    grid-template-columns: var(--sidebar-width, var(--sidebar-expanded-width, 280px)) 1fr var(--artifact-width, 0px);
+  }
 }
 
 /* Responsive: auto-collapse sidebar below 768px */
