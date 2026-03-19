@@ -11,11 +11,17 @@
 }
 
 .file-node:hover {
-  background: var(--color-surface-hover, hsl(var(--muted) / 0.5));
+  background: var(--surface-active);
+}
+
+.file-node:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+  outline-offset: -2px;
 }
 
 .file-node-active {
-  background: var(--color-surface-raised, hsl(var(--card)));
+  background: var(--surface-raised);
 }
 
 /* Git status indicator dot */

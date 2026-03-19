@@ -30,6 +30,11 @@
   border-color: var(--border-interactive);
 }
 
+.tool-card-shell-header:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 /* Top corners only when body is expanded */
 .tool-card-shell[data-expanded="true"] .tool-card-shell-header {
   border-radius: 6px 6px 0 0;

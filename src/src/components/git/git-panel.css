@@ -33,8 +33,13 @@
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 
-.git-sub-tab:hover {
+.git-sub-tab:hover:not(:disabled) {
   color: var(--text-secondary);
+}
+
+.git-sub-tab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
 }
 
 .git-sub-tab[data-active="true"] {
@@ -79,8 +84,13 @@
   transition: background var(--duration-fast) var(--ease-out);
 }
 
-.git-branch-trigger:hover {
+.git-branch-trigger:hover:not(:disabled) {
   background: var(--surface-raised);
+}
+
+.git-branch-trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
 }
 
 .git-branch-dropdown {
@@ -123,6 +133,11 @@
   background: var(--surface-raised);
 }
 
+.git-branch-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 .git-branch-item[data-current="true"] {
   color: var(--color-accent);
 }
@@ -159,6 +174,11 @@
   color: var(--text-primary);
 }
 
+.git-branch-new-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 .git-branch-create-input {
   display: flex;
   gap: var(--space-1);
@@ -192,13 +212,18 @@
   transition: background var(--duration-fast) var(--ease-out);
 }
 
-.git-branch-create-confirm:hover {
+.git-branch-create-confirm:hover:not(:disabled) {
   background: var(--surface-overlay);
+}
+
+.git-branch-create-confirm:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
 }
 
 .git-branch-create-confirm:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .git-remote-badge {
@@ -256,15 +281,20 @@
     color var(--duration-fast) var(--ease-out);
 }
 
-.git-action-btn:hover {
+.git-action-btn:hover:not(:disabled) {
   background: var(--surface-raised);
   color: var(--text-primary);
   border-color: var(--color-border);
 }
 
+.git-action-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 .git-action-btn:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* File row -- used by Plan 02 (Changes view) */
@@ -430,8 +460,13 @@
   transition: background var(--duration-fast) var(--ease-out);
 }
 
-.git-batch-btn:hover {
-  background: var(--surface-overlay);
+.git-batch-btn:hover:not(:disabled) {
+  background: var(--surface-raised);
+}
+
+.git-batch-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
 }
 
 .git-staged-count {
@@ -540,6 +575,11 @@
   color: var(--color-error);
 }
 
+.git-file-discard:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 
 /* Commit composer */
 .git-commit-composer {
@@ -585,9 +625,14 @@
   color: var(--text-primary);
 }
 
+.git-generate-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 .git-generate-btn:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .git-commit-textarea {
@@ -632,9 +677,14 @@
   opacity: 0.9;
 }
 
+.git-commit-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
 .git-commit-btn:disabled {
   opacity: 0.5;
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
 @keyframes spin {
