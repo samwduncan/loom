@@ -11,6 +11,7 @@
   z-index: var(--z-critical);
   background: var(--backdrop-overlay);
   backdrop-filter: blur(8px);
+  animation: cmdk-overlay-in var(--duration-normal) var(--ease-out);
 }
 
 [cmdk-dialog] {
@@ -33,6 +34,7 @@
     0 16px 70px var(--shadow-heavy),
     0 0 1px var(--shadow-edge);
   overflow: hidden;
+  animation: cmdk-content-in var(--duration-normal) var(--ease-out);
 }
 
 [cmdk-input] {
@@ -97,4 +99,24 @@
   height: 1px;
   background: var(--border-subtle);
   margin: 4px 0;
+}
+
+/* ─── Enter Transition (INTER-04) ─────────────────────────────
+ * Fade + scale on mount. Exit is instant (command palette should feel snappy on dismiss).
+ * Reduced motion handled by global override in base.css.
+ */
+@keyframes cmdk-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cmdk-content-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
