@@ -12,8 +12,8 @@
   background-color: color-mix(in oklch, var(--surface-overlay) 70%, transparent);
   -webkit-backdrop-filter: blur(var(--glass-blur));
   transition-property: opacity, transform;
-  transition-duration: var(--duration-normal);
-  transition-timing-function: var(--ease-spring);
+  transition-duration: var(--duration-spring-bouncy);
+  transition-timing-function: var(--ease-spring-bouncy);
 }
 
 .scroll-pill-badge {
