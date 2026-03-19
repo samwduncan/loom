@@ -9,8 +9,9 @@
   position: fixed;
   inset: 0;
   z-index: var(--z-critical);
-  background: var(--backdrop-overlay);
-  backdrop-filter: blur(8px);
+  background: oklch(0 0 0 / 0.35);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   animation: cmdk-overlay-in var(--duration-spring-gentle) var(--ease-spring-gentle);
 }
 
