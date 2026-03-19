@@ -23,6 +23,7 @@ import { useMessageSearch } from '@/hooks/useMessageSearch';
 import { useTimelineStore } from '@/stores/timeline';
 import { useUIStore } from '@/stores/ui';
 import { useNavigateAwayGuard } from '@/hooks/useNavigateAwayGuard';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { ChatEmptyState } from '@/components/chat/view/ChatEmptyState';
 import { MessageList } from '@/components/chat/view/MessageList';
 import { MessageListSkeleton } from '@/components/chat/view/MessageListSkeleton';
@@ -227,7 +228,16 @@ export function ChatView() {
           resultCount={displayMessages.length}
         />
       )}
-      {!hasSession ? (
+      {search.isOpen && search.debouncedQuery && displayMessages.length === 0 && !isLoadingMessages ? (
+        // Search active with no matching messages
+        <div className="flex-1 flex items-center justify-center">
+          <EmptyState
+            icon={<Search className="size-8" />}
+            heading="No matching messages"
+            description="Try different search terms"
+          />
+        </div>
+      ) : !hasSession ? (
         // No session selected -- show empty state with suggestion chips
         <ChatEmptyState onSuggestionClick={handleSuggestionClick} />
       ) : isLoadingMessages && messages.length === 0 ? (

@@ -116,4 +116,43 @@ describe('CommandPalette', () => {
     expect(screen.getByText('Toggle Thinking Visibility')).toBeInTheDocument();
     expect(screen.getByText('Toggle Sidebar')).toBeInTheDocument();
   });
+
+  it('renders designed empty state with description inside Command.Empty', async () => {
+    // Reset module cache so doMock takes effect on fresh import
+    vi.resetModules();
+
+    // Mock all groups to render nothing, so Command.Empty becomes visible
+    vi.doMock('./groups/NavigationGroup', () => ({
+      NavigationGroup: () => null,
+    }));
+    vi.doMock('./groups/SessionGroup', () => ({
+      SessionGroup: () => null,
+    }));
+    vi.doMock('./groups/FileGroup', () => ({
+      FileGroup: () => null,
+    }));
+    vi.doMock('./groups/ActionGroup', () => ({
+      ActionGroup: () => null,
+    }));
+    vi.doMock('./groups/CommandGroup', () => ({
+      CommandGroup: () => null,
+    }));
+    vi.doMock('./groups/ProjectGroup', () => ({
+      ProjectGroup: () => null,
+    }));
+
+    // Re-import with mocked groups
+    const { CommandPalette: CP } = await import('./CommandPalette');
+    const { useUIStore: freshUIStore } = await import('@/stores/ui');
+    freshUIStore.setState({ commandPaletteOpen: true });
+    render(
+      <MemoryRouter>
+        <CP />
+      </MemoryRouter>,
+    );
+
+    // Command.Empty shows when all groups return null (zero items)
+    expect(screen.getByText('No results found')).toBeInTheDocument();
+    expect(screen.getByText('Try a different search term or command')).toBeInTheDocument();
+  });
 });

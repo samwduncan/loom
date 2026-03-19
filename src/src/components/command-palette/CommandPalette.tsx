@@ -13,7 +13,9 @@
 
 import { Command } from 'cmdk';
 import { useState, useCallback } from 'react';
+import { Search } from 'lucide-react';
 import { useUIStore } from '@/stores/ui';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { useCommandPaletteShortcut } from './hooks/useCommandPaletteShortcut';
 import { useCommandSearch } from './hooks/useCommandSearch';
 import { NavigationGroup } from './groups/NavigationGroup';
@@ -69,7 +71,13 @@ export const CommandPalette = function CommandPalette() {
         <ActionGroup onClose={onClose} />
         <CommandGroup search={search} onClose={onClose} />
         <ProjectGroup onClose={onClose} />
-        <Command.Empty>No results found</Command.Empty>
+        <Command.Empty>
+          <EmptyState
+            icon={<Search className="size-8" />}
+            heading="No results found"
+            description="Try a different search term or command"
+          />
+        </Command.Empty>
       </Command.List>
     </Command.Dialog>
   );

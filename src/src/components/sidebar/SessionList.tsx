@@ -8,6 +8,7 @@
 import { useState, useCallback, useEffect, useRef, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { MessageSquare, Search } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useTimelineStore } from '@/stores/timeline';
 import { useStreamStore } from '@/stores/stream';
@@ -19,6 +20,7 @@ import { hoistPinnedSessions } from '@/lib/sessionGrouping';
 import { useSessionSelection } from '@/hooks/useSessionSelection';
 import { apiFetch } from '@/lib/api-client';
 import { useProjectContext } from '@/hooks/useProjectContext';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { InlineError } from '@/components/shared/InlineError';
 import { ProjectHeader } from './ProjectHeader';
 import { DateGroupHeader } from './DateGroupHeader';
@@ -187,10 +189,13 @@ export function SessionList() {
   const totalVisible = projectGroups.reduce((sum, p) => sum + p.visibleCount, 0);
   if (totalVisible === 0 && !isSearching) {
     return (
-      <div className="flex flex-col items-center justify-center flex-1 px-4 py-8">
-        <p className="text-muted text-[length:var(--text-body)] mb-3">No conversations yet</p>
-        <NewChatButton />
-      </div>
+      <EmptyState
+        icon={<MessageSquare className="size-8" />}
+        heading="No conversations yet"
+        description="Start a new conversation to get going"
+        action={<NewChatButton />}
+        className="flex-1"
+      />
     );
   }
 
@@ -201,8 +206,12 @@ export function SessionList() {
       </div>
       <div ref={scrollRef} className={cn('flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list">
         {totalVisible === 0 && isSearching && (
-          <div className="px-3 py-8 text-center text-[length:var(--text-body)] text-muted">
-            No matching sessions
+          <div className="px-3 py-4">
+            <EmptyState
+              icon={<Search className="size-8" />}
+              heading="No matching sessions"
+              description="Try different search terms"
+            />
           </div>
         )}
         {projectGroups.map((project) => {
