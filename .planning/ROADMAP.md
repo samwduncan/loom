@@ -145,8 +145,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 46-01-PLAN.md -- Standardize hover, focus, and disabled states across all custom interactive elements
-- [ ] 46-02-PLAN.md -- Add enter transitions to command palette, pickers, and branch selector
+- [x] 46-01-PLAN.md -- Standardize hover, focus, and disabled states across all custom interactive elements
+- [x] 46-02-PLAN.md -- Add enter transitions to command palette, pickers, and branch selector
 
 ### Phase 47: Spring Physics & Glass Surfaces
 **Goal**: Key interactions feel physically grounded with spring easing, and overlay surfaces gain depth through frosted glass -- the app stops feeling like flat rectangles snapping into place
@@ -158,11 +158,11 @@ Plans:
   3. Tool card expand/collapse, tool group accordion, command palette open/close, and scroll-to-bottom pill all use spring easing
   4. Settings modal, command palette, and delete/alert dialogs show a frosted glass overlay (background content is blurred and visible through the surface)
   5. All spring and glass effects are disabled when `prefers-reduced-motion` is active
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 47-01: TBD
-- [ ] 47-02: TBD
+- [ ] 47-01-PLAN.md -- Apply spring easing tokens to modals, sidebar, command palette, tool cards, tool groups, and scroll pill
+- [ ] 47-02-PLAN.md -- Add frosted glass overlay to settings modal, command palette, and alert/delete dialogs
 
 ### Phase 48: Visual Personality
 **Goal**: Loom has distinctive visual signatures that separate it from generic chat UIs -- text reveals and animated borders create moments of delight
@@ -232,4 +232,4 @@ Phases execute in numeric order: 44 -> 44.1 -> 45 -> 45.1 -> ... -> 49
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-19 after Phase 46 planning*
+*Last updated: 2026-03-19 after Phase 47 planning*
