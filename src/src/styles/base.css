@@ -79,3 +79,24 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ─── Skeleton Shimmer Animation (LOAD-01) ───────────────────────
+ * Global directional shimmer for all loading skeletons.
+ * Moved from sidebar.css to base.css for app-wide availability.
+ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--surface-raised) 25%,
+    var(--surface-overlay) 50%,
+    var(--surface-raised) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--space-1);
+}
