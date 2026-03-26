@@ -66,4 +66,39 @@
 - Full IDE replacement — Complements VS Code/Cursor
 
 ## Traceability
-<!-- Filled by roadmapper -->
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DATA-01 | Phase 50 | Pending |
+| DATA-02 | Phase 50 | Pending |
+| DATA-03 | Phase 50 | Pending |
+| DATA-04 | Phase 50 | Pending |
+| DATA-05 | Phase 50 | Pending |
+| PERSIST-01 | Phase 51 | Pending |
+| PERSIST-02 | Phase 51 | Pending |
+| PERSIST-03 | Phase 51 | Pending |
+| PERSIST-04 | Phase 51 | Pending |
+| LIVE-01 | Phase 52 | Pending |
+| LIVE-02 | Phase 52 | Pending |
+| LIVE-03 | Phase 52 | Pending |
+| LIVE-04 | Phase 52 | Pending |
+| LIVE-05 | Phase 52 | Pending |
+| MOBILE-01 | Phase 53 | Pending |
+| MOBILE-02 | Phase 53 | Pending |
+| MOBILE-03 | Phase 53 | Pending |
+| MOBILE-04 | Phase 53 | Pending |
+| MOBILE-05 | Phase 53 | Pending |
+| PERF-01 | Phase 54 | Pending |
+| PERF-02 | Phase 54 | Pending |
+| PERF-03 | Phase 54 | Pending |
+| PERF-04 | Phase 54 | Pending |
+| CONV-01 | Phase 55 | Pending |
+| CONV-02 | Phase 55 | Pending |
+| CONV-03 | Phase 55 | Pending |
+| CONV-04 | Phase 55 | Pending |
+| PWA-01 | Phase 56 | Pending |
+| PWA-02 | Phase 56 | Pending |
+| PWA-03 | Phase 56 | Pending |
+| IOS-01 | Phase 57 | Pending |
+| IOS-02 | Phase 57 | Pending |
+| IOS-03 | Phase 57 | Pending |

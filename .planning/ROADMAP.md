@@ -2,20 +2,21 @@
 
 ## Milestones
 
-- v1.0 "The Skeleton" -- Phases 1-10 (shipped 2026-03-07)
-- v1.1 "The Chat" -- Phases 11-19 (shipped 2026-03-09)
-- v1.2 "The Workspace" -- Phases 20-27 (shipped 2026-03-12)
-- v1.3 "The Refinery" -- Phases 28-37 (shipped 2026-03-17)
-- v1.4 "The Navigator" -- Phases 38-43 (shipped 2026-03-18)
-- **v1.5 "The Craft"** -- Phases 44-49 (in progress)
-- v2.0 "The Power" -- (planned)
-- v2.1 "The Polish" -- (planned)
-- v3.0 "The Vision" -- (planned)
+- ✅ **v1.0 "The Skeleton"** - Phases 1-10 (shipped 2026-03-07)
+- ✅ **v1.1 "The Chat"** - Phases 11-19 (shipped 2026-03-09)
+- ✅ **v1.2 "The Workspace"** - Phases 20-27 (shipped 2026-03-12)
+- ✅ **v1.3 "The Refinery"** - Phases 28-37 (shipped 2026-03-17)
+- ✅ **v1.4 "The Navigator"** - Phases 38-43 (shipped 2026-03-18)
+- ✅ **v1.5 "The Craft"** - Phases 44-47 (shipped 2026-03-20)
+- 🚧 **v2.0 "The Engine"** - Phases 50-57 (in progress)
+- 📋 **v2.1 "The Power"** - (planned)
+- 📋 **v2.2 "The Polish"** - (planned)
+- 📋 **v3.0 "The Vision"** - (planned)
 
 ## Phases
 
 <details>
-<summary>v1.0 "The Skeleton" (Phases 1-10) -- SHIPPED 2026-03-07</summary>
+<summary>✅ v1.0 "The Skeleton" (Phases 1-10) -- SHIPPED 2026-03-07</summary>
 
 - [x] Phase 1: Design Token System (3/3 plans) -- completed 2026-03-05
 - [x] Phase 2: Enforcement + Testing Infrastructure (3/3 plans) -- completed 2026-03-05
@@ -31,7 +32,7 @@
 </details>
 
 <details>
-<summary>v1.1 "The Chat" (Phases 11-19) -- SHIPPED 2026-03-09</summary>
+<summary>✅ v1.1 "The Chat" (Phases 11-19) -- SHIPPED 2026-03-09</summary>
 
 - [x] Phase 11: Markdown + Code Blocks + UI Primitives (3/3 plans) -- completed 2026-03-07
 - [x] Phase 12: Streaming Markdown + Marker Interleaving (3/3 plans) -- completed 2026-03-07
@@ -46,7 +47,7 @@
 </details>
 
 <details>
-<summary>v1.2 "The Workspace" (Phases 20-27) -- SHIPPED 2026-03-12</summary>
+<summary>✅ v1.2 "The Workspace" (Phases 20-27) -- SHIPPED 2026-03-12</summary>
 
 - [x] Phase 20: Content Layout + Tab System (2/2 plans) -- completed 2026-03-10
 - [x] Phase 21: Settings Panel (3/3 plans) -- completed 2026-03-10
@@ -60,7 +61,7 @@
 </details>
 
 <details>
-<summary>v1.3 "The Refinery" (Phases 28-37) -- SHIPPED 2026-03-17</summary>
+<summary>✅ v1.3 "The Refinery" (Phases 28-37) -- SHIPPED 2026-03-17</summary>
 
 - [x] Phase 28: Error & Connection Resilience (2/2 plans) -- completed 2026-03-12
 - [x] Phase 29: Session Hardening (2/2 plans) -- completed 2026-03-13
@@ -76,7 +77,7 @@
 </details>
 
 <details>
-<summary>v1.4 "The Navigator" (Phases 38-43) -- SHIPPED 2026-03-18</summary>
+<summary>✅ v1.4 "The Navigator" (Phases 38-43) -- SHIPPED 2026-03-18</summary>
 
 - [x] Phase 38: Broken Fixes & Persist Audit (2/2 plans) -- completed 2026-03-17
 - [x] Phase 39: Backend Hardening (2/2 plans) -- completed 2026-03-17
@@ -87,125 +88,142 @@
 
 </details>
 
-### v1.5 "The Craft" (Phases 44-49)
+<details>
+<summary>✅ v1.5 "The Craft" (Phases 44-47) -- SHIPPED 2026-03-20</summary>
 
-**Milestone Goal:** Make every pixel intentional. Fix every rough edge, nail every detail, add visual personality. Feel like a real product built by a real team.
+- [x] Phase 44: Foundation (2/2 plans) -- completed 2026-03-18
+- [x] Phase 45: Loading, Error & Empty States (2/2 plans) -- completed 2026-03-19
+- [x] Phase 46: Interactive State Consistency (2/2 plans) -- completed 2026-03-19
+- [x] Phase 47: Spring Physics & Glass Surfaces (2/2 plans) -- completed 2026-03-19
+
+</details>
+
+### 🚧 v2.0 "The Engine" (Phases 50-57)
+
+**Milestone Goal:** Make Loom a daily-driver that's faster than any mobile AI app. SQLite data layer replaces JSONL-on-every-load with sub-50ms session switching, live session attach streams running CLI sessions to the browser in real-time, mobile layout enables "monitor your agent from your phone," and a manifest-only PWA makes it installable. Zero new production dependencies needed.
 
 **Phase Numbering:**
-- Integer phases (44, 45, 46...): Planned milestone work
-- Decimal phases (44.1, 44.2): Urgent insertions (marked with INSERTED)
+- Integer phases (50, 51, 52...): Planned milestone work
+- Decimal phases (50.1, 50.2): Urgent insertions (marked with INSERTED)
 
-- [x] **Phase 44: Foundation** - Settings refactor, CSS spring token generation, dead UI removal (completed 2026-03-18)
-- [x] **Phase 45: Loading, Error & Empty States** - Skeleton shimmers, error retry, designed empty states for every data surface (completed 2026-03-19)
-- [x] **Phase 46: Interactive State Consistency** - Hover, focus, disabled, and transition states across all interactive elements (completed 2026-03-19)
-- [x] **Phase 47: Spring Physics & Glass Surfaces** - CSS linear() spring easing on key interactions, frosted glass on overlays (completed 2026-03-19)
-- [ ] **Phase 48: Visual Personality** - DecryptedText reveals, ElectricBorder/StarBorder accents on active elements
-- [ ] **Phase 49: Spacing & Typography Polish** - Border-radius, spacing, and font size audit against design token scale
+- [ ] **Phase 50: SQLite Data Layer** - Replace JSONL-on-every-load with SQLite message cache for sub-50ms session switching
+- [ ] **Phase 51: State Persistence** - Last session, scroll position, sidebar state survive browser restarts
+- [ ] **Phase 52: Live Session Attach** - Stream running CLI sessions to the browser in real-time via JSONL file watching
+- [ ] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas
+- [ ] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading
+- [ ] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector
+- [ ] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker)
+- [ ] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification
 
 ## Phase Details
 
-### Phase 44: Foundation
-**Goal**: Clean technical foundation so all subsequent phases build on resolved code and complete token infrastructure
-**Depends on**: Nothing (first phase of v1.5)
-**Requirements**: FOUND-01, FOUND-02, FOUND-03
+### Phase 50: SQLite Data Layer
+**Goal**: Sessions load instantly from a SQLite cache instead of parsing JSONL files on every request
+**Depends on**: Nothing (foundation for this milestone)
+**Requirements**: DATA-01, DATA-02, DATA-03, DATA-04, DATA-05
 **Success Criteria** (what must be TRUE):
-  1. Settings modal opens with refactored data hooks -- no per-hook boilerplate, connection store persists correctly across reloads, ModalState is a discriminated union
-  2. No placeholder fields, fake data, or non-functional controls are visible anywhere in the application
-  3. CSS custom properties `--ease-spring-gentle`, `--ease-spring-snappy`, `--ease-spring-bouncy` exist in tokens.css as `linear()` values and can be applied to any `transition-timing-function`
-**Plans**: 2 plans
-
-Plans:
-- [x] 44-01-PLAN.md -- Land WIP settings refactor + delete dead UI components
-- [x] 44-02-PLAN.md -- Generate CSS spring easing tokens from motion.ts configs
-
-### Phase 45: Loading, Error & Empty States
-**Goal**: Every async surface communicates its state clearly -- users never see a blank void, a frozen spinner, or an unhelpful error
-**Depends on**: Phase 44 (settings refactor must land before touching settings loading states)
-**Requirements**: LOAD-01, LOAD-02, LOAD-03, EMPTY-01, EMPTY-02, EMPTY-03, EMPTY-04
-**Success Criteria** (what must be TRUE):
-  1. Every component that fetches data shows a directional shimmer skeleton during loading (not a spinner, not a blank space)
-  2. Every component that fetches data has an error state with a clear message and a retry button that actually re-fetches
-  3. Terminal panel shows a skeleton component (not a text string) while loading
-  4. File tree, git panel (both views), session list, and search results each show a designed empty state with icon, heading, and guidance text
-**Plans**: 2 plans
-
-Plans:
-- [x] 45-01-PLAN.md -- Shared primitives (Skeleton, EmptyState, InlineError) + normalize all skeletons to shimmer + wire retry to error states
-- [x] 45-02-PLAN.md -- Upgrade all bare-text empty states to designed EmptyState components with icons and guidance
-
-### Phase 46: Interactive State Consistency
-**Goal**: Every clickable, focusable, and disableable element in the application behaves consistently -- the app feels like one designer touched every surface
-**Depends on**: Phase 45 (empty/error states may introduce new interactive elements that need consistent styling)
-**Requirements**: INTER-01, INTER-02, INTER-03, INTER-04
-**Success Criteria** (what must be TRUE):
-  1. Hovering any custom button, card, list item, or tab shows a consistent hover response using design tokens (not ad-hoc opacity or color changes)
-  2. Tabbing through the entire application shows a uniform focus ring (same color, width, offset) on every focusable element
-  3. All disabled interactive elements have reduced opacity, no hover effect, and a `not-allowed` cursor
-  4. Context menus, tooltips, and popovers all enter and exit with consistent transitions (no instant pop-in or pop-out)
-**Plans**: 2 plans
-
-Plans:
-- [x] 46-01-PLAN.md -- Standardize hover, focus, and disabled states across all custom interactive elements
-- [x] 46-02-PLAN.md -- Add enter transitions to command palette, pickers, and branch selector
-
-### Phase 47: Spring Physics & Glass Surfaces
-**Goal**: Key interactions feel physically grounded with spring easing, and overlay surfaces gain depth through frosted glass -- the app stops feeling like flat rectangles snapping into place
-**Depends on**: Phase 44 (spring tokens must exist), Phase 46 (interactive states must be consistent before layering spring physics)
-**Requirements**: SPRING-01, SPRING-02, SPRING-03, SPRING-04, SPRING-05, GLASS-01, GLASS-02, GLASS-03, GLASS-04
-**Success Criteria** (what must be TRUE):
-  1. Settings modal, delete confirmations, and alert dialogs open and close with visible spring overshoot (not linear or ease-out)
-  2. Sidebar expand/collapse animates with spring easing (not instant or linear)
-  3. Tool card expand/collapse, tool group accordion, command palette open/close, and scroll-to-bottom pill all use spring easing
-  4. Settings modal, command palette, and delete/alert dialogs show a frosted glass overlay (background content is blurred and visible through the surface)
-  5. All spring and glass effects are disabled when `prefers-reduced-motion` is active
-**Plans**: 2 plans
-
-Plans:
-- [x] 47-01-PLAN.md -- Apply spring easing tokens to modals, sidebar, command palette, tool cards, tool groups, and scroll pill
-- [x] 47-02-PLAN.md -- Add frosted glass overlay to settings modal, command palette, and alert/delete dialogs
-
-### Phase 48: Visual Personality
-**Goal**: Loom has distinctive visual signatures that separate it from generic chat UIs -- text reveals and animated borders create moments of delight
-**Depends on**: Phase 47 (spring tokens and glass surfaces provide the timing and surface context for personality effects)
-**Requirements**: VIS-01, VIS-02, VIS-03, VIS-04
-**Success Criteria** (what must be TRUE):
-  1. When a new session appears in the sidebar, its title animates with a character-scramble reveal (DecryptedText) instead of appearing instantly
-  2. Model name in the status line animates with DecryptedText when switching models or sessions
-  3. The active session in the sidebar has an animated ElectricBorder/StarBorder accent distinguishing it from inactive sessions
-  4. The composer input, when focused, shows an ElectricBorder/StarBorder accent
+  1. Switching to any previously-loaded session renders messages in under 50ms (vs 200-800ms today)
+  2. Session list in sidebar loads from cached metadata in under 10ms
+  3. Deleting `cache.db` and reloading causes a single slow load, then all subsequent loads are fast again
+  4. Background cache warmer completes indexing all JSONL files within 30 seconds of server startup
+  5. Cache uses WAL mode in a separate file from auth.db -- deleting it never affects authentication
 **Plans**: TBD
 
-Plans:
-- [ ] 48-01: TBD
-- [ ] 48-02: TBD
-
-### Phase 49: Spacing & Typography Polish
-**Goal**: Every pixel is intentional -- consistent token usage for border-radius, spacing, and font sizes across the entire application
-**Depends on**: Phase 48 (all visual changes must be stable before the final sweep)
-**Requirements**: POLISH-01, POLISH-02, POLISH-03
+### Phase 51: State Persistence
+**Goal**: Users return to exactly where they left off after closing and reopening the browser
+**Depends on**: Phase 50
+**Requirements**: PERSIST-01, PERSIST-02, PERSIST-03, PERSIST-04
 **Success Criteria** (what must be TRUE):
-  1. All border-radius values in the codebase use design token scale -- no hardcoded arbitrary values that bypass the scale
-  2. Spacing between sections, cards, and list items follows the token scale consistently -- no ad-hoc pixel values or inconsistent gaps
-  3. All font sizes use the defined type scale -- no arbitrary size overrides
+  1. Closing the browser and reopening navigates to the last-viewed session automatically
+  2. Scroll position restores to the same place when switching between sessions
+  3. Sidebar open/collapsed state and the active project group survive a full page reload
+  4. Permission mode setting persists across browser restarts without re-selection
 **Plans**: TBD
 
-Plans:
-- [ ] 49-01: TBD
+### Phase 52: Live Session Attach
+**Goal**: Users can watch a running CLI session stream output in real-time from the browser
+**Depends on**: Phase 50
+**Requirements**: LIVE-01, LIVE-02, LIVE-03, LIVE-04, LIVE-05
+**Success Criteria** (what must be TRUE):
+  1. Sessions with actively running CLI processes show a pulsing "live" indicator in the sidebar
+  2. Clicking "Attach" on a live session shows real-time output appearing within 200ms of the CLI writing it
+  3. User can detach from a live session and the CLI process continues running uninterrupted
+  4. Permission prompts from an attached session appear in the Loom UI for user response
+  5. Attaching to a session that finishes while attached transitions cleanly to normal completed state
+**Plans**: TBD
 
-### v2.0 "The Power" (Planned)
+### Phase 53: Mobile-Responsive Layout
+**Goal**: Users can comfortably monitor and interact with AI agents from a phone browser
+**Depends on**: Phase 51
+**Requirements**: MOBILE-01, MOBILE-02, MOBILE-03, MOBILE-04, MOBILE-05
+**Success Criteria** (what must be TRUE):
+  1. Tapping the composer input on mobile does not trigger browser zoom (16px minimum font size)
+  2. All interactive elements have at least 44x44px touch targets on mobile viewports
+  3. Sidebar opens as a full-screen drawer with swipe-to-close gesture on mobile
+  4. Composer input stays visible above the virtual keyboard when typing on mobile
+  5. Code blocks in messages scroll horizontally and images resize proportionally on narrow screens
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 54: Performance Hardening
+**Goal**: Every interaction feels instant through deduplication, optimistic updates, and lazy loading
+**Depends on**: Phase 50, Phase 52
+**Requirements**: PERF-01, PERF-02, PERF-03, PERF-04
+**Success Criteria** (what must be TRUE):
+  1. Rapidly clicking the same session multiple times only fires one API request
+  2. Deleting, renaming, or pinning a session updates the sidebar instantly with rollback on failure
+  3. Terminal, git panel, and file tree panels only load their JavaScript on first visit (not on app startup)
+  4. All async content areas show skeleton loading states with zero layout shifts during load
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 55: Conversation Enhancements
+**Goal**: Users get smart assistance features that match or exceed ChatGPT and Gemini mobile apps
+**Depends on**: Phase 50
+**Requirements**: CONV-01, CONV-02, CONV-03, CONV-04
+**Success Criteria** (what must be TRUE):
+  1. After an assistant response, 2-3 contextual follow-up prompt suggestions appear as tappable pills
+  2. Users can select from conversation templates to start common tasks with pre-filled system prompts
+  3. A sidebar indicator shows when an idle background session receives new output
+  4. Users can switch between Claude, Gemini, and Codex models from a selector in the composer
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 56: PWA Manifest
+**Goal**: Users can install Loom to their phone's home screen as a standalone app
+**Depends on**: Phase 53
+**Requirements**: PWA-01, PWA-02, PWA-03
+**Success Criteria** (what must be TRUE):
+  1. "Add to Home Screen" prompt appears on mobile browsers when visiting Loom via Tailscale HTTPS
+  2. Installed PWA launches with a proper app icon and splash screen (not a browser tab)
+  3. No service worker is registered -- the app always loads fresh content from the server
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 57: iOS Research
+**Goal**: Document the path to an iOS App Store app with a working Capacitor prototype
+**Depends on**: Phase 56
+**Requirements**: IOS-01, IOS-02, IOS-03
+**Success Criteria** (what must be TRUE):
+  1. A written document exists covering Capacitor integration path with pros, cons, and effort estimate
+  2. Tailscale DNS resolution has been tested from a WKWebView sandbox with documented results
+  3. A minimal Capacitor shell project exists that loads the Loom web build and renders the chat view
+**Plans**: TBD
+
+### 📋 v2.1 "The Power" (Planned)
 
 - [ ] Multi-provider tabbed workspaces (Claude, Gemini, Codex)
 - [ ] MCP server management UI
 - [ ] Plugin/skill management UI
 
-### v2.1 "The Polish" (Planned)
+### 📋 v2.2 "The Polish" (Planned)
 
 - [ ] Aurora/WebGL ambient overlay (GPU feasibility gated)
 - [ ] Comprehensive spring physics on all interactions
 - [ ] Tier 2/3 visual effects (Iridescence, LiquidChrome, Border Beam, etc.)
 - [ ] Full motion refinement pass
 
-### v3.0 "The Vision" (Planned)
+### 📋 v3.0 "The Vision" (Planned)
 
 - [ ] GSD visual dashboard
 - [ ] Nextcloud integration
@@ -215,21 +233,24 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 44 -> 44.1 -> 45 -> 45.1 -> ... -> 49
+Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 44. Foundation | 2/2 | Complete    | 2026-03-18 |
-| 45. Loading, Error & Empty States | 2/2 | Complete    | 2026-03-19 |
-| 46. Interactive State Consistency | 2/2 | Complete    | 2026-03-19 |
-| 47. Spring Physics & Glass Surfaces | 2/2 | Complete   | 2026-03-19 |
-| 48. Visual Personality | 0/2 | Not started | - |
-| 49. Spacing & Typography Polish | 0/1 | Not started | - |
+| 50. SQLite Data Layer | 0/TBD | Not started | - |
+| 51. State Persistence | 0/TBD | Not started | - |
+| 52. Live Session Attach | 0/TBD | Not started | - |
+| 53. Mobile-Responsive Layout | 0/TBD | Not started | - |
+| 54. Performance Hardening | 0/TBD | Not started | - |
+| 55. Conversation Enhancements | 0/TBD | Not started | - |
+| 56. PWA Manifest | 0/TBD | Not started | - |
+| 57. iOS Research | 0/TBD | Not started | - |
 
 ## Backlog (Future Milestones)
 
-- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v2.0/v3.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
+- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v2.1/v3.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
+- **Phases 48-49 (v1.5 deferred)** -- DecryptedText reveals, StarBorder accents, spacing/typography audit. Deprioritized in favor of engine work; revisit during v2.2 "The Polish."
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-19 after Phase 47 planning*
+*Last updated: 2026-03-26 after v2.0 roadmap creation*
