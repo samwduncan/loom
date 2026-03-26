@@ -21,6 +21,9 @@ import { useStreamStore } from '@/stores/stream';
 import type { Message } from '@/types/message';
 import type { ReactNode } from 'react';
 
+const SCROLL_STORAGE_PREFIX = 'loom-scroll-';
+let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+
 export interface MessageListProps {
   messages: Message[];
   sessionId: string;
@@ -92,13 +95,32 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     setUnreadCount(0);
   }
 
-  // Scroll to bottom on session switch or initial messages load
+  // Save scroll position for the previous session on switch (via effect to satisfy refs rule)
+  const prevSessionRef = useRef(sessionId);
+  useEffect(() => {
+    if (prevSessionRef.current !== sessionId) {
+      const el = scrollRef.current;
+      if (el && prevSessionRef.current) {
+        sessionStorage.setItem(`${SCROLL_STORAGE_PREFIX}${prevSessionRef.current}`, String(el.scrollTop));
+      }
+      prevSessionRef.current = sessionId;
+    }
+  }, [sessionId]);
+
+  // Scroll to saved position (or bottom) on session switch or initial messages load
   const scrolledSessionRef = useRef<string | null>(null);
   useLayoutEffect(() => {
     const el = scrollRef.current;
     if (el && messages.length > 0 && scrolledSessionRef.current !== sessionId) {
       scrolledSessionRef.current = sessionId;
-      requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+      const savedPos = sessionStorage.getItem(`${SCROLL_STORAGE_PREFIX}${sessionId}`);
+      requestAnimationFrame(() => {
+        if (savedPos !== null) {
+          el.scrollTop = Number(savedPos);
+        } else {
+          el.scrollTop = el.scrollHeight;
+        }
+      });
     }
   });
 
@@ -110,7 +132,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     }
   }, [isStreaming, atBottom, messages.length]);
 
-  // Track atBottom state
+  // Track atBottom state + throttled scroll position save
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -118,7 +140,13 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     const isBottom = distFromBottom < 150;
     setAtBottom(isBottom);
     if (isBottom) setUnreadCount(0);
-  }, []);
+
+    // Throttled save to sessionStorage (200ms trailing edge)
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      sessionStorage.setItem(`${SCROLL_STORAGE_PREFIX}${sessionId}`, String(el.scrollTop));
+    }, 200);
+  }, [sessionId]);
 
   // Attach scroll listener
   useEffect(() => {
