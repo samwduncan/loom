@@ -40,7 +40,7 @@ export function SearchInput({ value, onChange }: SearchInputProps) {
         aria-label="Search sessions"
         className={cn(
           'w-full bg-surface-base border border-border rounded-md',
-          'pl-7 pr-7 py-1.5 text-sm',
+          'pl-7 pr-7 py-1.5 text-base md:text-sm',
           'text-foreground placeholder:text-muted',
           'outline-none focus-visible:ring-2 focus-visible:ring-ring',
           'transition-colors duration-[var(--duration-fast)]',

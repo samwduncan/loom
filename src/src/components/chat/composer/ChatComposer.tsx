@@ -603,7 +603,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
           }
           rows={1}
           className={cn(
-            'w-full resize-none overflow-y-hidden bg-transparent text-sm text-foreground',
+            'w-full resize-none overflow-y-hidden bg-transparent text-base md:text-sm text-foreground',
             'placeholder:text-muted',
             'focus:outline-none',
           )}
