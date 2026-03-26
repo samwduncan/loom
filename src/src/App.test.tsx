@@ -81,4 +81,12 @@ describe('App routing', () => {
     expect(screen.getByTestId('chat-empty-state')).toBeInTheDocument();
     expect(screen.getByTestId('app-shell')).toBeInTheDocument();
   });
+
+  it('root path / with persisted activeSessionId redirects to /chat/{sessionId}', () => {
+    useTimelineStore.setState({ activeSessionId: 'persisted-session-123' });
+    renderWithRouter(['/']);
+    // ChatView renders with sessionId param (may show skeleton since no messages in store)
+    expect(screen.getByTestId('chat-view')).toBeInTheDocument();
+    expect(screen.getByTestId('app-shell')).toBeInTheDocument();
+  });
 });

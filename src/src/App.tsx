@@ -16,13 +16,20 @@ import { ProofOfLife } from '@/components/dev/ProofOfLife';
 import { AppShell } from '@/components/app-shell/AppShell';
 import { AppErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { Toaster } from '@/components/ui/sonner';
+import { useTimelineStore } from '@/stores/timeline';
+
+/** Reads persisted activeSessionId and redirects to last-viewed session or /chat */
+function LastSessionRedirect() {
+  const activeSessionId = useTimelineStore((state) => state.activeSessionId);
+  return <Navigate to={activeSessionId ? `/chat/${activeSessionId}` : '/chat'} replace />;
+}
 
 /** Route structure without BrowserRouter -- for testing with MemoryRouter */
 export function AppRoutes() {
   return (
     <Routes>
       <Route element={<AppShell />}>
-        <Route index element={<Navigate to="/chat" replace />} />
+        <Route index element={<LastSessionRedirect />} />
         {/* Route exists for useParams() match context -- ChatView is rendered by ContentArea */}
         <Route path="/chat/:sessionId?" element={null} />
       </Route>
