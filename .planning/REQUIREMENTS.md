@@ -7,7 +7,7 @@
 - [ ] **DATA-01**: Sessions load in <50ms from SQLite cache (vs 200-800ms JSONL parsing)
 - [ ] **DATA-02**: Cache auto-populates on first JSONL read, invalidates on mtime/size change
 - [ ] **DATA-03**: Session list loads from cached metadata in <10ms
-- [ ] **DATA-04**: Cache uses WAL mode in separate `cache.db` file (deletable without losing auth)
+- [x] **DATA-04**: Cache uses WAL mode in separate `cache.db` file (deletable without losing auth)
 - [ ] **DATA-05**: Background cache warmer indexes all JSONL files on server startup
 
 ## State Persistence (PERSIST)
@@ -72,7 +72,7 @@
 | DATA-01 | Phase 50 | Pending |
 | DATA-02 | Phase 50 | Pending |
 | DATA-03 | Phase 50 | Pending |
-| DATA-04 | Phase 50 | Pending |
+| DATA-04 | Phase 50 | Complete |
 | DATA-05 | Phase 50 | Pending |
 | PERSIST-01 | Phase 51 | Pending |
 | PERSIST-02 | Phase 51 | Pending |
