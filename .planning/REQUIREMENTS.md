@@ -11,10 +11,10 @@
 - [x] **DATA-05**: Background cache warmer indexes all JSONL files on server startup
 
 ## State Persistence (PERSIST)
-- [ ] **PERSIST-01**: Last-viewed session restores on browser reload
-- [ ] **PERSIST-02**: Scroll position restores per session on switch
-- [ ] **PERSIST-03**: Sidebar open/collapsed state and active project survive reload
-- [ ] **PERSIST-04**: Permission mode persists across sessions
+- [x] **PERSIST-01**: Last-viewed session restores on browser reload
+- [x] **PERSIST-02**: Scroll position restores per session on switch
+- [x] **PERSIST-03**: Sidebar open/collapsed state and active project survive reload
+- [x] **PERSIST-04**: Permission mode persists across sessions
 
 ## Live Session Attach (LIVE)
 - [ ] **LIVE-01**: Sidebar shows "active" indicator for sessions with running CLI processes
@@ -74,10 +74,10 @@
 | DATA-03 | Phase 50 | Complete |
 | DATA-04 | Phase 50 | Complete |
 | DATA-05 | Phase 50 | Complete |
-| PERSIST-01 | Phase 51 | Pending |
-| PERSIST-02 | Phase 51 | Pending |
-| PERSIST-03 | Phase 51 | Pending |
-| PERSIST-04 | Phase 51 | Pending |
+| PERSIST-01 | Phase 51 | Complete |
+| PERSIST-02 | Phase 51 | Complete |
+| PERSIST-03 | Phase 51 | Complete |
+| PERSIST-04 | Phase 51 | Complete |
 | LIVE-01 | Phase 52 | Pending |
 | LIVE-02 | Phase 52 | Pending |
 | LIVE-03 | Phase 52 | Pending |

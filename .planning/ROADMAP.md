@@ -107,7 +107,7 @@
 - Decimal phases (50.1, 50.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 50: SQLite Data Layer** - Replace JSONL-on-every-load with SQLite message cache for sub-50ms session switching (completed 2026-03-26)
-- [ ] **Phase 51: State Persistence** - Last session, scroll position, sidebar state survive browser restarts
+- [x] **Phase 51: State Persistence** - Last session, scroll position, sidebar state survive browser restarts (completed 2026-03-26)
 - [ ] **Phase 52: Live Session Attach** - Stream running CLI sessions to the browser in real-time via JSONL file watching
 - [ ] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas
 - [ ] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading
@@ -141,9 +141,9 @@ Plans:
   2. Scroll position restores to the same place when switching between sessions
   3. Sidebar open/collapsed state and the active project group survive a full page reload
   4. Permission mode setting persists across browser restarts without re-selection
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 51-01-PLAN.md -- Smart redirect + scroll position persistence
+- [x] 51-01-PLAN.md -- Smart redirect + scroll position persistence
 
 ### Phase 52: Live Session Attach
 **Goal**: Users can watch a running CLI session stream output in real-time from the browser
@@ -243,7 +243,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 50. SQLite Data Layer | 2/2 | Complete    | 2026-03-26 |
-| 51. State Persistence | 0/1 | Not started | - |
+| 51. State Persistence | 1/1 | Complete   | 2026-03-26 |
 | 52. Live Session Attach | 0/TBD | Not started | - |
 | 53. Mobile-Responsive Layout | 0/TBD | Not started | - |
 | 54. Performance Hardening | 0/TBD | Not started | - |

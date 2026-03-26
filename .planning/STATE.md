@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "The Engine"
-status: Ready to plan
-stopped_at: Completed 50-02-PLAN.md
-last_updated: "2026-03-26T23:38:32.612Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 51-01-PLAN.md
+last_updated: "2026-03-26T23:49:40.550Z"
 progress:
   total_phases: 8
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 50 — SQLite Data Layer
+**Current focus:** Phase 51 — State Persistence
 
 ## Current Position
 
-Phase: 51
-Plan: Not started
+Phase: 51 (State Persistence) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Plan: Not started
 *Updated after each plan completion*
 | Phase 50 P01 | 2min | 1 tasks | 2 files |
 | Phase 50 P02 | 3min | 2 tasks | 3 files |
+| Phase 51 P01 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,8 @@ Plan: Not started
 - [Phase 50]: Cache-first with silent fallback -- cache errors never break the API, always fall through to JSONL
 - [Phase 50]: Write-through on JSONL miss -- first read populates cache automatically for next time
 - [Phase 50]: Background warmer is fire-and-forget -- server fully functional without cache via JSONL fallback
+- [Phase 51]: sessionStorage for scroll positions -- ephemeral, auto-cleans on tab close, survives F5
+- [Phase 51]: LastSessionRedirect reads persisted activeSessionId for smart root-path routing
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-26T23:33:48.530Z
-Stopped at: Completed 50-02-PLAN.md
+Last session: 2026-03-26T23:49:40.548Z
+Stopped at: Completed 51-01-PLAN.md
 Resume: `/gsd:plan-phase 50` (skip research -- architecture fully specified in research/ARCHITECTURE.md)
