@@ -1,39 +1,22 @@
 /**
- * MessageList -- renders an array of Message objects with scroll anchoring.
+ * MessageList -- flat list with CSS content-visibility for smooth scrolling.
  *
- * 5-way dispatch: user, assistant, error, system, task_notification.
- * Each message wrapped in MessageErrorBoundary for crash isolation.
- * During streaming, renders ActiveMessage at the end.
- * Includes scroll anchor sentinel and ScrollToBottomPill.
- *
- * Scroll position is saved per session and restored on switch.
- * New sessions (no saved position) scroll to bottom.
- * Unread count tracks messages arriving while scrolled away from bottom.
- *
- * ActiveMessage stays mounted through finalization to complete the 200ms
- * fade-out before unmounting. showActiveMessage is driven by
- * onFinalizationComplete, NOT by isStreaming going false.
- *
- * Auto-collapse: messages scrolled far above viewport collapse to a compact
- * summary line. Clicking or scrolling back expands them. Last 10 messages
- * are always protected from collapsing.
+ * No virtualization library. All messages are in the DOM but the browser
+ * skips rendering off-screen items via content-visibility: auto. This avoids
+ * the height estimation errors that cause scroll jumps in virtualization libs.
  *
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useRef, useState, useEffect, useCallback, useLayoutEffect, type RefObject } from 'react';
-import { cn } from '@/utils/cn';
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, memo, type RefObject } from 'react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
 import { ErrorMessage } from '@/components/chat/view/ErrorMessage';
 import { SystemMessage } from '@/components/chat/view/SystemMessage';
 import { TaskNotificationMessage } from '@/components/chat/view/TaskNotificationMessage';
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
-import { CollapsibleMessage } from '@/components/chat/view/CollapsibleMessage';
 import { ScrollToBottomPill } from '@/components/chat/view/ScrollToBottomPill';
 import { MessageErrorBoundary } from '@/components/shared/ErrorBoundary';
-import { useScrollAnchor } from '@/hooks/useScrollAnchor';
-import { useAutoCollapse } from '@/hooks/useAutoCollapse';
 import { useStreamStore } from '@/stores/stream';
 import type { Message } from '@/types/message';
 import type { ReactNode } from 'react';
@@ -41,257 +24,165 @@ import type { ReactNode } from 'react';
 export interface MessageListProps {
   messages: Message[];
   sessionId: string;
-  /** Scroll container ref passed from ChatView for composer scroll stability */
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
-  /** Active search query (debounced) -- used for empty state display */
   searchQuery?: string;
-  /** Highlight function to wrap matching text in <mark> elements */
   highlightText?: (text: string) => ReactNode;
-  /** Whether older messages are available for loading */
   hasMore?: boolean;
-  /** Whether a pagination fetch is currently in flight */
   isFetchingMore?: boolean;
-  /** Callback to trigger loading older messages */
   onLoadMore?: () => void;
 }
 
-export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText, hasMore, isFetchingMore, onLoadMore }: MessageListProps) {
-  const internalScrollRef = useRef<HTMLDivElement>(null);
-  // Use external ref if provided (for composer scroll stability), otherwise internal
-  const scrollRef = scrollContainerRef ?? internalScrollRef;
+/** Memoized message renderer — prevents re-render on parent re-render */
+const MemoizedMessageItem = memo(function MemoizedMessageItem({
+  msg,
+  sessionId,
+  highlightText,
+}: {
+  msg: Message;
+  sessionId: string;
+  highlightText?: (text: string) => ReactNode;
+}) {
+  switch (msg.role) {
+    case 'user':
+      return <UserMessage message={msg} highlightText={highlightText} />;
+    case 'assistant':
+      return <AssistantMessage message={msg} highlightText={highlightText} />;
+    case 'error':
+      return <ErrorMessage message={msg} sessionId={sessionId} />;
+    case 'system':
+      return <SystemMessage message={msg} />;
+    case 'task_notification':
+      return <TaskNotificationMessage message={msg} />;
+    default:
+      return null;
+  }
+});
+
+/** No content-visibility — browser renders all items to avoid scroll height changes */
+
+export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText }: MessageListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const isStreaming = useStreamStore((state) => state.isStreaming);
-  const topSentinelRef = useRef<HTMLDivElement>(null);
+  const [atBottom, setAtBottom] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // ActiveMessage must stay mounted through finalization fade (200ms).
-  // showActiveMessage turns ON when streaming starts, OFF only when
-  // onFinalizationComplete fires -- NOT when isStreaming flips to false.
-  // Uses React "adjust state during rendering" pattern (not useEffect)
-  // to avoid the set-state-in-effect ESLint rule.
+  // ActiveMessage fade-out handling
   const [showActiveMessage, setShowActiveMessage] = useState(false);
-
   if (isStreaming && !showActiveMessage) {
     setShowActiveMessage(true);
   }
-
   const handleFinalized = useCallback(() => {
     setShowActiveMessage(false);
   }, []);
 
-  const {
-    sentinelRef,
-    showPill,
-    scrollToBottom,
-    unreadCount,
-    saveScrollPosition,
-    restoreScrollPosition,
-    incrementUnread,
-  } = useScrollAnchor(scrollRef);
-
-  // --- Auto-collapse: old messages collapse when scrolled out of viewport ---
-  const COLLAPSE_THRESHOLD = 10;
-  const { observeRef, isCollapsed, toggleExpand } = useAutoCollapse(scrollRef);
-
-  // --- Entrance animation tracking ---
-  // Uses React "adjust state during rendering" pattern to track which messages
-  // are "new" (appended after initial render or session switch).
-  // Initial load, session switches, and prepends suppress animations.
-  const [animationState, setAnimationState] = useState({
-    prevCount: messages.length,
-    prevSessionId: sessionId,
-    prevFirstId: messages[0]?.id ?? null,
-    newStartIndex: messages.length, // Start with all "old" (no animations on mount)
-  });
-
-  // Adjust state during rendering: detect message count changes and session switches
-  // without useEffect. React explicitly supports calling setState during render as
-  // long as it's guarded by a condition that prevents infinite loops.
-  if (sessionId !== animationState.prevSessionId) {
-    // Session switch: suppress animations, reset base
-    setAnimationState({
-      prevCount: messages.length,
-      prevSessionId: sessionId,
-      prevFirstId: messages[0]?.id ?? null,
-      newStartIndex: messages.length,
-    });
-  } else if (messages.length !== animationState.prevCount) {
-    const firstId = messages[0]?.id ?? null;
-    const isPrepend = firstId !== animationState.prevFirstId && messages.length > animationState.prevCount;
-    setAnimationState({
-      prevCount: messages.length,
-      prevSessionId: sessionId,
-      prevFirstId: firstId,
-      newStartIndex: isPrepend
-        ? messages.length // Prepend: suppress all animations (no visible entrance)
-        : messages.length > animationState.prevCount
-          ? animationState.prevCount // Append: animate new messages at end
-          : messages.length, // Count decreased (unlikely) -- no animations
-    });
+  // Track unread when new messages arrive while scrolled up
+  const [prevCount, setPrevCount] = useState(messages.length);
+  if (messages.length !== prevCount) {
+    if (messages.length > prevCount && !atBottom) {
+      setUnreadCount(prev => prev + (messages.length - prevCount));
+    }
+    setPrevCount(messages.length);
   }
 
-  const newStartIndex = animationState.newStartIndex;
+  // Session switch — reset scroll state (adjust-state-during-render pattern)
+  const [prevSession, setPrevSession] = useState(sessionId);
+  if (prevSession !== sessionId) {
+    setPrevSession(sessionId);
+    setAtBottom(true);
+    setUnreadCount(0);
+  }
 
-  // Scroll position save/restore on session switch.
-  // Saves old session position, restores target session position.
-  // New sessions (no saved position) scroll to bottom.
-  const prevSessionIdRef = useRef<string | null>(null);
-  const prevMessageCountRef = useRef(messages.length);
-
-  useLayoutEffect(() => {
-    // Save outgoing session's scroll position (must run before early return
-    // so switching to an empty session still saves the outgoing position)
-    if (prevSessionIdRef.current !== null && prevSessionIdRef.current !== sessionId) {
-      saveScrollPosition(prevSessionIdRef.current);
-    }
-
-    if (messages.length === 0) {
-      prevSessionIdRef.current = sessionId;
-      return;
-    }
-
-    // Restore target session's position or scroll to bottom for new sessions
-    if (prevSessionIdRef.current !== sessionId) {
-      const restored = restoreScrollPosition(sessionId);
-      if (!restored) {
-        // No saved position -- scroll to bottom (new session)
-        const el = scrollRef.current;
-        if (el) el.scrollTop = el.scrollHeight;
-      }
-      prevSessionIdRef.current = sessionId;
-    }
-  }, [sessionId, messages.length, scrollRef, saveScrollPosition, restoreScrollPosition]);
-
-  // Track new messages arriving while scrolled up for unread badge.
-  // useEffect syncs message count changes to unread counter when pill is visible.
-  // The ref sync pattern (useEffect, not render-time) satisfies react-hooks/refs.
-  useEffect(() => {
-    const prev = prevMessageCountRef.current;
-    prevMessageCountRef.current = messages.length;
-    if (messages.length > prev && showPill) {
-      incrementUnread(messages.length - prev);
-    }
-  }, [messages.length, showPill, incrementUnread]);
-
-  // --- Pagination: IntersectionObserver for scroll-up loading ---
-  useEffect(() => {
-    if (!topSentinelRef.current || !hasMore || !onLoadMore) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting && !isFetchingMore) {
-          onLoadMore();
-        }
-      },
-      { root: scrollRef.current, rootMargin: '200px 0px 0px 0px' },
-    );
-    observer.observe(topSentinelRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, isFetchingMore, onLoadMore, scrollRef]);
-
-  // --- Pagination: Scroll position preservation on prepend ---
-  // When older messages are prepended, scrollHeight increases but scrollTop
-  // stays the same, causing a visual jump. This compensates by adding the
-  // height delta to scrollTop immediately after DOM commit.
-  const prevScrollHeightRef = useRef(0);
-  const prevFirstMsgIdRef = useRef<string | null>(null);
-  const prevPrependCountRef = useRef(messages.length);
-
+  // Scroll to bottom on session switch or initial messages load
+  const scrolledSessionRef = useRef<string | null>(null);
   useLayoutEffect(() => {
     const el = scrollRef.current;
+    if (el && messages.length > 0 && scrolledSessionRef.current !== sessionId) {
+      scrolledSessionRef.current = sessionId;
+      requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+    }
+  });
+
+  // Auto-follow during streaming
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (isStreaming && atBottom && el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [isStreaming, atBottom, messages.length]);
+
+  // Track atBottom state
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
     if (!el) return;
+    const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    const isBottom = distFromBottom < 150;
+    setAtBottom(isBottom);
+    if (isBottom) setUnreadCount(0);
+  }, []);
 
-    const firstId = messages[0]?.id ?? null;
-    // Detect prepend: first message ID changed AND count increased
-    if (
-      prevFirstMsgIdRef.current !== null &&
-      firstId !== prevFirstMsgIdRef.current &&
-      messages.length > prevPrependCountRef.current
-    ) {
-      const delta = el.scrollHeight - prevScrollHeightRef.current;
-      el.scrollTop += delta;
+  // Attach scroll listener
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  const scrollToBottom = useCallback(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
-    prevScrollHeightRef.current = el.scrollHeight;
-    prevFirstMsgIdRef.current = firstId;
-    prevPrependCountRef.current = messages.length;
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- messages.length is intentional: we detect prepends via ref tracking, not full array identity
-  }, [messages.length, scrollRef]);
+    setUnreadCount(0);
+  }, []);
 
-  // Combined scroll-to-bottom + reset unread handler for pill click
-  const handlePillClick = useCallback(() => {
-    scrollToBottom();
-  }, [scrollToBottom]);
-
-  function renderMessage(msg: Message) {
-    switch (msg.role) {
-      case 'user':
-        return <UserMessage message={msg} highlightText={highlightText} />;
-      case 'assistant':
-        return <AssistantMessage message={msg} highlightText={highlightText} />;
-      case 'error':
-        return <ErrorMessage message={msg} sessionId={sessionId} />;
-      case 'system':
-        return <SystemMessage message={msg} />;
-      case 'task_notification':
-        return <TaskNotificationMessage message={msg} />;
-      default:
-        return null;
+  // Ref callback merges internal scrollRef with external scrollContainerRef
+  const mergedRef = useCallback((node: HTMLDivElement | null) => {
+    (scrollRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    if (scrollContainerRef) {
+      // ASSERT: scrollContainerRef is a MutableRefObject passed from ChatView for scroll-position stability
+      const mutableRef = scrollContainerRef as React.MutableRefObject<HTMLDivElement | null>;
+      mutableRef.current = node;
     }
+  }, [scrollContainerRef]);
+
+  // Search empty state
+  if (messages.length === 0 && searchQuery) {
+    return (
+      <div className="flex flex-1 items-center justify-center py-20 text-sm text-muted" data-testid="search-empty-state">
+        No messages match &lsquo;{searchQuery}&rsquo;
+      </div>
+    );
   }
 
   return (
     <div
-      ref={scrollRef}
-      className="flex-1 overflow-y-auto"
+      ref={mergedRef}
+      className="h-full overflow-y-auto"
       data-testid="message-list-scroll"
     >
-      {/* Search empty state */}
-      {messages.length === 0 && searchQuery ? (
-        <div className="flex flex-1 items-center justify-center py-20 text-sm text-muted" data-testid="search-empty-state">
-          No messages match &lsquo;{searchQuery}&rsquo;
-        </div>
-      ) : (
-      <div className="mx-auto max-w-3xl flex flex-col py-4">
-        {hasMore && (
-          <div ref={topSentinelRef} className="h-px" aria-hidden="true" data-testid="pagination-sentinel" />
-        )}
-        {isFetchingMore && (
-          <div className="flex justify-center py-2" data-testid="pagination-spinner">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-muted border-t-accent-primary" />
+      <div className="mx-auto max-w-3xl py-4">
+        {messages.map((msg) => (
+          <div key={msg.id}>
+            <div className="px-4">
+              <MessageErrorBoundary>
+                <MemoizedMessageItem msg={msg} sessionId={sessionId} highlightText={highlightText} />
+              </MessageErrorBoundary>
+            </div>
+          </div>
+        ))}
+        {showActiveMessage && (
+          <div className="px-4">
+            <ActiveMessage
+              sessionId={sessionId}
+              onFinalizationComplete={handleFinalized}
+            />
           </div>
         )}
-        {messages.map((msg, idx) => {
-          const isProtected = idx >= messages.length - COLLAPSE_THRESHOLD;
-          return (
-            <MessageErrorBoundary key={msg.id}>
-              <div
-                ref={isProtected ? undefined : observeRef(msg.id)}
-                className={cn(
-                  idx >= newStartIndex && 'motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 duration-200'
-                )}
-              >
-                <CollapsibleMessage
-                  role={msg.role}
-                  content={msg.content}
-                  toolCallCount={msg.toolCalls?.length ?? 0}
-                  isCollapsed={isCollapsed(msg.id)}
-                  onToggle={() => toggleExpand(msg.id)}
-                >
-                  {renderMessage(msg)}
-                </CollapsibleMessage>
-              </div>
-            </MessageErrorBoundary>
-          );
-        })}
-        {showActiveMessage && (
-          <ActiveMessage
-            sessionId={sessionId}
-            onFinalizationComplete={handleFinalized}
-          />
-        )}
       </div>
-      )}
-      <div ref={sentinelRef} className="h-0" aria-hidden="true" />
       <ScrollToBottomPill
-        visible={showPill}
-        onClick={handlePillClick}
+        visible={!atBottom}
+        onClick={scrollToBottom}
         unreadCount={unreadCount}
       />
     </div>

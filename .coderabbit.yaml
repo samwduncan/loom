@@ -1,0 +1,227 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# Loom - Web UI for Claude Code CLI
+# React 19 + Vite + React Router | Express + SQLite (better-sqlite3)
+
+language: en-US
+tone_instructions: "Be direct and actionable. Focus on bugs, security, and convention violations. Skip praise. Grade issues by severity: critical (security/data loss), high (logic bugs), medium (missing validation/error handling), low (style nits)."
+early_access: true
+
+reviews:
+  profile: assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+  high_level_summary_in_walkthrough: false
+  collapse_walkthrough: true
+  changed_files_summary: true
+  sequence_diagrams: false
+  poem: false
+  assess_linked_issues: true
+  related_issues: true
+  related_prs: true
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+      - "DRAFT"
+      - "[skip review]"
+
+  path_filters:
+    # Exclude build artifacts and caches
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/.vite/**"
+    - "!**/coverage/**"
+
+    # Exclude planning/working docs
+    - "!.planning/**"
+
+    # Exclude vendored/third-party
+    - "!src/public/fonts/**"
+
+  path_instructions:
+    # --- Frontend Components ---
+    - path: "src/src/components/**"
+      instructions: |
+        UI components. Loom enforces strict conventions via custom ESLint rules. Review for:
+        - No hardcoded colors (use CSS variables only — oklch tokens)
+        - No raw z-index values (use --z-base, --z-sticky, --z-dropdown, --z-overlay, --z-modal, --z-toast, --z-critical tokens)
+        - No className string concatenation (use cn() utility)
+        - No inline styles for visual properties (only dynamic dimensions/transforms allowed)
+        - No CSS variable token shadowing
+        - Named exports only (no default exports except route pages)
+        - Props interface exported and named {ComponentName}Props
+        - Max 200 lines JSX per component
+        - React.memo + custom comparator for items in memoized lists
+        - useCallback for all callbacks passed to memoized children
+
+    - path: "src/src/components/ui/**"
+      instructions: |
+        shadcn/ui primitives. Review for:
+        - Accessibility: ARIA attributes, keyboard navigation, focus management
+        - No business logic in UI primitives
+        - Consistent with shadcn/ui patterns
+
+    - path: "src/src/components/chat/**"
+      instructions: |
+        Chat/conversation UI. Performance-critical rendering path. Review for:
+        - Scroll anchor behavior (useScrollAnchor hook)
+        - Streaming buffer handling (useStreamBuffer hook)
+        - Message virtualization for long conversations
+        - No unnecessary re-renders during streaming
+
+    - path: "src/src/components/terminal/**"
+      instructions: |
+        xterm.js terminal integration. Review for:
+        - WebSocket lifecycle management (connect/disconnect/reconnect)
+        - Terminal resize handling
+        - Memory leaks (xterm dispose on unmount)
+
+    # --- Stores (Constitution 4.1: exactly 4 stores) ---
+    - path: "src/src/stores/**"
+      instructions: |
+        Zustand stores. STRICT rules (Constitution 4.1-4.5):
+        - Exactly 4 stores allowed: timeline, stream, ui, connection. Do NOT add new stores.
+        - Selector-only access (no whole-store subscriptions)
+        - useShallow() required when selecting multiple fields
+        - No cross-store imports (orchestration happens in hooks/components)
+        - Every store must export reset() for testing
+        - Timeline store: Immer middleware for nested mutations
+        - Other stores: vanilla set() returning new objects
+        - No getState().setState() outside the store file itself
+
+    # --- Hooks ---
+    - path: "src/src/hooks/**"
+      instructions: |
+        Custom React hooks. Review for:
+        - Proper dependency arrays
+        - Cleanup in useEffect (abort controllers, WebSocket unsubscribe, timer clearance)
+        - No direct store mutations (use store actions)
+        - Clear return type annotations
+
+    # --- Lib (infrastructure) ---
+    - path: "src/src/lib/**"
+      instructions: |
+        Core infrastructure (WebSocket, API client, parsers). Review for:
+        - WebSocket: reconnection logic, message validation, auth token handling
+        - Parsers: handle malformed input gracefully (ANSI, diff, grep output)
+        - Streaming: backpressure handling, memory management for long streams
+        - No unhandled promise rejections
+
+    # --- Types ---
+    - path: "src/src/types/**"
+      instructions: |
+        TypeScript type definitions. Review for:
+        - No `any` types (must use // @ts-expect-error with reason)
+        - No non-null assertions without comments
+        - Discriminated unions for message types
+        - WebSocket protocol types match server implementation
+
+    # --- Backend ---
+    - path: "server/**/*.js"
+      instructions: |
+        Express backend with SQLite. Review for:
+        - Auth: JWT verification on protected routes, token refresh
+        - Input validation: all user input validated (req.body, req.params, req.query)
+        - SQL injection: use parameterized queries (better-sqlite3 .prepare().run())
+        - WebSocket: auth on connection, message validation
+        - No credentials or secrets in code
+        - Error handling: try/catch, proper HTTP status codes, no leaked stack traces
+        - File operations: path traversal prevention (sanitize file paths from user input)
+
+    - path: "server/index.js"
+      instructions: |
+        Main server file (large, 2000+ lines). Review changes carefully for:
+        - Route handler security (auth middleware applied)
+        - WebSocket upgrade handling
+        - No breaking changes to API contract (see .planning/BACKEND_API_CONTRACT.md)
+
+    # --- Tests ---
+    - path: "**/*.test.{ts,tsx}"
+      instructions: |
+        Test files. Review for:
+        - Store tests call reset() in beforeEach
+        - No hardcoded timeouts (use waitFor/findBy)
+        - Meaningful assertions (not just "doesn't throw")
+        - 80% coverage threshold must be maintained
+
+    # --- Config ---
+    - path: "*.config.{js,ts}"
+      instructions: |
+        Build/tool configuration. Review for:
+        - Vite proxy settings (must proxy /api, /ws, /shell to backend)
+        - ESLint: custom loom-rules must not be disabled without justification
+        - No hardcoded secrets or environment-specific values
+
+    - path: "src/eslint-rules/**"
+      instructions: |
+        Custom ESLint plugin (loom-rules). Review for:
+        - Rule logic correctness (AST visitor patterns)
+        - Test coverage for rule
+        - Clear error messages that explain WHY, not just WHAT
+
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+
+  tools:
+    # Frontend
+    eslint:
+      enabled: true
+    biome:
+      enabled: false
+    # Security
+    gitleaks:
+      enabled: true
+    semgrep:
+      enabled: true
+    # General
+    markdownlint:
+      enabled: false
+    yamllint:
+      enabled: true
+    shellcheck:
+      enabled: true
+    # GitHub
+    github-checks:
+      enabled: true
+      timeout_ms: 90000
+
+chat:
+  auto_reply: true
+
+# Issue Planner — generates Coding Plans from GitHub Issues
+# Trigger manually: comment "@coderabbitai plan" on any issue
+# Auto-planning: creates plans for issues with matching labels
+issue_enrichment:
+  planning:
+    enabled: true
+    auto_planning:
+      enabled: true
+      labels:
+        - "feature"
+        - "enhancement"
+        - "!no-plan"
+        - "!bug"
+
+knowledge_base:
+  opt_out: false
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "CLAUDE.md"
+      - ".planning/V2_CONSTITUTION.md"
+  learnings:
+    scope: auto
+  web_search:
+    enabled: false
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto

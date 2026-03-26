@@ -16,7 +16,7 @@
  * Constitution: Named exports (2.2), cn() for classes (3.6).
  */
 
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
 import { ProviderHeader } from '@/components/chat/provider-logos/ProviderHeader';
@@ -54,7 +54,7 @@ function toToolCallStates(
   }));
 }
 
-export function AssistantMessage({ message, highlightText }: AssistantMessageProps) {
+export const AssistantMessage = memo(function AssistantMessage({ message, highlightText }: AssistantMessageProps) {
   const thinkingExpanded = useUIStore((state) => state.thinkingExpanded);
   const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
   const hasThinking = message.thinkingBlocks && message.thinkingBlocks.length > 0;
@@ -98,4 +98,4 @@ export function AssistantMessage({ message, highlightText }: AssistantMessagePro
       <TokenUsage metadata={message.metadata} />
     </MessageContainer>
   );
-}
+});

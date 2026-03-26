@@ -1,11 +1,10 @@
 /**
- * MessageList pagination tests -- sentinel rendering and loading spinner.
+ * MessageList tests -- message rendering and scroll behavior.
  *
  * Tests verify:
- * - Top sentinel renders when hasMore is true
- * - Sentinel hidden when hasMore is false
- * - Loading spinner shown when isFetchingMore is true
- * - Spinner hidden when isFetchingMore is false
+ * - Messages render by role
+ * - Scroll container exists
+ * - Empty search state
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -13,38 +12,11 @@ import { render, screen } from '@testing-library/react';
 import { MessageList } from './MessageList';
 import type { Message } from '@/types/message';
 
-// Mock IntersectionObserver (not available in jsdom)
-class MockIntersectionObserver {
-  callback: IntersectionObserverCallback;
-  options?: IntersectionObserverInit;
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
-  constructor(callback: IntersectionObserverCallback, options?: IntersectionObserverInit) {
-    this.callback = callback;
-    this.options = options;
-  }
-}
-vi.stubGlobal('IntersectionObserver', MockIntersectionObserver);
-
 // Mock stream store
 vi.mock('@/stores/stream', () => ({
   useStreamStore: vi.fn((selector: (state: { isStreaming: boolean }) => boolean) =>
     selector({ isStreaming: false }),
   ),
-}));
-
-// Mock useScrollAnchor
-vi.mock('@/hooks/useScrollAnchor', () => ({
-  useScrollAnchor: () => ({
-    sentinelRef: { current: null },
-    showPill: false,
-    scrollToBottom: vi.fn(),
-    unreadCount: 0,
-    saveScrollPosition: vi.fn(),
-    restoreScrollPosition: vi.fn(() => false),
-    incrementUnread: vi.fn(),
-  }),
 }));
 
 // Mock child components to keep tests focused
@@ -91,79 +63,65 @@ function makeMessage(id: string, role: 'user' | 'assistant' = 'user'): Message {
   };
 }
 
-describe('MessageList pagination', () => {
+describe('MessageList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders top sentinel when hasMore is true', () => {
+  it('renders user messages', () => {
     render(
       <MessageList
-        messages={[makeMessage('1')]}
+        messages={[makeMessage('1', 'user')]}
         sessionId="session-1"
-        hasMore={true}
-        isFetchingMore={false}
-        onLoadMore={vi.fn()}
       />,
     );
 
-    const sentinel = screen.getByTestId('pagination-sentinel');
-    expect(sentinel).toBeInTheDocument();
-    expect(sentinel).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('user-msg')).toBeInTheDocument();
   });
 
-  it('does not render sentinel when hasMore is false', () => {
+  it('renders assistant messages', () => {
     render(
       <MessageList
-        messages={[makeMessage('1')]}
+        messages={[makeMessage('1', 'assistant')]}
         sessionId="session-1"
-        hasMore={false}
-        isFetchingMore={false}
-        onLoadMore={vi.fn()}
       />,
     );
 
-    expect(screen.queryByTestId('pagination-sentinel')).not.toBeInTheDocument();
+    expect(screen.getByTestId('assistant-msg')).toBeInTheDocument();
   });
 
-  it('renders loading spinner when isFetchingMore is true', () => {
+  it('renders scroll container', () => {
     render(
       <MessageList
         messages={[makeMessage('1')]}
         sessionId="session-1"
-        hasMore={true}
-        isFetchingMore={true}
-        onLoadMore={vi.fn()}
       />,
     );
 
-    const spinner = screen.getByTestId('pagination-spinner');
-    expect(spinner).toBeInTheDocument();
+    expect(screen.getByTestId('message-list-scroll')).toBeInTheDocument();
   });
 
-  it('does not render spinner when isFetchingMore is false', () => {
+  it('shows search empty state when query matches nothing', () => {
     render(
       <MessageList
-        messages={[makeMessage('1')]}
+        messages={[]}
         sessionId="session-1"
-        hasMore={true}
-        isFetchingMore={false}
-        onLoadMore={vi.fn()}
+        searchQuery="nonexistent"
       />,
     );
 
-    expect(screen.queryByTestId('pagination-spinner')).not.toBeInTheDocument();
+    expect(screen.getByTestId('search-empty-state')).toBeInTheDocument();
   });
 
-  it('does not render sentinel or spinner when props are omitted', () => {
+  it('renders multiple messages', () => {
     render(
       <MessageList
-        messages={[makeMessage('1')]}
+        messages={[makeMessage('1', 'user'), makeMessage('2', 'assistant'), makeMessage('3', 'user')]}
         sessionId="session-1"
       />,
     );
 
-    expect(screen.queryByTestId('pagination-sentinel')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('pagination-spinner')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('user-msg')).toHaveLength(2);
+    expect(screen.getByTestId('assistant-msg')).toBeInTheDocument();
   });
 });

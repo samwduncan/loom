@@ -17,6 +17,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Brain, Search, Download } from 'lucide-react';
 import { useProjectContext } from '@/hooks/useProjectContext';
+import { getSessionProject } from '@/lib/session-project-map';
 import { useSessionSwitch } from '@/hooks/useSessionSwitch';
 import { usePaginatedMessages } from '@/hooks/usePaginatedMessages';
 import { useMessageSearch } from '@/hooks/useMessageSearch';
@@ -43,7 +44,9 @@ const EMPTY_MESSAGES: Message[] = [];
 export function ChatView() {
   useNavigateAwayGuard();
   const { sessionId } = useParams<{ sessionId: string }>();
-  const { projectName } = useProjectContext();
+  const { projectName: defaultProject } = useProjectContext();
+  // Use session-specific project if available (cross-project support)
+  const projectName = (sessionId && getSessionProject(sessionId)) || defaultProject;
   const paginationSessionId = (sessionId?.startsWith('stub-') ? null : sessionId) ?? null;
   const pagination = usePaginatedMessages(projectName, paginationSessionId);
   const { switchSession, isLoadingMessages } = useSessionSwitch(pagination.setInitialPaginationState);
@@ -250,7 +253,7 @@ export function ChatView() {
           sessionId={effectiveSessionId ?? ''}
           scrollContainerRef={scrollContainerRef}
           searchQuery={search.debouncedQuery}
-          highlightText={search.highlightText}
+          highlightText={search.debouncedQuery ? search.highlightText : undefined}
           hasMore={pagination.hasMore}
           isFetchingMore={pagination.isFetchingMore}
           onLoadMore={pagination.loadMore}

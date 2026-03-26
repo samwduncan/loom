@@ -32,7 +32,6 @@ export class WebSocketClient {
   private lastCloseCode: number | undefined = undefined;
   private token: string | null = null;
   private readonly maxReconnectDelay = 30_000;
-  private readonly pongTimeout = 30_000;
 
   // Callback injection -- set once during app init
   private onMessageCb: ((msg: ServerMessage) => void) | null = null;
@@ -203,14 +202,8 @@ export class WebSocketClient {
   // ---------------------------------------------------------------------------
 
   private resetPongTimer(): void {
-    if (this.pongTimer !== null) {
-      clearTimeout(this.pongTimer);
-    }
-    this.pongTimer = setTimeout(() => {
-      if (this.state === 'connected') {
-        this.ws?.close(4000, 'pong timeout');
-      }
-    }, this.pongTimeout);
+    // Disabled — server handles keepalive via WS protocol-level ping/pong.
+    // Client-side pong timer was causing spurious disconnects during idle viewing.
   }
 
   private clearPongTimer(): void {

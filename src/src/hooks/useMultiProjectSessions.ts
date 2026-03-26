@@ -18,6 +18,7 @@ import type { BackendSessionData } from '@/lib/transformMessages';
 import { groupSessionsByProject } from '@/lib/sessionGrouping';
 import type { ProjectGroup } from '@/types/session';
 import { useProjectContext } from '@/hooks/useProjectContext';
+import { setSessionProjectBatch } from '@/lib/session-project-map';
 
 const EXPANDED_STORAGE_KEY = 'loom-expanded-projects';
 
@@ -131,6 +132,16 @@ export function useMultiProjectSessions(): UseMultiProjectSessionsResult {
       );
 
       const grouped = groupSessionsByProject(projectInputs);
+
+      // Populate session → project map for cross-project message loading
+      const entries: Array<{ sessionId: string; projectName: string }> = [];
+      for (const input of projectInputs) {
+        for (const session of input.sessions) {
+          entries.push({ sessionId: session.id, projectName: input.projectName });
+        }
+      }
+      setSessionProjectBatch(entries);
+
       setProjectGroups(grouped);
       setError(null);
     } catch (err) {

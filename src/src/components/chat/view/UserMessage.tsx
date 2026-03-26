@@ -9,7 +9,7 @@
  * Constitution: Named exports (2.2), token-based styling (3.1).
  */
 
-import { useState, type ReactNode } from 'react';
+import { useState, memo, type ReactNode } from 'react';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
 import { ImageThumbnailGrid } from '@/components/chat/view/ImageThumbnailGrid';
 import { ImageLightbox } from '@/components/chat/view/ImageLightbox';
@@ -22,11 +22,11 @@ export interface UserMessageProps {
   highlightText?: (text: string) => ReactNode;
 }
 
-export function UserMessage({ message, highlightText }: UserMessageProps) {
+export const UserMessage = memo(function UserMessage({ message, highlightText }: UserMessageProps) {
   const [lightboxAttachment, setLightboxAttachment] = useState<ImageAttachment | null>(null);
 
   return (
-    <div className="mb-5">
+    <div className="pb-5">
       <MessageContainer role="user">
         <div className="group relative">
           {message.attachments && message.attachments.length > 0 && (
@@ -51,4 +51,4 @@ export function UserMessage({ message, highlightText }: UserMessageProps) {
       />
     </div>
   );
-}
+});

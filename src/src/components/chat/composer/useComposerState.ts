@@ -79,17 +79,23 @@ export function useComposerState() {
     }
   }, [isStreaming]);
 
-  // 5-second abort timeout: when entering 'aborting', start timer
+  // Timeout recovery: 'aborting' (5s) and 'sending' (10s) auto-reset to idle
+  // 'sending' timeout handles SDK crashes where STREAM_STARTED never fires
   useEffect(() => {
     if (state === 'aborting') {
       abortTimerRef.current = setTimeout(() => {
         dispatch({ type: 'ABORT_TIMEOUT' });
         abortTimerRef.current = null;
       }, 5000);
+    } else if (state === 'sending') {
+      abortTimerRef.current = setTimeout(() => {
+        dispatch({ type: 'STREAM_ENDED' });
+        abortTimerRef.current = null;
+      }, 10000);
     }
 
     return () => {
-      if (state === 'aborting' && abortTimerRef.current) {
+      if ((state === 'aborting' || state === 'sending') && abortTimerRef.current) {
         clearTimeout(abortTimerRef.current);
         abortTimerRef.current = null;
       }

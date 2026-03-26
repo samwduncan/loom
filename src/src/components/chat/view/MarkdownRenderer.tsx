@@ -14,7 +14,7 @@
  * Constitution: Named exports (2.2), cn() not needed (pure className strings).
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -160,7 +160,7 @@ const components: Components = {
   ),
 };
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: MarkdownRendererProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   // Memoize components to prevent react-markdown from remounting custom elements
@@ -197,4 +197,4 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
       />
     </div>
   );
-}
+});

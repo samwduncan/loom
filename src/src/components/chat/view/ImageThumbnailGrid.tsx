@@ -18,7 +18,7 @@ interface ImageThumbnailGridProps {
 
 export function ImageThumbnailGrid({ attachments, onImageClick }: ImageThumbnailGridProps) {
   return (
-    <div className="flex flex-wrap gap-2 mb-2">
+    <div className="flex flex-wrap gap-2 pb-2">
       {attachments.map((attachment) => (
         <img
           key={attachment.id}

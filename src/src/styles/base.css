@@ -89,6 +89,25 @@ body {
   100% { background-position: 200% 0; }
 }
 
+/* ─── Claude Logo Pulse Animation ─────────────────────────────
+ * Gentle scale + opacity breathing for streaming state.
+ */
+@keyframes claude-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}
+
+.animate-claude-pulse {
+  animation: claude-pulse 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,

@@ -58,6 +58,13 @@ export async function bootstrapAuth(): Promise<string> {
   const existing = getToken();
   if (existing) return existing;
 
+  // Platform mode: skip real auth, server doesn't validate tokens
+  if (import.meta.env.VITE_IS_PLATFORM === 'true') {
+    const platformToken = 'platform-mode';
+    setToken(platformToken);
+    return platformToken;
+  }
+
   const username = import.meta.env.VITE_AUTH_USERNAME;
   const password = import.meta.env.VITE_AUTH_PASSWORD;
 

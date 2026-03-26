@@ -532,17 +532,16 @@ describe('pong timeout (heartbeat)', () => {
     expect(client.getState()).toBe('connected');
   });
 
-  it('triggers close after 30s silence when connected', () => {
+  it('does not close on silence (pong timeout disabled — server handles keepalive)', () => {
     client.connect('test-token');
     getLastWS().simulateOpen();
 
-    // Advance 30s without any message
+    // Advance 30s without any message — should NOT close
     vi.advanceTimersByTime(30_000);
 
-    // Should have called close on the ws
     const ws = getLastWS();
-    expect(ws.closedWith).not.toBeNull();
-    expect(ws.closedWith?.code).toBe(4000);
+    expect(ws.closedWith).toBeNull();
+    expect(client.getState()).toBe('connected');
   });
 
   it('does not trigger close when disconnected', () => {
