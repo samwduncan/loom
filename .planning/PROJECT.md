@@ -56,40 +56,43 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - ✓ Persist layer audit (PERS-01, PERS-02) — deep merge functions, rehydration safety tests — v1.4
 - ✓ E2E verification (E2E-01 through E2E-11) — 18 Playwright specs covering permissions, tokens, images, export, retry, git, settings, collapse, navigate guard — v1.4
 
+### Validated (v1.5)
+
+- ✓ Settings refactor (useFetch<T> generic hook, SettingsTabSkeleton) — v1.5
+- ✓ Comprehensive UI audit: loading states, error states, empty states — v1.5
+- ✓ Consistent hover/focus/disabled states, accessibility refinements — v1.5
+- ✓ Spring physics on sidebar, modals, tool cards — v1.5
+- ✓ Glass surface on modals and command palette — v1.5
+
 ### Active
 
-**Current Milestone: v1.5 "The Craft"**
+**Current Milestone: v2.0 "The Engine"**
 
-**Goal:** Make every pixel intentional. Fix every rough edge, nail every detail, add visual personality. Feel like a real product built by a real team.
+**Goal:** Make Loom a daily-driver that's faster and more capable than any mobile AI app, with a data layer that makes everything instant.
 
 **Target features:**
-- [ ] Land settings refactor (generic useFetch hook, connection store persist fix, ModalState type safety)
-- [ ] Comprehensive UI audit: loading states, error states, empty states for every component
-- [ ] Dead UI removal and code quality cleanup
-- [ ] Sidebar slim mode (icon-only rail)
-- [ ] Smooth state transitions across all surfaces
-- [ ] Consistent hover/focus/disabled states
-- [ ] Spacing and typography consistency audit
-- [ ] Spring physics on key interactions (sidebar, modals, panels, tool cards)
-- [ ] Glass surface on modals and command palette
-- [ ] DecryptedText reveals for session titles and model names
-- [ ] StarBorder accents on active/focused elements
+- [ ] SQLite data layer — message cache, session metadata, sub-second session loads
+- [ ] State persistence — last session, scroll position, sidebar state survive browser restarts
+- [ ] Live session attach — JSONL file watcher for running CLI sessions, real-time output
+- [ ] Mobile-native UX — fix zoom, touch targets, gesture support, responsive polish
+- [ ] Competitive feature parity — match ChatGPT/Gemini app polish while leveraging terminal/filesystem/git advantages
+- [ ] Performance — lazy loading, optimistic updates, request deduplication, instant transitions
+- [ ] iOS app research — evaluate React Native, Capacitor, Swift native, PWA paths
 
 **Future milestones:**
-- v2.0 "The Power" — Multi-provider tabs, MCP management
-- v2.1 "The Polish" — Full visual transformation (aurora, advanced effects, comprehensive springs)
+- v2.1 "The Power" — Multi-provider tabs, MCP management
+- v2.2 "The Polish" — Full visual transformation (aurora, DecryptedText, StarBorder, comprehensive springs)
 - v3.0 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
 
 ### Out of Scope
 
-- **Mobile-native app** — Web-first, responsive handles mobile access
 - **Multi-user / auth system** — Single-user tool; backend already handles auth
 - **AI model training** — Loom consumes models, doesn't train them
 - **Full IDE replacement** — Complements VS Code/Cursor, doesn't replace
 - **Light mode** — Dark-only for M1-M3; potential M5 stretch goal
 - **Arbitrary LLM providers** — Claude, Gemini, Codex only (backend constraint)
 - **Character-by-character typewriter** — Anti-pattern; use batch rendering via rAF buffer
-- **Conversation branching** — High complexity, low value for single-user tool
+- **Conversation branching** — Reconsidering for v2.1+ (competitive parity)
 
 ## Context
 
