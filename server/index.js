@@ -49,6 +49,7 @@ import { queryClaudeSDK, abortClaudeSDKSession, isClaudeSDKSessionActive, getAct
 import { queryCodex, abortCodexSession, isCodexSessionActive, getActiveCodexSessions } from './openai-codex.js';
 import { spawnGemini, abortGeminiSession, isGeminiSessionActive, getActiveGeminiSessions } from './gemini-cli.js';
 import sessionManager from './sessionManager.js';
+import { warmCache } from './cache/cache-warmer.js';
 import gitRoutes from './routes/git.js';
 import authRoutes from './routes/auth.js';
 import mcpRoutes from './routes/mcp.js';
@@ -2063,6 +2064,13 @@ async function startServer() {
 
             // Start watching the projects folder for changes
             await setupProjectsWatcher();
+
+            // Start background cache warming (non-blocking)
+            warmCache().then(() => {
+              console.log('[CACHE] Background cache warming complete');
+            }).catch(err => {
+              console.error('[CACHE] Background cache warming failed:', err.message);
+            });
         });
     } catch (error) {
         console.error('[ERROR] Failed to start server:', error);

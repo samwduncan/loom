@@ -44,6 +44,7 @@ import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import os from 'os';
 import sessionManager from './sessionManager.js';
+import messageCache from './cache/message-cache.js';
 
 // Import TaskMaster detection functions
 async function detectTaskMasterFolder(projectPath) {
@@ -591,6 +592,53 @@ async function getProjects(progressCallback = null) {
 async function getSessions(projectName, limit = 5, offset = 0) {
   const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
 
+  // --- Cache-first path ---
+  try {
+    const cacheFiles = await fs.readdir(projectDir);
+    const cacheJsonlFiles = cacheFiles.filter(file => file.endsWith('.jsonl') && !file.startsWith('agent-'));
+
+    if (cacheJsonlFiles.length > 0) {
+      // Stat all files to check freshness
+      const fileStats = new Map();
+      for (const file of cacheJsonlFiles) {
+        const filePath = path.join(projectDir, file);
+        const stat = await fs.stat(filePath); // ASSERT: reuse existing stat pattern
+        fileStats.set(file, { mtimeMs: stat.mtimeMs, size: stat.size });
+      }
+
+      // Check which files have stale or missing cache entries
+      const uncached = messageCache.getUncachedFiles(projectName, cacheJsonlFiles);
+      if (uncached.length === 0) {
+        const stale = messageCache.getStaleSessionsForProject(projectName, fileStats);
+        if (stale.length === 0) {
+          // Full cache hit -- serve from SQLite
+          const result = messageCache.getSessionsByProject(projectName, limit, offset);
+          return {
+            sessions: result.sessions.map(row => ({
+              id: row.id,
+              summary: row.summary,
+              lastActivity: row.last_activity,
+              messageCount: row.message_count,
+              cwd: row.cwd,
+              lastUserMessage: row.last_user_message,
+              lastAssistantMessage: row.last_assistant_message,
+            })),
+            hasMore: result.total > offset + limit,
+            total: result.total,
+            offset,
+            limit
+          };
+        }
+      }
+    }
+  } catch (cacheError) {
+    // Cache check failed -- fall through to JSONL path
+    if (cacheError.code !== 'ENOENT') {
+      console.warn('[CACHE] getSessions cache check failed, falling back to JSONL:', cacheError.message);
+    }
+  }
+  // --- End cache-first path ---
+
   try {
     const files = await fs.readdir(projectDir);
     // agent-*.jsonl files contain session start data at this point. This needs to be revisited
@@ -622,6 +670,7 @@ async function getSessions(projectName, limit = 5, offset = 0) {
 
       result.sessions.forEach(session => {
         if (!allSessions.has(session.id)) {
+          session._sourceFile = path.basename(jsonlFile);  // Tag with source file for cache write-through
           allSessions.set(session.id, session);
         }
       });
@@ -702,6 +751,40 @@ async function getSessions(projectName, limit = 5, offset = 0) {
     const total = visibleSessions.length;
     const paginatedSessions = visibleSessions.slice(offset, offset + limit);
     const hasMore = offset + limit < total;
+
+    // --- Write-through: populate cache for next time ---
+    try {
+      for (const session of visibleSessions) {
+        const jsonlFile = session._sourceFile || null;
+        let jsonlMtime = null;
+        let jsonlSize = null;
+        if (jsonlFile) {
+          try {
+            const stat = await fs.stat(path.join(projectDir, jsonlFile));
+            jsonlMtime = stat.mtimeMs;
+            jsonlSize = stat.size;
+          } catch {
+            // File may have been deleted
+          }
+        }
+        messageCache.upsertSession({
+          id: session.id,
+          projectName,
+          summary: session.summary || 'New Session',
+          messageCount: session.messageCount || 0,
+          lastActivity: session.lastActivity || null,
+          cwd: session.cwd || null,
+          lastUserMessage: session.lastUserMessage || null,
+          lastAssistantMessage: session.lastAssistantMessage || null,
+          jsonlFile,
+          jsonlMtime,
+          jsonlSize,
+        });
+      }
+    } catch (cacheWriteError) {
+      console.warn('[CACHE] Failed to write session cache:', cacheWriteError.message);
+    }
+    // --- End write-through ---
 
     return {
       sessions: paginatedSessions,
@@ -930,6 +1013,48 @@ async function parseAgentTools(filePath) {
 async function getSessionMessages(projectName, sessionId, limit = null, offset = 0) {
   const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
 
+  // --- Cache-first path ---
+  try {
+    const sessionMeta = messageCache.getSessionMeta(sessionId);
+    if (sessionMeta) {
+      let isFresh = true;
+      if (sessionMeta.jsonl_file) {
+        try {
+          const filePath = path.join(projectDir, sessionMeta.jsonl_file);
+          const stat = await fs.stat(filePath);
+          isFresh = messageCache.checkFreshness(sessionId, stat.mtimeMs, stat.size);
+        } catch {
+          isFresh = false; // File missing or error -- invalidate
+        }
+      }
+
+      if (isFresh) {
+        const cachedMessages = messageCache.getMessagesBySession(sessionId);
+        if (cachedMessages.length > 0) {
+          if (limit === null) {
+            return cachedMessages;
+          }
+          const total = cachedMessages.length;
+          const startIndex = Math.max(0, total - offset - limit);
+          const endIndex = total - offset;
+          return {
+            messages: cachedMessages.slice(startIndex, endIndex),
+            total,
+            hasMore: startIndex > 0,
+            offset,
+            limit
+          };
+        }
+      } else {
+        // Stale -- invalidate so we re-parse
+        messageCache.invalidateSession(sessionId);
+      }
+    }
+  } catch (cacheError) {
+    console.warn('[CACHE] getSessionMessages cache check failed, falling back to JSONL:', cacheError.message);
+  }
+  // --- End cache-first path ---
+
   try {
     const files = await fs.readdir(projectDir);
     // agent-*.jsonl files contain subagent tool history - we'll process them separately
@@ -941,6 +1066,7 @@ async function getSessionMessages(projectName, sessionId, limit = null, offset =
     }
 
     const messages = [];
+    let sessionSourceFile = null;
     // Map of agentId -> tools for subagent tool grouping
     const agentToolsCache = new Map();
 
@@ -959,6 +1085,9 @@ async function getSessionMessages(projectName, sessionId, limit = null, offset =
             const entry = JSON.parse(line);
             if (entry.sessionId === sessionId) {
               messages.push(entry);
+              if (!sessionSourceFile) {
+                sessionSourceFile = file; // Track which file contains this session
+              }
             }
           } catch (parseError) {
             console.warn('Error parsing line:', parseError.message);
@@ -1001,6 +1130,36 @@ async function getSessionMessages(projectName, sessionId, limit = null, offset =
     );
 
     const total = sortedMessages.length;
+
+    // --- Write-through: cache messages for next time ---
+    try {
+      if (sortedMessages.length > 0) {
+        messageCache.insertMessages(projectName, sessionId, sortedMessages);
+        // Update session metadata with source file info for freshness checking
+        if (sessionSourceFile) {
+          const existingMeta = messageCache.getSessionMeta(sessionId);
+          if (!existingMeta) {
+            const stat = await fs.stat(path.join(projectDir, sessionSourceFile));
+            messageCache.upsertSession({
+              id: sessionId,
+              projectName,
+              summary: 'Session',
+              messageCount: sortedMessages.length,
+              lastActivity: sortedMessages[sortedMessages.length - 1]?.timestamp || null,
+              cwd: sortedMessages[0]?.cwd || null,
+              lastUserMessage: null,
+              lastAssistantMessage: null,
+              jsonlFile: sessionSourceFile,
+              jsonlMtime: stat.mtimeMs,
+              jsonlSize: stat.size,
+            });
+          }
+        }
+      }
+    } catch (cacheWriteError) {
+      console.warn('[CACHE] Failed to write message cache:', cacheWriteError.message);
+    }
+    // --- End write-through ---
 
     // If no limit is specified, return all messages (backward compatibility)
     if (limit === null) {
@@ -1086,6 +1245,14 @@ async function deleteSession(projectName, sessionId) {
 
         // Write back the filtered content
         await fs.writeFile(jsonlFile, filteredLines.join('\n') + (filteredLines.length > 0 ? '\n' : ''));
+
+        // Clear cache entry for deleted session
+        try {
+          messageCache.invalidateSession(sessionId);
+        } catch (cacheError) {
+          console.warn('[CACHE] Failed to invalidate deleted session:', cacheError.message);
+        }
+
         return true;
       }
     }
