@@ -23,6 +23,7 @@ import { cn } from '@/utils/cn';
 import { wsClient } from '@/lib/websocket-client';
 import { useStreamStore } from '@/stores/stream';
 import { useTimelineStore } from '@/stores/timeline';
+import { useUIStore } from '@/stores/ui';
 import { useAutoResize } from './useAutoResize';
 import { useComposerState } from './useComposerState';
 import { useDraftPersistence } from './useDraftPersistence';
@@ -36,6 +37,7 @@ import { MentionChipRow } from './MentionChipRow';
 import { MentionPicker } from './MentionPicker';
 import { SlashCommandPicker } from './SlashCommandPicker';
 import { DragOverlay } from './DragOverlay';
+import { ComposerStatusBar } from './ComposerStatusBar';
 import { ElectricBorder } from '@/components/effects/ElectricBorder';
 import type { FileMention } from '@/types/mention';
 import type { SlashCommand } from '@/types/slash-command';
@@ -69,6 +71,9 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
   // Stream store selectors
   const isStreaming = useStreamStore((s) => s.isStreaming);
   const streamSessionId = useStreamStore((s) => s.activeSessionId);
+
+  // UI store selectors
+  const permissionMode = useUIStore((s) => s.permissionMode);
 
   // Timeline store selectors
   const addMessage = useTimelineStore((s) => s.addMessage);
@@ -285,6 +290,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
 
       const options: ClaudeCommandOptions = { projectPath: projectName };
       options.sessionId = effectiveId;
+      if (permissionMode !== 'default') options.permissionMode = permissionMode;
 
       // Include images if attached (convert to base64)
       if (hasImages) {
@@ -361,6 +367,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     if (sessionId) {
       options.sessionId = sessionId;
     }
+    if (permissionMode !== 'default') options.permissionMode = permissionMode;
 
     // Convert images to base64 for WebSocket transport (async)
     if (hasImages) {
@@ -413,7 +420,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     if (effectiveSessionId) clearDraft(effectiveSessionId);
     if (hasImages) clearImages();
     requestAnimationFrame(() => textareaRef.current?.focus());
-  }, [input, mentions, attachments, isStreaming, canSend, projectName, sessionId, streamSessionId, addMessage, addSession, navigate, dispatch, clearDraft, getBase64ForSend, clearImages]);
+  }, [input, mentions, attachments, isStreaming, canSend, projectName, sessionId, streamSessionId, permissionMode, addMessage, addSession, navigate, dispatch, clearDraft, getBase64ForSend, clearImages]);
 
   const handleStop = useCallback(() => {
     if (!canStop) return;
@@ -653,6 +660,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         <DragOverlay isDragOver={isDragOver} />
       </div>
       </ElectricBorder>
+      <ComposerStatusBar projectName={projectName} sessionId={sessionId} />
     </div>
   );
 }

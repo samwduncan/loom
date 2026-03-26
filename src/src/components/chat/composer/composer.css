@@ -160,3 +160,35 @@
     transform: translateY(0);
   }
 }
+
+/* ─── Composer Status Bar ──────────────────────────────────── */
+
+.composer-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px 0;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.composer-status-bar-progress {
+  height: 2px;
+  border-radius: 1px;
+  background: var(--surface-active);
+  overflow: hidden;
+  width: 48px;
+}
+
+.composer-status-bar-progress-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition:
+    width var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out);
+}
+
+.composer-status-bar-separator {
+  color: var(--border-subtle);
+  user-select: none;
+}

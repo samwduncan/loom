@@ -16,6 +16,7 @@ import { persist } from 'zustand/middleware';
 import type {
   CompanionState,
   ModalState,
+  PermissionMode,
   TabId,
   ThemeConfig,
 } from '@/types/ui';
@@ -31,6 +32,7 @@ interface UIState {
   thinkingExpanded: boolean;
   autoExpandTools: boolean;
   showRawParams: boolean;
+  permissionMode: PermissionMode;
 
   // Actions
   toggleSidebar: () => void;
@@ -42,10 +44,11 @@ interface UIState {
   toggleThinking: () => void;
   toggleAutoExpandTools: () => void;
   toggleShowRawParams: () => void;
+  setPermissionMode: (mode: PermissionMode) => void;
   reset: () => void;
 }
 
-const INITIAL_UI_STATE: Omit<UIState, 'toggleSidebar' | 'setActiveTab' | 'openModal' | 'closeModal' | 'toggleCommandPalette' | 'setTheme' | 'toggleThinking' | 'toggleAutoExpandTools' | 'toggleShowRawParams' | 'reset'> = {
+const INITIAL_UI_STATE: Omit<UIState, 'toggleSidebar' | 'setActiveTab' | 'openModal' | 'closeModal' | 'toggleCommandPalette' | 'setTheme' | 'toggleThinking' | 'toggleAutoExpandTools' | 'toggleShowRawParams' | 'setPermissionMode' | 'reset'> = {
   sidebarOpen: true,
   activeTab: 'chat',
   modalState: null,
@@ -55,6 +58,7 @@ const INITIAL_UI_STATE: Omit<UIState, 'toggleSidebar' | 'setActiveTab' | 'openMo
   thinkingExpanded: true,
   autoExpandTools: false,
   showRawParams: false,
+  permissionMode: 'default' as PermissionMode,
 };
 
 export const useUIStore = create<UIState>()(
@@ -100,19 +104,24 @@ export const useUIStore = create<UIState>()(
         set((state) => ({ showRawParams: !state.showRawParams }));
       },
 
+      setPermissionMode: (mode: PermissionMode) => {
+        set({ permissionMode: mode });
+      },
+
       reset: () => {
         set({ ...INITIAL_UI_STATE });
       },
     }),
     {
       name: 'loom-ui',
-      version: 6,
+      version: 7,
       partialize: (state) => ({
         theme: state.theme,
         sidebarOpen: state.sidebarOpen,
         thinkingExpanded: state.thinkingExpanded,
         autoExpandTools: state.autoExpandTools,
         showRawParams: state.showRawParams,
+        permissionMode: state.permissionMode,
       }),
       merge: (persistedState, currentState) => {
         const persisted = persistedState as Partial<{
@@ -121,6 +130,7 @@ export const useUIStore = create<UIState>()(
           thinkingExpanded: boolean;
           autoExpandTools: boolean;
           showRawParams: boolean;
+          permissionMode: PermissionMode;
         }>;
         return {
           ...currentState,
@@ -128,6 +138,7 @@ export const useUIStore = create<UIState>()(
           thinkingExpanded: persisted.thinkingExpanded ?? currentState.thinkingExpanded,
           autoExpandTools: persisted.autoExpandTools ?? currentState.autoExpandTools,
           showRawParams: persisted.showRawParams ?? currentState.showRawParams,
+          permissionMode: persisted.permissionMode ?? currentState.permissionMode,
           theme: {
             ...currentState.theme,
             ...(persisted.theme ?? {}),
@@ -155,6 +166,10 @@ export const useUIStore = create<UIState>()(
         if (version < 6) {
           // v6: Added quick settings fields.
           s = { ...s, autoExpandTools: false, showRawParams: false };
+        }
+        if (version < 7) {
+          // v7: Added permissionMode preference.
+          s = { ...s, permissionMode: 'default' };
         }
         return s;
       },

@@ -220,6 +220,7 @@ describe('useUIStore', () => {
 
       expect(keys).toEqual([
         'autoExpandTools',
+        'permissionMode',
         'showRawParams',
         'sidebarOpen',
         'theme',

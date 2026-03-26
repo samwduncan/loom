@@ -6,13 +6,15 @@
  * Loom wordmark in Instrument Serif italic, collapse chevron,
  * NewChatButton, SessionList.
  * Collapsed: Fixed-position expand trigger at left edge.
+ * Mobile: Fixed overlay drawer with backdrop (grid column stays 0px).
  *
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6),
  * selector-only store access (4.2), z-index from dictionary (3.3).
  */
 
-import { memo } from 'react';
-import { Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { memo, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Settings, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import { ConnectionStatusIndicator } from '@/components/shared/ConnectionStatusIndicator';
@@ -20,12 +22,63 @@ import { NewChatButton } from './NewChatButton';
 import { SessionList } from './SessionList';
 import { QuickSettingsPanel } from './QuickSettingsPanel';
 
+/* ─── Mobile detection (synced with ContentArea's 767px breakpoint) ─── */
+const MOBILE_QUERY = '(max-width: 767px)';
+
+function subscribeMobile(cb: () => void) {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {};
+  const mql = window.matchMedia(MOBILE_QUERY);
+  mql.addEventListener('change', cb);
+  return () => mql.removeEventListener('change', cb);
+}
+
+function getMobileSnapshot() {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia(MOBILE_QUERY).matches;
+}
+
+function getMobileServerSnapshot() { return false; }
+
 export const Sidebar = memo(function Sidebar() {
   const isSidebarOpen = useUIStore((state) => state.sidebarOpen);
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
   const openModal = useUIStore((state) => state.openModal);
+  const isMobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServerSnapshot);
+  const location = useLocation();
 
+  // Auto-close mobile drawer on route change (session select, new chat)
+  const prevPathRef = useRef(location.pathname);
+  useEffect(() => {
+    if (isMobile && isSidebarOpen && prevPathRef.current !== location.pathname) {
+      toggleSidebar();
+    }
+    prevPathRef.current = location.pathname;
+  }, [location.pathname, isMobile, isSidebarOpen, toggleSidebar]);
+
+  // ─── Collapsed state ───
   if (!isSidebarOpen) {
+    // Mobile: hamburger in top-left corner
+    if (isMobile) {
+      return (
+        <button
+          onClick={toggleSidebar}
+          className={cn(
+            'fixed left-3 top-3',
+            'z-[var(--z-overlay)] p-2',
+            'bg-surface-raised/80 backdrop-blur-sm rounded-lg',
+            'border border-border/50',
+            'text-muted hover:text-foreground',
+            'transition-colors',
+          )}
+          aria-label="Open menu"
+          type="button"
+        >
+          <Menu size={20} />
+        </button>
+      );
+    }
+
+    // Desktop: mid-left chevron
     return (
       <button
         onClick={toggleSidebar}
@@ -44,13 +97,15 @@ export const Sidebar = memo(function Sidebar() {
     );
   }
 
-  return (
+  // ─── Sidebar content (shared between mobile overlay and desktop inline) ───
+  const sidebarContent = (
     <aside
       role="complementary"
       aria-label="Sidebar navigation"
       className={cn(
         'bg-surface-raised border-r border-border',
         'overflow-hidden flex flex-col h-full',
+        isMobile && 'w-[280px] max-w-[80vw]',
       )}
     >
       <header className="flex items-center justify-between p-4 border-b border-border">
@@ -65,10 +120,10 @@ export const Sidebar = memo(function Sidebar() {
             'text-muted hover:text-foreground',
             'transition-colors',
           )}
-          aria-label="Collapse sidebar"
+          aria-label={isMobile ? 'Close menu' : 'Collapse sidebar'}
           type="button"
         >
-          <ChevronLeft size={16} />
+          {isMobile ? <X size={16} /> : <ChevronLeft size={16} />}
         </button>
       </header>
       <div className="px-2 py-2 border-b border-border">
@@ -94,4 +149,23 @@ export const Sidebar = memo(function Sidebar() {
       </footer>
     </aside>
   );
+
+  // ─── Mobile: fixed overlay drawer with backdrop ───
+  if (isMobile) {
+    return (
+      <div className="fixed inset-0 z-[var(--z-overlay)] flex">
+        <div className="h-full shadow-xl">{sidebarContent}</div>
+        <button
+          className="flex-1 bg-black/40 cursor-default"
+          onClick={toggleSidebar}
+          aria-label="Close menu"
+          type="button"
+          tabIndex={-1}
+        />
+      </div>
+    );
+  }
+
+  // ─── Desktop: inline aside ───
+  return sidebarContent;
 });

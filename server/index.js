@@ -913,8 +913,8 @@ app.get('/api/projects/:projectName/files', authenticateToken, async (req, res) 
     }
 });
 
-// WebSocket heartbeat: ping all clients every 15s, terminate dead ones after 30s (2 missed pongs)
-const WS_PING_INTERVAL = 15_000;
+// WebSocket heartbeat: ping all clients every 60s, terminate dead ones after 120s (2 missed pongs)
+const WS_PING_INTERVAL = 60_000;
 const wsPingInterval = setInterval(() => {
     for (const ws of wss.clients) {
         if (ws.isAlive === false) {
@@ -999,6 +999,13 @@ function handleChatConnection(ws) {
                 console.log('[DEBUG] User message:', data.command || '[Continue/Resume]');
                 console.log('📁 Project:', data.options?.projectPath || 'Unknown');
                 console.log('🔄 Session:', data.options?.sessionId ? 'Resume' : 'New');
+
+                // Resolve projectPath (encoded e.g. '-home-swd') to actual filesystem path
+                // and set as cwd so the SDK can find session JSONL files and CLAUDE.md
+                if (data.options?.projectPath && !data.options.cwd) {
+                    data.options.cwd = await extractProjectDirectory(data.options.projectPath).catch(() => null)
+                        || data.options.projectPath.replace(/-/g, '/');
+                }
 
                 // Use Claude Agents SDK
                 await queryClaudeSDK(data.command, data.options, writer);
@@ -1870,6 +1877,44 @@ app.get('/api/projects/:projectName/sessions/:sessionId/token-usage', authentica
         console.error('Error reading session token usage:', error);
         res.status(500).json({ error: 'Failed to read session token usage' });
     }
+});
+
+// Usage metrics: reads burn-rate.json + proxies claude-metrics API
+app.get('/api/usage/metrics', authenticateToken, async (req, res) => {
+    const burnRatePath = path.join(os.homedir(), '.claude', 'cache', 'burn-rate.json');
+    const result = { burnRate: null, usage: null };
+
+    // Read burn-rate.json (5h block%, burn multiplier)
+    try {
+        const raw = await import('fs').then(f => f.promises.readFile(burnRatePath, 'utf-8'));
+        const data = JSON.parse(raw);
+        result.burnRate = {
+            blockPct: data.block_pct ?? null,
+            mult: data.global?.mult ?? null,
+            vel: data.global?.vel ?? null,
+            trend: data.global?.trend ?? '',
+            budget: data.calibration_budget ?? null,
+            elapsedS: data.elapsed_s ?? null,
+            timestamp: data.timestamp ?? null,
+        };
+    } catch {
+        // burn-rate.json not available
+    }
+
+    // Proxy claude-metrics usage summary
+    try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3000);
+        const resp = await fetch('http://localhost:3334/api/usage/summary', { signal: controller.signal });
+        clearTimeout(timeout);
+        if (resp.ok) {
+            result.usage = await resp.json();
+        }
+    } catch {
+        // claude-metrics not available
+    }
+
+    res.json(result);
 });
 
 // Serve React app for all other routes (excluding static files)

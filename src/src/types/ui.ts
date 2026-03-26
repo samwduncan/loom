@@ -8,6 +8,8 @@ import type { SettingsTabId } from './settings';
 
 export type TabId = 'chat' | 'files' | 'shell' | 'git';
 
+export type PermissionMode = 'default' | 'plan' | 'bypassPermissions';
+
 export type ModalState =
   | { type: 'settings'; initialTab?: SettingsTabId };
 

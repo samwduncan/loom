@@ -35,6 +35,8 @@ interface StreamState {
   activePermissionRequest: PermissionRequest | null;
   resultTokens: ResultTokens | null;
   resultCost: number | null;
+  tokenBudget: { used: number; total: number } | null;
+  modelName: string | null;
 
   // Actions
   startStream: () => void;
@@ -49,7 +51,8 @@ interface StreamState {
   setActivityText: (text: string) => void;
   setPermissionRequest: (request: PermissionRequest) => void;
   clearPermissionRequest: () => void;
-  setResultData: (tokens: ResultTokens, cost: number) => void;
+  setResultData: (tokens: ResultTokens, cost: number, modelName?: string) => void;
+  setTokenBudget: (used: number, total: number) => void;
   reset: () => void;
 }
 
@@ -62,13 +65,15 @@ const INITIAL_STREAM_STATE = {
   activePermissionRequest: null as PermissionRequest | null,
   resultTokens: null as ResultTokens | null,
   resultCost: null as number | null,
+  tokenBudget: null as { used: number; total: number } | null,
+  modelName: null as string | null,
 };
 
 export const useStreamStore = create<StreamState>()((set) => ({
   ...INITIAL_STREAM_STATE,
 
   startStream: () => {
-    set({ isStreaming: true, resultTokens: null, resultCost: null });
+    set({ isStreaming: true, resultTokens: null, resultCost: null, tokenBudget: null, modelName: null });
   },
 
   setActiveSessionId: (sessionId: string) => {
@@ -121,8 +126,12 @@ export const useStreamStore = create<StreamState>()((set) => ({
     set({ activePermissionRequest: null });
   },
 
-  setResultData: (tokens: ResultTokens, cost: number) => {
-    set({ resultTokens: tokens, resultCost: cost });
+  setResultData: (tokens: ResultTokens, cost: number, modelName?: string) => {
+    set({ resultTokens: tokens, resultCost: cost, ...(modelName ? { modelName } : {}) });
+  },
+
+  setTokenBudget: (used: number, total: number) => {
+    set({ tokenBudget: { used, total } });
   },
 
   reset: () => {

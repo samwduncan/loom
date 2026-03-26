@@ -65,7 +65,7 @@ export interface MultiplexerCallbacks {
     sessionId: string | null,
   ) => void;
   onPermissionCancelled: (requestId: string) => void;
-  onResultData: (tokens: ResultTokens, cost: number) => void;
+  onResultData: (tokens: ResultTokens, cost: number, modelName?: string) => void;
   onProjectsUpdated: () => void;
 }
 
@@ -188,11 +188,13 @@ export function routeClaudeResponse(
     case 'result': {
       // Extract token usage from modelUsage (keyed by model name)
       const modelUsage = data.modelUsage ?? {};
+      const modelKeys = Object.keys(modelUsage);
+      const modelName = modelKeys[0]; // e.g. "claude-sonnet-4-6-20250514"
       let inputTokens = 0;
       let outputTokens = 0;
       let cacheReadTokens = 0;
 
-      for (const key of Object.keys(modelUsage)) {
+      for (const key of modelKeys) {
         const usage = modelUsage[key] as Record<string, number> | undefined;
         if (usage && typeof usage === 'object') {
           inputTokens += usage.input_tokens ?? 0;
@@ -206,7 +208,7 @@ export function routeClaudeResponse(
       if (cacheReadTokens > 0) tokens.cacheRead = cacheReadTokens;
 
       if (inputTokens > 0 || outputTokens > 0 || cost > 0) {
-        callbacks.onResultData(tokens, cost);
+        callbacks.onResultData(tokens, cost, modelName);
       }
 
       // Informational -- actual exit code comes from claude-complete

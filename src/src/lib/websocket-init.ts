@@ -212,11 +212,11 @@ export async function initializeWebSocket(): Promise<void> {
       }
     },
 
-    onTokenBudget: (_used, _total, _sessionId) => {
-      // Future: update session metadata
+    onTokenBudget: (used, _total, _sessionId) => {
+      streamStore().setTokenBudget(used, _total);
     },
 
-    onResultData: (tokens, cost) => streamStore().setResultData(tokens, cost),
+    onResultData: (tokens, cost, modelName) => streamStore().setResultData(tokens, cost, modelName),
 
     onPermissionRequest: (requestId, toolName, input, sessionId) => {
       streamStore().setPermissionRequest({
