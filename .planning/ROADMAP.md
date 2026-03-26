@@ -98,7 +98,7 @@
 
 </details>
 
-### 🚧 v2.0 "The Engine" (Phases 50-57)
+### v2.0 "The Engine" (Phases 50-57)
 
 **Milestone Goal:** Make Loom a daily-driver that's faster than any mobile AI app. SQLite data layer replaces JSONL-on-every-load with sub-50ms session switching, live session attach streams running CLI sessions to the browser in real-time, mobile layout enables "monitor your agent from your phone," and a manifest-only PWA makes it installable. Zero new production dependencies needed.
 
@@ -141,7 +141,9 @@ Plans:
   2. Scroll position restores to the same place when switching between sessions
   3. Sidebar open/collapsed state and the active project group survive a full page reload
   4. Permission mode setting persists across browser restarts without re-selection
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 51-01-PLAN.md -- Smart redirect + scroll position persistence
 
 ### Phase 52: Live Session Attach
 **Goal**: Users can watch a running CLI session stream output in real-time from the browser
@@ -213,20 +215,20 @@ Plans:
   3. A minimal Capacitor shell project exists that loads the Loom web build and renders the chat view
 **Plans**: TBD
 
-### 📋 v2.1 "The Power" (Planned)
+### v2.1 "The Power" (Planned)
 
 - [ ] Multi-provider tabbed workspaces (Claude, Gemini, Codex)
 - [ ] MCP server management UI
 - [ ] Plugin/skill management UI
 
-### 📋 v2.2 "The Polish" (Planned)
+### v2.2 "The Polish" (Planned)
 
 - [ ] Aurora/WebGL ambient overlay (GPU feasibility gated)
 - [ ] Comprehensive spring physics on all interactions
 - [ ] Tier 2/3 visual effects (Iridescence, LiquidChrome, Border Beam, etc.)
 - [ ] Full motion refinement pass
 
-### 📋 v3.0 "The Vision" (Planned)
+### v3.0 "The Vision" (Planned)
 
 - [ ] GSD visual dashboard
 - [ ] Nextcloud integration
@@ -241,7 +243,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 50. SQLite Data Layer | 2/2 | Complete    | 2026-03-26 |
-| 51. State Persistence | 0/TBD | Not started | - |
+| 51. State Persistence | 0/1 | Not started | - |
 | 52. Live Session Attach | 0/TBD | Not started | - |
 | 53. Mobile-Responsive Layout | 0/TBD | Not started | - |
 | 54. Performance Hardening | 0/TBD | Not started | - |
@@ -256,4 +258,4 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-26 after v2.0 roadmap creation*
+*Last updated: 2026-03-26 after Phase 51 planning*
