@@ -1,275 +1,341 @@
-# Feature Landscape: M6 v1.5 "The Craft"
+# Feature Research: v2.0 "The Engine" -- Competitive Parity & Differentiation
 
-**Domain:** Production polish, visual personality, and micro-interaction quality for a premium dark-theme AI workspace
-**Researched:** 2026-03-18
-**Confidence:** HIGH (existing codebase audited, competitive analysis from 6 products, prior visual effects research from M3 deferred context)
+**Domain:** AI coding workspace -- competitive with ChatGPT app, Gemini app, Claude web, Cursor, Windsurf
+**Researched:** 2026-03-26
+**Confidence:** HIGH (6 competitor products analyzed, existing reference-app-analysis.md cross-referenced, current 2026 feature sets verified via web research)
 
-**Scope:** Polish and visual personality ONLY. All functional features (chat, streaming, file tree, editor, terminal, git, settings, command palette, accessibility, performance) are shipped. This milestone is about making every pixel intentional and every interaction satisfying.
+**Context:** Loom is a self-hosted web interface for AI coding agents (Claude Code, Gemini, Codex) with terminal, filesystem, git, and multi-provider support. It already ships: chat with streaming, tool call visualization, file tree, code editor, terminal, git panel, settings, command palette, @-mentions, slash commands, session management (auto-titles, project grouping, date subgroups, search, pins, bulk delete), accessibility, and performance optimizations. 49,216 LOC across 609 commits.
 
-**Existing Foundation:**
-- 3 CSS-only effects adopted: SpotlightCard, ShinyText, ElectricBorder
-- Glass tokens defined: `--glass-blur`, `--glass-saturate`, `--glass-bg-opacity`
-- Motion tokens defined: SPRING_GENTLE/SNAPPY/BOUNCY in motion.ts, CSS easing tokens in tokens.css
-- 3-tier error boundaries: App, Panel, Message (with ErrorFallback UI)
-- 4 skeleton components: MessageListSkeleton, SessionListSkeleton, SettingsTabSkeleton, GitPanelSkeleton
-- 1 empty state: ChatEmptyState (wordmark + suggestion chips)
-- Aurora FX tokens defined: `--fx-aurora-blur`, gradient color tokens
-- `prefers-reduced-motion` handled globally (0.01ms override)
-- Constitution bans: hardcoded colors, inline styles, typewriter effects, full motion bundle
+**This research answers:** What do competitors do that Loom doesn't? What can Loom do that competitors can't? What features differentiate a daily-driver from a demo?
 
 ---
 
-## Table Stakes
+## Feature Landscape
 
-Features users expect from software that feels professionally built. Missing any of these = the app feels like a prototype, not a product.
+### Table Stakes (Users Expect These)
 
-### Loading States
+Features every serious AI chat interface ships in 2026. Missing any of these makes Loom feel incomplete as a daily-driver.
 
-| Feature | Why Expected | Complexity | Dependencies | Current State |
-|---------|--------------|------------|--------------|---------------|
-| Skeleton screens for ALL data-loading surfaces | Every premium app (Claude.ai, ChatGPT, LobeChat) shows content-shaped placeholders during fetch. Blank areas feel broken. | Low | Existing skeleton-shimmer CSS class | 4 of ~8 surfaces covered. Missing: FileTree loading, Editor loading (exists but minimal), Terminal reconnecting, Command Palette initial. |
-| Shimmer animation upgrade | Current skeletons use `animate-pulse` (Tailwind default). Premium apps use directional shimmer sweep (gradient slide). ChatGPT uses `linear-gradient(90deg)` sweep; LobeChat uses 1.5s sweep. | Low | CSS keyframe in sidebar.css already exists as `skeleton-shimmer` | `skeleton-shimmer` class exists but most skeletons use `animate-pulse` instead. Inconsistent. |
-| Progressive content reveal | Session list, file tree, and git history should fade-in rows progressively rather than pop in all at once. Perplexity's staggered card reveal (100ms stagger) is the benchmark. | Medium | CSS `animation-delay` or `@starting-style` | Not implemented anywhere. |
-| Loading indicator for async operations | Commit, push, pull, branch create, file save -- all network operations need visual feedback. "Settings saved" toast exists but git ops lack spinners. | Low | Sonner toast (installed), button loading states | Git operations show toast on complete but no in-progress indicator on the button itself. |
-| Tab content loading during lazy import | Terminal and Git panels use `lazy()` + `Suspense`. The fallback for Terminal is text-only ("Loading terminal..."). Git has `GitPanelSkeleton`. Terminal needs a real skeleton. | Low | React Suspense boundary | TerminalSkeleton is a text string, not a skeleton component. |
+#### Data Layer & Performance
 
-### Error States
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Instant session switching (<200ms) | ChatGPT, Claude, Gemini all load conversations nearly instantly. Loom currently re-fetches JSONL from disk on every switch. Users expect tap-and-read. | HIGH | Requires client-side message cache (SQLite via backend or IndexedDB in browser). Backend parses JSONL once, caches parsed messages. This is THE critical infrastructure piece -- everything else depends on fast data access. |
+| Session metadata persistence | Last-used session, scroll position, sidebar state, active tab -- all must survive browser refresh. ChatGPT and Claude restore exactly where you left off. | MEDIUM | Zustand persist middleware already exists for some stores. Extend to cover scroll position (per-session), last active session ID, sidebar collapsed state. |
+| Paginated/virtualized message history | Long conversations (200+ messages) must not degrade performance. ChatGPT uses Ref+State batching at 30-60ms; Open WebUI uses lazy pagination. Loom has content-visibility but not true virtualization. | MEDIUM | content-visibility is a good start. For sessions >500 messages, need @tanstack/react-virtual or similar. Depends on instant session data being available. |
+| Request deduplication | Rapid session switches must not fire redundant API calls. Multiple clicks on same session = one fetch. | LOW | AbortController + request cache map. Standard SWR/TanStack Query pattern. |
+| Optimistic updates | User message appears instantly in chat before server confirms. ChatGPT, Claude, Gemini all do this. | LOW | Already partially implemented (message added to timeline before WS response). Verify all paths. |
 
-| Feature | Why Expected | Complexity | Dependencies | Current State |
-|---------|--------------|------------|--------------|---------------|
-| Inline retry for failed API calls | Network errors on git status, file tree fetch, settings load must show retry affordance at the point of failure, not just a toast. | Medium | Existing PanelErrorBoundary pattern | Error boundaries catch render errors. API fetch errors handled inconsistently -- some toast, some swallow, some show in-panel. |
-| Graceful degradation for partial failures | If git status fails, the git panel should still show commit history tab. If file tree fails, editor should still work with open files. | Medium | Per-section error isolation | Currently panel-level error boundaries. A git status failure crashes the entire git panel. |
-| Error toast with retry action | Toast notifications for async operation failures should include a "Retry" button. Current toasts are informational only. | Low | Sonner toast supports action buttons | Not using Sonner's action API. |
-| Timeout indicators | WebSocket reconnection, long API calls (>5s) should show elapsed time or progress. "Still connecting..." after 5s, "This is taking longer than usual..." after 15s. | Medium | Connection store, timer logic | Connection banner exists but only shows "Reconnecting..." with no elapsed time context. |
-| Network offline detection | Browser going offline should show a persistent banner. Not just WebSocket disconnect -- full offline mode indicator. | Low | `navigator.onLine` + `online`/`offline` events | Not implemented. |
+#### Conversation UX
 
-### Empty States
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Suggested follow-up prompts | ChatGPT shows 2-4 semi-transparent pill chips below each response. Claude suggests follow-ups. Gemini ends with "Would you like me to...". Reduces blank-page paralysis. | MEDIUM | Backend needs to extract/generate suggestions from response. Could be client-side heuristic (extract questions from response) or backend LLM call. Start with extraction, upgrade to generation later. |
+| Empty state with contextual suggestions | ChatGPT: "How can I help you today, [Name]?" + 2x2 suggestion grid. Claude: warm welcome + project context. Not just a wordmark. | LOW | ChatEmptyState exists with suggestion chips. Enhance: personalize based on project context, recent sessions, time of day. |
+| Conversation sharing/export | Claude: share link with snapshot. ChatGPT: share generates public link. LibreChat: Markdown/JSON/CSV/TXT/PNG export. Loom has export but no shareable links. | MEDIUM | Export already exists. Sharing requires backend endpoint to serve public snapshot. Consider: generate static HTML file (self-contained, no server needed) since Loom is self-hosted. |
+| Message editing with branch navigation | Claude: edit creates branch, navigate with < 2/3 > arrows. ChatGPT: same pattern. LibreChat: full tree view. This is becoming table stakes in 2026. | HIGH | Requires backend support for forking message history. Claude Code SDK supports --fork-session. UI: edit icon on user messages, branch indicator with navigation arrows. Depends on data layer. |
+| Conversation templates / system prompts | ChatGPT: Custom Instructions persist across chats. Claude: Projects with persistent system prompts. Gemini: Gems (custom personas). Cursor: .cursorrules files. | MEDIUM | Backend already supports system prompts per session. Need UI to create/save/apply templates. Store in SQLite or JSON config. Link to project context. |
+| Keyboard shortcut for new chat | Every competitor: Cmd+K or Cmd+N for new chat. Loom has Cmd+K for command palette but no direct new-chat shortcut. | LOW | Add Cmd+N → new session. Already in command palette but needs dedicated shortcut. |
 
-| Feature | Why Expected | Complexity | Dependencies | Current State |
-|---------|--------------|------------|--------------|---------------|
-| File tree empty state | "No project open" or "Connect to a project" when file tree has no root. Every IDE handles this. | Low | File store state | FileTree shows nothing when empty. |
-| Git panel empty state | "Not a git repository" when no git root detected. "No changes" when working tree is clean. | Low | Git status API | ChangesView has basic "No changes" text. HistoryView shows nothing when empty. |
-| Session list empty state | "No conversations yet" with a "Start a new chat" CTA. First-run experience matters. | Low | Timeline store | SessionList renders empty space when no sessions. |
-| Search results empty state | "No results found" with suggestion to refine query. For both session search and command palette. | Low | Existing search components | Command palette shows empty list. Session search shows nothing. |
-| Editor empty state | "Select a file to edit" placeholder when no file is open. VS Code shows this. | Low | File store activeFilePath | PanelPlaceholder component exists but is generic. |
+#### Mobile & Responsive
 
-### State Consistency
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Touch-friendly mobile layout | ChatGPT, Claude, Gemini all have polished mobile apps. Loom is accessed via Tailscale from phone browsers. Must not feel broken on mobile. | HIGH | Existing responsive patterns at 767px breakpoint. Need: sidebar as drawer/sheet, bottom-anchored composer, touch-friendly tap targets (44px min), swipe gestures for sidebar. |
+| No viewport zoom on input focus | iOS zooms when input font-size < 16px. Every mobile web app must handle this. | LOW | Set font-size: 16px on textarea, or use viewport meta tag with maximum-scale=1 (accessibility concern). Prefer 16px font. |
+| Pull-to-refresh | Mobile web convention. Refresh session list or current conversation. | LOW | CSS overscroll-behavior + JS touch handler. Simple but expected. |
+| Safe area insets | iPhone notch/dynamic island, Android navigation bar. PWA must respect safe areas. | LOW | CSS env(safe-area-inset-*). Already partially handled in base.css. Verify coverage. |
+| Mobile-optimized composer | Composer must stay above virtual keyboard on iOS/Android. Must not get hidden or cause scroll jumps. | MEDIUM | position: fixed + visualViewport API to detect keyboard height. Well-documented pattern but tricky on iOS Safari. |
 
-| Feature | Why Expected | Complexity | Dependencies | Current State |
-|---------|--------------|------------|--------------|---------------|
-| Hover/focus/active/disabled states on ALL interactive elements | Material Design, NN/g, and every design system mandate consistent interactive feedback. Missing hover states make elements feel dead. | Medium | Audit of ~51 files with interactive states | ~97 occurrences across 51 files. Coverage is uneven -- shadcn primitives have full states, custom components vary. |
-| Focus-visible ring consistency | Focus rings should use the same accent color, width, and offset across all focusable elements. Currently varies between components. | Low | CSS `focus-visible` rule in base.css | Some components use custom focus styles, others rely on browser defaults. |
-| Disabled state opacity consistency | All disabled elements should use the same opacity (0.5) and cursor (not-allowed). Some custom buttons don't apply disabled styling. | Low | CSS `:disabled` and `aria-disabled` | Inconsistent. shadcn uses `disabled:opacity-50`, custom components vary. |
-| Button press feedback | Active/pressed state should scale slightly (0.98) or darken. Confirms the click was registered. 150-300ms transition. | Low | CSS `:active` pseudo-class | Minimal active state styling across custom buttons. |
+#### State & Persistence
 
----
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Survive browser restart | Open Loom, close tab, reopen = same session, same scroll position, same sidebar state. ChatGPT and Claude do this perfectly. | MEDIUM | Zustand persist + rehydration. Already partially implemented. Extend to: activeSessionId, scroll offset per session, sidebar open/collapsed, active tab. |
+| Draft message persistence across sessions | Type a message, switch sessions, switch back = draft preserved. ChatGPT does this. | LOW | Already implemented in composer (draft persistence). Verify it works across session switches. |
+| Theme/preference sync | Settings changes apply instantly and persist. Quick settings toggles survive refresh. | LOW | Already implemented via Zustand persist. Verify all preferences covered. |
 
-## Differentiators
+### Differentiators (Competitive Advantage)
 
-Features that elevate beyond "good enough" to "this feels like a real product." Not expected, but deeply valued.
+Features that leverage Loom's unique position: self-hosted, terminal access, filesystem, git integration, multi-provider. No competitor has ALL of these.
 
-### Spring Physics Animations
+#### Unique to Loom's Architecture
 
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| Sidebar open/close with spring | Physical feel instead of linear CSS slide. LobeChat's sidebar and ChatGPT's sidebar both use physics-based curves. SPRING_GENTLE (stiffness:120, damping:14) is already defined. | Medium | LazyMotion + `m.div` from motion/react (~4.6KB base + 15KB domAnimation). OR pure CSS spring easing (`cubic-bezier(0.34, 1.56, 0.64, 1)`). | CSS spring easing is already in tokens. Start with CSS, upgrade to motion/react only if CSS can't handle exit animations. |
-| Modal/dialog entrance with spring | Settings modal and command palette sliding up with overshoot. Claude.ai uses `cubic-bezier(0.16, 1, 0.3, 1)` (easeOutExpo). ChatGPT uses bounce on sidebar. | Low | CSS spring easing token already defined | Settings dialog currently uses shadcn default animation. Override with Loom spring. |
-| Panel tab switch spring | Content sliding in from the direction of the selected tab. Left tab = slide from left. Right = slide from right. Provides spatial context. | Medium | CSS or motion/react AnimatePresence for exit | Mount-once CSS show/hide pattern may conflict. Need CSS-only approach (opacity + transform on show/hide). |
-| Tool card expand/collapse spring | Tool cards growing with a slight overshoot feels tactile and premium. Already using CSS Grid 0fr/1fr -- add spring easing to the `grid-template-rows` transition. | Low | Existing CSS Grid transition | Currently uses `--duration-normal` (200ms) with standard easing. Swap to spring easing and `--duration-spring` (500ms). |
-| Scroll-to-bottom pill spring | The floating "scroll to bottom" pill should pop in with SPRING_BOUNCY and exit with a quick fade. Currently uses CSS slide with standard timing. | Low | scroll-pill.css already has transition | Upgrade easing curve. |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Live session attach (JSONL file watcher) | Watch a running Claude Code CLI session in real-time from Loom's UI. No other web interface can do this. Cursor has cloud handoff but requires their infrastructure. Loom runs on YOUR server where CLI sessions already exist. | HIGH | Backend watches JSONL files with fs.watch/chokidar. Streams new entries via WebSocket. Frontend renders incoming tool calls, thinking, and text in real-time. Inspired by Happy Coder's session scanner pattern. THE killer differentiator. |
+| Terminal + Chat in one workspace | Cursor and Windsurf have this in an IDE. ChatGPT/Claude/Gemini do NOT. Loom already has xterm.js terminal. The differentiator is the integration: "Run in Terminal" from tool cards, @-mention terminal output, see filesystem changes in real-time. | LOW | Already built. Enhance: auto-refresh file tree when terminal commands modify files. Deep link between chat tool calls and terminal. |
+| Git-aware conversations | No competitor integrates git status into the chat experience. Loom's git panel shows changes, staging, commits, branch ops alongside the conversation that created them. | LOW | Already built. Enhance: auto-show git diff when AI modifies files. "Commit what Claude just did" quick action. |
+| Multi-provider model switching | LibreChat does this well. Open WebUI does multi-model comparison. But neither has terminal+git+filesystem. Loom can let you ask Claude to write code, then ask Gemini to review it, in the same workspace. | MEDIUM | Backend already supports Claude/Gemini/Codex. UI needs: model selector dropdown in composer, provider indicator on messages, per-message model attribution. Depends on v2.1 "The Power" but groundwork can be laid now. |
+| Self-hosted privacy | Your conversations never leave your server. ChatGPT/Claude/Gemini all send data to the cloud. For enterprise/security-conscious users, this is non-negotiable. | NONE | Already the case. Make it visible: "Your data stays on your server" in empty state, settings, or about. Marketing, not engineering. |
+| Project-scoped context | Loom knows which project directory a session is in. It can show project files, git status, terminal for THAT project. ChatGPT/Claude/Gemini are project-agnostic unless you manually set up Projects. | LOW | Already implemented via project grouping. Enhance: auto-select project when opening session, project-specific templates/system prompts. |
 
-### Glass / Frosted Surfaces
+#### Experience Differentiators
 
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| Command palette glass overlay | `backdrop-filter: blur(16px) saturate(1.4)` on the command palette background. Glass tokens already defined. Apple and LobeChat both use this. 64% of premium SaaS apps now use glassmorphism. | Low | Glass tokens in tokens.css, command-palette.css already has `backdrop-filter: blur(8px)` | Upgrade from 8px to 16px blur and add `saturate(1.4)`. Nearly trivial. |
-| Settings modal glass | Same glass treatment on the settings modal backdrop. Creates depth hierarchy without heavy shadows. | Low | Glass tokens + shadcn Dialog overlay | Override Dialog overlay with glass tokens. |
-| Tooltip glass | Tooltips with slight blur behind them feel premium. Subtle effect, high polish signal. | Low | Glass tokens + shadcn Tooltip component | Add `backdrop-filter` to tooltip styles. |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Sub-second session loads | Most competitors take 0.5-2s to load a conversation. With a local SQLite cache, Loom can load sessions in <100ms. Speed IS a feature. | HIGH | Depends on SQLite data layer. Parse JSONL once, cache in SQLite. Query by session ID for instant retrieval. This makes everything feel native-app fast. |
+| Background session monitoring | See which sessions are actively streaming (Claude working in background). Tab title shows activity. Notification when task completes. No competitor web app does this for coding agents. | MEDIUM | Backend already tracks streaming state per session. UI: sidebar indicator dots, tab title update, optional desktop notification via Notification API. |
+| Mobile agent monitoring | Start Claude Code from terminal, monitor from phone via Loom. See tool calls, approve permissions, view output -- all from mobile browser. Cursor has this with cloud agents; Loom can do it with live session attach. | HIGH | Combines live session attach + mobile responsive layout + permission handling on mobile. Cursor charges for cloud agents; Loom does this with your own server for free. |
+| Instant file preview from tool calls | When Claude reads/writes a file, click the tool card to see the file in Loom's code editor. No competitor web chat does this -- they show raw text in the chat. | MEDIUM | ToolCard already shows file content. Add: "Open in Editor" button on Read/Write/Edit tool cards. Wire to file store + editor tab. |
+| Cost tracking across providers | Token usage and cost per message, per session, per provider. Loom already shows per-turn usage footers. Aggregate into a usage dashboard. | MEDIUM | Backend already has /api/usage/metrics. Enhance: session-level aggregation, provider comparison, daily/weekly trends. |
 
-### Text Reveal Effects
+### Anti-Features (Do NOT Build)
 
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| DecryptedText for session titles | New sessions appear in the sidebar with characters scrambling into the auto-generated title. Distinctive visual signature. Motion's ScrambleText is 1KB and avoids React re-renders. | Medium | Source-copy from React Bits OR use motion/react ScrambleText (1KB) | Must only trigger on first appearance, not every re-render. Needs intersection observer or "isNew" flag. |
-| DecryptedText for model name in status | Model name in the status line decrypting on session switch. Subtle but memorable. | Low | Same component as above | Reuse the same DecryptedText component. |
-| BlurText fade-in for empty state | The "Loom" wordmark and subtitle in ChatEmptyState fading in with per-word blur. Aceternity's "Text Generate" pattern. Better than static text. | Low | CSS `@starting-style` or simple JS stagger | The empty state is shown infrequently, so a richer entrance is worth the impact. |
+Features that seem appealing but would harm Loom's quality, coherence, or focus.
 
-### Animated Border Effects
-
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| StarBorder on active sidebar session | The currently-selected session in the sidebar gets a subtle animated border glow. Differentiates from hover. CSS-only from React Bits. | Low | Source-copy StarBorder (CSS-only, already planned) | Already planned in visual effects audit. No dependencies. |
-| StarBorder on focused composer | The chat input getting an animated border when focused. Signals "this is where you type." More expressive than a static border color change. | Low | Same StarBorder component | Wrap ChatComposer focus state. |
-| ElectricBorder enhancement during streaming | ElectricBorder is already adopted on the composer during streaming. Ensure it's smooth, consistent, and uses the right speed. | Low | ElectricBorder (already in codebase) | Review and tune existing implementation. |
-
-### Sidebar Slim Mode
-
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| Icon-only rail collapse | Sidebar collapses to ~58px icon rail (matches LobeChat pattern). Shows chat icon, file icon, git icon, settings icon. Tooltips on hover. | High | UI store `sidebarCollapsed` state, CSS transition, icon mapping | Major layout change. Needs careful coordination with mount-once panel pattern. The sidebar currently hosts session list, project groups, search, bulk actions -- all need to gracefully hide. |
-
-### Spacing & Typography Audit
-
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| Global spacing consistency pass | Audit every component for consistent use of spacing tokens (4px grid). Fix any hardcoded margins, inconsistent padding. | Medium | Design token system | This is grunt work but high-impact. Inconsistent spacing is the #1 signal of "student project." |
-| Typography hierarchy verification | Verify consistent font sizes, weights, and line-heights across all surfaces. Headings, body, labels, captions should follow a clear scale. | Medium | Font tokens in tokens.css | Currently using Tailwind text utilities directly. May need a stricter type scale. |
-| Border-radius consistency | Every rounded corner should use the same scale: sm (4px), md (8px), lg (12px). No magic numbers. | Low | tokens.css border-radius tokens | Mostly consistent but needs audit. |
-
----
-
-## Anti-Features
-
-Features to explicitly NOT build for this milestone. Either too expensive, wrong direction, or counterproductive.
-
-| Anti-Feature | Why Avoid | What to Do Instead |
-|--------------|-----------|-------------------|
-| Full Framer Motion bundle | Constitution bans full motion bundle (~34KB). LazyMotion with domAnimation is the ceiling at 15KB. CSS spring easing handles 80% of use cases for free. | Start with CSS `cubic-bezier(0.34, 1.56, 0.64, 1)`. Only add LazyMotion if CSS can't handle exit animations or shared layout. |
-| WebGL background effects (Aurora, Grainient) | ogl dependency (~30KB), GPU concerns on integrated Radeon 780M, and these are visual spectacle -- not production polish. Polish is about details that make things feel right, not effects that make things look flashy. Defer to v2.1 "The Polish". | Focus on micro-interactions and state consistency. Ship the spring physics, glass surfaces, and text reveals. Aurora/Grainient are spectacle for later. |
-| Character-by-character typewriter | Constitution explicitly bans this. Batch rendering via rAF buffer is the established pattern. Typewriter creates janky scroll behavior and is a performance anti-pattern at 100+ tokens/sec. | Keep the existing rAF buffer two-phase renderer. DecryptedText on titles is different -- it's a one-time reveal on a short string, not streaming content. |
-| 3D card tilts / parallax | Too playful for a dev tool. Loom is "surgical laser + old library", not a creative portfolio. LobeChat gets away with it because of its consumer-app positioning. | SpotlightCard's cursor-following gradient is the right level of interactivity. |
-| Cursor followers / trails | Distracting during code work. The mouse is a precision tool in a workspace app. | Nothing. The cursor should be invisible infrastructure. |
-| Animated message entrance (AnimatedList) | Conflicts with scroll-to-bottom behavior, auto-scroll during streaming, and content-visibility optimization. Every competitive product streams content in without entrance animations -- the streaming itself IS the animation. | Messages appear via streaming (active) or instant (historical). No entrance animation needed. |
-| Confetti / sparkles / particles | Too playful. Loom's aesthetic is understated precision, not celebration. | Success feedback through toast messages and icon state changes (checkmark transitions). |
-| Light mode | Out of scope. Dark-only is a deliberate brand decision. Potential future milestone stretch goal. | Ensure dark theme is flawless. Every surface, every scrollbar, every focus ring. |
-| LiquidChrome / Iridescence WebGL | Same reasoning as Aurora -- spectacle, not polish. High risk of looking tacky if not perfectly tuned. | Defer to v2.1. |
-| Sidebar drag-to-resize | Adds significant complexity (drag handler, persist width, min/max constraints) for minimal UX value. Slim mode collapse is the better investment. | Binary collapse/expand with spring animation. Not continuous resize. |
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Offline chat with local models | "What if I'm offline?" | Loom is a coding agent interface, not a general chatbot. Local models (Ollama, llama.cpp) produce dramatically worse code than Claude/GPT. The quality gap would make Loom feel broken. Also conflicts with single-purpose focus. | Show clear offline indicator. Cache recent sessions for reading offline. Don't try to run inference. |
+| Full IDE replacement (LSP, debugger, extensions) | "I want to never leave Loom" | Cursor/Windsurf/VS Code have thousands of engineer-years of IDE investment. Loom's CodeMirror editor is for viewing/quick-editing, not full development. Trying to compete on IDE features dilutes the chat-first mission. | Keep editor for viewing AI-generated changes and quick edits. Link to VS Code/Cursor for heavy editing. |
+| Character-by-character typewriter streaming | "ChatGPT does word-level fades" | Already banned by Constitution. rAF batch rendering is faster and smoother. Typewriter effects cause jank at high token rates and violate the "mathematical precision" soul. | Keep rAF buffer. Enhance streaming cursor animation if needed. |
+| Plugin/extension marketplace | "Let users add features" | Loom is a single-user tool. Marketplace implies community, maintenance, compatibility testing, security review. Massive scope for zero ROI at current stage. | MCP servers ARE the extension mechanism. Build MCP management UI instead (v2.1). |
+| Real-time collaboration / multi-user | "What if I want to share with my team?" | Single-user tool running on personal server. Multi-user adds auth complexity, conflict resolution, presence, permissions. Completely different product. | Share via conversation export (static HTML). Team collaboration happens in the terminal/git, not the chat UI. |
+| Voice/video input | "ChatGPT has voice mode" | Loom is a CODING interface. Voice input for code is terrible UX. Video adds complexity for near-zero value in a coding context. | If users want voice, they can use their OS dictation (built into macOS/iOS/Android). |
+| Light mode | Requested by convention | Doubles CSS surface area. Dark-only is a deliberate brand choice ("deep charcoal & dusty rose"). All competitors' dark modes are their best modes. | Keep dark-only. Revisit only if user feedback overwhelmingly demands it. |
+| AI-generated session summaries | "Summarize my chat" | Costs API tokens for questionable value. Auto-titles already capture the gist. Full summaries are rarely re-read. | Auto-titles are sufficient. If users want summaries, they can ask the AI in-chat. |
+| Conversation branching tree view | "LibreChat has a tree view" | Complex navigation UI for a feature most users never use. LibreChat's tree view is powerful but niche. Simple < 2/3 > branch navigation covers 95% of use cases. | Implement edit-based branching with arrow navigation (Claude.ai pattern). Skip the tree visualization. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Shimmer upgrade ──────────────────────► ALL skeleton components (prerequisite)
-                                         │
-Glass tokens ─────────────────────────► Command palette glass ──► Settings modal glass ──► Tooltip glass
-  (already defined)                      │
-                                         │
-Spring easing tokens ─────────────────► Tool card springs
-  (already defined)                    ► Sidebar springs
-                                       ► Modal springs
-                                       ► Scroll pill springs
-                                         │
-Interactive state audit ──────────────► Hover/focus/active/disabled consistency
-                                         │
-                                         ├──► Button press feedback
-                                         └──► Focus ring consistency
-                                         │
-DecryptedText component ──────────────► Session title reveals ──► Model name reveals
-                                         │
-StarBorder component ─────────────────► Active session indicator ──► Focused composer
-  (planned, not yet adopted)             │
-                                         │
-Empty state components ───────────────► File tree empty ──► Git panel empty ──► Session list empty
-  (need design language)               ► Search empty ──► Editor empty
-                                         │
-Loading state audit ──────────────────► Terminal skeleton ──► FileTree skeleton
-                                       ► Consistent shimmer class usage
-                                         │
-Spacing/typography audit ─────────────► Global consistency pass (no external deps)
-                                         │
-Sidebar slim mode ────────────────────► Icon rail layout ──► Tooltip labels ──► Persist preference
-  (most complex, standalone)             Depends on: spring animations for collapse transition
+SQLite Data Layer (cache + metadata)
+    |-- Instant session switching
+    |       |-- Scroll position restoration
+    |       |-- Background session indicators
+    |-- Session search (already exists, would be faster)
+    |-- Message editing with branching
+    |-- Conversation templates (stored in SQLite)
+    |-- Usage aggregation dashboard
+
+Live Session Attach (JSONL watcher)
+    |-- Background session monitoring
+    |-- Mobile agent monitoring
+    |-- Tab title activity indicator
+
+Mobile Responsive Layout
+    |-- Sidebar as drawer
+    |-- Touch-friendly targets
+    |-- Mobile composer (above keyboard)
+    |-- Safe area insets
+    |-- Mobile agent monitoring (depends on both mobile + live attach)
+
+Conversation Templates
+    |-- requires: Template storage (SQLite or JSON)
+    |-- enhances: Empty state suggestions
+    |-- enhances: Project-scoped context
+
+Message Editing + Branching
+    |-- requires: SQLite data layer (for branch storage)
+    |-- requires: Backend fork support
+    |-- conflicts with: Simple message list (must handle tree structure)
+
+Suggested Follow-ups
+    |-- enhances: Empty state
+    |-- independent: Can ship without data layer changes
 ```
 
-### Critical Path
+### Dependency Notes
 
-1. **Shimmer & skeleton consistency** (unblocks visual baseline)
-2. **Interactive state audit** (unblocks hover/focus/disabled consistency)
-3. **Spring easing adoption** (unblocks all animated transitions)
-4. **Glass surface upgrade** (unblocks premium overlay feel)
-5. **Empty state components** (unblocks first-run experience)
-6. **DecryptedText + StarBorder adoption** (visual personality)
-7. **Spacing/typography audit** (final polish pass)
-8. **Sidebar slim mode** (largest standalone feature, can parallel others)
+- **SQLite data layer is the foundation.** Without fast data access, session switching feels sluggish, branching is impractical, and scroll restoration is unreliable. Build this FIRST.
+- **Live session attach is independent.** It's a backend feature (file watcher → WebSocket) that works regardless of the data layer. Can be built in parallel.
+- **Mobile layout is independent of data layer.** CSS/responsive work can happen in parallel with backend work.
+- **Message editing/branching depends on data layer.** Need structured message storage before you can fork conversation trees.
+- **Conversation templates are low-dependency.** Can be stored in a simple JSON file initially, migrated to SQLite later.
 
 ---
 
-## MVP Recommendation
+## Competitor Feature Matrix
 
-Prioritize in this order for maximum perceived quality improvement:
+### Session Management
 
-### Must-Have (Phases 1-3)
+| Feature | ChatGPT | Claude.ai | Gemini | Cursor | Windsurf | Loom (Current) | Loom (Target) |
+|---------|---------|-----------|--------|--------|----------|----------------|---------------|
+| Instant session load | Yes | Yes | Yes | Yes | Yes | NO (re-fetches JSONL) | YES (SQLite cache) |
+| Session search | Semantic search | Pro sidebar search | Rename + pin | N/A (file-based) | N/A | YES (keyword) | Keep, add fuzzy |
+| Auto-titles | Yes | Yes | Yes | N/A | N/A | YES | Keep |
+| Date grouping | Today/Yesterday/7d/30d | Same | Basic | N/A | N/A | YES (with project groups) | Keep |
+| Pin conversations | Projects + star | Star | Pin | N/A | N/A | YES | Keep |
+| Bulk operations | Archive/delete | Delete | Delete | N/A | N/A | YES (multi-select delete) | Keep |
+| Project organization | Projects + folders | Projects (knowledge base) | Gems (functional) | Per-repo | Per-repo | YES (auto by project dir) | Enhance with templates |
 
-1. **Settings refactor landing** -- Generic useFetch hook, connection store persist fix, ModalState type safety. Already in-progress work that must land first.
-2. **Shimmer consistency + missing skeletons** -- Upgrade all skeletons to use `skeleton-shimmer` (directional sweep), add TerminalSkeleton and FileTreeSkeleton. Low effort, high visual cohesion.
-3. **Interactive state audit** -- Systematic pass through all custom components for hover/focus/active/disabled consistency. Add `:not(:disabled):hover`, `:not(:disabled):active`, consistent `focus-visible` ring. The single highest-impact polish item.
-4. **Empty states for all surfaces** -- Design a consistent empty state pattern (icon + heading + subtext + optional CTA) and apply to file tree, git panel, session list, search results, editor placeholder.
-5. **Spring easing on key transitions** -- Swap standard easing for spring cubic-bezier on: tool card expand/collapse, sidebar open/close, modal entrance, scroll-to-bottom pill. CSS-only, zero new dependencies.
+### Conversation Features
 
-### Should-Have (Phases 4-5)
+| Feature | ChatGPT | Claude.ai | Gemini | Cursor | Windsurf | Loom (Current) | Loom (Target) |
+|---------|---------|-----------|--------|--------|----------|----------------|---------------|
+| Edit message + branch | Yes (< 2/3 >) | Yes (edit creates branch) | Basic regenerate | N/A | N/A | NO | YES (v2.0) |
+| Conversation sharing | Public link | Snapshot link | Share link | N/A | N/A | Export only | Static HTML export |
+| Conversation templates | Custom Instructions | Projects + system prompt | Gems | .cursorrules | .windsurfrules | NO | YES (project-scoped) |
+| Suggested follow-ups | Pill chips below response | Inline suggestions | "Would you like..." | N/A | N/A | NO | YES (extracted from response) |
+| Memory across chats | Yes (persistent memory) | No (project-scoped only) | Yes (personalization) | Rules files | Rules files | NO | Consider for v2.1+ |
+| Temporary/incognito chat | Yes | No | Yes (Temporary Chat) | N/A | N/A | NO | LOW priority |
 
-6. **Glass surface upgrade** -- Upgrade command palette from blur(8px) to blur(16px)+saturate(1.4). Apply to settings modal overlay. Apply to tooltips.
-7. **Error state hardening** -- Add inline retry to failed API sections (git status, file tree, settings tabs). Add Sonner action buttons for retry. Add timeout escalation messages.
-8. **DecryptedText reveals** -- Source-copy from React Bits or adopt motion/react ScrambleText. Apply to session titles on first appearance and model name on session switch.
-9. **StarBorder adoption** -- Source-copy from React Bits. Apply to active sidebar session and focused composer.
-10. **Spacing and typography audit** -- Systematic pass for 4px grid compliance, type scale consistency, border-radius consistency.
+### Streaming & UX
 
-### Defer to v2.1 (Phase 6+)
+| Feature | ChatGPT | Claude.ai | Gemini | Cursor | Windsurf | Loom (Current) | Loom (Target) |
+|---------|---------|-----------|--------|--------|----------|----------------|---------------|
+| Streaming quality | Word-fade 200ms | Smooth reveal + cursor | Fast streaming | Token streaming | Token streaming | rAF buffer 60fps | Keep (already best-in-class) |
+| Stop button | Yes | Yes | Yes | Yes | Yes | YES | Keep |
+| Retry/regenerate | Yes | Yes | Yes | Yes | Yes | YES | Keep |
+| Copy full response | Yes | Yes | Yes | N/A | N/A | YES (export) | Add per-message copy |
+| Read aloud | Yes | Voice mode | Yes | No | No | NO | Anti-feature for coding |
 
-11. **Sidebar slim mode** -- Complex layout change. Better as a standalone feature with proper research into responsive breakpoints and the mount-once panel interaction.
-12. **Aurora/Grainient WebGL backgrounds** -- Spectacle effects. Need GPU testing, perf gating, reduced-motion handling. Wrong milestone.
-13. **BlurText empty state entrance** -- Nice-to-have. Only seen on infrequent empty state.
-14. **Progressive content reveal (staggered rows)** -- Medium complexity, potential scroll interaction issues. Research needed on interaction with content-visibility.
+### Model Switching
+
+| Feature | ChatGPT | Claude.ai | Gemini | Cursor | Windsurf | Loom (Current) | Loom (Target) |
+|---------|---------|-----------|--------|--------|----------|----------------|---------------|
+| Model selector | Top-center pill | Dropdown | Model picker | Per-conversation | Per-conversation | NO (Claude only via backend) | YES (v2.1 groundwork) |
+| Mid-conversation switch | No (new chat) | No (new chat) | No | Yes | Yes | NO | YES (v2.1) |
+| Multi-model comparison | No | No | No | No | No | NO | Consider for v2.1 |
+| Provider indicator on messages | Logo avatar | Logo | Logo | Model name | Model name | YES (provider header) | Keep, enhance |
+
+### Mobile Experience
+
+| Feature | ChatGPT | Claude.ai | Gemini | Cursor | Windsurf | Loom (Current) | Loom (Target) |
+|---------|---------|-----------|--------|--------|----------|----------------|---------------|
+| Native mobile app | iOS + Android | iOS + Android | iOS + Android | Web (cursor.com/agents) | No | NO (web only) | PWA (Tailscale HTTPS) |
+| Mobile-optimized web | N/A (native) | N/A (native) | N/A (native) | Good | Basic | PARTIAL (767px breakpoint) | Full mobile responsive |
+| Voice input | Advanced voice mode | 5 voice personalities | Gemini Live | No | No | NO | Anti-feature for coding |
+| Haptic feedback | Yes (native) | Yes (native) | Yes (native) | No | No | NO | Not applicable (web) |
+| Push notifications | Yes | Yes | Yes | Yes (from cloud agents) | No | NO | Desktop Notification API |
+
+### Unique Capabilities (Loom Only)
+
+| Feature | Competitors | Loom Advantage |
+|---------|------------|----------------|
+| Live session attach | Cursor has cloud agents (paid). SessionCast is view-only. | Watch ANY running CLI session. Free. Real-time tool calls, permissions, output. |
+| Integrated terminal | Cursor/Windsurf (IDE). ChatGPT/Claude/Gemini: NONE. | Terminal + chat + git in one interface. "Run in Terminal" from tool cards. |
+| Git integration | Cursor/Windsurf (IDE). ChatGPT/Claude/Gemini: NONE. | See what the AI changed, stage, commit, push -- without switching apps. |
+| Self-hosted privacy | Open WebUI, LibreChat (self-hosted). ChatGPT/Claude/Gemini: cloud only. | Your data on your server. No API key exposure to third-party UIs. |
+| Multi-provider with tools | LibreChat (multi-provider, no terminal). Open WebUI (multi-model, no git). | Claude + Gemini + Codex with terminal, filesystem, git. Complete workspace. |
 
 ---
 
-## Competitive Context
+## v2.0 "The Engine" Priority Definition
 
-What the top products do that Loom currently doesn't:
+### P1: Must Have (This Milestone)
 
-| Pattern | Claude.ai | ChatGPT | LobeChat | Loom Current | Loom Target |
-|---------|-----------|---------|----------|--------------|-------------|
-| Loading skeletons | Custom shimmer | Subtle pulse | Shiny text sweep | Mix of pulse/shimmer | Consistent directional shimmer |
-| Empty state | Suggestions grid | Personalized greeting + cards | Agent marketplace | Wordmark + 4 chips | Wordmark + chips + subtle blur-in |
-| Spring animations | `cubic-bezier(0.16, 1, 0.3, 1)` on thinking | Bounce on sidebar, 500ms pulse | Full Framer Motion | Tokens defined, not applied | CSS spring on 5+ surfaces |
-| Glass effects | None visible | Glassmorphic tool pills | `blur(36px)` strong glass | 8px blur on command palette | 16px + saturate on 3 surfaces |
-| Text reveals | Staggered fade-in | Word fade 200-250ms | Shiny text shimmer | ShinyText on thinking label | DecryptedText on titles |
-| Active indicators | Simple highlight | Subtle bg tint | Animated glow + scale | Background tint | StarBorder animated glow |
-| Hover consistency | Full coverage | Full coverage | Full coverage with hover-reveal timestamps | ~70% coverage | 100% coverage |
-| Button press feedback | Scale + color | Scale overshoot (~800ms) | CVA variants | Minimal | Scale(0.98) + darken |
-| Error retry | Inline retry | Inline retry + regenerate | Plugin error with debug mode | 3-tier error boundaries | Inline retry at API level |
+These define whether v2.0 is a meaningful upgrade over v1.5.
+
+- [ ] **SQLite data layer** -- Message cache for sub-200ms session switching. Parse JSONL once, store parsed messages in SQLite. Backend serves cached data on session load. WHY: Everything else (branching, scroll restore, search speed, mobile perf) depends on fast data.
+- [ ] **State persistence** -- Last session, scroll position, sidebar state, active tab survive browser restart. WHY: Daily-driver requirement. Opening Loom must feel like returning to your desk, not starting over.
+- [ ] **Live session attach** -- JSONL file watcher streams running CLI sessions to the browser in real-time. WHY: THE killer differentiator. No competitor does this. Transforms Loom from "alternative chat UI" to "mission control for AI agents."
+- [ ] **Mobile-responsive layout** -- Sidebar drawer, touch targets, composer above keyboard, safe areas, no zoom on focus. WHY: Monitoring AI agents from phone via Tailscale is a daily use case. Current mobile experience is broken.
+- [ ] **Performance** -- Lazy loading, request deduplication, optimistic updates, instant transitions. WHY: Speed is the most impactful UX feature. Every 100ms saved compounds across hundreds of daily interactions.
+
+### P2: Should Have (This Milestone If Time Permits)
+
+- [ ] **Suggested follow-up prompts** -- Extract potential questions/next-steps from AI responses, show as chips below message. WHY: Reduces friction for continuing conversations. Low effort, high perceived value.
+- [ ] **Conversation templates / system prompts** -- Create, save, apply system prompt templates scoped to projects. WHY: Power users want repeatable context setup. Gems/Custom Instructions are table stakes for 2026.
+- [ ] **Background session indicators** -- Sidebar dots showing which sessions are actively streaming. Tab title shows activity state. WHY: Multi-session monitoring is natural with live attach.
+- [ ] **Desktop notifications** -- Notification API when background session completes or needs permission. WHY: Fire-and-forget workflow: start task, switch to other work, get notified.
+- [ ] **Enhanced empty state** -- Project-aware suggestions, recent session quick-resume, time-of-day greeting. WHY: First impression matters. Current wordmark is functional but not inviting.
+
+### P3: Defer to v2.1+ (Future Consideration)
+
+- [ ] **Message editing with branch navigation** -- WHY defer: Requires significant backend work (fork support, branch storage). Get data layer right first, add branching on top.
+- [ ] **Multi-provider model switching** -- WHY defer: Backend supports multiple providers but UI assumes Claude. Full multi-provider is v2.1 "The Power" scope.
+- [ ] **Conversation sharing** -- WHY defer: Self-hosted makes sharing complex (who can access the link?). Static HTML export is a simpler v2.0 target. Full sharing needs auth/access design.
+- [ ] **Cross-conversation memory** -- WHY defer: ChatGPT's memory is impressive but complex. Requires semantic extraction, storage, retrieval. High effort, uncertain value for coding context.
+- [ ] **Cost tracking dashboard** -- WHY defer: Per-turn usage already shown. Dashboard aggregation is nice-to-have, not daily-driver-critical.
+- [ ] **PWA with install prompt** -- WHY defer: Tailscale MagicDNS provides HTTPS (required for PWA). But service worker caching, manifest, install flow need dedicated effort. Do mobile responsive first, PWA later.
 
 ---
 
-## Complexity Estimates
+## Feature Prioritization Matrix
 
-| Feature Group | Items | Total Effort | Risk |
-|---------------|-------|-------------|------|
-| Skeleton/shimmer consistency | 5 items | 1-2 days | Low -- CSS changes, no architecture |
-| Interactive state audit | 4 items | 2-3 days | Low -- systematic CSS pass |
-| Empty states | 5 items | 1-2 days | Low -- new components, simple |
-| Spring easing adoption | 5 items | 1 day | Low -- CSS token swap |
-| Glass surface upgrade | 3 items | 0.5 day | Low -- token adjustment |
-| Error state hardening | 4 items | 2-3 days | Medium -- API error handling patterns |
-| DecryptedText + StarBorder | 4 items | 1-2 days | Low -- source-copy, integrate |
-| Spacing/typography audit | 3 items | 2-3 days | Low -- grunt work |
-| Sidebar slim mode | 1 item | 3-5 days | High -- layout architecture impact |
-| **Total (without sidebar slim)** | **33 items** | **~11-17 days** | |
-| **Total (with sidebar slim)** | **34 items** | **~14-22 days** | |
+| Feature | User Value | Implementation Cost | Priority | Depends On |
+|---------|------------|---------------------|----------|------------|
+| SQLite data layer | HIGH | HIGH | P1 | Nothing (foundation) |
+| State persistence | HIGH | LOW | P1 | Zustand persist (exists) |
+| Live session attach | HIGH | HIGH | P1 | Backend file watcher |
+| Mobile responsive | HIGH | MEDIUM | P1 | CSS/responsive work |
+| Performance (dedup, lazy, optimistic) | HIGH | MEDIUM | P1 | Data layer |
+| Suggested follow-ups | MEDIUM | LOW | P2 | Nothing |
+| Conversation templates | MEDIUM | MEDIUM | P2 | Storage (SQLite or JSON) |
+| Background indicators | MEDIUM | LOW | P2 | Live session attach |
+| Desktop notifications | MEDIUM | LOW | P2 | Notification API |
+| Enhanced empty state | MEDIUM | LOW | P2 | Nothing |
+| Message editing + branching | HIGH | HIGH | P3 | SQLite + backend fork |
+| Multi-provider switching | HIGH | HIGH | P3 | v2.1 scope |
+| Conversation sharing | MEDIUM | MEDIUM | P3 | Auth/access design |
+| Cross-conversation memory | LOW | HIGH | P3 | Complex infrastructure |
+| Cost dashboard | LOW | MEDIUM | P3 | Usage data aggregation |
+
+---
+
+## Mobile-Specific Findings
+
+What mobile AI apps do that web interfaces don't -- and what Loom should (and shouldn't) adopt:
+
+### Must Adopt for Mobile Web
+
+1. **Bottom-anchored composer** -- Mobile apps put input at the bottom, above the keyboard. Loom's current composer position works on desktop but may need adjustment for mobile viewport.
+2. **Swipe gestures** -- Swipe right to open sidebar (drawer pattern). This is standard mobile web UX. Use touch event handlers, not complex gesture libraries.
+3. **Touch-optimized tap targets** -- 44px minimum per Apple HIG. Audit all buttons, links, tool card actions.
+4. **Viewport stability** -- No zoom on input focus (16px font minimum), no scroll jump when keyboard appears. Use visualViewport API.
+5. **Simplified mobile UI** -- Hide panels (file tree, terminal, git) behind bottom tabs or a mobile-specific navigation. Chat is primary on mobile; workspace features are secondary.
+
+### Do NOT Adopt from Mobile Apps
+
+1. **Native haptics** -- Web Vibration API is inconsistent and annoying. Mobile apps use nuanced haptic patterns; web can't replicate this quality.
+2. **Voice mode** -- Coding via voice is terrible UX. Let OS handle dictation.
+3. **Camera/AR features** -- Screenshot sharing is useful (already have image paste). Camera integration adds complexity for edge-case value.
+4. **In-app purchases** -- Loom is self-hosted, single-user. No monetization.
+5. **Health/fitness integration** -- Claude app added this. Irrelevant for a coding tool.
+
+### Mobile Monitoring Pattern (Loom's Unique Mobile Story)
+
+The mobile story for Loom is NOT "use AI from your phone." It's **"monitor your AI agent from your phone."**
+
+1. Start Claude Code task from terminal (desktop or SSH)
+2. Open Loom on phone via Tailscale
+3. Watch live session attach stream -- see tool calls, file changes, thinking
+4. Approve/deny permissions from phone
+5. Get notification when task completes
+6. Review changes in git panel on phone
+
+This workflow is unique to Loom. Cursor's cloud agents approach this but require their infrastructure and paid tier. Loom does it with your own server.
 
 ---
 
 ## Sources
 
-### Primary (HIGH confidence)
-- Codebase audit of `/home/swd/loom/src/src/components/` -- 51 files with interactive states, 4 existing skeletons, 3 adopted effects
-- `.planning/reference-app-analysis.md` -- Competitive analysis of Claude.ai, ChatGPT, Perplexity, Open WebUI, LobeChat, LibreChat
-- `.planning/chat-interface-standards.md` -- 106 requirements across 16 categories
-- `.planning/COMPONENT_ADOPTION_MAP.md` -- Planned component adoptions
-- `.planning/visual-effects-audit.md` -- React Bits, shadcn, Magic UI evaluation
-- `.planning/M3-POLISH-DEFERRED-CONTEXT.md` -- Deferred polish context from M3 planning
-- `.planning/PROJECT_SOUL.md` -- North star: "surgical laser + old library"
+### Competitor Products Analyzed
+- ChatGPT (OpenAI) -- iOS/Android/Web, GPT-5.1, Canvas, memory, conversation branching
+- Claude.ai (Anthropic) -- iOS/Android/Web, Artifacts, Projects, Apps, Remote Control
+- Gemini (Google) -- iOS/Android/Web, Gems, Extensions, Temporary Chat, personalization
+- Cursor -- Desktop IDE, Cloud Agents, model switching, background tasks, mobile at cursor.com/agents
+- Windsurf -- Desktop IDE, Cascade, SWE-1/1.5, planning agent, flow-based coding
+- LibreChat -- Self-hosted, multi-provider, conversation forking/tree view, MCP management
+- Open WebUI -- Self-hosted, multi-model merge, Arena mode, OKLCH, comprehensive settings
 
-### Secondary (MEDIUM confidence)
-- [Motion.dev LazyMotion docs](https://motion.dev/docs/react-lazy-motion) -- 4.6KB base, domAnimation +15KB
-- [Motion.dev ScrambleText](https://motion.dev/docs/react-scramble-text) -- 1KB scramble component
-- [React Bits DecryptedText](https://www.reactbits.dev/text-animations/decrypted-text) -- Source-copy text animation
-- [Glassmorphism implementation guide](https://playground.halfaccessible.com/blog/glassmorphism-design-trend-implementation-guide) -- 3-5 glass elements negligible perf
-- [NN/g Button States](https://www.nngroup.com/articles/button-states-communicate-interaction/) -- Hover/focus/active/disabled UX research
-- [Empty State UX patterns](https://www.pencilandpaper.io/articles/empty-states) -- Design patterns for empty states
-- [Framer Motion vs React Spring 2025](https://hookedonui.com/animating-react-uis-in-2025-framer-motion-12-vs-react-spring-10/) -- Animation library comparison
+### Research Sources
+- [ChatGPT Mobile App Guide 2026](https://www.ai-toolbox.co/chatgpt-management-and-productivity/chatgpt-mobile-app-guide-2026)
+- [ChatGPT Release Notes](https://help.openai.com/en/articles/6825453-chatgpt-release-notes)
+- [Claude Pro Mobile Features](https://aionx.co/claude-ai-reviews/claude-pro-mobile-app-features/)
+- [Claude Apps Announcement](https://www.uselayo.com/blog/claude-apps-the-complete-guide-for-2026)
+- [Cursor Features](https://cursor.com/features)
+- [Cursor CLI Cloud Handoff](https://cursor.com/changelog/cli-jan-16-2026)
+- [Windsurf Cascade](https://windsurf.com/cascade)
+- [Cursor vs Windsurf vs Claude Code 2026](https://dev.to/pockit_tools/cursor-vs-windsurf-vs-claude-code-in-2026-the-honest-comparison-after-using-all-three-3gof)
+- [Gemini Release Notes](https://gemini.google/release-notes/)
+- [ChatGPT Memory FAQ](https://help.openai.com/en/articles/8590148-memory-faq)
+- [Offline-First Frontend Apps](https://blog.logrocket.com/offline-first-frontend-apps-2025-indexeddb-sqlite/)
+- [SessionCast](https://www.toolify.ai/tool/sessioncast)
+- [Claude Code Remote Control](https://venturebeat.com/orchestration/anthropic-just-released-a-mobile-version-of-claude-code-called-remote)
+- Existing `.planning/reference-app-analysis.md` (6-product deep analysis)
+- Existing `.planning/chat-interface-standards.md` (106 requirements)
+- Existing `.planning/M3-POLISH-DEFERRED-CONTEXT.md` (deferred visual polish context)
 
-### Tertiary (LOW confidence -- verify before adopting)
-- [Dark Glassmorphism 2026 trend](https://medium.com/@developer_89726/dark-glassmorphism-the-aesthetic-that-will-define-ui-in-2026-93aa4153088f) -- 64% SaaS adoption claim (single source)
-- [BadtzUI Border Beam](https://www.badtz-ui.com/docs/components/border-beam) -- Alternative to StarBorder
+### Confidence Notes
+- **Competitor feature sets:** HIGH -- verified via official product pages, release notes, and hands-on analysis
+- **Mobile patterns:** MEDIUM -- web research corroborated by existing reference analysis; some mobile-specific claims from single sources
+- **Live session attach feasibility:** HIGH -- Happy Coder pattern documented, backend JSONL format understood, WebSocket infrastructure exists
+- **SQLite cache approach:** HIGH -- proven pattern in multiple self-hosted projects (Open WebUI, LibreChat); backend already uses better-sqlite3
+
+---
+*Feature research for: v2.0 "The Engine" -- AI coding workspace competitive parity and differentiation*
+*Researched: 2026-03-26*
