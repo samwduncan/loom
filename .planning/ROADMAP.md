@@ -106,7 +106,7 @@
 - Integer phases (50, 51, 52...): Planned milestone work
 - Decimal phases (50.1, 50.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 50: SQLite Data Layer** - Replace JSONL-on-every-load with SQLite message cache for sub-50ms session switching
+- [x] **Phase 50: SQLite Data Layer** - Replace JSONL-on-every-load with SQLite message cache for sub-50ms session switching (completed 2026-03-26)
 - [ ] **Phase 51: State Persistence** - Last session, scroll position, sidebar state survive browser restarts
 - [ ] **Phase 52: Live Session Attach** - Stream running CLI sessions to the browser in real-time via JSONL file watching
 - [ ] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas
@@ -127,10 +127,10 @@
   3. Deleting `cache.db` and reloading causes a single slow load, then all subsequent loads are fast again
   4. Background cache warmer completes indexing all JSONL files within 30 seconds of server startup
   5. Cache uses WAL mode in a separate file from auth.db -- deleting it never affects authentication
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 50-01-PLAN.md -- MessageCache module (SQLite schema + CRUD operations)
-- [ ] 50-02-PLAN.md -- CacheWarmer + projects.js wiring + server startup
+- [x] 50-02-PLAN.md -- CacheWarmer + projects.js wiring + server startup
 
 ### Phase 51: State Persistence
 **Goal**: Users return to exactly where they left off after closing and reopening the browser
@@ -240,7 +240,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 50. SQLite Data Layer | 1/2 | In Progress|  |
+| 50. SQLite Data Layer | 2/2 | Complete   | 2026-03-26 |
 | 51. State Persistence | 0/TBD | Not started | - |
 | 52. Live Session Attach | 0/TBD | Not started | - |
 | 53. Mobile-Responsive Layout | 0/TBD | Not started | - |
