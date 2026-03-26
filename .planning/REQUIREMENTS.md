@@ -1,135 +1,69 @@
-# Requirements: Loom V2
+# Loom v2.0 "The Engine" — Requirements
 
-**Defined:** 2026-03-18
+**Defined:** 2026-03-26
 **Core Value:** Make AI agent work visible, beautiful, and controllable
 
-## v1.5 Requirements
+## Data Layer (DATA)
+- [ ] **DATA-01**: Sessions load in <50ms from SQLite cache (vs 200-800ms JSONL parsing)
+- [ ] **DATA-02**: Cache auto-populates on first JSONL read, invalidates on mtime/size change
+- [ ] **DATA-03**: Session list loads from cached metadata in <10ms
+- [ ] **DATA-04**: Cache uses WAL mode in separate `cache.db` file (deletable without losing auth)
+- [ ] **DATA-05**: Background cache warmer indexes all JSONL files on server startup
 
-Requirements for "The Craft" milestone. Production quality -- fix every rough edge, nail every detail, add visual personality.
+## State Persistence (PERSIST)
+- [ ] **PERSIST-01**: Last-viewed session restores on browser reload
+- [ ] **PERSIST-02**: Scroll position restores per session on switch
+- [ ] **PERSIST-03**: Sidebar open/collapsed state and active project survive reload
+- [ ] **PERSIST-04**: Permission mode persists across sessions
 
-### Foundation & Code Quality
+## Live Session Attach (LIVE)
+- [ ] **LIVE-01**: Sidebar shows "active" indicator for sessions with running CLI processes
+- [ ] **LIVE-02**: User can attach to a running session and see real-time output
+- [ ] **LIVE-03**: JSONL file watcher uses fs.watch with byte-offset delta parsing (<200ms latency)
+- [ ] **LIVE-04**: User can detach from live session without interrupting the CLI process
+- [ ] **LIVE-05**: Permission prompts from attached sessions surface in Loom UI
 
-- [x] **FOUND-01**: Settings refactor landed -- generic `useFetch<T>` hook eliminates per-hook boilerplate, connection store has deep merge persist function, ModalState uses discriminated union
-- [x] **FOUND-02**: All dead UI removed -- no placeholder fields, fake data, or unused controls visible to the user
-- [x] **FOUND-03**: CSS spring tokens generated from existing `SPRING_GENTLE/SNAPPY/BOUNCY` configs and available as `linear()` values in tokens.css
+## Mobile UX (MOBILE)
+- [ ] **MOBILE-01**: No auto-zoom on input focus (viewport meta + 16px inputs)
+- [ ] **MOBILE-02**: Touch-friendly tap targets (minimum 44x44px hit areas)
+- [ ] **MOBILE-03**: Sidebar drawer with swipe-to-close gesture
+- [ ] **MOBILE-04**: Composer keyboard avoidance (input stays above virtual keyboard)
+- [ ] **MOBILE-05**: Responsive message layout (code blocks horizontal scroll, images resize)
 
-### Loading & Error States
+## Performance (PERF)
+- [ ] **PERF-01**: Request deduplication (concurrent identical fetches share one promise)
+- [ ] **PERF-02**: Optimistic UI updates for session operations (delete, rename, pin)
+- [ ] **PERF-03**: Lazy panel mounting (terminal, git panel only mount on first visit)
+- [ ] **PERF-04**: Skeleton loading states for all async content (no layout shifts)
 
-- [x] **LOAD-01**: Every async component shows a directional shimmer skeleton during loading (normalized animation across all skeletons)
-- [x] **LOAD-02**: Every component that fetches data has an error state with a retry button and clear error message
-- [x] **LOAD-03**: Terminal Suspense fallback uses skeleton component instead of text string
+## Conversation UX (CONV)
+- [ ] **CONV-01**: Suggested follow-up prompts after assistant responses
+- [ ] **CONV-02**: Conversation templates (quick-start prompts for common tasks)
+- [ ] **CONV-03**: Background session indicator (notification when idle session gets response)
+- [ ] **CONV-04**: Model selector in composer (switch between Claude/Gemini/Codex per message)
 
-### Empty States
+## PWA (PWA)
+- [ ] **PWA-01**: PWA manifest enables "Add to Home Screen" on mobile
+- [ ] **PWA-02**: App icon and splash screen for installed PWA
+- [ ] **PWA-03**: No service worker (manifest-only — avoid stale content on Tailscale network)
 
-- [x] **EMPTY-01**: File tree shows a designed empty state when no project is selected or project has no files
-- [x] **EMPTY-02**: Git panel shows designed empty states for both Changes (no changes) and History (no commits) views
-- [x] **EMPTY-03**: Session list shows a designed empty state when no sessions exist for a project
-- [x] **EMPTY-04**: Search results show a "no matches" state with contextual guidance
+## iOS Research (IOS)
+- [ ] **IOS-01**: Document Capacitor integration path with tradeoffs
+- [ ] **IOS-02**: Verify Tailscale DNS resolution from WKWebView sandbox
+- [ ] **IOS-03**: Prototype minimal Capacitor shell with Loom web build
 
-### Interactive State Consistency
-
-- [x] **INTER-01**: All custom interactive elements (buttons, cards, list items, tabs) have consistent hover states using design tokens
-- [x] **INTER-02**: All focusable elements have visible, consistent focus rings that match the design system
-- [x] **INTER-03**: All interactive elements have appropriate disabled states (reduced opacity, no hover, cursor change)
-- [x] **INTER-04**: All context menus, tooltips, and popovers have consistent enter/exit transitions
-
-### Spring Physics
-
-- [x] **SPRING-01**: Modal open/close uses spring easing (settings modal, delete confirmations, alert dialogs)
-- [x] **SPRING-02**: Sidebar expand/collapse uses spring easing
-- [x] **SPRING-03**: Tool card expand/collapse and tool group accordion use spring easing
-- [x] **SPRING-04**: Command palette open/close uses spring easing
-- [x] **SPRING-05**: Scroll-to-bottom pill entrance/exit uses spring easing
-
-### Glass Surfaces
-
-- [x] **GLASS-01**: Settings modal overlay uses frosted glass effect (`backdrop-filter: blur(16px) saturate(1.4)`)
-- [x] **GLASS-02**: Command palette overlay uses upgraded frosted glass effect
-- [x] **GLASS-03**: Delete/alert confirmation dialogs use frosted glass effect
-- [x] **GLASS-04**: Glass effects respect `prefers-reduced-motion` (disabled when reduced motion is active)
-
-### Visual Personality
-
-- [ ] **VIS-01**: Session titles in sidebar use DecryptedText reveal animation on first render
-- [ ] **VIS-02**: Model name in status line uses DecryptedText reveal animation
-- [ ] **VIS-03**: ElectricBorder/StarBorder applied to active session item in sidebar
-- [ ] **VIS-04**: ElectricBorder/StarBorder applied to focused composer input
-
-### Spacing & Typography Polish
-
-- [ ] **POLISH-01**: All border-radius values use design tokens (no hardcoded `rounded-*` that bypass the scale)
-- [ ] **POLISH-02**: Spacing between sections, cards, and list items is consistent and uses token scale
-- [ ] **POLISH-03**: Font sizes across all surfaces use the defined type scale (no ad-hoc `text-[10px]` or similar)
-
-## v2.0 Requirements
-
-Deferred to "The Power" milestone.
-
-### Sidebar Slim Mode (deferred from v1.5)
-
-- **SLIM-01**: Sidebar collapses to icon-only rail showing tab icons and session count
-- **SLIM-02**: Hover or click on slim rail expands sidebar temporarily
-- **SLIM-03**: Keyboard shortcut toggles between expanded and slim modes
-
-### Multi-Provider
-
-- **MULTI-01**: Multi-provider tabbed workspaces (Claude, Gemini, Codex)
-- **MULTI-02**: Background task execution with tab notifications
-- **MULTI-03**: MCP server management UI (enable, disable, configure)
+## Future Requirements (deferred)
+- Message editing with branch navigation (depends on data layer maturity)
+- Conversation forking (depends on Claude SDK --fork-session investigation)
+- Full service worker with offline support (reconsider when PWA usage data available)
+- Capacitor App Store submission (depends on IOS research results)
 
 ## Out of Scope
-
-| Feature | Reason |
-|---------|--------|
-| Aurora/WebGL ambient overlay | GPU feasibility risk on 780M iGPU; deferred to v2.1 "The Polish" |
-| Tier 2/3 effects (Iridescence, LiquidChrome, Border Beam, etc.) | Deferred to v2.1 when UI surface is final |
-| "Spring physics on ALL interactions" | Diminishing returns; v1.5 targets key surfaces only |
-| framer-motion / Motion library | CSS `linear()` handles all v1.5 use cases; zero runtime cost |
-| AnimatePresence exit animations | Incompatible with mount-once CSS show/hide tab system |
-| Sidebar slim mode | Store migration + layout complexity; deferred to v2.0 |
-| Light mode | Dark-only through v2.0 |
-| Mobile-responsive layout | Desktop-first; web handles mobile access |
+- Voice mode / text-to-speech — Not aligned with coding agent mission
+- Plugin/extension marketplace — Over-engineering for single-user tool
+- Light mode — Dark-only per Constitution
+- Local/offline LLM support — Loom consumes cloud models only
+- Full IDE replacement — Complements VS Code/Cursor
 
 ## Traceability
-
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| FOUND-01 | Phase 44 | Complete |
-| FOUND-02 | Phase 44 | Complete |
-| FOUND-03 | Phase 44 | Complete |
-| LOAD-01 | Phase 45 | Complete |
-| LOAD-02 | Phase 45 | Complete |
-| LOAD-03 | Phase 45 | Complete |
-| EMPTY-01 | Phase 45 | Complete |
-| EMPTY-02 | Phase 45 | Complete |
-| EMPTY-03 | Phase 45 | Complete |
-| EMPTY-04 | Phase 45 | Complete |
-| INTER-01 | Phase 46 | Complete |
-| INTER-02 | Phase 46 | Complete |
-| INTER-03 | Phase 46 | Complete |
-| INTER-04 | Phase 46 | Complete |
-| SPRING-01 | Phase 47 | Complete |
-| SPRING-02 | Phase 47 | Complete |
-| SPRING-03 | Phase 47 | Complete |
-| SPRING-04 | Phase 47 | Complete |
-| SPRING-05 | Phase 47 | Complete |
-| GLASS-01 | Phase 47 | Complete |
-| GLASS-02 | Phase 47 | Complete |
-| GLASS-03 | Phase 47 | Complete |
-| GLASS-04 | Phase 47 | Complete |
-| VIS-01 | Phase 48 | Pending |
-| VIS-02 | Phase 48 | Pending |
-| VIS-03 | Phase 48 | Pending |
-| VIS-04 | Phase 48 | Pending |
-| POLISH-01 | Phase 49 | Pending |
-| POLISH-02 | Phase 49 | Pending |
-| POLISH-03 | Phase 49 | Pending |
-
-**Coverage:**
-- v1.5 requirements: 30 total
-- Mapped to phases: 30
-- Unmapped: 0
-
----
-*Requirements defined: 2026-03-18*
-*Last updated: 2026-03-18 after roadmap creation*
+<!-- Filled by roadmapper -->
