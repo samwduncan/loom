@@ -127,7 +127,10 @@
   3. Deleting `cache.db` and reloading causes a single slow load, then all subsequent loads are fast again
   4. Background cache warmer completes indexing all JSONL files within 30 seconds of server startup
   5. Cache uses WAL mode in a separate file from auth.db -- deleting it never affects authentication
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 50-01-PLAN.md -- MessageCache module (SQLite schema + CRUD operations)
+- [ ] 50-02-PLAN.md -- CacheWarmer + projects.js wiring + server startup
 
 ### Phase 51: State Persistence
 **Goal**: Users return to exactly where they left off after closing and reopening the browser
@@ -237,7 +240,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 50. SQLite Data Layer | 0/TBD | Not started | - |
+| 50. SQLite Data Layer | 0/2 | Not started | - |
 | 51. State Persistence | 0/TBD | Not started | - |
 | 52. Live Session Attach | 0/TBD | Not started | - |
 | 53. Mobile-Responsive Layout | 0/TBD | Not started | - |
