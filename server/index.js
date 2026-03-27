@@ -2189,4 +2189,79 @@ async function startServer() {
     }
 }
 
+// Graceful shutdown: drain connections and clean up all resources on SIGTERM/SIGINT
+function gracefulShutdown(signal) {
+    console.log(`[INFO] Received ${signal}, starting graceful shutdown...`);
+
+    // Force exit after timeout (systemd will SIGKILL after TimeoutStopSec anyway)
+    const forceTimer = setTimeout(() => {
+        console.error('[WARN] Forced shutdown after 10s timeout');
+        process.exit(1);
+    }, 10000);
+    forceTimer.unref();
+
+    // 1. Kill all PTY sessions (prevents zombie child processes)
+    for (const [key, session] of ptySessionsMap) {
+        try {
+            if (session.pty && session.pty.kill) {
+                session.pty.kill();
+            }
+        } catch (err) {
+            console.error(`[WARN] Error killing PTY ${key}:`, err.message);
+        }
+    }
+    ptySessionsMap.clear();
+    console.log('[INFO] PTY sessions killed');
+
+    // 2. Unwatch all session watchers (releases fs.watch handles)
+    try {
+        sessionWatcher.unwatchAll();
+        console.log('[INFO] Session watchers released');
+    } catch (err) {
+        console.error('[WARN] Error unwatching sessions:', err.message);
+    }
+
+    // 3. Close project file watchers (releases inotify handles)
+    Promise.all(
+        projectsWatchers.map(async (watcher) => {
+            try {
+                await watcher.close();
+            } catch (err) {
+                console.error('[WARN] Error closing project watcher:', err.message);
+            }
+        })
+    ).then(() => {
+        projectsWatchers = [];
+        console.log('[INFO] Project watchers closed');
+    });
+
+    // 4. Close all WebSocket connections
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.close(1001, 'Server shutting down');
+        }
+    });
+
+    wss.close(() => {
+        console.log('[INFO] WebSocket server closed');
+    });
+
+    // 5. Close database connections
+    try {
+        messageCache.close();
+        console.log('[INFO] Message cache closed');
+    } catch (err) {
+        console.error('[WARN] Error closing message cache:', err.message);
+    }
+
+    // 6. Stop accepting new HTTP connections — exit when all drained
+    server.close(() => {
+        console.log('[INFO] HTTP server closed — shutdown complete');
+        process.exit(0);
+    });
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
 startServer();
