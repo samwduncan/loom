@@ -17,10 +17,10 @@
 - [x] **PERSIST-04**: Permission mode persists across sessions
 
 ## Live Session Attach (LIVE)
-- [ ] **LIVE-01**: Sidebar shows "active" indicator for sessions with running CLI processes
-- [ ] **LIVE-02**: User can attach to a running session and see real-time output
+- [x] **LIVE-01**: Sidebar shows "active" indicator for sessions with running CLI processes
+- [x] **LIVE-02**: User can attach to a running session and see real-time output
 - [x] **LIVE-03**: JSONL file watcher uses fs.watch with byte-offset delta parsing (<200ms latency)
-- [ ] **LIVE-04**: User can detach from live session without interrupting the CLI process
+- [x] **LIVE-04**: User can detach from live session without interrupting the CLI process
 - [ ] **LIVE-05**: Permission prompts from attached sessions surface in Loom UI
 
 ## Mobile UX (MOBILE)
@@ -78,10 +78,10 @@
 | PERSIST-02 | Phase 51 | Complete |
 | PERSIST-03 | Phase 51 | Complete |
 | PERSIST-04 | Phase 51 | Complete |
-| LIVE-01 | Phase 52 | Pending |
-| LIVE-02 | Phase 52 | Pending |
+| LIVE-01 | Phase 52 | Complete |
+| LIVE-02 | Phase 52 | Complete |
 | LIVE-03 | Phase 52 | Complete |
-| LIVE-04 | Phase 52 | Pending |
+| LIVE-04 | Phase 52 | Complete |
 | LIVE-05 | Phase 52 | Pending |
 | MOBILE-01 | Phase 53 | Pending |
 | MOBILE-02 | Phase 53 | Pending |
