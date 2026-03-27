@@ -69,7 +69,8 @@ ok "TypeScript compilation passed"
 # Step 5: Build frontend
 step "Step 5: Build frontend"
 # Build to repo root dist/ (not src/dist/) — nginx root points here
-(cd src && npx vite build --outDir ../dist) || fail "Vite build failed"
+# --emptyOutDir required because outDir is outside project root (Vite won't auto-clean)
+(cd src && npx vite build --outDir ../dist --emptyOutDir) || fail "Vite build failed"
 ok "Frontend built to dist/"
 
 # Step 6: Copy public/ contents into dist/ (AR fix #1: PWA manifest, favicons, icons)
