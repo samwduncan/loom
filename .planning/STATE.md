@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "The Engine"
-status: Ready to plan
-stopped_at: Completed 55-02-PLAN.md
-last_updated: "2026-03-27T01:35:34.814Z"
+status: Phase 57 Complete
+stopped_at: Completed 57-01-PLAN.md
+last_updated: "2026-03-27T02:40:00.000Z"
 progress:
   total_phases: 8
-  completed_phases: 7
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 8
+  total_plans: 15
+  completed_plans: 15
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 56 — pwa-manifest
+**Current focus:** Milestone v2.0 complete — all 8 phases done
 
 ## Current Position
 
-Phase: 57
-Plan: Not started
+Phase: 57 (ios-research) — COMPLETE
+Plan: 1/1 complete
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: Not started
 | Phase 54 P01 | 3min | 2 tasks | 3 files |
 | Phase 55 P01 | 3min | 2 tasks | 4 files |
 | Phase 55 P02 | 3min | 2 tasks | 8 files |
+| Phase 57 P01 | 5min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Plan: Not started
 - [Phase 55]: Client-side regex heuristics for follow-up suggestions (code/error/list/default categories)
 - [Phase 55]: Static amber dot (no animation) for background session notifications
 - [Phase 55]: Provider-specific options: Claude gets images/fileMentions/permissionMode; Codex/Gemini get projectPath/sessionId only
+- [Phase 57]: Capacitor 7.6.1 over 8.x -- Xcode 16+ requirement is more accessible than 26+
+- [Phase 57]: Tailscale DNS from WKWebView: HIGH confidence -- system-wide VPN routes all traffic including WKWebView networking daemon
+- [Phase 57]: API base URL abstraction is highest-value prep for Capacitor bundled assets mode
 
 ### Pending Todos
 
@@ -106,6 +110,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-27T01:17:53.297Z
-Stopped at: Completed 55-02-PLAN.md
-Resume: `/gsd:plan-phase 50` (skip research -- architecture fully specified in research/ARCHITECTURE.md)
+Last session: 2026-03-27T02:40:00.000Z
+Stopped at: Completed Phase 57 (all v2.0 phases done)
+Resume: `/gsd:complete-milestone` or `/gsd:verify-work 57`

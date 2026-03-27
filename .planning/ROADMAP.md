@@ -113,7 +113,7 @@
 - [x] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading (completed 2026-03-27)
 - [x] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector (completed 2026-03-27)
 - [x] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker) (completed 2026-03-27)
-- [ ] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification
+- [x] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification (completed 2026-03-27)
 
 ## Phase Details
 
@@ -227,9 +227,9 @@ Plans:
   1. A written document exists covering Capacitor integration path with pros, cons, and effort estimate
   2. Tailscale DNS resolution has been analyzed with documented verdict and caveats; on-device verification deferred pending Mac access
   3. A minimal Capacitor shell project is scaffolded and configured to load the Loom web build; building and on-device rendering deferred pending Mac access
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 57-01-PLAN.md -- Capacitor scaffold + iOS integration assessment document
+- [x] 57-01-PLAN.md -- Capacitor scaffold + iOS integration assessment document
 
 ### v2.1 "The Power" (Planned)
 
@@ -265,7 +265,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 54. Performance Hardening | 2/2 | Complete    | 2026-03-27 |
 | 55. Conversation Enhancements | 2/2 | Complete    | 2026-03-27 |
 | 56. PWA Manifest | 1/1 | Complete    | 2026-03-27 |
-| 57. iOS Research | 0/1 | Not started | - |
+| 57. iOS Research | 1/1 | Complete   | 2026-03-27 |
 
 ## Backlog (Future Milestones)
 
