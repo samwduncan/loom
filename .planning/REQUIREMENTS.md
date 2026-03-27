@@ -53,11 +53,11 @@
 - [ ] **IOS-03**: Prototype minimal Capacitor shell with Loom web build
 
 ## Production Deployment (PROD)
-- [ ] **PROD-01**: nginx reverse proxy serves Loom on HTTPS (port 5443 via Tailscale Serve) proxying API/WS to Express on 5555
-- [ ] **PROD-02**: nginx serves static assets (dist/) directly with immutable cache headers and brotli/gzip compression
+- [x] **PROD-01**: nginx reverse proxy serves Loom on HTTPS (port 5443 via Tailscale Serve) proxying API/WS to Express on 5555
+- [x] **PROD-02**: nginx serves static assets (dist/) directly with immutable cache headers and brotli/gzip compression
 - [ ] **PROD-03**: Single `./deploy.sh` command builds frontend, validates build, and reloads services with zero-downtime
 - [ ] **PROD-04**: Build validation gates: TypeScript compilation, bundle size limits, dist/ integrity checks
-- [ ] **PROD-05**: nginx and Express managed as systemd services with proper dependencies and restart policies
+- [x] **PROD-05**: nginx and Express managed as systemd services with proper dependencies and restart policies
 
 ## Future Requirements (deferred)
 - Message editing with branch navigation (depends on data layer maturity)
@@ -109,8 +109,8 @@
 | IOS-01 | Phase 57 | Pending |
 | IOS-02 | Phase 57 | Pending |
 | IOS-03 | Phase 57 | Pending |
-| PROD-01 | Phase 58 | Pending |
-| PROD-02 | Phase 58 | Pending |
+| PROD-01 | Phase 58 | Complete |
+| PROD-02 | Phase 58 | Complete |
 | PROD-03 | Phase 58 | Pending |
 | PROD-04 | Phase 58 | Pending |
-| PROD-05 | Phase 58 | Pending |
+| PROD-05 | Phase 58 | Complete |

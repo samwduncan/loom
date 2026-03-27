@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "The Engine"
-status: Phase 57 Complete
-stopped_at: Completed 57-01-PLAN.md
-last_updated: "2026-03-27T02:40:00.000Z"
+status: Ready to execute
+stopped_at: Completed 58-01-PLAN.md
+last_updated: "2026-03-27T22:02:58.762Z"
 progress:
-  total_phases: 8
+  total_phases: 9
   completed_phases: 8
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 17
+  completed_plans: 16
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Milestone v2.0 complete — all 8 phases done
+**Current focus:** Phase 58 — production-build-nginx
 
 ## Current Position
 
-Phase: 57 (ios-research) — COMPLETE
-Plan: 1/1 complete
+Phase: 58 (production-build-nginx) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Plan: 1/1 complete
 | Phase 55 P01 | 3min | 2 tasks | 4 files |
 | Phase 55 P02 | 3min | 2 tasks | 8 files |
 | Phase 57 P01 | 5min | 2 tasks | 6 files |
+| Phase 58 P01 | 6min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Plan: 1/1 complete
 - [Phase 57]: Capacitor 7.6.1 over 8.x -- Xcode 16+ requirement is more accessible than 26+
 - [Phase 57]: Tailscale DNS from WKWebView: HIGH confidence -- system-wide VPN routes all traffic including WKWebView networking daemon
 - [Phase 57]: API base URL abstraction is highest-value prep for Capacitor bundled assets mode
+- [Phase 58]: worker_shutdown_timeout in nginx.conf main context (not conf.d/) -- directive is main-context only
+- [Phase 58]: Three-tier proxy: Tailscale Serve :5443 -> nginx :5580 -> Express :5555 with brotli/gzip and immutable caching
+- [Phase 58]: Graceful shutdown: PTY kill -> session unwatch -> file watcher close -> WS close -> DB close -> HTTP drain -> exit
 
 ### Pending Todos
 
@@ -110,6 +114,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-27T02:40:00.000Z
-Stopped at: Completed Phase 57 (all v2.0 phases done)
+Last session: 2026-03-27T22:02:58.760Z
+Stopped at: Completed 58-01-PLAN.md
 Resume: `/gsd:complete-milestone` or `/gsd:verify-work 57`
