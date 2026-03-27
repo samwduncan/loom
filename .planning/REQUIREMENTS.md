@@ -33,8 +33,8 @@
 ## Performance (PERF)
 - [ ] **PERF-01**: Request deduplication (concurrent identical fetches share one promise)
 - [ ] **PERF-02**: Optimistic UI updates for session operations (delete, rename, pin)
-- [ ] **PERF-03**: Lazy panel mounting (terminal, git panel only mount on first visit)
-- [ ] **PERF-04**: Skeleton loading states for all async content (no layout shifts)
+- [x] **PERF-03**: Lazy panel mounting (terminal, git panel only mount on first visit)
+- [x] **PERF-04**: Skeleton loading states for all async content (no layout shifts)
 
 ## Conversation UX (CONV)
 - [ ] **CONV-01**: Suggested follow-up prompts after assistant responses
@@ -90,8 +90,8 @@
 | MOBILE-05 | Phase 53 | Complete |
 | PERF-01 | Phase 54 | Pending |
 | PERF-02 | Phase 54 | Pending |
-| PERF-03 | Phase 54 | Pending |
-| PERF-04 | Phase 54 | Pending |
+| PERF-03 | Phase 54 | Complete |
+| PERF-04 | Phase 54 | Complete |
 | CONV-01 | Phase 55 | Pending |
 | CONV-02 | Phase 55 | Pending |
 | CONV-03 | Phase 55 | Pending |
