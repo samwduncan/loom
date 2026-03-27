@@ -510,7 +510,9 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
 app.get('/api/projects/:projectName/sessions', authenticateToken, async (req, res) => {
     try {
         const { limit = 5, offset = 0 } = req.query;
-        const result = await getSessions(req.params.projectName, parseInt(limit, 10) || 5, parseInt(offset, 10) || 0);
+        const limitNum = parseInt(limit, 10);
+        const offsetNum = parseInt(offset, 10);
+        const result = await getSessions(req.params.projectName, Number.isFinite(limitNum) ? limitNum : 5, Number.isFinite(offsetNum) ? offsetNum : 0);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -524,8 +526,10 @@ app.get('/api/projects/:projectName/sessions/:sessionId/messages', authenticateT
         const { limit, offset } = req.query;
 
         // Parse limit and offset if provided
-        const parsedLimit = limit ? parseInt(limit, 10) : null;
-        const parsedOffset = offset ? parseInt(offset, 10) : 0;
+        const rawLimit = limit ? parseInt(limit, 10) : null;
+        const parsedLimit = rawLimit !== null && Number.isFinite(rawLimit) ? rawLimit : null;
+        const rawOffset = offset ? parseInt(offset, 10) : 0;
+        const parsedOffset = Number.isFinite(rawOffset) ? rawOffset : 0;
 
         const result = await getSessionMessages(projectName, sessionId, parsedLimit, parsedOffset);
 
@@ -2169,7 +2173,7 @@ async function startServer() {
 
 // Graceful shutdown: drain connections and clean up all resources on SIGTERM/SIGINT
 let shuttingDown = false;
-function gracefulShutdown(signal) {
+async function gracefulShutdown(signal) {
     if (shuttingDown) return;
     shuttingDown = true;
     console.log(`[INFO] Received ${signal}, starting graceful shutdown...`);
@@ -2203,7 +2207,7 @@ function gracefulShutdown(signal) {
     }
 
     // 3. Close project file watchers (releases inotify handles)
-    Promise.all(
+    await Promise.all(
         projectsWatchers.map(async (watcher) => {
             try {
                 await watcher.close();
@@ -2211,10 +2215,9 @@ function gracefulShutdown(signal) {
                 console.error('[WARN] Error closing project watcher:', err.message);
             }
         })
-    ).then(() => {
-        projectsWatchers = [];
-        console.log('[INFO] Project watchers closed');
-    });
+    );
+    projectsWatchers = [];
+    console.log('[INFO] Project watchers closed');
 
     // 4. Close all WebSocket connections
     wss.clients.forEach((client) => {
