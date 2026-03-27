@@ -31,8 +31,8 @@
 - [x] **MOBILE-05**: Responsive message layout (code blocks horizontal scroll, images resize)
 
 ## Performance (PERF)
-- [ ] **PERF-01**: Request deduplication (concurrent identical fetches share one promise)
-- [ ] **PERF-02**: Optimistic UI updates for session operations (delete, rename, pin)
+- [x] **PERF-01**: Request deduplication (concurrent identical fetches share one promise)
+- [x] **PERF-02**: Optimistic UI updates for session operations (delete, rename, pin)
 - [x] **PERF-03**: Lazy panel mounting (terminal, git panel only mount on first visit)
 - [x] **PERF-04**: Skeleton loading states for all async content (no layout shifts)
 
@@ -88,8 +88,8 @@
 | MOBILE-03 | Phase 53 | Complete |
 | MOBILE-04 | Phase 53 | Complete |
 | MOBILE-05 | Phase 53 | Complete |
-| PERF-01 | Phase 54 | Pending |
-| PERF-02 | Phase 54 | Pending |
+| PERF-01 | Phase 54 | Complete |
+| PERF-02 | Phase 54 | Complete |
 | PERF-03 | Phase 54 | Complete |
 | PERF-04 | Phase 54 | Complete |
 | CONV-01 | Phase 55 | Pending |

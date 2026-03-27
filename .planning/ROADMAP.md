@@ -110,7 +110,7 @@
 - [x] **Phase 51: State Persistence** - Last session, scroll position, sidebar state survive browser restarts (completed 2026-03-26)
 - [x] **Phase 52: Live Session Attach** - Stream running CLI sessions to the browser in real-time via JSONL file watching (completed 2026-03-27)
 - [x] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas (completed 2026-03-27)
-- [ ] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading
+- [x] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading (completed 2026-03-27)
 - [ ] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector
 - [ ] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker)
 - [ ] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification
@@ -187,9 +187,9 @@ Plans:
   2. Deleting, renaming, or pinning a session updates the sidebar instantly with rollback on failure
   3. Terminal, git panel, and file tree panels only load their JavaScript on first visit (not on app startup)
   4. All async content areas show skeleton loading states with zero layout shifts during load
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 54-01-PLAN.md -- Request deduplication + optimistic session operations
+- [x] 54-01-PLAN.md -- Request deduplication + optimistic session operations
 - [x] 54-02-PLAN.md -- Lazy panel mounting + skeleton audit
 **UI hint**: yes
 
@@ -257,7 +257,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 51. State Persistence | 1/1 | Complete    | 2026-03-26 |
 | 52. Live Session Attach | 3/3 | Complete    | 2026-03-27 |
 | 53. Mobile-Responsive Layout | 3/3 | Complete    | 2026-03-27 |
-| 54. Performance Hardening | 1/2 | In Progress|  |
+| 54. Performance Hardening | 2/2 | Complete   | 2026-03-27 |
 | 55. Conversation Enhancements | 0/TBD | Not started | - |
 | 56. PWA Manifest | 0/TBD | Not started | - |
 | 57. iOS Research | 0/TBD | Not started | - |
