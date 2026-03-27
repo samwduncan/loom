@@ -21,7 +21,7 @@
 - [x] **LIVE-02**: User can attach to a running session and see real-time output
 - [x] **LIVE-03**: JSONL file watcher uses fs.watch with byte-offset delta parsing (<200ms latency)
 - [x] **LIVE-04**: User can detach from live session without interrupting the CLI process
-- [ ] **LIVE-05**: Permission prompts from attached sessions surface in Loom UI
+- [x] **LIVE-05**: Permission prompts from attached sessions surface in Loom UI
 
 ## Mobile UX (MOBILE)
 - [ ] **MOBILE-01**: No auto-zoom on input focus (viewport meta + 16px inputs)
@@ -82,7 +82,7 @@
 | LIVE-02 | Phase 52 | Complete |
 | LIVE-03 | Phase 52 | Complete |
 | LIVE-04 | Phase 52 | Complete |
-| LIVE-05 | Phase 52 | Pending |
+| LIVE-05 | Phase 52 | Complete |
 | MOBILE-01 | Phase 53 | Pending |
 | MOBILE-02 | Phase 53 | Pending |
 | MOBILE-03 | Phase 53 | Pending |
