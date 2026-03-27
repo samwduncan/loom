@@ -210,7 +210,8 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canStop, streamSessionId]);
 
-  // Keyboard avoidance fallback for browsers without interactive-widget support
+  // Keyboard avoidance: detect keyboard height via visualViewport and prevent
+  // iOS WKWebView from auto-scrolling the page when inputs get focus.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const vv = window.visualViewport;
@@ -219,16 +220,27 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     function handleResize() {
       const viewport = window.visualViewport;
       if (!viewport) return;
-      // When keyboard is open, visualViewport.height < window.innerHeight
       const keyboardHeight = window.innerHeight - viewport.height;
       document.documentElement.style.setProperty(
         '--keyboard-offset',
         keyboardHeight > 50 ? `${keyboardHeight}px` : '0px',
       );
+      // Prevent iOS WKWebView from auto-scrolling the page up when keyboard opens.
+      // The page uses overflow:hidden but iOS still translates the viewport.
+      window.scrollTo(0, 0);
+    }
+
+    // Also prevent scroll on viewport scroll events (iOS translates the viewport)
+    function handleScroll() {
+      window.scrollTo(0, 0);
     }
 
     vv.addEventListener('resize', handleResize);
-    return () => vv.removeEventListener('resize', handleResize);
+    vv.addEventListener('scroll', handleScroll);
+    return () => {
+      vv.removeEventListener('resize', handleResize);
+      vv.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   // Handle mention selection: add to mentions array, remove @query from input
