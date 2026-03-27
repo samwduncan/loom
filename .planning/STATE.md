@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "The Engine"
-status: Ready to execute
-stopped_at: Completed 58-01-PLAN.md
-last_updated: "2026-03-27T22:02:58.762Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 58-02-PLAN.md
+last_updated: "2026-03-27T22:10:50.605Z"
 progress:
   total_phases: 9
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 17
-  completed_plans: 16
+  completed_plans: 17
 ---
 
 # Project State
@@ -56,6 +56,7 @@ Plan: 2 of 2
 | Phase 55 P02 | 3min | 2 tasks | 8 files |
 | Phase 57 P01 | 5min | 2 tasks | 6 files |
 | Phase 58 P01 | 6min | 2 tasks | 5 files |
+| Phase 58 P02 | 5min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,8 @@ Plan: 2 of 2
 - [Phase 58]: worker_shutdown_timeout in nginx.conf main context (not conf.d/) -- directive is main-context only
 - [Phase 58]: Three-tier proxy: Tailscale Serve :5443 -> nginx :5580 -> Express :5555 with brotli/gzip and immutable caching
 - [Phase 58]: Graceful shutdown: PTY kill -> session unwatch -> file watcher close -> WS close -> DB close -> HTTP drain -> exit
+- [Phase 58]: Added --emptyOutDir to vite build -- required because outDir is outside Vite project root
+- [Phase 58]: Deploy pipeline: dirty check -> pull -> npm ci (both) -> tsc -> vite build -> public copy -> validate -> Express restart -> health check -> nginx reload
 
 ### Pending Todos
 
@@ -114,6 +117,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-27T22:02:58.760Z
-Stopped at: Completed 58-01-PLAN.md
+Last session: 2026-03-27T22:10:50.603Z
+Stopped at: Completed 58-02-PLAN.md
 Resume: `/gsd:complete-milestone` or `/gsd:verify-work 57`

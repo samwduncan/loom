@@ -114,7 +114,7 @@
 - [x] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector (completed 2026-03-27)
 - [x] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker) (completed 2026-03-27)
 - [x] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification (completed 2026-03-27)
-- [ ] **Phase 58: Production Build & Nginx** - nginx reverse proxy, TLS, optimized static serving, and automated build/deploy pipeline
+- [x] **Phase 58: Production Build & Nginx** - nginx reverse proxy, TLS, optimized static serving, and automated build/deploy pipeline (completed 2026-03-27)
 
 ## Phase Details
 
@@ -242,10 +242,10 @@ Plans:
   3. Running `./deploy.sh` builds the frontend, validates it, and reloads both nginx and Express with zero-downtime
   4. Deploy aborts with clear error if TypeScript compilation fails, bundle exceeds size limits, or dist/ is missing expected files
   5. Both nginx and loom-backend run as systemd services with `After=` dependency ordering and automatic restart on failure
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 58-01-PLAN.md -- nginx reverse proxy + brotli + Tailscale Serve + systemd + graceful shutdown
-- [ ] 58-02-PLAN.md -- deploy.sh build pipeline with validation gates + end-to-end verification
+- [x] 58-02-PLAN.md -- deploy.sh build pipeline with validation gates + end-to-end verification
 
 ### v2.1 "The Power" (Planned)
 
@@ -282,7 +282,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 58
 | 55. Conversation Enhancements | 2/2 | Complete    | 2026-03-27 |
 | 56. PWA Manifest | 1/1 | Complete    | 2026-03-27 |
 | 57. iOS Research | 1/1 | Complete   | 2026-03-27 |
-| 58. Production Build & Nginx | 1/2 | In Progress|  |
+| 58. Production Build & Nginx | 2/2 | Complete   | 2026-03-27 |
 
 ## Backlog (Future Milestones)
 
