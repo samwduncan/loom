@@ -1,116 +1,124 @@
-# Loom v2.0 "The Engine" — Requirements
+# Requirements: Loom v2.1 "The Mobile"
 
-**Defined:** 2026-03-26
-**Core Value:** Make AI agent work visible, beautiful, and controllable
+**Defined:** 2026-03-27
+**Core Value:** Make AI agent work visible, beautiful, and controllable — now as a native-feeling iOS app
 
-## Data Layer (DATA)
-- [x] **DATA-01**: Sessions load in <50ms from SQLite cache (vs 200-800ms JSONL parsing)
-- [x] **DATA-02**: Cache auto-populates on first JSONL read, invalidates on mtime/size change
-- [x] **DATA-03**: Session list loads from cached metadata in <10ms
-- [x] **DATA-04**: Cache uses WAL mode in separate `cache.db` file (deletable without losing auth)
-- [x] **DATA-05**: Background cache warmer indexes all JSONL files on server startup
+## v2.1 Requirements
 
-## State Persistence (PERSIST)
-- [x] **PERSIST-01**: Last-viewed session restores on browser reload
-- [x] **PERSIST-02**: Scroll position restores per session on switch
-- [x] **PERSIST-03**: Sidebar open/collapsed state and active project survive reload
-- [x] **PERSIST-04**: Permission mode persists across sessions
+Requirements for this milestone. Each maps to roadmap phases.
 
-## Live Session Attach (LIVE)
-- [x] **LIVE-01**: Sidebar shows "active" indicator for sessions with running CLI processes
-- [x] **LIVE-02**: User can attach to a running session and see real-time output
-- [x] **LIVE-03**: JSONL file watcher uses fs.watch with byte-offset delta parsing (<200ms latency)
-- [x] **LIVE-04**: User can detach from live session without interrupting the CLI process
-- [x] **LIVE-05**: Permission prompts from attached sessions surface in Loom UI
+### Platform Foundation
 
-## Mobile UX (MOBILE)
-- [x] **MOBILE-01**: No auto-zoom on input focus (viewport meta + 16px inputs)
-- [x] **MOBILE-02**: Touch-friendly tap targets (minimum 44x44px hit areas)
-- [x] **MOBILE-03**: Sidebar drawer with swipe-to-close gesture
-- [x] **MOBILE-04**: Composer keyboard avoidance (input stays above virtual keyboard)
-- [x] **MOBILE-05**: Responsive message layout (code blocks horizontal scroll, images resize)
+- [ ] **PLAT-01**: App detects native vs web platform and configures API/WS URLs accordingly
+- [ ] **PLAT-02**: All fetch() calls route through centralized URL helper supporting same-origin (web) and remote server (Capacitor bundled) modes
+- [ ] **PLAT-03**: All WebSocket connections construct absolute URLs for Capacitor bundled mode
+- [ ] **PLAT-04**: Express backend accepts requests from `capacitor://localhost` origin (CORS whitelist)
 
-## Performance (PERF)
-- [x] **PERF-01**: Request deduplication (concurrent identical fetches share one promise)
-- [x] **PERF-02**: Optimistic UI updates for session operations (delete, rename, pin)
-- [x] **PERF-03**: Lazy panel mounting (terminal, git panel only mount on first visit)
-- [x] **PERF-04**: Skeleton loading states for all async content (no layout shifts)
+### Keyboard & Composer
 
-## Conversation UX (CONV)
-- [x] **CONV-01**: Suggested follow-up prompts after assistant responses
-- [x] **CONV-02**: Conversation templates (quick-start prompts for common tasks)
-- [x] **CONV-03**: Background session indicator (notification when idle session gets response)
-- [x] **CONV-04**: Model selector in composer (switch between Claude/Gemini/Codex per message)
+- [ ] **KEY-01**: Capacitor Keyboard plugin provides reliable keyboard height events on iOS
+- [ ] **KEY-02**: Keyboard avoidance uses native `keyboardWillShow`/`keyboardWillHide` events instead of visualViewport hack
+- [ ] **KEY-03**: Composer slides smoothly with keyboard animation, maintaining CSS `--keyboard-offset` pattern
+- [ ] **KEY-04**: Message list auto-scrolls to latest message when keyboard opens
+- [ ] **KEY-05**: Keyboard resize mode set to `none` — WKWebView doesn't auto-resize
 
-## PWA (PWA)
-- [ ] **PWA-01**: PWA manifest enables "Add to Home Screen" on mobile
-- [ ] **PWA-02**: App icon and splash screen for installed PWA
-- [ ] **PWA-03**: No service worker (manifest-only — avoid stale content on Tailscale network)
+### Touch & Layout
 
-## iOS Research (IOS)
-- [ ] **IOS-01**: Document Capacitor integration path with tradeoffs
-- [ ] **IOS-02**: Verify Tailscale DNS resolution from WKWebView sandbox
-- [ ] **IOS-03**: Prototype minimal Capacitor shell with Loom web build
+- [ ] **TOUCH-01**: All interactive elements have 44px+ touch targets at mobile breakpoint
+- [ ] **TOUCH-02**: Safe-area insets applied correctly on all four edges
+- [ ] **TOUCH-03**: App shell prevents rubber-band overscroll at page level
+- [ ] **TOUCH-04**: Gesture back navigation handled gracefully (no conflict with sidebar drawer)
+- [ ] **TOUCH-05**: Primary actions (send, stop) positioned within thumb-zone reach
 
-## Production Deployment (PROD)
-- [x] **PROD-01**: nginx reverse proxy serves Loom on HTTPS (port 5443 via Tailscale Serve) proxying API/WS to Express on 5555
-- [x] **PROD-02**: nginx serves static assets (dist/) directly with immutable cache headers and brotli/gzip compression
-- [x] **PROD-03**: Single `./deploy.sh` command builds frontend, validates build, and reloads services with zero-downtime
-- [x] **PROD-04**: Build validation gates: TypeScript compilation, bundle size limits, dist/ integrity checks
-- [x] **PROD-05**: nginx and Express managed as systemd services with proper dependencies and restart policies
+### Native Plugins
 
-## Future Requirements (deferred)
-- Message editing with branch navigation (depends on data layer maturity)
-- Conversation forking (depends on Claude SDK --fork-session investigation)
-- Full service worker with offline support (reconsider when PWA usage data available)
-- Capacitor App Store submission (depends on IOS research results)
+- [ ] **NATIVE-01**: Status bar shows light text on dark background matching app theme
+- [ ] **NATIVE-02**: Splash screen matches app background and hides smoothly after React mounts
+- [ ] **NATIVE-03**: Haptic feedback on message send, tool completion, and error states
+- [ ] **NATIVE-04**: Capacitor plugins load via dynamic imports (tree-shaken from web builds)
+
+### Motion & Animation
+
+- [ ] **MOTION-01**: Device refresh rate detected (60Hz vs 120Hz) at runtime
+- [ ] **MOTION-02**: Spring/transition durations adapted for 120Hz ProMotion displays
+- [ ] **MOTION-03**: Info.plist includes `CADisableMinimumFrameDurationOnPhone` for ProMotion opt-in
+
+### Bundled Assets
+
+- [ ] **BUNDLE-01**: Vite production build syncs to iOS app via `cap sync` pipeline
+- [ ] **BUNDLE-02**: App loads and functions correctly from bundled assets with remote API
+- [ ] **BUNDLE-03**: Clear error state when server/VPN connection lost
+- [ ] **BUNDLE-04**: Splash-to-auth-to-content flow without white flash
+
+## Future Requirements
+
+Deferred to later milestones. Tracked but not in current roadmap.
+
+### Push & Notifications
+
+- **PUSH-01**: Push notifications for long-running task completion (APNS)
+- **PUSH-02**: Local notifications for background session events
+
+### Advanced Native
+
+- **ADV-01**: Face ID / Touch ID authentication
+- **ADV-02**: Share extension for sharing content into Loom
+- **ADV-03**: iPad split-screen layout optimization
 
 ## Out of Scope
-- Voice mode / text-to-speech — Not aligned with coding agent mission
-- Plugin/extension marketplace — Over-engineering for single-user tool
-- Light mode — Dark-only per Constitution
-- Local/offline LLM support — Loom consumes cloud models only
-- Full IDE replacement — Complements VS Code/Cursor
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| Push notifications | APNS server integration + Apple Dev Program — overkill for personal use |
+| Face ID / biometrics | Auth system is JWT with hardcoded creds — biometrics on top is theater |
+| Offline conversation cache | AI assistant is inherently online — focus on fast online, not fake offline |
+| Share extension | Unclear use case for coding assistant, significant native code |
+| iPad split-screen | Portrait-phone-first; current responsive layout works acceptably on iPad |
+| Native file picker | Loom has its own backend-connected file tree |
+| Camera integration | Not relevant for coding assistant |
+| WebGL / Metal graphics | Deferred to v2.3 "The Polish" |
+| CoreML on-device | Not needed — all AI inference is server-side |
+| Separate mobile entry point | Single codebase, platform detection at runtime |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-01 | Phase 50 | Complete |
-| DATA-02 | Phase 50 | Complete |
-| DATA-03 | Phase 50 | Complete |
-| DATA-04 | Phase 50 | Complete |
-| DATA-05 | Phase 50 | Complete |
-| PERSIST-01 | Phase 51 | Complete |
-| PERSIST-02 | Phase 51 | Complete |
-| PERSIST-03 | Phase 51 | Complete |
-| PERSIST-04 | Phase 51 | Complete |
-| LIVE-01 | Phase 52 | Complete |
-| LIVE-02 | Phase 52 | Complete |
-| LIVE-03 | Phase 52 | Complete |
-| LIVE-04 | Phase 52 | Complete |
-| LIVE-05 | Phase 52 | Complete |
-| MOBILE-01 | Phase 53 | Complete |
-| MOBILE-02 | Phase 53 | Complete |
-| MOBILE-03 | Phase 53 | Complete |
-| MOBILE-04 | Phase 53 | Complete |
-| MOBILE-05 | Phase 53 | Complete |
-| PERF-01 | Phase 54 | Complete |
-| PERF-02 | Phase 54 | Complete |
-| PERF-03 | Phase 54 | Complete |
-| PERF-04 | Phase 54 | Complete |
-| CONV-01 | Phase 55 | Complete |
-| CONV-02 | Phase 55 | Complete |
-| CONV-03 | Phase 55 | Complete |
-| CONV-04 | Phase 55 | Complete |
-| PWA-01 | Phase 56 | Pending |
-| PWA-02 | Phase 56 | Pending |
-| PWA-03 | Phase 56 | Pending |
-| IOS-01 | Phase 57 | Pending |
-| IOS-02 | Phase 57 | Pending |
-| IOS-03 | Phase 57 | Pending |
-| PROD-01 | Phase 58 | Complete |
-| PROD-02 | Phase 58 | Complete |
-| PROD-03 | Phase 58 | Complete |
-| PROD-04 | Phase 58 | Complete |
-| PROD-05 | Phase 58 | Complete |
+| PLAT-01 | — | Pending |
+| PLAT-02 | — | Pending |
+| PLAT-03 | — | Pending |
+| PLAT-04 | — | Pending |
+| KEY-01 | — | Pending |
+| KEY-02 | — | Pending |
+| KEY-03 | — | Pending |
+| KEY-04 | — | Pending |
+| KEY-05 | — | Pending |
+| TOUCH-01 | — | Pending |
+| TOUCH-02 | — | Pending |
+| TOUCH-03 | — | Pending |
+| TOUCH-04 | — | Pending |
+| TOUCH-05 | — | Pending |
+| NATIVE-01 | — | Pending |
+| NATIVE-02 | — | Pending |
+| NATIVE-03 | — | Pending |
+| NATIVE-04 | — | Pending |
+| MOTION-01 | — | Pending |
+| MOTION-02 | — | Pending |
+| MOTION-03 | — | Pending |
+| BUNDLE-01 | — | Pending |
+| BUNDLE-02 | — | Pending |
+| BUNDLE-03 | — | Pending |
+| BUNDLE-04 | — | Pending |
+
+**Coverage:**
+- v2.1 requirements: 25 total
+- Mapped to phases: 0
+- Unmapped: 25
+
+---
+*Requirements defined: 2026-03-27*
+*Last updated: 2026-03-27 after initial definition*
