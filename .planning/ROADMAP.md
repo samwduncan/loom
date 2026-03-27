@@ -155,7 +155,11 @@ Plans:
   3. User can detach from a live session and the CLI process continues running uninterrupted
   4. Permission prompts from an attached session appear in the Loom UI for user response
   5. Attaching to a session that finishes while attached transitions cleanly to normal completed state
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 52-01-PLAN.md -- SessionWatcher module + server WS attach/detach handlers
+- [ ] 52-02-PLAN.md -- Frontend types, multiplexer routing, store state, sidebar live indicator
+- [ ] 52-03-PLAN.md -- ChatView auto-attach, LiveSessionBanner, auto-detach on switch
 
 ### Phase 53: Mobile-Responsive Layout
 **Goal**: Users can comfortably monitor and interact with AI agents from a phone browser
@@ -244,7 +248,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 |-------|----------------|--------|-----------|
 | 50. SQLite Data Layer | 2/2 | Complete    | 2026-03-26 |
 | 51. State Persistence | 1/1 | Complete    | 2026-03-26 |
-| 52. Live Session Attach | 0/TBD | Not started | - |
+| 52. Live Session Attach | 0/3 | In progress | - |
 | 53. Mobile-Responsive Layout | 0/TBD | Not started | - |
 | 54. Performance Hardening | 0/TBD | Not started | - |
 | 55. Conversation Enhancements | 0/TBD | Not started | - |
@@ -258,4 +262,4 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-26 after Phase 51 planning*
+*Last updated: 2026-03-26 after Phase 52 planning*
