@@ -112,7 +112,7 @@
 - [x] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas (completed 2026-03-27)
 - [x] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading (completed 2026-03-27)
 - [x] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector (completed 2026-03-27)
-- [ ] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker)
+- [x] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker) (completed 2026-03-27)
 - [ ] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification
 
 ## Phase Details
@@ -262,7 +262,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 53. Mobile-Responsive Layout | 3/3 | Complete    | 2026-03-27 |
 | 54. Performance Hardening | 2/2 | Complete    | 2026-03-27 |
 | 55. Conversation Enhancements | 2/2 | Complete    | 2026-03-27 |
-| 56. PWA Manifest | 0/TBD | Not started | - |
+| 56. PWA Manifest | 1/1 | Complete   | 2026-03-27 |
 | 57. iOS Research | 0/TBD | Not started | - |
 
 ## Backlog (Future Milestones)
