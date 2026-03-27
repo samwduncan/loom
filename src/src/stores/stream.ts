@@ -37,6 +37,8 @@ interface StreamState {
   resultCost: number | null;
   tokenBudget: { used: number; total: number } | null;
   modelName: string | null;
+  // Live session attach
+  liveAttachedSessions: Set<string>;
 
   // Actions
   startStream: () => void;
@@ -53,6 +55,9 @@ interface StreamState {
   clearPermissionRequest: () => void;
   setResultData: (tokens: ResultTokens, cost: number, modelName?: string) => void;
   setTokenBudget: (used: number, total: number) => void;
+  attachLiveSession: (sessionId: string) => void;
+  detachLiveSession: (sessionId: string) => void;
+  isSessionLiveAttached: (sessionId: string) => boolean;
   reset: () => void;
 }
 
@@ -67,9 +72,10 @@ const INITIAL_STREAM_STATE = {
   resultCost: null as number | null,
   tokenBudget: null as { used: number; total: number } | null,
   modelName: null as string | null,
+  liveAttachedSessions: new Set<string>(),
 };
 
-export const useStreamStore = create<StreamState>()((set) => ({
+export const useStreamStore = create<StreamState>()((set, get) => ({
   ...INITIAL_STREAM_STATE,
 
   startStream: () => {
@@ -134,8 +140,26 @@ export const useStreamStore = create<StreamState>()((set) => ({
     set({ tokenBudget: { used, total } });
   },
 
+  attachLiveSession: (sessionId: string) => {
+    set((state) => ({
+      liveAttachedSessions: new Set([...state.liveAttachedSessions, sessionId]),
+    }));
+  },
+
+  detachLiveSession: (sessionId: string) => {
+    set((state) => {
+      const next = new Set(state.liveAttachedSessions);
+      next.delete(sessionId);
+      return { liveAttachedSessions: next };
+    });
+  },
+
+  isSessionLiveAttached: (sessionId: string) => {
+    return get().liveAttachedSessions.has(sessionId);
+  },
+
   reset: () => {
-    set({ ...INITIAL_STREAM_STATE });
+    set({ ...INITIAL_STREAM_STATE, liveAttachedSessions: new Set<string>() });
   },
 }));
 

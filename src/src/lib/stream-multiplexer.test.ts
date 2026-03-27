@@ -42,6 +42,9 @@ function createMockCallbacks(): MultiplexerCallbacks {
     onPermissionCancelled: vi.fn(),
     onResultData: vi.fn(),
     onProjectsUpdated: vi.fn(),
+    onLiveSessionData: vi.fn(),
+    onLiveSessionAttached: vi.fn(),
+    onLiveSessionDetached: vi.fn(),
   };
 }
 

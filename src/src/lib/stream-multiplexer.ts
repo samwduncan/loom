@@ -67,6 +67,10 @@ export interface MultiplexerCallbacks {
   onPermissionCancelled: (requestId: string) => void;
   onResultData: (tokens: ResultTokens, cost: number, modelName?: string) => void;
   onProjectsUpdated: () => void;
+  // Live session attach
+  onLiveSessionData: (sessionId: string, entries: unknown[]) => void;
+  onLiveSessionAttached: (sessionId: string) => void;
+  onLiveSessionDetached: (sessionId: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -325,6 +329,16 @@ export function routeServerMessage(
     case 'gemini-complete':
     case 'gemini-error':
       console.log('[Multiplexer] Gemini message (M4):', msg.type);
+      break;
+    // Live session attach
+    case 'live-session-data':
+      callbacks.onLiveSessionData(msg.sessionId, msg.entries);
+      break;
+    case 'live-session-attached':
+      callbacks.onLiveSessionAttached(msg.sessionId);
+      break;
+    case 'live-session-detached':
+      callbacks.onLiveSessionDetached(msg.sessionId);
       break;
   }
 }

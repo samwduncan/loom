@@ -235,6 +235,11 @@ export async function initializeWebSocket(): Promise<void> {
     onProjectsUpdated: () => {
       window.dispatchEvent(new CustomEvent('loom:projects-updated'));
     },
+
+    // Live session attach (wired fully in Task 2)
+    onLiveSessionData: () => {},
+    onLiveSessionAttached: () => {},
+    onLiveSessionDetached: () => {},
   };
 
   // Track streaming state to call onStreamStart once per stream

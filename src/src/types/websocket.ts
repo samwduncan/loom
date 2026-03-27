@@ -158,7 +158,11 @@ export type ServerMessage =
   // Gemini (M4 — types locked from backend source)
   | { type: 'gemini-response'; data: GeminiSDKData; sessionId: string | null }
   | { type: 'gemini-complete'; sessionId: string }
-  | { type: 'gemini-error'; error: string; sessionId: string | null };
+  | { type: 'gemini-error'; error: string; sessionId: string | null }
+  // Live session attach
+  | { type: 'live-session-data'; sessionId: string; entries: unknown[] }
+  | { type: 'live-session-attached'; sessionId: string; watching: boolean }
+  | { type: 'live-session-detached'; sessionId: string };
 
 // ---------------------------------------------------------------------------
 // Client -> Server messages (discriminated union)
@@ -200,7 +204,10 @@ export type ClientMessage =
   | { type: 'abort-session'; sessionId: string; provider?: 'claude' | 'codex' | 'gemini' }
   | { type: 'claude-permission-response'; requestId: string; allow: boolean; updatedInput?: unknown; message?: string; rememberEntry?: string }
   | { type: 'check-session-status'; sessionId: string; provider?: 'claude' | 'codex' | 'gemini' }
-  | { type: 'get-active-sessions' };
+  | { type: 'get-active-sessions' }
+  // Live session attach
+  | { type: 'attach-session'; sessionId: string; projectName: string }
+  | { type: 'detach-session'; sessionId: string };
 
 // ---------------------------------------------------------------------------
 // Type guard
