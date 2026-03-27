@@ -50,6 +50,7 @@ export function SessionList() {
   const activeSessionId = useTimelineStore((s) => s.activeSessionId);
   const sessions = useTimelineStore((s) => s.sessions);
   const removeSession = useTimelineStore((s) => s.removeSession);
+  const addSession = useTimelineStore((s) => s.addSession);
   const updateSessionTitle = useTimelineStore((s) => s.updateSessionTitle);
   const streamingSessionId = useStreamStore((s) => s.isStreaming ? s.activeSessionId : null);
   const liveAttachedSessions = useStreamStore((s) => s.liveAttachedSessions);
@@ -113,6 +114,7 @@ export function SessionList() {
     if (id) setEditingSessionId(id);
   }, [contextMenu.sessionId, closeContextMenu]);
 
+  // PERF-02: Rename is already optimistic -- updates title immediately, rolls back on API failure
   const handleSessionRename = useCallback(async (sessionId: string, newTitle: string) => {
     const previousTitle = sessions.find((s) => s.id === sessionId)?.title;
     updateSessionTitle(sessionId, newTitle);
@@ -134,6 +136,7 @@ export function SessionList() {
     if (id) setDeleteTarget({ type: 'single', id });
   }, [contextMenu.sessionId, closeContextMenu, setDeleteTarget]);
 
+  // PERF-02: Pin is client-only (localStorage) -- already instant, no API call
   const handlePin = useCallback(() => {
     const id = contextMenu.sessionId;
     if (id) togglePin(id);
@@ -152,33 +155,52 @@ export function SessionList() {
     if (!deleteTarget) return;
 
     if (deleteTarget.type === 'bulk') {
+      // Bulk deletes wait for API -- complexity not worth optimistic handling
       await selection.bulkDelete(rawGroups, activeSessionId, navigate, removeSession);
       setDeleteTarget(null);
       return;
     }
 
-    // Single delete
+    // Single delete -- optimistic: remove from UI immediately, rollback on failure
     const deleteSessionId = deleteTarget.id;
     if (!projectName) { setDeleteTarget(null); return; }
+
+    // Capture full session object for rollback (messages may be empty from rehydration -- that's fine)
+    const capturedSession = sessions.find((s) => s.id === deleteSessionId);
     const wasActive = deleteSessionId === activeSessionId;
+
+    // Optimistic UI update: remove session immediately
+    removeSession(deleteSessionId);
+    setDeleteTarget(null);
+
+    // Navigate away if this was the active session
+    if (wasActive) {
+      const remaining = sessions
+        .filter((s) => s.id !== deleteSessionId)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+      navigate(remaining.length > 0 ? `/chat/${remaining[0]!.id}` : '/chat'); // ASSERT: length check
+    }
+
+    // Fire API in background
     try {
       await apiFetch(
         `/api/projects/${encodeURIComponent(projectName)}/sessions/${encodeURIComponent(deleteSessionId)}`,
         { method: 'DELETE' },
       );
-      removeSession(deleteSessionId);
-      if (wasActive) {
-        const remaining = sessions
-          .filter((s) => s.id !== deleteSessionId)
-          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
-        navigate(remaining.length > 0 ? `/chat/${remaining[0]!.id}` : '/chat'); // ASSERT: length check
-      }
+      // Success -- no action needed, UI already updated
     } catch (err) {
       console.error('Failed to delete session:', err);
+      // Rollback: restore the session into the sidebar
+      if (capturedSession) {
+        addSession(capturedSession);
+      }
+      // Navigate back to the restored session if it was active
+      if (wasActive && capturedSession) {
+        navigate(`/chat/${capturedSession.id}`);
+      }
       toast.error('Failed to delete session');
     }
-    setDeleteTarget(null);
-  }, [deleteTarget, projectName, activeSessionId, sessions, removeSession, navigate, selection, rawGroups, setDeleteTarget]);
+  }, [deleteTarget, projectName, activeSessionId, sessions, removeSession, addSession, navigate, selection, rawGroups, setDeleteTarget]);
 
   const deleteCount = deleteTarget?.type === 'bulk' ? selection.selectedIds.size : 1;
 
