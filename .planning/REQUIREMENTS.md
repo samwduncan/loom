@@ -28,7 +28,7 @@
 - [x] **MOBILE-02**: Touch-friendly tap targets (minimum 44x44px hit areas)
 - [x] **MOBILE-03**: Sidebar drawer with swipe-to-close gesture
 - [x] **MOBILE-04**: Composer keyboard avoidance (input stays above virtual keyboard)
-- [ ] **MOBILE-05**: Responsive message layout (code blocks horizontal scroll, images resize)
+- [x] **MOBILE-05**: Responsive message layout (code blocks horizontal scroll, images resize)
 
 ## Performance (PERF)
 - [ ] **PERF-01**: Request deduplication (concurrent identical fetches share one promise)
@@ -87,7 +87,7 @@
 | MOBILE-02 | Phase 53 | Complete |
 | MOBILE-03 | Phase 53 | Complete |
 | MOBILE-04 | Phase 53 | Complete |
-| MOBILE-05 | Phase 53 | Pending |
+| MOBILE-05 | Phase 53 | Complete |
 | PERF-01 | Phase 54 | Pending |
 | PERF-02 | Phase 54 | Pending |
 | PERF-03 | Phase 54 | Pending |

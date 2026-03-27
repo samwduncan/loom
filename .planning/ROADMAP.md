@@ -109,7 +109,7 @@
 - [x] **Phase 50: SQLite Data Layer** - Replace JSONL-on-every-load with SQLite message cache for sub-50ms session switching (completed 2026-03-26)
 - [x] **Phase 51: State Persistence** - Last session, scroll position, sidebar state survive browser restarts (completed 2026-03-26)
 - [x] **Phase 52: Live Session Attach** - Stream running CLI sessions to the browser in real-time via JSONL file watching (completed 2026-03-27)
-- [ ] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas
+- [x] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas (completed 2026-03-27)
 - [ ] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading
 - [ ] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector
 - [ ] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker)
@@ -171,11 +171,11 @@ Plans:
   3. Sidebar opens as a full-screen drawer with swipe-to-close gesture on mobile
   4. Composer input stays visible above the virtual keyboard when typing on mobile
   5. Code blocks in messages scroll horizontally and images resize proportionally on narrow screens
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 53-01-PLAN.md -- Viewport zoom verification + 44px touch targets on all interactive elements
 - [x] 53-02-PLAN.md -- Sidebar swipe-to-close gesture + keyboard avoidance + safe areas
-- [ ] 53-03-PLAN.md -- Responsive message layout (code blocks, images, content at 390px)
+- [x] 53-03-PLAN.md -- Responsive message layout (code blocks, images, content at 390px)
 **UI hint**: yes
 
 ### Phase 54: Performance Hardening
@@ -253,7 +253,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 50. SQLite Data Layer | 2/2 | Complete    | 2026-03-26 |
 | 51. State Persistence | 1/1 | Complete    | 2026-03-26 |
 | 52. Live Session Attach | 3/3 | Complete    | 2026-03-27 |
-| 53. Mobile-Responsive Layout | 2/3 | In Progress|  |
+| 53. Mobile-Responsive Layout | 3/3 | Complete   | 2026-03-27 |
 | 54. Performance Hardening | 0/TBD | Not started | - |
 | 55. Conversation Enhancements | 0/TBD | Not started | - |
 | 56. PWA Manifest | 0/TBD | Not started | - |
