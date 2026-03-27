@@ -10,6 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const installMode = fs.existsSync(path.join(__dirname, '..', '.git')) ? 'git' : 'npm';
+const distIndexPath = path.join(__dirname, '../dist/index.html');
+const hasDist = fs.existsSync(distIndexPath);
 
 // ANSI color codes for terminal output
 const colors = {
@@ -66,6 +68,7 @@ import geminiRoutes from './routes/gemini.js';
 import { initializeDatabase } from './database/db.js';
 import { validateApiKey, authenticateToken, authenticateWebSocket } from './middleware/auth.js';
 import { IS_PLATFORM } from './constants/config.js';
+import multer from 'multer';
 
 // File system watchers for provider project/session folders
 const PROVIDER_WATCH_PATHS = [
@@ -90,6 +93,16 @@ const connectedClients = new Set();
 // Maps WebSocket client -> Set of attached sessionIds (for cleanup on disconnect)
 const clientAttachments = new Map();
 let isGetProjectsRunning = false; // Flag to prevent reentrant calls
+
+// Check if any client is still watching a session; unwatch if orphaned
+function unwatchIfOrphaned(sessionId, excludeClient) {
+    for (const [client, sessions] of clientAttachments.entries()) {
+        if (client !== excludeClient && sessions.has(sessionId)) {
+            return; // another client is still watching
+        }
+    }
+    sessionWatcher.unwatch(sessionId);
+}
 
 // Broadcast progress to all connected WebSocket clients
 function broadcastProgress(progress) {
@@ -323,7 +336,9 @@ const wss = new WebSocketServer({
 // Make WebSocket server available to routes
 app.locals.wss = wss;
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://samsara.tailad2401.ts.net:5443', 'http://100.86.4.57:5184', 'http://localhost:5184'],
+}));
 app.use(express.json({
     limit: '50mb',
     type: (req) => {
@@ -444,7 +459,10 @@ app.post('/api/system/update', authenticateToken, async (req, res) => {
             console.error('Update error:', text);
         });
 
+        let responded = false;
         child.on('close', (code) => {
+            if (responded) return;
+            responded = true;
             if (code === 0) {
                 res.json({
                     success: true,
@@ -462,6 +480,8 @@ app.post('/api/system/update', authenticateToken, async (req, res) => {
         });
 
         child.on('error', (error) => {
+            if (responded) return;
+            responded = true;
             console.error('Update process error:', error);
             res.status(500).json({
                 success: false,
@@ -490,7 +510,7 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
 app.get('/api/projects/:projectName/sessions', authenticateToken, async (req, res) => {
     try {
         const { limit = 5, offset = 0 } = req.query;
-        const result = await getSessions(req.params.projectName, parseInt(limit), parseInt(offset));
+        const result = await getSessions(req.params.projectName, parseInt(limit, 10) || 5, parseInt(offset, 10) || 0);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -908,7 +928,6 @@ app.get('/api/projects/:projectName/files', authenticateToken, async (req, res) 
         }
 
         const files = await getFileTree(actualPath, 10, 0, true);
-        const hiddenFiles = files.filter(f => f.name.startsWith('.'));
         res.json(files);
     } catch (error) {
         console.error('[ERROR] File tree error:', error.message);
@@ -1149,16 +1168,7 @@ function handleChatConnection(ws) {
                 }
 
                 // If no clients are watching this session anymore, stop the file watcher
-                let anyClientWatching = false;
-                for (const [, sessions] of clientAttachments.entries()) {
-                    if (sessions.has(sessionId)) {
-                        anyClientWatching = true;
-                        break;
-                    }
-                }
-                if (!anyClientWatching) {
-                    sessionWatcher.unwatch(sessionId);
-                }
+                unwatchIfOrphaned(sessionId);
 
                 writer.send({
                     type: 'live-session-detached',
@@ -1175,7 +1185,7 @@ function handleChatConnection(ws) {
     });
 
     ws.on('close', () => {
-        console.log('🔌 Chat client disconnected');
+        console.log('[INFO] Chat client disconnected');
         // Remove from connected clients
         connectedClients.delete(ws);
 
@@ -1183,17 +1193,7 @@ function handleChatConnection(ws) {
         const attachments = clientAttachments.get(ws);
         if (attachments) {
             for (const sessionId of attachments) {
-                // Check if any other client is still watching
-                let otherWatching = false;
-                for (const [otherClient, otherSessions] of clientAttachments.entries()) {
-                    if (otherClient !== ws && otherSessions.has(sessionId)) {
-                        otherWatching = true;
-                        break;
-                    }
-                }
-                if (!otherWatching) {
-                    sessionWatcher.unwatch(sessionId);
-                }
+                unwatchIfOrphaned(sessionId, ws);
             }
             clientAttachments.delete(ws);
         }
@@ -1569,7 +1569,6 @@ function handleShellConnection(ws) {
 // Audio transcription endpoint
 app.post('/api/transcribe', authenticateToken, async (req, res) => {
     try {
-        const multer = (await import('multer')).default;
         const upload = multer({ storage: multer.memoryStorage() });
 
         // Handle multipart form data
@@ -1589,7 +1588,7 @@ app.post('/api/transcribe', authenticateToken, async (req, res) => {
 
             try {
                 // Create form data for OpenAI
-                const FormData = (await import('form-data')).default;
+                const { default: FormData } = await import('form-data');
                 const formData = new FormData();
                 formData.append('file', req.file.buffer, {
                     filename: req.file.originalname,
@@ -1632,7 +1631,7 @@ app.post('/api/transcribe', authenticateToken, async (req, res) => {
 
                 // Handle different enhancement modes
                 try {
-                    const OpenAI = (await import('openai')).default;
+                    const { default: OpenAI } = await import('openai');
                     const openai = new OpenAI({ apiKey });
 
                     let prompt, systemMessage, temperature = 0.7, maxTokens = 800;
@@ -1718,16 +1717,11 @@ Agent instructions:`;
 // Image upload endpoint
 app.post('/api/projects/:projectName/upload-images', authenticateToken, async (req, res) => {
     try {
-        const multer = (await import('multer')).default;
-        const path = (await import('path')).default;
-        const fs = (await import('fs')).promises;
-        const os = (await import('os')).default;
-
         // Configure multer for image uploads
         const storage = multer.diskStorage({
             destination: async (req, file, cb) => {
                 const uploadDir = path.join(os.tmpdir(), 'claude-ui-uploads', String(req.user.id));
-                await fs.mkdir(uploadDir, { recursive: true });
+                await fsPromises.mkdir(uploadDir, { recursive: true });
                 cb(null, uploadDir);
             },
             filename: (req, file, cb) => {
@@ -1770,12 +1764,12 @@ app.post('/api/projects/:projectName/upload-images', authenticateToken, async (r
                 const processedImages = await Promise.all(
                     req.files.map(async (file) => {
                         // Read file and convert to base64
-                        const buffer = await fs.readFile(file.path);
+                        const buffer = await fsPromises.readFile(file.path);
                         const base64 = buffer.toString('base64');
                         const mimeType = file.mimetype;
 
                         // Clean up temp file immediately
-                        await fs.unlink(file.path);
+                        await fsPromises.unlink(file.path);
 
                         return {
                             name: file.originalname,
@@ -1790,7 +1784,7 @@ app.post('/api/projects/:projectName/upload-images', authenticateToken, async (r
             } catch (error) {
                 console.error('Error processing images:', error);
                 // Clean up any remaining files
-                await Promise.all(req.files.map(f => fs.unlink(f.path).catch(() => { })));
+                await Promise.all(req.files.map(f => fsPromises.unlink(f.path).catch(() => { })));
                 res.status(500).json({ error: 'Failed to process images' });
             }
         });
@@ -2024,28 +2018,17 @@ app.get('*', (req, res) => {
 
     // Only serve index.html for HTML routes, not for static assets
     // Static assets should already be handled by express.static middleware above
-    const indexPath = path.join(__dirname, '../dist/index.html');
-
-    // Check if dist/index.html exists (production build available)
-    if (fs.existsSync(indexPath)) {
+    if (hasDist) {
         // Set no-cache headers for HTML to prevent service worker issues
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        res.sendFile(indexPath);
+        res.sendFile(distIndexPath);
     } else {
         // In development, redirect to Vite dev server only if dist doesn't exist
         res.redirect(`http://localhost:${process.env.VITE_PORT || 5173}`);
     }
 });
-
-// Helper function to convert permissions to rwx format
-function permToRwx(perm) {
-    const r = perm & 4 ? 'r' : '-';
-    const w = perm & 2 ? 'w' : '-';
-    const x = perm & 1 ? 'x' : '-';
-    return r + w + x;
-}
 
 async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden = true) {
     // Using fsPromises from import
@@ -2057,6 +2040,9 @@ async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden =
         for (const entry of entries) {
             // Debug: log all entries including hidden files
 
+
+            // Skip hidden files when not requested
+            if (!showHidden && entry.name.startsWith('.')) continue;
 
             // Skip heavy build directories and VCS directories
             if (entry.name === 'node_modules' ||
@@ -2079,19 +2065,11 @@ async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden =
                 item.size = stats.size;
                 item.modified = stats.mtime.toISOString();
 
-                // Convert permissions to rwx format
-                const mode = stats.mode;
-                const ownerPerm = (mode >> 6) & 7;
-                const groupPerm = (mode >> 3) & 7;
-                const otherPerm = mode & 7;
-                item.permissions = ((mode >> 6) & 7).toString() + ((mode >> 3) & 7).toString() + (mode & 7).toString();
-                item.permissionsRwx = permToRwx(ownerPerm) + permToRwx(groupPerm) + permToRwx(otherPerm);
+                // No longer computing permissions — frontend doesn't consume them
             } catch (statError) {
                 // If stat fails, provide default values
                 item.size = 0;
                 item.modified = null;
-                item.permissions = '000';
-                item.permissionsRwx = '---------';
             }
 
             if (entry.isDirectory() && currentDepth < maxDepth) {
@@ -2123,7 +2101,7 @@ async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden =
     });
 }
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5555;
 const HOST = process.env.HOST || '0.0.0.0';
 // Show localhost in URL when binding to all interfaces (0.0.0.0 isn't a connectable address)
 const DISPLAY_HOST = HOST === '0.0.0.0' ? 'localhost' : HOST;
@@ -2190,7 +2168,10 @@ async function startServer() {
 }
 
 // Graceful shutdown: drain connections and clean up all resources on SIGTERM/SIGINT
+let shuttingDown = false;
 function gracefulShutdown(signal) {
+    if (shuttingDown) return;
+    shuttingDown = true;
     console.log(`[INFO] Received ${signal}, starting graceful shutdown...`);
 
     // Force exit after timeout (systemd will SIGKILL after TimeoutStopSec anyway)

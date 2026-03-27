@@ -10,8 +10,9 @@ REPO_DIR="/home/swd/loom"
 MAX_DIST_SIZE_MB=15
 MIN_ASSET_COUNT=50
 HEALTH_URL="http://127.0.0.1:5555/health"
-HEALTH_RETRIES=5
+HEALTH_RETRIES=15
 HEALTH_INTERVAL=1
+DEPLOY_URL="https://samsara.tailad2401.ts.net:5443"
 
 # Flags
 NO_PULL=false
@@ -75,8 +76,11 @@ ok "Frontend built to dist/"
 
 # Step 6: Copy public/ contents into dist/ (AR fix #1: PWA manifest, favicons, icons)
 step "Step 6: Copy public assets"
-cp -r "$REPO_DIR/public/"* "$REPO_DIR/dist/" || fail "Failed to copy public/ contents into dist/"
-ok "public/ contents copied to dist/ (manifest.json, favicons, icons)"
+# Selective copy — skip dev-only artifacts (generate-icons.js, convert-icons.md, screenshots/)
+for item in manifest.json favicon.png favicon.svg logo.svg logo-*.png api-docs.html clear-cache.html icons; do
+    cp -r "$REPO_DIR/public/$item" "$REPO_DIR/dist/" 2>/dev/null || true
+done
+ok "Production public assets copied to dist/"
 
 # Step 7: Validate build
 step "Step 7: Validate build"
@@ -152,4 +156,4 @@ ok "nginx reloaded"
 step "Deploy complete"
 echo -e "${GREEN}Loom deployed successfully.${NC}"
 echo "  Frontend: $(find "$REPO_DIR/dist/assets" -type f | wc -l) assets, ${DIST_SIZE}MB"
-echo "  URL: https://samsara.tailad2401.ts.net:5443"
+echo "  URL: $DEPLOY_URL"
