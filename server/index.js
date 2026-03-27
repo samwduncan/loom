@@ -31,8 +31,6 @@ const c = {
     dim: (text) => `${colors.dim}${text}${colors.reset}`,
 };
 
-console.log('PORT from env:', process.env.PORT);
-
 import express from 'express';
 import { WebSocketServer, WebSocket } from 'ws';
 import os from 'os';
@@ -44,7 +42,7 @@ import pty from 'node-pty';
 import fetch from 'node-fetch';
 import mime from 'mime-types';
 
-import { getProjects, getSessions, getSessionMessages, renameProject, deleteSession, updateSessionTitle, deleteProject, addProjectManually, extractProjectDirectory, clearProjectDirectoryCache } from './projects.js';
+import { getProjects, getSessions, getSessionMessages, renameProject, deleteSession, updateSessionTitle, deleteProject, addProjectManually, extractProjectDirectory, clearProjectDirectoryCache, sanitizeProjectName } from './projects.js';
 import { queryClaudeSDK, abortClaudeSDKSession, isClaudeSDKSessionActive, getActiveClaudeSDKSessions, resolveToolApproval } from './claude-sdk.js';
 import { queryCodex, abortCodexSession, isCodexSessionActive, getActiveCodexSessions } from './openai-codex.js';
 import { spawnGemini, abortGeminiSession, isGeminiSessionActive, getActiveGeminiSessions } from './gemini-cli.js';
@@ -1095,7 +1093,8 @@ function handleChatConnection(ws) {
                 console.log('[INFO] Attach session request:', sessionId, 'project:', projectName);
 
                 try {
-                    const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
+                    const safeProjectName = sanitizeProjectName(projectName);
+                    const projectDir = path.join(os.homedir(), '.claude', 'projects', safeProjectName);
                     const sessionMeta = messageCache.getSessionMeta(sessionId);
                     let jsonlFile = sessionMeta?.jsonl_file;
 

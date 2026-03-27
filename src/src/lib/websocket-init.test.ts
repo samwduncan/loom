@@ -46,7 +46,7 @@ const mockSetActiveSessionId = vi.fn();
 const mockSetPermissionRequest = vi.fn();
 const mockClearPermissionRequest = vi.fn();
 
-const mockSetState = vi.fn();
+const mockClearStreamingFlag = vi.fn();
 
 vi.mock('@/stores/stream', () => ({
   useStreamStore: {
@@ -60,9 +60,9 @@ vi.mock('@/stores/stream', () => ({
       setActiveSessionId: mockSetActiveSessionId,
       setPermissionRequest: mockSetPermissionRequest,
       clearPermissionRequest: mockClearPermissionRequest,
+      clearStreamingFlag: mockClearStreamingFlag,
       thinkingState: null,
     }),
-    setState: (...args: unknown[]) => mockSetState(...args),
   },
 }));
 
@@ -574,7 +574,7 @@ describe('initializeWebSocket', () => {
       // Should NOT call endStream -- keep partial content (tool calls, thinking) visible
       expect(mockEndStream).not.toHaveBeenCalled();
       // But should clear isStreaming so sidebar pulse dot stops
-      expect(mockSetState).toHaveBeenCalledWith({ isStreaming: false });
+      expect(mockClearStreamingFlag).toHaveBeenCalled();
     });
   });
 });

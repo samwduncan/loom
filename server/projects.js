@@ -589,7 +589,23 @@ async function getProjects(progressCallback = null) {
   return projects;
 }
 
+/**
+ * Sanitize projectName to prevent path traversal attacks.
+ * Only allows alphanumeric, dots, underscores, and hyphens.
+ * Also validates the resolved path stays within .claude/projects/.
+ */
+function sanitizeProjectName(projectName) {
+  const safe = String(projectName).replace(/[^a-zA-Z0-9._-]/g, '');
+  const resolved = path.resolve(os.homedir(), '.claude', 'projects', safe);
+  const expectedPrefix = path.resolve(os.homedir(), '.claude', 'projects');
+  if (!resolved.startsWith(expectedPrefix + path.sep) && resolved !== expectedPrefix) {
+    throw new Error('Invalid project name');
+  }
+  return safe;
+}
+
 async function getSessions(projectName, limit = 5, offset = 0) {
+  projectName = sanitizeProjectName(projectName);
   const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
 
   // --- Cache-first path ---
@@ -1011,6 +1027,7 @@ async function parseAgentTools(filePath) {
 
 // Get messages for a specific session with pagination support
 async function getSessionMessages(projectName, sessionId, limit = null, offset = 0) {
+  projectName = sanitizeProjectName(projectName);
   const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
 
   // --- Cache-first path ---
@@ -1206,6 +1223,7 @@ async function renameProject(projectName, newDisplayName) {
 
 // Delete a session from a project
 async function deleteSession(projectName, sessionId) {
+  projectName = sanitizeProjectName(projectName);
   const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
 
   try {
@@ -1903,5 +1921,6 @@ export {
   clearProjectDirectoryCache,
   getCodexSessions,
   getCodexSessionMessages,
-  deleteCodexSession
+  deleteCodexSession,
+  sanitizeProjectName
 };

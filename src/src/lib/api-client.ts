@@ -6,9 +6,15 @@
  * Auto-retries once on 401 via refreshAuth() (token refresh + retry).
  *
  * Request deduplication: concurrent identical GET requests share a single
- * in-flight fetch via `inflightRequests` Map. Each consumer gets a cloned
- * Response so all can read the body. The map self-cleans in `.finally()`.
- * POST/PATCH/DELETE are never deduplicated (mutation safety).
+ * in-flight fetch. Each consumer gets a cloned Response so all can read
+ * the body. The map self-cleans in `.finally()`.
+ *
+ * Dedup safety:
+ * - AbortSignal is NOT passed into the shared fetch (secondary callers'
+ *   signals must not abort the shared request). Instead, each caller's
+ *   signal is checked after the shared fetch resolves.
+ * - 401 handling runs for the original caller; deduped callers who see
+ *   a 401 clone trigger their own refresh+retry cycle.
  *
  * Constitution: Named exports only (2.2), no default export.
  */
@@ -29,13 +35,44 @@ export function clearInflightRequests(): void {
 
 /**
  * Process a Response: check status, parse JSON, throw on error.
- * Used by both the original caller and dedup waiters.
  */
 async function processResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     throw new Error(`API error ${res.status}: ${res.statusText}`);
   }
   return res.json() as Promise<T>;
+}
+
+/**
+ * Single-attempt fetch with current auth token.
+ * Signal is optional — deduped requests omit it so one caller can't abort another.
+ */
+function doFetch(path: string, options: RequestInit, signal?: AbortSignal): Promise<Response> {
+  const token = getToken();
+  return fetch(path, {
+    ...options,
+    signal,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers as Record<string, string> | undefined),
+    },
+  });
+}
+
+/**
+ * Handle 401 by refreshing auth and retrying once.
+ */
+async function handleUnauthorized<T>(path: string, options: RequestInit, signal?: AbortSignal): Promise<T> {
+  await refreshAuth();
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
+  }
+  const retryRes = await doFetch(path, options, signal);
+  if (!retryRes.ok) {
+    throw new Error(`API error ${retryRes.status}: ${retryRes.statusText}`);
+  }
+  return retryRes.json() as Promise<T>;
 }
 
 export async function apiFetch<T>(
@@ -46,54 +83,63 @@ export async function apiFetch<T>(
   const method = (options.method ?? 'GET').toUpperCase();
   const isGet = method === 'GET';
 
-  // Dedup: return existing in-flight promise for identical GET requests.
-  // Each consumer clones the response so all can independently read the body.
+  // Dedup: join existing in-flight GET request.
+  // The shared fetch has NO abort signal — individual callers check their own signal after.
   if (isGet) {
     const existing = inflightRequests.get(path);
     if (existing) {
-      const cloned = await existing.then((r) => r.clone());
-      return processResponse<T>(cloned);
+      // Check caller's own signal before waiting
+      if (signal?.aborted) {
+        throw new DOMException('Aborted', 'AbortError');
+      }
+      try {
+        const cloned = await existing.then((r) => r.clone());
+        // Check caller's signal after await
+        if (signal?.aborted) {
+          throw new DOMException('Aborted', 'AbortError');
+        }
+        // Handle 401 for deduped callers too
+        if (cloned.status === 401) {
+          return handleUnauthorized<T>(path, options, signal);
+        }
+        return processResponse<T>(cloned);
+      } catch (err) {
+        // If the shared request was aborted by someone else, retry with our own signal
+        if (err instanceof DOMException && err.name === 'AbortError' && !signal?.aborted) {
+          return apiFetch<T>(path, options, signal);
+        }
+        throw err;
+      }
     }
   }
 
-  const doFetch = () => {
-    const token = getToken();
-    return fetch(path, {
-      ...options,
-      signal,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(options.headers as Record<string, string> | undefined),
-      },
-    });
-  };
+  // For GET requests, create a shared fetch WITHOUT signal (dedup-safe).
+  // For mutations, pass signal through normally.
+  const fetchPromise = isGet
+    ? doFetch(path, options) // No signal — shared across callers
+    : doFetch(path, options, signal);
 
-  // For GET requests, store the fetch promise in the dedup map
-  const fetchPromise = doFetch();
   if (isGet) {
     inflightRequests.set(path, fetchPromise);
-    // Self-clean when settled (success or failure)
     fetchPromise.finally(() => {
       inflightRequests.delete(path);
     });
   }
 
-  // Original caller also clones when dedup is active, so the stored
-  // promise's Response stays unconsumed for other waiters.
+  // Check caller's signal before waiting
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
+  }
+
   const res = isGet ? (await fetchPromise).clone() : await fetchPromise;
 
+  // Check caller's signal after await
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError');
+  }
+
   if (res.status === 401) {
-    // Attempt token refresh and retry once
-    await refreshAuth();
-    if (signal?.aborted) {
-      throw new DOMException('Aborted', 'AbortError');
-    }
-    const retryRes = await doFetch();
-    if (!retryRes.ok) {
-      throw new Error(`API error ${retryRes.status}: ${retryRes.statusText}`);
-    }
-    return retryRes.json() as Promise<T>;
+    return handleUnauthorized<T>(path, options, signal);
   }
 
   return processResponse<T>(res);

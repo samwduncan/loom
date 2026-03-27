@@ -18,7 +18,7 @@ import { EventEmitter } from 'events';
 class SessionWatcher extends EventEmitter {
   constructor() {
     super();
-    /** @type {Map<string, { filePath: string, offset: number, watcher: fs.FSWatcher, buffer: string, debounceTimer: NodeJS.Timeout|null }>} */
+    /** @type {Map<string, { filePath: string, offset: number, watcher: fs.FSWatcher, buffer: string, debounceTimer: NodeJS.Timeout|null, reading: boolean }>} */
     this.watched = new Map();
     this.MAX_WATCHES = 5;
   }
@@ -69,6 +69,7 @@ class SessionWatcher extends EventEmitter {
       watcher: fsWatcher,
       buffer: '',
       debounceTimer: null,
+      reading: false,
     });
   }
 
@@ -127,6 +128,10 @@ class SessionWatcher extends EventEmitter {
     const entry = this.watched.get(sessionId);
     if (!entry) return;
 
+    // Per-session read lock — prevent concurrent reads racing on shared offset/buffer
+    if (entry.reading) return;
+    entry.reading = true;
+
     try {
       const currentStat = await stat(entry.filePath);
       const currentSize = currentStat.size;
@@ -140,8 +145,9 @@ class SessionWatcher extends EventEmitter {
       if (currentSize <= entry.offset) return;
 
       // Read only the new bytes
+      const readStart = entry.offset;
       const stream = createReadStream(entry.filePath, {
-        start: entry.offset,
+        start: readStart,
         encoding: 'utf8',
       });
 
@@ -176,8 +182,8 @@ class SessionWatcher extends EventEmitter {
         }
       }
 
-      // Update offset to current file size
-      entry.offset = currentSize;
+      // Update offset based on actual bytes read (not stat snapshot which may be stale)
+      entry.offset = readStart + Buffer.byteLength(rawData, 'utf8');
 
       // Emit parsed entries
       if (entries.length > 0) {
@@ -193,6 +199,8 @@ class SessionWatcher extends EventEmitter {
         console.error(`[SessionWatcher] Read error for session ${sessionId}:`, err.message);
         this.emit('error', { sessionId, error: err.message });
       }
+    } finally {
+      if (entry) entry.reading = false;
     }
   }
 }

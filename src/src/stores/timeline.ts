@@ -137,7 +137,8 @@ export const useTimelineStore = create<TimelineState>()(
         set((state) => {
           const session = state.sessions.find((s) => s.id === sessionId);
           if (session) {
-            session.messages.unshift(...messages);
+            // Array concat instead of unshift(...spread) to avoid V8 call stack limit on large arrays
+            session.messages = [...messages, ...session.messages];
           }
         });
       },
@@ -176,7 +177,7 @@ export const useTimelineStore = create<TimelineState>()(
       }),
       migrate: (persistedState: unknown, _version: number) => {
         // Version 1: initial schema, no migration needed
-        // SAFETY: migrate receives the persisted shape we defined via partialize
+        // ASSERT: migrate receives the persisted shape we defined via partialize
         return persistedState as PersistedTimelineState;
       },
       merge: (persistedState, currentState) => {

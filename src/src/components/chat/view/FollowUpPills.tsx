@@ -12,54 +12,47 @@ import { cn } from '@/utils/cn';
 import type { Message } from '@/types/message';
 import './follow-up-pills.css';
 
-interface FollowUpPillsProps {
+export interface FollowUpPillsProps {
   lastMessage: Message | null;
   onSelect: (text: string) => void;
   isStreaming: boolean;
 }
 
-const CODE_SUGGESTIONS = [
+const CODE_SUGGESTIONS: string[] = [
   'Explain this code',
   'Refactor this',
   'Write tests for this',
-] as const;
+];
 
-const ERROR_SUGGESTIONS = [
+const ERROR_SUGGESTIONS: string[] = [
   'What caused this?',
   'How do I prevent this?',
   'Show me the fix',
-] as const;
+];
 
-const LIST_SUGGESTIONS = [
+const LIST_SUGGESTIONS: string[] = [
   'Go deeper on step 1',
   'Are there alternatives?',
   'Summarize this',
-] as const;
+];
 
-const DEFAULT_SUGGESTIONS = [
+const DEFAULT_SUGGESTIONS: string[] = [
   'Tell me more',
   'Give me an example',
   'What should I do next?',
-] as const;
+];
 
 function deriveSuggestions(content: string): string[] {
-  // Check for code blocks (``` markers)
   if (/```[\s\S]*?```/.test(content)) {
-    return CODE_SUGGESTIONS.slice(0, 3) as unknown as string[];
+    return CODE_SUGGESTIONS.slice(0, 3);
   }
-
-  // Check for error-related content
   if (/\b(error|exception|bug|fix|issue|failed|failure|crash)\b/i.test(content)) {
-    return ERROR_SUGGESTIONS.slice(0, 3) as unknown as string[];
+    return ERROR_SUGGESTIONS.slice(0, 3);
   }
-
-  // Check for numbered lists or step-by-step content
-  if (/(?:^|\n)\s*(?:\d+[\.\)]\s|[-*]\s)/m.test(content)) {
-    return LIST_SUGGESTIONS.slice(0, 3) as unknown as string[];
+  if (/(?:^|\n)\s*(?:\d+[.)]\s|[-*]\s)/m.test(content)) {
+    return LIST_SUGGESTIONS.slice(0, 3);
   }
-
-  // Default fallback
-  return DEFAULT_SUGGESTIONS.slice(0, 3) as unknown as string[];
+  return DEFAULT_SUGGESTIONS.slice(0, 3);
 }
 
 export function FollowUpPills({ lastMessage, onSelect, isStreaming }: FollowUpPillsProps) {

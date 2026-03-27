@@ -335,7 +335,9 @@ async function getGithubTokenById(tokenId, userId) {
  * GET /api/projects/clone-progress
  */
 router.get('/clone-progress', async (req, res) => {
-  const { path: workspacePath, githubUrl, githubTokenId, newGithubToken } = req.query;
+  const { path: workspacePath, githubUrl, githubTokenId } = req.query;
+  // Read token from header only — never accept secrets in GET query params (logged in access logs/browser history)
+  const newGithubToken = req.headers['x-github-token'] || null;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');

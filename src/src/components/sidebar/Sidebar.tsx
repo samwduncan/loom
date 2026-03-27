@@ -12,38 +12,22 @@
  * selector-only store access (4.2), z-index from dictionary (3.3).
  */
 
-import { memo, useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Settings, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
+import { useMobile } from '@/hooks/useMobile';
 import { ConnectionStatusIndicator } from '@/components/shared/ConnectionStatusIndicator';
 import { NewChatButton } from './NewChatButton';
 import { SessionList } from './SessionList';
 import { QuickSettingsPanel } from './QuickSettingsPanel';
 
-/* ─── Mobile detection (synced with ContentArea's 767px breakpoint) ─── */
-const MOBILE_QUERY = '(max-width: 767px)';
-
-function subscribeMobile(cb: () => void) {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {};
-  const mql = window.matchMedia(MOBILE_QUERY);
-  mql.addEventListener('change', cb);
-  return () => mql.removeEventListener('change', cb);
-}
-
-function getMobileSnapshot() {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
-  return window.matchMedia(MOBILE_QUERY).matches;
-}
-
-function getMobileServerSnapshot() { return false; }
-
 export const Sidebar = memo(function Sidebar() {
   const isSidebarOpen = useUIStore((state) => state.sidebarOpen);
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
   const openModal = useUIStore((state) => state.openModal);
-  const isMobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServerSnapshot);
+  const isMobile = useMobile();
   const location = useLocation();
 
   // Auto-close mobile drawer on route change (session select, new chat)

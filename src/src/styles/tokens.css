@@ -46,6 +46,15 @@
   --status-warning: oklch(0.72 0.14 70);
   --status-info: oklch(0.65 0.12 240);
 
+  /* ─── Live Session Banner (green success tones) ────────────────── */
+  --live-banner-bg: oklch(0.25 0.02 145);
+  --live-banner-border: oklch(0.35 0.05 145);
+  --live-banner-text: oklch(0.85 0.12 145);
+  --live-banner-btn-bg: oklch(0.30 0.02 145);
+  --live-banner-btn-bg-hover: oklch(0.35 0.02 145);
+  --live-banner-btn-text: oklch(0.75 0.08 145);
+  --live-banner-btn-text-hover: oklch(0.85 0.08 145);
+
   /* ─── ANSI Terminal Colors ────────────────────────────────────────
    * Standard + bright variants for xterm.js theme (terminal-theme.ts).
    * Standard ANSI 0-7 reuse status/surface tokens; only unique ones here.

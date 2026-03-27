@@ -316,7 +316,7 @@ export async function initializeWebSocket(): Promise<void> {
             isCurrentlyStreaming = false;
             // Don't call endStream() -- keep partial content (tool calls, thinking) visible
             // Only clear isStreaming so sidebar pulse dot stops
-            useStreamStore.setState({ isStreaming: false });
+            useStreamStore.getState().clearStreamingFlag();
             connectionStore().setProviderError(
               'claude',
               'Connection lost during response',

@@ -24,9 +24,10 @@
  * token-based styling (3.1).
  */
 
-import { lazy, Suspense, useState, useSyncExternalStore } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
+import { useMobile } from '@/hooks/useMobile';
 import type { TabId } from '@/types/ui';
 import { TabBar } from './TabBar';
 import { useTabKeyboardShortcuts } from '../hooks/useTabKeyboardShortcuts';
@@ -59,38 +60,14 @@ function TerminalSkeleton() {
   );
 }
 
-// Mobile detection via matchMedia. Functions are called by useSyncExternalStore.
-// matchMedia is called per-invocation (not cached) to support test mocking.
-const MOBILE_QUERY = '(max-width: 767px)';
-
-function subscribeMobile(cb: () => void) {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return () => {};
-  }
-  const mql = window.matchMedia(MOBILE_QUERY);
-  mql.addEventListener('change', cb);
-  return () => mql.removeEventListener('change', cb);
-}
-
-function getMobileSnapshot() {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
-  }
-  return window.matchMedia(MOBILE_QUERY).matches;
-}
-
-function getMobileServerSnapshot() {
-  return false;
-}
-
-export const ContentArea = function ContentArea() {
+export function ContentArea() {
   useTabKeyboardShortcuts();
 
   const rawActiveTab = useUIStore((s) => s.activeTab);
 
   // Mobile override: force chat on small viewports (LAY-06)
   // Synchronous in the render path -- no useEffect flash, no store mutation
-  const isMobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServerSnapshot);
+  const isMobile = useMobile();
   const activeTab = isMobile ? 'chat' : rawActiveTab;
 
   // PERF-03: Track which tabs have been visited. Chat and files are always eager.

@@ -109,7 +109,7 @@ function renderOutputLine(line: string, index: number) {
     <div
       key={index}
       className="whitespace-pre-wrap break-all leading-relaxed"
-      // SAFETY: parseAnsi only emits className-based spans, input text is HTML-escaped
+      // ASSERT: parseAnsi only emits className-based spans, input text is HTML-escaped
       dangerouslySetInnerHTML={{ __html: parseAnsi(line) }}
     />
   );

@@ -110,7 +110,7 @@ function CodeBlock({ language, code }: CodeBlockProps): ReactElement {
               'p-3 font-mono text-sm whitespace-pre [&_.shiki]:!bg-transparent [&_.shiki]:overflow-visible',
               showLineNumbers && '[&_.shiki_code]:counter-reset-[line] [&_.shiki_.line]:counter-increment-[line] [&_.shiki_.line]:block [&_.shiki_.line]:before:content-[counter(line)] [&_.shiki_.line]:before:inline-block [&_.shiki_.line]:before:w-8 [&_.shiki_.line]:before:mr-4 [&_.shiki_.line]:before:text-right [&_.shiki_.line]:before:text-muted [&_.shiki_.line]:before:opacity-50',
             )}
-            // SAFETY: Shiki generates sanitized HTML from code strings; no user-controlled HTML injection possible.
+            // ASSERT: Shiki generates sanitized HTML from code strings; no user-controlled HTML injection possible.
             dangerouslySetInnerHTML={{ __html: deferredHtml }}
           />
         ) : (

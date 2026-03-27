@@ -9,7 +9,7 @@
 
 import { cn } from '@/utils/cn';
 
-interface ChatEmptyStateProps {
+export interface ChatEmptyStateProps {
   onSuggestionClick?: (text: string) => void;
 }
 

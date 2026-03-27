@@ -47,7 +47,7 @@ import type { ProviderId } from '@/types/provider';
 import type { ClaudeCommandOptions, CodexCommandOptions, GeminiCommandOptions } from '@/types/websocket';
 import './composer.css';
 
-interface ChatComposerProps {
+export interface ChatComposerProps {
   projectName: string;
   sessionId: string | null;
   /** Scroll container ref for scroll-position stability during resize */

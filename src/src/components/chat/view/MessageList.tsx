@@ -22,7 +22,6 @@ import type { Message } from '@/types/message';
 import type { ReactNode } from 'react';
 
 const SCROLL_STORAGE_PREFIX = 'loom-scroll-';
-let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export interface MessageListProps {
   messages: Message[];
@@ -30,9 +29,6 @@ export interface MessageListProps {
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
   searchQuery?: string;
   highlightText?: (text: string) => ReactNode;
-  hasMore?: boolean;
-  isFetchingMore?: boolean;
-  onLoadMore?: () => void;
 }
 
 /** Memoized message renderer — prevents re-render on parent re-render */
@@ -65,6 +61,7 @@ const MemoizedMessageItem = memo(function MemoizedMessageItem({
 
 export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isStreaming = useStreamStore((state) => state.isStreaming);
   const [atBottom, setAtBottom] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -142,18 +139,21 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     if (isBottom) setUnreadCount(0);
 
     // Throttled save to sessionStorage (200ms trailing edge)
-    if (saveTimeout) clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
       sessionStorage.setItem(`${SCROLL_STORAGE_PREFIX}${sessionId}`, String(el.scrollTop));
     }, 200);
   }, [sessionId]);
 
-  // Attach scroll listener
+  // Attach scroll listener + cleanup pending save timeout on unmount
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     el.addEventListener('scroll', handleScroll, { passive: true });
-    return () => el.removeEventListener('scroll', handleScroll);
+    return () => {
+      el.removeEventListener('scroll', handleScroll);
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
   }, [handleScroll]);
 
   const scrollToBottom = useCallback(() => {

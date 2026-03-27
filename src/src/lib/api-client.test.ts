@@ -68,7 +68,21 @@ describe('apiFetch', () => {
     expect(result).toEqual(data);
   });
 
-  it('passes AbortSignal through to fetch', async () => {
+  it('passes AbortSignal through to fetch for mutations', async () => {
+    mockGetToken.mockReturnValue('token');
+    const mockFetch = vi.mocked(globalThis.fetch);
+    mockFetch.mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
+    const controller = new AbortController();
+
+    // POST passes signal directly (no dedup)
+    await apiFetch('/api/test', { method: 'POST' }, controller.signal);
+
+    expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
+      signal: controller.signal,
+    }));
+  });
+
+  it('does not pass caller signal to shared GET fetch (dedup-safe)', async () => {
     mockGetToken.mockReturnValue('token');
     const mockFetch = vi.mocked(globalThis.fetch);
     mockFetch.mockResolvedValue(new Response(JSON.stringify({}), { status: 200 }));
@@ -76,8 +90,9 @@ describe('apiFetch', () => {
 
     await apiFetch('/api/test', {}, controller.signal);
 
+    // GET dedup: signal is NOT passed to the shared fetch
     expect(mockFetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
-      signal: controller.signal,
+      signal: undefined,
     }));
   });
 

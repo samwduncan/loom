@@ -75,7 +75,7 @@ function Sep() {
   return <span className="composer-status-bar-separator">·</span>;
 }
 
-interface ComposerStatusBarProps {
+export interface ComposerStatusBarProps {
   projectName: string;
   sessionId: string | null;
 }

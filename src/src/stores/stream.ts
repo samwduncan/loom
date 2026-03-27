@@ -57,9 +57,9 @@ interface StreamState {
   clearPermissionRequest: () => void;
   setResultData: (tokens: ResultTokens, cost: number, modelName?: string) => void;
   setTokenBudget: (used: number, total: number) => void;
+  clearStreamingFlag: () => void;
   attachLiveSession: (sessionId: string) => void;
   detachLiveSession: (sessionId: string) => void;
-  isSessionLiveAttached: (sessionId: string) => boolean;
   addNotifiedSession: (sessionId: string) => void;
   clearNotifiedSession: (sessionId: string) => void;
   reset: () => void;
@@ -80,7 +80,7 @@ const INITIAL_STREAM_STATE = {
   notifiedSessions: new Set<string>(),
 };
 
-export const useStreamStore = create<StreamState>()((set, get) => ({
+export const useStreamStore = create<StreamState>()((set) => ({
   ...INITIAL_STREAM_STATE,
 
   startStream: () => {
@@ -145,6 +145,12 @@ export const useStreamStore = create<StreamState>()((set, get) => ({
     set({ tokenBudget: { used, total } });
   },
 
+  // Clear isStreaming without calling endStream() — preserves partial content
+  // (tool calls, thinking) on connection loss. Only stops sidebar pulse dot.
+  clearStreamingFlag: () => {
+    set({ isStreaming: false });
+  },
+
   attachLiveSession: (sessionId: string) => {
     set((state) => ({
       liveAttachedSessions: new Set([...state.liveAttachedSessions, sessionId]),
@@ -157,10 +163,6 @@ export const useStreamStore = create<StreamState>()((set, get) => ({
       next.delete(sessionId);
       return { liveAttachedSessions: next };
     });
-  },
-
-  isSessionLiveAttached: (sessionId: string) => {
-    return get().liveAttachedSessions.has(sessionId);
   },
 
   addNotifiedSession: (sessionId: string) => {

@@ -26,7 +26,7 @@ const PROVIDER_NAMES: Record<ProviderId, string> = {
 
 const PROVIDERS: ProviderId[] = ['claude', 'gemini', 'codex'];
 
-interface ModelSelectorProps {
+export interface ModelSelectorProps {
   selectedProvider: ProviderId;
   onSelect: (provider: ProviderId) => void;
 }
