@@ -1,0 +1,35 @@
+/**
+ * Follow-up pills CSS -- horizontal pill row layout.
+ * Mobile: horizontal scroll. Desktop: flex-wrap centered.
+ * All colors via design tokens.
+ */
+
+.follow-up-pills {
+  display: flex;
+  gap: 8px;
+  padding: var(--space-2) var(--space-4);
+  justify-content: center;
+}
+
+/* Mobile: horizontal scroll */
+@media (max-width: 767px) {
+  .follow-up-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    justify-content: flex-start;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .follow-up-pills::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Desktop: wrap */
+@media (min-width: 768px) {
+  .follow-up-pills {
+    flex-wrap: wrap;
+  }
+}
