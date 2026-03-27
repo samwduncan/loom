@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "The Engine"
-status: Ready to plan
-stopped_at: Completed 51-01-PLAN.md
-last_updated: "2026-03-26T23:52:10.296Z"
+status: Ready to execute
+stopped_at: Completed 52-01-PLAN.md
+last_updated: "2026-03-27T00:04:28.722Z"
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 4
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 51 — State Persistence
+**Current focus:** Phase 52 — Live Session Attach
 
 ## Current Position
 
-Phase: 52
-Plan: Not started
+Phase: 52 (Live Session Attach) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -44,6 +44,7 @@ Plan: Not started
 | Phase 50 P01 | 2min | 1 tasks | 2 files |
 | Phase 50 P02 | 3min | 2 tasks | 3 files |
 | Phase 51 P01 | 3min | 2 tasks | 3 files |
+| Phase 52 P01 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,8 @@ Plan: Not started
 - [Phase 50]: Background warmer is fire-and-forget -- server fully functional without cache via JSONL fallback
 - [Phase 51]: sessionStorage for scroll positions -- ephemeral, auto-cleans on tab close, survives F5
 - [Phase 51]: LastSessionRedirect reads persisted activeSessionId for smart root-path routing
+- [Phase 52]: Singleton SessionWatcher: one instance per server, shared across all WS clients
+- [Phase 52]: clientAttachments Map<ws, Set<sessionId>> for multi-client subscription tracking with orphan cleanup
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-26T23:49:40.548Z
-Stopped at: Completed 51-01-PLAN.md
+Last session: 2026-03-27T00:04:28.719Z
+Stopped at: Completed 52-01-PLAN.md
 Resume: `/gsd:plan-phase 50` (skip research -- architecture fully specified in research/ARCHITECTURE.md)
