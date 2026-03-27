@@ -88,7 +88,8 @@ export function ChatView() {
   // Derive last assistant message for follow-up suggestions
   const lastAssistantMessage = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].role === 'assistant') return messages[i];
+      const msg = messages[i]; // ASSERT: i is bounded by length check
+      if (msg && msg.role === 'assistant') return msg;
     }
     return null;
   }, [messages]);
@@ -326,7 +327,7 @@ export function ChatView() {
       )}
       {sessionId && <LiveSessionBanner sessionId={sessionId} />}
       <FollowUpPills
-        lastMessage={lastAssistantMessage}
+        lastMessage={lastAssistantMessage ?? null}
         onSelect={handleSuggestionClick}
         isStreaming={isStreaming}
       />

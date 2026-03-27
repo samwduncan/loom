@@ -40,6 +40,8 @@ const mockStreamState = {
   isStreaming: false,
   activeSessionId: null as string | null,
   liveAttachedSessions: new Set<string>(),
+  notifiedSessions: new Set<string>(),
+  clearNotifiedSession: vi.fn(),
 };
 vi.mock('@/stores/stream', () => ({
   useStreamStore: (selector: (s: typeof mockStreamState) => unknown) => selector(mockStreamState),
