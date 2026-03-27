@@ -38,11 +38,13 @@ import { MentionPicker } from './MentionPicker';
 import { SlashCommandPicker } from './SlashCommandPicker';
 import { DragOverlay } from './DragOverlay';
 import { ComposerStatusBar } from './ComposerStatusBar';
+import { ModelSelector } from './ModelSelector';
 import { ElectricBorder } from '@/components/effects/ElectricBorder';
 import type { FileMention } from '@/types/mention';
 import type { SlashCommand } from '@/types/slash-command';
 import type { Message } from '@/types/message';
-import type { ClaudeCommandOptions } from '@/types/websocket';
+import type { ProviderId } from '@/types/provider';
+import type { ClaudeCommandOptions, CodexCommandOptions, GeminiCommandOptions } from '@/types/websocket';
 import './composer.css';
 
 interface ChatComposerProps {
@@ -57,6 +59,7 @@ interface ChatComposerProps {
 export function ChatComposer({ projectName, sessionId, scrollContainerRef, suggestionText }: ChatComposerProps) {
   const navigate = useNavigate();
   const [input, setInput] = useState('');
+  const [selectedProvider, setSelectedProvider] = useState<ProviderId>('claude');
   const [mentions, setMentions] = useState<FileMention[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputRef = useRef(input);
@@ -304,27 +307,34 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     // happens server-side via the fileMentions field in options.
     const commandText = trimmed;
 
+    // Determine command type from selected provider
+    const commandType = selectedProvider === 'codex' ? 'codex-command' as const
+      : selectedProvider === 'gemini' ? 'gemini-command' as const
+      : 'claude-command' as const;
+
     // Message queuing during streaming: send immediately, add optimistic with queued flag
     if (isStreaming) {
       const effectiveId = sessionId ?? streamSessionId;
       if (!effectiveId) return;
 
-      const options: ClaudeCommandOptions = { projectPath: projectName };
-      options.sessionId = effectiveId;
-      if (permissionMode !== 'default') options.permissionMode = permissionMode;
+      const options: ClaudeCommandOptions | CodexCommandOptions | GeminiCommandOptions =
+        selectedProvider === 'claude'
+          ? (() => {
+              const o: ClaudeCommandOptions = { projectPath: projectName, sessionId: effectiveId };
+              if (permissionMode !== 'default') o.permissionMode = permissionMode;
+              if (hasImages) { /* images added below */ }
+              if (mentions.length > 0) o.fileMentions = mentions.map((m) => m.path);
+              return o;
+            })()
+          : { projectPath: projectName, sessionId: effectiveId };
 
-      // Include images if attached (convert to base64)
-      if (hasImages) {
-        options.images = await getBase64ForSend();
-      }
-
-      // Include file mentions for server-side content injection
-      if (mentions.length > 0) {
-        options.fileMentions = mentions.map((m) => m.path);
+      // Include images for Claude only (async)
+      if (hasImages && selectedProvider === 'claude') {
+        (options as ClaudeCommandOptions).images = await getBase64ForSend();
       }
 
       wsClient.send({
-        type: 'claude-command',
+        type: commandType,
         command: commandText,
         options,
       });
@@ -344,7 +354,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
           queued: true,
         },
         providerContext: {
-          providerId: 'claude',
+          providerId: selectedProvider,
           modelId: '',
           agentName: null,
         },
@@ -374,7 +384,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         id: stubId,
         title: extractSessionTitle(trimmed) || 'New Chat',
         messages: [],
-        providerId: 'claude',
+        providerId: selectedProvider,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         metadata: { tokenBudget: null, contextWindowUsed: null, totalCost: null },
@@ -383,21 +393,21 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
       navigate(`/chat/${stubId}`);
     }
 
-    // Build options -- omit sessionId for new chat
-    const options: ClaudeCommandOptions = { projectPath: projectName };
-    if (sessionId) {
-      options.sessionId = sessionId;
-    }
-    if (permissionMode !== 'default') options.permissionMode = permissionMode;
+    // Build options -- provider-specific fields
+    const options: ClaudeCommandOptions | CodexCommandOptions | GeminiCommandOptions =
+      selectedProvider === 'claude'
+        ? (() => {
+            const o: ClaudeCommandOptions = { projectPath: projectName };
+            if (sessionId) o.sessionId = sessionId;
+            if (permissionMode !== 'default') o.permissionMode = permissionMode;
+            if (mentions.length > 0) o.fileMentions = mentions.map((m) => m.path);
+            return o;
+          })()
+        : { projectPath: projectName, ...(sessionId ? { sessionId } : {}) };
 
-    // Convert images to base64 for WebSocket transport (async)
-    if (hasImages) {
-      options.images = await getBase64ForSend();
-    }
-
-    // Include file mentions for server-side content injection
-    if (mentions.length > 0) {
-      options.fileMentions = mentions.map((m) => m.path);
+    // Convert images to base64 for WebSocket transport (Claude only, async)
+    if (hasImages && selectedProvider === 'claude') {
+      (options as ClaudeCommandOptions).images = await getBase64ForSend();
     }
 
     // Store pending title for new chats
@@ -406,7 +416,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     }
 
     wsClient.send({
-      type: 'claude-command',
+      type: commandType,
       command: commandText,
       options,
     });
@@ -427,7 +437,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
           duration: null,
         },
         providerContext: {
-          providerId: 'claude',
+          providerId: selectedProvider,
           modelId: '',
           agentName: null,
         },
@@ -441,7 +451,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     if (effectiveSessionId) clearDraft(effectiveSessionId);
     if (hasImages) clearImages();
     requestAnimationFrame(() => textareaRef.current?.focus());
-  }, [input, mentions, attachments, isStreaming, canSend, projectName, sessionId, streamSessionId, permissionMode, addMessage, addSession, navigate, dispatch, clearDraft, getBase64ForSend, clearImages]);
+  }, [input, mentions, attachments, isStreaming, canSend, projectName, sessionId, streamSessionId, permissionMode, selectedProvider, addMessage, addSession, navigate, dispatch, clearDraft, getBase64ForSend, clearImages]);
 
   const handleStop = useCallback(() => {
     if (!canStop) return;
@@ -631,10 +641,13 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
         />
 
         <div className="mt-2 flex items-end justify-between">
-          <ComposerKeyboardHints
-            hasMessageSent={hasMessageSentRef.current}
-            isStreaming={isStreamingState}
-          />
+          <div className="flex items-center gap-2">
+            <ComposerKeyboardHints
+              hasMessageSent={hasMessageSentRef.current}
+              isStreaming={isStreamingState}
+            />
+            <ModelSelector selectedProvider={selectedProvider} onSelect={setSelectedProvider} />
+          </div>
 
           <div className="composer-button-cell">
             {/* Send button */}

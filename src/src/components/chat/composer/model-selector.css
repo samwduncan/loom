@@ -1,0 +1,42 @@
+/**
+ * ModelSelector styles -- trigger button and option layout.
+ * All colors via design tokens.
+ */
+
+.model-selector-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.model-selector-trigger:hover {
+  background-color: var(--surface-active);
+  color: var(--text-primary);
+}
+
+.model-selector-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.model-selector-option:hover {
+  background-color: var(--surface-overlay);
+}
