@@ -63,6 +63,28 @@
   }
 }
 
+/* Live session attached indicator -- green pulsing dot */
+@keyframes session-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.session-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: oklch(0.72 0.19 142); /* success green */
+  animation: session-live-pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-live-dot {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
 /* Inline rename input -- transparent background, same font, accent underline */
 .session-rename-input {
   width: 100%;

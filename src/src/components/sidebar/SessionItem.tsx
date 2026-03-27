@@ -32,6 +32,7 @@ export interface SessionItemProps {
   providerId: ProviderId;
   isActive: boolean;
   isStreaming?: boolean;
+  isLiveAttached?: boolean;
   hasDraft?: boolean;
   isEditing?: boolean;
   searchQuery?: string;
@@ -68,6 +69,7 @@ export function SessionItem({
   providerId,
   isActive,
   isStreaming,
+  isLiveAttached,
   hasDraft,
   isEditing: isEditingProp,
   searchQuery,
@@ -194,6 +196,9 @@ export function SessionItem({
         )}
         {isPinned && !isEditing && (
           <Pin size={12} className="text-muted shrink-0" aria-label="Pinned" />
+        )}
+        {isLiveAttached && !isEditing && (
+          <span className="session-live-dot" aria-label="Live session attached" />
         )}
         {isStreaming && !isEditing && (
           <span className="session-streaming-dot" aria-label="Streaming" />

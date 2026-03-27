@@ -36,7 +36,11 @@ vi.mock('@/lib/api-client', () => ({
 }));
 
 // Mock stream store
-const mockStreamState = { isStreaming: false, activeSessionId: null as string | null };
+const mockStreamState = {
+  isStreaming: false,
+  activeSessionId: null as string | null,
+  liveAttachedSessions: new Set<string>(),
+};
 vi.mock('@/stores/stream', () => ({
   useStreamStore: (selector: (s: typeof mockStreamState) => unknown) => selector(mockStreamState),
 }));

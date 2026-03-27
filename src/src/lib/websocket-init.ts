@@ -14,6 +14,8 @@ import {
 } from '@/lib/stream-multiplexer';
 import type { MultiplexerCallbacks } from '@/lib/stream-multiplexer';
 import { bootstrapAuth, refreshAuth } from '@/lib/auth';
+import { transformBackendMessages } from '@/lib/transformMessages';
+import type { BackendEntry } from '@/lib/transformMessages';
 import { useConnectionStore } from '@/stores/connection';
 import { useStreamStore } from '@/stores/stream';
 import { useTimelineStore } from '@/stores/timeline';
@@ -236,10 +238,22 @@ export async function initializeWebSocket(): Promise<void> {
       window.dispatchEvent(new CustomEvent('loom:projects-updated'));
     },
 
-    // Live session attach (wired fully in Task 2)
-    onLiveSessionData: () => {},
-    onLiveSessionAttached: () => {},
-    onLiveSessionDetached: () => {},
+    // Live session attach
+    onLiveSessionData: (sessionId, entries) => {
+      const messages = transformBackendMessages(entries as BackendEntry[]);
+      const timelineState = useTimelineStore.getState();
+      for (const msg of messages) {
+        timelineState.addMessage(sessionId, msg);
+      }
+    },
+
+    onLiveSessionAttached: (sessionId) => {
+      streamStore().attachLiveSession(sessionId);
+    },
+
+    onLiveSessionDetached: (sessionId) => {
+      streamStore().detachLiveSession(sessionId);
+    },
   };
 
   // Track streaming state to call onStreamStart once per stream

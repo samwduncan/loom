@@ -52,6 +52,7 @@ export function SessionList() {
   const removeSession = useTimelineStore((s) => s.removeSession);
   const updateSessionTitle = useTimelineStore((s) => s.updateSessionTitle);
   const streamingSessionId = useStreamStore((s) => s.isStreaming ? s.activeSessionId : null);
+  const liveAttachedSessions = useStreamStore((s) => s.liveAttachedSessions);
   const { projectName } = useProjectContext();
 
   useSessionList(); // Populates timeline store (needed by ChatView)
@@ -238,6 +239,7 @@ export function SessionList() {
                       providerId={session.providerId}
                       isActive={session.id === activeSessionId}
                       isStreaming={session.id === streamingSessionId}
+                      isLiveAttached={liveAttachedSessions.has(session.id)}
                       hasDraft={draftSessionIds.has(session.id)}
                       isEditing={editingSessionId === session.id}
                       searchQuery={isSearching ? query : undefined}
