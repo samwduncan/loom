@@ -26,8 +26,8 @@
 ## Mobile UX (MOBILE)
 - [ ] **MOBILE-01**: No auto-zoom on input focus (viewport meta + 16px inputs)
 - [ ] **MOBILE-02**: Touch-friendly tap targets (minimum 44x44px hit areas)
-- [ ] **MOBILE-03**: Sidebar drawer with swipe-to-close gesture
-- [ ] **MOBILE-04**: Composer keyboard avoidance (input stays above virtual keyboard)
+- [x] **MOBILE-03**: Sidebar drawer with swipe-to-close gesture
+- [x] **MOBILE-04**: Composer keyboard avoidance (input stays above virtual keyboard)
 - [ ] **MOBILE-05**: Responsive message layout (code blocks horizontal scroll, images resize)
 
 ## Performance (PERF)
@@ -85,8 +85,8 @@
 | LIVE-05 | Phase 52 | Complete |
 | MOBILE-01 | Phase 53 | Pending |
 | MOBILE-02 | Phase 53 | Pending |
-| MOBILE-03 | Phase 53 | Pending |
-| MOBILE-04 | Phase 53 | Pending |
+| MOBILE-03 | Phase 53 | Complete |
+| MOBILE-04 | Phase 53 | Complete |
 | MOBILE-05 | Phase 53 | Pending |
 | PERF-01 | Phase 54 | Pending |
 | PERF-02 | Phase 54 | Pending |
