@@ -24,8 +24,8 @@
 - [x] **LIVE-05**: Permission prompts from attached sessions surface in Loom UI
 
 ## Mobile UX (MOBILE)
-- [ ] **MOBILE-01**: No auto-zoom on input focus (viewport meta + 16px inputs)
-- [ ] **MOBILE-02**: Touch-friendly tap targets (minimum 44x44px hit areas)
+- [x] **MOBILE-01**: No auto-zoom on input focus (viewport meta + 16px inputs)
+- [x] **MOBILE-02**: Touch-friendly tap targets (minimum 44x44px hit areas)
 - [x] **MOBILE-03**: Sidebar drawer with swipe-to-close gesture
 - [x] **MOBILE-04**: Composer keyboard avoidance (input stays above virtual keyboard)
 - [ ] **MOBILE-05**: Responsive message layout (code blocks horizontal scroll, images resize)
@@ -83,8 +83,8 @@
 | LIVE-03 | Phase 52 | Complete |
 | LIVE-04 | Phase 52 | Complete |
 | LIVE-05 | Phase 52 | Complete |
-| MOBILE-01 | Phase 53 | Pending |
-| MOBILE-02 | Phase 53 | Pending |
+| MOBILE-01 | Phase 53 | Complete |
+| MOBILE-02 | Phase 53 | Complete |
 | MOBILE-03 | Phase 53 | Complete |
 | MOBILE-04 | Phase 53 | Complete |
 | MOBILE-05 | Phase 53 | Pending |
