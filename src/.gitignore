@@ -28,3 +28,6 @@ test-results/
 playwright-report/
 blob-report/
 /playwright/.cache/
+
+# Capacitor iOS (generated Xcode scaffold)
+ios/

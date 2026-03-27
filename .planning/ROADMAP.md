@@ -225,8 +225,8 @@ Plans:
 **Requirements**: IOS-01, IOS-02, IOS-03
 **Success Criteria** (what must be TRUE):
   1. A written document exists covering Capacitor integration path with pros, cons, and effort estimate
-  2. Tailscale DNS resolution has been tested from a WKWebView sandbox with documented results
-  3. A minimal Capacitor shell project exists that loads the Loom web build and renders the chat view
+  2. Tailscale DNS resolution has been analyzed with documented verdict and caveats; on-device verification deferred pending Mac access
+  3. A minimal Capacitor shell project is scaffolded and configured to load the Loom web build; building and on-device rendering deferred pending Mac access
 **Plans:** 1 plan
 Plans:
 - [ ] 57-01-PLAN.md -- Capacitor scaffold + iOS integration assessment document

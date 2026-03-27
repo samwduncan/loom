@@ -14,7 +14,9 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "build:analyze": "ANALYZE=true vite build"
+    "build:analyze": "ANALYZE=true vite build",
+    "cap:sync": "cap sync ios",
+    "cap:open": "cap open ios"
   },
   "dependencies": {
     "@codemirror/language-data": "^6.5.2",
@@ -59,6 +61,9 @@
     ]
   },
   "devDependencies": {
+    "@capacitor/cli": "^7.6.1",
+    "@capacitor/core": "^7.6.1",
+    "@capacitor/ios": "^7.6.1",
     "@eslint/js": "^9.39.3",
     "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
