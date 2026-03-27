@@ -202,7 +202,10 @@ Plans:
   2. Users can select from conversation templates to start common tasks with pre-filled system prompts
   3. A sidebar indicator shows when an idle background session receives new output
   4. Users can switch between Claude, Gemini, and Codex models from a selector in the composer
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 55-01-PLAN.md -- Follow-up suggestion pills + enhanced conversation templates
+- [ ] 55-02-PLAN.md -- Background session notification dot + model selector in composer
 **UI hint**: yes
 
 ### Phase 56: PWA Manifest
@@ -258,7 +261,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 52. Live Session Attach | 3/3 | Complete    | 2026-03-27 |
 | 53. Mobile-Responsive Layout | 3/3 | Complete    | 2026-03-27 |
 | 54. Performance Hardening | 2/2 | Complete    | 2026-03-27 |
-| 55. Conversation Enhancements | 0/TBD | Not started | - |
+| 55. Conversation Enhancements | 0/2 | Not started | - |
 | 56. PWA Manifest | 0/TBD | Not started | - |
 | 57. iOS Research | 0/TBD | Not started | - |
 
@@ -269,4 +272,4 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-27 after Phase 54 planning*
+*Last updated: 2026-03-27 after Phase 55 planning*
