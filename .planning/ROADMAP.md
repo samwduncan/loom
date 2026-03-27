@@ -8,7 +8,7 @@
 - ✅ **v1.3 "The Refinery"** - Phases 28-37 (shipped 2026-03-17)
 - ✅ **v1.4 "The Navigator"** - Phases 38-43 (shipped 2026-03-18)
 - ✅ **v1.5 "The Craft"** - Phases 44-47 (shipped 2026-03-20)
-- 🚧 **v2.0 "The Engine"** - Phases 50-57 (in progress)
+- 🚧 **v2.0 "The Engine"** - Phases 50-58 (in progress)
 - 📋 **v2.1 "The Power"** - (planned)
 - 📋 **v2.2 "The Polish"** - (planned)
 - 📋 **v3.0 "The Vision"** - (planned)
@@ -98,9 +98,9 @@
 
 </details>
 
-### v2.0 "The Engine" (Phases 50-57)
+### v2.0 "The Engine" (Phases 50-58)
 
-**Milestone Goal:** Make Loom a daily-driver that's faster than any mobile AI app. SQLite data layer replaces JSONL-on-every-load with sub-50ms session switching, live session attach streams running CLI sessions to the browser in real-time, mobile layout enables "monitor your agent from your phone," and a manifest-only PWA makes it installable. Zero new production dependencies needed.
+**Milestone Goal:** Make Loom a daily-driver that's faster than any mobile AI app. SQLite data layer replaces JSONL-on-every-load with sub-50ms session switching, live session attach streams running CLI sessions to the browser in real-time, mobile layout enables "monitor your agent from your phone," a manifest-only PWA makes it installable, and production-grade nginx deployment ensures reliable, fast serving over HTTPS.
 
 **Phase Numbering:**
 - Integer phases (50, 51, 52...): Planned milestone work
@@ -114,6 +114,7 @@
 - [x] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector (completed 2026-03-27)
 - [x] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker) (completed 2026-03-27)
 - [x] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification (completed 2026-03-27)
+- [ ] **Phase 58: Production Build & Nginx** - nginx reverse proxy, TLS, optimized static serving, and automated build/deploy pipeline
 
 ## Phase Details
 
@@ -231,6 +232,21 @@ Plans:
 Plans:
 - [x] 57-01-PLAN.md -- Capacitor scaffold + iOS integration assessment document
 
+### Phase 58: Production Build & Nginx
+**Goal**: Production-grade deployment with nginx reverse proxy, TLS via Tailscale Serve on port 5443, optimized static asset serving, and a single-command deploy pipeline with build validation
+**Depends on**: Phase 57
+**Requirements**: PROD-01, PROD-02, PROD-03, PROD-04, PROD-05
+**Success Criteria** (what must be TRUE):
+  1. nginx serves Loom on HTTPS via Tailscale Serve (port 5443), proxying /api/* and /ws to Express on 5555
+  2. Static assets from dist/ are served directly by nginx with immutable cache headers and brotli+gzip compression
+  3. Running `./deploy.sh` builds the frontend, validates it, and reloads both nginx and Express with zero-downtime
+  4. Deploy aborts with clear error if TypeScript compilation fails, bundle exceeds size limits, or dist/ is missing expected files
+  5. Both nginx and loom-backend run as systemd services with `After=` dependency ordering and automatic restart on failure
+**Plans:** 2 plans
+Plans:
+- [ ] 58-01-PLAN.md -- nginx reverse proxy + brotli + Tailscale Serve + systemd + graceful shutdown
+- [ ] 58-02-PLAN.md -- deploy.sh build pipeline with validation gates + end-to-end verification
+
 ### v2.1 "The Power" (Planned)
 
 - [ ] Multi-provider tabbed workspaces (Claude, Gemini, Codex)
@@ -254,7 +270,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
+Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 58
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -266,6 +282,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 55. Conversation Enhancements | 2/2 | Complete    | 2026-03-27 |
 | 56. PWA Manifest | 1/1 | Complete    | 2026-03-27 |
 | 57. iOS Research | 1/1 | Complete   | 2026-03-27 |
+| 58. Production Build & Nginx | 0/2 | Planned | -- |
 
 ## Backlog (Future Milestones)
 
@@ -274,4 +291,4 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-27 after Phase 57 planning*
+*Last updated: 2026-03-27 after Phase 58 planning*
