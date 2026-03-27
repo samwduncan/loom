@@ -134,3 +134,13 @@ body {
     }
   }
 }
+
+/* ─── Keyboard Avoidance (interactive-widget=overlays-content) ──────── */
+/* The keyboard overlays the viewport; we shrink the shell by --keyboard-offset
+   so the composer stays visible above the keyboard. */
+@media (max-width: 767px) {
+  .app-shell {
+    padding-bottom: var(--keyboard-offset, 0px);
+    transition: padding-bottom 100ms ease-out;
+  }
+}
