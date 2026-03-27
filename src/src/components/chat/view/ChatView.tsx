@@ -13,7 +13,7 @@
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Brain, Search, Download } from 'lucide-react';
 import { useProjectContext } from '@/hooks/useProjectContext';
@@ -36,6 +36,7 @@ import { exportAsMarkdown, exportAsJSON } from '@/lib/export-conversation';
 import { LiveAnnouncer } from '@/components/a11y/LiveAnnouncer';
 import { useStreamAnnouncements } from '@/components/a11y/useStreamAnnouncements';
 import { LiveSessionBanner } from '@/components/chat/view/LiveSessionBanner';
+import { FollowUpPills } from '@/components/chat/view/FollowUpPills';
 import { wsClient } from '@/lib/websocket-client';
 import { useStreamStore } from '@/stores/stream';
 import { cn } from '@/utils/cn';
@@ -80,6 +81,17 @@ export function ChatView() {
       switchSession(projectName, sessionId);
     }
   }, [sessionId, projectName, messages.length, switchSession]);
+
+  // Streaming state for follow-up pills visibility
+  const isStreaming = useStreamStore((s) => s.isStreaming);
+
+  // Derive last assistant message for follow-up suggestions
+  const lastAssistantMessage = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'assistant') return messages[i];
+    }
+    return null;
+  }, [messages]);
 
   // Live session attach state
   const isLiveAttached = useStreamStore((s) =>
@@ -200,8 +212,8 @@ export function ChatView() {
       className={cn(
         'relative grid h-full',
         search.isOpen
-          ? 'grid-rows-[auto_1fr_auto_auto_auto_auto]'
-          : 'grid-rows-[1fr_auto_auto_auto_auto]',
+          ? 'grid-rows-[auto_1fr_auto_auto_auto_auto_auto]'
+          : 'grid-rows-[1fr_auto_auto_auto_auto_auto]',
       )}
       data-testid="chat-view"
     >
@@ -313,6 +325,11 @@ export function ChatView() {
         />
       )}
       {sessionId && <LiveSessionBanner sessionId={sessionId} />}
+      <FollowUpPills
+        lastMessage={lastAssistantMessage}
+        onSelect={handleSuggestionClick}
+        isStreaming={isStreaming}
+      />
       <StatusLine />
       <PermissionBanner sessionId={effectiveSessionId ?? null} />
       <ChatComposer
