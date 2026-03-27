@@ -227,7 +227,9 @@ Plans:
   1. A written document exists covering Capacitor integration path with pros, cons, and effort estimate
   2. Tailscale DNS resolution has been tested from a WKWebView sandbox with documented results
   3. A minimal Capacitor shell project exists that loads the Loom web build and renders the chat view
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 57-01-PLAN.md -- Capacitor scaffold + iOS integration assessment document
 
 ### v2.1 "The Power" (Planned)
 
@@ -263,7 +265,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 54. Performance Hardening | 2/2 | Complete    | 2026-03-27 |
 | 55. Conversation Enhancements | 2/2 | Complete    | 2026-03-27 |
 | 56. PWA Manifest | 1/1 | Complete    | 2026-03-27 |
-| 57. iOS Research | 0/TBD | Not started | - |
+| 57. iOS Research | 0/1 | Not started | - |
 
 ## Backlog (Future Milestones)
 
@@ -272,4 +274,4 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-27 after Phase 55 planning*
+*Last updated: 2026-03-27 after Phase 57 planning*
