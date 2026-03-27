@@ -212,7 +212,8 @@ export function ChatView() {
             type="button"
             onClick={toggleThinking}
             className={cn(
-              'rounded-md p-1.5',
+              'rounded-md p-3 md:p-1.5',
+              'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
               'transition-colors duration-150',
               'hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]',
               thinkingExpanded ? 'text-foreground' : 'text-muted',
@@ -226,7 +227,8 @@ export function ChatView() {
             type="button"
             onClick={search.toggle}
             className={cn(
-              'rounded-md p-1.5',
+              'rounded-md p-3 md:p-1.5',
+              'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
               'transition-colors duration-150',
               'hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]',
               search.isOpen ? 'text-foreground' : 'text-muted',
@@ -241,7 +243,8 @@ export function ChatView() {
               type="button"
               onClick={() => setExportOpen((p) => !p)}
               className={cn(
-                'rounded-md p-1.5',
+                'rounded-md p-3 md:p-1.5',
+                'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
                 'transition-colors duration-150',
                 'hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]',
                 'text-muted',
@@ -256,14 +259,14 @@ export function ChatView() {
                 <button
                   type="button"
                   onClick={handleExportMarkdown}
-                  className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]"
+                  className="w-full px-3 py-3 md:py-1.5 text-left text-sm text-foreground hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]"
                 >
                   Export as Markdown
                 </button>
                 <button
                   type="button"
                   onClick={handleExportJSON}
-                  className="w-full px-3 py-1.5 text-left text-sm text-foreground hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]"
+                  className="w-full px-3 py-3 md:py-1.5 text-left text-sm text-foreground hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]"
                 >
                   Export as JSON
                 </button>

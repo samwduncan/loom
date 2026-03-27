@@ -161,6 +161,22 @@
   }
 }
 
+/* ─── Mobile Touch Targets for Mention Chips ──────────────── */
+
+@media (max-width: 767px) {
+  .mention-chip-remove {
+    min-width: 28px;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mention-chip {
+    min-height: 36px;
+    padding: 6px 12px;
+  }
+}
+
 /* ─── Composer Status Bar ──────────────────────────────────── */
 
 .composer-status-bar {

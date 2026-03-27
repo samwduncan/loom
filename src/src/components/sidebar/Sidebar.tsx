@@ -118,7 +118,8 @@ export const Sidebar = memo(function Sidebar() {
           onClick={toggleSidebar}
           className={cn(
             'fixed left-3 top-3',
-            'z-[var(--z-overlay)] p-2',
+            'z-[var(--z-overlay)] p-3',
+            'min-h-[44px] min-w-[44px]',
             'bg-surface-raised/80 backdrop-blur-sm rounded-lg',
             'border border-border/50',
             'text-muted hover:text-foreground',
@@ -170,7 +171,9 @@ export const Sidebar = memo(function Sidebar() {
         <button
           onClick={toggleSidebar}
           className={cn(
-            'p-1 rounded-md',
+            'p-3 md:p-1 rounded-md',
+            'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
+            'flex items-center justify-center',
             'text-muted hover:text-foreground',
             'transition-colors',
           )}
@@ -190,7 +193,8 @@ export const Sidebar = memo(function Sidebar() {
           <button
             onClick={() => openModal({ type: 'settings' })}
             className={cn(
-              'p-2 rounded-md',
+              'p-3 md:p-2 rounded-md',
+              'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
               'text-muted hover:text-foreground',
               'transition-colors',
             )}

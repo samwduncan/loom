@@ -78,7 +78,7 @@ function CodeBlock({ language, code }: CodeBlockProps): ReactElement {
           type="button"
           onClick={handleCopy}
           aria-label="Copy code"
-          className="flex items-center gap-1 text-xs text-muted hover:text-secondary transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          className="flex items-center gap-1 text-xs text-muted hover:text-secondary transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm min-h-[44px] md:min-h-0 px-2 md:px-0"
         >
           {copied ? (
             <>

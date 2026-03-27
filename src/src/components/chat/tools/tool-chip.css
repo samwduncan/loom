@@ -179,6 +179,15 @@
   color: var(--status-error);
 }
 
+/* ─── Mobile Touch Targets ───────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .tool-chip {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+}
+
 /* ─── Reduced Motion ─────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {

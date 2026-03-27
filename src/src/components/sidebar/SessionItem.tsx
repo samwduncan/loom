@@ -156,6 +156,7 @@ export function SessionItem({
       }}
       className={cn(
         'px-3 py-2 cursor-pointer',
+        'min-h-[44px] md:min-h-0',
         'transition-[background-color] duration-[var(--duration-fast)]',
         'session-item-hover',
         isActive && !isSelecting && 'session-item-active',

@@ -645,7 +645,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
               aria-label="Send message"
               data-visible={canSend && !isStreamingState ? 'true' : 'false'}
               className={cn(
-                'flex h-8 w-8 items-center justify-center rounded-lg',
+                'flex h-11 w-11 md:h-8 md:w-8 items-center justify-center rounded-lg',
                 'bg-primary text-surface-base',
                 'disabled:opacity-50 disabled:pointer-events-none',
                 'hover:opacity-80 transition-opacity',
@@ -662,7 +662,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
               aria-label="Stop generation"
               data-visible={isStreamingState ? 'true' : 'false'}
               className={cn(
-                'flex h-8 w-8 items-center justify-center rounded-lg',
+                'flex h-11 w-11 md:h-8 md:w-8 items-center justify-center rounded-lg',
                 'bg-destructive text-foreground',
                 'disabled:opacity-50 disabled:pointer-events-none',
                 'hover:opacity-80 transition-opacity',
