@@ -50,6 +50,8 @@ import { queryCodex, abortCodexSession, isCodexSessionActive, getActiveCodexSess
 import { spawnGemini, abortGeminiSession, isGeminiSessionActive, getActiveGeminiSessions } from './gemini-cli.js';
 import sessionManager from './sessionManager.js';
 import { warmCache } from './cache/cache-warmer.js';
+import sessionWatcher from './cache/session-watcher.js';
+import messageCache from './cache/message-cache.js';
 import gitRoutes from './routes/git.js';
 import authRoutes from './routes/auth.js';
 import mcpRoutes from './routes/mcp.js';
@@ -87,6 +89,8 @@ const WATCHER_DEBOUNCE_MS = 1500; // Increased from 300ms — session list refre
 let projectsWatchers = [];
 let projectsWatcherDebounceTimer = null;
 const connectedClients = new Set();
+// Maps WebSocket client -> Set of attached sessionIds (for cleanup on disconnect)
+const clientAttachments = new Map();
 let isGetProjectsRunning = false; // Flag to prevent reentrant calls
 
 // Broadcast progress to all connected WebSocket clients
@@ -1086,6 +1090,81 @@ function handleChatConnection(ws) {
                     type: 'active-sessions',
                     sessions: activeSessions
                 });
+            } else if (data.type === 'attach-session') {
+                const { sessionId, projectName } = data;
+                console.log('[INFO] Attach session request:', sessionId, 'project:', projectName);
+
+                try {
+                    const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
+                    const sessionMeta = messageCache.getSessionMeta(sessionId);
+                    let jsonlFile = sessionMeta?.jsonl_file;
+
+                    if (!jsonlFile) {
+                        // Scan project directory for JSONL files containing this session
+                        const files = await fsPromises.readdir(projectDir);
+                        const jsonlFiles = files.filter(f => f.endsWith('.jsonl') && !f.startsWith('agent-'));
+                        for (const f of jsonlFiles) {
+                            const content = await fsPromises.readFile(path.join(projectDir, f), 'utf8');
+                            if (content.includes(sessionId)) {
+                                jsonlFile = f;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!jsonlFile) {
+                        writer.send({ type: 'error', error: `Cannot find JSONL file for session ${sessionId}` });
+                        return;
+                    }
+
+                    const filePath = path.join(projectDir, jsonlFile);
+
+                    // Start watching (idempotent -- won't double-watch)
+                    if (!sessionWatcher.isWatching(sessionId)) {
+                        sessionWatcher.watch(sessionId, filePath);
+                    }
+
+                    // Track this client's attachment
+                    if (!clientAttachments.has(ws)) {
+                        clientAttachments.set(ws, new Set());
+                    }
+                    clientAttachments.get(ws).add(sessionId);
+
+                    writer.send({
+                        type: 'live-session-attached',
+                        sessionId,
+                        watching: true,
+                    });
+                } catch (err) {
+                    console.error('[ERROR] Attach session failed:', err.message);
+                    writer.send({ type: 'error', error: `Attach failed: ${err.message}` });
+                }
+            } else if (data.type === 'detach-session') {
+                const { sessionId } = data;
+                console.log('[INFO] Detach session request:', sessionId);
+
+                // Remove this client's attachment
+                const attachments = clientAttachments.get(ws);
+                if (attachments) {
+                    attachments.delete(sessionId);
+                }
+
+                // If no clients are watching this session anymore, stop the file watcher
+                let anyClientWatching = false;
+                for (const [, sessions] of clientAttachments.entries()) {
+                    if (sessions.has(sessionId)) {
+                        anyClientWatching = true;
+                        break;
+                    }
+                }
+                if (!anyClientWatching) {
+                    sessionWatcher.unwatch(sessionId);
+                }
+
+                writer.send({
+                    type: 'live-session-detached',
+                    sessionId,
+                });
             }
         } catch (error) {
             console.error('[ERROR] Chat WebSocket error:', error.message);
@@ -1100,6 +1179,25 @@ function handleChatConnection(ws) {
         console.log('🔌 Chat client disconnected');
         // Remove from connected clients
         connectedClients.delete(ws);
+
+        // Clean up live session attachments for this client
+        const attachments = clientAttachments.get(ws);
+        if (attachments) {
+            for (const sessionId of attachments) {
+                // Check if any other client is still watching
+                let otherWatching = false;
+                for (const [otherClient, otherSessions] of clientAttachments.entries()) {
+                    if (otherClient !== ws && otherSessions.has(sessionId)) {
+                        otherWatching = true;
+                        break;
+                    }
+                }
+                if (!otherWatching) {
+                    sessionWatcher.unwatch(sessionId);
+                }
+            }
+            clientAttachments.delete(ws);
+        }
     });
 }
 
@@ -2064,6 +2162,20 @@ async function startServer() {
 
             // Start watching the projects folder for changes
             await setupProjectsWatcher();
+
+            // Wire live session watcher: broadcast new JSONL entries to attached clients
+            sessionWatcher.on('entries', ({ sessionId, entries }) => {
+                const message = JSON.stringify({
+                    type: 'live-session-data',
+                    sessionId,
+                    entries,
+                });
+                for (const [client, attachedSessions] of clientAttachments.entries()) {
+                    if (attachedSessions.has(sessionId) && client.readyState === WebSocket.OPEN) {
+                        client.send(message);
+                    }
+                }
+            });
 
             // Start background cache warming (non-blocking)
             warmCache().then(() => {
