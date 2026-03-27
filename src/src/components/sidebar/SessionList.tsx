@@ -54,6 +54,8 @@ export function SessionList() {
   const updateSessionTitle = useTimelineStore((s) => s.updateSessionTitle);
   const streamingSessionId = useStreamStore((s) => s.isStreaming ? s.activeSessionId : null);
   const liveAttachedSessions = useStreamStore((s) => s.liveAttachedSessions);
+  const notifiedSessions = useStreamStore((s) => s.notifiedSessions);
+  const clearNotifiedSession = useStreamStore((s) => s.clearNotifiedSession);
   const { projectName } = useProjectContext();
 
   useSessionList(); // Populates timeline store (needed by ChatView)
@@ -99,7 +101,10 @@ export function SessionList() {
   });
 
   const handleSessionClick = useCallback(
-    (sessionId: string) => { navigate(`/chat/${sessionId}`); }, [navigate],
+    (sessionId: string) => {
+      clearNotifiedSession(sessionId);
+      navigate(`/chat/${sessionId}`);
+    }, [navigate, clearNotifiedSession],
   );
   const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>, sessionId: string) => {
     e.preventDefault();
@@ -262,6 +267,7 @@ export function SessionList() {
                       isActive={session.id === activeSessionId}
                       isStreaming={session.id === streamingSessionId}
                       isLiveAttached={liveAttachedSessions.has(session.id)}
+                      hasNewActivity={notifiedSessions.has(session.id)}
                       hasDraft={draftSessionIds.has(session.id)}
                       isEditing={editingSessionId === session.id}
                       searchQuery={isSearching ? query : undefined}

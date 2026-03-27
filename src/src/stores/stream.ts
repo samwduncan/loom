@@ -39,6 +39,8 @@ interface StreamState {
   modelName: string | null;
   // Live session attach
   liveAttachedSessions: Set<string>;
+  // Background completion notifications
+  notifiedSessions: Set<string>;
 
   // Actions
   startStream: () => void;
@@ -58,6 +60,8 @@ interface StreamState {
   attachLiveSession: (sessionId: string) => void;
   detachLiveSession: (sessionId: string) => void;
   isSessionLiveAttached: (sessionId: string) => boolean;
+  addNotifiedSession: (sessionId: string) => void;
+  clearNotifiedSession: (sessionId: string) => void;
   reset: () => void;
 }
 
@@ -73,6 +77,7 @@ const INITIAL_STREAM_STATE = {
   tokenBudget: null as { used: number; total: number } | null,
   modelName: null as string | null,
   liveAttachedSessions: new Set<string>(),
+  notifiedSessions: new Set<string>(),
 };
 
 export const useStreamStore = create<StreamState>()((set, get) => ({
@@ -158,8 +163,22 @@ export const useStreamStore = create<StreamState>()((set, get) => ({
     return get().liveAttachedSessions.has(sessionId);
   },
 
+  addNotifiedSession: (sessionId: string) => {
+    set((state) => ({
+      notifiedSessions: new Set([...state.notifiedSessions, sessionId]),
+    }));
+  },
+
+  clearNotifiedSession: (sessionId: string) => {
+    set((state) => {
+      const next = new Set(state.notifiedSessions);
+      next.delete(sessionId);
+      return { notifiedSessions: next };
+    });
+  },
+
   reset: () => {
-    set({ ...INITIAL_STREAM_STATE, liveAttachedSessions: new Set<string>() });
+    set({ ...INITIAL_STREAM_STATE, liveAttachedSessions: new Set<string>(), notifiedSessions: new Set<string>() });
   },
 }));
 

@@ -85,6 +85,15 @@
   }
 }
 
+/* Background completion notification dot -- static amber */
+.session-notified-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: oklch(0.75 0.15 65); /* warm amber */
+  flex-shrink: 0;
+}
+
 /* Inline rename input -- transparent background, same font, accent underline */
 .session-rename-input {
   width: 100%;

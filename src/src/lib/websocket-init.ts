@@ -101,13 +101,21 @@ export async function initializeWebSocket(): Promise<void> {
       }, 200);
     },
     onStreamStart: () => streamStore().startStream(),
-    onStreamEnd: (_sessionId, _exitCode) => {
+    onStreamEnd: (sessionId, _exitCode) => {
       // Clear pending activity debounce to avoid stale text after stream ends
       if (activityDebounceTimer !== null) {
         clearTimeout(activityDebounceTimer);
         activityDebounceTimer = null;
       }
       streamStore().endStream();
+
+      // Notify if this completion is for a session the user isn't currently viewing
+      if (sessionId) {
+        const viewedSessionId = window.location.pathname.match(/\/chat\/(.+)/)?.[1] ?? null;
+        if (viewedSessionId !== sessionId) {
+          streamStore().addNotifiedSession(sessionId);
+        }
+      }
     },
 
     onError: (error, _sessionId) => {
@@ -244,6 +252,12 @@ export async function initializeWebSocket(): Promise<void> {
       const timelineState = useTimelineStore.getState();
       for (const msg of messages) {
         timelineState.addMessage(sessionId, msg);
+      }
+
+      // Notify if live data arrives for a session the user isn't viewing
+      const viewedSessionId = window.location.pathname.match(/\/chat\/(.+)/)?.[1] ?? null;
+      if (viewedSessionId !== sessionId) {
+        streamStore().addNotifiedSession(sessionId);
       }
     },
 
