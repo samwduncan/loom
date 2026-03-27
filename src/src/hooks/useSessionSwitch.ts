@@ -52,6 +52,15 @@ export function useSessionSwitch(
         streamState.reset();
       }
 
+      // 2.5. Detach from any live-attached sessions before switching
+      const currentLiveAttached = streamState.liveAttachedSessions;
+      if (currentLiveAttached.size > 0) {
+        for (const attachedId of currentLiveAttached) {
+          wsClient.send({ type: 'detach-session', sessionId: attachedId });
+          streamState.detachLiveSession(attachedId);
+        }
+      }
+
       // 3. Check memory cache -- session with messages already loaded
       // eslint-disable-next-line loom/no-external-store-mutation -- infrastructure hook reads state, not mutation
       const timelineState = useTimelineStore.getState();
