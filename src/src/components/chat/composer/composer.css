@@ -192,3 +192,18 @@
   color: var(--border-subtle);
   user-select: none;
 }
+
+/* ─── Composer Safe Area & Keyboard Avoidance (MOBILE-04) ───── */
+@media (max-width: 767px) {
+  .composer-safe-area {
+    padding-bottom: calc(1rem + var(--keyboard-offset, 0px));
+  }
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 767px) {
+    .composer-safe-area {
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom) + var(--keyboard-offset, 0px));
+    }
+  }
+}

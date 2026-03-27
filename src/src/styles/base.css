@@ -32,6 +32,11 @@
   src: url('/fonts/jetbrains-mono-variable.woff2') format('woff2');
 }
 
+/* ─── Mobile Keyboard Offset (fallback for browsers without interactive-widget) */
+:root {
+  --keyboard-offset: 0px;
+}
+
 /* Base Reset and Defaults */
 html {
   height: 100dvh;
@@ -118,4 +123,11 @@ body {
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: var(--space-1);
+}
+
+/* ─── Safe Area Support for Notched Devices (MOBILE-04) ──────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
