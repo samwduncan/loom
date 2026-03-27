@@ -192,7 +192,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
       <div className="mx-auto max-w-3xl py-4">
         {messages.map((msg) => (
           <div key={msg.id}>
-            <div className="px-4">
+            <div className="px-2 md:px-4">
               <MessageErrorBoundary>
                 <MemoizedMessageItem msg={msg} sessionId={sessionId} highlightText={highlightText} />
               </MessageErrorBoundary>
@@ -200,7 +200,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
           </div>
         ))}
         {showActiveMessage && (
-          <div className="px-4">
+          <div className="px-2 md:px-4">
             <ActiveMessage
               sessionId={sessionId}
               onFinalizationComplete={handleFinalized}

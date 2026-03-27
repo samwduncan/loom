@@ -60,7 +60,9 @@ export const Sidebar = memo(function Sidebar() {
   const touchRef = useRef({ startX: 0, swiping: false });
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchRef.current.startX = e.touches[0].clientX;
+    const touch = e.touches[0];
+    if (!touch) return;
+    touchRef.current.startX = touch.clientX;
     touchRef.current.swiping = false;
     if (sidebarPanelRef.current) {
       sidebarPanelRef.current.style.transition = 'none';
@@ -68,7 +70,9 @@ export const Sidebar = memo(function Sidebar() {
   }, []);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    const deltaX = e.touches[0].clientX - touchRef.current.startX;
+    const touch = e.touches[0];
+    if (!touch) return;
+    const deltaX = touch.clientX - touchRef.current.startX;
     if (deltaX < -10) touchRef.current.swiping = true;
     if (touchRef.current.swiping && sidebarPanelRef.current) {
       const clamped = Math.min(0, deltaX);

@@ -43,7 +43,7 @@ const components: Components = {
     }
     return (
       <code
-        className="bg-code-inline rounded-sm px-1.5 py-0.5 font-mono text-[0.85em]"
+        className="bg-code-inline rounded-sm px-1.5 py-0.5 font-mono text-[0.85em] break-all"
         {...rest}
       >
         {children}
@@ -172,7 +172,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: Mark
         <img
           src={src}
           alt={alt ?? ''}
-          className="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity my-2"
+          className="max-w-full w-auto h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity my-2"
           onClick={() => src && setLightboxSrc(src)}
           {...props}
         />
@@ -181,7 +181,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: Mark
   }, []);
 
   return (
-    <div className="markdown-body text-foreground text-sm leading-relaxed">
+    <div className="markdown-body text-foreground text-sm leading-relaxed overflow-hidden">
       <Markdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}

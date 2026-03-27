@@ -24,7 +24,7 @@ export function ImageThumbnailGrid({ attachments, onImageClick }: ImageThumbnail
           key={attachment.id}
           src={attachment.url}
           alt={attachment.name}
-          className="max-w-[200px] max-h-[200px] rounded-lg cursor-pointer object-cover hover:opacity-90 transition-opacity"
+          className="max-w-[calc(50%-0.25rem)] md:max-w-[200px] max-h-[200px] rounded-lg cursor-pointer object-cover hover:opacity-90 transition-opacity"
           onClick={() => onImageClick(attachment)}
         />
       ))}

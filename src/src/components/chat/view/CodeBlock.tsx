@@ -68,7 +68,7 @@ function CodeBlock({ language, code }: CodeBlockProps): ReactElement {
 
   return (
     <div
-      className="bg-code-surface rounded-lg overflow-hidden my-3"
+      className="bg-code-surface rounded-lg overflow-hidden my-3 max-w-full min-w-0"
       style={{ minHeight: `${estimatedHeight}px` }}
     >
       {/* Header: language label + copy button */}
