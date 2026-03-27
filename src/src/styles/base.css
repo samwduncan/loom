@@ -126,8 +126,11 @@ body {
 }
 
 /* ─── Safe Area Support for Notched Devices (MOBILE-04) ──────── */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
+@supports (padding: env(safe-area-inset-top)) {
+  /* Top safe area: notch / Dynamic Island */
+  @media (max-width: 767px) {
+    .app-shell {
+      padding-top: env(safe-area-inset-top);
+    }
   }
 }

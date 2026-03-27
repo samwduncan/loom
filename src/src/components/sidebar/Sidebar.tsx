@@ -105,7 +105,7 @@ export const Sidebar = memo(function Sidebar() {
         <button
           onClick={toggleSidebar}
           className={cn(
-            'fixed left-3 top-3',
+            'fixed left-3 top-[calc(0.75rem+env(safe-area-inset-top))]',
             'z-[var(--z-overlay)] p-3',
             'min-h-[44px] min-w-[44px]',
             'bg-surface-raised/80 backdrop-blur-sm rounded-lg',
@@ -151,7 +151,7 @@ export const Sidebar = memo(function Sidebar() {
         isMobile && 'w-[280px] max-w-[80vw]',
       )}
     >
-      <header className="flex items-center justify-between p-4 border-b border-border">
+      <header className="flex items-center justify-between p-4 pt-[max(1rem,env(safe-area-inset-top))] border-b border-border">
         <span className="flex items-center gap-2">
           <span className="font-serif italic text-lg text-foreground">Loom</span>
           <ConnectionStatusIndicator />
@@ -175,7 +175,7 @@ export const Sidebar = memo(function Sidebar() {
         <NewChatButton />
       </div>
       <SessionList />
-      <footer className="mt-auto p-3 border-t border-border">
+      <footer className="mt-auto p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-border">
         <div className="flex items-center gap-1">
           <QuickSettingsPanel />
           <button
