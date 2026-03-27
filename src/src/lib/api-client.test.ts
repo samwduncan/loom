@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { apiFetch } from './api-client';
+import { apiFetch, clearInflightRequests } from './api-client';
 
 // Mock auth module
 vi.mock('@/lib/auth', () => ({
@@ -150,6 +150,114 @@ describe('apiFetch', () => {
 
     await expect(apiFetch('/api/test')).rejects.toThrow('API error 401');
     expect(mockRefreshAuth).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('apiFetch deduplication', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    clearInflightRequests();
+    mockGetToken.mockReturnValue('token');
+    vi.stubGlobal('fetch', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    clearInflightRequests();
+  });
+
+  function mockJsonResponse(body: unknown, status = 200) {
+    return new Response(JSON.stringify(body), {
+      status,
+      statusText: status === 200 ? 'OK' : 'Error',
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  it('dedup: two concurrent GET requests to the same URL share one fetch call', async () => {
+    const mockFetch = vi.mocked(globalThis.fetch);
+    mockFetch.mockResolvedValue(mockJsonResponse({ data: 'hello' }));
+
+    const p1 = apiFetch('/api/test');
+    const p2 = apiFetch('/api/test');
+
+    const [r1, r2] = await Promise.all([p1, p2]);
+
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(r1).toEqual({ data: 'hello' });
+    expect(r2).toEqual({ data: 'hello' });
+  });
+
+  it('dedup: a GET request after the first resolves fires a new fetch', async () => {
+    const mockFetch = vi.mocked(globalThis.fetch);
+    mockFetch.mockResolvedValue(mockJsonResponse({ data: 'first' }));
+
+    await apiFetch('/api/test');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    mockFetch.mockResolvedValue(mockJsonResponse({ data: 'second' }));
+
+    const result = await apiFetch('/api/test');
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({ data: 'second' });
+  });
+
+  it('dedup: POST/PATCH/DELETE requests are never deduplicated', async () => {
+    const mockFetch = vi.mocked(globalThis.fetch);
+    // Use mockImplementation to return a fresh Response each call (body is single-use)
+    mockFetch.mockImplementation(() =>
+      Promise.resolve(mockJsonResponse({ ok: true })),
+    );
+
+    const p1 = apiFetch('/api/test', { method: 'POST', body: '{}' });
+    const p2 = apiFetch('/api/test', { method: 'POST', body: '{}' });
+
+    await Promise.all([p1, p2]);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+
+    // Also verify PATCH and DELETE
+    mockFetch.mockClear();
+    mockFetch.mockImplementation(() =>
+      Promise.resolve(mockJsonResponse({ ok: true })),
+    );
+
+    const p3 = apiFetch('/api/test', { method: 'PATCH', body: '{}' });
+    const p4 = apiFetch('/api/test', { method: 'DELETE' });
+
+    await Promise.all([p3, p4]);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('dedup: if the shared promise rejects, all waiters receive the error and entry is cleaned', async () => {
+    const mockFetch = vi.mocked(globalThis.fetch);
+    mockFetch.mockResolvedValue(mockJsonResponse(null, 500));
+
+    const p1 = apiFetch('/api/fail');
+    const p2 = apiFetch('/api/fail');
+
+    await expect(p1).rejects.toThrow('API error 500');
+    await expect(p2).rejects.toThrow('API error 500');
+
+    // Entry should be cleaned up -- next call fires a fresh fetch
+    mockFetch.mockResolvedValue(mockJsonResponse({ recovered: true }));
+    const result = await apiFetch('/api/fail');
+    expect(result).toEqual({ recovered: true });
+    // 1 shared original + 1 new after cleanup
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('dedup: requests with different URLs are not deduplicated', async () => {
+    const mockFetch = vi.mocked(globalThis.fetch);
+    // Use mockImplementation to return a fresh Response each call
+    mockFetch.mockImplementation(() =>
+      Promise.resolve(mockJsonResponse({ data: 'a' })),
+    );
+
+    const p1 = apiFetch('/api/one');
+    const p2 = apiFetch('/api/two');
+
+    await Promise.all([p1, p2]);
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 });
