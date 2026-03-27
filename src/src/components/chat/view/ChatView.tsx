@@ -35,6 +35,9 @@ import { StatusLine } from '@/components/chat/view/StatusLine';
 import { exportAsMarkdown, exportAsJSON } from '@/lib/export-conversation';
 import { LiveAnnouncer } from '@/components/a11y/LiveAnnouncer';
 import { useStreamAnnouncements } from '@/components/a11y/useStreamAnnouncements';
+import { LiveSessionBanner } from '@/components/chat/view/LiveSessionBanner';
+import { wsClient } from '@/lib/websocket-client';
+import { useStreamStore } from '@/stores/stream';
 import { cn } from '@/utils/cn';
 import type { Message } from '@/types/message';
 
@@ -78,6 +81,53 @@ export function ChatView() {
     }
   }, [sessionId, projectName, messages.length, switchSession]);
 
+  // Live session attach state
+  const isLiveAttached = useStreamStore((s) =>
+    sessionId ? s.liveAttachedSessions.has(sessionId) : false,
+  );
+  const detachLiveSession = useStreamStore((s) => s.detachLiveSession);
+  const sessionUpdatedAt = useTimelineStore((state) => {
+    if (!sessionId) return null;
+    const session = state.sessions.find((s) => s.id === sessionId);
+    return session?.updatedAt ?? null;
+  });
+
+  // Auto-attach to live sessions: if session's last activity is within 5 minutes, attempt attach.
+  // Runs once per sessionId (not on isLiveAttached changes). Cleanup auto-detaches.
+  // Track whether we sent attach so cleanup knows to detach.
+  const didAttachRef = useRef(false);
+
+  useEffect(() => {
+    didAttachRef.current = false;
+    if (!sessionId || !projectName || sessionId.startsWith('stub-')) return;
+
+    // Don't auto-attach if already attached
+    if (isLiveAttached) return;
+
+    // Check if session appears "active" based on recent updatedAt
+    if (!sessionUpdatedAt) return;
+
+    const lastActivity = new Date(sessionUpdatedAt).getTime();
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+
+    if (lastActivity > fiveMinutesAgo) {
+      wsClient.send({
+        type: 'attach-session',
+        sessionId,
+        projectName,
+      });
+      didAttachRef.current = true;
+    }
+
+    // Auto-detach when navigating away from this session
+    return () => {
+      if (didAttachRef.current) {
+        wsClient.send({ type: 'detach-session', sessionId });
+        detachLiveSession(sessionId);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally runs once per sessionId, not on isLiveAttached changes
+  }, [sessionId, projectName]);
 
   // Determine content state.
   const hasSession = Boolean(sessionId || activeSessionId);
@@ -150,8 +200,8 @@ export function ChatView() {
       className={cn(
         'relative grid h-full',
         search.isOpen
-          ? 'grid-rows-[auto_1fr_auto_auto_auto]'
-          : 'grid-rows-[1fr_auto_auto_auto]',
+          ? 'grid-rows-[auto_1fr_auto_auto_auto_auto]'
+          : 'grid-rows-[1fr_auto_auto_auto_auto]',
       )}
       data-testid="chat-view"
     >
@@ -259,6 +309,7 @@ export function ChatView() {
           onLoadMore={pagination.loadMore}
         />
       )}
+      {sessionId && <LiveSessionBanner sessionId={sessionId} />}
       <StatusLine />
       <PermissionBanner sessionId={effectiveSessionId ?? null} />
       <ChatComposer
