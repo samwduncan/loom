@@ -12,7 +12,7 @@
  * selector-only store access (4.2), z-index from dictionary (3.3).
  */
 
-import { memo, useEffect, useRef, useSyncExternalStore } from 'react';
+import { memo, useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Settings, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
@@ -54,6 +54,60 @@ export const Sidebar = memo(function Sidebar() {
     }
     prevPathRef.current = location.pathname;
   }, [location.pathname, isMobile, isSidebarOpen, toggleSidebar]);
+
+  // ─── Swipe-to-close gesture for mobile drawer ───
+  const sidebarPanelRef = useRef<HTMLDivElement>(null);
+  const touchRef = useRef({ startX: 0, swiping: false });
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchRef.current.startX = e.touches[0].clientX;
+    touchRef.current.swiping = false;
+    if (sidebarPanelRef.current) {
+      sidebarPanelRef.current.style.transition = 'none';
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const deltaX = e.touches[0].clientX - touchRef.current.startX;
+    if (deltaX < -10) touchRef.current.swiping = true;
+    if (touchRef.current.swiping && sidebarPanelRef.current) {
+      const clamped = Math.min(0, deltaX);
+      sidebarPanelRef.current.style.transform = `translateX(${clamped}px)`;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!sidebarPanelRef.current) return;
+    const el = sidebarPanelRef.current;
+
+    // Read current transform to determine swipe distance
+    const matrix = new DOMMatrix(getComputedStyle(el).transform);
+    const currentX = matrix.m41;
+
+    if (currentX < -100) {
+      // Swipe past threshold — animate out then close
+      el.style.transition = 'transform 200ms ease-out';
+      el.style.transform = `translateX(-${el.offsetWidth}px)`;
+      const onEnd = () => {
+        el.removeEventListener('transitionend', onEnd);
+        el.style.transition = '';
+        el.style.transform = '';
+        toggleSidebar();
+      };
+      el.addEventListener('transitionend', onEnd);
+    } else {
+      // Snap back
+      el.style.transition = 'transform 200ms ease-out';
+      el.style.transform = 'translateX(0)';
+      const onEnd = () => {
+        el.removeEventListener('transitionend', onEnd);
+        el.style.transition = '';
+      };
+      el.addEventListener('transitionend', onEnd);
+    }
+
+    touchRef.current.swiping = false;
+  }, [toggleSidebar]);
 
   // ─── Collapsed state ───
   if (!isSidebarOpen) {
@@ -154,7 +208,15 @@ export const Sidebar = memo(function Sidebar() {
   if (isMobile) {
     return (
       <div className="fixed inset-0 z-[var(--z-overlay)] flex">
-        <div className="h-full shadow-xl">{sidebarContent}</div>
+        <div
+          ref={sidebarPanelRef}
+          className="h-full shadow-xl"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {sidebarContent}
+        </div>
         <button
           className="flex-1 bg-black/40 cursor-default"
           onClick={toggleSidebar}
