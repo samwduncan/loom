@@ -111,7 +111,7 @@
 - [x] **Phase 52: Live Session Attach** - Stream running CLI sessions to the browser in real-time via JSONL file watching (completed 2026-03-27)
 - [x] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas (completed 2026-03-27)
 - [x] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading (completed 2026-03-27)
-- [ ] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector
+- [x] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector (completed 2026-03-27)
 - [ ] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker)
 - [ ] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification
 
@@ -202,10 +202,10 @@ Plans:
   2. Users can select from conversation templates to start common tasks with pre-filled system prompts
   3. A sidebar indicator shows when an idle background session receives new output
   4. Users can switch between Claude, Gemini, and Codex models from a selector in the composer
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 55-01-PLAN.md -- Follow-up suggestion pills + enhanced conversation templates
-- [ ] 55-02-PLAN.md -- Background session notification dot + model selector in composer
+- [x] 55-02-PLAN.md -- Background session notification dot + model selector in composer
 **UI hint**: yes
 
 ### Phase 56: PWA Manifest
@@ -261,7 +261,7 @@ Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 57
 | 52. Live Session Attach | 3/3 | Complete    | 2026-03-27 |
 | 53. Mobile-Responsive Layout | 3/3 | Complete    | 2026-03-27 |
 | 54. Performance Hardening | 2/2 | Complete    | 2026-03-27 |
-| 55. Conversation Enhancements | 1/2 | In Progress|  |
+| 55. Conversation Enhancements | 2/2 | Complete   | 2026-03-27 |
 | 56. PWA Manifest | 0/TBD | Not started | - |
 | 57. iOS Research | 0/TBD | Not started | - |
 

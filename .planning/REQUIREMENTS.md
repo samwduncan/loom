@@ -39,8 +39,8 @@
 ## Conversation UX (CONV)
 - [x] **CONV-01**: Suggested follow-up prompts after assistant responses
 - [x] **CONV-02**: Conversation templates (quick-start prompts for common tasks)
-- [ ] **CONV-03**: Background session indicator (notification when idle session gets response)
-- [ ] **CONV-04**: Model selector in composer (switch between Claude/Gemini/Codex per message)
+- [x] **CONV-03**: Background session indicator (notification when idle session gets response)
+- [x] **CONV-04**: Model selector in composer (switch between Claude/Gemini/Codex per message)
 
 ## PWA (PWA)
 - [ ] **PWA-01**: PWA manifest enables "Add to Home Screen" on mobile
@@ -94,8 +94,8 @@
 | PERF-04 | Phase 54 | Complete |
 | CONV-01 | Phase 55 | Complete |
 | CONV-02 | Phase 55 | Complete |
-| CONV-03 | Phase 55 | Pending |
-| CONV-04 | Phase 55 | Pending |
+| CONV-03 | Phase 55 | Complete |
+| CONV-04 | Phase 55 | Complete |
 | PWA-01 | Phase 56 | Pending |
 | PWA-02 | Phase 56 | Pending |
 | PWA-03 | Phase 56 | Pending |
