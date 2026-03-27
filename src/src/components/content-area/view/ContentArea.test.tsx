@@ -1,6 +1,9 @@
 /**
- * ContentArea tests -- verifies mount-once CSS show/hide, mobile override,
- * error boundary integration, and ARIA attributes.
+ * ContentArea tests -- verifies lazy-mount-on-first-visit, CSS show/hide,
+ * mobile override, error boundary integration, and ARIA attributes.
+ *
+ * PERF-03: Shell and Git panels only mount when first visited.
+ * PERF-04: Skeleton audit -- all async areas confirmed to have loading states.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -8,7 +11,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ContentArea } from './ContentArea';
 
-// Mock useUIStore
+// Mock useUIStore -- mockActiveTab is mutable for re-render simulation
 let mockActiveTab = 'chat';
 const mockSetActiveTab = vi.fn();
 
@@ -30,6 +33,26 @@ vi.mock('@/stores/ui', () => ({
 // Mock ChatView to avoid its complex dependencies
 vi.mock('@/components/chat/view/ChatView', () => ({
   ChatView: () => <div data-testid="chat-view">ChatView</div>,
+}));
+
+// Mock FileTreePanel
+vi.mock('@/components/file-tree/FileTreePanel', () => ({
+  FileTreePanel: () => <div data-testid="file-tree-panel">FileTreePanel</div>,
+}));
+
+// Mock TerminalPanel (used via React.lazy)
+vi.mock('@/components/terminal/TerminalPanel', () => ({
+  TerminalPanel: () => <div data-testid="terminal-panel">TerminalPanel</div>,
+}));
+
+// Mock GitPanel (used via React.lazy)
+vi.mock('@/components/git/GitPanel', () => ({
+  GitPanel: () => <div data-testid="git-panel">GitPanel</div>,
+}));
+
+// Mock GitPanelSkeleton
+vi.mock('@/components/git/GitPanelSkeleton', () => ({
+  GitPanelSkeleton: () => <div data-testid="git-panel-skeleton">GitPanelSkeleton</div>,
 }));
 
 // Track PanelErrorBoundary props
@@ -93,40 +116,118 @@ describe('ContentArea', () => {
     setupMatchMedia();
   });
 
-  it('all four panel containers are in the DOM simultaneously', () => {
-    renderContentArea();
-    expect(document.getElementById('panel-chat')).toBeInTheDocument();
-    expect(document.getElementById('panel-files')).toBeInTheDocument();
-    expect(document.getElementById('panel-shell')).toBeInTheDocument();
-    expect(document.getElementById('panel-git')).toBeInTheDocument();
+  describe('lazy-mount-on-first-visit (PERF-03)', () => {
+    it('on initial render with activeTab=chat, shell and git panels are NOT in the DOM', () => {
+      mockActiveTab = 'chat';
+      renderContentArea();
+      // Chat and files are always eagerly mounted
+      expect(document.getElementById('panel-chat')).toBeInTheDocument();
+      expect(document.getElementById('panel-files')).toBeInTheDocument();
+      // Shell and git should NOT be rendered until visited
+      expect(document.getElementById('panel-shell')).not.toBeInTheDocument();
+      expect(document.getElementById('panel-git')).not.toBeInTheDocument();
+    });
+
+    it('switching to shell tab renders the terminal panel', () => {
+      mockActiveTab = 'shell';
+      renderContentArea();
+      // Shell panel should now be in the DOM
+      expect(document.getElementById('panel-shell')).toBeInTheDocument();
+      expect(document.getElementById('panel-shell')).not.toHaveClass('hidden');
+    });
+
+    it('switching back to chat from shell keeps terminal panel mounted (hidden)', () => {
+      // First render with shell active to mark it as visited
+      mockActiveTab = 'shell';
+      const { rerender } = renderContentArea();
+      expect(document.getElementById('panel-shell')).toBeInTheDocument();
+
+      // Switch back to chat
+      mockActiveTab = 'chat';
+      rerender(
+        <MemoryRouter initialEntries={['/chat/test-session']}>
+          <Routes>
+            <Route path="/chat/:sessionId?" element={<ContentArea />} />
+            <Route path="*" element={<ContentArea />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+
+      // Shell should still be mounted (hidden, not removed)
+      expect(document.getElementById('panel-shell')).toBeInTheDocument();
+      expect(document.getElementById('panel-shell')).toHaveClass('hidden');
+      // Chat should be visible
+      expect(document.getElementById('panel-chat')).not.toHaveClass('hidden');
+    });
+
+    it('git tab content is not rendered until user visits it', () => {
+      // Render with chat active
+      mockActiveTab = 'chat';
+      const { rerender } = renderContentArea();
+      expect(document.getElementById('panel-git')).not.toBeInTheDocument();
+
+      // Visit shell -- git should still not be rendered
+      mockActiveTab = 'shell';
+      rerender(
+        <MemoryRouter initialEntries={['/chat/test-session']}>
+          <Routes>
+            <Route path="/chat/:sessionId?" element={<ContentArea />} />
+            <Route path="*" element={<ContentArea />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+      expect(document.getElementById('panel-shell')).toBeInTheDocument();
+      expect(document.getElementById('panel-git')).not.toBeInTheDocument();
+
+      // Visit git -- now it should render
+      mockActiveTab = 'git';
+      rerender(
+        <MemoryRouter initialEntries={['/chat/test-session']}>
+          <Routes>
+            <Route path="/chat/:sessionId?" element={<ContentArea />} />
+            <Route path="*" element={<ContentArea />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+      expect(document.getElementById('panel-git')).toBeInTheDocument();
+      expect(document.getElementById('panel-git')).not.toHaveClass('hidden');
+    });
   });
 
-  it('active panel has no hidden class; inactive panels have hidden class', () => {
-    mockActiveTab = 'chat';
-    renderContentArea();
-    expect(document.getElementById('panel-chat')).not.toHaveClass('hidden');
-    expect(document.getElementById('panel-files')).toHaveClass('hidden');
-    expect(document.getElementById('panel-shell')).toHaveClass('hidden');
-    expect(document.getElementById('panel-git')).toHaveClass('hidden');
+  describe('CSS show/hide', () => {
+    it('active panel has no hidden class; inactive eagerly-mounted panels have hidden class', () => {
+      mockActiveTab = 'chat';
+      renderContentArea();
+      expect(document.getElementById('panel-chat')).not.toHaveClass('hidden');
+      expect(document.getElementById('panel-files')).toHaveClass('hidden');
+      // Shell and git not yet mounted, so not present
+    });
+
+    it('switching activeTab changes which panel is visible', () => {
+      mockActiveTab = 'files';
+      renderContentArea();
+      expect(document.getElementById('panel-chat')).toHaveClass('hidden');
+      expect(document.getElementById('panel-files')).not.toHaveClass('hidden');
+    });
   });
 
-  it('switching activeTab changes which panel is visible', () => {
-    mockActiveTab = 'files';
-    renderContentArea();
-    expect(document.getElementById('panel-chat')).toHaveClass('hidden');
-    expect(document.getElementById('panel-files')).not.toHaveClass('hidden');
-    expect(document.getElementById('panel-shell')).toHaveClass('hidden');
-    expect(document.getElementById('panel-git')).toHaveClass('hidden');
-  });
+  describe('ARIA attributes', () => {
+    it('eagerly-mounted panels have role=tabpanel and aria-labelledby', () => {
+      renderContentArea();
+      for (const id of ['chat', 'files'] as const) {
+        const panel = document.getElementById(`panel-${id}`);
+        expect(panel).toHaveAttribute('role', 'tabpanel');
+        expect(panel).toHaveAttribute('aria-labelledby', `tab-${id}`);
+      }
+    });
 
-  it('each panel has role="tabpanel" and aria-labelledby', () => {
-    renderContentArea();
-    const panels = ['chat', 'files', 'shell', 'git'] as const;
-    for (const id of panels) {
-      const panel = document.getElementById(`panel-${id}`);
-      expect(panel).toHaveAttribute('role', 'tabpanel');
-      expect(panel).toHaveAttribute('aria-labelledby', `tab-${id}`);
-    }
+    it('lazy-mounted panels have correct ARIA when visited', () => {
+      mockActiveTab = 'shell';
+      renderContentArea();
+      const shell = document.getElementById('panel-shell');
+      expect(shell).toHaveAttribute('role', 'tabpanel');
+      expect(shell).toHaveAttribute('aria-labelledby', 'tab-shell');
+    });
   });
 
   it('ChatView is rendered directly in the chat panel', () => {
@@ -136,25 +237,20 @@ describe('ContentArea', () => {
     expect(screen.getByTestId('chat-view')).toBeInTheDocument();
   });
 
-  it('each panel is wrapped in PanelErrorBoundary with scoped resetKeys', () => {
+  it('error boundaries wrap eagerly-mounted panels', () => {
     mockActiveTab = 'chat';
     renderContentArea();
-    // Should have 4 error boundaries -- one per panel
-    const boundaries = panelErrorBoundaryProps;
-    expect(boundaries).toHaveLength(4);
-    const panelNames = boundaries.map((b) => b.panelName);
-    expect(panelNames).toContain('chat');
-    expect(panelNames).toContain('files');
-    expect(panelNames).toContain('shell');
-    expect(panelNames).toContain('git');
-    // Only the active panel should have resetKeys with activeTab; others get empty array
-    for (const b of boundaries) {
-      if (b.panelName === 'chat') {
-        expect(b.resetKeys).toEqual(['chat']);
-      } else {
-        expect(b.resetKeys).toEqual([]);
-      }
-    }
+    // Should have at least 2 error boundaries (chat + files) -- lazy ones not yet mounted
+    const eagerBoundaries = panelErrorBoundaryProps.filter(
+      (b) => b.panelName === 'chat' || b.panelName === 'files',
+    );
+    expect(eagerBoundaries).toHaveLength(2);
+    // Active panel (chat) gets resetKeys with activeTab
+    const chatBoundary = panelErrorBoundaryProps.find((b) => b.panelName === 'chat');
+    expect(chatBoundary?.resetKeys).toEqual(['chat']);
+    // Inactive panel (files) gets empty resetKeys
+    const filesBoundary = panelErrorBoundaryProps.find((b) => b.panelName === 'files');
+    expect(filesBoundary?.resetKeys).toEqual([]);
   });
 
   it('mobile override: renders chat even when store says files', () => {
