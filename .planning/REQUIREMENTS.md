@@ -102,11 +102,11 @@ Content scrolls at 60fps on real device. This is THE highest priority -- everyth
   - _Acceptance:_ Streaming auto-scroll fires at most once per animation frame via rAF, not on every `messages.length` change.
   - _Why:_ Current implementation triggers `el.scrollTop = el.scrollHeight` on every message chunk during streaming.
 
-- [ ] **SCROLL-04**: Verify useAutoResize layout pattern is acceptable at typing frequency
+- [x] **SCROLL-04**: Verify useAutoResize layout pattern is acceptable at typing frequency
   - _Acceptance:_ useAutoResize write->read->write pattern retained intentionally per D-09 -- fires at typing frequency (10-20Hz), not scroll frequency (60-120Hz). Pattern documented with `// SCROLL-04 / D-09` comment in useAutoResize.ts.
   - _Why:_ The write->read->write is unavoidable for height measurement (must reset to 0, read scrollHeight, set final). useLayoutEffect ensures pre-paint timing. Acceptable at typing frequency.
 
-- [ ] **SCROLL-05**: Defer forced reflow in ActiveMessage finalization out of scroll-critical path
+- [x] **SCROLL-05**: Defer forced reflow in ActiveMessage finalization out of scroll-critical path
   - _Acceptance:_ `void container.offsetHeight` forced reflow deferred behind rAF + 50ms setTimeout per D-11/D-12. FLIP animation intentionally preserved -- forced reflow required for CSS height transition. Relocated out of scroll-critical path so it cannot block an active scroll frame.
   - _Why:_ The forced reflow is inherent to the FLIP animation pattern (browser must commit start height before animating to end height). Deferring by 50ms ensures it fires between scroll frames, not during one.
 
@@ -124,7 +124,7 @@ Content scrolls at 60fps on real device. This is THE highest priority -- everyth
   - _Acceptance:_ Tapping the iOS status bar area scrolls the chat message list to the top with smooth animation. Uses Capacitor `statusTap` event.
   - _Why:_ Universal iOS expectation since iPhone OS 1.0. Five lines of code, high impact.
 
-- [ ] **SCROLL-09**: Rubber band bounce preserved on all scroll containers
+- [x] **SCROLL-09**: Rubber band bounce preserved on all scroll containers
   - _Acceptance:_ Message list and session list have native iOS overscroll bounce. No `overscroll-behavior: none` on these containers (only on html/body to prevent page-level bounce).
   - _Why:_ Users expect bounce on every scrollable surface. We may have accidentally disabled it.
 
@@ -290,12 +290,12 @@ v2.2 ships when:
 | SCROLL-01 | 64 | Pending |
 | SCROLL-02 | 64 | Pending |
 | SCROLL-03 | 64 | Pending |
-| SCROLL-04 | 64 | Pending |
-| SCROLL-05 | 64 | Pending |
+| SCROLL-04 | 64 | Complete |
+| SCROLL-05 | 64 | Complete |
 | SCROLL-06 | 64 | Pending |
 | SCROLL-07 | 64 | Pending |
 | SCROLL-08 | 64 | Pending |
-| SCROLL-09 | 64 | Pending |
+| SCROLL-09 | 64 | Complete |
 | SCROLL-10 | 64 | Pending |
 | TOUCH-01 | 65 | Pending |
 | TOUCH-02 | 65 | Pending |
