@@ -26,6 +26,12 @@ export function useAutoResize(
     const el = ref.current;
     if (!el) return;
 
+    // NOTE: This write->read->write pattern is intentional and acceptable.
+    // It fires at typing frequency (10-20Hz via value changes), not scroll frequency.
+    // The pattern is unavoidable: height must be reset to measure natural scrollHeight.
+    // useLayoutEffect ensures this runs before paint, preventing visual flicker.
+    // See SCROLL-04 / D-09: verified acceptable for scroll performance.
+
     // Reset height to measure natural scrollHeight
     el.style.height = '0px';
     const scrollHeight = el.scrollHeight;

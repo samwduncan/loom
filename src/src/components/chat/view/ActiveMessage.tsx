@@ -162,57 +162,64 @@ export const ActiveMessage = memo(function ActiveMessage(
     // Crossfade orchestration: measure heights, animate, clean up
     // Use rAF to wait for React to render the finalized content
     requestAnimationFrame(() => {
-      const container = containerRef.current;
-      const streaming = streamingRef.current;
-      const finalized = finalizedRef.current;
+      // D-12: Defer finalization by 50ms to avoid collision with active scroll frame.
+      // The forced reflow (void container.offsetHeight) is still required for the
+      // FLIP animation to work, but we push it out of the scroll-critical path.
+      setTimeout(() => {
+        const container = containerRef.current;
+        const streaming = streamingRef.current;
+        const finalized = finalizedRef.current;
 
-      if (!container || !streaming || !finalized) {
-        // Fallback: skip animation, go straight to finalized
-        setPhase('finalized');
-        onFinalizationCompleteRef.current();
-        return;
-      }
-
-      // Measure heights
-      const streamingHeight = streaming.getBoundingClientRect().height;
-      const finalizedHeight = finalized.getBoundingClientRect().height;
-
-      // Set container to explicit streaming height
-      container.style.height = `${streamingHeight}px`;
-
-      // Force reflow to ensure starting height is committed
-      void container.offsetHeight;
-
-      // Animate to finalized height + trigger opacity crossfade via data-phase
-      container.style.height = `${finalizedHeight}px`;
-      setPhase('finalizing');
-
-      // After crossfade completes: clean up and signal parent
-      let signaled = false;
-      const signalComplete = () => {
-        if (signaled) return;
-        signaled = true;
-        setPhase('finalized');
-        if (container) {
-          container.style.height = 'auto';
+        if (!container || !streaming || !finalized) {
+          // Fallback: skip animation, go straight to finalized
+          setPhase('finalized');
+          onFinalizationCompleteRef.current();
+          return;
         }
-        onFinalizationCompleteRef.current();
-      };
 
-      const handleTransitionEnd = (e: TransitionEvent) => {
-        // Wait for the opacity transition on the finalized layer
-        if (e.propertyName === 'opacity' && e.target === finalized) {
+        // Measure heights
+        const streamingHeight = streaming.getBoundingClientRect().height;
+        const finalizedHeight = finalized.getBoundingClientRect().height;
+
+        // Set container to explicit streaming height
+        container.style.height = `${streamingHeight}px`;
+
+        // ASSERT: forced reflow required for FLIP animation -- CSS transition needs
+        // the browser to commit streamingHeight before animating to finalizedHeight.
+        // Deferred via rAF+setTimeout so this doesn't block scroll frames.
+        void container.offsetHeight;
+
+        // Animate to finalized height + trigger opacity crossfade via data-phase
+        container.style.height = `${finalizedHeight}px`;
+        setPhase('finalizing');
+
+        // After crossfade completes: clean up and signal parent
+        let signaled = false;
+        const signalComplete = () => {
+          if (signaled) return;
+          signaled = true;
+          setPhase('finalized');
+          if (container) {
+            container.style.height = 'auto';
+          }
+          onFinalizationCompleteRef.current();
+        };
+
+        const handleTransitionEnd = (e: TransitionEvent) => {
+          // Wait for the opacity transition on the finalized layer
+          if (e.propertyName === 'opacity' && e.target === finalized) {
+            container.removeEventListener('transitionend', handleTransitionEnd);
+            signalComplete();
+          }
+        };
+        container.addEventListener('transitionend', handleTransitionEnd);
+
+        // Safety fallback if transitionend doesn't fire (reduced-motion, display changes)
+        setTimeout(() => {
           container.removeEventListener('transitionend', handleTransitionEnd);
           signalComplete();
-        }
-      };
-      container.addEventListener('transitionend', handleTransitionEnd);
-
-      // Safety fallback if transitionend doesn't fire (reduced-motion, display changes)
-      setTimeout(() => {
-        container.removeEventListener('transitionend', handleTransitionEnd);
-        signalComplete();
-      }, CROSSFADE_MS + 100);
+        }, CROSSFADE_MS + 100);
+      }, 50);
     });
   }, [addMessage, addSession]);
 

@@ -164,9 +164,12 @@ describe('ActiveMessage', () => {
       useStreamStore.getState().endStream();
     });
 
-    // Crossfade uses rAF to measure heights before setting data-phase
+    // Crossfade uses rAF + 50ms deferred setTimeout before setting data-phase (D-12)
     act(() => {
       flushRaf();
+    });
+    act(() => {
+      vi.advanceTimersByTime(50);
     });
 
     expect(container).toHaveAttribute('data-phase', 'finalizing');
@@ -183,9 +186,12 @@ describe('ActiveMessage', () => {
       useStreamStore.getState().endStream();
     });
 
-    // Flush the rAF that starts the crossfade
+    // Flush the rAF that starts the crossfade + 50ms deferred setTimeout (D-12)
     act(() => {
       flushRaf();
+    });
+    act(() => {
+      vi.advanceTimersByTime(50);
     });
 
     // Not yet called
@@ -211,9 +217,12 @@ describe('ActiveMessage', () => {
       useStreamStore.getState().endStream();
     });
 
-    // Flush the rAF that starts the crossfade
+    // Flush the rAF that starts the crossfade + 50ms deferred setTimeout (D-12)
     act(() => {
       flushRaf();
+    });
+    act(() => {
+      vi.advanceTimersByTime(50);
     });
 
     expect(onFinalizationComplete).not.toHaveBeenCalled();
@@ -263,9 +272,12 @@ describe('ActiveMessage', () => {
       useStreamStore.getState().endStream();
     });
 
-    // Flush the rAF that starts the crossfade
+    // Flush the rAF that starts the crossfade + 50ms deferred setTimeout (D-12)
     act(() => {
       flushRaf();
+    });
+    act(() => {
+      vi.advanceTimersByTime(50);
     });
 
     // Component is still in the DOM during finalization
