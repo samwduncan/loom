@@ -83,12 +83,13 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 **Goal:** Make Loom a native-feeling iOS app on iPhone 16 Pro Max via Capacitor — reliable keyboard avoidance, touch-first interactions, 120Hz springs, and bundled assets for offline-capable fast loads.
 
 **Target features:**
-- [ ] Capacitor Keyboard plugin — replace visualViewport hack with native keyboard height events
+- [x] Capacitor Keyboard plugin — native keyboard events replace visualViewport hack (Phase 60, 2026-03-28)
+- [x] Platform foundation — URL abstraction, CORS, Capacitor config (Phase 59, 2026-03-28)
 - [ ] Touch-first composer & interactions — 44px+ targets, haptic feedback, thumb-zone optimization
 - [ ] Mobile layout polish — safe-area refinement, gesture navigation, sidebar drawer tuning
 - [ ] 120Hz spring profiles — halve durations for ProMotion, device-adaptive motion
 - [ ] Capacitor native plugins — Keyboard, Haptics, StatusBar, SplashScreen
-- [ ] Bundled assets mode — API base URL abstraction, local assets, CORS for capacitor://localhost
+- [ ] Bundled assets mode — local assets, cap sync pipeline, on-device validation
 
 **Future milestones:**
 - v2.2 "The Power" — Multi-provider tabs, MCP management
@@ -203,4 +204,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 after v2.1 milestone start*
+*Last updated: 2026-03-28 after Phase 60 (Keyboard & Composer) completion*
