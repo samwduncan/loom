@@ -22,6 +22,10 @@
     padding: var(--space-2) var(--space-3);
   }
 
+  .follow-up-pills button {
+    min-height: 44px;
+  }
+
   .follow-up-pills::-webkit-scrollbar {
     display: none;
   }

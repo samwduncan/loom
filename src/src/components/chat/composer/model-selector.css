@@ -40,3 +40,15 @@
 .model-selector-option:hover {
   background-color: var(--surface-overlay);
 }
+
+/* ─── Mobile Touch Targets (TOUCH-01) ──────────────────────── */
+@media (max-width: 767px) {
+  .model-selector-trigger {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+  .model-selector-option {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+}
