@@ -7,11 +7,22 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Mock IS_NATIVE (must be before component import)
+let mockIsNative = false;
+vi.mock('@/lib/platform', () => ({
+  get IS_NATIVE() { return mockIsNative; },
+}));
+
 // Mock the connection store
 const mockUseConnectionStore = vi.fn();
 vi.mock('@/stores/connection', () => ({
   useConnectionStore: (selector: (s: unknown) => unknown) =>
     selector(mockUseConnectionStore()),
+}));
+
+// Mock haptics
+vi.mock('@/lib/haptics', () => ({
+  hapticNotification: vi.fn(),
 }));
 
 // Mock wsClient
@@ -34,6 +45,7 @@ function setConnectionState(status: string, error: string | null = null, reconne
 describe('ConnectionBanner', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockIsNative = false;
   });
 
   it('renders nothing when connected', () => {
@@ -82,5 +94,26 @@ describe('ConnectionBanner', () => {
     setConnectionState('disconnected', 'Server returned 500');
     render(<ConnectionBanner />);
     expect(screen.getByText(/Server returned 500/)).toBeInTheDocument();
+  });
+
+  it('shows VPN-specific message when IS_NATIVE and disconnected without error', () => {
+    mockIsNative = true;
+    setConnectionState('disconnected', null);
+    render(<ConnectionBanner />);
+    expect(screen.getByText(/Tailscale VPN/)).toBeInTheDocument();
+  });
+
+  it('shows generic message when not IS_NATIVE and disconnected without error', () => {
+    mockIsNative = false;
+    setConnectionState('disconnected', null);
+    render(<ConnectionBanner />);
+    expect(screen.getByText(/Connection lost/)).toBeInTheDocument();
+  });
+
+  it('shows error from store when IS_NATIVE and disconnected with error', () => {
+    mockIsNative = true;
+    setConnectionState('disconnected', 'Server unreachable');
+    render(<ConnectionBanner />);
+    expect(screen.getByText(/Server unreachable/)).toBeInTheDocument();
   });
 });

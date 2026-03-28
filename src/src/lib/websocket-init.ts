@@ -14,6 +14,7 @@ import {
 } from '@/lib/stream-multiplexer';
 import type { MultiplexerCallbacks } from '@/lib/stream-multiplexer';
 import { bootstrapAuth, refreshAuth } from '@/lib/auth';
+import { IS_NATIVE } from '@/lib/platform';
 import { transformBackendMessages } from '@/lib/transformMessages';
 import type { BackendEntry } from '@/lib/transformMessages';
 import { useConnectionStore } from '@/stores/connection';
@@ -346,6 +347,14 @@ export async function initializeWebSocket(): Promise<void> {
   });
 
   // Bootstrap auth and connect
-  const token = await bootstrapAuth();
-  wsClient.connect(token);
+  try {
+    const token = await bootstrapAuth();
+    wsClient.connect(token);
+  } catch (err: unknown) {
+    const message = IS_NATIVE
+      ? 'Server unreachable \u2014 check Tailscale VPN connection'
+      : 'Unable to connect to server';
+    connectionStore().setProviderError('claude', message);
+    connectionStore().updateProviderStatus('claude', 'disconnected');
+  }
 }

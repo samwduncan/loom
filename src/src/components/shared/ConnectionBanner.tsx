@@ -12,6 +12,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/utils/cn';
 import { useConnectionStore } from '@/stores/connection';
 import { hapticNotification } from '@/lib/haptics';
+import { IS_NATIVE } from '@/lib/platform';
 import { wsClient } from '@/lib/websocket-client';
 
 export const ConnectionBanner = memo(function ConnectionBanner() {
@@ -96,7 +97,7 @@ export const ConnectionBanner = memo(function ConnectionBanner() {
         'border-b border-border',
       )}
     >
-      <span>Connection lost</span>
+      <span>{IS_NATIVE ? 'Server unreachable \u2014 check Tailscale VPN' : 'Connection lost'}</span>
       <button
         type="button"
         onClick={() => wsClient.tryReconnect()}

@@ -83,6 +83,14 @@ vi.mock('@/stores/connection', () => ({
   },
 }));
 
+// Mock platform
+vi.mock('@/lib/platform', () => ({
+  IS_NATIVE: false,
+  resolveApiUrl: (p: string) => p,
+  resolveWsUrl: (p: string, t: string) => `ws://test${p}?token=${t}`,
+  fetchAnon: vi.fn(),
+}));
+
 // Mock auth
 const mockBootstrapAuth = vi.fn().mockResolvedValue('test-token');
 const mockRefreshAuth = vi.fn().mockResolvedValue('refreshed-token');
@@ -158,10 +166,19 @@ describe('initializeWebSocket', () => {
     });
   });
 
-  it('propagates bootstrapAuth errors', async () => {
-    mockBootstrapAuth.mockRejectedValue(new Error('Auth failed'));
+  it('catches bootstrapAuth errors and sets connection store error state', async () => {
+    mockBootstrapAuth.mockRejectedValue(new Error('fetch failed'));
 
-    await expect(initializeWebSocket()).rejects.toThrow('Auth failed');
+    // Should NOT reject -- error is caught internally
+    await initializeWebSocket();
+
+    // In web mode (IS_NATIVE=false), message is 'Unable to connect to server'
+    expect(mockSetProviderError).toHaveBeenCalledWith(
+      'claude',
+      expect.stringContaining('Unable to connect'),
+    );
+    expect(mockUpdateProviderStatus).toHaveBeenCalledWith('claude', 'disconnected');
+    expect(mockConnect).not.toHaveBeenCalled();
   });
 
   describe('onStateChange callback', () => {
@@ -575,6 +592,55 @@ describe('initializeWebSocket', () => {
       expect(mockEndStream).not.toHaveBeenCalled();
       // But should clear isStreaming so sidebar pulse dot stops
       expect(mockClearStreamingFlag).toHaveBeenCalled();
+    });
+  });
+
+  describe('auth bootstrap failure handling', () => {
+    it('resolves without throwing when bootstrapAuth rejects', async () => {
+      mockBootstrapAuth.mockRejectedValue(new Error('fetch failed'));
+
+      // Should resolve, not reject
+      await expect(initializeWebSocket()).resolves.toBeUndefined();
+    });
+
+    it('calls setProviderError with error message when auth fails', async () => {
+      mockBootstrapAuth.mockRejectedValue(new Error('fetch failed'));
+
+      await initializeWebSocket();
+
+      // In web mode (IS_NATIVE=false), message is 'Unable to connect to server'
+      expect(mockSetProviderError).toHaveBeenCalledWith(
+        'claude',
+        expect.stringContaining('Unable to connect'),
+      );
+    });
+
+    it('calls updateProviderStatus with disconnected when auth fails', async () => {
+      mockBootstrapAuth.mockRejectedValue(new Error('fetch failed'));
+
+      await initializeWebSocket();
+
+      expect(mockUpdateProviderStatus).toHaveBeenCalledWith('claude', 'disconnected');
+    });
+
+    it('does not call wsClient.connect when auth fails', async () => {
+      mockBootstrapAuth.mockRejectedValue(new Error('fetch failed'));
+
+      await initializeWebSocket();
+
+      expect(mockConnect).not.toHaveBeenCalled();
+    });
+
+    it('happy path unchanged -- connect called with token on success', async () => {
+      mockBootstrapAuth.mockResolvedValue('good-token');
+
+      await initializeWebSocket();
+
+      expect(mockConnect).toHaveBeenCalledWith('good-token');
+      expect(mockSetProviderError).not.toHaveBeenCalledWith(
+        'claude',
+        expect.stringContaining('Unable to connect'),
+      );
     });
   });
 });
