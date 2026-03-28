@@ -31,6 +31,7 @@ import { useImageAttachments } from './useImageAttachments';
 import { useFileMentions } from '@/hooks/useFileMentions';
 import { extractSessionTitle } from '@/lib/extract-session-title';
 import { useSlashCommands } from '@/hooks/useSlashCommands';
+import { useKeyboardOffset } from '@/hooks/useKeyboardOffset';
 import { ComposerKeyboardHints } from './ComposerKeyboardHints';
 import { ImagePreviewRow } from './ImagePreviewRow';
 import { MentionChipRow } from './MentionChipRow';
@@ -210,45 +211,8 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canStop, streamSessionId]);
 
-  // Keyboard avoidance for iOS WKWebView (Capacitor) and desktop browsers.
-  // iOS changes both window.innerHeight and visualViewport.height together,
-  // so we compare against the initial full height to detect the keyboard.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    // Capture the full viewport height before any keyboard appears
-    const fullHeight = vv.height;
-
-    function handleResize() {
-      const viewport = window.visualViewport;
-      if (!viewport) return;
-      // On iOS, visualViewport.height shrinks when keyboard opens.
-      // Compare against the original height to detect keyboard.
-      const keyboardHeight = fullHeight - viewport.height;
-      document.documentElement.style.setProperty(
-        '--keyboard-offset',
-        keyboardHeight > 50 ? `${keyboardHeight}px` : '0px',
-      );
-      // Prevent iOS from scrolling the page — we handle offset via CSS
-      window.scrollTo(0, 0);
-    }
-
-    function handleScroll() {
-      // iOS WKWebView translates the viewport on focus — reset it
-      if (window.scrollY !== 0) window.scrollTo(0, 0);
-    }
-
-    vv.addEventListener('resize', handleResize);
-    vv.addEventListener('scroll', handleScroll);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      vv.removeEventListener('resize', handleResize);
-      vv.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+  // Keyboard avoidance: platform-aware offset via native events or viewport fallback
+  useKeyboardOffset({ scrollContainerRef: scrollContainerRef ?? undefined });
 
   // Handle mention selection: add to mentions array, remove @query from input
   const handleMentionSelect = useCallback(
