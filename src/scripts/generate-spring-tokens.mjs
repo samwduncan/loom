@@ -11,8 +11,8 @@
  *
  * The spring parameters match src/lib/motion.ts:
  *   SPRING_GENTLE:  { stiffness: 120, damping: 14, mass: 1 }
- *   SPRING_SNAPPY:  { stiffness: 300, damping: 20, mass: 1 }
- *   SPRING_BOUNCY:  { stiffness: 180, damping: 12, mass: 1 }
+ *   SPRING_SNAPPY:  { stiffness: 300, damping: 24, mass: 1 }
+ *   SPRING_BOUNCY:  { stiffness: 180, damping: 14, mass: 1 }
  *
  * spring() param order: spring(mass, stiffness, damping, velocity)
  */
@@ -21,8 +21,8 @@ import { SpringEasing, CSSSpringEasing } from 'spring-easing';
 
 const springs = [
   { name: 'gentle',  mass: 1, stiffness: 120, damping: 14 },
-  { name: 'snappy',  mass: 1, stiffness: 300, damping: 20 },
-  { name: 'bouncy',  mass: 1, stiffness: 180, damping: 12 },
+  { name: 'snappy',  mass: 1, stiffness: 300, damping: 24 },
+  { name: 'bouncy',  mass: 1, stiffness: 180, damping: 14 },
 ];
 
 const NUM_POINTS = 64;

@@ -59,8 +59,11 @@ export function hapticImpact(style: 'Heavy' | 'Medium' | 'Light'): void {
     Light: ImpactStyle.Light,
   };
 
+  const mappedStyle = styleMap[style];
+  if (!mappedStyle) return;
+
   // Fire-and-forget -- no await, errors swallowed (D-06)
-  void Haptics.impact({ style: styleMap[style] });
+  void Haptics.impact({ style: mappedStyle });
 }
 
 /**
@@ -86,8 +89,11 @@ export function hapticNotification(type: 'Success' | 'Warning' | 'Error'): void 
     Error: NotificationType.Error,
   };
 
+  const mappedType = typeMap[type];
+  if (!mappedType) return;
+
   // Fire-and-forget -- no await, errors swallowed (D-06)
-  void Haptics.notification({ type: typeMap[type] });
+  void Haptics.notification({ type: mappedType });
 }
 
 /**

@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
-status: Ready to plan
-stopped_at: Completed 62-01-PLAN.md
-last_updated: "2026-03-28T05:00:47.693Z"
+status: Ready to execute
+stopped_at: Completed 62-02-PLAN.md
+last_updated: "2026-03-28T05:45:57.638Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 7
+  total_plans: 10
   completed_plans: 7
 ---
 
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 61 — Touch, Layout & Native Plugins
+**Current focus:** Phase 62 — Haptics & Motion
 
 ## Current Position
 
-Phase: 62
-Plan: Not started
+Phase: 62 (Haptics & Motion) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -48,7 +48,7 @@ Plan: Not started
 | Phase 60 P02 | 4min | 2 tasks | 4 files |
 | Phase 61 P01 | 3min | 2 tasks | 8 files |
 | Phase 61 P02 | 5min | 2 tasks | 9 files |
-| Phase 62 P01 | 5min | 2 tasks | 5 files |
+| Phase 62 P02 | 3min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -78,7 +78,8 @@ Plan: Not started
 - [Phase 61]: SS-2: hideSplashWhenReady() awaits nativePluginsReady to avoid cold-start race
 - [Phase 61]: S-4: No touch-action: pan-y -- breaks sidebar swipe and horizontal scroll
 - [Phase 61]: FollowUpPills touch target in CSS per S-6, global Radix menu 44px override via [role=menuitem], no touch-action overrides on sidebar backdrop
-- [Phase 62]: Date.now() throttle for hapticNotification -- simpler than setTimeout, no cleanup, matches fire-and-forget
+- [Phase 62]: CADisableMinimumFrameDurationOnPhone is build-time Info.plist opt-in for 120Hz (not runtime detection)
+- [Phase 62]: Spring damping increased: SNAPPY 20->24 (+20%), BOUNCY 12->14 (+17%) for tighter feel on ProMotion
 
 ### Pending Todos
 
@@ -92,6 +93,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T04:53:34.655Z
-Stopped at: Completed 62-01-PLAN.md
-Resume: Continue with 62-02-PLAN.md or 62-03-PLAN.md
+Last session: 2026-03-28T05:45:57.636Z
+Stopped at: Completed 62-02-PLAN.md
+Resume: `/gsd:plan-phase 59`

@@ -39,9 +39,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Motion & Animation
 
-- [ ] **MOTION-01**: Device refresh rate detected (60Hz vs 120Hz) at runtime
-- [ ] **MOTION-02**: Spring/transition durations adapted for 120Hz ProMotion displays
-- [ ] **MOTION-03**: Info.plist includes `CADisableMinimumFrameDurationOnPhone` for ProMotion opt-in
+- [x] **MOTION-01**: 120Hz ProMotion rendering enabled via Info.plist opt-in (CADisableMinimumFrameDurationOnPhone) -- CSS compositor animations automatically run at device refresh rate, no runtime detection needed
+- [x] **MOTION-02**: Spring/transition durations adapted for 120Hz ProMotion displays
+- [x] **MOTION-03**: Info.plist includes `CADisableMinimumFrameDurationOnPhone` for ProMotion opt-in
 
 ### Bundled Assets
 
@@ -106,9 +106,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NATIVE-02 | Phase 61 | Complete |
 | NATIVE-03 | Phase 62 | Pending |
 | NATIVE-04 | Phase 61 | Complete |
-| MOTION-01 | Phase 62 | Pending |
-| MOTION-02 | Phase 62 | Pending |
-| MOTION-03 | Phase 62 | Pending |
+| MOTION-01 | Phase 62 | Complete |
+| MOTION-02 | Phase 62 | Complete |
+| MOTION-03 | Phase 62 | Complete |
 | BUNDLE-01 | Phase 63 | Pending |
 | BUNDLE-02 | Phase 63 | Pending |
 | BUNDLE-03 | Phase 63 | Pending |

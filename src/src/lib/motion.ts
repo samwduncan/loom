@@ -30,7 +30,7 @@ export const SPRING_GENTLE: SpringConfig = {
  */
 export const SPRING_SNAPPY: SpringConfig = {
   stiffness: 300,
-  damping: 20,
+  damping: 24,
 };
 
 /**
@@ -39,7 +39,7 @@ export const SPRING_SNAPPY: SpringConfig = {
  */
 export const SPRING_BOUNCY: SpringConfig = {
   stiffness: 180,
-  damping: 12,
+  damping: 14,
 };
 
 /**

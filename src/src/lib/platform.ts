@@ -26,7 +26,7 @@
  */
 export const IS_NATIVE: boolean =
   typeof window !== 'undefined' &&
-  typeof (window as Record<string, unknown>).Capacitor !== 'undefined';
+  typeof (window as unknown as Record<string, unknown>).Capacitor !== 'undefined';
 
 /**
  * Base URL for HTTP API requests.

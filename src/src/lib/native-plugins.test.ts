@@ -78,11 +78,13 @@ vi.mock('@/lib/haptics', () => ({
   setHapticsModule: mockSetHapticsModule,
 }));
 
-let capturedSubscribeCallback: ((state: any) => void) | null = null;
+// ANY: connection store state shape varies across tests -- generic listener type needed
+let capturedSubscribeCallback: ((state: Record<string, unknown>) => void) | null = null;
 
 vi.mock('@/stores/connection', () => ({
   useConnectionStore: {
-    subscribe: vi.fn((listener: any) => {
+    // ANY: Zustand subscribe accepts generic listener -- exact state type not needed in test mocks
+    subscribe: vi.fn((listener: (state: Record<string, unknown>) => void) => {
       capturedSubscribeCallback = listener;
       return mockUnsubscribe;
     }),
@@ -275,7 +277,7 @@ describe('native-plugins', () => {
 
     // Simulate connection becoming 'connected' via the subscribe callback (SS-1)
     expect(capturedSubscribeCallback).not.toBe(null);
-    capturedSubscribeCallback!({ providers: { claude: { status: 'connected' } } });
+    capturedSubscribeCallback!({ providers: { claude: { status: 'connected' } } }); // ASSERT: callback captured -- verified by expect(not.toBe(null)) above
 
     expect(mockSplashScreen.hide).toHaveBeenCalledWith({ fadeOutDuration: 300 });
     expect(mockUnsubscribe).toHaveBeenCalled();
@@ -306,12 +308,10 @@ describe('native-plugins', () => {
 
     await hideSplashWhenReady();
 
-    // Dismiss via connection
-    capturedSubscribeCallback!({ providers: { claude: { status: 'connected' } } });
+    capturedSubscribeCallback!({ providers: { claude: { status: 'connected' } } }); // ASSERT: callback captured after hideSplashWhenReady subscribes to connection store
     expect(mockSplashScreen.hide).toHaveBeenCalledTimes(1);
 
-    // Try to dismiss again via same callback
-    capturedSubscribeCallback!({ providers: { claude: { status: 'connected' } } });
+    capturedSubscribeCallback!({ providers: { claude: { status: 'connected' } } }); // ASSERT: callback still valid from same hideSplashWhenReady subscribe call
     expect(mockSplashScreen.hide).toHaveBeenCalledTimes(1); // still 1
   });
 
@@ -369,7 +369,7 @@ describe('native-plugins', () => {
     platformMock.IS_NATIVE = true;
 
     // Override the dynamic import to throw
-    const originalMock = vi.mocked(await import('@capacitor/haptics'));
+    vi.mocked(await import('@capacitor/haptics'));
     vi.doMock('@capacitor/haptics', () => {
       throw new Error('Haptics unavailable');
     });

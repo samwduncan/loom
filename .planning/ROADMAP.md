@@ -186,7 +186,7 @@ Plans:
   2. Spring/transition durations feel snappier on 120Hz displays compared to 60Hz (not just faster, but tighter)
   3. Haptic feedback respects `prefers-reduced-motion` and degrades gracefully on web (no errors, just silent no-op)
   4. Info.plist includes ProMotion opt-in so CSS animations run at native 120Hz refresh rate
-**Plans:** 3 plans
+**Plans:** 0/3 plans executed
 Plans:
 - [ ] 62-01-PLAN.md -- Haptics module + Capacitor plugin init (haptics.ts, native-plugins.ts)
 - [ ] 62-02-PLAN.md -- Spring tuning + ProMotion Info.plist opt-in (motion.ts, tokens.css, Info.plist)
@@ -235,7 +235,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 | 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
 | 60. Keyboard & Composer | 2/2 | Complete    | 2026-03-28 |
 | 61. Touch, Layout & Native Plugins | 2/2 | Complete    | 2026-03-28 |
-| 62. Haptics & Motion | 0/3 | Not started | - |
+| 62. Haptics & Motion | 0/3 | Planned    |  |
 | 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |
 
 ## Backlog (Future Milestones)

@@ -86,7 +86,7 @@ describe('CSS spring easing tokens in tokens.css', () => {
 
   it('SPRING_GENTLE, SPRING_SNAPPY, SPRING_BOUNCY JS configs still export correctly (regression)', () => {
     expect(SPRING_GENTLE).toEqual({ stiffness: 120, damping: 14 });
-    expect(SPRING_SNAPPY).toEqual({ stiffness: 300, damping: 20 });
-    expect(SPRING_BOUNCY).toEqual({ stiffness: 180, damping: 12 });
+    expect(SPRING_SNAPPY).toEqual({ stiffness: 300, damping: 24 });
+    expect(SPRING_BOUNCY).toEqual({ stiffness: 180, damping: 14 });
   });
 });
