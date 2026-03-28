@@ -179,7 +179,7 @@ export const PermissionBanner = memo(function PermissionBanner({
       <button
         type="button"
         onClick={handleAllow}
-        className="shrink-0 rounded-md bg-[var(--success)] px-3 py-1 text-xs font-medium text-[var(--success-foreground,var(--surface-0))] transition-colors hover:brightness-110"
+        className="shrink-0 rounded-md bg-[var(--success)] px-3 py-1 text-xs font-medium text-[var(--success-foreground,var(--surface-0))] transition-colors hover:brightness-110 min-h-[44px] md:min-h-0"
       >
         Allow
       </button>
@@ -188,7 +188,7 @@ export const PermissionBanner = memo(function PermissionBanner({
       <button
         type="button"
         onClick={handleDeny}
-        className="shrink-0 rounded-md border border-[var(--border-subtle)] px-3 py-1 text-xs font-medium text-muted transition-colors hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)]"
+        className="shrink-0 rounded-md border border-[var(--border-subtle)] px-3 py-1 text-xs font-medium text-muted transition-colors hover:bg-[color-mix(in_oklch,var(--text-muted)_10%,transparent)] min-h-[44px] md:min-h-0"
       >
         Deny
       </button>

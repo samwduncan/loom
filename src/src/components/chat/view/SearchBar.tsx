@@ -10,6 +10,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
+import { cn } from '@/utils/cn';
 
 interface SearchBarProps {
   query: string;
@@ -61,7 +62,10 @@ export function SearchBar({ query, onQueryChange, onClose, resultCount }: Search
       <button
         type="button"
         onClick={onClose}
-        className="shrink-0 rounded-sm p-0.5 text-muted transition-colors duration-150 hover:text-foreground"
+        className={cn(
+          'shrink-0 rounded-sm p-0.5 text-muted transition-colors duration-150 hover:text-foreground',
+          'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center',
+        )}
         title="Close search"
         data-testid="search-close"
       >

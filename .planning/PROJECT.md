@@ -64,25 +64,36 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - ✓ Spring physics on sidebar, modals, tool cards — v1.5
 - ✓ Glass surface on modals and command palette — v1.5
 
+### Validated (v2.0)
+
+- ✓ SQLite cache layer (cache.db) with schema versioning, prepared statements, write-through population — v2.0
+- ✓ State persistence — last session, scroll position, sidebar state survive browser restarts — v2.0
+- ✓ Live session attach — JSONL file watcher (SessionWatcher singleton), real-time streaming output — v2.0
+- ✓ Mobile-responsive UX — sidebar drawer, touch targets, gesture swipe, responsive breakpoints — v2.0
+- ✓ Performance — lazy loading, optimistic updates, request deduplication, instant transitions — v2.0
+- ✓ iOS app research — Capacitor 7.6.1 scaffold, deployment model assessment, Tailscale DNS analysis — v2.0
+- ✓ Follow-up suggestions — client-side regex heuristics, category-based recommendations — v2.0
+- ✓ Production deployment — nginx reverse proxy, brotli/gzip, immutable caching, deploy.sh, graceful shutdown — v2.0
+- ✓ iOS mobile fixes — viewport-fit, safe-area, keyboard avoidance (visualViewport hack), WKWebView compat — v2.0
+
 ### Active
 
-**Current Milestone: v2.0 "The Engine"**
+**Current Milestone: v2.1 "The Mobile"**
 
-**Goal:** Make Loom a daily-driver that's faster and more capable than any mobile AI app, with a data layer that makes everything instant.
+**Goal:** Make Loom a native-feeling iOS app on iPhone 16 Pro Max via Capacitor — reliable keyboard avoidance, touch-first interactions, 120Hz springs, and bundled assets for offline-capable fast loads.
 
 **Target features:**
-- [ ] SQLite data layer — message cache, session metadata, sub-second session loads
-- [ ] State persistence — last session, scroll position, sidebar state survive browser restarts
-- [ ] Live session attach — JSONL file watcher for running CLI sessions, real-time output
-- [ ] Mobile-native UX — fix zoom, touch targets, gesture support, responsive polish
-- [ ] Competitive feature parity — match ChatGPT/Gemini app polish while leveraging terminal/filesystem/git advantages
-- [ ] Performance — lazy loading, optimistic updates, request deduplication, instant transitions
-- [ ] iOS app research — evaluate React Native, Capacitor, Swift native, PWA paths
+- [x] Capacitor Keyboard plugin — native keyboard events replace visualViewport hack (Phase 60, 2026-03-28)
+- [x] Platform foundation — URL abstraction, CORS, Capacitor config (Phase 59, 2026-03-28)
+- [x] Touch targets & native plugins — 44px+ targets, StatusBar, SplashScreen, safe-area audit, overscroll prevention (Phase 61, 2026-03-28)
+- [ ] Haptics & motion — haptic feedback, 120Hz spring tuning for ProMotion
+- [ ] Capacitor native plugins — remaining: Haptics (Phase 62)
+- [ ] Bundled assets mode — local assets, cap sync pipeline, on-device validation
 
 **Future milestones:**
-- v2.1 "The Power" — Multi-provider tabs, MCP management
-- v2.2 "The Polish" — Full visual transformation (aurora, DecryptedText, StarBorder, comprehensive springs)
-- v3.0 "The Vision" — GSD dashboard, Nextcloud, companions, CodeRabbit
+- v2.2 "The Power" — Multi-provider tabs, MCP management
+- v2.3 "The Polish" — Full visual transformation (aurora, WebGL, Tier 2/3 effects, comprehensive springs)
+- v3.0 "The Vision" — GSD dashboard, Nextcloud, companions
 
 ### Out of Scope
 
@@ -96,18 +107,20 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (post v1.4):**
-- 49,216 LOC TypeScript + CSS across 43 phases, 98 plans (5 milestones)
-- Tech stack: Vite + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- 609 commits (145 M1 + 158 M2 + 145 M3 + 103 M4 + 58 M5), 15-day total build (2026-03-04 to 2026-03-18)
-- 150 test files (135 unit + 15 E2E Playwright specs), 9 custom ESLint rules
-- Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui (15 primitives), tailwindcss-animate, cmdk, fuse.js, @codemirror/*, @xterm/*
+**Current State (post v2.0):**
+- ~55,000 LOC TypeScript + CSS across 58 phases, 17+ plans (8 milestones)
+- Tech stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
+- ~1400 commits, 24-day total build (2026-03-04 to 2026-03-27)
+- 156 test files (137 unit + 19 E2E Playwright specs), 9 custom ESLint rules
+- Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui (15 primitives), tailwindcss-animate, cmdk, fuse.js, @codemirror/*, @xterm/*, better-sqlite3
 - Frontend at `src/`, backend at `server/` (port 5555)
-- Dev server: port 5184
+- Dev server: port 5184, production nginx on port 5580 (via Tailscale Serve :5443)
 - Full workspace with: chat, file tree, code editor, terminal, git panel, settings, command palette, @-mentions, slash commands, quick settings, accessibility, performance optimizations
-- Session intelligence: auto-titles, project grouping, search, pins, bulk delete
+- SQLite cache layer for sub-second session loads, live session attach via JSONL file watcher
+- Mobile-responsive: sidebar drawer, touch targets, safe-area, keyboard avoidance (visualViewport hack)
+- Capacitor 7.6.1 scaffold ready, server.url mode working on iPhone 16 Pro Max
 - WCAG AA contrast compliance, full keyboard navigation, screen reader support
-- Backend: auth auto-retry, WebSocket heartbeat, systemd auto-start
+- Backend: auth auto-retry, WebSocket heartbeat, systemd auto-start, graceful shutdown, deploy.sh pipeline
 
 **Known Tech Debt:**
 - CMD-14 deferred: recent commands need command registry for re-execution
@@ -172,5 +185,22 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 | 0.01ms reduced-motion override (not 0ms) | Preserves JS animationend/transitionend events | Good — no broken event handlers |
 | useSyncExternalStore for LiveAnnouncer | Satisfies React 19 lint rules for external state | Good — correct React pattern |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd:transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd:complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-03-18 after v1.4 milestone completion*
+*Last updated: 2026-03-28 after Phase 60 (Keyboard & Composer) completion*

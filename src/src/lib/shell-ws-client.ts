@@ -13,6 +13,7 @@ import type {
   ShellClientMessage,
   ShellServerMessage,
 } from '@/types/shell';
+import { resolveShellWsUrl } from '@/lib/platform';
 
 export class ShellWebSocketClient {
   private ws: WebSocket | null = null;
@@ -68,8 +69,7 @@ export class ShellWebSocketClient {
     // from searchParams during the upgrade handshake. This is standard
     // practice for WebSocket auth. The URL is not exposed in browser history
     // or Referer headers (WebSocket connections are not navigations).
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${protocol}//${window.location.host}/shell?token=${token}`;
+    const url = resolveShellWsUrl(token);
 
     this.ws = new WebSocket(url);
 

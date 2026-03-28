@@ -2,7 +2,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/styles/index.css';
 import { App } from '@/App';
+import { initializeNativePlugins, hideSplashWhenReady } from '@/lib/native-plugins';
 import { initializeWebSocket } from '@/lib/websocket-init';
+
+// Fire-and-forget native plugin init BEFORE React render tree mounts.
+// Must run before initializeWebSocket so Keyboard resize mode is configured first.
+void initializeNativePlugins();
 
 // Fire-and-forget WS init BEFORE React render tree mounts.
 // void prefix satisfies no-floating-promises. Safe to call multiple times (has init guard).
@@ -13,3 +18,9 @@ createRoot(document.getElementById('root')!).render( // ASSERT: root element is 
     <App />
   </StrictMode>,
 );
+
+// Hide splash screen when WebSocket connects (or after 3s fallback).
+// Must run after React mounts so the user sees content, not a blank screen.
+// hideSplashWhenReady() is async and internally awaits nativePluginsReady
+// to avoid the cold-start race (SS-2).
+void hideSplashWhenReady();

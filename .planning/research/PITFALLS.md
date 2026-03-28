@@ -1,295 +1,596 @@
-# Pitfalls Research: v2.0 "The Engine" -- SQLite Cache, Live Attach, Mobile, iOS
+# Domain Pitfalls: v2.1 "The Mobile" -- Capacitor Native Plugins & Bundled Assets
 
-**Domain:** Adding SQLite message caching, JSONL live session watching, mobile-native UX, and iOS app research to a 49K+ LOC React workspace app with existing Zustand state management, WebSocket streaming, and chokidar file watchers
-**Researched:** 2026-03-26
-**Confidence:** HIGH (architecture well-understood, pitfalls confirmed across multiple sources)
+**Domain:** Adding Capacitor Keyboard/Haptics/StatusBar/SplashScreen plugins and bundled assets mode to a 55K+ LOC React SPA (Vite 7, Zustand, OKLCH dark theme) running in WKWebView on iPhone 16 Pro Max
+**Researched:** 2026-03-27
+**Confidence:** HIGH for plugin-specific issues (confirmed via GitHub issues, official docs, community reports); MEDIUM for 120Hz/ProMotion (WKWebView rAF throttling is documented but workarounds are evolving)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause data loss, architectural rewrites, or user-facing corruption.
+Mistakes that cause broken UX, architectural rewrites, or features that silently fail on device.
 
-### Pitfall 1: SQLite Cache Diverges from JSONL Source of Truth
+### Pitfall 1: Keyboard Plugin `resize: "none"` Creates Race Condition with Existing visualViewport Hack
 
 **What goes wrong:**
-The SQLite cache holds messages that no longer match the JSONL files on disk. Claude Code can delete sessions, rewrite JSONL files during compaction, or modify entries outside Loom's awareness. The cache serves stale or phantom messages that don't exist in the source data. Users see conversations that have been deleted or modified.
+The existing `ChatComposer.tsx` keyboard avoidance (lines 216-251) listens to `visualViewport.resize` events and computes `--keyboard-offset` from the initial fullHeight. When you add the Capacitor Keyboard plugin, two systems fight for control: the plugin's `keyboardWillShow`/`keyboardDidShow` events AND the existing visualViewport listener both try to set the keyboard offset. The result is flickering, double-offsets, or the offset being set and then immediately overridden.
 
 **Why it happens:**
-JSONL files are the source of truth -- they live in `~/.claude/projects/`. The backend reads them directly on every `getSessionMessages()` call (server/projects.js:930+). A cache in front of this creates a classic dual-source problem: the cache has no way to know when the upstream JSONL changed unless explicitly told. Developers naturally optimize for "cache hit" and forget to build invalidation.
+The Keyboard plugin fires `keyboardWillShow` with `keyboardHeight` BEFORE the viewport actually resizes. The visualViewport listener fires AFTER the viewport resizes. With `resize: "none"` (the correct mode for manual control), the WKWebView itself does not resize -- but `visualViewport.height` may still change slightly, triggering the old handler. With `resize: "native"`, the WKWebView shrinks, which changes `visualViewport.height`, and the old handler computes a SECOND offset on top of the native resize.
 
-**How to avoid:**
-1. **Use file mtime as cache key.** Before serving from SQLite, check `fs.stat()` mtime of the JSONL file. If mtime > cache timestamp, invalidate and re-parse. This is O(1) stat vs O(n) file read.
-2. **Store the JSONL file hash or byte offset alongside cached data.** If the file grew (new messages appended), only parse the delta from the last known byte offset.
-3. **Never cache session metadata separately from messages.** If you cache the session list, it must invalidate when any JSONL file changes -- the existing chokidar watcher (server/index.js:168-206) already handles this.
-4. **Cache invalidation on delete.** When `deleteSession()` runs, the cache entry must be purged synchronously before the response returns.
+**Consequences:**
+- Composer jumps violently on keyboard open/close
+- Double padding (plugin offset + visualViewport offset)
+- Keyboard dismiss leaves permanent dead space (known Capacitor bug: [#2194](https://github.com/ionic-team/capacitor-plugins/issues/2194))
 
-**Warning signs:**
-- User deletes a session in Loom but it reappears after reload
-- Message counts in sidebar don't match actual conversation length
-- "Ghost sessions" appear that have no backing JSONL file
+**Prevention:**
+1. Use `resize: "none"` in `capacitor.config.ts` keyboard config -- this is the only mode compatible with manual CSS offset control
+2. When Capacitor is detected (`Capacitor.isNativePlatform()`), completely disable the visualViewport hack. Do not run both systems.
+3. Listen exclusively to `Keyboard.addListener('keyboardWillShow', ...)` and `Keyboard.addListener('keyboardWillHide', ...)` for keyboard height
+4. Set `--keyboard-offset` from the plugin's `keyboardHeight` value only
+5. Keep the `window.scrollTo(0, 0)` call -- WKWebView still auto-scrolls on focus regardless of which keyboard detection method you use
 
-**Phase to address:** SQLite data layer phase (first phase of milestone)
+**Detection (warning signs):**
+- Composer bounces twice when keyboard opens
+- Bottom padding remains after keyboard closes
+- Testing only in Safari (where visualViewport works differently) misses the issue
+
+**Phase to address:** First phase -- Keyboard plugin integration
 
 ---
 
-### Pitfall 2: WAL Checkpoint Starvation from Concurrent Reads
+### Pitfall 2: Bundled Assets CORS -- `capacitor://localhost` Origin Breaks All Fetch + WebSocket
 
 **What goes wrong:**
-The SQLite WAL (Write-Ahead Log) file grows without bound because the backend holds long-running read transactions open while streaming sessions. SQLite cannot checkpoint (transfer WAL data back to the main database file) while any reader holds a snapshot. The WAL eventually consumes hundreds of MB of disk, and read performance degrades as SQLite must scan increasingly large WAL files.
+In bundled assets mode, the SPA loads from `capacitor://localhost`. Every `fetch('/api/sessions')` call resolves to `capacitor://localhost/api/sessions` which does not exist. Every WebSocket connection via `window.location.host` (see `websocket-client.ts:63-64`) constructs `ws://localhost/ws` which connects to nothing. The entire app is non-functional.
 
 **Why it happens:**
-Loom's backend serves multiple concurrent requests -- session list, message fetching, file tree operations -- each potentially holding an SQLite read. With better-sqlite3's synchronous API, transactions are typically short, but if a long-running operation (like parsing all JSONL files for cache population) holds a read lock while writes happen, checkpointing stalls. The existing auth.db is tiny and never hits this, but a message cache with thousands of entries will.
+The existing codebase uses relative URLs everywhere:
+- `api-client.ts:52` -- `fetch(path, ...)` where path is `/api/sessions`, `/api/settings`, etc.
+- `websocket-client.ts:63-64` -- `${protocol}//${window.location.host}/ws`
+- `shell-ws-client.ts:71-72` -- Same pattern for terminal WebSocket
+- `auth.ts` -- Token refresh uses relative URL
 
-**How to avoid:**
-1. **Enable WAL mode immediately.** `db.pragma('journal_mode = WAL')` -- the existing auth.db doesn't do this, so don't copy its pattern.
-2. **Keep read transactions short.** Use `db.prepare().all()` for bounded queries, never hold a read open across async boundaries.
-3. **Set busy_timeout.** `db.pragma('busy_timeout = 5000')` prevents SQLITE_BUSY errors when writes briefly block.
-4. **Periodic manual checkpoint.** If the WAL file exceeds 10MB, call `db.pragma('wal_checkpoint(TRUNCATE)')` during idle periods (e.g., when no sessions are streaming).
-5. **Separate databases for auth and cache.** Don't add message cache tables to auth.db -- use a dedicated `cache.db` that can be deleted without losing auth state.
+In browser mode (dev server or nginx), relative URLs resolve against the same origin. In Capacitor bundled mode, the origin is `capacitor://localhost` -- a custom scheme with no server behind it. Capacitor's `WebViewAssetHandler.swift` serves static files from the bundle, but there is no API server at that origin.
 
-**Warning signs:**
-- `*.db-wal` file growing beyond 50MB
-- Session loading gets progressively slower over days without restart
-- SQLITE_BUSY errors in server logs
+**Consequences:**
+- App loads (HTML/CSS/JS from bundle) but shows empty state -- no sessions, no connection
+- WebSocket fails silently (no error page like a browser would show)
+- JWT auth flow fails (can't reach `/api/auth`)
+- Every API call throws network error
 
-**Phase to address:** SQLite data layer phase (schema design)
+**Prevention:**
+1. Create a centralized `getApiBaseUrl()` function:
+   ```typescript
+   import { Capacitor } from '@capacitor/core';
+
+   export function getApiBaseUrl(): string {
+     if (Capacitor.isNativePlatform()) {
+       return 'http://100.86.4.57:5555'; // or from env/config
+     }
+     return ''; // relative URLs for web
+   }
+   ```
+2. Refactor `api-client.ts` to prefix all paths with `getApiBaseUrl()`
+3. Refactor `websocket-client.ts` and `shell-ws-client.ts` to construct absolute `ws://` URLs when native
+4. Add `capacitor://localhost` to Express CORS whitelist (`server/index.js`)
+5. The `getApiBaseUrl()` value should come from a build-time config, not hardcoded -- use `import.meta.env.VITE_API_BASE_URL` with a Capacitor-specific `.env.capacitor` file
+
+**Detection:**
+- App loads but spinner never resolves
+- Network tab shows `capacitor://localhost/api/sessions` 404s
+- WebSocket connection state stays "connecting" forever
+
+**Phase to address:** First phase -- this is a prerequisite for everything else in bundled mode
 
 ---
 
-### Pitfall 3: Cache Schema Migration Corrupts Existing Data
+### Pitfall 3: CapacitorHttp Native Fetch Patching Breaks WebSocket Connections
 
 **What goes wrong:**
-A schema change (adding a column, changing an index) during a Loom update either fails silently (leaving the cache in a broken state) or drops data. Unlike the auth.db which has a well-defined schema, a cache schema will evolve rapidly during development. Users who update Loom mid-milestone get a broken cache with no recovery path.
+Capacitor 7 includes `CapacitorHttp` which can patch the global `fetch()` and `XMLHttpRequest` to route through native HTTP instead of WKWebView's network stack. When enabled (either explicitly or via default config), this native HTTP interceptor interferes with WebSocket upgrade requests, causing HTTP 400 errors or silent connection failures. The interceptor adds `localhost/capacitor_https_interceptor` to URLs on iOS ([#7585](https://github.com/ionic-team/capacitor/issues/7585)).
 
 **Why it happens:**
-The existing auth.db migration system (server/database/db.js:74+) uses `PRAGMA table_info()` to detect missing columns and adds them individually. This works for a stable schema with 2-3 migrations, but a cache schema undergoing rapid iteration needs a more robust system. SQLite doesn't support `ALTER TABLE DROP COLUMN` (before 3.35.0) or `ALTER TABLE MODIFY COLUMN` at all. Renaming columns requires creating a new table, copying data, and dropping the old one.
+CapacitorHttp patches `window.fetch` globally. While it's supposed to skip WebSocket-related requests, edge cases exist where Socket.IO/Engine.IO protocol negotiation (HTTP polling before WS upgrade) gets intercepted and broken ([#7568](https://github.com/ionic-team/capacitor/issues/7568)). Even if Loom uses raw WebSocket (not Socket.IO), the global fetch patch can still interfere with the auth token fetch that precedes WebSocket connection.
 
-**How to avoid:**
-1. **Use a version number in the cache database.** Store schema version via `PRAGMA user_version`. On startup, check version -- if outdated, drop and rebuild from JSONL source. A cache is rebuildable by definition.
-2. **Make the cache fully expendable.** Design so that deleting `cache.db` simply means a slower first load while the cache rebuilds from JSONL files. Never store data in the cache that can't be regenerated.
-3. **Use `user_version` pragma, not a migrations table.** `db.pragma('user_version')` returns a single integer. Increment it with each schema change. On mismatch, `DROP TABLE` and recreate. No need for a migration tracking table on a cache.
-4. **Test the "cold start" path.** Every code path must handle "cache.db doesn't exist or is version 0" gracefully.
+**Consequences:**
+- WebSocket connects in browser, fails in Capacitor app
+- Auth flow works intermittently (native HTTP vs WKWebView HTTP behave differently for cookies/headers)
+- Hard to debug because the fetch patching is transparent
 
-**Warning signs:**
-- "SQLITE_ERROR: no such column" in server logs after update
-- Session list loads but messages fail to display
-- Cache works on fresh install but breaks after upgrade
+**Prevention:**
+1. Explicitly disable CapacitorHttp in `capacitor.config.ts`:
+   ```typescript
+   plugins: {
+     CapacitorHttp: {
+       enabled: false
+     }
+   }
+   ```
+2. Since Loom's Express backend will have proper CORS headers for `capacitor://localhost`, native HTTP bypass is unnecessary
+3. If you need CapacitorHttp for some requests later, use the plugin API directly (`CapacitorHttp.request()`) instead of the global fetch patch
 
-**Phase to address:** SQLite data layer phase (migration strategy)
+**Detection:**
+- API calls work but WebSocket fails
+- Random "HTTP 400 Bad Request" on WebSocket endpoints
+- Works in Safari, fails in Capacitor app
+
+**Phase to address:** First phase -- configure alongside CORS and API base URL
 
 ---
 
-### Pitfall 4: Live Session Attach Creates Duplicate Messages
+### Pitfall 4: SplashScreen-to-WKWebView Transition Flashes White on Dark Theme
 
 **What goes wrong:**
-When attaching to a live CLI session via JSONL file watching, the same messages appear twice -- once from the initial file read and once from the watcher's change events. Or worse, partial JSONL lines are parsed as the file is being written, producing corrupt JSON that crashes the parser.
+Between the native splash screen dismissing and the WKWebView rendering the first frame, there is a brief flash of the WKWebView's default background color (white). On a dark-themed app like Loom (`--surface-base` is a warm dark brown), this creates a jarring white flash that looks broken.
+
+**Consequences:**
+- Professional appearance ruined on every app launch
+- Users perceive the app as slow/broken
+- Particularly noticeable on OLED screens where white flash is physically painful in dark environments
 
 **Why it happens:**
-JSONL files are append-only during a session. When you read the file initially to load history, then start watching for changes, there's a window where:
-1. You read the file up to byte offset N
-2. Between your read completing and the watcher starting, bytes N+1 through M are written
-3. The watcher fires for the change, you re-read from offset N, getting everything from N to M+more
-4. Result: bytes N+1 through M are processed twice
+WKWebView's default background is white. The native splash screen (LaunchScreen.storyboard) is shown by iOS during app launch. When the splash screen is hidden (either automatically or via `SplashScreen.hide()`), the WKWebView becomes visible. But the web content may not have fully rendered yet -- CSS hasn't loaded, fonts haven't loaded, React hasn't mounted. The gap between "WKWebView visible" and "first meaningful paint" shows the white background.
 
-Additionally, JSONL lines are written as complete operations, but the OS may report a write before the full line (including newline) is flushed. `fs.read()` at that moment captures a partial JSON line.
+**Prevention:**
+1. Set the WKWebView background color in `AppDelegate.swift` or Capacitor config:
+   ```swift
+   // In AppDelegate.swift or a custom CAPBridgeViewController
+   webView?.isOpaque = false
+   webView?.backgroundColor = UIColor(red: 0.169, green: 0.145, blue: 0.129, alpha: 1.0) // matches --surface-base
+   webView?.scrollView.backgroundColor = UIColor(red: 0.169, green: 0.145, blue: 0.129, alpha: 1.0)
+   ```
+   The Capacitor config also supports `backgroundColor` in the iOS section.
+2. Match the LaunchScreen.storyboard background color to `--surface-base` (the warm dark #2b2521)
+3. Use `SplashScreen` plugin with `launchAutoHide: false`, then call `SplashScreen.hide()` from `useEffect` in the root App component AFTER React has mounted and the first render is committed
+4. Add `fadeOutDuration: 200` for a smooth crossfade instead of an abrupt cut
+5. Set `<meta name="theme-color" content="#2b2521">` (already present in index.html -- good)
 
-**How to avoid:**
-1. **Track byte offset, not line count.** After initial read, record the file size. On `change` events, read from that offset forward. Use `fs.createReadStream({ start: lastOffset })`.
-2. **Buffer incomplete lines.** If the last chunk doesn't end with `\n`, hold it and prepend to the next read. Only parse complete lines terminated by newline.
-3. **Deduplicate by entry ID.** Every JSONL entry has a unique combination of `sessionId` + `timestamp` + `type`. Use a Set of seen entry hashes to skip duplicates.
-4. **Use `awaitWriteFinish` carefully.** The existing chokidar config uses `stabilityThreshold: 2000` (server/index.js:183), but for live attach you need much lower latency. For live session watching, use a separate watcher with `stabilityThreshold: 100` -- you want near-real-time, not 2-second debounce.
-5. **Don't use the existing chokidar session watcher.** That watcher (server/index.js:104-210) is for session list updates with 1.5s debounce. Live attach needs its own dedicated watcher per active session with sub-200ms latency.
+**Detection:**
+- Brief white flash between splash and app content
+- More noticeable on first launch (cold start) than subsequent launches
 
-**Warning signs:**
-- Messages flash in, disappear, then reappear during live streaming
-- JSON parse errors in logs during active sessions
-- Tool call cards appear duplicated in the chat view
-
-**Phase to address:** Live session attach phase
+**Phase to address:** SplashScreen phase -- but WKWebView backgroundColor should be set in the first phase when configuring the Xcode project
 
 ---
 
-### Pitfall 5: iOS Safari Virtual Keyboard Destroys Chat Composer Layout
+## Major Pitfalls
+
+Mistakes that cause significant UX degradation or require multi-file refactoring.
+
+### Pitfall 5: StatusBar Plugin setBackgroundColor Does NOT Work on iOS
 
 **What goes wrong:**
-When the user taps the chat composer on iOS Safari, the virtual keyboard slides up and either: (a) the composer is pushed behind the keyboard and becomes invisible, (b) the entire viewport resizes causing the message list to jump, or (c) the address bar animation fights with the layout causing a cascade of resize events that trigger janky scroll behavior.
+Developers call `StatusBar.setBackgroundColor({ color: '#2b2521' })` expecting the status bar area to match the app's dark theme. On iOS, this method is a no-op. The status bar background on iOS is always transparent -- it's the content behind it that determines the visual appearance. You can only control the text/icon color (light or dark) via `setStyle()`.
 
 **Why it happens:**
-iOS Safari has unique viewport behavior:
-- `100vh` includes the bottom bar, so elements pinned to the bottom disappear behind the keyboard
-- The `resize` event fires multiple times during keyboard animation (not just once when done)
-- `visualViewport.height` changes dynamically as the keyboard slides, but `window.innerHeight` updates only after the animation completes
-- The existing `overflow: hidden` on `html, body` (src/src/styles/base.css) doesn't prevent iOS bounce scrolling within scrollable containers
-- Input elements with `font-size < 16px` trigger automatic zoom, and Loom uses Inter at various sizes
+iOS status bar architecture is fundamentally different from Android. On iOS, the status bar is an overlay -- it draws on top of whatever content is beneath it. The "background color" is determined by your app's content that extends behind the status bar (enabled via `viewport-fit=cover` and safe-area padding). On Android, the status bar is a separate system chrome bar with its own background color.
 
-**How to avoid:**
-1. **Use `dvh` (dynamic viewport height) instead of `vh`.** Baseline support since June 2025 (~95% of browsers). Replace `100vh` with `100dvh` for the app shell.
-2. **Add `interactive-widget=resizes-content` to viewport meta tag.** This tells the browser to shrink the layout viewport when the keyboard opens, making `dvh` reflect the reduced space.
-3. **Ensure composer input is `font-size: 16px` or larger.** iOS auto-zooms on inputs < 16px. The composer textarea must explicitly set this. Check with `window.visualViewport.scale` -- if > 1 after tapping input, you've hit this.
-4. **Use `visualViewport` API for keyboard detection.** Listen to `visualViewport.resize` events to detect keyboard presence. The difference between `window.innerHeight` and `visualViewport.height` tells you the keyboard height.
-5. **Don't fight the resize.** Let the layout reflow naturally with CSS, don't try to JavaScript your way to fixed positioning during keyboard animation.
-6. **Test with real iOS device.** The iOS simulator keyboard doesn't behave identically to physical device keyboard. Xcode Simulator -> I/O -> Keyboard -> Toggle Software Keyboard still differs from real hardware.
+**Consequences:**
+- Android-style StatusBar color code silently fails on iOS
+- Developers waste time debugging why the color doesn't apply
+- If `overlaysWebView` is set to `false` on iOS, you get a black bar instead of transparent overlay
 
-**Warning signs:**
-- Composer disappears when keyboard opens on iPhone
-- Message list jumps up and down during keyboard animation
-- Text in composer appears zoomed in after tapping
+**Prevention:**
+1. Use `StatusBar.setStyle({ style: Style.Dark })` for light text on dark background (correct for Loom's dark theme)
+2. Do NOT call `setBackgroundColor` on iOS -- guard with platform check or just don't use it
+3. Ensure `viewport-fit=cover` is in the viewport meta tag (already present in `index.html`)
+4. The existing `.app-shell { padding-top: env(safe-area-inset-top) }` in `base.css` handles the content offset correctly -- the status bar area will show the app-shell background color
+5. Set `overlaysWebView: true` (the default on iOS) to let web content extend behind the status bar
 
-**Phase to address:** Mobile-native UX phase
+**Detection:**
+- Status bar area appears as a different color than expected
+- Black bar at top of screen when `overlaysWebView` is incorrectly set to `false`
+
+**Phase to address:** StatusBar integration phase
 
 ---
 
-### Pitfall 6: Service Worker Serves Stale App After Update
+### Pitfall 6: Haptics Fire on Every Re-render in React Without useCallback/Ref Guard
 
 **What goes wrong:**
-After deploying a Loom update, users continue seeing the old version indefinitely. The service worker caches the entire SPA shell and serves it from cache without checking for updates. Even after the user manually reloads, they get the cached version because the service worker intercepts the navigation request and serves the old index.html.
+Developers add `Haptics.impact({ style: ImpactStyle.Light })` inside event handlers that are recreated on every render, or inside effects that run more frequently than expected. On iOS, rapid haptic firing (10+ per second) causes the Taptic Engine to enter a protective throttle mode where it stops responding for several seconds. The user experiences haptics that work initially, then go dead.
 
 **Why it happens:**
-Service workers use a lifecycle: install -> waiting -> activate. A new service worker version won't activate until ALL tabs running the old version are closed. Even with `skipWaiting()`, the page must reload to pick up the new worker. For a PWA that users keep open in a pinned tab (Loom's primary use case), this means potentially days of stale content. The Vite build outputs hashed filenames for JS/CSS, but `index.html` itself isn't hashed.
+React re-renders frequently. If a haptic call is placed in an `onClick` handler that isn't memoized, the closure captures a new reference each render. More critically, if haptics are added to scroll events, intersection observers, or animation callbacks, they fire at 60fps, overwhelming the Taptic Engine.
 
-**How to avoid:**
-1. **Don't add a service worker yet.** Loom is served over Tailscale on a local network. Service workers solve offline access and install-to-homescreen -- neither is critical for v2.0. The PWA manifest can exist without a service worker.
-2. **If you must add one, use network-first for index.html.** Cache static assets (JS/CSS with content hashes) but always fetch index.html from the network. Fall back to cache only when offline.
-3. **Implement an update notification.** When a new service worker is detected, show a toast: "New version available. Reload to update." with a button that calls `registration.waiting.postMessage({ type: 'SKIP_WAITING' })`.
-4. **Version the service worker file itself.** Include a version constant that changes with each build. The browser compares service worker files byte-by-byte; any change triggers an update cycle.
+**Consequences:**
+- Haptics work for a few seconds then stop entirely (Taptic Engine thermal protection)
+- Battery drain from unnecessary haptic motor activation
+- Haptics feel "buzzy" instead of crisp when fired too rapidly
 
-**Warning signs:**
-- Users report seeing old UI after you've deployed
-- console.log version strings show old build hash
-- "New version available" prompts never appear
+**Prevention:**
+1. Use `useCallback` for all haptic-triggering event handlers
+2. Debounce haptic calls -- minimum 50ms between impact triggers
+3. Create a centralized `useHaptic()` hook that handles platform detection, debouncing, and reduced-motion preference:
+   ```typescript
+   function useHaptic() {
+     const lastFired = useRef(0);
+     return useCallback(async (style: ImpactStyle = ImpactStyle.Light) => {
+       if (prefersReducedMotion()) return;
+       if (!Capacitor.isNativePlatform()) return;
+       const now = Date.now();
+       if (now - lastFired.current < 50) return;
+       lastFired.current = now;
+       await Haptics.impact({ style });
+     }, []);
+   }
+   ```
+4. Never put haptics in scroll handlers, rAF loops, or resize observers
+5. Respect `prefers-reduced-motion` -- haptics are a form of motion feedback
 
-**Phase to address:** Do NOT implement in v2.0 unless explicitly required for iOS app. Defer to PWA-specific phase.
+**Detection:**
+- Haptics work on first interaction but not subsequent ones
+- Device feels warm near the Taptic Engine area
+- `console.log` in haptic handler shows it firing hundreds of times
+
+**Phase to address:** Touch-first interactions phase
 
 ---
 
-## Technical Debt Patterns
+### Pitfall 7: requestAnimationFrame Capped at 60fps in WKWebView -- Spring Animations Cannot Hit 120Hz
 
-Shortcuts that seem reasonable but create long-term problems.
+**What goes wrong:**
+Loom's spring animations (defined in `motion.ts`) use `SPRING_GENTLE`, `SPRING_SNAPPY`, and `SPRING_BOUNCY` configs. If these are driven by JavaScript `requestAnimationFrame` (via Framer Motion or a custom spring solver), they will run at 60fps maximum in WKWebView, even on 120Hz ProMotion displays. The animations feel subtly choppy compared to native iOS apps or even CSS animations in the same WKWebView.
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Storing parsed messages in SQLite as JSON blobs | Fast to implement, no schema design | Can't query individual fields, can't index message content for search, re-parse cost on every read | Never -- design proper columns for queryable fields (sessionId, timestamp, role, type) with a `content` JSON column for the variable parts |
-| Using localStorage for mobile state persistence | Works today, no new deps | 5-10MB limit, synchronous API blocks main thread on large reads, no structured queries | Only for small state (<100KB): expanded projects, UI preferences. Never for messages. |
-| Polling JSONL files instead of inotify-based watching | Works cross-platform, no inotify limit concerns | CPU waste at scale, latency proportional to poll interval, battery drain on mobile | Only as fallback when inotify watches are exhausted (> `fs.inotify.max_user_watches`). Log a warning when falling back. |
-| Caching message list in Zustand memory alongside SQLite | Instant re-renders, familiar pattern | Double memory consumption -- messages in SQLite + in-memory Zustand store. 1000-message sessions with tool calls can be 5MB+ each | Acceptable for the active session only. Evict non-active sessions from Zustand to SQLite cache. |
-| Wrapping entire web app in Capacitor without code changes | "Works" immediately | WebSocket URLs hardcoded to `window.location`, no native safe area padding, no deep links, push notifications don't work, Tailscale DNS not resolvable from iOS app sandbox | Never -- Capacitor requires explicit URL configuration, safe area CSS, and native plugin integration |
+**Why it happens:**
+Apple throttles `requestAnimationFrame` to 60Hz in WKWebView to conserve battery. This is documented in [WebKit bug #173434](https://bugs.webkit.org/show_bug.cgi?id=173434). CSS animations and transitions DO run at 120Hz because they're compositor-driven and don't go through the JavaScript event loop. Safari 18.3+ has an experimental flag for unlocked rAF framerates, but this flag does NOT apply to WKWebView.
 
-## Integration Gotchas
+**Consequences:**
+- JS-driven springs (Framer Motion `animate()`, custom spring solvers) capped at 60fps
+- CSS-based animations run at 120fps on the same device, creating a jarring inconsistency
+- "Halving spring durations for ProMotion" is pointless if the animation can only sample 60 times per second -- you get the same number of frames, just with a shorter duration, making them feel abrupt rather than smooth
 
-Common mistakes when connecting SQLite cache to the existing Loom architecture.
+**Prevention:**
+1. Prefer CSS transitions and animations over JS-driven animations wherever possible:
+   - Sidebar slide: use CSS `transform: translateX()` with `transition` (already works at 120Hz)
+   - Modal/dialog enter/exit: CSS `@keyframes` (already works at 120Hz)
+   - Tool card expand/collapse: CSS `grid-template-rows: 0fr/1fr` transition (already works at 120Hz)
+2. For spring physics that CSS cannot express, use the Web Animations API (`element.animate()`) which is compositor-driven and can hit 120Hz
+3. The existing CSS spring approximations in `tokens.css` (`--ease-spring-gentle: cubic-bezier(...)`) already run at 120Hz -- lean into these rather than replacing with JS springs
+4. Do NOT "halve durations" for ProMotion. Instead, keep the same spring configs and let the higher framerate produce smoother interpolation. Only reduce durations if the animation FEELS too slow, not because of framerate math
+5. Reserve Framer Motion's `LazyMotion` for gesture-driven interactions (drag, swipe) where CSS cannot provide the interactivity
 
-| Integration | Common Mistake | Correct Approach |
-|-------------|----------------|------------------|
-| SQLite + existing `getSessionMessages()` | Adding cache check inside the existing function, tangling cache logic with JSONL parsing | Wrap with a caching layer: `getCachedSessionMessages()` calls cache first, falls back to `getSessionMessages()` on miss. Keep the original pure. |
-| SQLite + Zustand persist middleware | Using Zustand's persist middleware to write to SQLite via a custom storage adapter | Don't. Zustand persist is for serializable config (UI prefs, expanded state). Message data should flow: JSONL -> SQLite cache -> REST API -> Zustand. The cache is a backend concern, not a frontend store middleware. |
-| Live watcher + existing chokidar session watcher | Reusing the existing chokidar watcher (server/index.js:104-210) that watches `~/.claude/projects/` for session list updates | Create a separate, per-session watcher for live attach. The existing watcher has 1.5s debounce and ignores `change` events (line 190-191 comment). Live attach needs `change` events with ~100ms latency. |
-| Live watcher + WebSocket | Sending raw JSONL entries over WebSocket without the stream multiplexer format | Route live attach data through a new WebSocket message type (e.g., `type: 'live-session-update'`) that the frontend multiplexer can route. Don't try to pretend it's a normal streaming response -- it has different semantics (append-only history vs. active tool calls). |
-| Mobile viewport + existing `overflow: hidden` on body | Assuming the existing `overflow: hidden` on html/body (base.css) handles mobile scroll containment | iOS Safari ignores `overflow: hidden` on body when the keyboard is open. Use `position: fixed; inset: 0;` on the app shell container to truly lock the viewport. |
-| Capacitor + JWT auth | Assuming `window.location` works for constructing API URLs in Capacitor | Capacitor apps don't have a meaningful `window.location.host` -- it's `localhost` or a custom scheme. API URLs must be configured explicitly via env vars or Capacitor config. The existing `bootstrapAuth()` in `src/src/lib/auth.ts` constructs URLs from `window.location`. |
+**Detection:**
+- Animations feel slightly stuttery in Capacitor app but smooth in Safari
+- Chrome DevTools Performance panel shows 16.67ms frame intervals (60fps) instead of 8.33ms
+- CSS animations on the same page feel smoother than JS-driven ones
 
-## Performance Traps
+**Phase to address:** 120Hz spring profiles phase
 
-Patterns that work at small scale but fail as Loom's usage grows.
+---
 
-| Trap | Symptoms | Prevention | When It Breaks |
-|------|----------|------------|----------------|
-| Re-parsing entire JSONL file on every cache miss | First load is slow but tolerable; gets worse as session grows | Track byte offset of last read; parse only the delta. Index by sessionId in SQLite. | Sessions > 500 messages (~2MB JSONL). Current largest sessions are probably 1000+ entries with tool calls. |
-| Loading all sessions into SQLite at startup | Server startup takes 30+ seconds scanning hundreds of JSONL files across projects | Lazy population: only cache a session when it's first requested. Background populate on idle. | > 50 projects with > 10 sessions each. The existing `getProjects()` already has progress broadcasting because it's slow. |
-| Watching every JSONL file for live attach | inotify watch count explodes, `ENOSPC: System limit for number of file watchers reached` | Only watch the JSONL file for the currently attached session. Close watcher when detaching. Current `max_user_watches` default is 65536 on most Linux distros. | > 100 simultaneous JSONL files being watched. Unlikely for single user, but the existing chokidar watcher with `depth: 3` already creates many watches. |
-| Sending full message objects over WebSocket for live attach | Bandwidth and parse overhead scales with message complexity (tool calls with large outputs) | Send only the new JSONL line (raw string) and let the frontend parse/transform. Or send a minimal delta: `{ type, sessionId, timestamp, preview }`. | Messages with large tool outputs (file contents, grep results) can be 100KB+ each. |
-| CSS `backdrop-filter: blur()` on mobile during streaming | GPU compositing overhead on mobile GPUs causes dropped frames | Disable `backdrop-filter` on mobile via `@media (max-width: 767px)` or use a solid semi-transparent background instead. The iGPU can handle it on desktop; mobile WebView cannot. | Any mobile device during active streaming. The glass effects from v1.5 will compound this. |
+### Pitfall 8: `window.location.host` Returns `localhost` in Bundled Mode -- Auth Flow Breaks
 
-## Security Mistakes
+**What goes wrong:**
+In bundled mode, `window.location` returns:
+```
+protocol: "capacitor:"
+host: "localhost"
+hostname: "localhost"
+port: ""
+origin: "capacitor://localhost"
+```
+Any code that constructs URLs from `window.location` properties will point to the wrong host. The auth flow in `auth.ts` fetches a token from a relative URL, which resolves to `capacitor://localhost/api/auth` -- a non-existent endpoint.
 
-Domain-specific security issues beyond general web security.
+**Why it happens:**
+Capacitor serves bundled assets via the `capacitor://` custom scheme with the hostname `localhost`. This is intentional (Apple's App Transport Security requires a hostname, and `localhost` is conventional). But code written for browser deployment assumes `window.location.host` refers to the actual API server.
 
-| Mistake | Risk | Prevention |
-|---------|------|------------|
-| SQLite cache.db readable without auth | Anyone with filesystem access reads all cached conversations, which may contain secrets, API keys, credentials the AI discussed | Set `cache.db` permissions to `0600` (owner read/write only). Store in a user-specific directory, not the Loom install directory. Consider encrypting at rest with `sqlcipher` if compliance matters. |
-| Live attach exposes other users' CLI sessions | In a multi-user server scenario, JSONL watcher could expose sessions from other system users' `~/.claude/` | The existing auth model is single-user, so this is low risk now. But if Loom ever supports multi-user: validate that the requested session's JSONL path is within the authenticated user's home directory. Path traversal check. |
-| Capacitor WebView stores auth token in cleartext | JWT token persisted via `localStorage` in the WebView is accessible to any app that can read the WebView data directory | Use Capacitor's `@capacitor/preferences` (encrypted storage on iOS Keychain / Android Keystore) instead of `localStorage` for auth tokens in the native app. |
-| Service worker caches API responses containing sensitive data | Cached API responses (session messages, file contents) persist in the browser's Cache Storage even after logout | Never cache API responses in the service worker. Only cache static assets (JS, CSS, fonts, images). Use `Cache-Control: no-store` headers on all `/api/*` responses. |
+**Consequences:**
+- Auth token fetch fails -- app cannot authenticate
+- WebSocket URLs are wrong (this overlaps with Pitfall 2 but is more specific)
+- Any diagnostic display showing "Connected to {hostname}:{port}" shows wrong info (see `ProofOfLife.tsx:159`)
+- Deep links and route-based session loading break if they reconstruct URLs
 
-## UX Pitfalls
+**Prevention:**
+1. NEVER use `window.location` for API URL construction in Capacitor-aware code
+2. Use the centralized `getApiBaseUrl()` from Pitfall 2's prevention
+3. Audit every occurrence of `window.location` in the codebase (currently 12+ occurrences across 7 files)
+4. For route-based logic (like `window.location.pathname.match(/\/chat\/(.+)/)` in `websocket-init.ts:114`), these are fine -- the React Router hash/path still works correctly in Capacitor
 
-Common user experience mistakes when adding these features.
+**Detection:**
+- Auth flow hangs or returns network error
+- "Connected to localhost:" shown in ProofOfLife component
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Showing "Loading..." every time when SQLite cache exists | User sees a flash of loading state even though data is available instantly from cache | Serve from cache immediately (optimistic), then validate in background. Only show loading if cache is empty. The existing `useSessionSwitch` (line 58-63) already has memory cache check -- extend this pattern to SQLite. |
-| Live attach indicator is invisible or unclear | User doesn't know if they're watching a live CLI session vs. viewing history. They type a message thinking they're in Loom but it goes nowhere. | Clear visual indicator: pulsing dot + "Live" badge in session header. Disable the composer when viewing a live CLI session (you can't type into someone else's Claude Code). Or show "Send via Loom" vs "Watching CLI" modes. |
-| Mobile hamburger menu hides critical controls | User can't find settings, project switcher, or session list because everything is behind a hamburger | The existing 767px breakpoint (sidebar becomes drawer) is correct. But ensure the drawer has swipe-to-open gesture, not just a button. Touch target for the hamburger must be at minimum 44x44px (Apple HIG). |
-| Cache makes deleted sessions "come back" | User deletes a session, switches away, comes back -- session reappears because the SQLite cache wasn't invalidated | Delete from both SQLite and JSONL atomically. The existing `deleteSession()` endpoint must clear the cache entry. Use a "tombstone" approach if needed: mark as deleted in cache, garbage collect later. |
-| Mobile pull-to-refresh conflicts with scroll | User tries to scroll up in message list but triggers browser pull-to-refresh, reloading the entire page | Use `overscroll-behavior-y: contain` on the message list container. This prevents the browser's native pull-to-refresh from activating on inner scrollable elements. |
+**Phase to address:** First phase -- alongside Pitfall 2
 
-## "Looks Done But Isn't" Checklist
+---
 
-Things that appear complete but are missing critical pieces.
+### Pitfall 9: Safe-Area Insets Not Updated for Keyboard on iOS -- Double-Offset or Missing Offset
 
-- [ ] **SQLite cache:** Often missing cache invalidation on JSONL file modification -- verify that editing a session externally (e.g., via Claude Code `--resume`) updates the cached version
-- [ ] **SQLite cache:** Often missing WAL mode configuration -- verify `PRAGMA journal_mode` returns `wal`, not `delete`
-- [ ] **SQLite cache:** Often missing busy_timeout -- verify concurrent requests don't produce SQLITE_BUSY errors under load
-- [ ] **Live attach:** Often missing partial line buffering -- verify that a JSONL line written across two OS write operations doesn't produce a JSON parse error
-- [ ] **Live attach:** Often missing watcher cleanup -- verify that switching away from a live session closes its file watcher (leaked watchers consume inotify handles)
-- [ ] **Live attach:** Often missing "catch up" on reconnect -- verify that if WebSocket disconnects during live session, reconnecting replays missed messages from the JSONL file
-- [ ] **Mobile viewport:** Often missing iOS zoom prevention -- verify that tapping the composer on iPhone doesn't trigger auto-zoom (font-size >= 16px check)
-- [ ] **Mobile viewport:** Often missing keyboard detection -- verify that the message list scrolls up when keyboard opens, keeping the most recent message visible
-- [ ] **Mobile touch:** Often missing touch target sizes -- verify all interactive elements are at minimum 44x44px on mobile (Apple HIG requirement)
-- [ ] **Mobile offline:** Often missing graceful degradation -- verify that the app shows a clear "No connection" state instead of silently failing when the server is unreachable
-- [ ] **iOS app (Capacitor):** Often missing URL configuration -- verify that API calls work with a configured server URL, not `window.location`
-- [ ] **iOS app (Capacitor):** Often missing safe area insets -- verify that content doesn't overlap the iPhone notch or home indicator bar (`env(safe-area-inset-top)`)
+**What goes wrong:**
+`env(safe-area-inset-bottom)` does NOT update when the keyboard appears on iOS. The composer CSS (`composer.css:219-225`) adds `env(safe-area-inset-bottom) + var(--keyboard-offset)`. When the keyboard is open, the safe-area-inset-bottom still reports its original value (34px on iPhone 16 Pro Max). If the keyboard offset already accounts for the full distance from bottom of screen to top of keyboard, the safe-area-inset-bottom adds an extra 34px of dead space.
 
-## Recovery Strategies
+**Why it happens:**
+WebKit intentionally does NOT update `env(safe-area-inset-bottom)` when the keyboard is visible. The rationale is that safe-area-insets represent physical device geometry (notch, home indicator), not transient UI like the keyboard. This is [confirmed behavior](https://webventures.rejh.nl/blog/2025/safe-area-inset-bottom-does-not-update/) across all WebKit versions.
 
-When pitfalls occur despite prevention, how to recover.
+**Consequences:**
+- Composer floats 34px above the keyboard (wasted space) on iPhone with home indicator
+- Or worse: if keyboard offset is measured from viewport bottom (not safe area bottom), the composer is 34px too high when keyboard is open and correctly positioned when keyboard is closed
 
-| Pitfall | Recovery Cost | Recovery Steps |
-|---------|---------------|----------------|
-| Cache diverged from JSONL | LOW | Delete `cache.db`. It rebuilds from JSONL on next request. Design this as a supported operation: `DELETE /api/cache/clear`. |
-| WAL checkpoint starvation | LOW | Restart server. WAL checkpoints on clean shutdown. Or call `PRAGMA wal_checkpoint(TRUNCATE)` via a maintenance endpoint. |
-| Schema migration failure | LOW | Delete `cache.db`, let it recreate with the new schema. Only possible because cache is expendable (JSONL is source of truth). |
-| Duplicate messages from live attach | MEDIUM | Frontend deduplication by message hash. Clear and re-fetch the session to reset state. Long-term: server-side dedup before sending over WebSocket. |
-| iOS keyboard layout broken | MEDIUM | Revert to non-`dvh` viewport units. Use `visualViewport` API JavaScript fallback. Test on actual iOS device (not simulator). |
-| Service worker serves stale app | HIGH | Users must manually clear site data (Settings -> Safari -> Clear Website Data). This is why service workers should NOT be added in v2.0. If already deployed: add `self.skipWaiting()` + `clients.claim()` to the new service worker and pray. |
-| Capacitor app store URL rejected | HIGH | Apple review can reject apps that are "just a web wrapper." Ensure the app provides native value (push notifications, share sheet integration, file picking). If rejected, pivot to PWA-only strategy. |
+**Prevention:**
+1. The Capacitor Keyboard plugin's `keyboardHeight` value includes the distance from the bottom of the keyboard to the bottom of the screen (including safe area). When setting `--keyboard-offset` from the plugin, the safe-area-inset-bottom is already "inside" that value.
+2. Adjust the CSS to be keyboard-aware:
+   ```css
+   /* When keyboard is CLOSED: include safe-area */
+   .composer-safe-area {
+     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+   }
+   /* When keyboard is OPEN: keyboard-offset replaces safe-area */
+   .composer-safe-area[data-keyboard-open="true"] {
+     padding-bottom: calc(1rem + var(--keyboard-offset, 0px));
+   }
+   ```
+3. Toggle a `data-keyboard-open` attribute (or CSS class) on the composer container from the Keyboard plugin's show/hide events
+4. Test with AND without the home indicator bar (iPhone SE vs iPhone 16 Pro Max)
 
-## Pitfall-to-Phase Mapping
+**Detection:**
+- Gap between keyboard top and composer bottom
+- Composer at different heights when keyboard-offset is applied vs when safe-area-inset-bottom is used
 
-How roadmap phases should address these pitfalls.
+**Phase to address:** Keyboard plugin integration phase
 
-| Pitfall | Prevention Phase | Verification |
-|---------|------------------|--------------|
-| Cache diverges from JSONL | SQLite data layer | Load session, modify JSONL externally, reload -- verify updated content appears |
-| WAL checkpoint starvation | SQLite data layer | Run server for 1 hour with active use, verify WAL file stays < 10MB |
-| Schema migration corruption | SQLite data layer | Delete cache.db, restart server, verify sessions load correctly from JSONL |
-| Live attach duplicate messages | Live session attach | Start Claude Code CLI, attach in Loom, send 10 messages -- verify exactly 10 appear, not 20 |
-| Live attach partial JSON lines | Live session attach | Send a rapid burst of messages (10+ in 2 seconds) -- verify no parse errors in logs |
-| iOS keyboard layout | Mobile-native UX | Open on iPhone, tap composer, verify no zoom and keyboard doesn't cover input |
-| Mobile touch targets | Mobile-native UX | Tap every button/link on mobile -- verify no mis-taps from undersized targets |
-| Service worker stale content | NOT in v2.0 | Defer entirely. Only add service worker if iOS Capacitor app requires it. |
-| Capacitor URL configuration | iOS app research | If Capacitor path chosen, verify API connectivity before any other feature work |
+---
+
+### Pitfall 10: Font Loading Fails Intermittently in Bundled WKWebView
+
+**What goes wrong:**
+Self-hosted `.woff2` fonts (Inter, Instrument Serif, JetBrains Mono) declared in `base.css` with `url('/fonts/...')` paths occasionally fail to load in WKWebView's bundled mode. The app renders with system fallback fonts, breaking the editorial typography design. This happens approximately 20% of cold starts on some iOS versions.
+
+**Why it happens:**
+WKWebView loads bundled assets via the `capacitor://localhost` custom scheme through a native `WKURLSchemeHandler`. Font loading in WKWebView has a documented race condition: if CSS is parsed and font loading starts before the scheme handler is fully initialized, the font request fails silently. This is worse on cold start (no cached assets) and with `font-display: swap` (which tells the browser to render with fallback immediately, then swap -- but the swap never happens if the font request fails entirely).
+
+**Consequences:**
+- App renders with system sans-serif instead of Inter Variable
+- Code blocks use system monospace instead of JetBrains Mono
+- Layout shifts when fonts eventually load (if they do)
+- The editorial personality of Loom's typography is lost
+
+**Prevention:**
+1. Preload critical fonts in `index.html`:
+   ```html
+   <link rel="preload" href="/fonts/inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+   <link rel="preload" href="/fonts/jetbrains-mono-variable.woff2" as="font" type="font/woff2" crossorigin>
+   ```
+   Note: The `crossorigin` attribute is required even for same-origin fonts -- this is a browser spec requirement for font preloads
+2. Keep `font-display: swap` (already present) as fallback
+3. Test font loading on device with cold starts -- kill the app from the app switcher, relaunch 10 times
+4. If the intermittent failure persists, consider inlining the most critical font (Inter Variable) as a base64 data URL in the CSS. This is ~100KB but guarantees first-paint typography. Do this ONLY if testing reveals the problem.
+5. Verify font paths resolve correctly -- `/fonts/inter-variable.woff2` should map to `ios/App/App/public/fonts/inter-variable.woff2` after `cap sync`
+
+**Detection:**
+- System font visible on cold start
+- DevTools Network tab shows failed font requests (if debugging is enabled)
+- Typography looks "wrong" but only sometimes
+
+**Phase to address:** Bundled assets phase -- verify during first device testing
+
+---
+
+## Moderate Pitfalls
+
+### Pitfall 11: `position: fixed` Breaks Inside CSS Transform Context in WKWebView
+
+**What goes wrong:**
+Any element with `position: fixed` that is a descendant of an element with a CSS `transform` (including `transform: translateZ(0)` or `will-change: transform`) loses its fixed positioning. Instead of being fixed relative to the viewport, it becomes fixed relative to the transformed ancestor. This is per CSS spec, not a bug, but WKWebView enforces it more aggressively than Chrome.
+
+**Loom exposure:**
+- The composer (floating pill at bottom) uses fixed-like positioning
+- ElectricBorder effect uses CSS transforms
+- Modal overlays and command palette may have transform-based entrance animations
+- Sidebar drawer animation uses `translateX`
+
+**Prevention:**
+1. Audit all `position: fixed` elements to ensure they are NOT descendants of transformed elements
+2. The composer should be a direct child of the root layout, not nested inside a transformed container
+3. For elements that need both fixed positioning and transform animations, apply the transform to a child element, not the fixed-positioned parent
+4. WKWebView is stricter about `will-change: transform` creating a new stacking context -- remove `will-change` from ancestors of fixed elements
+
+**Phase to address:** Mobile layout polish phase
+
+---
+
+### Pitfall 12: Landscape Orientation Breaks Safe-Area Layout
+
+**What goes wrong:**
+When the iPhone is rotated to landscape, `env(safe-area-inset-left)` and `env(safe-area-inset-right)` become non-zero (for the notch/Dynamic Island). If the app doesn't account for left/right safe areas, content is obscured behind the notch. Additionally, there's a documented WKWebView bug where `viewport-fit=cover` causes layout collapse on rotation ([WebKit bug](https://github.com/ccorcos/WkWebView-Safe-Area-Inset-Bug)).
+
+**Loom exposure:**
+The current CSS in `base.css` only handles `safe-area-inset-top` and `safe-area-inset-bottom`. There's no left/right safe-area handling. The sidebar panel is flush-left, which means in landscape-left orientation, the sidebar content extends behind the notch.
+
+**Prevention:**
+1. Add left/right safe-area padding to the app shell:
+   ```css
+   .app-shell {
+     padding-left: env(safe-area-inset-left);
+     padding-right: env(safe-area-inset-right);
+   }
+   ```
+2. Or, if landscape is not a priority for v2.1, lock orientation to portrait in `Info.plist`:
+   ```xml
+   <key>UISupportedInterfaceOrientations</key>
+   <array>
+     <string>UIInterfaceOrientationPortrait</string>
+   </array>
+   ```
+3. If supporting landscape, test rotation transitions -- WKWebView can briefly show incorrect safe-area values during the rotation animation
+
+**Phase to address:** Mobile layout polish phase (or defer by locking to portrait)
+
+---
+
+### Pitfall 13: Building iOS App from Linux Requires Cloud Build or Mac Access
+
+**What goes wrong:**
+Developers attempt to build and deploy the iOS app entirely from Linux, hit a wall at the Xcode build step, and lose time trying workarounds. While `cap add ios` and `cap sync` work on Linux (confirmed in Phase 57), actually compiling Swift code and producing an `.ipa` requires Xcode, which only runs on macOS.
+
+**Why it happens:**
+Apple's iOS toolchain (Xcode, `xcodebuild`, codesigning, provisioning profiles) is macOS-only. There is no cross-compilation path. Even cloud solutions still use Mac hardware -- they just rent it.
+
+**Prevention:**
+1. Development workflow: Edit web code on Linux, run `cap sync ios` on Linux, then use a Mac ONLY for `xcodebuild` / `cap run ios`
+2. Cloud build options that work with Capacitor:
+   - **Capgo Build** -- uploads synced iOS project, builds on cloud Mac, returns `.ipa`
+   - **Xcode Cloud** -- Apple's own CI, free tier available
+   - **GitHub Actions with macOS runner** -- `macos-latest` image has Xcode pre-installed
+3. Minimize trips to Mac: batch native changes (plugin configs, storyboard, Info.plist) and only build when native code changes. Web-only changes can be tested via `server.url` mode pointed at the Linux dev server.
+4. Do NOT attempt to install macOS in a VM on Linux for Xcode -- it violates Apple's EULA and the toolchain doesn't work reliably in VMs
+
+**Detection:**
+- `cap run ios` fails with "Xcode not found"
+- `pod install` fails (no CocoaPods on Linux) -- use SPM as fallback (already working)
+- `xcodebuild` command not available
+
+**Phase to address:** Build/deploy infrastructure phase
+
+---
+
+### Pitfall 14: WKWebView Keyboard Dismiss Leaves Blank Space (The "Black Gap" Bug)
+
+**What goes wrong:**
+After the keyboard closes, WKWebView occasionally fails to resize back to its original dimensions. A black (or white, depending on WKWebView background color) gap remains where the keyboard was. This persists until the user scrolls, interacts with another element, or the view is forced to re-layout. Reported in [Capacitor #2194](https://github.com/ionic-team/capacitor-plugins/issues/2194) and confirmed on multiple iOS versions.
+
+**Why it happens:**
+This is a WKWebView rendering bug, not a Capacitor bug. It appears more frequently in Low Power Mode and on older devices. The WKWebView's internal `UIScrollView` doesn't properly recalculate its content inset when the keyboard animation completes.
+
+**Prevention:**
+1. In the `keyboardDidHide` listener, force a re-layout:
+   ```typescript
+   Keyboard.addListener('keyboardDidHide', () => {
+     document.documentElement.style.setProperty('--keyboard-offset', '0px');
+     // Force WKWebView to recalculate layout
+     window.scrollTo(0, 0);
+     // Trigger a reflow
+     document.body.style.overflow = 'hidden';
+     requestAnimationFrame(() => {
+       document.body.style.overflow = '';
+     });
+   });
+   ```
+2. Use `resize: "none"` mode (already recommended in Pitfall 1) -- this mode has fewer instances of the bug because WKWebView isn't trying to resize itself
+3. Add a `keyboardWillHide` listener that starts the CSS transition BEFORE WKWebView tries to re-layout, masking any brief gap
+
+**Detection:**
+- Black or colored gap at bottom of screen after keyboard dismiss
+- More frequent when device is in Low Power Mode
+- Does not reproduce consistently -- test 20+ keyboard open/close cycles
+
+**Phase to address:** Keyboard plugin integration phase
+
+---
+
+### Pitfall 15: Capacitor Plugin Imports Crash on Web (Non-Native) Platform
+
+**What goes wrong:**
+Code like `Haptics.impact({ style: ImpactStyle.Light })` throws or silently fails when running in a regular browser (not Capacitor app). If plugin calls are not guarded, the web version of Loom breaks when the same codebase runs in development (Vite dev server) or production (nginx).
+
+**Why it happens:**
+Capacitor plugins have web implementations that are stubs or no-ops. But importing and calling them adds bundle weight and may trigger console warnings. More critically, `Capacitor.isNativePlatform()` returns `false` on web, so if you forget to check, the plugin may throw on platforms where native functionality doesn't exist.
+
+**Prevention:**
+1. Always guard plugin calls:
+   ```typescript
+   import { Capacitor } from '@capacitor/core';
+
+   async function triggerHaptic() {
+     if (!Capacitor.isNativePlatform()) return;
+     const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
+     await Haptics.impact({ style: ImpactStyle.Light });
+   }
+   ```
+2. Use dynamic imports (`import()`) for all Capacitor plugins to avoid loading native code on web
+3. Create a `src/lib/native.ts` module that centralizes all Capacitor plugin access behind platform-guarded wrappers
+4. Test the web version after adding every Capacitor plugin -- run `npm run dev` and verify no console errors
+
+**Detection:**
+- Console warnings about "Capacitor plugin not available" on web
+- Web build size increases significantly after adding plugins
+- Errors in CI tests (which run in jsdom, not Capacitor)
+
+**Phase to address:** Every plugin phase -- establish the pattern in the first phase
+
+---
+
+## Minor Pitfalls
+
+### Pitfall 16: `-webkit-overflow-scrolling: touch` Causes Render Artifacts
+
+**What goes wrong:**
+Adding `-webkit-overflow-scrolling: touch` to scrollable containers (message list, sidebar) causes white flickering and disappearing elements during fast scrolling in WKWebView.
+
+**Prevention:**
+Loom does not currently use `-webkit-overflow-scrolling: touch` (it was removed from modern WebKit). Do NOT add it. Modern WKWebView provides momentum scrolling by default on `overflow: auto/scroll` elements. The property is deprecated and causes more problems than it solves.
+
+**Phase to address:** N/A -- just don't add it
+
+---
+
+### Pitfall 17: `max-scale=1.0, user-scalable=no` Ignored for Programmatic Zoom
+
+**What goes wrong:**
+The viewport meta tag already includes `maximum-scale=1.0, user-scalable=no` (index.html:7). This prevents pinch-to-zoom, which is correct for an app. However, WKWebView can still programmatically zoom when focusing on small text inputs (auto-zoom on focus). If the font size of the `<textarea>` is less than 16px, iOS zooms in.
+
+**Prevention:**
+The composer textarea uses `text-base md:text-sm` which resolves to 16px on mobile and 14px on desktop. The 16px mobile size should prevent auto-zoom. Verify this is the case on device. If any other inputs (settings modal, command palette) use font sizes below 16px on mobile, they will trigger auto-zoom.
+
+**Phase to address:** Touch-first interactions phase -- audit all focusable inputs
+
+---
+
+### Pitfall 18: `process.env` in `capacitor.config.ts` Only Resolves at Sync Time
+
+**What goes wrong:**
+Developers expect `process.env.CAPACITOR_SERVER_URL` to be a runtime variable. It is not. The `.ts` config is evaluated by the Capacitor CLI during `cap sync`, and the resolved values are baked into `capacitor.config.json` inside the iOS project. Changing the env var after sync has no effect until the next `cap sync`.
+
+**Prevention:**
+This is already documented in the existing `capacitor.config.ts` comments (line 9-10) and the IOS-ASSESSMENT.md. Reinforce it:
+1. Run `cap sync ios` after changing environment variables
+2. Do NOT try to read `process.env` in client-side code -- use `import.meta.env` (Vite's mechanism)
+3. Document the `cap sync` workflow clearly: `CAPACITOR_SERVER_URL=http://... npx cap sync ios`
+
+**Phase to address:** Build/deploy documentation
+
+---
+
+## Phase-Specific Warnings
+
+| Phase Topic | Likely Pitfall | Severity | Mitigation |
+|-------------|---------------|----------|------------|
+| Keyboard plugin | Pitfall 1: Dual keyboard detection systems fight | Critical | Disable visualViewport hack when Capacitor detected |
+| Keyboard plugin | Pitfall 9: Safe-area + keyboard double offset | Major | Toggle safe-area off when keyboard open |
+| Keyboard plugin | Pitfall 14: Black gap after dismiss | Major | Force re-layout in keyboardDidHide |
+| Bundled assets | Pitfall 2: All fetch/WS URLs broken | Critical | Centralized getApiBaseUrl() first |
+| Bundled assets | Pitfall 3: CapacitorHttp breaks WebSocket | Critical | Disable CapacitorHttp explicitly |
+| Bundled assets | Pitfall 8: window.location returns capacitor://localhost | Major | Audit all window.location usage |
+| Bundled assets | Pitfall 10: Font loading race condition | Major | Preload critical fonts |
+| StatusBar | Pitfall 5: setBackgroundColor is no-op on iOS | Major | Use setStyle only; rely on web content for visual |
+| SplashScreen | Pitfall 4: White flash on dark theme | Critical | Set WKWebView backgroundColor to match theme |
+| Haptics | Pitfall 6: Taptic Engine throttle from rapid firing | Major | Debounce with 50ms minimum, useHaptic hook |
+| 120Hz springs | Pitfall 7: rAF capped at 60fps in WKWebView | Major | Prefer CSS transitions; use Web Animations API |
+| Layout polish | Pitfall 11: Fixed positioning breaks under transforms | Moderate | Audit DOM nesting of fixed elements |
+| Layout polish | Pitfall 12: Landscape safe-area not handled | Moderate | Lock to portrait or add left/right safe-area |
+| Build/deploy | Pitfall 13: No Xcode on Linux | Moderate | Cloud build or Mac-only for final compile |
+| All plugins | Pitfall 15: Plugin calls crash on web | Major | Platform guard + dynamic imports pattern |
+| Touch inputs | Pitfall 17: Auto-zoom on small font inputs | Minor | Ensure 16px minimum on mobile inputs |
 
 ## Sources
 
-- [better-sqlite3 performance docs](https://github.com/WiseLibs/better-sqlite3/blob/master/docs/performance.md) -- WAL mode, busy_timeout, concurrency
-- [SQLite WAL mode docs](https://sqlite.org/wal.html) -- checkpoint starvation, reader/writer concurrency
-- [chokidar v4 README](https://github.com/paulmillr/chokidar) -- awaitWriteFinish, depth, inotify implications
-- [ENOSPC inotify fix guide (2026)](https://blog.path-finder.jp/troubleshooting/how-to-fix-enospc-system-limit-for-number-of-file/) -- max_user_watches tuning
-- [PWA on iOS limitations (2025)](https://brainhub.eu/library/pwa-on-ios) -- push notifications, service worker lifecycle
-- [PWA iOS limitations (2026)](https://www.magicbell.com/blog/pwa-ios-limitations-safari-support-complete-guide) -- Safari restrictions
-- [CSS dvh explained](https://savvy.co.il/en/blog/css/css-dynamic-viewport-height-dvh/) -- dynamic viewport units, interactive-widget
-- [iOS viewport-resize-behavior](https://github.com/bramus/viewport-resize-behavior/blob/main/explainer.md) -- interactive-widget meta tag
-- [Fix mobile keyboard overlap with dvh](https://www.franciscomoretti.com/blog/fix-mobile-keyboard-overlap-with-visualviewport) -- visualViewport API
-- [Zustand persist middleware docs](https://zustand.docs.pmnd.rs/reference/integrations/persisting-store-data) -- partialize, onRehydrateStorage, storage adapters
-- [Capacitor vs React Native (2025)](https://nextnative.dev/blog/capacitor-vs-react-native) -- WebView vs native UI tradeoffs
-- [WebSocket reconnection guide](https://websocket.org/guides/reconnection/) -- state sync, sequence numbers
-- [Service worker cache invalidation](https://iinteractive.com/resources/blog/taming-pwa-cache-behavior) -- skipWaiting, double-reload problem
-- Loom server/index.js -- existing chokidar watcher configuration, WebSocket architecture
-- Loom server/projects.js -- existing JSONL parsing, getSessionMessages implementation
-- Loom src/src/stores/stream.ts -- existing stream state management
-- Loom src/src/hooks/useSessionSwitch.ts -- existing session switching with memory cache
-
----
-*Pitfalls research for: v2.0 "The Engine" -- SQLite cache, live attach, mobile, iOS*
-*Researched: 2026-03-26*
+- [Capacitor Keyboard Plugin Docs](https://capacitorjs.com/docs/apis/keyboard)
+- [Capacitor StatusBar Plugin Docs](https://capacitorjs.com/docs/apis/status-bar)
+- [Capacitor Haptics Plugin Docs](https://capacitorjs.com/docs/apis/haptics)
+- [Capacitor SplashScreen Plugin Docs](https://capacitorjs.com/docs/apis/splash-screen)
+- [WKWebView resize after keyboard close -- #2194](https://github.com/ionic-team/capacitor-plugins/issues/2194)
+- [CapacitorHttp breaks WebSocket -- #7568](https://github.com/ionic-team/capacitor/issues/7568)
+- [CapacitorHttp interceptor URL mangling -- #7585](https://github.com/ionic-team/capacitor/issues/7585)
+- [Keyboard height not recalculated on input type change -- #2301](https://github.com/ionic-team/capacitor-plugins/issues/2301)
+- [iOS WKWebView keyboard jump -- #1366](https://github.com/ionic-team/capacitor/issues/1366)
+- [WKWebView 120Hz rAF support -- WebKit #173434](https://bugs.webkit.org/show_bug.cgi?id=173434)
+- [StatusBar setBackgroundColor iOS limitation -- #777](https://github.com/ionic-team/capacitor/issues/777)
+- [SplashScreen black screen on dark theme](https://forum.ionicframework.com/t/black-screen-after-splashscreen-capacitor-react-ios/237108)
+- [WKWebView fixed position broken with scrollView.bounce -- WebKit #158325](https://bugs.webkit.org/show_bug.cgi?id=158325)
+- [Safe-area-inset-bottom does not update for keyboard](https://webventures.rejh.nl/blog/2025/safe-area-inset-bottom-does-not-update/)
+- [WKWebView safe-area rotation bug](https://github.com/ccorcos/WkWebView-Safe-Area-Inset-Bug)
+- [Capacitor font loading production bug -- #5147](https://github.com/ionic-team/capacitor/issues/5147)
+- [Capgo Build -- iOS from non-Mac](https://capgo.app/blog/build-ios-app-from-windows-capacitor-capgo-build/)
+- [Capawesome iOS Troubleshooting](https://capawesome.io/blog/troubleshooting-capacitor-ios-issues/)
+- [CORS with capacitor://localhost -- #1143](https://github.com/ionic-team/capacitor/issues/1143)

@@ -25,7 +25,7 @@ export function NewChatButton() {
       onClick={handleClick}
       className={cn(
         'w-full flex items-center justify-center gap-1.5',
-        'px-3 py-2 mx-0',
+        'px-3 py-2 mx-0 min-h-[44px] md:min-h-0',
         'text-primary text-[length:var(--text-body)] font-medium',
         'bg-transparent rounded-md',
         'hover:bg-primary-muted',

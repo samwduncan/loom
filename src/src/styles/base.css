@@ -41,6 +41,7 @@
 html {
   height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -48,6 +49,7 @@ html {
 body {
   margin: 0;
   overflow: hidden;
+  overscroll-behavior: none;
   font-family: var(--font-ui, 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif);
   font-size: 0.875rem; /* 14px base per CONTEXT.md */
   line-height: 1.5;
@@ -126,8 +128,44 @@ body {
 }
 
 /* ─── Safe Area Support for Notched Devices (MOBILE-04) ──────── */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
+@supports (padding: env(safe-area-inset-top)) {
+  /* Top safe area: notch / Dynamic Island */
+  @media (max-width: 767px) {
+    .app-shell {
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+}
+
+/* ─── Mobile Touch Targets for Radix Menus (TOUCH-01, D-16) ─────
+   Shadcn components use Radix UI primitives with role="menuitem".
+   Desktop-first sizing is too compact for touch. Override at mobile. */
+@media (max-width: 767px) {
+  [role="menuitem"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"],
+  [role="option"] {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* ─── Keyboard Avoidance (interactive-widget=overlays-content) ──────── */
+/* The keyboard overlays the viewport; we shrink the shell by --keyboard-offset
+   so the composer stays visible above the keyboard. */
+@media (max-width: 767px) {
+  .app-shell {
+    padding-bottom: var(--keyboard-offset, 0px);
+    transition: padding-bottom 100ms ease-out;
+  }
+}
+
+/* D-06/D-08: No CSS transition on native -- iOS drives the keyboard animation natively.
+   Adding a CSS transition on top creates double-animation / visual lag.
+   The data-native attribute is set by native-plugins.ts at startup. */
+@media (max-width: 767px) {
+  html[data-native] .app-shell {
+    transition: none;
   }
 }

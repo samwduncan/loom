@@ -1,762 +1,637 @@
-# Architecture Research: SQLite Data Layer, Live Session Attach, iOS App
+# Architecture Research: Capacitor Native Plugin Integration
 
-**Domain:** AI chat client data layer + mobile app architecture
-**Researched:** 2026-03-26
-**Confidence:** HIGH (data layer, live attach) / MEDIUM (iOS app paths)
+**Domain:** Capacitor native plugin integration into existing Vite+React+Zustand SPA
+**Researched:** 2026-03-27
+**Confidence:** HIGH (Capacitor patterns well-documented, existing codebase thoroughly analyzed)
 
 ## System Overview
 
-### Current Architecture (Before)
-
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Frontend (React 19)                        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
-│  │ timeline │  │  stream  │  │    ui    │  │   file   │           │
-│  │  store   │  │  store   │  │  store   │  │  store   │           │
-│  └────┬─────┘  └────┬─────┘  └──────────┘  └──────────┘           │
-│       │              │                                             │
-│  useSessionSwitch    │  stream-multiplexer                        │
-│       │              │        │                                    │
-│  apiFetch(REST)  WebSocket(/ws)                                   │
-└───────┼──────────────┼────────────────────────────────────────────┘
-        │              │
-┌───────┼──────────────┼────────────────────────────────────────────┐
-│       ▼              ▼           Backend (Express 4 + ws)         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                        │
-│  │projects.js│  │claude-sdk│  │  db.js   │                        │
-│  │(JSONL I/O)│  │ (Agent)  │  │(auth.db) │                        │
-│  └────┬─────┘  └──────────┘  └──────────┘                        │
-│       │                                                           │
-│  ~/.claude/projects/-project-name/*.jsonl  (646MB for loom)       │
-│  383 files, 140K lines, read on every session load                │
-└───────────────────────────────────────────────────────────────────┘
-```
+                            EXISTING (unchanged)
+┌─────────────────────────────────────────────────────────────────┐
+│                    React Component Tree                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐        │
+│  │ ChatView │  │ Composer │  │ AppShell │  │ Sidebar  │        │
+│  └────┬─────┘  └─────┬────┘  └─────┬────┘  └────┬─────┘        │
+│       │              │             │             │              │
+├───────┴──────────────┴─────────────┴─────────────┴──────────────┤
+│                    Zustand Stores (5)                            │
+│  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐              │
+│  │ time │  │stream│  │  ui  │  │ conn │  │ file │              │
+│  └──────┘  └──────┘  └──────┘  └──────┘  └──────┘              │
+├─────────────────────────────────────────────────────────────────┤
+│              Network Layer (websocket-client, api-client)        │
+│  ┌────────────────────────┐  ┌───────────────────────┐          │
+│  │    WebSocketClient     │  │      apiFetch()       │          │
+│  │  (ws://host/ws)        │  │  (fetch /api/...)     │          │
+│  └────────────────────────┘  └───────────────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
 
-**Problem:** Every session load reads raw JSONL files (line-by-line parse of potentially hundreds of KB). The loom project alone has 383 JSONL files totaling 646MB. Session list refresh re-scans all files. No caching layer exists between JSONL and REST response.
-
-### Target Architecture (After)
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Frontend (React 19)                        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐           │
-│  │ timeline │  │  stream  │  │    ui    │  │   file   │           │
-│  │  store   │  │  store   │  │  store   │  │  store   │           │
-│  └────┬─────┘  └────┬─────┘  └──────────┘  └──────────┘           │
-│       │              │                                             │
-│  useSessionSwitch    │  stream-multiplexer                        │
-│       │              │        │                                    │
-│  apiFetch(REST)  WebSocket(/ws)                                   │
-│       │              │     ┌──────────────┐                       │
-│       │              ├─────│ live-session  │  <── NEW WS channel  │
-│       │              │     │  messages     │                       │
-│       │              │     └──────────────┘                       │
-└───────┼──────────────┼────────────────────────────────────────────┘
-        │              │
-┌───────┼──────────────┼────────────────────────────────────────────┐
-│       ▼              ▼           Backend (Express 4 + ws)         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────┐                    │
-│  │projects.js│  │claude-sdk│  │  db.js        │                   │
-│  │(JSONL→SQL)│  │ (Agent)  │  │  auth.db      │                   │
-│  └────┬─────┘  └──────────┘  │  messages.db  │── NEW             │
-│       │                       └──────────────┘                    │
-│       │         ┌────────────────┐                                │
-│       └────────►│  MessageCache  │◄── NEW module                  │
-│                 │  (SQLite R/W)  │                                │
-│                 └───────┬────────┘                                │
-│                         │                                         │
-│                 ┌───────▼────────┐                                │
-│                 │ SessionWatcher │◄── NEW module                  │
-│                 │ (JSONL tail)   │                                │
-│                 └───────┬────────┘                                │
-│                         │                                         │
-│  ~/.claude/projects/-project-name/*.jsonl  (source of truth)      │
-└───────────────────────────────────────────────────────────────────┘
+                           NEW (this milestone)
+┌─────────────────────────────────────────────────────────────────┐
+│                     Platform Abstraction Layer                   │
+│  ┌─────────────┐  ┌──────────────────┐  ┌──────────────────┐   │
+│  │ getApiBase()│  │ getPlatformInfo()│  │ getWsBase()      │   │
+│  │ (URL prefix)│  │ (ios/web/android)│  │ (ws:// prefix)   │   │
+│  └──────┬──────┘  └────────┬─────────┘  └────────┬─────────┘   │
+│         │                  │                     │              │
+│  ┌──────┴──────────────────┴─────────────────────┴──────────┐   │
+│  │              src/lib/platform.ts (single file)            │   │
+│  └───────────────────────────────────────────────────────────┘   │
+├─────────────────────────────────────────────────────────────────┤
+│                  Capacitor Plugin Bridge Layer                   │
+│  ┌───────────┐  ┌────────┐  ┌───────────┐  ┌──────────────┐    │
+│  │ Keyboard  │  │Haptics │  │ StatusBar │  │ SplashScreen │    │
+│  └─────┬─────┘  └───┬────┘  └─────┬─────┘  └──────┬───────┘    │
+│        │            │             │               │             │
+│  ┌─────┴────────────┴─────────────┴───────────────┴──────────┐  │
+│  │          src/lib/native-plugins.ts (lazy init)             │  │
+│  └────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ## Component Responsibilities
 
-### New Components
+| Component | Responsibility | New vs Modified | Location |
+|-----------|---------------|-----------------|----------|
+| `platform.ts` | API base URL, WS base URL, platform detection | **NEW** | `src/lib/platform.ts` |
+| `native-plugins.ts` | Capacitor plugin initialization and lifecycle | **NEW** | `src/lib/native-plugins.ts` |
+| `api-client.ts` | Prefix all fetch paths with `API_BASE` | **MODIFIED** (1 line) | `src/lib/api-client.ts` |
+| `auth.ts` | Prefix auth fetch paths with `API_BASE` | **MODIFIED** (3 lines) | `src/lib/auth.ts` |
+| `websocket-client.ts` | Use `WS_BASE` for WS URL construction | **MODIFIED** (2 call sites) | `src/lib/websocket-client.ts` |
+| `shell-ws-client.ts` | Use `WS_BASE` for WS URL construction | **MODIFIED** (1 call site) | `src/lib/shell-ws-client.ts` |
+| `ChatComposer.tsx` | Replace `visualViewport` hack with Keyboard plugin on native | **MODIFIED** (1 effect) | `src/components/chat/composer/ChatComposer.tsx` |
+| `main.tsx` | Add native plugin init before React mount | **MODIFIED** (1 import + 1 call) | `src/main.tsx` |
+| `motion.ts` | Add 120Hz-aware spring configs | **MODIFIED** (add configs) | `src/lib/motion.ts` |
+| `capacitor.config.ts` | Add Keyboard plugin config section | **MODIFIED** (add plugins) | `capacitor.config.ts` |
+| Express CORS | Add `capacitor://localhost` origin | **MODIFIED** (1 line) | `server/index.js` |
 
-| Component | Responsibility | Location |
-|-----------|----------------|----------|
-| **MessageCache** | SQLite read/write for session metadata + messages. Handles cache invalidation, indexing, bulk import from JSONL. | `server/cache/message-cache.js` |
-| **SessionWatcher** | Tails active JSONL files for new appended lines. Emits parsed entries to subscribers (WebSocket broadcast). | `server/cache/session-watcher.js` |
-| **CacheWarmer** | Background process that indexes un-cached JSONL files into SQLite on startup and incrementally on file changes. | `server/cache/cache-warmer.js` |
+## New File Structure
 
-### Modified Components
-
-| Component | Current | Change |
-|-----------|---------|--------|
-| **projects.js** `getSessionMessages()` | Reads JSONL, parses line-by-line, filters by sessionId | Check SQLite cache first; fall back to JSONL on cache miss; write to cache after JSONL read |
-| **projects.js** `getSessions()` | Reads all JSONL files, parses all sessions | Check SQLite for session list; fall back to JSONL scan on first load |
-| **projects.js** `parseJsonlSessions()` | Returns session metadata from JSONL | Also writes parsed metadata to SQLite cache as side-effect |
-| **server/index.js** `setupProjectsWatcher()` | Watches for new/deleted JSONL files (ignores `change` events) | Add SessionWatcher for `change` events on active session files |
-| **websocket-init.ts** | Routes `claude-response`, `claude-complete`, etc. | Add `live-session-data` message type for attached sessions |
-| **stream-multiplexer.ts** | Routes SDK messages to store callbacks | Add `onLiveSessionMessage` callback for non-owned session data |
-
-### Unchanged Components
-
-| Component | Why Unchanged |
-|-----------|---------------|
-| **claude-sdk.js** | Continues to manage SDK sessions. MessageCache is downstream. |
-| **db.js** (auth.db) | Separate concern. Message cache uses its own database file. |
-| **timeline store** | Already handles `prependMessages()` and `addMessage()`. |
-| **stream store** | Already handles live streaming state. |
-| **useSessionSwitch** | Only change is: REST endpoint returns faster (SQLite vs JSONL). |
-
----
+```
+src/src/
+├── lib/
+│   ├── platform.ts              # NEW: Platform detection, URL resolution
+│   ├── native-plugins.ts        # NEW: Capacitor plugin init/lifecycle
+│   ├── api-client.ts            # MODIFIED: Use API_BASE
+│   ├── auth.ts                  # MODIFIED: Use API_BASE
+│   ├── websocket-client.ts      # MODIFIED: Use WS_BASE
+│   ├── shell-ws-client.ts       # MODIFIED: Use WS_BASE
+│   └── motion.ts                # MODIFIED: Add ProMotion spring configs
+└── components/
+    └── chat/composer/
+        └── ChatComposer.tsx     # MODIFIED: Guard keyboard effect with IS_NATIVE
+```
 
 ## Architectural Patterns
 
-### Pattern 1: Write-Through Cache with JSONL as Source of Truth
+### Pattern 1: Platform Abstraction via Module-Level Constants
 
-**What:** SQLite caches parsed JSONL data. JSONL files remain the canonical source. Cache is always rebuildable by re-reading JSONL. The backend never writes to JSONL (only Claude CLI does).
+**What:** A single `platform.ts` module that resolves platform identity and URL bases at import time. Every network call reads from this module instead of computing URLs inline.
 
-**When to use:** Loom's relationship with JSONL files is read-only. Claude CLI owns the files. We cannot switch to SQLite-primary without breaking Claude CLI compatibility.
+**When to use:** Always -- this is the foundation all other patterns build on.
 
 **Trade-offs:**
-- Pro: Zero risk to existing Claude CLI sessions
-- Pro: Cache can be deleted and rebuilt at any time
-- Con: Must handle cache staleness (new JSONL entries not yet in SQLite)
-- Con: Two sources means potential consistency issues
+- PRO: Single source of truth for all URL construction
+- PRO: Zero runtime overhead after module initialization (constants, not functions)
+- PRO: Trivially testable -- mock the module in tests
+- CON: Requires `@capacitor/core` as a runtime dependency (not just devDependency)
 
 **Implementation:**
-
-```javascript
-// server/cache/message-cache.js
-import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const DB_PATH = path.join(__dirname, '..', 'database', 'messages.db');
-const db = new Database(DB_PATH);
-
-// WAL mode for concurrent reads during writes
-db.pragma('journal_mode = WAL');
-db.pragma('synchronous = NORMAL');
-db.pragma('cache_size = -64000');  // 64MB cache
-db.pragma('temp_store = MEMORY');
-```
-
-**Cache lookup with JSONL fallback:**
-
-```javascript
-function getSessionMessages(projectName, sessionId, limit, offset) {
-  // 1. Check cache
-  const cached = db.prepare(`
-    SELECT raw_json FROM messages
-    WHERE session_id = ? AND project_name = ?
-    ORDER BY timestamp ASC
-  `).all(sessionId, projectName);
-
-  if (cached.length > 0) {
-    const messages = cached.map(row => JSON.parse(row.raw_json));
-    return paginate(messages, limit, offset);
-  }
-
-  // 2. Cache miss -- read JSONL (existing code path)
-  // 3. Write to cache (non-blocking via process.nextTick)
-}
-```
-
-### Pattern 2: Byte-Offset JSONL Tailing
-
-**What:** Track the last-read byte position in each JSONL file. On file change notification, open a ReadStream starting at that byte offset, read only new lines, parse them, and emit to subscribers.
-
-**When to use:** For live session attach -- watching an active JSONL file being appended to by Claude CLI.
-
-**Trade-offs:**
-- Pro: Only reads new data (not entire file)
-- Pro: Works with Node.js `fs.createReadStream({ start: offset })`
-- Pro: Stateless -- if offset is lost, re-read from 0 (full cache rebuild)
-- Con: File rotation/truncation breaks assumptions (Claude CLI doesn't do this)
-- Con: Partial line at EOF requires buffering
-
-**Implementation:**
-
-```javascript
-// server/cache/session-watcher.js
-import { watch, statSync, createReadStream } from 'fs';
-import { stat } from 'fs/promises';
-import readline from 'readline';
-import { EventEmitter } from 'events';
-
-class SessionWatcher extends EventEmitter {
-  constructor() {
-    super();
-    this.watched = new Map(); // filePath -> { offset, sessionId, watcher }
-  }
-
-  watch(filePath, sessionId) {
-    const fileSize = statSync(filePath).size;
-    const fsWatcher = watch(filePath, async (eventType) => {
-      if (eventType === 'change') {
-        await this.readNewLines(filePath);
-      }
-    });
-    this.watched.set(filePath, { offset: fileSize, sessionId, watcher: fsWatcher });
-  }
-
-  async readNewLines(filePath) {
-    const state = this.watched.get(filePath);
-    if (!state) return;
-
-    const currentSize = (await stat(filePath)).size;
-    if (currentSize <= state.offset) return;
-
-    const stream = createReadStream(filePath, {
-      start: state.offset,
-      encoding: 'utf8'
-    });
-    const rl = readline.createInterface({ input: stream });
-    const newEntries = [];
-
-    for await (const line of rl) {
-      if (line.trim()) {
-        try { newEntries.push(JSON.parse(line)); } catch { /* skip */ }
-      }
-    }
-
-    state.offset = currentSize;
-    if (newEntries.length > 0) {
-      this.emit('entries', { sessionId: state.sessionId, filePath, entries: newEntries });
-    }
-  }
-
-  unwatch(filePath) {
-    const state = this.watched.get(filePath);
-    if (state?.watcher) state.watcher.close();
-    this.watched.delete(filePath);
-  }
-}
-```
-
-**Why `fs.watch` over chokidar for live tailing:**
-
-Chokidar is already used for project-level file discovery (new/deleted files). For live tailing of a specific known file, `fs.watch` is simpler and lower overhead. Chokidar's `awaitWriteFinish` (stabilityThreshold: 2000ms in the existing setup) adds latency that defeats live streaming. Use `fs.watch` with inotify for immediate change notifications, then read only new bytes.
-
-### Pattern 3: WebSocket Channel Multiplexing for Live Attach
-
-**What:** Reuse the existing WebSocket connection (`/ws`) with a new message type for live session data from JSONL file tailing. No new WebSocket endpoint needed.
-
-**When to use:** When a user views a session that's being actively written to by Claude CLI (not by Loom's own SDK connection).
-
-**Trade-offs:**
-- Pro: No new WebSocket connections
-- Pro: Reuses existing multiplexer infrastructure
-- Con: Must distinguish between "owned stream" (Loom spawned it) and "attached stream" (CLI spawned it)
-
-**Message types added to existing protocol:**
 
 ```typescript
-// Client -> Server: Subscribe to live updates for a session
-interface AttachSession {
-  type: 'attach-session';
-  projectName: string;
-  sessionId: string;
-}
+// src/lib/platform.ts
+import { Capacitor } from '@capacitor/core';
 
-// Client -> Server: Unsubscribe from live updates
-interface DetachSession {
-  type: 'detach-session';
-  sessionId: string;
-}
+/**
+ * Platform detection -- resolved once at module load.
+ * On web: 'web'. On iOS native: 'ios'. On Android: 'android'.
+ */
+export const PLATFORM = Capacitor.getPlatform() as 'web' | 'ios' | 'android';
+export const IS_NATIVE = Capacitor.isNativePlatform();
 
-// Server -> Client: New entries from JSONL file watching
-interface LiveSessionData {
-  type: 'live-session-data';
-  sessionId: string;
-  entries: BackendEntry[];  // Same shape as REST message response
+/**
+ * API base URL.
+ * - Web (dev): '' (empty -- Vite proxy handles /api -> localhost:5555)
+ * - Web (prod): '' (empty -- nginx proxies /api -> localhost:5555)
+ * - Native: 'http://100.86.4.57:5555' (direct to Express)
+ *
+ * Configurable via VITE_API_BASE_URL build-time env var for flexibility.
+ */
+export const API_BASE = IS_NATIVE
+  ? (import.meta.env.VITE_API_BASE_URL || 'http://100.86.4.57:5555')
+  : '';
+
+/**
+ * WebSocket base URL.
+ * - Web: '' (empty -- browser constructs from window.location)
+ * - Native: 'ws://100.86.4.57:5555' (direct to Express)
+ */
+export const WS_BASE = IS_NATIVE
+  ? (import.meta.env.VITE_WS_BASE_URL || 'ws://100.86.4.57:5555')
+  : '';
+```
+
+**Why `@capacitor/core` import, not `window.Capacitor`?** The `window.Capacitor` global exists in native shells without importing, but the import gives TypeScript type safety. `@capacitor/core` is ~8KB minified+gzipped -- negligible for this app's bundle. On web builds, `Capacitor.getPlatform()` returns `'web'` and `isNativePlatform()` returns `false`.
+
+**Why module-level constants, not functions?** The platform never changes at runtime. Computing once at module load avoids repeated checks. The existing codebase uses this pattern (see `motion.ts` constants, the `TOKEN_KEY` in `auth.ts`).
+
+### Pattern 2: One-Line Integration into Existing Network Layer
+
+**What:** Modify `api-client.ts` and `websocket-client.ts` to prefix paths with the platform-resolved base URL. The change is minimal -- a string concatenation.
+
+**Why this matters:** The existing codebase has exactly 4 files that make network requests: `api-client.ts`, `auth.ts`, `websocket-client.ts`, `shell-ws-client.ts`. All other code goes through these. The integration surface is small and well-bounded.
+
+**Implementation in api-client.ts (doFetch function, line 51-52):**
+
+```typescript
+// BEFORE:
+return fetch(path, { ...options, signal, headers: { ... } });
+
+// AFTER:
+import { API_BASE } from '@/lib/platform';
+return fetch(`${API_BASE}${path}`, { ...options, signal, headers: { ... } });
+```
+
+When `API_BASE` is `''` (web), this is a no-op -- `'' + '/api/sessions'` = `'/api/sessions'`.
+When `API_BASE` is `'http://100.86.4.57:5555'` (native), it becomes `'http://100.86.4.57:5555/api/sessions'`.
+
+**Implementation in auth.ts (3 fetch calls at lines 77, 81, 94):**
+
+```typescript
+import { API_BASE } from '@/lib/platform';
+// Line 77: fetch(`${API_BASE}/api/auth/status`)
+// Line 81: fetch(`${API_BASE}/api/auth/register`, ...)
+// Line 94: fetch(`${API_BASE}/api/auth/login`, ...)
+```
+
+**Implementation in websocket-client.ts (connect at line 63, reconnect at line 298):**
+
+```typescript
+import { WS_BASE, IS_NATIVE } from '@/lib/platform';
+
+// In connect() and reconnect():
+const url = IS_NATIVE
+  ? `${WS_BASE}/ws?token=${token}`
+  : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws?token=${token}`;
+```
+
+**Implementation in shell-ws-client.ts (connect at line 72):**
+
+```typescript
+import { WS_BASE, IS_NATIVE } from '@/lib/platform';
+
+const url = IS_NATIVE
+  ? `${WS_BASE}/shell?token=${token}`
+  : `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/shell?token=${token}`;
+```
+
+### Pattern 3: Capacitor Plugin Initialization Outside React
+
+**What:** Initialize Capacitor native plugins in `main.tsx` before the React tree mounts, matching the existing `initializeWebSocket()` pattern.
+
+**When to use:** For plugins that need to be ready before any React component renders (Keyboard, StatusBar, SplashScreen).
+
+**Rationale:** The existing codebase already does this -- `initializeWebSocket()` runs before `createRoot()`. Native plugin init follows the same established pattern. Plugins like Keyboard must register listeners before the user can interact with the app.
+
+**Implementation:**
+
+```typescript
+// src/lib/native-plugins.ts
+import { IS_NATIVE, PLATFORM } from '@/lib/platform';
+
+let initialized = false;
+
+/**
+ * Initialize native Capacitor plugins. Called once before React mounts.
+ * No-ops on web -- every plugin import is guarded by IS_NATIVE.
+ */
+export async function initializeNativePlugins(): Promise<void> {
+  if (initialized || !IS_NATIVE) return;
+  initialized = true;
+
+  if (PLATFORM === 'ios') {
+    // Dynamic imports -- only loaded in native builds, tree-shaken on web
+    const { Keyboard } = await import('@capacitor/keyboard');
+    const { StatusBar, Style } = await import('@capacitor/status-bar');
+    const { SplashScreen } = await import('@capacitor/splash-screen');
+
+    // Configure keyboard: we handle layout ourselves via --keyboard-offset
+    // "none" resize mode (set in capacitor.config.ts) prevents WKWebView
+    // from resizing the viewport -- we control offset via CSS custom property
+    Keyboard.addListener('keyboardWillShow', (info) => {
+      document.documentElement.style.setProperty(
+        '--keyboard-offset',
+        `${info.keyboardHeight}px`,
+      );
+    });
+    Keyboard.addListener('keyboardWillHide', () => {
+      document.documentElement.style.setProperty('--keyboard-offset', '0px');
+    });
+
+    // Dark status bar to match Loom's dark theme
+    await StatusBar.setStyle({ style: Style.Dark });
+
+    // Hide splash screen once plugins are initialized
+    await SplashScreen.hide();
+  }
 }
 ```
 
----
+```typescript
+// src/main.tsx (modified)
+import { initializeNativePlugins } from '@/lib/native-plugins';
+
+// Init native plugins before React mount (no-ops on web)
+void initializeNativePlugins();
+
+// Existing WS init (unchanged)
+void initializeWebSocket();
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode><App /></StrictMode>,
+);
+```
+
+**Why dynamic imports inside `initializeNativePlugins()`?** Plugin packages like `@capacitor/keyboard` contain native bridge code that should not be bundled for web builds. Dynamic `import()` inside the `IS_NATIVE` guard means Vite will code-split these into a separate chunk that is never loaded on web. The guard returns early on web before hitting any `import()`, so the chunks are never fetched.
+
+**Why not React hooks for plugin init?** The existing pattern (`initializeWebSocket()` in `main.tsx`) works and avoids coupling plugin lifecycle to React component lifecycle. Keyboard events must fire regardless of which component is mounted. A global listener in `native-plugins.ts` sets the CSS custom property that any component can consume.
+
+### Pattern 4: Keyboard Plugin Replacing visualViewport Hack
+
+**What:** Replace the `ChatComposer.tsx` visualViewport resize listener with the Capacitor Keyboard plugin's `keyboardWillShow`/`keyboardWillHide` events when running natively.
+
+**Current implementation (ChatComposer.tsx lines 213-251):**
+- Listens to `window.visualViewport` resize events
+- Compares current viewport height to initial height to infer keyboard presence
+- Sets `--keyboard-offset` CSS custom property when delta > 50px
+- Prevents iOS scroll bouncing with `window.scrollTo(0, 0)`
+
+**Problems with the current approach:**
+1. The visualViewport fires DURING resize, causing a visible layout lag
+2. The 50px threshold is a heuristic -- misfires on small viewport changes (e.g., address bar collapse)
+3. Cannot distinguish keyboard from other viewport changes (orientation, address bar)
+4. Captures `fullHeight` at mount time -- if the component remounts after keyboard was open, the reference height is wrong
+
+**New implementation:**
+- On native: Keyboard plugin fires `keyboardWillShow` BEFORE the keyboard animates, providing exact `keyboardHeight` in pixels. The listener is registered globally in `native-plugins.ts`.
+- On web: Keep the existing visualViewport hack unchanged (still needed for PWA/Safari mobile)
+- The CSS consumer (`--keyboard-offset`) stays identical -- zero CSS changes
+
+```typescript
+// In ChatComposer.tsx, modify the keyboard effect:
+import { IS_NATIVE } from '@/lib/platform';
+
+useEffect(() => {
+  // On native, keyboard events are handled globally by native-plugins.ts.
+  // The --keyboard-offset CSS var is set there. Skip the visualViewport hack.
+  if (IS_NATIVE) return;
+
+  // Web fallback: existing visualViewport hack (unchanged)
+  if (typeof window === 'undefined') return;
+  const vv = window.visualViewport;
+  if (!vv) return;
+  const fullHeight = vv.height;
+  // ... rest of existing code ...
+}, []);
+```
+
+**Capacitor Keyboard config required in `capacitor.config.ts`:**
+
+```typescript
+const config: CapacitorConfig = {
+  // ... existing config ...
+  plugins: {
+    Keyboard: {
+      resize: 'none',           // We handle layout ourselves via CSS
+      style: 'dark',            // Match Loom's dark theme
+      resizeOnFullScreen: false, // Don't resize in fullscreen either
+    },
+  },
+};
+```
+
+The `resize: 'none'` setting is **critical** -- it tells iOS not to resize the WKWebView when the keyboard appears. Loom handles this via `--keyboard-offset` CSS custom property on `.app-shell` and `.composer-safe-area`. Without `resize: 'none'`, the WebView would shrink AND Loom would apply its offset, causing double-shrink.
+
+### Pattern 5: 120Hz Spring Animation (CSS-First Strategy)
+
+**What:** Optimize spring animations for ProMotion displays by relying on CSS animations (which run at 120Hz in WKWebView) rather than JS-driven rAF animations (which are capped at 60Hz).
+
+**Critical finding:** In WKWebView on iOS, `requestAnimationFrame` is **throttled to 60fps** even on ProMotion 120Hz devices. This is a deliberate Apple battery-saving decision. CSS animations and CSS transitions run at the native display refresh rate (120Hz). The Safari 18.3+ feature flag for unlocked rAF rates does NOT apply to WKWebView -- only to Safari itself. There is no workaround.
+
+**Implication for Loom:** The existing tiered animation system (CSS -> tailwindcss-animate -> LazyMotion) is already architecturally correct. CSS transitions already run at 120Hz on ProMotion. The spring configs in `motion.ts` used with Framer Motion's LazyMotion will be capped at 60fps in WKWebView -- but LazyMotion is only used for complex gestures, not routine UI transitions.
+
+**Changes to `motion.ts`:**
+
+```typescript
+import { PLATFORM } from '@/lib/platform';
+
+/**
+ * ProMotion-tuned springs: halved duration for 120Hz displays.
+ * 120Hz displays complete visual motion in half the frames,
+ * so tighter springs feel responsive rather than sluggish.
+ */
+export const SPRING_SNAPPY_IOS: SpringConfig = {
+  stiffness: 400,
+  damping: 28,
+};
+
+export const SPRING_GENTLE_IOS: SpringConfig = {
+  stiffness: 180,
+  damping: 18,
+};
+
+/**
+ * Platform-aware spring selection.
+ * Returns iOS-tuned springs on native iOS, standard springs on web.
+ */
+export function getSpring(name: 'gentle' | 'snappy' | 'bouncy'): SpringConfig {
+  const isIOS = PLATFORM === 'ios';
+  switch (name) {
+    case 'gentle': return isIOS ? SPRING_GENTLE_IOS : SPRING_GENTLE;
+    case 'snappy': return isIOS ? SPRING_SNAPPY_IOS : SPRING_SNAPPY;
+    case 'bouncy': return SPRING_BOUNCY; // Bouncy stays the same -- playful feel
+  }
+}
+```
+
+**More important -- CSS transition duration tokens:**
+
+The real 120Hz win is in CSS custom properties. Add iOS-tuned duration tokens using a touch device media query as a proxy:
+
+```css
+/* tokens.css addition */
+@media (hover: none) and (pointer: coarse) {
+  :root {
+    --duration-spring-gentle: 350ms;  /* down from 500ms */
+    --duration-spring-snappy: 150ms;  /* down from 250ms */
+  }
+}
+```
+
+On 120Hz displays, shorter durations feel equally smooth because each frame covers less distance. The existing CSS transitions that reference these tokens automatically pick up the faster values. This is the bulk of the animation improvement -- no JS changes needed for CSS-driven motion.
+
+### Pattern 6: CORS Configuration for capacitor://localhost
+
+**What:** Add the `capacitor://localhost` origin to the Express CORS whitelist.
+
+**Current CORS config (server/index.js lines 339-341):**
+
+```javascript
+app.use(cors({
+    origin: ['https://samsara.tailad2401.ts.net:5443', 'http://100.86.4.57:5184', 'http://localhost:5184'],
+}));
+```
+
+**Modified:**
+
+```javascript
+app.use(cors({
+    origin: [
+      'https://samsara.tailad2401.ts.net:5443',
+      'http://100.86.4.57:5184',
+      'http://localhost:5184',
+      'capacitor://localhost',  // iOS Capacitor bundled assets mode
+    ],
+}));
+```
+
+**Why `capacitor://localhost`?** When Capacitor loads bundled assets on iOS, the WKWebView origin is `capacitor://localhost` -- a custom URL scheme, not `http://localhost`. This must be added explicitly to the CORS whitelist. The `cors` npm package (already used by Loom's Express backend) handles non-HTTP schemes correctly.
+
+**WebSocket CORS note:** WebSocket upgrade requests do NOT enforce CORS in browsers. The browser sends the `Origin` header but the server is not required to validate it. Loom's `ws` library verifyClient validates the JWT token, not the origin. WebSocket connections from `capacitor://localhost` work without WS-specific changes.
+
+**Alternative considered and rejected: `CapacitorHttp` native plugin.** This routes HTTP through the native networking layer, bypassing CORS entirely. It would require reimplementing all of `apiFetch()`'s deduplication, auth injection, and 401 retry logic. Two HTTP stacks means twice the bugs. The one-line CORS change is better.
 
 ## Data Flow
 
-### Flow 1: Session List Load (Optimized Path)
+### API Request Flow (Modified)
 
 ```
-[Sidebar mounts]
-    ↓
-[useMultiProjectSessions] → GET /api/projects
-    ↓
-[projects.js] → SELECT * FROM sessions WHERE project_name = ?
-    ↓                    (SQLite, <5ms)
-[Response with session list]
-    ↓
-    │  On cache miss (first load or new project):
-    ↓
-[projects.js] → parseJsonlSessions() → INSERT INTO sessions
-    ↓                                     (JSONL parse, then cache)
-[Response with session list]
+[React Component]
+    |
+    v  (calls useApiFetch / apiFetch directly)
+[api-client.ts] --> prepend API_BASE --> [fetch()]
+    |
+    |--- Web: same-origin /api/... (Vite proxy or nginx)
+    |--- Native: http://100.86.4.57:5555/api/... (direct to Express)
+    |
+    v
+[Express :5555] --> processes --> [Response]
+    |
+    v
+[api-client.ts] --> JSON parse, 401 retry --> [React Component]
 ```
 
-**Expected improvement:** Session list load from ~500ms (383 JSONL stat + parse) to <10ms (single SQLite query with index on project_name).
-
-### Flow 2: Session Messages Load (Cache Hit)
+### WebSocket Connection Flow (Modified)
 
 ```
-[User clicks session in sidebar]
-    ↓
-[useSessionSwitch] → GET /api/projects/:name/sessions/:id/messages
-    ↓
-[projects.js] → SELECT raw_json FROM messages WHERE session_id = ?
-    ↓               (SQLite, <20ms for typical 200-entry session)
-[transformBackendMessages()] → timeline store update
-    ↓
-[ChatView renders messages]
+[main.tsx]
+    |
+    v  (initializeWebSocket)
+[websocket-init.ts] --> bootstrapAuth() --> [auth.ts uses API_BASE for /api/auth/*]
+    |
+    v  (got JWT token)
+[websocket-client.ts] --> connect(token)
+    |
+    |--- Web: ws://host/ws?token=... (from window.location)
+    |--- Native: ws://100.86.4.57:5555/ws?token=... (from WS_BASE)
+    |
+    v
+[Express :5555 WebSocket server] --> bidirectional streaming
 ```
 
-**Expected improvement:** Message load from ~200-800ms (JSONL line-by-line parse with readline) to <20ms (indexed SQLite query).
-
-### Flow 3: Live Session Attach (New)
+### Keyboard Event Flow (New on Native)
 
 ```
-[User views session that CLI is actively writing to]
-    ↓
-[Frontend] → WS: { type: 'attach-session', projectName, sessionId }
-    ↓
-[server/index.js] → SessionWatcher.watch(jsonlFilePath, sessionId)
-    ↓
-[Claude CLI appends to .jsonl file]
-    ↓
-[fs.watch fires] → SessionWatcher.readNewLines(filePath)
-    ↓
-[New JSONL entries parsed]
-    ↓
-[WS broadcast] → { type: 'live-session-data', sessionId, entries }
-    ↓
-[stream-multiplexer.ts] → onLiveSessionMessage callback
-    ↓
-[transformBackendMessages(entries)] → timeline store addMessage()
-    ↓
-[ChatView renders new messages in real-time]
+[iOS keyboard appears]
+    |
+    v  (native event, fires BEFORE keyboard animation starts)
+[@capacitor/keyboard plugin] --> keyboardWillShow { keyboardHeight: 336 }
+    |
+    v  (listener registered in native-plugins.ts at app init)
+[document.documentElement.style.setProperty('--keyboard-offset', '336px')]
+    |
+    v  (CSS cascade -- no React re-render needed)
+[.app-shell padding-bottom: var(--keyboard-offset)]
+[.composer-safe-area padding-bottom: calc(1rem + env(safe-area-inset-bottom) + var(--keyboard-offset))]
+    |
+    v  (100ms CSS transition on .app-shell padding-bottom)
+[UI shifts up, composer visible above keyboard]
 ```
 
-### Flow 4: Cache Warming (Background)
+### Native Plugin Initialization Flow
 
 ```
-[Server starts]
-    ↓
-[CacheWarmer] → Check sessions table for last cached_at per project
-    ↓
-[For each project directory]:
-    ↓
-    ├── stat each .jsonl file → compare mtime to cached_at
-    │   ↓ (file newer than cache)
-    ├── parseJsonlSessions() → UPSERT into sessions table
-    ├── For sessions with messages not yet cached:
-    │   ↓
-    │   readJsonlMessages() → INSERT INTO messages
-    │
-    └── Skip files older than cached_at (already cached)
+[App launch]
+    |
+    v
+[main.tsx]
+    |--- void initializeNativePlugins()     <-- NEW (no-ops on web)
+    |       |
+    |       |--- IS_NATIVE = false? --> return immediately
+    |       |--- IS_NATIVE = true? -->
+    |           |--- dynamic import @capacitor/keyboard --> register listeners
+    |           |--- dynamic import @capacitor/status-bar --> set Style.Dark
+    |           |--- dynamic import @capacitor/splash-screen --> hide()
+    |
+    |--- void initializeWebSocket()         <-- EXISTING (unchanged)
+    |
+    |--- createRoot().render(<App />)       <-- EXISTING (unchanged)
 ```
 
-**Startup time budget:** Cache warming should be non-blocking. Process files in the background with `setImmediate()` yielding between files to avoid blocking the event loop. REST endpoints work immediately with JSONL fallback while cache warms.
+## Build Pipeline Changes
 
----
+### Vite Build: Zero Modifications Required
 
-## SQLite Schema Design
+The Vite build pipeline needs **no changes**:
 
-### Separate Database File
+1. **`webDir: 'dist'`** in `capacitor.config.ts` already points to Vite's default output directory
+2. **`npm run build`** (`tsc -b && vite build`) produces the same `dist/` that `cap sync ios` copies to `ios/App/App/public/`
+3. **New `@capacitor/*` imports** are resolved by Vite's standard module resolution
+4. **Dynamic `import()`** calls in `native-plugins.ts` are automatically code-split by Vite/Rollup into separate chunks. On web, these chunks are never fetched.
+5. **Manual chunks** in `vite.config.ts` do not need updating -- Capacitor packages are small enough to stay in the default chunk
 
-Use a separate `messages.db` file, NOT the existing `auth.db`. Rationale:
+The existing build pipeline is: `npm run build` -> `npx cap sync ios` (already in `package.json` as `cap:sync`).
 
-1. **Independent lifecycle** -- message cache can be deleted and rebuilt without affecting auth
-2. **Size isolation** -- messages.db will grow to 50-100MB; auth.db stays tiny
-3. **WAL mode isolation** -- separate WAL files prevent checkpoint contention
-4. **Backup simplicity** -- auth.db needs backup, messages.db is disposable (rebuildable from JSONL)
+### Dependency Changes
 
-### Tables
+```bash
+# Move @capacitor/core to production dependencies (needed at runtime for platform detection)
+npm install @capacitor/core
 
-```sql
--- Session metadata (replaces in-memory parseJsonlSessions results)
-CREATE TABLE sessions (
-  id TEXT PRIMARY KEY,              -- UUID from JSONL sessionId field
-  project_name TEXT NOT NULL,       -- e.g. '-home-swd-loom'
-  summary TEXT DEFAULT 'New Session',
-  message_count INTEGER DEFAULT 0,
-  last_activity TEXT,               -- ISO 8601
-  cwd TEXT,
-  last_user_message TEXT,
-  last_assistant_message TEXT,
-  jsonl_file TEXT,                  -- filename (not full path)
-  jsonl_byte_offset INTEGER,        -- last read position
-  cached_at TEXT,                   -- when this row was last updated
-  is_junk INTEGER DEFAULT 0         -- 1 = filtered from session list
-);
+# Add native plugins as production dependencies (dynamically imported, tree-shaken on web)
+npm install @capacitor/keyboard @capacitor/status-bar @capacitor/haptics @capacitor/splash-screen
 
--- Individual JSONL entries (full raw data)
-CREATE TABLE messages (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  session_id TEXT NOT NULL,
-  project_name TEXT NOT NULL,
-  entry_type TEXT NOT NULL,         -- 'user', 'assistant', 'progress', 'summary', etc.
-  message_id TEXT,                  -- message.id from Claude API (nullable)
-  uuid TEXT UNIQUE,                 -- JSONL entry UUID (for dedup)
-  parent_uuid TEXT,
-  timestamp TEXT,
-  raw_json TEXT NOT NULL,           -- Complete JSONL line as stored
-  FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
-);
-
--- Indexes for common access patterns
-CREATE INDEX idx_sessions_project ON sessions(project_name, last_activity DESC);
-CREATE INDEX idx_messages_session ON messages(session_id, timestamp ASC);
-CREATE INDEX idx_messages_type ON messages(session_id, entry_type);
-CREATE INDEX idx_sessions_not_junk ON sessions(project_name, is_junk, last_activity DESC);
+# Keep @capacitor/cli and @capacitor/ios as devDependencies (build tools only)
 ```
 
-### Why Store `raw_json` Instead of Normalized Columns
-
-1. **JSONL schema is Claude's, not ours.** The entry format changes between Claude CLI versions (we've seen `version: "2.1.59"` through `"2.1.71"` in the loom project alone). Normalizing into typed columns means schema migrations on every CLI update.
-2. **The frontend already has `transformBackendMessages()`.** It expects raw JSONL entries. Storing raw JSON means the cache output matches the existing REST response format exactly.
-3. **Storage is cheap.** 140K JSONL lines for loom at ~1KB average = ~140MB raw. SQLite with TEXT compression stores this efficiently. A typical session (100-500 entries) is 100KB-500KB.
-4. **Query patterns are simple.** We only query by session_id + timestamp order. We never query message content. Full-text search (if ever needed) would use SQLite FTS5 on a separate virtual table.
-
----
-
-## Live Session Attach: Detailed Design
-
-### Detecting Active CLI Sessions
-
-The server already knows which sessions it started via `claude-sdk.js` (the `activeSessions` Map). But CLI sessions started outside Loom don't appear there.
-
-**Detection strategy (recommended -- explicit attach):**
-
-Don't auto-detect. Let the user explicitly "attach" to a session. Show an "Attach" button when session's last_activity is within the last 5 minutes. When attached, start the SessionWatcher. When the JSONL file stops growing for 30 seconds, auto-detach and send a completion signal.
-
-**Why not auto-detect:** Auto-detecting active CLI sessions requires either:
-- Process scanning (`ps aux | grep claude`) -- fragile, platform-specific
-- Lock file detection -- Claude CLI doesn't create lock files
-- File mtime polling -- adds complexity for uncertain benefit
-
-Explicit attach is simpler, more reliable, and gives the user control.
-
-### Resolving Which JSONL File Contains a Session
-
-A session's entries may span multiple JSONL files (though typically one). The `getSessionMessages()` function already scans all JSONL files in a project directory. For the SessionWatcher, we need to know which file to watch.
-
-**Strategy:** When messages are loaded for a session (either from JSONL or from cache), record the JSONL filename in the `sessions.jsonl_file` column. When attaching, watch that specific file.
-
-### Frontend Integration
-
-The stream-multiplexer already has the callback injection pattern. Add one new callback:
-
-```typescript
-// In MultiplexerCallbacks interface
-onLiveSessionMessage: (sessionId: string, entries: BackendEntry[]) => void;
-
-// In routeMessage()
-case 'live-session-data': {
-  callbacks.onLiveSessionMessage(msg.sessionId, msg.entries);
-  break;
-}
-```
-
-The `websocket-init.ts` wiring:
-
-```typescript
-onLiveSessionMessage: (sessionId, entries) => {
-  const messages = transformBackendMessages(entries);
-  const timelineState = useTimelineStore.getState();
-  for (const msg of messages) {
-    timelineState.addMessage(sessionId, msg);
-  }
-}
-```
-
-This reuses the existing `addMessage` flow, which ChatView already renders reactively.
-
-### Edge Cases
-
-| Edge Case | Handling |
-|-----------|----------|
-| File gets very large during attach | Byte-offset means we only read new data; no risk |
-| Multiple clients watching same session | SessionWatcher broadcasts to all connected WebSocket clients |
-| JSONL file rotated/deleted mid-watch | `fs.watch` fires, readNewLines detects size shrink, re-read from 0 |
-| Client disconnects while attached | WebSocket close handler calls `SessionWatcher.unwatch()` |
-| Partial JSON line at EOF | readline module handles this -- waits for newline before emitting |
-| Session entries span multiple JSONL files | Watch all files that contain the session (rare, but handle gracefully) |
-
----
-
-## iOS App Architecture: Options Analysis
-
-### Option 1: Capacitor (RECOMMENDED)
-
-**What:** Wrap the existing Vite React app in Capacitor's native iOS container (WKWebView). Same codebase, same build, native shell.
-
-**Effort:** 2-3 days for initial working build, 1-2 weeks for polish.
-
-**Architecture:**
-
-```
-┌────────────────────────────────┐
-│     iOS App (Capacitor)        │
-│  ┌───────────────────────────┐ │
-│  │  WKWebView                │ │
-│  │  ┌─────────────────────┐  │ │
-│  │  │  Loom React App     │  │ │
-│  │  │  (same bundle)      │  │ │
-│  │  └─────────────────────┘  │ │
-│  └───────────────────────────┘ │
-│  Capacitor Bridge              │
-│  - Push notifications          │
-│  - Haptic feedback             │
-│  - Safe area management        │
-│  - Status bar control          │
-└────────────────────────────────┘
-         │ HTTPS via Tailscale
-         ▼
-┌────────────────────────────────┐
-│  Loom Backend (port 5555)      │
-│  100.86.4.57                   │
-└────────────────────────────────┘
-```
-
-**Pros:**
-- Zero code duplication -- same React app, same components, same Zustand stores
-- Capacitor's WKWebView has full JIT engine access (faster JS than React Native's bridge)
-- Tailscale provides HTTPS via MagicDNS which WKWebView requires
-- Capacitor plugins for push notifications, haptics, biometric auth
-- Publishable to App Store via Xcode
-- 1 codebase serves web, mobile web, and iOS app
-- Existing responsive work (767px breakpoint, sidebar drawer, ComposerStatusBar) directly applies
-
-**Cons:**
-- Not truly "native" UI -- uses web rendering, not UIKit
-- WKWebView can be killed by iOS for memory pressure ("white screen of death")
-- iOS gesture conflicts (swipe-back navigation vs. sidebar gestures)
-- App Store review is not guaranteed for wrapper apps (but Capacitor apps with native API integration generally pass)
-
-### Option 2: PWA (Progressive Web App)
-
-**What:** Add web app manifest, service worker, icons. Users add to Home Screen from Safari.
-
-**Effort:** 1-2 days.
-
-**Pros:**
-- Minimal implementation effort
-- No App Store submission, no Xcode, no Apple Developer account ($99/year saved)
-- Same codebase with zero changes
-- Tailscale MagicDNS provides required HTTPS
-
-**Cons:**
-- iOS PWA limitations are severe (as of iOS 18.x / early 2026):
-  - Storage evicted after 7 days of non-use
-  - No Background Sync
-  - Push notifications require Home Screen install + iOS 16.4+ and are limited
-  - No Fullscreen API
-  - Session/cookie storage isolated from Safari
-  - No haptic feedback, no status bar control
-- Apple actively discourages PWAs
-- Memory limits are tighter than Capacitor's WKWebView
-- Feels second-class on iOS
-
-### Option 3: React Native
-
-**What:** Rewrite the frontend in React Native components (not web views).
-
-**Effort:** 4-8 weeks minimum.
-
-**Pros:**
-- True native UI components (UIKit rendered)
-- Best gesture handling
-- Largest mobile library ecosystem
-
-**Cons:**
-- Complete frontend rewrite -- NONE of these transfer: CSS/Tailwind, shadcn/ui, react-markdown, Shiki, CodeMirror, xterm.js
-- Two codebases to maintain forever
-- Massive effort for a single-user tool
-- Different animation/styling paradigms
-
-### Option 4: Native Swift/SwiftUI
-
-**Effort:** 8-16 weeks. Completely separate codebase. Requires dedicated iOS development skills. Massively overengineered for a single-user tool. Not recommended.
-
-### iOS Recommendation
-
-**Capacitor** is the clear winner:
-
-1. **Single-user tool** -- Native feel matters less than development speed
-2. **Existing responsive work** -- Sidebar drawer, ComposerStatusBar, 767px breakpoint already in place
-3. **Tailscale provides HTTPS** -- Solves the biggest barrier
-4. **Zero code duplication** -- One codebase, one design system, one build pipeline
-
-**Recommended order:**
-1. Add PWA manifest + service worker now (1 day, free, immediately useful)
-2. Add Capacitor when push notifications or haptics are desired (2-3 days)
-3. Never build React Native or Swift native
-
----
-
-## Scaling Considerations
-
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 1 user (current) | SQLite cache is more than sufficient. Single-process Node.js handles everything. |
-| 1-5 users (potential) | SQLite WAL mode handles concurrent readers. No changes needed. |
-| Beyond 5 users | Not a realistic scenario. If needed: PostgreSQL migration with same schema. |
-
-### First Bottleneck: Cache Warming on Startup
-
-With 646MB of JSONL for the loom project alone, initial cache warming could take 30-60 seconds. Mitigation:
-- Process files in chunks with `setImmediate()` between files
-- REST endpoints fall back to JSONL during warming
-- Cache persists across server restarts (only re-index files with newer mtime)
-- Session list is usable before all messages are cached (session metadata is fast; message caching is lazy)
-
-### Second Bottleneck: JSONL File Growth
-
-Individual JSONL files can grow to several MB for long sessions. Mitigation:
-- Byte-offset tailing reads only new data
-- SQLite cache means JSONL is read once per session
-- Cache invalidation is timestamp-based (compare JSONL mtime to cached_at)
-
----
+**Why move `@capacitor/core` to dependencies?** Currently it is a devDependency. But `platform.ts` imports from it at runtime. The `Capacitor.getPlatform()` and `Capacitor.isNativePlatform()` calls need the runtime code. On web, the `@capacitor/core` web implementation (~8KB gzipped) returns `'web'` and `false` respectively. This is a negligible bundle impact for an app that already ships React, Shiki, CodeMirror, and xterm.js.
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Replacing JSONL with SQLite as Source of Truth
+### Anti-Pattern 1: Platform Checks Scattered Throughout Components
 
-**What people do:** Stop reading JSONL, write all data to SQLite, treat it as primary.
-**Why wrong:** Claude CLI writes to JSONL. If we stop reading JSONL, we lose sessions started from the terminal.
-**Do this instead:** SQLite is always a cache. JSONL is always source of truth. Cache can be deleted and rebuilt.
+**What people do:** Put `if (Capacitor.isNativePlatform())` checks in UI components, hooks, and event handlers across the codebase.
 
-### Anti-Pattern 2: Watching All JSONL Files Simultaneously
+**Why it is wrong:** Unmaintainable platform-conditional logic across dozens of files. Impossible to test web and native behavior independently. Violates single-responsibility.
 
-**What people do:** `fs.watch` on every JSONL file in every project directory.
-**Why wrong:** 383 files in one project. inotify watches are a finite kernel resource (default 8192 per user on Linux). Watching all files wastes descriptors.
-**Do this instead:** Only watch JSONL files for sessions the user is actively viewing. Watch project directories for new/deleted files (existing chokidar setup). Max simultaneous watches: 1-3 files.
+**Do this instead:** Centralize platform logic in `platform.ts` (URL resolution) and `native-plugins.ts` (plugin lifecycle). Components should be platform-unaware. The keyboard example demonstrates this: ChatComposer does NOT import Capacitor. It checks the `IS_NATIVE` constant from `platform.ts` to decide whether to run the web fallback. The actual Keyboard plugin listener lives in `native-plugins.ts`, setting a CSS variable that any component can consume.
 
-### Anti-Pattern 3: Polling JSONL Files for Changes
+### Anti-Pattern 2: Using CapacitorHttp to Bypass CORS
 
-**What people do:** `setInterval` every 500ms to stat/read JSONL files.
-**Why wrong:** CPU waste. `fs.watch` uses inotify (Linux) which is event-driven, zero-CPU when idle, triggers within milliseconds of a write.
-**Do this instead:** Use `fs.watch` for live tailing. Use chokidar (which also uses inotify internally) for directory-level watching.
+**What people do:** Use `@capacitor/core`'s `CapacitorHttp` to route HTTP through the native layer, bypassing CORS entirely.
 
-### Anti-Pattern 4: Storing Messages in auth.db
+**Why it is wrong:** Creates a completely separate HTTP path for native vs web. Loom's `apiFetch()` request deduplication, auth header injection, and 401 auto-retry logic would need to be reimplemented or abandoned. Two HTTP stacks = twice the bugs.
 
-**What people do:** Add message tables to auth.db for simplicity.
-**Why wrong:** auth.db is critical (user credentials, API keys). messages.db is disposable. Mixing them means larger backups, WAL contention, and inability to safely rebuild the cache.
-**Do this instead:** Separate database file. Same `better-sqlite3` driver. Independent lifecycle.
+**Do this instead:** Add `capacitor://localhost` to the Express CORS whitelist. One line. Keeps the entire `fetch()` pipeline identical across platforms.
 
-### Anti-Pattern 5: Building Native WebSocket in Capacitor Plugin
+### Anti-Pattern 3: Using @capacitor-community/react-hooks
 
-**What people do:** Create a native Swift WebSocket connection via Capacitor plugin.
-**Why wrong:** WKWebView already has full WebSocket support via the browser API. The existing `WebSocketClient` class works unchanged.
-**Do this instead:** Web app's WebSocket code works as-is in Capacitor.
+**What people do:** Install the `@capacitor-community/react-hooks` package for `useKeyboard()`, `useHaptics()`, etc.
 
-### Anti-Pattern 6: Caching Transformed Messages Instead of Raw JSONL
+**Why it is wrong:** That package is maintained for Capacitor 3-5, has not been updated for Capacitor 7, and adds a dependency for functionality that is trivially hand-written. Loom's established pattern of module-level initialization (see `websocket-init.ts`) is superior to hooks for cross-cutting concerns like keyboard height that affect global CSS, not a single component.
 
-**What people do:** Store the frontend's `Message` type in SQLite instead of raw JSONL entries.
-**Why wrong:** The transformation logic (`transformBackendMessages`) evolves with the frontend. If cached transformed data has a bug, the entire cache is poisoned. Raw JSONL is stable (CLI owns the format).
-**Do this instead:** Cache raw JSONL entries. Transform on read (same as current code path). Transformation is fast (in-memory object mapping) and benefits from frontend fixes without cache invalidation.
+**Do this instead:** Register plugin listeners in `native-plugins.ts`. If a component later needs reactive keyboard state (e.g., to show/hide a button), write a thin 20-line `useNativeKeyboard()` hook. But for v2.1, the CSS custom property approach requires no hook at all.
 
----
+### Anti-Pattern 4: Trying to Unlock 120Hz rAF in WKWebView
+
+**What people do:** Search for hacks, Safari feature flags, or workarounds to get `requestAnimationFrame` running at 120Hz in WKWebView.
+
+**Why it is wrong:** Apple deliberately throttles rAF to 60Hz in WKWebView for battery life. The Safari 18.3+ feature flag for unlocked frame rates does NOT apply to WKWebView. There is no workaround, and this has been a known limitation since WebKit Bug 173434 (2017).
+
+**Do this instead:** Use CSS transitions and CSS animations for 120Hz-smooth motion. They run at the native display refresh rate automatically. Reserve JS-driven animations (Framer Motion/LazyMotion) for complex interactive gestures, accepting they will cap at 60fps in WKWebView. The existing tiered animation system (CSS -> tailwindcss-animate -> LazyMotion) already follows this approach.
+
+### Anti-Pattern 5: Importing Plugins at Top Level
+
+**What people do:** Static `import { Keyboard } from '@capacitor/keyboard'` at the top of components or lib files.
+
+**Why it is wrong:** Vite cannot tree-shake the plugin bridge code out of the web build. Every plugin import adds native bridge stubs to the main bundle even though they do nothing on web.
+
+**Do this instead:** Dynamic `import()` inside the `IS_NATIVE` guard. Vite code-splits dynamic imports into separate chunks. When `IS_NATIVE` is `false` (web), the `import()` call is never reached and the chunk is never fetched.
 
 ## Integration Points
-
-### Internal Boundaries
-
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| projects.js <-> MessageCache | Direct import (same process) | MessageCache exposes synchronous better-sqlite3 methods |
-| server/index.js <-> SessionWatcher | EventEmitter pattern | SessionWatcher emits `entries` events; index.js broadcasts to WS clients |
-| Frontend <-> Live session data | WebSocket messages | New `live-session-data` type through existing `/ws` connection |
-| CacheWarmer <-> MessageCache | Direct import | CacheWarmer calls MessageCache.upsertSession/insertMessages |
-| CacheWarmer <-> JSONL files | fs.createReadStream | Read-only; never modifies JSONL files |
 
 ### External Services
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Claude CLI JSONL files | Read-only filesystem access | Source of truth; never written to by Loom |
-| Tailscale MagicDNS | HTTPS for Capacitor/PWA | Required for iOS WKWebView security |
-| Apple App Store | Capacitor build -> Xcode -> TestFlight | Only if App Store distribution desired |
+| Express :5555 | HTTP + WebSocket via platform-resolved URLs | Add `capacitor://localhost` to CORS |
+| Tailscale VPN | System-wide tunnel routes WKWebView traffic | Must be active; detect loss and show error state |
+| iOS Keyboard | Capacitor Keyboard plugin, resize: 'none' | Replaces visualViewport hack on native |
+| iOS Haptics | Capacitor Haptics plugin, dynamic import | Impact on send, selection on scroll |
+| iOS StatusBar | Style.Dark at init, overlays WebView content | Matches Loom's dark OKLCH theme |
+| iOS SplashScreen | Auto-hide after native-plugins.ts init | Brief branding moment, then app takes over |
 
----
+### Internal Boundaries
 
-## Recommended Build Order
+| Boundary | Communication | Notes |
+|----------|---------------|-------|
+| `platform.ts` -> `api-client.ts` | Import `API_BASE` constant | String concat prefix on fetch path |
+| `platform.ts` -> `websocket-client.ts` | Import `WS_BASE`, `IS_NATIVE` | URL construction branch in connect/reconnect |
+| `platform.ts` -> `auth.ts` | Import `API_BASE` constant | Prefix 3 fetch calls |
+| `native-plugins.ts` -> CSS | `document.documentElement.style.setProperty` | Same pattern as existing keyboard code in ChatComposer |
+| `native-plugins.ts` -> React components | None (fire-and-forget) | Plugins set CSS vars; components consume via CSS |
+| `motion.ts` -> CSS tokens | `getSpring()` returns platform-tuned configs | Components call `getSpring('snappy')` for JS animations |
 
-Dependencies determine order. Each step is independently testable.
+## Suggested Build Order (Dependencies Determine Sequence)
 
-1. **MessageCache module** (no dependencies on existing code)
-   - Create `server/database/messages.db` with schema
-   - Implement `upsertSession()`, `insertMessages()`, `getSessionsByProject()`, `getMessagesBySession()`
-   - Unit test with better-sqlite3 in-memory database
-   - **Output:** Working SQLite cache module, fully tested, not wired into anything yet
+Each phase can be independently tested. Dependencies flow downward.
 
-2. **CacheWarmer module** (depends on MessageCache)
-   - Background JSONL scanning and cache population
-   - Incremental update based on file mtime vs cached_at
-   - Integration test: create temp JSONL files, verify they appear in SQLite
-   - **Output:** Cache populates on startup, incrementally updates
+1. **Platform abstraction** (`platform.ts`)
+   - Pure logic, no side effects, no visual changes
+   - Unit test: mock Capacitor to return `'web'` vs `'ios'`, verify constants
+   - Everything below depends on this file existing
 
-3. **Wire MessageCache into projects.js** (depends on MessageCache)
-   - Add cache-first lookup to `getSessionMessages()` and `getSessions()`
-   - JSONL fallback on cache miss with write-through
-   - Verify existing REST endpoints return identical data, faster
-   - **Output:** Sub-second session loads with zero frontend changes
+2. **API base URL integration** (`api-client.ts`, `auth.ts`)
+   - Modify the 2 files that make HTTP fetch requests
+   - Test: verify web still works identically (API_BASE = '')
+   - This is the "single highest-value prep work" from the iOS assessment
+   - Depends on: Step 1
 
-4. **SessionWatcher module** (independent of cache, depends on fs.watch)
-   - Byte-offset tailing of individual JSONL files
-   - EventEmitter interface
-   - Unit test: append lines to a temp file, verify events fire with correct data
-   - **Output:** Working file tailing, not connected to anything yet
+3. **WebSocket URL integration** (`websocket-client.ts`, `shell-ws-client.ts`)
+   - Same pattern as Step 2 but for WebSocket connections
+   - Test: verify WS reconnection still works on web
+   - Depends on: Step 1
 
-5. **WebSocket integration for live attach** (depends on SessionWatcher)
-   - `attach-session` / `detach-session` client message handling
-   - Server-side wiring in index.js
-   - `live-session-data` broadcast to attached clients
-   - **Output:** Backend can broadcast JSONL changes over WebSocket
+4. **Express CORS** (`server/index.js`)
+   - One-line change to add `capacitor://localhost` to origin array
+   - Test: `curl -H "Origin: capacitor://localhost" -I http://localhost:5555/api/auth/status`
+   - Independent of Steps 2-3 but needed before native testing
 
-6. **Frontend live attach** (depends on WebSocket integration)
-   - New multiplexer callback `onLiveSessionMessage`
-   - Wiring in websocket-init.ts
-   - "Attach" button in session header when session appears active
-   - Visual indicator for live-attached sessions
-   - **Output:** User can watch CLI sessions in real-time from the Loom UI
+5. **Capacitor Keyboard plugin** (`native-plugins.ts`, `capacitor.config.ts`, `ChatComposer.tsx`)
+   - Largest behavior change: new file + config + component modification
+   - The keyboard listener in native-plugins.ts replaces the visualViewport hack
+   - ChatComposer.tsx change is a 1-line guard (`if (IS_NATIVE) return`)
+   - Depends on: Step 1
 
-7. **PWA manifest + service worker** (independent of all above)
-   - `manifest.json`, icons, basic service worker for offline shell
-   - Can be done in parallel with steps 1-6
-   - **Output:** "Add to Home Screen" works on mobile
+6. **120Hz spring tuning** (`motion.ts`, CSS tokens)
+   - Add ProMotion spring configs and platform-aware `getSpring()` function
+   - Add touch-device media query for shorter CSS durations
+   - Can be done in parallel with Step 5
+   - Depends on: Step 1
 
-8. **Capacitor iOS shell** (depends on working PWA manifest)
-   - `npx cap init`, `npx cap add ios`
-   - Configure for Tailscale HTTPS endpoint
-   - Status bar, safe area, splash screen
-   - **Output:** Loom runs as an iOS app via WKWebView
-
----
+7. **StatusBar + SplashScreen + Haptics** (additions to `native-plugins.ts`)
+   - Polish features: dark status bar, splash screen hide, haptic feedback
+   - Low risk, high perceived-quality payoff
+   - Depends on: Step 5 (same init pattern, same file)
 
 ## Sources
 
-- [better-sqlite3 performance docs](https://github.com/WiseLibs/better-sqlite3/blob/master/docs/performance.md)
-- [SQLite WAL mode optimizations](https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance)
-- [SQLite performance tuning (phiresky)](https://phiresky.github.io/blog/2020/sqlite-performance-tuning/)
-- [SQLite production setup 2026](https://oneuptime.com/blog/post/2026-02-02-sqlite-production-setup/view)
-- [SQLite WAL mode on Ubuntu 2026](https://oneuptime.com/blog/post/2026-03-02-how-to-set-up-sqlite-with-wal-mode-on-ubuntu/view)
-- [Node.js fs.createReadStream docs](https://nodejs.org/api/fs.html) -- `start` option for byte-offset reads
-- [chokidar v5](https://github.com/paulmillr/chokidar) -- ESM-only, used for project directory watching
-- [node-tail](https://github.com/lucagrulla/node-tail) -- zero-dependency file tailing reference
-- [tail-file-stream](https://www.npmjs.com/package/tail-file-stream) -- streaming interface for appended files
-- [Capacitor vs React Native 2025](https://nextnative.dev/blog/capacitor-vs-react-native)
-- [Capacitor with React](https://capacitorjs.com/solution/react)
-- [Capacitor WKWebView performance](https://nextnative.dev/blog/improve-mobile-app-performance)
-- [iOS PWA limitations 2026](https://www.magicbell.com/blog/pwa-ios-limitations-safari-support-complete-guide)
-- [PWA vs Native App 2026](https://progressier.com/pwa-vs-native-app-comparison-table)
-- [PWAs on iOS 2025 analysis](https://ravi6997.medium.com/pwas-on-ios-in-2025-why-your-web-app-might-beat-native-0b1c35acf845)
+- [Capacitor Keyboard Plugin API](https://capacitorjs.com/docs/apis/keyboard) -- keyboardWillShow event, resize modes, configuration
+- [Capacitor JavaScript Utilities](https://capacitorjs.com/docs/basics/utilities) -- isNativePlatform(), getPlatform()
+- [Capacitor Web API](https://capacitorjs.com/docs/core-apis/web) -- How @capacitor/core behaves on web
+- [Capacitor Status Bar Plugin](https://capacitorjs.com/docs/apis/status-bar) -- Style.Dark, iOS Info.plist requirements
+- [Capacitor Haptics Plugin](https://capacitorjs.com/docs/apis/haptics) -- impact(), notification(), selectionChanged()
+- [Capacitor Splash Screen Plugin](https://capacitorjs.com/docs/apis/splash-screen) -- launchAutoHide, manual hide()
+- [Ionic CORS Troubleshooting](https://ionicframework.com/docs/troubleshooting/cors) -- capacitor://localhost origin handling
+- [WebKit Bug 173434](https://bugs.webkit.org/show_bug.cgi?id=173434) -- rAF 60fps throttle in WKWebView, filed 2017
+- [Apple Developer Forums: WKWebView 120Hz](https://developer.apple.com/forums/thread/773222) -- Confirms rAF 60fps cap, CSS runs at 120Hz
+- [@capacitor/core on Bundlephobia](https://bundlephobia.com/package/@capacitor/core) -- ~8KB gzipped
+- [Best practice for importing mobile-only plugins](https://forum.ionicframework.com/t/best-practice-for-importing-mobile-only-capacitor-plugins/210090) -- Dynamic import pattern
+- [Capacitor keyboard resize:none discussion](https://github.com/ionic-team/capacitor/discussions/6424) -- Non-Ionic keyboard handling
+- [Native platform check without importing](https://www.leonelngande.com/native-platform-check-without-importing-capacitor/) -- window.Capacitor global analysis
+- [Capacitor App Initialization Guide](https://capgo.app/blog/capacitor-app-initialization-step-by-step-guide/) -- Plugin init lifecycle
 
 ---
-*Architecture research for: Loom V2 data layer, live session attach, iOS app*
-*Researched: 2026-03-26*
+*Architecture research for: Capacitor native plugin integration into Loom v2.1 "The Mobile"*
+*Researched: 2026-03-27*

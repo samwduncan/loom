@@ -1,5 +1,64 @@
 # Loom V2: Milestone Master Plan
 
+## v2.0 The Engine (Shipped: 2026-03-27)
+
+**Status:** SHIPPED
+**Shipped:** 2026-03-27
+**Phases:** 9 (50-58) | **Plans:** 17 | **Commits:** ~800
+**LOC:** ~55,000 TypeScript + CSS
+**Timeline:** 7 days (2026-03-20 to 2026-03-27)
+**Archive:** `milestones/v2.0-ROADMAP.md`, `milestones/v2.0-REQUIREMENTS.md`
+
+**Delivered:** SQLite cache layer for sub-second session loads, state persistence across browser restarts, live session attach via JSONL file watcher, mobile-responsive UX (sidebar drawer, touch targets, safe-area), follow-up suggestions, production nginx deployment pipeline, iOS Capacitor research + prototype (server.url mode working on iPhone 16 Pro Max), and iOS mobile fixes (keyboard avoidance, viewport-fit, safe-area padding).
+
+**Key Accomplishments:**
+1. SQLite cache (cache.db) with schema versioning via PRAGMA user_version — cache-first with silent JSONL fallback, disposable/rebuildable
+2. State persistence — last session, scroll position, sidebar state survive browser restarts via sessionStorage + Zustand persist
+3. Live session attach — SessionWatcher singleton with clientAttachments Map, real-time JSONL file watching for running CLI sessions
+4. Mobile-responsive UX — sidebar drawer overlay with swipe, 44px touch targets, safe-area padding, mobile content containment
+5. Follow-up suggestions — client-side regex heuristics for code/error/list/default categories
+6. Production deployment — nginx reverse proxy with brotli/gzip, immutable caching, deploy.sh pipeline, graceful shutdown
+7. iOS Capacitor 7.6.1 — scaffold generated on Linux, server.url mode verified on device, comprehensive assessment (IOS-ASSESSMENT.md)
+8. iOS mobile fixes — viewport-fit=cover, safe-area padding, keyboard avoidance via visualViewport hack, WKWebView scroll prevention
+
+**Gate Criteria:**
+- [x] SQLite cache provides sub-second session loads
+- [x] State persists across browser restarts (last session, scroll, sidebar)
+- [x] Live session attach shows real-time CLI output
+- [x] Mobile layout works on iPhone 16 Pro Max
+- [x] Production nginx serves Loom via Tailscale HTTPS
+- [x] Capacitor scaffold generated and synced
+- [x] All M1-M7 tests pass (156 test files, 1405+ tests)
+
+---
+
+## v1.5 The Craft (Shipped: 2026-03-20)
+
+**Status:** SHIPPED
+**Shipped:** 2026-03-20
+**Phases:** 4 (44-47) | **Plans:** ~8 | **Commits:** ~60
+**LOC:** ~50,000 TypeScript + CSS
+**Timeline:** 2 days (2026-03-18 to 2026-03-20)
+
+**Delivered:** Settings refactor (useFetch<T> generic hook, SettingsTabSkeleton), comprehensive UI audit for loading/error/empty states, consistent hover/focus/disabled states, spring physics on sidebar/modals/tool cards, glass surface on modals and command palette.
+
+**Key Accomplishments:**
+1. Settings refactor — useFetch<T> generic hook, SettingsTabSkeleton loading pattern
+2. Comprehensive UI audit — loading states, error states, empty states across all components
+3. Consistent interaction states — hover, focus, disabled patterns on every interactive element
+4. Spring physics — sidebar, modals, tool cards with gentle/snappy/bouncy profiles
+5. Glass surface — modals and command palette with backdrop-filter blur
+
+**Gate Criteria:**
+- [x] Settings refactor with useFetch<T> generic hook
+- [x] UI audit complete — loading, error, empty states
+- [x] Consistent hover/focus/disabled states
+- [x] Spring physics on key surfaces
+- [x] Glass surface on modals and command palette
+- [x] All M1-M6 tests pass (regression)
+
+---
+
 ## v1.4 The Navigator (Shipped: 2026-03-18)
 
 **Status:** SHIPPED
@@ -221,53 +280,34 @@ This document captures the full development vision across all milestones. It per
 
 ---
 
-## v1.5: "The Craft" — Production Quality
+## v2.1: "The Mobile" — iOS Native Experience (CURRENT)
 
-**Goal**: Make every pixel intentional. Fix every rough edge, nail every detail, add visual personality. When someone opens Loom, they should feel the care that went into it — like a team of five spent months on this.
+**Goal**: Make Loom a native-feeling iOS app on iPhone 16 Pro Max via Capacitor — reliable keyboard avoidance, touch-first interactions, 120Hz springs, and bundled assets for offline-capable fast loads.
 
-**Status:** Planned (next milestone)
+**Status:** In progress
 
-**Three layers:**
+**Deliverables**:
+- Capacitor Keyboard plugin replacing visualViewport hack for reliable keyboard height events
+- Touch-first composer and interactions with 44px+ targets and haptic feedback
+- Mobile layout polish (safe-area refinement, gesture navigation, thumb-zone optimization)
+- 120Hz spring profile tuning for ProMotion displays
+- Capacitor native plugins: Keyboard, Haptics, StatusBar, SplashScreen
+- Bundled assets mode (API base URL abstraction, local assets, CORS)
 
-*Layer 1 — Fix what's broken:*
-- Land in-progress settings refactor (useSettingsData generic hook, connection store persist, ModalState type safety)
-- Comprehensive UI audit: every component checked for loading states, error states, empty states
-- Dead UI removal, type safety fixes, code quality cleanup
-
-*Layer 2 — Attention to detail:*
-- Sidebar slim mode (icon-only rail)
-- Every state transition is smooth (loading → content, tab switches, modal open/close)
-- Empty states that feel designed, not forgotten
-- Consistent focus rings, hover states on every interactive element
-- Spacing and typography audit (tokens used consistently everywhere)
-- Error states that feel helpful, not broken
-
-*Layer 3 — Visual personality:*
-- Spring physics on key interactions (sidebar, modals, panels, tool cards — not "all interactions")
-- Glass surface on modals and command palette
-- DecryptedText reveals for session titles and model names
-- StarBorder accents on active/focused elements
-- Motion refinement (every animation uses motion tokens, nothing is jarring)
-
-**Reference:** `.planning/M3-POLISH-DEFERRED-CONTEXT.md` — visual research, gap analysis, component adoption map
-
-**Explicitly deferred to v2.1:**
-- Aurora/WebGL (GPU feasibility risk on 780M iGPU; needs spike, not full phase)
-- Tier 2/3 effects (Iridescence, LiquidChrome, Border Beam, Shimmer Button, etc.)
-- "Spring physics on ALL interactions" — diminishing returns; do key surfaces only
+**NOT in scope:** WebGL/Metal graphics, CoreML, camera/biometrics/push, separate mobile entry point
 
 **Gate Criteria**:
-- [ ] Zero loading flashes — every component has skeleton/loading state
-- [ ] Zero dead UI — no placeholder fields, no fake data, no unused controls
-- [ ] All animations use defined motion tokens
-- [ ] Consistent hover/focus/disabled states across all interactive elements
-- [ ] FPS stays above 55 during heavy streaming
-- [ ] All M1-M5 tests pass (regression)
-- [ ] User spot check: "Does this feel like a real product built by a real team?"
+- [ ] Keyboard avoidance works reliably via Capacitor Keyboard plugin
+- [ ] Touch targets 44px+ across all interactive elements
+- [ ] Haptic feedback on key interactions (send, tool complete, errors)
+- [ ] Spring animations feel native at 120Hz
+- [ ] Bundled assets mode loads without server.url dependency
+- [ ] All previous tests pass (regression)
+- [ ] User spot check on device: "Does this feel like a native iOS app?"
 
 ---
 
-## v2.0: "The Power" — Multi-Agent + Management
+## v2.2: "The Power" — Multi-Agent + Management
 
 **Goal**: Enable simultaneous work with multiple AI providers and manage the tooling ecosystem from within the app.
 
@@ -276,41 +316,34 @@ This document captures the full development vision across all milestones. It per
 **Deliverables**:
 - Multi-provider tabbed workspaces (Claude, Gemini, Codex)
 - Background task execution with tab notifications
-- Shared context between provider tabs (Gemini can see Claude's conversation)
-- MCP server management UI (enable, disable, configure)
+- Shared context between provider tabs
+- MCP server management UI
 - Plugin/skill management UI
-- Approval flow for write-heavy MCP actions
 
 **Gate Criteria**:
 - [ ] Can work with Claude in one tab and Gemini in another simultaneously
-- [ ] Background tab notifications work
-- [ ] Gemini tab can access Claude conversation context
 - [ ] MCP servers can be enabled/disabled from UI
-- [ ] All M1-M6 tests pass (regression)
-- [ ] User spot check: "Can I effectively work with multiple agents?"
+- [ ] All previous tests pass (regression)
 
 ---
 
-## v2.1: "The Polish" — Full Visual Transformation
+## v2.3: "The Polish" — Full Visual Transformation
 
 **Goal**: Comprehensive visual effects pass on the complete, final surface. Aurora, advanced effects, and exhaustive motion refinement.
 
 **Phases**: ~3-5
 
 **Deliverables**:
-- Aurora/ambient WebGL overlay during streaming (GPU feasibility gated on 780M iGPU)
-- Comprehensive spring physics across ALL interactions (surface is now final)
-- Tier 2 effects: GlassSurface displacement, Iridescence sidebar accent, LiquidChrome settings
-- Tier 3 effects: Border Beam, Shimmer Button, Dot Pattern, Meteors, Sparkles, Lamp Effect, Text Generate
-- Empty state enhancements (Background Beams, Lamp Effect for welcome screen)
-- OKLCH-to-Hex bridge for WebGL components consuming design tokens
+- Aurora/ambient WebGL overlay during streaming (GPU feasibility gated)
+- Comprehensive spring physics across ALL interactions
+- Tier 2/3 effects (Iridescence, LiquidChrome, Border Beam, Shimmer Button, etc.)
+- OKLCH-to-Hex bridge for WebGL components
 - Performance-gated activation pattern for all GPU effects
 
 **Gate Criteria**:
-- [ ] Streaming at 100 tokens/sec with zero visible jitter
-- [ ] Aurora active during streaming with FPS > 55 on 780M iGPU
+- [ ] Aurora active during streaming with FPS > 55
 - [ ] All effects respect prefers-reduced-motion
-- [ ] All M1-M7 tests pass (regression)
+- [ ] All previous tests pass (regression)
 - [ ] User spot check: "Would a harsh, experienced developer rate this 10/10?"
 
 ---
@@ -409,4 +442,4 @@ interface Session {
 
 ---
 *Created: 2026-03-04*
-*Last updated: 2026-03-18 after v1.4 milestone completion*
+*Last updated: 2026-03-27 after v2.1 milestone start*

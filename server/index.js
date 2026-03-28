@@ -10,6 +10,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const installMode = fs.existsSync(path.join(__dirname, '..', '.git')) ? 'git' : 'npm';
+const distIndexPath = path.join(__dirname, '../dist/index.html');
+const hasDist = fs.existsSync(distIndexPath);
 
 // ANSI color codes for terminal output
 const colors = {
@@ -66,6 +68,7 @@ import geminiRoutes from './routes/gemini.js';
 import { initializeDatabase } from './database/db.js';
 import { validateApiKey, authenticateToken, authenticateWebSocket } from './middleware/auth.js';
 import { IS_PLATFORM } from './constants/config.js';
+import multer from 'multer';
 
 // File system watchers for provider project/session folders
 const PROVIDER_WATCH_PATHS = [
@@ -90,6 +93,16 @@ const connectedClients = new Set();
 // Maps WebSocket client -> Set of attached sessionIds (for cleanup on disconnect)
 const clientAttachments = new Map();
 let isGetProjectsRunning = false; // Flag to prevent reentrant calls
+
+// Check if any client is still watching a session; unwatch if orphaned
+function unwatchIfOrphaned(sessionId, excludeClient) {
+    for (const [client, sessions] of clientAttachments.entries()) {
+        if (client !== excludeClient && sessions.has(sessionId)) {
+            return; // another client is still watching
+        }
+    }
+    sessionWatcher.unwatch(sessionId);
+}
 
 // Broadcast progress to all connected WebSocket clients
 function broadcastProgress(progress) {
@@ -323,7 +336,23 @@ const wss = new WebSocketServer({
 // Make WebSocket server available to routes
 app.locals.wss = wss;
 
-app.use(cors());
+const ALLOWED_ORIGINS = [
+    'https://samsara.tailad2401.ts.net:5443',
+    'http://100.86.4.57:5184',
+    'http://localhost:5184',
+    'capacitor://localhost',
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow requests with no origin (same-origin, curl, etc.)
+        if (!origin) return callback(null, true);
+        if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+        // Debug: log unrecognized origins during development (remove before v2.2)
+        console.warn('[CORS] Rejected unrecognized origin:', origin);
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
+}));
 app.use(express.json({
     limit: '50mb',
     type: (req) => {
@@ -444,7 +473,10 @@ app.post('/api/system/update', authenticateToken, async (req, res) => {
             console.error('Update error:', text);
         });
 
+        let responded = false;
         child.on('close', (code) => {
+            if (responded) return;
+            responded = true;
             if (code === 0) {
                 res.json({
                     success: true,
@@ -462,6 +494,8 @@ app.post('/api/system/update', authenticateToken, async (req, res) => {
         });
 
         child.on('error', (error) => {
+            if (responded) return;
+            responded = true;
             console.error('Update process error:', error);
             res.status(500).json({
                 success: false,
@@ -490,7 +524,9 @@ app.get('/api/projects', authenticateToken, async (req, res) => {
 app.get('/api/projects/:projectName/sessions', authenticateToken, async (req, res) => {
     try {
         const { limit = 5, offset = 0 } = req.query;
-        const result = await getSessions(req.params.projectName, parseInt(limit), parseInt(offset));
+        const limitNum = parseInt(limit, 10);
+        const offsetNum = parseInt(offset, 10);
+        const result = await getSessions(req.params.projectName, Number.isFinite(limitNum) ? limitNum : 5, Number.isFinite(offsetNum) ? offsetNum : 0);
         res.json(result);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -504,8 +540,10 @@ app.get('/api/projects/:projectName/sessions/:sessionId/messages', authenticateT
         const { limit, offset } = req.query;
 
         // Parse limit and offset if provided
-        const parsedLimit = limit ? parseInt(limit, 10) : null;
-        const parsedOffset = offset ? parseInt(offset, 10) : 0;
+        const rawLimit = limit ? parseInt(limit, 10) : null;
+        const parsedLimit = rawLimit !== null && Number.isFinite(rawLimit) ? rawLimit : null;
+        const rawOffset = offset ? parseInt(offset, 10) : 0;
+        const parsedOffset = Number.isFinite(rawOffset) ? rawOffset : 0;
 
         const result = await getSessionMessages(projectName, sessionId, parsedLimit, parsedOffset);
 
@@ -908,7 +946,6 @@ app.get('/api/projects/:projectName/files', authenticateToken, async (req, res) 
         }
 
         const files = await getFileTree(actualPath, 10, 0, true);
-        const hiddenFiles = files.filter(f => f.name.startsWith('.'));
         res.json(files);
     } catch (error) {
         console.error('[ERROR] File tree error:', error.message);
@@ -1149,16 +1186,7 @@ function handleChatConnection(ws) {
                 }
 
                 // If no clients are watching this session anymore, stop the file watcher
-                let anyClientWatching = false;
-                for (const [, sessions] of clientAttachments.entries()) {
-                    if (sessions.has(sessionId)) {
-                        anyClientWatching = true;
-                        break;
-                    }
-                }
-                if (!anyClientWatching) {
-                    sessionWatcher.unwatch(sessionId);
-                }
+                unwatchIfOrphaned(sessionId);
 
                 writer.send({
                     type: 'live-session-detached',
@@ -1175,7 +1203,7 @@ function handleChatConnection(ws) {
     });
 
     ws.on('close', () => {
-        console.log('🔌 Chat client disconnected');
+        console.log('[INFO] Chat client disconnected');
         // Remove from connected clients
         connectedClients.delete(ws);
 
@@ -1183,17 +1211,7 @@ function handleChatConnection(ws) {
         const attachments = clientAttachments.get(ws);
         if (attachments) {
             for (const sessionId of attachments) {
-                // Check if any other client is still watching
-                let otherWatching = false;
-                for (const [otherClient, otherSessions] of clientAttachments.entries()) {
-                    if (otherClient !== ws && otherSessions.has(sessionId)) {
-                        otherWatching = true;
-                        break;
-                    }
-                }
-                if (!otherWatching) {
-                    sessionWatcher.unwatch(sessionId);
-                }
+                unwatchIfOrphaned(sessionId, ws);
             }
             clientAttachments.delete(ws);
         }
@@ -1569,7 +1587,6 @@ function handleShellConnection(ws) {
 // Audio transcription endpoint
 app.post('/api/transcribe', authenticateToken, async (req, res) => {
     try {
-        const multer = (await import('multer')).default;
         const upload = multer({ storage: multer.memoryStorage() });
 
         // Handle multipart form data
@@ -1589,7 +1606,7 @@ app.post('/api/transcribe', authenticateToken, async (req, res) => {
 
             try {
                 // Create form data for OpenAI
-                const FormData = (await import('form-data')).default;
+                const { default: FormData } = await import('form-data');
                 const formData = new FormData();
                 formData.append('file', req.file.buffer, {
                     filename: req.file.originalname,
@@ -1632,7 +1649,7 @@ app.post('/api/transcribe', authenticateToken, async (req, res) => {
 
                 // Handle different enhancement modes
                 try {
-                    const OpenAI = (await import('openai')).default;
+                    const { default: OpenAI } = await import('openai');
                     const openai = new OpenAI({ apiKey });
 
                     let prompt, systemMessage, temperature = 0.7, maxTokens = 800;
@@ -1718,16 +1735,11 @@ Agent instructions:`;
 // Image upload endpoint
 app.post('/api/projects/:projectName/upload-images', authenticateToken, async (req, res) => {
     try {
-        const multer = (await import('multer')).default;
-        const path = (await import('path')).default;
-        const fs = (await import('fs')).promises;
-        const os = (await import('os')).default;
-
         // Configure multer for image uploads
         const storage = multer.diskStorage({
             destination: async (req, file, cb) => {
                 const uploadDir = path.join(os.tmpdir(), 'claude-ui-uploads', String(req.user.id));
-                await fs.mkdir(uploadDir, { recursive: true });
+                await fsPromises.mkdir(uploadDir, { recursive: true });
                 cb(null, uploadDir);
             },
             filename: (req, file, cb) => {
@@ -1770,12 +1782,12 @@ app.post('/api/projects/:projectName/upload-images', authenticateToken, async (r
                 const processedImages = await Promise.all(
                     req.files.map(async (file) => {
                         // Read file and convert to base64
-                        const buffer = await fs.readFile(file.path);
+                        const buffer = await fsPromises.readFile(file.path);
                         const base64 = buffer.toString('base64');
                         const mimeType = file.mimetype;
 
                         // Clean up temp file immediately
-                        await fs.unlink(file.path);
+                        await fsPromises.unlink(file.path);
 
                         return {
                             name: file.originalname,
@@ -1790,7 +1802,7 @@ app.post('/api/projects/:projectName/upload-images', authenticateToken, async (r
             } catch (error) {
                 console.error('Error processing images:', error);
                 // Clean up any remaining files
-                await Promise.all(req.files.map(f => fs.unlink(f.path).catch(() => { })));
+                await Promise.all(req.files.map(f => fsPromises.unlink(f.path).catch(() => { })));
                 res.status(500).json({ error: 'Failed to process images' });
             }
         });
@@ -2024,28 +2036,17 @@ app.get('*', (req, res) => {
 
     // Only serve index.html for HTML routes, not for static assets
     // Static assets should already be handled by express.static middleware above
-    const indexPath = path.join(__dirname, '../dist/index.html');
-
-    // Check if dist/index.html exists (production build available)
-    if (fs.existsSync(indexPath)) {
+    if (hasDist) {
         // Set no-cache headers for HTML to prevent service worker issues
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        res.sendFile(indexPath);
+        res.sendFile(distIndexPath);
     } else {
         // In development, redirect to Vite dev server only if dist doesn't exist
         res.redirect(`http://localhost:${process.env.VITE_PORT || 5173}`);
     }
 });
-
-// Helper function to convert permissions to rwx format
-function permToRwx(perm) {
-    const r = perm & 4 ? 'r' : '-';
-    const w = perm & 2 ? 'w' : '-';
-    const x = perm & 1 ? 'x' : '-';
-    return r + w + x;
-}
 
 async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden = true) {
     // Using fsPromises from import
@@ -2057,6 +2058,9 @@ async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden =
         for (const entry of entries) {
             // Debug: log all entries including hidden files
 
+
+            // Skip hidden files when not requested
+            if (!showHidden && entry.name.startsWith('.')) continue;
 
             // Skip heavy build directories and VCS directories
             if (entry.name === 'node_modules' ||
@@ -2079,19 +2083,11 @@ async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden =
                 item.size = stats.size;
                 item.modified = stats.mtime.toISOString();
 
-                // Convert permissions to rwx format
-                const mode = stats.mode;
-                const ownerPerm = (mode >> 6) & 7;
-                const groupPerm = (mode >> 3) & 7;
-                const otherPerm = mode & 7;
-                item.permissions = ((mode >> 6) & 7).toString() + ((mode >> 3) & 7).toString() + (mode & 7).toString();
-                item.permissionsRwx = permToRwx(ownerPerm) + permToRwx(groupPerm) + permToRwx(otherPerm);
+                // No longer computing permissions — frontend doesn't consume them
             } catch (statError) {
                 // If stat fails, provide default values
                 item.size = 0;
                 item.modified = null;
-                item.permissions = '000';
-                item.permissionsRwx = '---------';
             }
 
             if (entry.isDirectory() && currentDepth < maxDepth) {
@@ -2123,7 +2119,7 @@ async function getFileTree(dirPath, maxDepth = 3, currentDepth = 0, showHidden =
     });
 }
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5555;
 const HOST = process.env.HOST || '0.0.0.0';
 // Show localhost in URL when binding to all interfaces (0.0.0.0 isn't a connectable address)
 const DISPLAY_HOST = HOST === '0.0.0.0' ? 'localhost' : HOST;
@@ -2188,5 +2184,82 @@ async function startServer() {
         process.exit(1);
     }
 }
+
+// Graceful shutdown: drain connections and clean up all resources on SIGTERM/SIGINT
+let shuttingDown = false;
+async function gracefulShutdown(signal) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`[INFO] Received ${signal}, starting graceful shutdown...`);
+
+    // Force exit after timeout (systemd will SIGKILL after TimeoutStopSec anyway)
+    const forceTimer = setTimeout(() => {
+        console.error('[WARN] Forced shutdown after 10s timeout');
+        process.exit(1);
+    }, 10000);
+    forceTimer.unref();
+
+    // 1. Kill all PTY sessions (prevents zombie child processes)
+    for (const [key, session] of ptySessionsMap) {
+        try {
+            if (session.pty && session.pty.kill) {
+                session.pty.kill();
+            }
+        } catch (err) {
+            console.error(`[WARN] Error killing PTY ${key}:`, err.message);
+        }
+    }
+    ptySessionsMap.clear();
+    console.log('[INFO] PTY sessions killed');
+
+    // 2. Unwatch all session watchers (releases fs.watch handles)
+    try {
+        sessionWatcher.unwatchAll();
+        console.log('[INFO] Session watchers released');
+    } catch (err) {
+        console.error('[WARN] Error unwatching sessions:', err.message);
+    }
+
+    // 3. Close project file watchers (releases inotify handles)
+    await Promise.all(
+        projectsWatchers.map(async (watcher) => {
+            try {
+                await watcher.close();
+            } catch (err) {
+                console.error('[WARN] Error closing project watcher:', err.message);
+            }
+        })
+    );
+    projectsWatchers = [];
+    console.log('[INFO] Project watchers closed');
+
+    // 4. Close all WebSocket connections
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.close(1001, 'Server shutting down');
+        }
+    });
+
+    wss.close(() => {
+        console.log('[INFO] WebSocket server closed');
+    });
+
+    // 5. Close database connections
+    try {
+        messageCache.close();
+        console.log('[INFO] Message cache closed');
+    } catch (err) {
+        console.error('[WARN] Error closing message cache:', err.message);
+    }
+
+    // 6. Stop accepting new HTTP connections — exit when all drained
+    server.close(() => {
+        console.log('[INFO] HTTP server closed — shutdown complete');
+        process.exit(0);
+    });
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 startServer();

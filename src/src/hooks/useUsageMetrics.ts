@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { getToken } from '@/lib/auth';
+import { apiFetch } from '@/lib/api-client';
 
 export interface UsageMetrics {
   burnRate: {
@@ -36,13 +36,9 @@ const POLL_INTERVAL = 30_000;
 
 async function fetchMetricsData(): Promise<UsageMetrics | null> {
   try {
-    const token = getToken();
-    const res = await fetch('/api/usage/metrics', {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    if (res.ok) return await res.json();
+    return await apiFetch<UsageMetrics>('/api/usage/metrics');
   } catch {
-    // Silently fail
+    // Silently fail -- metrics are non-critical
   }
   return null;
 }
@@ -89,13 +85,11 @@ export function useSessionTokenUsage(
     prevSessionRef.current = sessionId;
 
     let cancelled = false;
-    const token = getToken();
-    fetch(`/api/projects/${projectName}/sessions/${sessionId}/token-usage`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then((res) => (res.ok ? res.json() : null))
+    apiFetch<{ used: number; total: number }>(
+      `/api/projects/${projectName}/sessions/${sessionId}/token-usage`,
+    )
       .then((data) => {
-        if (!cancelled && data && typeof data.used === 'number') {
+        if (!cancelled && typeof data.used === 'number') {
           setUsage({ used: data.used, total: data.total });
         }
       })

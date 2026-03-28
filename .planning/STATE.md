@@ -1,30 +1,30 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: "The Engine"
-status: Phase 57 Complete
-stopped_at: Completed 57-01-PLAN.md
-last_updated: "2026-03-27T02:40:00.000Z"
+milestone: v2.1
+milestone_name: "The Mobile"
+status: Ready to plan
+stopped_at: Completed 61-02-PLAN.md
+last_updated: "2026-03-28T05:00:47.693Z"
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 15
-  completed_plans: 15
+  total_phases: 5
+  completed_phases: 3
+  total_plans: 7
+  completed_plans: 7
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-26)
+See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Milestone v2.0 complete — all 8 phases done
+**Current focus:** Phase 61 — Touch, Layout & Native Plugins
 
 ## Current Position
 
-Phase: 57 (ios-research) — COMPLETE
-Plan: 1/1 complete
+Phase: 62
+Plan: Not started
 
 ## Performance Metrics
 
@@ -41,61 +41,42 @@ Plan: 1/1 complete
 | - | - | - | - |
 
 *Updated after each plan completion*
-| Phase 50 P01 | 2min | 1 tasks | 2 files |
-| Phase 50 P02 | 3min | 2 tasks | 3 files |
-| Phase 51 P01 | 3min | 2 tasks | 3 files |
-| Phase 52 P01 | 2min | 2 tasks | 2 files |
-| Phase 52 P02 | 4min | 2 tasks | 7 files |
-| Phase 52 P03 | 4min | 2 tasks | 3 files |
-| Phase 53 P02 | 2min | 2 tasks | 5 files |
-| Phase 53 P01 | 2min | 1 tasks | 7 files |
-| Phase 53 P03 | 2min | 2 tasks | 5 files |
-| Phase 54 P02 | 3min | 1 tasks | 2 files |
-| Phase 54 P01 | 3min | 2 tasks | 3 files |
-| Phase 55 P01 | 3min | 2 tasks | 4 files |
-| Phase 55 P02 | 3min | 2 tasks | 8 files |
-| Phase 57 P01 | 5min | 2 tasks | 6 files |
+| Phase 59 P01 | 3min | 2 tasks | 3 files |
+| Phase 59 P03 | 3min | 2 tasks | 3 files |
+| Phase 59 P02 | 3min | 2 tasks | 3 files |
+| Phase 60 P01 | 3min | 2 tasks | 5 files |
+| Phase 60 P02 | 4min | 2 tasks | 4 files |
+| Phase 61 P01 | 3min | 2 tasks | 8 files |
+| Phase 61 P02 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
 ### Decisions
 
-- [v1.5] Spring easing profiles: gentle (modals), snappy (tool expand), bouncy (scroll pill)
-- [v1.5] Glass overlays: oklch(0 0 0 / 0.35) opacity, static backdrop-filter (no animation)
-- [v2.0-pre] Mobile sidebar: overlay drawer with hamburger, backdrop dismiss, auto-close on navigation
-- [v2.0-pre] Backend cwd fix: extractProjectDirectory() resolves projectPath before SDK call
-- [v2.0-pre] ComposerStatusBar: permission mode, model name, context window, 5h%, burn rate, cost
-- [v2.0-pre] Stream store: added tokenBudget, modelName fields; multiplexer extracts model from result
-- [v2.0-pre] UI store v7: added permissionMode with persistence and migration
-- [v2.0] SQLite cache is freely deletable -- JSONL remains source of truth, cache rebuilds from scratch
-- [v2.0] No service worker in v2.0 -- manifest-only PWA to avoid stale content trap
-- [v2.0] Zero new production deps -- better-sqlite3 already installed, fs.watch is built-in
-- [Phase 50]: Schema versioning via PRAGMA user_version -- drop-and-rebuild on mismatch (cache is disposable)
-- [Phase 50]: Separate cache.db from auth.db -- deletable without auth impact
-- [Phase 50]: Pre-compiled prepared statements on this._stmts for zero per-call overhead
-- [Phase 50]: Cache-first with silent fallback -- cache errors never break the API, always fall through to JSONL
-- [Phase 50]: Write-through on JSONL miss -- first read populates cache automatically for next time
-- [Phase 50]: Background warmer is fire-and-forget -- server fully functional without cache via JSONL fallback
-- [Phase 51]: sessionStorage for scroll positions -- ephemeral, auto-cleans on tab close, survives F5
-- [Phase 51]: LastSessionRedirect reads persisted activeSessionId for smart root-path routing
-- [Phase 52]: Singleton SessionWatcher: one instance per server, shared across all WS clients
-- [Phase 52]: clientAttachments Map<ws, Set<sessionId>> for multi-client subscription tracking with orphan cleanup
-- [Phase 52]: Static import of transformBackendMessages in websocket-init for live session data transformation
-- [Phase 52]: Green live dot (oklch 0.72 0.19 142, 2s pulse) visually distinct from blue streaming dot (1.5s pulse)
-- [Phase 52]: didAttachRef pattern: track attach state in ref written only inside useEffect to satisfy React 19 refs rule
-- [Phase 52]: Selector-only store access in ChatView components (no getState) for Constitution 4.5 compliance
-- [Phase 53]: DOMMatrix for swipe distance reading; 100px close threshold; interactive-widget primary + visualViewport fallback for keyboard avoidance
-- [Phase 53]: Mobile-first touch targets: 44px default with md: breakpoint restoring desktop sizes
-- [Phase 53]: Mobile content containment: overflow-hidden on markdown-body + max-w-full min-w-0 on code blocks + break-all on inline code
-- [Phase 54]: useState over useRef for visitedTabs to satisfy React 19 react-hooks/refs lint rule
-- [Phase 54]: Dedup map stores raw fetch Promise<Response>, consumers clone independently
-- [Phase 54]: Optimistic delete for single sessions only; bulk delete waits for API
-- [Phase 55]: Client-side regex heuristics for follow-up suggestions (code/error/list/default categories)
-- [Phase 55]: Static amber dot (no animation) for background session notifications
-- [Phase 55]: Provider-specific options: Claude gets images/fileMentions/permissionMode; Codex/Gemini get projectPath/sessionId only
-- [Phase 57]: Capacitor 7.6.1 over 8.x -- Xcode 16+ requirement is more accessible than 26+
-- [Phase 57]: Tailscale DNS from WKWebView: HIGH confidence -- system-wide VPN routes all traffic including WKWebView networking daemon
-- [Phase 57]: API base URL abstraction is highest-value prep for Capacitor bundled assets mode
+- [v2.0] Capacitor 7.6.1 over 8.x -- Xcode 16+ vs 26+ requirement
+- [v2.0] API base URL abstraction is highest-value Capacitor prep
+- [v2.0] Keyboard avoidance via visualViewport hack -- works but fragile, replace with Capacitor Keyboard plugin in v2.1
+- [v2.0] CSS --keyboard-offset pattern is correct -- needs better signal source
+- [v2.0] Three-tier proxy: Tailscale Serve :5443 -> nginx :5580 -> Express :5555
+- [v2.1] platform.ts with IS_NATIVE/API_BASE/WS_BASE -- single source of truth for URL construction
+- [v2.1] native-plugins.ts for dynamic plugin init before React mounts -- matches initializeWebSocket() pattern
+- [v2.1] CSS-first motion strategy -- rAF capped at 60fps in WKWebView, but CSS transitions run at 120Hz
+- [v2.1] Platform checks only in platform.ts and native-plugins.ts -- UI components remain platform-unaware
+- [Phase 59]: Runtime detection via window.Capacitor global -- no @capacitor/core dependency
+- [Phase 59]: Empty-string API_BASE in web mode -- zero behavioral change for existing fetch calls
+- [Phase 59]: fetchAnon separate from apiFetch -- auth bootstrap has no token yet
+- [Phase 59]: Function-based CORS origin with debug logging for rejected origins
+- [Phase 59]: Both connect() and reconnect() in websocket-client.ts migrated to resolveWsUrl (Pitfall 1 addressed)
+- [Phase 59]: No test modifications needed for fetch migration -- web mode resolveApiUrl returns paths unchanged
+- [Phase 59]: apiFetch replaces manual getToken + header injection pattern in hooks -- simpler, auto-handles auth and JSON parsing
+- [Phase 60]: @capacitor/keyboard as devDep with dynamic import behind IS_NATIVE guard -- zero web bundle impact
+- [Phase 60]: data-native attribute on <html> for CSS-only native vs web branching
+- [Phase 60]: useKeyboardOffset hook: useEffect with nativePluginsReady await + cancelled flag for async safety
+- [Phase 60]: CSS max(env(safe-area-inset-bottom), var(--keyboard-offset)) prevents double-padding on notched devices
+- [Phase 61]: SS-7: Each Capacitor plugin in its own try/catch for failure isolation
+- [Phase 61]: SS-2: hideSplashWhenReady() awaits nativePluginsReady to avoid cold-start race
+- [Phase 61]: S-4: No touch-action: pan-y -- breaks sidebar swipe and horizontal scroll
+- [Phase 61]: FollowUpPills touch target in CSS per S-6, global Radix menu 44px override via [role=menuitem], no touch-action overrides on sidebar backdrop
 
 ### Pending Todos
 
@@ -103,13 +84,12 @@ None.
 
 ### Blockers/Concerns
 
-- Weekly rate limit % not available from SDK -- only from Claude Code runtime JSON
-- Phases 48-49 (DecryptedText, StarBorder) deferred from v1.5 to v2.2 "The Polish"
-- Verify `vite-plugin-pwa` compatibility with Vite 7 before Phase 56
-- Capacitor + Tailscale DNS resolution in WKWebView sandbox needs device testing (Phase 57)
+- Mac with Xcode required for on-device builds (Phase 63) -- swd has iPhone 16 Pro Max but Linux dev machine
+- 120Hz ProMotion spring tuning needs real device to feel right (Phase 62)
+- CapacitorHttp must be disabled -- patches global fetch and breaks WebSocket upgrade
 
 ## Session Continuity
 
-Last session: 2026-03-27T02:40:00.000Z
-Stopped at: Completed Phase 57 (all v2.0 phases done)
-Resume: `/gsd:complete-milestone` or `/gsd:verify-work 57`
+Last session: 2026-03-28T04:53:34.655Z
+Stopped at: Completed 61-02-PLAN.md
+Resume: `/gsd:plan-phase 59`

@@ -11,6 +11,7 @@
 
 import type { ServerMessage, ClientMessage } from '@/types/websocket';
 import { isServerMessage } from '@/types/websocket';
+import { resolveWsUrl } from '@/lib/platform';
 
 export type ConnectionState =
   | 'disconnected'
@@ -54,14 +55,13 @@ export class WebSocketClient {
   }
 
   /**
-   * Open a WebSocket connection. Builds URL from window.location.
+   * Open a WebSocket connection. Uses platform URL helper for web/native compat.
    */
   connect(token: string): void {
     this.token = token;
     this.setState('connecting');
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${protocol}//${window.location.host}/ws?token=${token}`;
+    const url = resolveWsUrl('/ws', token);
 
     this.ws = new WebSocket(url);
     this.ws.onopen = () => this.handleOpen();
@@ -295,8 +295,7 @@ export class WebSocketClient {
 
     this.setState('connecting');
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${protocol}//${window.location.host}/ws?token=${this.token}`;
+    const url = resolveWsUrl('/ws', this.token);
 
     this.ws = new WebSocket(url);
     this.ws.onopen = () => this.handleOpen();
