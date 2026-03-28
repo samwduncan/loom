@@ -86,39 +86,51 @@ Text scales and spaces appropriately for mobile reading; minimum font sizes meet
 
 ## SCROLL: Scroll Performance
 
-Content scrolls at 60fps on real device (iPhone 16 Pro Max with WKWebView); no jank, stutter, or layout thrash.
+Content scrolls at 60fps on real device. This is THE highest priority — everything else is meaningless if scrolling feels broken.
 
-- [ ] **SCROLL-01**: Session list scrolling maintains 60fps on iPhone 16 Pro Max (real device, not simulator)
-  - _Acceptance:_ Measure with Safari DevTools Performance tab; scroll flame graph shows consistent 16.6ms frame time.
-  - _Why:_ WKWebView's compositor needs validation; simulator lies about performance.
+### Jank Source Elimination (audit findings)
 
-- [ ] **SCROLL-02**: Chat message scrolling (both direction) maintains 60fps with 50+ message turns
-  - _Acceptance:_ Load 50-message session; scroll up/down; DevTools reports no frame drop below 45fps.
-  - _Why:_ Rich content (code blocks, thinking disclosure) risks compositing overhead.
+- [ ] **SCROLL-01**: Remove setState from scroll event handler — use ref + IntersectionObserver for atBottom detection
+  - _Acceptance:_ `setAtBottom()` and `setUnreadCount()` NEVER called inside scroll event callback. atBottom state derived from IntersectionObserver on a sentinel element at the bottom of the message list.
+  - _Why:_ CRITICAL. Currently fires React setState 60+ times/sec during scroll, blocking compositor on every frame. This is the #1 jank source.
 
-- [ ] **SCROLL-03**: Tool cards expand/collapse without frame drop during scroll
-  - _Acceptance:_ Expand a ToolCardShell mid-scroll; no frame time spike > 20ms during animation.
-  - _Why:_ CSS Grid expand animation can trigger layout thrash if not GPU-optimized.
+- [ ] **SCROLL-02**: Remove DOM measurements (scrollHeight, scrollTop, clientHeight) from scroll handler
+  - _Acceptance:_ Scroll event handler does NOT read any layout properties. All scroll-position-dependent logic uses IntersectionObserver or rAF-batched reads.
+  - _Why:_ DOM layout reads during scroll force synchronous layout recalculation in WKWebView.
 
-- [ ] **SCROLL-04**: Sidebar session list scrolling smooth with 100+ sessions
-  - _Acceptance:_ Create 100 test sessions; scroll sidebar; DevTools reports 60fps.
-  - _Why:_ Session list can grow large during long dev sessions; poor performance here impacts UX heavily.
+- [ ] **SCROLL-03**: Auto-scroll-to-bottom during streaming uses rAF batching, not per-message-length useEffect
+  - _Acceptance:_ Streaming auto-scroll fires at most once per animation frame via rAF, not on every `messages.length` change.
+  - _Why:_ Current implementation triggers `el.scrollTop = el.scrollHeight` on every message chunk during streaming.
 
-- [ ] **SCROLL-05**: content-visibility CSS rule applied to off-screen message turns to skip rendering
-  - _Acceptance:_ MarkdownRenderer or TurnBlock has `content-visibility: auto` on container; DevTools Layout Shift shows reduction.
-  - _Why:_ Prevents browser from rendering content outside viewport; especially important for large conversations.
+- [ ] **SCROLL-04**: Fix layout thrashing in useAutoResize (composer textarea)
+  - _Acceptance:_ useAutoResize separates DOM reads and writes into distinct rAF frames — no write→read→write pattern.
+  - _Why:_ Current pattern: `height='0px'` → read `scrollHeight` (forces reflow) → write `height` → write `overflowY`. Blocks main thread on every keystroke.
 
-- [ ] **SCROLL-06**: GPU compositing layers verified: all animations use transform/opacity only
-  - _Acceptance:_ DevTools Rendering tab shows no animation triggering layout recalculation; use `will-change: transform` where needed.
-  - _Why:_ WKWebView compositor requires clean separation of paint and composite layers.
+- [ ] **SCROLL-05**: Remove forced reflow in ActiveMessage finalization
+  - _Acceptance:_ No `void container.offsetHeight` or equivalent forced-reflow pattern. Height transition uses CSS transitions or double-rAF instead.
+  - _Why:_ Forces synchronous layout at the exact moment the user is likely to interact.
 
-- [ ] **SCROLL-07**: ScrollToBottomPill animation does not stall chat scroll performance
-  - _Acceptance:_ Pill fade in/out (duration 200ms) does not cause frame drop in main scroll thread.
-  - _Why:_ Pill uses CSS transitions; must not block message list scroll.
+- [ ] **SCROLL-06**: Delete dead useScrollAnchor.ts hook
+  - _Acceptance:_ File removed from codebase. No imports reference it.
+  - _Why:_ Contains a rAF loop calling `scrollIntoView()` every frame — 60+ forced reflows/sec. Not currently used but dangerous if accidentally imported.
 
-- [ ] **SCROLL-08**: Live session banner does not cause pinned header jank when scrolling
-  - _Acceptance:_ Scroll chat with LiveSessionBanner visible; banner stays pinned; no frame drop.
-  - _Why:_ Fixed/sticky positioning on WKWebView can cause compositor issues if not GPU-backed.
+### Scroll Infrastructure
+
+- [ ] **SCROLL-07**: Evaluate and implement virtualized scrolling if content-visibility alone is insufficient
+  - _Acceptance:_ After SCROLL-01 through SCROLL-06 are fixed, test with 100+ message conversation on real device. If still janky, implement @tanstack/react-virtual with variable-height measurement, reverse scroll, and streaming support.
+  - _Why:_ content-visibility:auto helps paint but doesn't solve DOM bloat. Virtualization renders only visible items. Decision deferred until jank sources are eliminated first.
+
+- [ ] **SCROLL-08**: Status bar tap scrolls message list to top
+  - _Acceptance:_ Tapping the iOS status bar area scrolls the chat message list to the top with smooth animation. Uses Capacitor `statusTap` event.
+  - _Why:_ Universal iOS expectation since iPhone OS 1.0. Five lines of code, high impact.
+
+- [ ] **SCROLL-09**: Rubber band bounce preserved on all scroll containers
+  - _Acceptance:_ Message list and session list have native iOS overscroll bounce. No `overscroll-behavior: none` on these containers (only on html/body to prevent page-level bounce).
+  - _Why:_ Users expect bounce on every scrollable surface. We may have accidentally disabled it.
+
+- [ ] **SCROLL-10**: Chat message scrolling (both directions) maintains 60fps with 50+ messages on real device
+  - _Acceptance:_ Load 50-message session on iPhone 16 Pro Max. Scroll up/down rapidly. No visible stutter or frame drops.
+  - _Why:_ The ultimate validation that scroll fixes worked. Test AFTER implementing SCROLL-01 through SCROLL-06.
 
 ---
 
@@ -143,12 +155,28 @@ Users interact with app via native iOS gestures: swipe-to-delete, pull-to-refres
   - _Why:_ iOS-standard navigation; users coming from native apps expect this.
 
 - [ ] **GESTURE-05**: Haptic feedback integrated into more touch actions beyond current set
-  - _Acceptance:_ Haptics fire on: session select, sidebar toggle, pull-to-refresh complete, context menu open. Currently only on send/tool/error/selection.
+  - _Acceptance:_ Haptics fire on: session select, sidebar toggle, pull-to-refresh complete, context menu open, swipe-to-delete reveal. Currently only on send/tool/error/selection.
   - _Why:_ Broader haptic coverage makes the app feel more responsive and native.
 
 - [ ] **GESTURE-06**: Long-press on message gives copy/retry context menu
-  - _Acceptance:_ Long-press (500ms) on message bubble opens popover with Copy Text / Retry options.
+  - _Acceptance:_ Long-press (500ms) on message bubble opens popover with Copy Text / Retry / Share options. Uses @capacitor/clipboard for reliable copy on HTTP origins.
   - _Why:_ Mobile pattern for secondary actions; avoids extra UI chrome in message view.
+
+- [ ] **GESTURE-07**: @use-gesture/react library for professional gesture handling
+  - _Acceptance:_ All gesture hooks (swipe, long-press, pull-to-refresh) use @use-gesture/react for velocity tracking, direction detection, and conflict resolution. No raw touchstart/touchmove event handlers for new gestures.
+  - _Why:_ 6KB for battle-tested gesture math. Raw touch handlers are a half-measure — they reinvent the library poorly and miss edge cases (multi-touch, scroll conflicts, velocity thresholds).
+
+- [ ] **GESTURE-08**: @capacitor/app lifecycle — reconnect WebSocket on foreground return
+  - _Acceptance:_ When app returns from background, WebSocket auto-reconnects within 2 seconds. Uses `App.addListener('appStateChange')`. No stale UI after backgrounding.
+  - _Why:_ Currently backgrounding kills the WS connection silently and user sees stale state on return. Critical for daily-driver usage.
+
+- [ ] **GESTURE-09**: Native share sheet for conversations and code blocks
+  - _Acceptance:_ Share button in message context menu and session export opens iOS native share sheet (UIActivityViewController) via @capacitor/share. Falls back to Web Share API on desktop.
+  - _Why:_ Users want to share interesting AI conversations. Native share sheet gives AirDrop, Messages, Mail, Notes access.
+
+- [ ] **GESTURE-10**: Native action sheet for destructive confirmations
+  - _Acceptance:_ Delete session confirmation uses native iOS action sheet (slides from bottom) via @capacitor/action-sheet on native. Falls back to existing Radix AlertDialog on web.
+  - _Why:_ Native action sheet looks and feels right on iOS. Web-style modals feel foreign.
 
 ---
 
@@ -217,11 +245,11 @@ All requirements verified with real device testing on iPhone 16 Pro Max (WKWebVi
 |----------|-------|--------|-------|
 | TOUCH | 7 | TBD | Touch targets measured via code audit + real device |
 | TYPO | 8 | TBD | Font sizes and spacing audited via code review + device |
-| SCROLL | 8 | TBD | Performance validated on real iPhone 16 Pro Max |
-| GESTURE | 6 | TBD | Gestures tested manually on device |
+| SCROLL | 10 | TBD | Jank elimination + infrastructure + validation |
+| GESTURE | 10 | TBD | Gestures, lifecycle, share, native plugins |
 | VISUAL | 10 | TBD | Visual inspection on real device |
 | INFRA | 0 | ✓ DONE | All shipped in v2.1 + hotfixes |
-| **TOTAL** | **39** | TBD | |
+| **TOTAL** | **45** | TBD | |
 
 ---
 
@@ -299,10 +327,10 @@ v2.2 ships when:
 | VISUAL-09 | 68 | 0h | TBD | Pending |
 | VISUAL-10 | 68 | 1h | TBD | Pending |
 **Coverage:**
-- v2.2 requirements: 39 total (7 TOUCH + 8 TYPO + 8 SCROLL + 6 GESTURE + 10 VISUAL)
+- v2.2 requirements: 45 total (7 TOUCH + 8 TYPO + 10 SCROLL + 10 GESTURE + 10 VISUAL)
 - INFRA: 0 new (all shipped in v2.1)
-- Mapped to estimated phases: 39
-- Unmapped: 0 ✓
+- Mapped to estimated phases: TBD (roadmap pending)
+- Unmapped: TBD
 
 ---
 

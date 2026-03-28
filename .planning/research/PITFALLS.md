@@ -1,596 +1,770 @@
-# Domain Pitfalls: v2.1 "The Mobile" -- Capacitor Native Plugins & Bundled Assets
+# Domain Pitfalls: iOS Polish for Existing Capacitor Web App
 
-**Domain:** Adding Capacitor Keyboard/Haptics/StatusBar/SplashScreen plugins and bundled assets mode to a 55K+ LOC React SPA (Vite 7, Zustand, OKLCH dark theme) running in WKWebView on iPhone 16 Pro Max
-**Researched:** 2026-03-27
-**Confidence:** HIGH for plugin-specific issues (confirmed via GitHub issues, official docs, community reports); MEDIUM for 120Hz/ProMotion (WKWebView rAF throttling is documented but workarounds are evolving)
+**Domain:** Adding iOS-native gestures, visual effects, and touch polish to an existing React + Capacitor 7.6.1 chat app running in WKWebView server.url mode
+**Researched:** 2026-03-28
+**Platform:** iPhone 16 Pro Max, iOS 17+, Capacitor 7.6.1, Vite 7, React 19
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause broken UX, architectural rewrites, or features that silently fail on device.
-
-### Pitfall 1: Keyboard Plugin `resize: "none"` Creates Race Condition with Existing visualViewport Hack
-
-**What goes wrong:**
-The existing `ChatComposer.tsx` keyboard avoidance (lines 216-251) listens to `visualViewport.resize` events and computes `--keyboard-offset` from the initial fullHeight. When you add the Capacitor Keyboard plugin, two systems fight for control: the plugin's `keyboardWillShow`/`keyboardDidShow` events AND the existing visualViewport listener both try to set the keyboard offset. The result is flickering, double-offsets, or the offset being set and then immediately overridden.
-
-**Why it happens:**
-The Keyboard plugin fires `keyboardWillShow` with `keyboardHeight` BEFORE the viewport actually resizes. The visualViewport listener fires AFTER the viewport resizes. With `resize: "none"` (the correct mode for manual control), the WKWebView itself does not resize -- but `visualViewport.height` may still change slightly, triggering the old handler. With `resize: "native"`, the WKWebView shrinks, which changes `visualViewport.height`, and the old handler computes a SECOND offset on top of the native resize.
-
-**Consequences:**
-- Composer jumps violently on keyboard open/close
-- Double padding (plugin offset + visualViewport offset)
-- Keyboard dismiss leaves permanent dead space (known Capacitor bug: [#2194](https://github.com/ionic-team/capacitor-plugins/issues/2194))
-
-**Prevention:**
-1. Use `resize: "none"` in `capacitor.config.ts` keyboard config -- this is the only mode compatible with manual CSS offset control
-2. When Capacitor is detected (`Capacitor.isNativePlatform()`), completely disable the visualViewport hack. Do not run both systems.
-3. Listen exclusively to `Keyboard.addListener('keyboardWillShow', ...)` and `Keyboard.addListener('keyboardWillHide', ...)` for keyboard height
-4. Set `--keyboard-offset` from the plugin's `keyboardHeight` value only
-5. Keep the `window.scrollTo(0, 0)` call -- WKWebView still auto-scrolls on focus regardless of which keyboard detection method you use
-
-**Detection (warning signs):**
-- Composer bounces twice when keyboard opens
-- Bottom padding remains after keyboard closes
-- Testing only in Safari (where visualViewport works differently) misses the issue
-
-**Phase to address:** First phase -- Keyboard plugin integration
+Mistakes that cause rewrites, broken UX, or multi-day debugging sessions.
 
 ---
 
-### Pitfall 2: Bundled Assets CORS -- `capacitor://localhost` Origin Breaks All Fetch + WebSocket
+### Pitfall 1: iOS Back Gesture Conflict with Custom Swipe Gestures
 
-**What goes wrong:**
-In bundled assets mode, the SPA loads from `capacitor://localhost`. Every `fetch('/api/sessions')` call resolves to `capacitor://localhost/api/sessions` which does not exist. Every WebSocket connection via `window.location.host` (see `websocket-client.ts:63-64`) constructs `ws://localhost/ws` which connects to nothing. The entire app is non-functional.
+**What goes wrong:** Adding horizontal swipe gestures (swipe-to-delete on session items, swipe-to-open sidebar) conflicts with iOS's built-in edge-swipe-to-go-back gesture. When users start a swipe near the left edge, both the native navigation gesture AND the custom gesture fire, causing a jarring double-action: the session item slides AND the WKWebView navigates back.
 
-**Why it happens:**
-The existing codebase uses relative URLs everywhere:
-- `api-client.ts:52` -- `fetch(path, ...)` where path is `/api/sessions`, `/api/settings`, etc.
-- `websocket-client.ts:63-64` -- `${protocol}//${window.location.host}/ws`
-- `shell-ws-client.ts:71-72` -- Same pattern for terminal WebSocket
-- `auth.ts` -- Token refresh uses relative URL
+**Why it happens:** WKWebView's `allowsBackForwardNavigationGestures` is true by default. Capacitor does not disable it. The iOS gesture recognizer has priority over web touch events, but doesn't fully suppress them -- both fire.
 
-In browser mode (dev server or nginx), relative URLs resolve against the same origin. In Capacitor bundled mode, the origin is `capacitor://localhost` -- a custom scheme with no server behind it. Capacitor's `WebViewAssetHandler.swift` serves static files from the bundle, but there is no API server at that origin.
-
-**Consequences:**
-- App loads (HTML/CSS/JS from bundle) but shows empty state -- no sessions, no connection
-- WebSocket fails silently (no error page like a browser would show)
-- JWT auth flow fails (can't reach `/api/auth`)
-- Every API call throws network error
+**Consequences:** Users accidentally navigate away from the app when swiping session items near the left edge. The app shell may show a blank page or the WKWebView's back-stack snapshot. Recovery requires tapping forward or reloading.
 
 **Prevention:**
-1. Create a centralized `getApiBaseUrl()` function:
-   ```typescript
-   import { Capacitor } from '@capacitor/core';
 
-   export function getApiBaseUrl(): string {
-     if (Capacitor.isNativePlatform()) {
-       return 'http://100.86.4.57:5555'; // or from env/config
-     }
-     return ''; // relative URLs for web
-   }
-   ```
-2. Refactor `api-client.ts` to prefix all paths with `getApiBaseUrl()`
-3. Refactor `websocket-client.ts` and `shell-ws-client.ts` to construct absolute `ws://` URLs when native
-4. Add `capacitor://localhost` to Express CORS whitelist (`server/index.js`)
-5. The `getApiBaseUrl()` value should come from a build-time config, not hardcoded -- use `import.meta.env.VITE_API_BASE_URL` with a Capacitor-specific `.env.capacitor` file
+In `ios/App/App/ViewController.swift` (or a Capacitor plugin), disable back-forward gestures since Loom is an SPA with no native navigation stack:
 
-**Detection:**
-- App loads but spinner never resolves
-- Network tab shows `capacitor://localhost/api/sessions` 404s
-- WebSocket connection state stays "connecting" forever
-
-**Phase to address:** First phase -- this is a prerequisite for everything else in bundled mode
-
----
-
-### Pitfall 3: CapacitorHttp Native Fetch Patching Breaks WebSocket Connections
-
-**What goes wrong:**
-Capacitor 7 includes `CapacitorHttp` which can patch the global `fetch()` and `XMLHttpRequest` to route through native HTTP instead of WKWebView's network stack. When enabled (either explicitly or via default config), this native HTTP interceptor interferes with WebSocket upgrade requests, causing HTTP 400 errors or silent connection failures. The interceptor adds `localhost/capacitor_https_interceptor` to URLs on iOS ([#7585](https://github.com/ionic-team/capacitor/issues/7585)).
-
-**Why it happens:**
-CapacitorHttp patches `window.fetch` globally. While it's supposed to skip WebSocket-related requests, edge cases exist where Socket.IO/Engine.IO protocol negotiation (HTTP polling before WS upgrade) gets intercepted and broken ([#7568](https://github.com/ionic-team/capacitor/issues/7568)). Even if Loom uses raw WebSocket (not Socket.IO), the global fetch patch can still interfere with the auth token fetch that precedes WebSocket connection.
-
-**Consequences:**
-- WebSocket connects in browser, fails in Capacitor app
-- Auth flow works intermittently (native HTTP vs WKWebView HTTP behave differently for cookies/headers)
-- Hard to debug because the fetch patching is transparent
-
-**Prevention:**
-1. Explicitly disable CapacitorHttp in `capacitor.config.ts`:
-   ```typescript
-   plugins: {
-     CapacitorHttp: {
-       enabled: false
-     }
-   }
-   ```
-2. Since Loom's Express backend will have proper CORS headers for `capacitor://localhost`, native HTTP bypass is unnecessary
-3. If you need CapacitorHttp for some requests later, use the plugin API directly (`CapacitorHttp.request()`) instead of the global fetch patch
-
-**Detection:**
-- API calls work but WebSocket fails
-- Random "HTTP 400 Bad Request" on WebSocket endpoints
-- Works in Safari, fails in Capacitor app
-
-**Phase to address:** First phase -- configure alongside CORS and API base URL
-
----
-
-### Pitfall 4: SplashScreen-to-WKWebView Transition Flashes White on Dark Theme
-
-**What goes wrong:**
-Between the native splash screen dismissing and the WKWebView rendering the first frame, there is a brief flash of the WKWebView's default background color (white). On a dark-themed app like Loom (`--surface-base` is a warm dark brown), this creates a jarring white flash that looks broken.
-
-**Consequences:**
-- Professional appearance ruined on every app launch
-- Users perceive the app as slow/broken
-- Particularly noticeable on OLED screens where white flash is physically painful in dark environments
-
-**Why it happens:**
-WKWebView's default background is white. The native splash screen (LaunchScreen.storyboard) is shown by iOS during app launch. When the splash screen is hidden (either automatically or via `SplashScreen.hide()`), the WKWebView becomes visible. But the web content may not have fully rendered yet -- CSS hasn't loaded, fonts haven't loaded, React hasn't mounted. The gap between "WKWebView visible" and "first meaningful paint" shows the white background.
-
-**Prevention:**
-1. Set the WKWebView background color in `AppDelegate.swift` or Capacitor config:
-   ```swift
-   // In AppDelegate.swift or a custom CAPBridgeViewController
-   webView?.isOpaque = false
-   webView?.backgroundColor = UIColor(red: 0.169, green: 0.145, blue: 0.129, alpha: 1.0) // matches --surface-base
-   webView?.scrollView.backgroundColor = UIColor(red: 0.169, green: 0.145, blue: 0.129, alpha: 1.0)
-   ```
-   The Capacitor config also supports `backgroundColor` in the iOS section.
-2. Match the LaunchScreen.storyboard background color to `--surface-base` (the warm dark #2b2521)
-3. Use `SplashScreen` plugin with `launchAutoHide: false`, then call `SplashScreen.hide()` from `useEffect` in the root App component AFTER React has mounted and the first render is committed
-4. Add `fadeOutDuration: 200` for a smooth crossfade instead of an abrupt cut
-5. Set `<meta name="theme-color" content="#2b2521">` (already present in index.html -- good)
-
-**Detection:**
-- Brief white flash between splash and app content
-- More noticeable on first launch (cold start) than subsequent launches
-
-**Phase to address:** SplashScreen phase -- but WKWebView backgroundColor should be set in the first phase when configuring the Xcode project
-
----
-
-## Major Pitfalls
-
-Mistakes that cause significant UX degradation or require multi-file refactoring.
-
-### Pitfall 5: StatusBar Plugin setBackgroundColor Does NOT Work on iOS
-
-**What goes wrong:**
-Developers call `StatusBar.setBackgroundColor({ color: '#2b2521' })` expecting the status bar area to match the app's dark theme. On iOS, this method is a no-op. The status bar background on iOS is always transparent -- it's the content behind it that determines the visual appearance. You can only control the text/icon color (light or dark) via `setStyle()`.
-
-**Why it happens:**
-iOS status bar architecture is fundamentally different from Android. On iOS, the status bar is an overlay -- it draws on top of whatever content is beneath it. The "background color" is determined by your app's content that extends behind the status bar (enabled via `viewport-fit=cover` and safe-area padding). On Android, the status bar is a separate system chrome bar with its own background color.
-
-**Consequences:**
-- Android-style StatusBar color code silently fails on iOS
-- Developers waste time debugging why the color doesn't apply
-- If `overlaysWebView` is set to `false` on iOS, you get a black bar instead of transparent overlay
-
-**Prevention:**
-1. Use `StatusBar.setStyle({ style: Style.Dark })` for light text on dark background (correct for Loom's dark theme)
-2. Do NOT call `setBackgroundColor` on iOS -- guard with platform check or just don't use it
-3. Ensure `viewport-fit=cover` is in the viewport meta tag (already present in `index.html`)
-4. The existing `.app-shell { padding-top: env(safe-area-inset-top) }` in `base.css` handles the content offset correctly -- the status bar area will show the app-shell background color
-5. Set `overlaysWebView: true` (the default on iOS) to let web content extend behind the status bar
-
-**Detection:**
-- Status bar area appears as a different color than expected
-- Black bar at top of screen when `overlaysWebView` is incorrectly set to `false`
-
-**Phase to address:** StatusBar integration phase
-
----
-
-### Pitfall 6: Haptics Fire on Every Re-render in React Without useCallback/Ref Guard
-
-**What goes wrong:**
-Developers add `Haptics.impact({ style: ImpactStyle.Light })` inside event handlers that are recreated on every render, or inside effects that run more frequently than expected. On iOS, rapid haptic firing (10+ per second) causes the Taptic Engine to enter a protective throttle mode where it stops responding for several seconds. The user experiences haptics that work initially, then go dead.
-
-**Why it happens:**
-React re-renders frequently. If a haptic call is placed in an `onClick` handler that isn't memoized, the closure captures a new reference each render. More critically, if haptics are added to scroll events, intersection observers, or animation callbacks, they fire at 60fps, overwhelming the Taptic Engine.
-
-**Consequences:**
-- Haptics work for a few seconds then stop entirely (Taptic Engine thermal protection)
-- Battery drain from unnecessary haptic motor activation
-- Haptics feel "buzzy" instead of crisp when fired too rapidly
-
-**Prevention:**
-1. Use `useCallback` for all haptic-triggering event handlers
-2. Debounce haptic calls -- minimum 50ms between impact triggers
-3. Create a centralized `useHaptic()` hook that handles platform detection, debouncing, and reduced-motion preference:
-   ```typescript
-   function useHaptic() {
-     const lastFired = useRef(0);
-     return useCallback(async (style: ImpactStyle = ImpactStyle.Light) => {
-       if (prefersReducedMotion()) return;
-       if (!Capacitor.isNativePlatform()) return;
-       const now = Date.now();
-       if (now - lastFired.current < 50) return;
-       lastFired.current = now;
-       await Haptics.impact({ style });
-     }, []);
-   }
-   ```
-4. Never put haptics in scroll handlers, rAF loops, or resize observers
-5. Respect `prefers-reduced-motion` -- haptics are a form of motion feedback
-
-**Detection:**
-- Haptics work on first interaction but not subsequent ones
-- Device feels warm near the Taptic Engine area
-- `console.log` in haptic handler shows it firing hundreds of times
-
-**Phase to address:** Touch-first interactions phase
-
----
-
-### Pitfall 7: requestAnimationFrame Capped at 60fps in WKWebView -- Spring Animations Cannot Hit 120Hz
-
-**What goes wrong:**
-Loom's spring animations (defined in `motion.ts`) use `SPRING_GENTLE`, `SPRING_SNAPPY`, and `SPRING_BOUNCY` configs. If these are driven by JavaScript `requestAnimationFrame` (via Framer Motion or a custom spring solver), they will run at 60fps maximum in WKWebView, even on 120Hz ProMotion displays. The animations feel subtly choppy compared to native iOS apps or even CSS animations in the same WKWebView.
-
-**Why it happens:**
-Apple throttles `requestAnimationFrame` to 60Hz in WKWebView to conserve battery. This is documented in [WebKit bug #173434](https://bugs.webkit.org/show_bug.cgi?id=173434). CSS animations and transitions DO run at 120Hz because they're compositor-driven and don't go through the JavaScript event loop. Safari 18.3+ has an experimental flag for unlocked rAF framerates, but this flag does NOT apply to WKWebView.
-
-**Consequences:**
-- JS-driven springs (Framer Motion `animate()`, custom spring solvers) capped at 60fps
-- CSS-based animations run at 120fps on the same device, creating a jarring inconsistency
-- "Halving spring durations for ProMotion" is pointless if the animation can only sample 60 times per second -- you get the same number of frames, just with a shorter duration, making them feel abrupt rather than smooth
-
-**Prevention:**
-1. Prefer CSS transitions and animations over JS-driven animations wherever possible:
-   - Sidebar slide: use CSS `transform: translateX()` with `transition` (already works at 120Hz)
-   - Modal/dialog enter/exit: CSS `@keyframes` (already works at 120Hz)
-   - Tool card expand/collapse: CSS `grid-template-rows: 0fr/1fr` transition (already works at 120Hz)
-2. For spring physics that CSS cannot express, use the Web Animations API (`element.animate()`) which is compositor-driven and can hit 120Hz
-3. The existing CSS spring approximations in `tokens.css` (`--ease-spring-gentle: cubic-bezier(...)`) already run at 120Hz -- lean into these rather than replacing with JS springs
-4. Do NOT "halve durations" for ProMotion. Instead, keep the same spring configs and let the higher framerate produce smoother interpolation. Only reduce durations if the animation FEELS too slow, not because of framerate math
-5. Reserve Framer Motion's `LazyMotion` for gesture-driven interactions (drag, swipe) where CSS cannot provide the interactivity
-
-**Detection:**
-- Animations feel slightly stuttery in Capacitor app but smooth in Safari
-- Chrome DevTools Performance panel shows 16.67ms frame intervals (60fps) instead of 8.33ms
-- CSS animations on the same page feel smoother than JS-driven ones
-
-**Phase to address:** 120Hz spring profiles phase
-
----
-
-### Pitfall 8: `window.location.host` Returns `localhost` in Bundled Mode -- Auth Flow Breaks
-
-**What goes wrong:**
-In bundled mode, `window.location` returns:
+```swift
+// In CAPBridgeViewController subclass
+override func viewDidLoad() {
+    super.viewDidLoad()
+    bridge?.webView?.allowsBackForwardNavigationGestures = false
+}
 ```
-protocol: "capacitor:"
-host: "localhost"
-hostname: "localhost"
-port: ""
-origin: "capacitor://localhost"
+
+For swipe-to-delete specifically, reserve the left 20px edge zone for iOS native gestures and only allow swipe-to-delete from touches starting >20px from the left edge:
+
+```typescript
+const handleTouchStart = (e: React.TouchEvent) => {
+  const touch = e.touches[0];
+  if (!touch) return;
+  // Skip if touch starts in iOS edge-swipe zone
+  if (IS_NATIVE && touch.clientX < 20) return;
+  startX.current = touch.clientX;
+};
 ```
-Any code that constructs URLs from `window.location` properties will point to the wrong host. The auth flow in `auth.ts` fetches a token from a relative URL, which resolves to `capacitor://localhost/api/auth` -- a non-existent endpoint.
 
-**Why it happens:**
-Capacitor serves bundled assets via the `capacitor://` custom scheme with the hostname `localhost`. This is intentional (Apple's App Transport Security requires a hostname, and `localhost` is conventional). But code written for browser deployment assumes `window.location.host` refers to the actual API server.
+**Detection:** Test on real device by swiping from the very left edge of the screen. If you see a page-back animation or the whole WKWebView content slides right, the conflict exists.
 
-**Consequences:**
-- Auth token fetch fails -- app cannot authenticate
-- WebSocket URLs are wrong (this overlaps with Pitfall 2 but is more specific)
-- Any diagnostic display showing "Connected to {hostname}:{port}" shows wrong info (see `ProofOfLife.tsx:159`)
-- Deep links and route-based session loading break if they reconstruct URLs
-
-**Prevention:**
-1. NEVER use `window.location` for API URL construction in Capacitor-aware code
-2. Use the centralized `getApiBaseUrl()` from Pitfall 2's prevention
-3. Audit every occurrence of `window.location` in the codebase (currently 12+ occurrences across 7 files)
-4. For route-based logic (like `window.location.pathname.match(/\/chat\/(.+)/)` in `websocket-init.ts:114`), these are fine -- the React Router hash/path still works correctly in Capacitor
-
-**Detection:**
-- Auth flow hangs or returns network error
-- "Connected to localhost:" shown in ProofOfLife component
-
-**Phase to address:** First phase -- alongside Pitfall 2
+**Phase:** GESTURE (Phase 67) -- must be addressed before implementing swipe-to-delete.
 
 ---
 
-### Pitfall 9: Safe-Area Insets Not Updated for Keyboard on iOS -- Double-Offset or Missing Offset
+### Pitfall 2: `touch-action: pan-y` Does NOT Work in Safari/WKWebView for Gesture Discrimination
 
-**What goes wrong:**
-`env(safe-area-inset-bottom)` does NOT update when the keyboard appears on iOS. The composer CSS (`composer.css:219-225`) adds `env(safe-area-inset-bottom) + var(--keyboard-offset)`. When the keyboard is open, the safe-area-inset-bottom still reports its original value (34px on iPhone 16 Pro Max). If the keyboard offset already accounts for the full distance from bottom of screen to top of keyboard, the safe-area-inset-bottom adds an extra 34px of dead space.
+**What goes wrong:** Setting `touch-action: pan-y` on a swipe-to-delete container (intending to allow vertical scroll but capture horizontal swipe) does NOT behave as expected in Safari. Safari has historically had incomplete support for `touch-action` values beyond `auto` and `manipulation`. Even with Safari 18.2 fixing serialization order, the actual gesture discrimination is unreliable -- diagonal gestures get cancelled, vertical scrolling gets stuck, or the swipe gesture never fires.
 
-**Why it happens:**
-WebKit intentionally does NOT update `env(safe-area-inset-bottom)` when the keyboard is visible. The rationale is that safe-area-insets represent physical device geometry (notch, home indicator), not transient UI like the keyboard. This is [confirmed behavior](https://webventures.rejh.nl/blog/2025/safe-area-inset-bottom-does-not-update/) across all WebKit versions.
+**Why it happens:** Safari/WebKit uses a different gesture recognition pipeline than Chrome. The `touch-action` CSS property is partially implemented -- `pan-x` and `pan-y` values may be parsed but don't always gate gestures correctly. The browser's built-in momentum scrolling has its own gesture recognizer that takes priority.
 
-**Consequences:**
-- Composer floats 34px above the keyboard (wasted space) on iPhone with home indicator
-- Or worse: if keyboard offset is measured from viewport bottom (not safe area bottom), the composer is 34px too high when keyboard is open and correctly positioned when keyboard is closed
+**Consequences:** Horizontal swipe gestures on list items break vertical scrolling. Users can swipe a session item but then can't scroll the session list. Or vice versa -- scrolling works but swipe-to-delete never triggers because the browser steals the touch.
 
 **Prevention:**
-1. The Capacitor Keyboard plugin's `keyboardHeight` value includes the distance from the bottom of the keyboard to the bottom of the screen (including safe area). When setting `--keyboard-offset` from the plugin, the safe-area-inset-bottom is already "inside" that value.
-2. Adjust the CSS to be keyboard-aware:
+
+Do NOT rely on `touch-action: pan-y` for gesture discrimination on iOS. Instead, use a JavaScript-based approach with an initial-direction heuristic:
+
+```typescript
+const DIRECTION_THRESHOLD = 10; // px before committing to direction
+
+const handleTouchMove = (e: React.TouchEvent) => {
+  const touch = e.touches[0];
+  if (!touch || !startRef.current) return;
+
+  const dx = touch.clientX - startRef.current.x;
+  const dy = touch.clientY - startRef.current.y;
+
+  // Haven't committed to a direction yet
+  if (!directionRef.current) {
+    if (Math.abs(dx) > DIRECTION_THRESHOLD || Math.abs(dy) > DIRECTION_THRESHOLD) {
+      // Commit: if more horizontal than vertical, it's a swipe
+      directionRef.current = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+    }
+    return; // Wait for direction commitment
+  }
+
+  if (directionRef.current === 'vertical') return; // Let browser handle scroll
+
+  // Horizontal swipe: prevent scroll, apply transform
+  e.preventDefault(); // Only works with non-passive listener!
+  applySwipeTransform(dx);
+};
+```
+
+The `touch-action: manipulation` already set on `<body>` in base.css is correct (disables double-tap zoom and pinch-zoom). Do NOT override it with `pan-y` or `pan-x` on child elements.
+
+**Detection:** Test on real iPhone: try to scroll the session list vertically when a session item has `touch-action: pan-y`. If scrolling feels sticky or unresponsive, this pitfall has been triggered.
+
+**Phase:** GESTURE (Phase 67) -- critical for swipe-to-delete implementation.
+
+---
+
+### Pitfall 3: React's Passive Event Listeners Block `preventDefault()` on Touch Events
+
+**What goes wrong:** Calling `e.preventDefault()` inside a React `onTouchMove` handler does nothing on iOS. The gesture you're trying to capture (e.g., horizontal swipe) still triggers the browser's built-in scroll. The console shows: "Unable to preventDefault inside passive event listener invocation."
+
+**Why it happens:** React 17+ attaches all event listeners to the root, and since iOS 11.3, all root-level touch event listeners are passive by default. React's synthetic event system does not pass `{ passive: false }` -- it CAN'T, because it uses event delegation on the root. When you call `e.preventDefault()` in a React `onTouchMove`, you're calling it on a passive listener, which is a no-op.
+
+**Consequences:** Custom horizontal swipe gestures (swipe-to-delete) can't prevent the browser from simultaneously scrolling vertically. The UI jitters as both horizontal translation AND vertical scroll happen at once.
+
+**Prevention:**
+
+Use `useEffect` to attach touch listeners directly to the DOM element with `{ passive: false }`:
+
+```typescript
+useEffect(() => {
+  const el = itemRef.current;
+  if (!el) return;
+
+  const onTouchMove = (e: TouchEvent) => {
+    if (isSwipingRef.current) {
+      e.preventDefault(); // This WORKS because listener is non-passive
+      applySwipeTransform(e);
+    }
+  };
+
+  // MUST be { passive: false } to allow preventDefault
+  el.addEventListener('touchmove', onTouchMove, { passive: false });
+  return () => el.removeEventListener('touchmove', onTouchMove);
+}, []);
+```
+
+Do NOT use React's `onTouchMove` prop for gestures that need `preventDefault`. Use it only for gestures that don't need to block scrolling (like tracking a move for visual feedback).
+
+If using `@use-gesture`, you MUST use the `target` option with a ref instead of the `...bind()` spread pattern, AND set `eventOptions: { passive: false }`:
+
+```typescript
+useDrag(handler, {
+  target: itemRef,
+  eventOptions: { passive: false },
+  axis: 'x',
+  filterTaps: true,
+});
+```
+
+**Detection:** Open Safari DevTools console. If you see "Unable to preventDefault inside passive event listener" warnings, your gesture handler is bound passively.
+
+**Phase:** GESTURE (Phase 67) -- must be addressed in every swipe/drag gesture implementation.
+
+---
+
+### Pitfall 4: `overscroll-behavior: none` is Ignored in WKWebView
+
+**What goes wrong:** The CSS `overscroll-behavior: none` (already set on `html` and `body` in base.css) does NOT suppress rubber-band bounce in WKWebView. Users see the rubber-band overscroll when pulling down on the chat message list, even though the CSS says it shouldn't bounce.
+
+**Why it happens:** WKWebView uses its own scroll view (`UIScrollView`) under the hood, and `overscroll-behavior` is a web-standard CSS property that WebKit recognizes but the underlying native scroll view ignores. The bounce behavior is controlled by `UIScrollView.bounces`, which CSS cannot reach.
+
+**Consequences:** Pull-to-refresh (GESTURE-02) becomes unreliable because the rubber-band bounce interferes with custom pull-to-refresh detection. Users see both the native bounce AND any custom pull-to-refresh indicator, creating a jarring double-animation.
+
+**Prevention:**
+
+For pull-to-refresh, you have two options:
+
+**Option A (Recommended): Use native `UIRefreshControl` via a Capacitor plugin.** This is the iOS-native approach and feels exactly right:
+
+```swift
+// Custom Capacitor plugin
+@objc func enablePullToRefresh(_ call: CAPPluginCall) {
+    DispatchQueue.main.async {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh), for: .valueChanged)
+        self.bridge?.webView?.scrollView.refreshControl = refreshControl
+    }
+}
+```
+
+Then notify the web app via `window.dispatchEvent(new CustomEvent('native-refresh'))`.
+
+**Option B: Disable bounce entirely and implement a pure-web pull-to-refresh.** Set `scrollView.bounces = false` in native code, then implement a custom pull indicator using touch events. This is harder to get right and will never feel as native.
+
+For the chat message list specifically, you probably want bounce disabled (no pull-to-refresh on chat) but pull-to-refresh on the session list. This means per-scroll-container control, which requires native code:
+
+```swift
+// Disable bounce on the main WKWebView scroll view
+bridge?.webView?.scrollView.bounces = false
+// The web app handles per-container scroll via its own overflow elements
+```
+
+**Detection:** On real iPhone, pull down firmly at the top of the session list. If you see the entire WKWebView bounce (background shows through), `overscroll-behavior` is being ignored.
+
+**Phase:** GESTURE (Phase 67) -- affects pull-to-refresh implementation choice.
+
+---
+
+### Pitfall 5: WKWebView Keyboard Dismissal Leaves Viewport Shifted (iOS 12-26)
+
+**What goes wrong:** After the keyboard dismisses, `position: fixed` elements bounce up and down, `visualViewport.offsetTop` doesn't reset to 0, and `visualViewport.height` stays smaller than `window.innerHeight`. The composer ends up floating in the wrong position, or the entire app shell has a gap at the bottom.
+
+**Why it happens:** This is a long-running WebKit bug (filed as WebKit bug 192564, still open). When `viewport-fit=cover` is set (required for safe-area support on notched devices), keyboard dismissal doesn't properly restore the viewport geometry. The issue persists across iOS 12 through iOS 26 beta.
+
+**Consequences:** After using the composer (typing, sending), the app shell has a phantom gap at the bottom. The gap grows with repeated keyboard open/close cycles. Users must scroll or interact to reset the layout.
+
+**Prevention:**
+
+The existing `useKeyboardOffset` hook already handles the web fallback path. For the native path (`IS_NATIVE === true`), the hook is currently a no-op, relying on WKWebView's default Body resize. This is correct for Loom because:
+
+1. The `.app-shell` uses `position: fixed; inset: 0` on native (base.css line 182)
+2. The `contain: layout size style` prevents layout from leaking
+
+However, add a safety net for the keyboard dismissal bug:
+
+```typescript
+// In useKeyboardOffset, add a focusout listener for native
+if (IS_NATIVE) {
+  const handleFocusOut = () => {
+    // Force layout recalculation after keyboard dismisses
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+    });
+  };
+  document.addEventListener('focusout', handleFocusOut);
+  return () => document.removeEventListener('focusout', handleFocusOut);
+}
+```
+
+**Detection:** On real iPhone, tap the composer to open keyboard, type something, then dismiss keyboard. Check if there's a gap at the bottom of the app. Repeat 5 times -- the bug is sometimes intermittent.
+
+**Phase:** SCROLL (Phase 66) -- must be verified during scroll performance validation.
+
+---
+
+### Pitfall 6: `requestAnimationFrame` Capped at 60fps in WKWebView (ProMotion Ignored)
+
+**What goes wrong:** Spring animations driven by `requestAnimationFrame` (rAF) run at 60fps maximum in WKWebView, even on iPhone 16 Pro Max with its 120Hz ProMotion display. CSS animations run at 120Hz, creating a visible disconnect: CSS-driven UI elements animate at 120fps while JS-driven elements stutter at 60fps.
+
+**Why it happens:** Apple intentionally caps rAF at 60Hz in WKWebView to save battery. Safari 18.3+ has a developer flag to unlock 120Hz rAF, but this flag only applies to Safari itself, not to WKWebView used by third-party apps (like Capacitor). This is a deliberate platform restriction, not a bug.
+
+**Consequences:** Any spring animation driven by JavaScript (e.g., via Framer Motion, GSAP, or custom rAF loops) will look noticeably less smooth than CSS transitions. Side-by-side, the CSS sidebar animation at 120Hz looks buttery while the JS spring on a modal looks choppy.
+
+**Prevention:**
+
+This is exactly why the existing architectural decision to prefer CSS transitions over JS animation is correct. Double down on it:
+
+1. **Use CSS transitions for all UI animations.** CSS transitions run on the compositor at 120Hz:
    ```css
-   /* When keyboard is CLOSED: include safe-area */
-   .composer-safe-area {
-     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-   }
-   /* When keyboard is OPEN: keyboard-offset replaces safe-area */
-   .composer-safe-area[data-keyboard-open="true"] {
-     padding-bottom: calc(1rem + var(--keyboard-offset, 0px));
+   .sidebar-panel {
+     transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
    }
    ```
-3. Toggle a `data-keyboard-open` attribute (or CSS class) on the composer container from the Keyboard plugin's show/hide events
-4. Test with AND without the home indicator bar (iPhone SE vs iPhone 16 Pro Max)
 
-**Detection:**
-- Gap between keyboard top and composer bottom
-- Composer at different heights when keyboard-offset is applied vs when safe-area-inset-bottom is used
-
-**Phase to address:** Keyboard plugin integration phase
-
----
-
-### Pitfall 10: Font Loading Fails Intermittently in Bundled WKWebView
-
-**What goes wrong:**
-Self-hosted `.woff2` fonts (Inter, Instrument Serif, JetBrains Mono) declared in `base.css` with `url('/fonts/...')` paths occasionally fail to load in WKWebView's bundled mode. The app renders with system fallback fonts, breaking the editorial typography design. This happens approximately 20% of cold starts on some iOS versions.
-
-**Why it happens:**
-WKWebView loads bundled assets via the `capacitor://localhost` custom scheme through a native `WKURLSchemeHandler`. Font loading in WKWebView has a documented race condition: if CSS is parsed and font loading starts before the scheme handler is fully initialized, the font request fails silently. This is worse on cold start (no cached assets) and with `font-display: swap` (which tells the browser to render with fallback immediately, then swap -- but the swap never happens if the font request fails entirely).
-
-**Consequences:**
-- App renders with system sans-serif instead of Inter Variable
-- Code blocks use system monospace instead of JetBrains Mono
-- Layout shifts when fonts eventually load (if they do)
-- The editorial personality of Loom's typography is lost
-
-**Prevention:**
-1. Preload critical fonts in `index.html`:
-   ```html
-   <link rel="preload" href="/fonts/inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-   <link rel="preload" href="/fonts/jetbrains-mono-variable.woff2" as="font" type="font/woff2" crossorigin>
+2. **CSS `@keyframes` for springs.** Approximate spring physics with a cubic-bezier that matches the spring curve:
+   ```css
+   /* Approximation of spring(mass:1, stiffness:200, damping:20) */
+   transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
    ```
-   Note: The `crossorigin` attribute is required even for same-origin fonts -- this is a browser spec requirement for font preloads
-2. Keep `font-display: swap` (already present) as fallback
-3. Test font loading on device with cold starts -- kill the app from the app switcher, relaunch 10 times
-4. If the intermittent failure persists, consider inlining the most critical font (Inter Variable) as a base64 data URL in the CSS. This is ~100KB but guarantees first-paint typography. Do this ONLY if testing reveals the problem.
-5. Verify font paths resolve correctly -- `/fonts/inter-variable.woff2` should map to `ios/App/App/public/fonts/inter-variable.woff2` after `cap sync`
 
-**Detection:**
-- System font visible on cold start
-- DevTools Network tab shows failed font requests (if debugging is enabled)
-- Typography looks "wrong" but only sometimes
+3. **Only use rAF for non-visual work** (scroll position calculation, intersection detection). Never for driving visual animation on native.
 
-**Phase to address:** Bundled assets phase -- verify during first device testing
+4. **If LazyMotion/Framer Motion is used for a spring**, know that it will max out at 60fps on native. This is acceptable for low-frequency animations (modal entry) but visible on high-frequency ones (drag follow, sidebar swipe).
+
+**Detection:** On real iPhone, compare a CSS transition animation vs. a rAF-driven animation side by side. The rAF version will look noticeably less smooth.
+
+**Phase:** VISUAL (Phase 68) -- affects spring animation tuning for VISUAL-03 and VISUAL-04.
 
 ---
 
 ## Moderate Pitfalls
 
-### Pitfall 11: `position: fixed` Breaks Inside CSS Transform Context in WKWebView
-
-**What goes wrong:**
-Any element with `position: fixed` that is a descendant of an element with a CSS `transform` (including `transform: translateZ(0)` or `will-change: transform`) loses its fixed positioning. Instead of being fixed relative to the viewport, it becomes fixed relative to the transformed ancestor. This is per CSS spec, not a bug, but WKWebView enforces it more aggressively than Chrome.
-
-**Loom exposure:**
-- The composer (floating pill at bottom) uses fixed-like positioning
-- ElectricBorder effect uses CSS transforms
-- Modal overlays and command palette may have transform-based entrance animations
-- Sidebar drawer animation uses `translateX`
-
-**Prevention:**
-1. Audit all `position: fixed` elements to ensure they are NOT descendants of transformed elements
-2. The composer should be a direct child of the root layout, not nested inside a transformed container
-3. For elements that need both fixed positioning and transform animations, apply the transform to a child element, not the fixed-positioned parent
-4. WKWebView is stricter about `will-change: transform` creating a new stacking context -- remove `will-change` from ancestors of fixed elements
-
-**Phase to address:** Mobile layout polish phase
+Mistakes that cause hours of debugging or suboptimal UX but don't require rewrites.
 
 ---
 
-### Pitfall 12: Landscape Orientation Breaks Safe-Area Layout
+### Pitfall 7: Long-Press Triggers Native iOS Context Menu (Link Preview / Image Preview)
 
-**What goes wrong:**
-When the iPhone is rotated to landscape, `env(safe-area-inset-left)` and `env(safe-area-inset-right)` become non-zero (for the notch/Dynamic Island). If the app doesn't account for left/right safe areas, content is obscured behind the notch. Additionally, there's a documented WKWebView bug where `viewport-fit=cover` causes layout collapse on rotation ([WebKit bug](https://github.com/ccorcos/WkWebView-Safe-Area-Inset-Bug)).
+**What goes wrong:** Implementing a custom long-press context menu (GESTURE-03, GESTURE-06) conflicts with iOS's built-in context menu. When a user long-presses on a session item or message, they see BOTH your custom React popover AND the native iOS context menu (with "Open Link", "Copy", "Share" options). Or worse, the native menu fires and your custom handler never runs.
 
-**Loom exposure:**
-The current CSS in `base.css` only handles `safe-area-inset-top` and `safe-area-inset-bottom`. There's no left/right safe-area handling. The sidebar panel is flush-left, which means in landscape-left orientation, the sidebar content extends behind the notch.
+**Why it happens:** WKWebView has a built-in long-press gesture recognizer that shows native previews for links and images. This recognizer fires at ~450ms. If your custom handler also fires at 500ms, there's a race condition. Capacitor doesn't have a `SuppressesLongPressGesture` option (Cordova did).
 
 **Prevention:**
-1. Add left/right safe-area padding to the app shell:
+
+Suppress the native context menu with CSS and the `contextmenu` event:
+
+```css
+/* Suppress native long-press callout on elements where we have custom menus */
+.session-item,
+.message-bubble {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+```
+
+```typescript
+// Prevent the native context menu from firing
+el.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+}, { passive: false });
+```
+
+In capacitor.config.ts, disable link previews:
+
+```typescript
+ios: {
+  allowsLinkPreview: false, // Suppress iOS link preview on long-press
+}
+```
+
+Then implement your custom long-press with a timer:
+
+```typescript
+const LONG_PRESS_MS = 500;
+let timer: ReturnType<typeof setTimeout> | null = null;
+let moved = false;
+
+const onTouchStart = () => {
+  moved = false;
+  timer = setTimeout(() => {
+    if (!moved) {
+      hapticImpact('Medium');
+      showContextMenu();
+    }
+  }, LONG_PRESS_MS);
+};
+
+const onTouchMove = (e: TouchEvent) => {
+  // Cancel if finger moved more than 10px
+  const dx = Math.abs(e.touches[0].clientX - startX);
+  const dy = Math.abs(e.touches[0].clientY - startY);
+  if (dx > 10 || dy > 10) {
+    moved = true;
+    if (timer) clearTimeout(timer);
+  }
+};
+
+const onTouchEnd = () => {
+  if (timer) clearTimeout(timer);
+};
+```
+
+**Detection:** Long-press on a link inside a message on real iPhone. If the native "Open / Copy / Share" popover appears, suppression is incomplete.
+
+**Phase:** GESTURE (Phase 67) -- GESTURE-03 and GESTURE-06.
+
+---
+
+### Pitfall 8: Nested `backdrop-filter: blur()` Causes WKWebView Rendering Glitches
+
+**What goes wrong:** Having a modal with `backdrop-filter: blur(10px)` that overlays a sidebar also using `backdrop-filter: blur()` causes visual artifacts in WKWebView. The blur either disappears, renders as a solid color, or creates a "double blur" that looks like frosted glass on top of frosted glass -- unreadable.
+
+**Why it happens:** WebKit's compositor has a known limitation with nested backdrop-filter elements. Each backdrop-filter creates a new stacking context and requires a separate compositing pass. When stacked, the GPU memory pressure can cause the renderer to fall back to a non-blurred path, or the blur accumulates beyond readability.
+
+**Consequences:** Opening the command palette (which has glass effect) while the sidebar is open (which may also have glass) creates visual garbage. The SettingsModal overlay looks correct in Chrome DevTools but broken on real iPhone.
+
+**Prevention:**
+
+1. **Limit backdrop-filter to ONE visible layer at a time.** When a modal opens, remove blur from the background layer:
    ```css
-   .app-shell {
-     padding-left: env(safe-area-inset-left);
-     padding-right: env(safe-area-inset-right);
+   .sidebar.modal-open {
+     backdrop-filter: none; /* Remove while modal is showing */
    }
    ```
-2. Or, if landscape is not a priority for v2.1, lock orientation to portrait in `Info.plist`:
-   ```xml
-   <key>UISupportedInterfaceOrientations</key>
-   <array>
-     <string>UIInterfaceOrientationPortrait</string>
-   </array>
-   ```
-3. If supporting landscape, test rotation transitions -- WKWebView can briefly show incorrect safe-area values during the rotation animation
 
-**Phase to address:** Mobile layout polish phase (or defer by locking to portrait)
-
----
-
-### Pitfall 13: Building iOS App from Linux Requires Cloud Build or Mac Access
-
-**What goes wrong:**
-Developers attempt to build and deploy the iOS app entirely from Linux, hit a wall at the Xcode build step, and lose time trying workarounds. While `cap add ios` and `cap sync` work on Linux (confirmed in Phase 57), actually compiling Swift code and producing an `.ipa` requires Xcode, which only runs on macOS.
-
-**Why it happens:**
-Apple's iOS toolchain (Xcode, `xcodebuild`, codesigning, provisioning profiles) is macOS-only. There is no cross-compilation path. Even cloud solutions still use Mac hardware -- they just rent it.
-
-**Prevention:**
-1. Development workflow: Edit web code on Linux, run `cap sync ios` on Linux, then use a Mac ONLY for `xcodebuild` / `cap run ios`
-2. Cloud build options that work with Capacitor:
-   - **Capgo Build** -- uploads synced iOS project, builds on cloud Mac, returns `.ipa`
-   - **Xcode Cloud** -- Apple's own CI, free tier available
-   - **GitHub Actions with macOS runner** -- `macos-latest` image has Xcode pre-installed
-3. Minimize trips to Mac: batch native changes (plugin configs, storyboard, Info.plist) and only build when native code changes. Web-only changes can be tested via `server.url` mode pointed at the Linux dev server.
-4. Do NOT attempt to install macOS in a VM on Linux for Xcode -- it violates Apple's EULA and the toolchain doesn't work reliably in VMs
-
-**Detection:**
-- `cap run ios` fails with "Xcode not found"
-- `pod install` fails (no CocoaPods on Linux) -- use SPM as fallback (already working)
-- `xcodebuild` command not available
-
-**Phase to address:** Build/deploy infrastructure phase
-
----
-
-### Pitfall 14: WKWebView Keyboard Dismiss Leaves Blank Space (The "Black Gap" Bug)
-
-**What goes wrong:**
-After the keyboard closes, WKWebView occasionally fails to resize back to its original dimensions. A black (or white, depending on WKWebView background color) gap remains where the keyboard was. This persists until the user scrolls, interacts with another element, or the view is forced to re-layout. Reported in [Capacitor #2194](https://github.com/ionic-team/capacitor-plugins/issues/2194) and confirmed on multiple iOS versions.
-
-**Why it happens:**
-This is a WKWebView rendering bug, not a Capacitor bug. It appears more frequently in Low Power Mode and on older devices. The WKWebView's internal `UIScrollView` doesn't properly recalculate its content inset when the keyboard animation completes.
-
-**Prevention:**
-1. In the `keyboardDidHide` listener, force a re-layout:
-   ```typescript
-   Keyboard.addListener('keyboardDidHide', () => {
-     document.documentElement.style.setProperty('--keyboard-offset', '0px');
-     // Force WKWebView to recalculate layout
-     window.scrollTo(0, 0);
-     // Trigger a reflow
-     document.body.style.overflow = 'hidden';
-     requestAnimationFrame(() => {
-       document.body.style.overflow = '';
-     });
-   });
-   ```
-2. Use `resize: "none"` mode (already recommended in Pitfall 1) -- this mode has fewer instances of the bug because WKWebView isn't trying to resize itself
-3. Add a `keyboardWillHide` listener that starts the CSS transition BEFORE WKWebView tries to re-layout, masking any brief gap
-
-**Detection:**
-- Black or colored gap at bottom of screen after keyboard dismiss
-- More frequent when device is in Low Power Mode
-- Does not reproduce consistently -- test 20+ keyboard open/close cycles
-
-**Phase to address:** Keyboard plugin integration phase
-
----
-
-### Pitfall 15: Capacitor Plugin Imports Crash on Web (Non-Native) Platform
-
-**What goes wrong:**
-Code like `Haptics.impact({ style: ImpactStyle.Light })` throws or silently fails when running in a regular browser (not Capacitor app). If plugin calls are not guarded, the web version of Loom breaks when the same codebase runs in development (Vite dev server) or production (nginx).
-
-**Why it happens:**
-Capacitor plugins have web implementations that are stubs or no-ops. But importing and calling them adds bundle weight and may trigger console warnings. More critically, `Capacitor.isNativePlatform()` returns `false` on web, so if you forget to check, the plugin may throw on platforms where native functionality doesn't exist.
-
-**Prevention:**
-1. Always guard plugin calls:
-   ```typescript
-   import { Capacitor } from '@capacitor/core';
-
-   async function triggerHaptic() {
-     if (!Capacitor.isNativePlatform()) return;
-     const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
-     await Haptics.impact({ style: ImpactStyle.Light });
+2. **Use a smaller blur radius on mobile.** 10px is expensive; 4-6px looks nearly as good with half the GPU cost:
+   ```css
+   @media (max-width: 767px) {
+     .glass-surface {
+       backdrop-filter: blur(6px);
+     }
    }
    ```
-2. Use dynamic imports (`import()`) for all Capacitor plugins to avoid loading native code on web
-3. Create a `src/lib/native.ts` module that centralizes all Capacitor plugin access behind platform-guarded wrappers
-4. Test the web version after adding every Capacitor plugin -- run `npm run dev` and verify no console errors
 
-**Detection:**
-- Console warnings about "Capacitor plugin not available" on web
-- Web build size increases significantly after adding plugins
-- Errors in CI tests (which run in jsdom, not Capacitor)
+3. **Never nest more than 2 backdrop-filter elements in the same stacking context.** Audit the DOM tree before adding new glass effects.
 
-**Phase to address:** Every plugin phase -- establish the pattern in the first phase
+4. **Use `will-change: transform` on the blurred element** to force GPU compositing:
+   ```css
+   .glass-surface {
+     will-change: transform;
+     backdrop-filter: blur(6px);
+     -webkit-backdrop-filter: blur(6px); /* Still needed for older iOS */
+   }
+   ```
+
+**Detection:** Open command palette on top of sidebar on real iPhone. If the blur disappears or creates a solid-color overlay, nesting is the issue.
+
+**Phase:** VISUAL (Phase 68) -- VISUAL-02 glass effects.
+
+---
+
+### Pitfall 9: Pull-to-Refresh Fights with Existing `overscroll-behavior: none` and Scroll Anchoring
+
+**What goes wrong:** Implementing pull-to-refresh (GESTURE-02) in the session list conflicts with the existing `overscroll-behavior: none` on `<body>`. The pull gesture never triggers because the browser (or the CSS rule) prevents the overscroll that would normally indicate a pull. Additionally, if using the JS-based approach, the scroll anchor logic in `useScrollAnchor` fights the pull gesture -- it tries to keep the scroll at the bottom while the pull tries to scroll past the top.
+
+**Why it happens:** `overscroll-behavior: none` on `<body>` prevents scroll chaining globally. But pull-to-refresh requires overscroll at the top of the list. The scroll container needs `overscroll-behavior-y: contain` (not `none`) to allow the pull but prevent chaining to the parent. However, the session list is in the sidebar, not the main body.
+
+**Consequences:** Pull-to-refresh either never triggers (overscroll blocked), or it triggers but the scroll anchor logic immediately cancels it (thinks user is scrolling, not pulling).
+
+**Prevention:**
+
+The session list sidebar scroll container should have:
+
+```css
+.session-list-scroll {
+  overflow-y: auto;
+  overscroll-behavior-y: contain; /* Allow overscroll but contain it */
+  /* NOT 'none' -- need overscroll for pull detection */
+}
+```
+
+The pull-to-refresh detection should be a separate concern from scroll anchoring. Use a dedicated state machine:
+
+```typescript
+type PullState = 'idle' | 'pulling' | 'threshold' | 'refreshing';
+
+// Only enter 'pulling' when scrollTop === 0 AND touch is moving down
+const handleTouchMove = (e: TouchEvent) => {
+  if (scrollContainerRef.current?.scrollTop !== 0) return; // Not at top
+  const dy = e.touches[0].clientY - startY;
+  if (dy > 0 && pullState === 'idle') {
+    setPullState('pulling');
+  }
+};
+```
+
+Keep `overscroll-behavior: none` on `<body>` (prevents the whole page from bouncing) but use `overscroll-behavior-y: contain` on the specific scroll container that needs pull-to-refresh.
+
+**Detection:** Scroll the session list to the very top, then pull down. If nothing happens, overscroll is blocked. If the whole page bounces, scroll chaining leaked.
+
+**Phase:** GESTURE (Phase 67) -- GESTURE-02 implementation.
+
+---
+
+### Pitfall 10: Server.url Mode Creates Unpredictable Caching for CSS/JS Assets
+
+**What goes wrong:** In server.url mode, WKWebView loads assets from the remote dev server (or nginx). WKWebView's HTTP cache aggressively caches CSS and JS files. After deploying a new version, users see stale styles or stale JavaScript -- glass effects from the old build, missing gesture handlers from the new build, or half-old/half-new component rendering.
+
+**Why it happens:** WKWebView honors HTTP cache headers, but it also has its own process-level cache that survives app backgrounding. The `cleartext: true` config doesn't affect caching behavior. Unlike a regular browser, there's no easy "hard refresh" -- force-quitting the app doesn't always clear the WKWebView cache.
+
+**Consequences:** After deploying a new build with gesture handlers, users don't get the new code until the cache expires (or the app is fully killed and relaunched, sometimes multiple times). CSS changes don't apply, causing visual regressions that are "fixed" but invisible to the user.
+
+**Prevention:**
+
+Loom already uses Vite's content-hashed filenames (e.g., `index-a1b2c3.js`), which should bust caches on asset changes. Verify this is working:
+
+1. **Check nginx headers** -- ensure `Cache-Control: immutable, max-age=31536000` is set for hashed assets and `Cache-Control: no-cache` for `index.html`:
+   ```nginx
+   location ~* \.[0-9a-f]{8}\.(js|css)$ {
+     add_header Cache-Control "immutable, max-age=31536000";
+   }
+   location = / {
+     add_header Cache-Control "no-cache";
+   }
+   ```
+
+2. **After deploy, increment a query param on the server.url** in capacitor.config.ts to bust the HTML cache:
+   ```typescript
+   server: {
+     url: process.env.CAPACITOR_SERVER_URL
+       ? `${process.env.CAPACITOR_SERVER_URL}?v=${Date.now()}`
+       : undefined,
+   }
+   ```
+   This is only needed during development -- production bundled mode doesn't have this issue.
+
+3. **Add a version check** in the app that compares client-side JS version with server-reported version and forces a reload on mismatch.
+
+**Detection:** Deploy a CSS change (e.g., change an OKLCH color token). Load the app on iPhone. If the old color shows, caching is stale. Check Safari DevTools Network tab for "304 Not Modified" on index.html.
+
+**Phase:** All phases -- ongoing concern during development and testing.
+
+---
+
+### Pitfall 11: `will-change` Overuse Causes GPU Memory Pressure and Black Flashes
+
+**What goes wrong:** Adding `will-change: transform` to too many elements (every session item, every message, every tool card) causes WKWebView to create excessive compositor layers. On iPhone, GPU memory is limited. When the limit is exceeded, layers start getting evicted and re-created, causing black flashes or blank rectangles during scroll.
+
+**Why it happens:** Each `will-change: transform` creates a separate GPU texture. On a chat with 50+ messages, each with a tool card, that's 100+ compositor layers. iPhone 16 Pro Max has 8GB RAM, but GPU texture memory is a fraction of that. WKWebView is less aggressive about layer management than Safari.
+
+**Consequences:** Scrolling through a long conversation causes random black rectangles to flash where messages should be. The issue is intermittent and hard to reproduce in simulators (which have access to Mac GPU memory).
+
+**Prevention:**
+
+1. **Apply `will-change` only to elements that are ACTIVELY animating.** Remove it after animation completes:
+   ```typescript
+   el.style.willChange = 'transform';
+   el.addEventListener('transitionend', () => {
+     el.style.willChange = 'auto';
+   }, { once: true });
+   ```
+
+2. **Never put `will-change` in a CSS rule that applies to repeated list items.** The `.msg-item` class should NOT have `will-change: transform`. Use it only on the sidebar panel, modals, and other singleton elements.
+
+3. **The existing `content-visibility: auto` on `.msg-item` is correct** -- it already handles off-screen optimization without creating GPU layers.
+
+4. **Use Safari DevTools "Layers" panel** to count compositor layers. Stay under 50 active layers.
+
+**Detection:** Scroll rapidly through a 100+ message conversation on real iPhone. If you see black rectangles or blank spaces that fill in after a moment, GPU layers are being evicted.
+
+**Phase:** SCROLL (Phase 66) -- SCROLL-06 GPU compositing verification.
+
+---
+
+### Pitfall 12: Swipe-to-Delete Gesture Conflicts with Existing Sidebar Swipe-to-Close
+
+**What goes wrong:** Loom already has a swipe-to-close gesture on the sidebar (Sidebar.tsx, line 42-101). Adding swipe-to-delete on session items INSIDE the sidebar creates a gesture conflict. A horizontal swipe on a session item could mean: (a) swipe-to-delete this session, OR (b) swipe to close the entire sidebar. Both gestures listen for the same touchmove direction (leftward horizontal swipe).
+
+**Why it happens:** Both gestures are registered on overlapping DOM elements. The sidebar swipe-to-close listens on the sidebar panel ref, and the swipe-to-delete would listen on individual session items inside that panel. Touch events bubble from session items to the sidebar panel.
+
+**Consequences:** Swiping left on a session item either: always closes the sidebar (parent captures first), always triggers delete (child prevents propagation), or sometimes one and sometimes the other (race condition).
+
+**Prevention:**
+
+Use `stopPropagation()` on the session item's touch handler to prevent the event from reaching the sidebar's swipe-to-close handler:
+
+```typescript
+// In SwipeableSessionItem
+const handleTouchMove = (e: React.TouchEvent) => {
+  if (isSwipingRef.current) {
+    e.stopPropagation(); // Prevent sidebar's swipe-to-close from firing
+    applySwipeTransform(e);
+  }
+};
+```
+
+Additionally, add a velocity/distance threshold difference:
+- Swipe-to-delete: requires >60px horizontal displacement on the session item
+- Swipe-to-close sidebar: requires >100px horizontal displacement (already set at line 78)
+
+Ensure the sidebar swipe-to-close only activates on touches that start on the sidebar panel itself (not on session items):
+
+```typescript
+const handleTouchStart = (e: React.TouchEvent) => {
+  // Only capture swipe-to-close on sidebar chrome (header, footer),
+  // NOT on session items which have their own swipe handler
+  const target = e.target as HTMLElement;
+  if (target.closest('[data-swipeable-item]')) return;
+  // ... existing swipe-to-close logic
+};
+```
+
+**Detection:** On mobile, open sidebar and try to swipe-delete a session. If the entire sidebar closes instead, the gesture conflict exists.
+
+**Phase:** GESTURE (Phase 67) -- GESTURE-01 implementation.
 
 ---
 
 ## Minor Pitfalls
 
-### Pitfall 16: `-webkit-overflow-scrolling: touch` Causes Render Artifacts
-
-**What goes wrong:**
-Adding `-webkit-overflow-scrolling: touch` to scrollable containers (message list, sidebar) causes white flickering and disappearing elements during fast scrolling in WKWebView.
-
-**Prevention:**
-Loom does not currently use `-webkit-overflow-scrolling: touch` (it was removed from modern WebKit). Do NOT add it. Modern WKWebView provides momentum scrolling by default on `overflow: auto/scroll` elements. The property is deprecated and causes more problems than it solves.
-
-**Phase to address:** N/A -- just don't add it
+Issues that cause subtle UX degradation but are easy to fix once identified.
 
 ---
 
-### Pitfall 17: `max-scale=1.0, user-scalable=no` Ignored for Programmatic Zoom
+### Pitfall 13: CSS Transitions Break After Keyboard Use on Some iOS Versions
 
-**What goes wrong:**
-The viewport meta tag already includes `maximum-scale=1.0, user-scalable=no` (index.html:7). This prevents pinch-to-zoom, which is correct for an app. However, WKWebView can still programmatically zoom when focusing on small text inputs (auto-zoom on focus). If the font size of the `<textarea>` is less than 16px, iOS zooms in.
+**What goes wrong:** After the keyboard has been used (opened and closed), CSS transitions on animated elements stop working or run at incorrect speeds. Elements snap to their final state instead of animating.
+
+**Why it happens:** A known iOS/WKWebView bug (tracked in Cordova iOS issue #796) where keyboard interaction disrupts the animation compositor state. The WKWebView's compositor sometimes fails to re-initialize properly after a viewport resize triggered by keyboard show/hide.
 
 **Prevention:**
-The composer textarea uses `text-base md:text-sm` which resolves to 16px on mobile and 14px on desktop. The 16px mobile size should prevent auto-zoom. Verify this is the case on device. If any other inputs (settings modal, command palette) use font sizes below 16px on mobile, they will trigger auto-zoom.
 
-**Phase to address:** Touch-first interactions phase -- audit all focusable inputs
+Force a compositor reset after keyboard dismissal:
+
+```typescript
+// Add to useKeyboardOffset's native path
+const handleFocusOut = () => {
+  requestAnimationFrame(() => {
+    // Force compositor to recalculate
+    document.body.style.opacity = '0.999';
+    requestAnimationFrame(() => {
+      document.body.style.opacity = '';
+    });
+  });
+};
+```
+
+This is a "poke the compositor" hack, but it's the standard workaround used by Ionic framework internally.
+
+**Detection:** Type in the composer (keyboard opens), send a message (keyboard closes), then immediately expand a ThinkingDisclosure or ToolCard. If the expand animation snaps instead of transitioning, this bug is active.
+
+**Phase:** SCROLL (Phase 66) -- verify during scroll performance testing.
 
 ---
 
-### Pitfall 18: `process.env` in `capacitor.config.ts` Only Resolves at Sync Time
+### Pitfall 14: OLED True Black (#000) Creates "Smearing" on Dark Content During Scroll
 
-**What goes wrong:**
-Developers expect `process.env.CAPACITOR_SERVER_URL` to be a runtime variable. It is not. The `.ts` config is evaluated by the Capacitor CLI during `cap sync`, and the resolved values are baked into `capacitor.config.json` inside the iOS project. Changing the env var after sync has no effect until the next `cap sync`.
+**What goes wrong:** Using true black (`oklch(0 0 0)`) as the background for VISUAL-01 causes "black smearing" on OLED displays during fast scroll. Pixels transitioning from true black to gray/colored have noticeably slower response times than pixels transitioning between two non-black values.
+
+**Why it happens:** OLED pixels in their "off" state (true black) take longer to turn on than pixels that are already emitting some light. During fast scrolling, this creates a ghosting/smearing effect where dark content appears to trail or blur.
 
 **Prevention:**
-This is already documented in the existing `capacitor.config.ts` comments (line 9-10) and the IOS-ASSESSMENT.md. Reinforce it:
-1. Run `cap sync ios` after changing environment variables
-2. Do NOT try to read `process.env` in client-side code -- use `import.meta.env` (Vite's mechanism)
-3. Document the `cap sync` workflow clearly: `CAPACITOR_SERVER_URL=http://... npx cap sync ios`
 
-**Phase to address:** Build/deploy documentation
+Use near-black instead of true black for the outermost background:
+
+```css
+/* VISUAL-01: Use near-black, not true black, for OLED */
+html {
+  background-color: oklch(0.05 0 0); /* Near-black, not pure black */
+}
+body {
+  background-color: var(--surface-base); /* oklch(0.15) -- elevated surface */
+}
+```
+
+The power savings difference between `oklch(0 0 0)` and `oklch(0.05 0 0)` is negligible (OLED pixels at 5% brightness use ~2% of full power). The smear reduction is worth it.
+
+**Detection:** Scroll fast through a long conversation with code blocks (which have lighter backgrounds). If dark text smears or trails during scroll, true black is causing OLED ghosting.
+
+**Phase:** VISUAL (Phase 68) -- VISUAL-01 OLED background.
+
+---
+
+### Pitfall 15: Desktop-Pretty Glass Effects Look Terrible on Small Mobile Screens
+
+**What goes wrong:** Glass morphism effects (backdrop-filter blur with semi-transparent backgrounds) that look gorgeous on a 27" desktop display look muddy, low-contrast, and unreadable on a 6.7" iPhone screen. The blur radius that creates a subtle frosted-glass effect on desktop creates an illegible smear on mobile.
+
+**Why it happens:** On mobile: (1) the blurred background contains denser content (more text per cm of screen), (2) the viewing angle is closer, (3) ambient light varies more (indoor/outdoor), and (4) the physical pixel density is higher, making blur artifacts more visible. Additionally, dark mode glass effects on dark backgrounds create near-zero contrast between the glass surface and its contents.
+
+**Consequences:** Modals, command palette, and settings panels look beautiful in Chrome DevTools mobile preview but are hard to read on real iPhone in daylight.
+
+**Prevention:**
+
+1. **Increase background opacity on mobile** to compensate for reduced contrast:
+   ```css
+   @media (max-width: 767px) {
+     .glass-surface {
+       /* Desktop: oklch(0.15 / 0.6), Mobile: more opaque */
+       background: oklch(0.15 0 0 / 0.85);
+       backdrop-filter: blur(6px); /* Smaller radius */
+     }
+   }
+   ```
+
+2. **Test in direct sunlight.** DevTools cannot simulate the contrast reduction caused by bright ambient light on a glossy screen.
+
+3. **Ensure text on glass surfaces meets AAA contrast (7:1)** since the glass background is semi-transparent and thus variable. Test against both best-case and worst-case blurred content behind the glass.
+
+**Detection:** Take the phone outside or hold it under a bright desk lamp. If you can't read text in modals, the glass effect needs more opacity.
+
+**Phase:** VISUAL (Phase 68) -- VISUAL-02 glass effects, VISUAL-08 contrast.
+
+---
+
+### Pitfall 16: `position: sticky` Breaks in WKWebView Nested Scroll Containers
+
+**What goes wrong:** The LiveSessionBanner (SCROLL-08) or DateGroupHeader uses `position: sticky` to stay pinned during scroll. In WKWebView, sticky positioning fails silently inside nested scroll containers -- the element just scrolls away with everything else.
+
+**Why it happens:** WKWebView's sticky implementation requires the sticky element's containing block to be the scroll container itself. If there's an intermediate `overflow: hidden` or `overflow: auto` parent between the sticky element and its scroll container, sticky behavior breaks. This is a Safari/WebKit limitation, not a standards issue.
+
+**Prevention:**
+
+Audit the DOM tree between any sticky element and its scroll parent. Ensure no intermediate ancestor has `overflow: hidden`:
+
+```typescript
+// Debug utility to check sticky viability
+function canSticky(el: HTMLElement): boolean {
+  let parent = el.parentElement;
+  while (parent && parent !== el.closest('[style*="overflow"]')) {
+    const style = getComputedStyle(parent);
+    if (style.overflow !== 'visible') {
+      console.warn('Sticky broken by', parent, 'overflow:', style.overflow);
+      return false;
+    }
+    parent = parent.parentElement;
+  }
+  return true;
+}
+```
+
+If sticky won't work, fall back to `position: fixed` with manual offset calculation (which the app already does for the LiveSessionBanner).
+
+**Detection:** On real iPhone, scroll the message list with a sticky header visible. If the header scrolls away instead of staying pinned, a parent overflow is breaking it.
+
+**Phase:** SCROLL (Phase 66) -- SCROLL-08 sticky header behavior.
+
+---
+
+### Pitfall 17: Haptic Feedback Timing Mismatch Creates "Laggy" Feel
+
+**What goes wrong:** Firing haptic feedback AFTER the visual response (e.g., after a state update completes) creates a perceptible delay between touch and feedback. Users feel the tap, see the UI change 16ms later, then feel the haptic 50-100ms after that. This makes the app feel sluggish rather than responsive.
+
+**Why it happens:** Haptic calls go through the Capacitor bridge (JS -> Swift -> Taptic Engine), which adds ~30-50ms of latency. If the haptic is fired inside a `setState` callback or after an async operation, the total delay becomes noticeable.
+
+**Prevention:**
+
+Fire haptics BEFORE or SIMULTANEOUS with the visual change, never after:
+
+```typescript
+const handleSessionSelect = (sessionId: string) => {
+  // Fire haptic FIRST -- it goes through native bridge async
+  hapticSelection();
+  // Then update state -- visual change happens on next frame
+  navigate(`/session/${sessionId}`);
+};
+```
+
+The existing haptics.ts module already fires with `void Haptics.impact()` (fire-and-forget), which is correct. The key is calling it at the right point in the handler -- at the top, before any async work.
+
+**Detection:** Tap rapidly between sessions. If the haptic feels "late" compared to the visual transition, the firing order is wrong.
+
+**Phase:** GESTURE (Phase 67) -- GESTURE-05 expanded haptics.
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase Topic | Likely Pitfall | Severity | Mitigation |
-|-------------|---------------|----------|------------|
-| Keyboard plugin | Pitfall 1: Dual keyboard detection systems fight | Critical | Disable visualViewport hack when Capacitor detected |
-| Keyboard plugin | Pitfall 9: Safe-area + keyboard double offset | Major | Toggle safe-area off when keyboard open |
-| Keyboard plugin | Pitfall 14: Black gap after dismiss | Major | Force re-layout in keyboardDidHide |
-| Bundled assets | Pitfall 2: All fetch/WS URLs broken | Critical | Centralized getApiBaseUrl() first |
-| Bundled assets | Pitfall 3: CapacitorHttp breaks WebSocket | Critical | Disable CapacitorHttp explicitly |
-| Bundled assets | Pitfall 8: window.location returns capacitor://localhost | Major | Audit all window.location usage |
-| Bundled assets | Pitfall 10: Font loading race condition | Major | Preload critical fonts |
-| StatusBar | Pitfall 5: setBackgroundColor is no-op on iOS | Major | Use setStyle only; rely on web content for visual |
-| SplashScreen | Pitfall 4: White flash on dark theme | Critical | Set WKWebView backgroundColor to match theme |
-| Haptics | Pitfall 6: Taptic Engine throttle from rapid firing | Major | Debounce with 50ms minimum, useHaptic hook |
-| 120Hz springs | Pitfall 7: rAF capped at 60fps in WKWebView | Major | Prefer CSS transitions; use Web Animations API |
-| Layout polish | Pitfall 11: Fixed positioning breaks under transforms | Moderate | Audit DOM nesting of fixed elements |
-| Layout polish | Pitfall 12: Landscape safe-area not handled | Moderate | Lock to portrait or add left/right safe-area |
-| Build/deploy | Pitfall 13: No Xcode on Linux | Moderate | Cloud build or Mac-only for final compile |
-| All plugins | Pitfall 15: Plugin calls crash on web | Major | Platform guard + dynamic imports pattern |
-| Touch inputs | Pitfall 17: Auto-zoom on small font inputs | Minor | Ensure 16px minimum on mobile inputs |
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Phase 64: Touch Targets | Touch target changes affecting existing layout | Test after EVERY change on real device; padding increase can push adjacent elements |
+| Phase 65: Typography | Font size increase causing text overflow/truncation | Test with long session titles (100+ chars) and multi-language text |
+| Phase 66: Scroll Performance | Measuring perf in Simulator instead of real device | Simulator uses Mac GPU; ALWAYS validate on physical iPhone |
+| Phase 66: Scroll Performance | Adding `will-change` to fix jank but causing GPU memory issues | Use Safari DevTools Layers panel; stay under 50 active layers |
+| Phase 66: Scroll Performance | CSS transitions broken after keyboard use | Compositor reset hack (Pitfall 13) |
+| Phase 66: Scroll Performance | `position: sticky` silently broken by nested overflow | Audit DOM tree between sticky element and scroll parent (Pitfall 16) |
+| Phase 67: Gestures (swipe-to-delete) | React `onTouchMove` passive listener prevents `preventDefault` | Use `useEffect` with DOM addEventListener `{ passive: false }` |
+| Phase 67: Gestures (swipe-to-delete) | Conflict with existing sidebar swipe-to-close | Use `stopPropagation` and different displacement thresholds |
+| Phase 67: Gestures (swipe-to-delete) | iOS back gesture conflict on left edge | Disable `allowsBackForwardNavigationGestures` in Swift |
+| Phase 67: Gestures (pull-to-refresh) | CSS `overscroll-behavior: none` blocks pull detection | Consider native UIRefreshControl via Capacitor plugin |
+| Phase 67: Gestures (long-press) | Native iOS context menu conflicts with custom menu | Set `-webkit-touch-callout: none` and `allowsLinkPreview: false` |
+| Phase 68: Visual (glass) | Nested backdrop-filter causes rendering artifacts | Limit to ONE visible blur layer at a time |
+| Phase 68: Visual (OLED) | True black smearing during fast scroll | Use near-black `oklch(0.05 0 0)` instead of pure black |
+| Phase 68: Visual (springs) | rAF animations capped at 60fps in WKWebView | Use CSS transitions for all visible animations; rAF for logic only |
+| Phase 68: Visual (contrast) | Glass effects unreadable on mobile in bright light | Increase glass opacity on mobile; test outdoors |
+
+---
 
 ## Sources
 
-- [Capacitor Keyboard Plugin Docs](https://capacitorjs.com/docs/apis/keyboard)
-- [Capacitor StatusBar Plugin Docs](https://capacitorjs.com/docs/apis/status-bar)
-- [Capacitor Haptics Plugin Docs](https://capacitorjs.com/docs/apis/haptics)
-- [Capacitor SplashScreen Plugin Docs](https://capacitorjs.com/docs/apis/splash-screen)
-- [WKWebView resize after keyboard close -- #2194](https://github.com/ionic-team/capacitor-plugins/issues/2194)
-- [CapacitorHttp breaks WebSocket -- #7568](https://github.com/ionic-team/capacitor/issues/7568)
-- [CapacitorHttp interceptor URL mangling -- #7585](https://github.com/ionic-team/capacitor/issues/7585)
-- [Keyboard height not recalculated on input type change -- #2301](https://github.com/ionic-team/capacitor-plugins/issues/2301)
-- [iOS WKWebView keyboard jump -- #1366](https://github.com/ionic-team/capacitor/issues/1366)
-- [WKWebView 120Hz rAF support -- WebKit #173434](https://bugs.webkit.org/show_bug.cgi?id=173434)
-- [StatusBar setBackgroundColor iOS limitation -- #777](https://github.com/ionic-team/capacitor/issues/777)
-- [SplashScreen black screen on dark theme](https://forum.ionicframework.com/t/black-screen-after-splashscreen-capacitor-react-ios/237108)
-- [WKWebView fixed position broken with scrollView.bounce -- WebKit #158325](https://bugs.webkit.org/show_bug.cgi?id=158325)
-- [Safe-area-inset-bottom does not update for keyboard](https://webventures.rejh.nl/blog/2025/safe-area-inset-bottom-does-not-update/)
-- [WKWebView safe-area rotation bug](https://github.com/ccorcos/WkWebView-Safe-Area-Inset-Bug)
-- [Capacitor font loading production bug -- #5147](https://github.com/ionic-team/capacitor/issues/5147)
-- [Capgo Build -- iOS from non-Mac](https://capgo.app/blog/build-ios-app-from-windows-capacitor-capgo-build/)
-- [Capawesome iOS Troubleshooting](https://capawesome.io/blog/troubleshooting-capacitor-ios-issues/)
-- [CORS with capacitor://localhost -- #1143](https://github.com/ionic-team/capacitor/issues/1143)
+**WKWebView Gesture Conflicts:**
+- [touch-action: disable webview swipe back behavior (W3C PointerEvents #358)](https://github.com/w3c/pointerevents/issues/358)
+- [allowsBackForwardNavigationGestures (Apple Developer Docs)](https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu)
+- [WKWebView Swipe Back Gesture (Apple Developer Forums)](https://developer.apple.com/forums/thread/766975)
+
+**touch-action Support:**
+- [touch-action and scrolling directional lock (W3C #303)](https://github.com/w3c/pointerevents/issues/303)
+- [touch-action: pan-y prevents L shaped gestures (@use-gesture #640)](https://github.com/pmndrs/use-gesture/discussions/640)
+- [WebKit Features in Safari 18.2](https://webkit.org/blog/16301/webkit-features-in-safari-18-2/)
+
+**Passive Event Listeners:**
+- [@use-gesture FAQ: passive events](https://use-gesture.netlify.app/docs/faq/)
+- [Prevent Default Behavior of Gesture (@use-gesture #1)](https://github.com/pmndrs/use-gesture/issues/1)
+- [Blocking Navigation Gestures on iOS Safari](https://pqina.nl/blog/blocking-navigation-gestures-on-ios-13-4/)
+
+**WKWebView overscroll-behavior:**
+- [Disable rubber-band bounce scrolling in iOS WKWebView](https://feedback.base44.com/p/disable-rubber-band-bounce-scrolling-in-ios-wkwebview-wrapper)
+- [CSS overscroll-behavior WebKit Bug #176454](https://bugs.webkit.org/show_bug.cgi?id=176454)
+- [DisallowOverscroll not working on iOS 16 (Cordova #1244)](https://github.com/apache/cordova-ios/issues/1244)
+
+**Keyboard/Viewport Issues:**
+- [Keyboard dismissal leaves viewport shifted (WebKit #192564)](https://bugs.webkit.org/show_bug.cgi?id=192564)
+- [Capacitor keyboard resize CSS rules not reevaluated (#6430)](https://github.com/ionic-team/capacitor/issues/6430)
+- [Webview glitch on keyboard open (#5535)](https://github.com/ionic-team/capacitor/issues/5535)
+
+**Animation Performance:**
+- [WKWebView 120Hz Support (Apple Developer Forums)](https://developer.apple.com/forums/thread/773222)
+- [Support for 120Hz requestAnimationFrame (WebKit #173434)](https://bugs.webkit.org/show_bug.cgi?id=173434)
+- [Web Animation Performance Tier List (Motion Magazine)](https://motion.dev/magazine/web-animation-performance-tier-list)
+- [CSS animations break after keyboard use (Cordova iOS #796)](https://github.com/apache/cordova-ios/issues/796)
+
+**Context Menu / Long Press:**
+- [SuppressesLongPressGesture in Capacitor (Discussion #3208)](https://github.com/ionic-team/capacitor/discussions/3208)
+- [How to Prevent Default Context Menu on Long Press](https://additionalknowledge.com/2024/08/02/how-to-prevent-the-default-context-menu-live-preview-on-long-press-in-mobile-safari-chrome/)
+
+**Visual Effects:**
+- [How to fix filter: blur() performance in Safari](https://graffino.com/til/how-to-fix-filter-blur-performance-issue-in-safari/)
+- [Backdrop Filter Blur rendering issues in Safari](https://copyprogramming.com/howto/backdrop-filter-blur-box-shadow-not-rendering-properly-in-safari)
+- [Dark Mode Design Best Practices (NNG)](https://www.nngroup.com/articles/dark-mode-users-issues/)
+
+**Server.url / Caching:**
+- [WKWebView localhost same-origin policy (Capacitor #788)](https://github.com/ionic-team/capacitor/issues/788)
+- [Capacitor iOS swipe back gesture (Discussion #3137)](https://github.com/ionic-team/capacitor/discussions/3137)
+
+**Capacitor WKWebView Configuration:**
+- [Adjusting WKWebView settings (Capacitor #1097)](https://github.com/ionic-team/capacitor/issues/1097)
+- [Capacitor WKWebView bouncing issue iOS 16 (#5907)](https://github.com/ionic-team/capacitor/issues/5907)
