@@ -51,11 +51,19 @@ body {
   height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
+  touch-action: manipulation;
   font-family: var(--font-ui, 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif);
   font-size: 0.875rem; /* 14px base per CONTEXT.md */
   line-height: 1.5;
   color: var(--text-primary);
   background-color: var(--surface-base);
+}
+
+/* Native: Force GPU compositing layer on body (Ionic pattern).
+   translateZ(0) promotes body to its own compositor layer immediately,
+   preventing a scroll-halt repaint when child scroll containers start. */
+html[data-native] body {
+  transform: translateZ(0);
 }
 
 #root {
@@ -177,4 +185,24 @@ html[data-native] .app-shell {
   height: auto;
   padding-bottom: 0 !important;
   transition: none;
+  contain: layout size style;
+}
+
+/* ─── Native Scroll Container Optimizations (Ionic patterns) ────── */
+/* Applied to main scroll areas (message list, sidebar) on native.
+   -webkit-overflow-scrolling: touch — momentum scrolling in WKWebView
+   will-change: scroll-position — compositor optimization for scroll
+   overscroll-behavior-y: contain — prevent scroll chaining to parent */
+/* ─── Message Item Content Visibility (PERF) ────────────────────
+ * Skip layout/paint for off-screen messages. Safari 15.4+ supports
+ * content-visibility: auto. contain-intrinsic-size prevents layout
+ * shift when items enter the viewport. */
+.msg-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+}
+
+html[data-native] .native-scroll {
+  will-change: scroll-position;
+  overscroll-behavior-y: contain;
 }

@@ -16,7 +16,6 @@
   .follow-up-pills {
     flex-wrap: nowrap;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     justify-content: flex-start;
     padding: var(--space-2) var(--space-3);

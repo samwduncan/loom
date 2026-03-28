@@ -9,6 +9,7 @@ import { initializeWebSocket } from '@/lib/websocket-init';
 // Must run before initializeWebSocket so Keyboard resize mode is configured first.
 void initializeNativePlugins();
 
+
 // Fire-and-forget WS init BEFORE React render tree mounts.
 // void prefix satisfies no-floating-promises. Safe to call multiple times (has init guard).
 void initializeWebSocket();

@@ -222,7 +222,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
   return (
     <div
       ref={mergedRef}
-      className="h-full overflow-y-auto will-change-transform"
+      className="native-scroll h-full overflow-y-auto"
       data-testid="message-list-scroll"
     >
       <div className="mx-auto max-w-3xl py-4">
@@ -232,7 +232,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
           </div>
         )}
         {messages.map((msg) => (
-          <div key={msg.id} className="contain-content">
+          <div key={msg.id} className="contain-content msg-item">
             <div className="px-2 md:px-4">
               <MessageErrorBoundary>
                 <MemoizedMessageItem msg={msg} sessionId={sessionId} highlightText={highlightText} />

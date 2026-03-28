@@ -213,8 +213,8 @@ export function ChatView() {
       className={cn(
         'relative grid h-full',
         search.isOpen
-          ? 'grid-rows-[auto_1fr_auto_auto_auto_auto_auto]'
-          : 'grid-rows-[1fr_auto_auto_auto_auto_auto]',
+          ? 'grid-rows-[auto_minmax(0,1fr)_auto_auto_auto_auto_auto]'
+          : 'grid-rows-[minmax(0,1fr)_auto_auto_auto_auto_auto]',
       )}
       data-testid="chat-view"
     >

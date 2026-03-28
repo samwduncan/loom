@@ -43,7 +43,7 @@ export const AppShell = memo(function AppShell() {
       style={{
         gridTemplateColumns:
           'var(--sidebar-width, var(--sidebar-expanded-width, 280px)) 1fr var(--artifact-width, 0px)',
-        gridTemplateRows: '1fr',
+        gridTemplateRows: 'minmax(0, 1fr)',
       }}
     >
       <ConnectionBanner />

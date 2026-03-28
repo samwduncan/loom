@@ -232,7 +232,7 @@ export function SessionList() {
       <div className="px-2 py-1.5">
         <SearchInput value={query} onChange={setQuery} />
       </div>
-      <div ref={scrollRef} className={cn('flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list">
+      <div ref={scrollRef} className={cn('native-scroll flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list">
         {totalVisible === 0 && isSearching && (
           <div className="px-3 py-4">
             <EmptyState
