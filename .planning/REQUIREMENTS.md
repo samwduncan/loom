@@ -116,9 +116,9 @@ Content scrolls at 60fps on real device. This is THE highest priority -- everyth
 
 ### Scroll Infrastructure
 
-- [ ] **SCROLL-07**: Evaluate and implement virtualized scrolling if content-visibility alone is insufficient
-  - _Acceptance:_ After SCROLL-01 through SCROLL-06 are fixed, test with 100+ message conversation on real device. If still janky, implement @tanstack/react-virtual with variable-height measurement, reverse scroll, and streaming support.
-  - _Why:_ content-visibility:auto helps paint but doesn't solve DOM bloat. Virtualization renders only visible items. Decision deferred until jank sources are eliminated first.
+- [ ] **SCROLL-07**: Measure-then-decide virtualization gate -- no virtualization this phase
+  - _Acceptance:_ After SCROLL-01 through SCROLL-06 are fixed, test with 50+ message conversation on real device. Phase passes if <5% frame drops at 50+ messages during fast scroll. If virtualization IS needed in future, `virtua` (~3KB, reverse scroll support) is preferred over @tanstack/react-virtual or react-virtuoso (per D-15/D-16). No virtualization library is added in this phase.
+  - _Why:_ Fix the JS execution bottleneck first. content-visibility:auto provides off-screen rendering optimization. Virtualization only considered if fixes don't achieve 60fps.
 
 - [ ] **SCROLL-08**: Status bar tap scrolls message list to top
   - _Acceptance:_ Tapping the iOS status bar area scrolls the chat message list to the top with smooth animation. Uses Capacitor `statusTap` event.
