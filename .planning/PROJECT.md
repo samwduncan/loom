@@ -86,8 +86,7 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - [x] Capacitor Keyboard plugin — native keyboard events replace visualViewport hack (Phase 60, 2026-03-28)
 - [x] Platform foundation — URL abstraction, CORS, Capacitor config (Phase 59, 2026-03-28)
 - [x] Touch targets & native plugins — 44px+ targets, StatusBar, SplashScreen, safe-area audit, overscroll prevention (Phase 61, 2026-03-28)
-- [ ] Haptics & motion — haptic feedback, 120Hz spring tuning for ProMotion
-- [ ] Capacitor native plugins — remaining: Haptics (Phase 62)
+- [x] Haptics & motion — haptic feedback on send/tool/error/selection, 120Hz ProMotion opt-in, spring tuning (Phase 62, 2026-03-28)
 - [ ] Bundled assets mode — local assets, cap sync pipeline, on-device validation
 
 **Future milestones:**
@@ -203,4 +202,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-28 after Phase 60 (Keyboard & Composer) completion*
+*Last updated: 2026-03-28 after Phase 62 (Haptics & Motion) completion*
