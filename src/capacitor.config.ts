@@ -11,9 +11,11 @@ const config: CapacitorConfig = {
       enabled: false,
     },
     SplashScreen: {
-      // D-07: Disable auto-hide so hideSplashWhenReady() controls dismiss timing.
-      // D-08: Match the app's dark background to prevent white flash on launch.
-      launchAutoHide: false,
+      // launchAutoHide must be true in server.url mode — the JS bridge timing is
+      // unreliable when loading from a remote server, so SplashScreen.hide() from
+      // hideSplashWhenReady() may never fire. For bundled mode this is also fine
+      // since the local HTML loads fast enough that auto-hide is seamless.
+      launchAutoHide: true,
       backgroundColor: '#2b2521',
     },
   },

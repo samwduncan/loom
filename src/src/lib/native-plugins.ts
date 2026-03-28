@@ -125,7 +125,7 @@ export async function initializeNativePlugins(): Promise<void> {
     try {
       const { StatusBar, Style } = await import('@capacitor/status-bar');
       await StatusBar.setStyle({ style: Style.Dark });
-      await StatusBar.setBackgroundColor({ color: '#2b2521' });
+      // setBackgroundColor is Android-only — skip on iOS to avoid console warning
     } catch (err: unknown) {
       console.warn('[native-plugins] StatusBar plugin failed to load:', err);
     }

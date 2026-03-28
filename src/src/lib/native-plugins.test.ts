@@ -198,12 +198,12 @@ describe('native-plugins', () => {
 
   // --- StatusBar tests ---
 
-  it('initializes StatusBar with Dark style and #2b2521 background on native', async () => {
+  it('initializes StatusBar with Dark style on native', async () => {
     platformMock.IS_NATIVE = true;
     await initializeNativePlugins();
 
     expect(mockStatusBar.setStyle).toHaveBeenCalledWith({ style: 'DARK' });
-    expect(mockStatusBar.setBackgroundColor).toHaveBeenCalledWith({ color: '#2b2521' });
+    // setBackgroundColor is Android-only — removed from iOS init
   });
 
   it('caches splash-screen module on native init', async () => {
@@ -239,7 +239,6 @@ describe('native-plugins', () => {
 
     // StatusBar should still be called (separate try/catch -- SS-7)
     expect(mockStatusBar.setStyle).toHaveBeenCalledWith({ style: 'DARK' });
-    expect(mockStatusBar.setBackgroundColor).toHaveBeenCalledWith({ color: '#2b2521' });
   });
 
   // --- hideSplashWhenReady tests ---
@@ -406,7 +405,6 @@ describe('native-plugins', () => {
     expect(mockKeyboard.setResizeMode).toHaveBeenCalledWith({ mode: 'none' });
     expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledWith({ isVisible: true });
     expect(mockStatusBar.setStyle).toHaveBeenCalledWith({ style: 'DARK' });
-    expect(mockStatusBar.setBackgroundColor).toHaveBeenCalledWith({ color: '#2b2521' });
     // setHapticsModule called (haptics initialized after splash)
     expect(mockSetHapticsModule).toHaveBeenCalled();
   });
