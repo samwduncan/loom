@@ -47,7 +47,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [x] **BUNDLE-01**: Vite production build syncs to iOS app via `cap sync` pipeline
 - [x] **BUNDLE-02**: App loads and functions correctly from bundled assets with remote API
-- [ ] **BUNDLE-03**: Clear error state when server/VPN connection lost
+- [x] **BUNDLE-03**: Clear error state when server/VPN connection lost
 - [x] **BUNDLE-04**: Splash-to-auth-to-content flow without white flash
 
 ## Future Requirements
@@ -111,7 +111,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MOTION-03 | Phase 62 | Complete |
 | BUNDLE-01 | Phase 63 | Complete |
 | BUNDLE-02 | Phase 63 | Complete |
-| BUNDLE-03 | Phase 63 | Pending |
+| BUNDLE-03 | Phase 63 | Complete |
 | BUNDLE-04 | Phase 63 | Complete |
 
 **Coverage:**
