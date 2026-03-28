@@ -41,6 +41,7 @@
 html {
   height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -48,6 +49,7 @@ html {
 body {
   margin: 0;
   overflow: hidden;
+  overscroll-behavior: none;
   font-family: var(--font-ui, 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif);
   font-size: 0.875rem; /* 14px base per CONTEXT.md */
   line-height: 1.5;
@@ -132,6 +134,20 @@ body {
     .app-shell {
       padding-top: env(safe-area-inset-top);
     }
+  }
+}
+
+/* ─── Mobile Touch Targets for Radix Menus (TOUCH-01, D-16) ─────
+   Shadcn components use Radix UI primitives with role="menuitem".
+   Desktop-first sizing is too compact for touch. Override at mobile. */
+@media (max-width: 767px) {
+  [role="menuitem"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"],
+  [role="option"] {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
 }
 

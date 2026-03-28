@@ -39,7 +39,7 @@ export const AppShell = memo(function AppShell() {
     <div
       data-testid="app-shell"
       data-sidebar-state={sidebarOpen ? 'expanded' : 'collapsed-hidden'}
-      className={cn('app-shell relative grid h-dvh overflow-hidden bg-surface-base')}
+      className={cn('app-shell relative grid h-dvh overflow-hidden bg-surface-base pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]')}
       style={{
         gridTemplateColumns:
           'var(--sidebar-width, var(--sidebar-expanded-width, 280px)) 1fr var(--artifact-width, 0px)',
