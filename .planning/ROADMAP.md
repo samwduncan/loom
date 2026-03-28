@@ -8,9 +8,10 @@
 - ✅ **v1.3 "The Refinery"** - Phases 28-37 (shipped 2026-03-17)
 - ✅ **v1.4 "The Navigator"** - Phases 38-43 (shipped 2026-03-18)
 - ✅ **v1.5 "The Craft"** - Phases 44-47 (shipped 2026-03-20)
-- 🚧 **v2.0 "The Engine"** - Phases 50-58 (in progress)
-- 📋 **v2.1 "The Power"** - (planned)
-- 📋 **v2.2 "The Polish"** - (planned)
+- ✅ **v2.0 "The Engine"** - Phases 50-58 (shipped 2026-03-27)
+- 🚧 **v2.1 "The Mobile"** - Phases 59-63 (in progress)
+- 📋 **v2.2 "The Power"** - (planned)
+- 📋 **v2.3 "The Polish"** - (planned)
 - 📋 **v3.0 "The Vision"** - (planned)
 
 ## Phases
@@ -98,162 +99,105 @@
 
 </details>
 
-### v2.0 "The Engine" (Phases 50-58)
+<details>
+<summary>✅ v2.0 "The Engine" (Phases 50-58) -- SHIPPED 2026-03-27</summary>
 
-**Milestone Goal:** Make Loom a daily-driver that's faster than any mobile AI app. SQLite data layer replaces JSONL-on-every-load with sub-50ms session switching, live session attach streams running CLI sessions to the browser in real-time, mobile layout enables "monitor your agent from your phone," a manifest-only PWA makes it installable, and production-grade nginx deployment ensures reliable, fast serving over HTTPS.
+- [x] Phase 50: SQLite Data Layer (2/2 plans) -- completed 2026-03-26
+- [x] Phase 51: State Persistence (1/1 plan) -- completed 2026-03-26
+- [x] Phase 52: Live Session Attach (3/3 plans) -- completed 2026-03-27
+- [x] Phase 53: Mobile-Responsive Layout (3/3 plans) -- completed 2026-03-27
+- [x] Phase 54: Performance Hardening (2/2 plans) -- completed 2026-03-27
+- [x] Phase 55: Conversation Enhancements (2/2 plans) -- completed 2026-03-27
+- [x] Phase 56: PWA Manifest (1/1 plan) -- completed 2026-03-27
+- [x] Phase 57: iOS Research (1/1 plan) -- completed 2026-03-27
+- [x] Phase 58: Production Build & Nginx (2/2 plans) -- completed 2026-03-27
+
+</details>
+
+### v2.1 "The Mobile" (Phases 59-63)
+
+**Milestone Goal:** Make Loom a native-feeling iOS app on iPhone 16 Pro Max via Capacitor -- reliable keyboard avoidance, touch-first interactions, 120Hz springs, and bundled assets for offline-capable fast loads.
 
 **Phase Numbering:**
-- Integer phases (50, 51, 52...): Planned milestone work
-- Decimal phases (50.1, 50.2): Urgent insertions (marked with INSERTED)
+- Integer phases (59, 60, 61...): Planned milestone work
+- Decimal phases (59.1, 59.2): Urgent insertions (marked with INSERTED)
 
-- [x] **Phase 50: SQLite Data Layer** - Replace JSONL-on-every-load with SQLite message cache for sub-50ms session switching (completed 2026-03-26)
-- [x] **Phase 51: State Persistence** - Last session, scroll position, sidebar state survive browser restarts (completed 2026-03-26)
-- [x] **Phase 52: Live Session Attach** - Stream running CLI sessions to the browser in real-time via JSONL file watching (completed 2026-03-27)
-- [x] **Phase 53: Mobile-Responsive Layout** - Touch-friendly layout with sidebar drawer, keyboard avoidance, and safe areas (completed 2026-03-27)
-- [x] **Phase 54: Performance Hardening** - Request deduplication, optimistic updates, lazy panel mounting, skeleton loading (completed 2026-03-27)
-- [x] **Phase 55: Conversation Enhancements** - Follow-up prompts, templates, background indicators, model selector (completed 2026-03-27)
-- [x] **Phase 56: PWA Manifest** - Install-to-homescreen on mobile via manifest-only PWA (no service worker) (completed 2026-03-27)
-- [x] **Phase 57: iOS Research** - Evaluate Capacitor integration path with prototype and Tailscale DNS verification (completed 2026-03-27)
-- [x] **Phase 58: Production Build & Nginx** - nginx reverse proxy, TLS, optimized static serving, and automated build/deploy pipeline (completed 2026-03-27)
+- [ ] **Phase 59: Platform Foundation** - URL abstraction, CORS whitelist, and Capacitor config -- prerequisite for all native features
+- [ ] **Phase 60: Keyboard & Composer** - Replace visualViewport hack with Capacitor Keyboard plugin for reliable keyboard avoidance
+- [ ] **Phase 61: Touch, Layout & Native Plugins** - Touch target audit, safe-area refinement, StatusBar, SplashScreen, and gesture handling
+- [ ] **Phase 62: Haptics & Motion** - Haptic feedback on key interactions, 120Hz spring tuning for ProMotion displays
+- [ ] **Phase 63: Bundled Assets & Device Validation** - cap sync pipeline, bundled asset loading, and on-device integration testing
 
 ## Phase Details
 
-### Phase 50: SQLite Data Layer
-**Goal**: Sessions load instantly from a SQLite cache instead of parsing JSONL files on every request
+### Phase 59: Platform Foundation
+**Goal**: App can communicate with the Express backend from both web (same-origin) and Capacitor bundled (remote server) modes without code changes
 **Depends on**: Nothing (foundation for this milestone)
-**Requirements**: DATA-01, DATA-02, DATA-03, DATA-04, DATA-05
+**Requirements**: PLAT-01, PLAT-02, PLAT-03, PLAT-04
 **Success Criteria** (what must be TRUE):
-  1. Switching to any previously-loaded session renders messages in under 50ms (vs 200-800ms today)
-  2. Session list in sidebar loads from cached metadata in under 10ms
-  3. Deleting `cache.db` and reloading causes a single slow load, then all subsequent loads are fast again
-  4. Background cache warmer completes indexing all JSONL files within 30 seconds of server startup
-  5. Cache uses WAL mode in a separate file from auth.db -- deleting it never affects authentication
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 50-01-PLAN.md -- MessageCache module (SQLite schema + CRUD operations)
-- [x] 50-02-PLAN.md -- CacheWarmer + projects.js wiring + server startup
+  1. Opening the app in a regular browser works identically to before -- zero behavioral change on web
+  2. All fetch() calls in the codebase route through the centralized URL helper (no hardcoded relative paths remain)
+  3. WebSocket connections construct correct absolute URLs when running inside Capacitor
+  4. Express accepts requests from `capacitor://localhost` origin without CORS errors
+**Plans**: TBD
 
-### Phase 51: State Persistence
-**Goal**: Users return to exactly where they left off after closing and reopening the browser
-**Depends on**: Phase 50
-**Requirements**: PERSIST-01, PERSIST-02, PERSIST-03, PERSIST-04
+### Phase 60: Keyboard & Composer
+**Goal**: Keyboard avoidance works reliably on iOS via native Capacitor events instead of the fragile visualViewport hack
+**Depends on**: Phase 59
+**Requirements**: KEY-01, KEY-02, KEY-03, KEY-04, KEY-05
 **Success Criteria** (what must be TRUE):
-  1. Closing the browser and reopening navigates to the last-viewed session automatically
-  2. Scroll position restores to the same place when switching between sessions
-  3. Sidebar open/collapsed state and the active project group survive a full page reload
-  4. Permission mode setting persists across browser restarts without re-selection
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 51-01-PLAN.md -- Smart redirect + scroll position persistence
-
-### Phase 52: Live Session Attach
-**Goal**: Users can watch a running CLI session stream output in real-time from the browser
-**Depends on**: Phase 50
-**Requirements**: LIVE-01, LIVE-02, LIVE-03, LIVE-04, LIVE-05
-**Success Criteria** (what must be TRUE):
-  1. Sessions with actively running CLI processes show a pulsing "live" indicator in the sidebar
-  2. Clicking "Attach" on a live session shows real-time output appearing within 200ms of the CLI writing it
-  3. User can detach from a live session and the CLI process continues running uninterrupted
-  4. Permission prompts from an attached session appear in the Loom UI for user response
-  5. Attaching to a session that finishes while attached transitions cleanly to normal completed state
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 52-01-PLAN.md -- SessionWatcher module + server WS attach/detach handlers
-- [x] 52-02-PLAN.md -- Frontend types, multiplexer routing, store state, sidebar live indicator
-- [x] 52-03-PLAN.md -- ChatView auto-attach, LiveSessionBanner, auto-detach on switch
-
-### Phase 53: Mobile-Responsive Layout
-**Goal**: Users can comfortably monitor and interact with AI agents from a phone browser
-**Depends on**: Phase 51
-**Requirements**: MOBILE-01, MOBILE-02, MOBILE-03, MOBILE-04, MOBILE-05
-**Success Criteria** (what must be TRUE):
-  1. Tapping the composer input on mobile does not trigger browser zoom (16px minimum font size)
-  2. All interactive elements have at least 44x44px touch targets on mobile viewports
-  3. Sidebar opens as a full-screen drawer with swipe-to-close gesture on mobile
-  4. Composer input stays visible above the virtual keyboard when typing on mobile
-  5. Code blocks in messages scroll horizontally and images resize proportionally on narrow screens
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 53-01-PLAN.md -- Viewport zoom verification + 44px touch targets on all interactive elements
-- [x] 53-02-PLAN.md -- Sidebar swipe-to-close gesture + keyboard avoidance + safe areas
-- [x] 53-03-PLAN.md -- Responsive message layout (code blocks, images, content at 390px)
-**UI hint**: yes
-
-### Phase 54: Performance Hardening
-**Goal**: Every interaction feels instant through deduplication, optimistic updates, and lazy loading
-**Depends on**: Phase 50, Phase 52
-**Requirements**: PERF-01, PERF-02, PERF-03, PERF-04
-**Success Criteria** (what must be TRUE):
-  1. Rapidly clicking the same session multiple times only fires one API request
-  2. Deleting, renaming, or pinning a session updates the sidebar instantly with rollback on failure
-  3. Terminal, git panel, and file tree panels only load their JavaScript on first visit (not on app startup)
-  4. All async content areas show skeleton loading states with zero layout shifts during load
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 54-01-PLAN.md -- Request deduplication + optimistic session operations
-- [x] 54-02-PLAN.md -- Lazy panel mounting + skeleton audit
-**UI hint**: yes
-
-### Phase 55: Conversation Enhancements
-**Goal**: Users get smart assistance features that match or exceed ChatGPT and Gemini mobile apps
-**Depends on**: Phase 50
-**Requirements**: CONV-01, CONV-02, CONV-03, CONV-04
-**Success Criteria** (what must be TRUE):
-  1. After an assistant response, 2-3 contextual follow-up prompt suggestions appear as tappable pills
-  2. Users can select from conversation templates to start common tasks with pre-filled system prompts
-  3. A sidebar indicator shows when an idle background session receives new output
-  4. Users can switch between Claude, Gemini, and Codex models from a selector in the composer
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 55-01-PLAN.md -- Follow-up suggestion pills + enhanced conversation templates
-- [x] 55-02-PLAN.md -- Background session notification dot + model selector in composer
-**UI hint**: yes
-
-### Phase 56: PWA Manifest
-**Goal**: Users can install Loom to their phone's home screen as a standalone app
-**Depends on**: Phase 53
-**Requirements**: PWA-01, PWA-02, PWA-03
-**Success Criteria** (what must be TRUE):
-  1. "Add to Home Screen" prompt appears on mobile browsers when visiting Loom via Tailscale HTTPS
-  2. Installed PWA launches with a proper app icon and splash screen (not a browser tab)
-  3. No service worker is registered -- the app always loads fresh content from the server
+  1. Opening the keyboard on iOS slides the composer up smoothly with no jank, flicker, or double-offset
+  2. The message list auto-scrolls so the latest message stays visible when the keyboard opens
+  3. Dismissing the keyboard returns the composer to its resting position with no black gap or layout jump
+  4. The existing visualViewport hack is disabled on native (no dual-handler race condition)
+  5. WKWebView does not auto-resize the viewport when the keyboard appears (resize mode set to `none`)
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 57: iOS Research
-**Goal**: Document the path to an iOS App Store app with a working Capacitor prototype
-**Depends on**: Phase 56
-**Requirements**: IOS-01, IOS-02, IOS-03
+### Phase 61: Touch, Layout & Native Plugins
+**Goal**: The app looks and feels right on iOS -- proper status bar, smooth launch, correct touch targets, and no layout quirks
+**Depends on**: Phase 60
+**Requirements**: TOUCH-01, TOUCH-02, TOUCH-03, TOUCH-04, TOUCH-05, NATIVE-01, NATIVE-02, NATIVE-03, NATIVE-04
 **Success Criteria** (what must be TRUE):
-  1. A written document exists covering Capacitor integration path with pros, cons, and effort estimate
-  2. Tailscale DNS resolution has been analyzed with documented verdict and caveats; on-device verification deferred pending Mac access
-  3. A minimal Capacitor shell project is scaffolded and configured to load the Loom web build; building and on-device rendering deferred pending Mac access
-**Plans:** 1/1 plans complete
-Plans:
-- [x] 57-01-PLAN.md -- Capacitor scaffold + iOS integration assessment document
+  1. Every interactive element (buttons, links, inputs, toggles) has at least a 44px touch target on mobile
+  2. Status bar shows light text on dark background, matching the app theme
+  3. App launches with a color-matched splash screen that fades smoothly into the React app (no white flash)
+  4. Swiping back from the left edge navigates correctly without conflicting with the sidebar drawer
+  5. Safe-area insets are respected on all four edges (top status bar, bottom home indicator, notch sides)
+**Plans**: TBD
+**UI hint**: yes
 
-### Phase 58: Production Build & Nginx
-**Goal**: Production-grade deployment with nginx reverse proxy, TLS via Tailscale Serve on port 5443, optimized static asset serving, and a single-command deploy pipeline with build validation
-**Depends on**: Phase 57
-**Requirements**: PROD-01, PROD-02, PROD-03, PROD-04, PROD-05
+### Phase 62: Haptics & Motion
+**Goal**: Key interactions have physical feedback and animations feel tuned for 120Hz ProMotion displays
+**Depends on**: Phase 61
+**Requirements**: MOTION-01, MOTION-02, MOTION-03, NATIVE-03
 **Success Criteria** (what must be TRUE):
-  1. nginx serves Loom on HTTPS via Tailscale Serve (port 5443), proxying /api/* and /ws to Express on 5555
-  2. Static assets from dist/ are served directly by nginx with immutable cache headers and brotli+gzip compression
-  3. Running `./deploy.sh` builds the frontend, validates it, and reloads both nginx and Express with zero-downtime
-  4. Deploy aborts with clear error if TypeScript compilation fails, bundle exceeds size limits, or dist/ is missing expected files
-  5. Both nginx and loom-backend run as systemd services with `After=` dependency ordering and automatic restart on failure
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 58-01-PLAN.md -- nginx reverse proxy + brotli + Tailscale Serve + systemd + graceful shutdown
-- [x] 58-02-PLAN.md -- deploy.sh build pipeline with validation gates + end-to-end verification
+  1. Sending a message, completing a tool call, and hitting an error each produce distinct haptic feedback
+  2. Spring/transition durations feel snappier on 120Hz displays compared to 60Hz (not just faster, but tighter)
+  3. Haptic feedback respects `prefers-reduced-motion` and degrades gracefully on web (no errors, just silent no-op)
+  4. Info.plist includes ProMotion opt-in so CSS animations run at native 120Hz refresh rate
+**Plans**: TBD
+**UI hint**: yes
 
-### v2.1 "The Power" (Planned)
+### Phase 63: Bundled Assets & Device Validation
+**Goal**: The Capacitor app loads from bundled HTML/CSS/JS with remote API calls, and all previous phases work correctly on a real iPhone
+**Depends on**: Phase 62
+**Requirements**: BUNDLE-01, BUNDLE-02, BUNDLE-03, BUNDLE-04
+**Success Criteria** (what must be TRUE):
+  1. `npm run build` followed by `cap sync ios` produces a working iOS app bundle
+  2. App loads its UI shell from bundled assets (sub-second launch) and fetches data from the remote Express server
+  3. Losing server/VPN connection shows a clear error state (not a blank screen or silent failure)
+  4. The full launch flow (splash -> auth -> content) completes without any white flash or visual discontinuity
+  5. On-device spot check: keyboard, touch targets, haptics, status bar, safe-area, and springs all work as designed
+**Plans**: TBD
+
+### v2.2 "The Power" (Planned)
 
 - [ ] Multi-provider tabbed workspaces (Claude, Gemini, Codex)
 - [ ] MCP server management UI
 - [ ] Plugin/skill management UI
 
-### v2.2 "The Polish" (Planned)
+### v2.3 "The Polish" (Planned)
 
 - [ ] Aurora/WebGL ambient overlay (GPU feasibility gated)
 - [ ] Comprehensive spring physics on all interactions
@@ -270,25 +214,21 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 50 -> 50.1 -> 51 -> 51.1 -> ... -> 58
+Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 50. SQLite Data Layer | 2/2 | Complete    | 2026-03-26 |
-| 51. State Persistence | 1/1 | Complete    | 2026-03-26 |
-| 52. Live Session Attach | 3/3 | Complete    | 2026-03-27 |
-| 53. Mobile-Responsive Layout | 3/3 | Complete    | 2026-03-27 |
-| 54. Performance Hardening | 2/2 | Complete    | 2026-03-27 |
-| 55. Conversation Enhancements | 2/2 | Complete    | 2026-03-27 |
-| 56. PWA Manifest | 1/1 | Complete    | 2026-03-27 |
-| 57. iOS Research | 1/1 | Complete   | 2026-03-27 |
-| 58. Production Build & Nginx | 2/2 | Complete   | 2026-03-27 |
+| 59. Platform Foundation | 0/TBD | Not started | - |
+| 60. Keyboard & Composer | 0/TBD | Not started | - |
+| 61. Touch, Layout & Native Plugins | 0/TBD | Not started | - |
+| 62. Haptics & Motion | 0/TBD | Not started | - |
+| 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |
 
 ## Backlog (Future Milestones)
 
-- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v2.1/v3.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
-- **Phases 48-49 (v1.5 deferred)** -- DecryptedText reveals, StarBorder accents, spacing/typography audit. Deprioritized in favor of engine work; revisit during v2.2 "The Polish."
+- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v2.2/v3.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
+- **Phases 48-49 (v1.5 deferred)** -- DecryptedText reveals, StarBorder accents, spacing/typography audit. Deprioritized in favor of engine work; revisit during v2.3 "The Polish."
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-27 after Phase 58 planning*
+*Last updated: 2026-03-27 after v2.1 roadmap creation*

@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
-status: Defining requirements
-stopped_at: Milestone started
+status: Ready to plan Phase 59
+stopped_at: Roadmap created
 last_updated: "2026-03-27"
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Defining requirements for v2.1 "The Mobile"
+**Current focus:** v2.1 "The Mobile" -- Phase 59: Platform Foundation
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-27 — Milestone v2.1 started
+Phase: 59 (1 of 5) -- Platform Foundation
+Plan: --
+Status: Ready to plan
+Last activity: 2026-03-27 -- Roadmap created for v2.1 (5 phases, 25 requirements)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -48,17 +50,15 @@ Last activity: 2026-03-27 — Milestone v2.1 started
 
 ### Decisions
 
-- [v2.0] SQLite cache is freely deletable -- JSONL remains source of truth, cache rebuilds from scratch
-- [v2.0] No service worker -- manifest-only PWA to avoid stale content trap
-- [v2.0] Zero new production deps -- better-sqlite3 already installed, fs.watch is built-in
-- [v2.0] Singleton SessionWatcher with clientAttachments Map for multi-client subscriptions
-- [v2.0] Client-side regex heuristics for follow-up suggestions
 - [v2.0] Capacitor 7.6.1 over 8.x -- Xcode 16+ vs 26+ requirement
 - [v2.0] API base URL abstraction is highest-value Capacitor prep
+- [v2.0] Keyboard avoidance via visualViewport hack -- works but fragile, replace with Capacitor Keyboard plugin in v2.1
+- [v2.0] CSS --keyboard-offset pattern is correct -- needs better signal source
 - [v2.0] Three-tier proxy: Tailscale Serve :5443 -> nginx :5580 -> Express :5555
-- [v2.0] Deploy pipeline: dirty check -> pull -> npm ci -> tsc -> vite build -> validate -> restart
-- [v2.0] Keyboard avoidance via visualViewport hack — works but fragile, replace with Capacitor Keyboard plugin in v2.1
-- [v2.0] CSS --keyboard-offset pattern is correct — needs better signal source
+- [v2.1] platform.ts with IS_NATIVE/API_BASE/WS_BASE -- single source of truth for URL construction
+- [v2.1] native-plugins.ts for dynamic plugin init before React mounts -- matches initializeWebSocket() pattern
+- [v2.1] CSS-first motion strategy -- rAF capped at 60fps in WKWebView, but CSS transitions run at 120Hz
+- [v2.1] Platform checks only in platform.ts and native-plugins.ts -- UI components remain platform-unaware
 
 ### Pending Todos
 
@@ -66,12 +66,12 @@ None.
 
 ### Blockers/Concerns
 
-- Mac with Xcode required for on-device builds — swd has iPhone 16 Pro Max but Linux dev machine
-- Capacitor Keyboard plugin needs device testing for keyboard height accuracy
-- 120Hz ProMotion spring tuning needs real device to feel right
+- Mac with Xcode required for on-device builds (Phase 63) -- swd has iPhone 16 Pro Max but Linux dev machine
+- 120Hz ProMotion spring tuning needs real device to feel right (Phase 62)
+- CapacitorHttp must be disabled -- patches global fetch and breaks WebSocket upgrade
 
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: Milestone v2.1 started — defining requirements
-Resume: Continue with requirements definition
+Stopped at: Roadmap created for v2.1 "The Mobile"
+Resume: `/gsd:plan-phase 59`

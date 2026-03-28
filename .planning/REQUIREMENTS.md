@@ -88,37 +88,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAT-01 | — | Pending |
-| PLAT-02 | — | Pending |
-| PLAT-03 | — | Pending |
-| PLAT-04 | — | Pending |
-| KEY-01 | — | Pending |
-| KEY-02 | — | Pending |
-| KEY-03 | — | Pending |
-| KEY-04 | — | Pending |
-| KEY-05 | — | Pending |
-| TOUCH-01 | — | Pending |
-| TOUCH-02 | — | Pending |
-| TOUCH-03 | — | Pending |
-| TOUCH-04 | — | Pending |
-| TOUCH-05 | — | Pending |
-| NATIVE-01 | — | Pending |
-| NATIVE-02 | — | Pending |
-| NATIVE-03 | — | Pending |
-| NATIVE-04 | — | Pending |
-| MOTION-01 | — | Pending |
-| MOTION-02 | — | Pending |
-| MOTION-03 | — | Pending |
-| BUNDLE-01 | — | Pending |
-| BUNDLE-02 | — | Pending |
-| BUNDLE-03 | — | Pending |
-| BUNDLE-04 | — | Pending |
+| PLAT-01 | Phase 59 | Pending |
+| PLAT-02 | Phase 59 | Pending |
+| PLAT-03 | Phase 59 | Pending |
+| PLAT-04 | Phase 59 | Pending |
+| KEY-01 | Phase 60 | Pending |
+| KEY-02 | Phase 60 | Pending |
+| KEY-03 | Phase 60 | Pending |
+| KEY-04 | Phase 60 | Pending |
+| KEY-05 | Phase 60 | Pending |
+| TOUCH-01 | Phase 61 | Pending |
+| TOUCH-02 | Phase 61 | Pending |
+| TOUCH-03 | Phase 61 | Pending |
+| TOUCH-04 | Phase 61 | Pending |
+| TOUCH-05 | Phase 61 | Pending |
+| NATIVE-01 | Phase 61 | Pending |
+| NATIVE-02 | Phase 61 | Pending |
+| NATIVE-03 | Phase 62 | Pending |
+| NATIVE-04 | Phase 61 | Pending |
+| MOTION-01 | Phase 62 | Pending |
+| MOTION-02 | Phase 62 | Pending |
+| MOTION-03 | Phase 62 | Pending |
+| BUNDLE-01 | Phase 63 | Pending |
+| BUNDLE-02 | Phase 63 | Pending |
+| BUNDLE-03 | Phase 63 | Pending |
+| BUNDLE-04 | Phase 63 | Pending |
 
 **Coverage:**
 - v2.1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25
+- Mapped to phases: 25/25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after initial definition*
+*Last updated: 2026-03-27 after roadmap creation*
