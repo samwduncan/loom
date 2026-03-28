@@ -16,6 +16,14 @@
   transition-timing-function: var(--ease-spring-snappy);
 }
 
+/* Native: drop backdrop-blur — it forces compositor work every scroll frame in WKWebView,
+   causing significant jank. Use solid background instead. */
+html[data-native] .scroll-pill {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background-color: var(--surface-overlay);
+}
+
 .scroll-pill-badge {
   line-height: 1;
 }

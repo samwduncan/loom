@@ -214,20 +214,20 @@
   user-select: none;
 }
 
-/* ─── Composer Safe Area & Keyboard Avoidance (MOBILE-04) ─────
-   When keyboard is open, its height covers the home indicator area.
-   Use max() to pick the larger of safe-area-inset-bottom vs keyboard-offset,
-   preventing double-padding on notched devices (D-20, D-21). */
+/* ─── Composer Safe Area (MOBILE-04) ─────
+   .app-shell padding-bottom handles --keyboard-offset (shrinks entire grid).
+   Composer only needs safe-area-inset-bottom for the home indicator when
+   keyboard is closed. When keyboard is open, the indicator is covered. */
 @media (max-width: 767px) {
   .composer-safe-area {
-    padding-bottom: calc(1rem + var(--keyboard-offset, 0px));
+    padding-bottom: 1rem;
   }
 }
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   @media (max-width: 767px) {
     .composer-safe-area {
-      padding-bottom: calc(1rem + max(env(safe-area-inset-bottom), var(--keyboard-offset, 0px)));
+      padding-bottom: calc(1rem + env(safe-area-inset-bottom));
     }
   }
 }
