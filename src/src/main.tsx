@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/styles/index.css';
 import { App } from '@/App';
-import { initializeNativePlugins } from '@/lib/native-plugins';
+import { initializeNativePlugins, hideSplashWhenReady } from '@/lib/native-plugins';
 import { initializeWebSocket } from '@/lib/websocket-init';
 
 // Fire-and-forget native plugin init BEFORE React render tree mounts.
@@ -18,3 +18,9 @@ createRoot(document.getElementById('root')!).render( // ASSERT: root element is 
     <App />
   </StrictMode>,
 );
+
+// Hide splash screen when WebSocket connects (or after 3s fallback).
+// Must run after React mounts so the user sees content, not a blank screen.
+// hideSplashWhenReady() is async and internally awaits nativePluginsReady
+// to avoid the cold-start race (SS-2).
+void hideSplashWhenReady();

@@ -10,6 +10,12 @@ const config: CapacitorConfig = {
       // All HTTP routing handled by platform.ts resolveApiUrl() instead.
       enabled: false,
     },
+    SplashScreen: {
+      // D-07: Disable auto-hide so hideSplashWhenReady() controls dismiss timing.
+      // D-08: Match the app's dark background to prevent white flash on launch.
+      launchAutoHide: false,
+      backgroundColor: '#2b2521',
+    },
   },
   server: {
     // To use remote dev server: set CAPACITOR_SERVER_URL before running `cap sync`
