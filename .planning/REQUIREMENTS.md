@@ -16,11 +16,11 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Keyboard & Composer
 
-- [ ] **KEY-01**: Capacitor Keyboard plugin provides reliable keyboard height events on iOS
-- [ ] **KEY-02**: Keyboard avoidance uses native `keyboardWillShow`/`keyboardWillHide` events instead of visualViewport hack
-- [ ] **KEY-03**: Composer slides smoothly with keyboard animation, maintaining CSS `--keyboard-offset` pattern
-- [ ] **KEY-04**: Message list auto-scrolls to latest message when keyboard opens
-- [ ] **KEY-05**: Keyboard resize mode set to `none` — WKWebView doesn't auto-resize
+- [x] **KEY-01**: Capacitor Keyboard plugin provides reliable keyboard height events on iOS
+- [x] **KEY-02**: Keyboard avoidance uses native `keyboardWillShow`/`keyboardWillHide` events instead of visualViewport hack
+- [x] **KEY-03**: Composer slides smoothly with keyboard animation, maintaining CSS `--keyboard-offset` pattern
+- [x] **KEY-04**: Message list auto-scrolls to latest message when keyboard opens
+- [x] **KEY-05**: Keyboard resize mode set to `none` — WKWebView doesn't auto-resize
 
 ### Touch & Layout
 
@@ -92,11 +92,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-02 | Phase 59 | Complete |
 | PLAT-03 | Phase 59 | Complete |
 | PLAT-04 | Phase 59 | Complete |
-| KEY-01 | Phase 60 | Pending |
-| KEY-02 | Phase 60 | Pending |
-| KEY-03 | Phase 60 | Pending |
-| KEY-04 | Phase 60 | Pending |
-| KEY-05 | Phase 60 | Pending |
+| KEY-01 | Phase 60 | Complete |
+| KEY-02 | Phase 60 | Complete |
+| KEY-03 | Phase 60 | Complete |
+| KEY-04 | Phase 60 | Complete |
+| KEY-05 | Phase 60 | Complete |
 | TOUCH-01 | Phase 61 | Pending |
 | TOUCH-02 | Phase 61 | Pending |
 | TOUCH-03 | Phase 61 | Pending |

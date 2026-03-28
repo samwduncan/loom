@@ -123,7 +123,7 @@
 - Decimal phases (59.1, 59.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 59: Platform Foundation** - URL abstraction, CORS whitelist, and Capacitor config -- prerequisite for all native features -- completed 2026-03-28
-- [ ] **Phase 60: Keyboard & Composer** - Replace visualViewport hack with Capacitor Keyboard plugin for reliable keyboard avoidance
+- [x] **Phase 60: Keyboard & Composer** - Replace visualViewport hack with Capacitor Keyboard plugin for reliable keyboard avoidance (completed 2026-03-28)
 - [ ] **Phase 61: Touch, Layout & Native Plugins** - Touch target audit, safe-area refinement, StatusBar, SplashScreen, and gesture handling
 - [ ] **Phase 62: Haptics & Motion** - Haptic feedback on key interactions, 120Hz spring tuning for ProMotion displays
 - [ ] **Phase 63: Bundled Assets & Device Validation** - cap sync pipeline, bundled asset loading, and on-device integration testing
@@ -155,10 +155,10 @@ Plans:
   3. Dismissing the keyboard returns the composer to its resting position with no black gap or layout jump
   4. The existing visualViewport hack is disabled on native (no dual-handler race condition)
   5. WKWebView does not auto-resize the viewport when the keyboard appears (resize mode set to `none`)
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 60-01-PLAN.md -- Install @capacitor/keyboard, create native-plugins.ts, wire main.tsx, conditional CSS transition
-- [ ] 60-02-PLAN.md -- Create useKeyboardOffset hook, integrate into ChatComposer, fix safe-area CSS stacking
+- [x] 60-01-PLAN.md -- Install @capacitor/keyboard, create native-plugins.ts, wire main.tsx, conditional CSS transition
+- [x] 60-02-PLAN.md -- Create useKeyboardOffset hook, integrate into ChatComposer, fix safe-area CSS stacking
 **UI hint**: yes
 
 ### Phase 61: Touch, Layout & Native Plugins
@@ -226,7 +226,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
-| 60. Keyboard & Composer | 0/2 | Not started | - |
+| 60. Keyboard & Composer | 2/2 | Complete   | 2026-03-28 |
 | 61. Touch, Layout & Native Plugins | 0/TBD | Not started | - |
 | 62. Haptics & Motion | 0/TBD | Not started | - |
 | 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |

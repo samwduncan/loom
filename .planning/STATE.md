@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
-status: planning
-stopped_at: Phase 60 context gathered
-last_updated: "2026-03-28T01:55:23.830Z"
-last_activity: 2026-03-28 — Phase 59 Platform Foundation verified and complete
+status: Phase complete — ready for verification
+stopped_at: Completed 60-02-PLAN.md
+last_updated: "2026-03-28T02:36:25.464Z"
 progress:
   total_phases: 5
-  completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
-  percent: 20
+  completed_phases: 2
+  total_plans: 5
+  completed_plans: 5
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** v2.1 "The Mobile" — Phase 60: Keyboard & Composer
+**Current focus:** Phase 60 — Keyboard & Composer
 
 ## Current Position
 
-Phase: 60 (1 of 5 remaining) — Keyboard & Composer
-Plan: --
-Status: Ready to plan
-Last activity: 2026-03-28 — Phase 59 Platform Foundation verified and complete
-
-Progress: [██░░░░░░░░] 20%
+Phase: 60 (Keyboard & Composer) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -50,6 +44,8 @@ Progress: [██░░░░░░░░] 20%
 | Phase 59 P01 | 3min | 2 tasks | 3 files |
 | Phase 59 P03 | 3min | 2 tasks | 3 files |
 | Phase 59 P02 | 3min | 2 tasks | 3 files |
+| Phase 60 P01 | 3min | 2 tasks | 5 files |
+| Phase 60 P02 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -71,6 +67,10 @@ Progress: [██░░░░░░░░] 20%
 - [Phase 59]: Both connect() and reconnect() in websocket-client.ts migrated to resolveWsUrl (Pitfall 1 addressed)
 - [Phase 59]: No test modifications needed for fetch migration -- web mode resolveApiUrl returns paths unchanged
 - [Phase 59]: apiFetch replaces manual getToken + header injection pattern in hooks -- simpler, auto-handles auth and JSON parsing
+- [Phase 60]: @capacitor/keyboard as devDep with dynamic import behind IS_NATIVE guard -- zero web bundle impact
+- [Phase 60]: data-native attribute on <html> for CSS-only native vs web branching
+- [Phase 60]: useKeyboardOffset hook: useEffect with nativePluginsReady await + cancelled flag for async safety
+- [Phase 60]: CSS max(env(safe-area-inset-bottom), var(--keyboard-offset)) prevents double-padding on notched devices
 
 ### Pending Todos
 
@@ -84,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T01:55:23.828Z
-Stopped at: Phase 60 context gathered
+Last session: 2026-03-28T02:36:25.462Z
+Stopped at: Completed 60-02-PLAN.md
 Resume: `/gsd:plan-phase 59`
