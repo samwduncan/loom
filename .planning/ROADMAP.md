@@ -154,7 +154,7 @@
   5. No React setState calls fire inside scroll event handlers (ref + debounced state only)
 **Plans**: 3 plans
 Plans:
-- [ ] 64-01-PLAN.md -- Core scroll hook (useChatScroll) with IO sentinel, ResizeObserver auto-follow, dead code cleanup
+- [x] 64-01-PLAN.md -- Core scroll hook (useChatScroll) with IO sentinel, ResizeObserver auto-follow, dead code cleanup
 - [x] 64-02-PLAN.md -- Secondary jank fixes: ActiveMessage deferred reflow, overscroll-behavior, content-visibility reconciliation
 - [ ] 64-03-PLAN.md -- statusTap verification, virtualization gate, real device 60fps validation
 **UI hint**: yes
@@ -237,7 +237,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 64. Scroll Performance | 1/3 | In Progress|  |
+| 64. Scroll Performance | 2/3 | In Progress|  |
 | 65. Touch Target Compliance | 0/? | Not started | - |
 | 66. Typography & Spacing | 0/? | Not started | - |
 | 67. iOS-Native Gestures | 0/? | Not started | - |

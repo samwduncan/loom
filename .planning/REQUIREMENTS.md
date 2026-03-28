@@ -90,15 +90,15 @@ Content scrolls at 60fps on real device. This is THE highest priority -- everyth
 
 ### Jank Source Elimination (audit findings)
 
-- [ ] **SCROLL-01**: Remove setState from scroll event handler -- use ref + IntersectionObserver for atBottom detection
+- [x] **SCROLL-01**: Remove setState from scroll event handler -- use ref + IntersectionObserver for atBottom detection
   - _Acceptance:_ `setAtBottom()` and `setUnreadCount()` NEVER called inside scroll event callback. atBottom state derived from IntersectionObserver on a sentinel element at the bottom of the message list.
   - _Why:_ CRITICAL. Currently fires React setState 60+ times/sec during scroll, blocking compositor on every frame. This is the #1 jank source.
 
-- [ ] **SCROLL-02**: Remove DOM measurements (scrollHeight, scrollTop, clientHeight) from scroll handler
+- [x] **SCROLL-02**: Remove DOM measurements (scrollHeight, scrollTop, clientHeight) from scroll handler
   - _Acceptance:_ Scroll event handler does NOT read any layout properties. All scroll-position-dependent logic uses IntersectionObserver or rAF-batched reads.
   - _Why:_ DOM layout reads during scroll force synchronous layout recalculation in WKWebView.
 
-- [ ] **SCROLL-03**: Auto-scroll-to-bottom during streaming uses rAF batching, not per-message-length useEffect
+- [x] **SCROLL-03**: Auto-scroll-to-bottom during streaming uses rAF batching, not per-message-length useEffect
   - _Acceptance:_ Streaming auto-scroll fires at most once per animation frame via rAF, not on every `messages.length` change.
   - _Why:_ Current implementation triggers `el.scrollTop = el.scrollHeight` on every message chunk during streaming.
 
@@ -110,7 +110,7 @@ Content scrolls at 60fps on real device. This is THE highest priority -- everyth
   - _Acceptance:_ `void container.offsetHeight` forced reflow deferred behind rAF + 50ms setTimeout per D-11/D-12. FLIP animation intentionally preserved -- forced reflow required for CSS height transition. Relocated out of scroll-critical path so it cannot block an active scroll frame.
   - _Why:_ The forced reflow is inherent to the FLIP animation pattern (browser must commit start height before animating to end height). Deferring by 50ms ensures it fires between scroll frames, not during one.
 
-- [ ] **SCROLL-06**: Delete dead useScrollAnchor.ts hook
+- [x] **SCROLL-06**: Delete dead useScrollAnchor.ts hook
   - _Acceptance:_ File removed from codebase. No imports reference it.
   - _Why:_ Contains a rAF loop calling `scrollIntoView()` every frame -- 60+ forced reflows/sec. Not currently used but dangerous if accidentally imported.
 
@@ -287,12 +287,12 @@ v2.2 ships when:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCROLL-01 | 64 | Pending |
-| SCROLL-02 | 64 | Pending |
-| SCROLL-03 | 64 | Pending |
+| SCROLL-01 | 64 | Complete |
+| SCROLL-02 | 64 | Complete |
+| SCROLL-03 | 64 | Complete |
 | SCROLL-04 | 64 | Complete |
 | SCROLL-05 | 64 | Complete |
-| SCROLL-06 | 64 | Pending |
+| SCROLL-06 | 64 | Complete |
 | SCROLL-07 | 64 | Pending |
 | SCROLL-08 | 64 | Pending |
 | SCROLL-09 | 64 | Complete |

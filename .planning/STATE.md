@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
 status: Ready to execute
-stopped_at: Completed 64-02-PLAN.md
-last_updated: "2026-03-28T20:39:06.048Z"
+stopped_at: Completed 64-01-PLAN.md
+last_updated: "2026-03-28T20:42:16.034Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 64 (scroll-performance) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -47,6 +47,8 @@ Plan: 2 of 3
 - [Phase 64]: ActiveMessage finalization reflow deferred by rAF + 50ms setTimeout (D-12, SCROLL-05)
 - [Phase 64]: content-visibility single CSS source (.msg-item at 150px) -- inline styles removed from MessageContainer
 - [Phase 64]: overscroll-behavior: none added to html/body, .native-scroll omits overscroll-behavior-y for iOS rubber band bounce (D-18)
+- [Phase 64]: Single IO threshold -150px rootMargin (not dual 200/100px hysteresis) -- debounce absorbs flicker
+- [Phase 64]: isAutoScrollingRef initialized from isStreaming prop to handle mount-with-active-stream
 
 ### Pending Todos
 
@@ -61,6 +63,6 @@ Plan: 2 of 3
 
 ## Session Continuity
 
-Last session: 2026-03-28T20:39:06.046Z
-Stopped at: Completed 64-02-PLAN.md
+Last session: 2026-03-28T20:42:16.032Z
+Stopped at: Completed 64-01-PLAN.md
 Resume: `/gsd:plan-phase 64`
