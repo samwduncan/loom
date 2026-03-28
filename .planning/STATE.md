@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
-status: Ready to plan
-stopped_at: Phase 63 context gathered
-last_updated: "2026-03-28T06:16:18.014Z"
+status: Ready to execute
+stopped_at: Completed 63-01-PLAN.md
+last_updated: "2026-03-28T06:40:01.482Z"
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 62 — Haptics & Motion
+**Current focus:** Phase 63 — Bundled Assets & Device Validation
 
 ## Current Position
 
-Phase: 63
-Plan: Not started
+Phase: 63 (Bundled Assets & Device Validation) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: Not started
 | Phase 62 P02 | 3min | 3 tasks | 6 files |
 | Phase 62 P01 | 5min | 2 tasks | 5 files |
 | Phase 62 P03 | 2min | 2 tasks | 5 files |
+| Phase 63 P01 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,8 @@ Plan: Not started
 - [Phase 62]: Date.now() throttle for hapticNotification -- simpler than setTimeout, no cleanup, matches fire-and-forget
 - [Phase 62]: ToolChip haptics in useEffect with prevStatusRef -- not in render-phase adjust-state block (AR S-1)
 - [Phase 62]: QuickSettingsPanel onChange wrappers accept _checked: boolean for Radix Switch type compat (AR A-4)
+- [Phase 63]: base: './' affects only production build, not dev server HMR
+- [Phase 63]: cap-build.sh separate from deploy.sh -- different output dirs (src/dist/ vs repo root dist/), no service restart
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T06:16:18.012Z
-Stopped at: Phase 63 context gathered
+Last session: 2026-03-28T06:40:01.479Z
+Stopped at: Completed 63-01-PLAN.md
 Resume: `/gsd:plan-phase 59`
