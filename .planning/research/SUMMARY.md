@@ -1,184 +1,177 @@
 # Project Research Summary
 
-**Project:** Loom v2.1 "The Mobile"
-**Domain:** iOS native-feeling AI chat workspace via Capacitor WKWebView
-**Researched:** 2026-03-27
-**Confidence:** HIGH (official Capacitor docs, Apple developer forums, GitHub issue tracking)
+**Project:** Loom v2.2 "The Touch"
+**Domain:** iOS-native gesture and visual polish for existing React + Capacitor chat app
+**Researched:** 2026-03-28
+**Confidence:** HIGH
 
 ## Executive Summary
 
-Loom v2.1 turns a 55K+ LOC React SPA into a native-feeling iOS app by adding four official Capacitor 7 plugins (Keyboard, Haptics, StatusBar, SplashScreen) and a platform abstraction layer that routes API/WebSocket traffic to the remote Express server. The approach is well-understood: Capacitor's plugin ecosystem is mature, the codebase's architecture (centralized network layer, tiered animation system, CSS custom property keyboard offset) is already well-suited for native integration, and the required changes are surgical rather than structural. No new architectural patterns are needed — the work fits cleanly into established codebase patterns.
+Loom v2.2 is about making an existing, fully functional web-based chat app *feel* native on iOS. The research is clear: this is not a feature build -- it is a polish milestone. The app already works in Capacitor 7.6.1 on iPhone 16 Pro Max with keyboard handling, haptics, status bar, and sidebar swipe-to-close. What it lacks are the micro-interactions that iOS users attempt within seconds of opening any app: swipe-to-delete on lists, long-press context menus, pull-to-refresh, and the visual refinements (OLED backgrounds, glass effects, spring curves) that signal "this was built for this device." Without these, Loom feels like a website in a wrapper.
 
-The recommended approach is a dependency-ordered five-phase execution: (1) platform abstraction and CORS foundation — prerequisite for everything else; (2) keyboard plugin replacing the fragile `visualViewport` hack; (3) status bar, splash screen, and touch polish; (4) haptics and 120Hz motion tuning; (5) bundled assets validation on device. The foundation phase must come first because every other feature depends on correct API URL construction. Skipping it produces an app that loads HTML but silently fails all network calls — a particularly deceptive failure mode.
+The recommended approach is custom gesture hooks built on raw `touchStart`/`touchMove`/`touchEnd` -- the same zero-dependency pattern already proven in `Sidebar.tsx`. No gesture library needed. Four new Capacitor plugins (App lifecycle, Clipboard, Share, Action Sheet) address real gaps: WebSocket reconnection on app resume, reliable clipboard access over HTTP, native share sheet, and native confirmation dialogs. All are official Capacitor 7.x plugins with verified compatibility. The visual work (OLED backgrounds, glass surfaces, spring animation tuning) must use CSS transitions exclusively because WKWebView caps `requestAnimationFrame` at 60fps while CSS animations run at 120Hz on ProMotion displays.
 
-The key risks are all known and preventable. The most dangerous is the dual-keyboard-handler race condition: when Capacitor's Keyboard plugin coexists with the existing `visualViewport` hack, they fight over `--keyboard-offset`, producing visible UI thrashing. Prevention is a single `if (IS_NATIVE) return` guard in ChatComposer.tsx. The second critical risk is the `capacitor://localhost` CORS gap: every fetch and WebSocket call must be prefixed with the server's absolute URL in native mode, or the app is completely non-functional despite appearing to load. A centralized `platform.ts` module with `API_BASE` and `WS_BASE` constants handles this with ~5 lines of production code. Both pitfalls are well-documented with clear prevention strategies.
+The primary risks are WKWebView-specific: passive event listeners silently blocking `preventDefault()` on touch events, `overscroll-behavior: none` being ignored by native UIScrollView, nested `backdrop-filter` causing rendering artifacts, and the iOS back gesture conflicting with custom swipe gestures. All have documented workarounds. The critical implementation rule is: **test every change on the physical iPhone**, not the simulator. The simulator uses Mac GPU resources and does not reproduce WKWebView's real compositor behavior, OLED smearing, or touch-action quirks.
 
 ## Key Findings
 
 ### Recommended Stack
 
-Four official Capacitor 7 plugins cover all required native capabilities. All are thin TypeScript wrappers over UIKit APIs, adding ~2-5KB each to the web bundle. The critical architectural addition is `platform.ts` — a module-level constants file that resolves `API_BASE` and `WS_BASE` once at import time using `Capacitor.isNativePlatform()`. This zero-overhead approach matches the existing codebase pattern for constants in `motion.ts` and `auth.ts`.
+The existing stack (Vite 7, React 19, Capacitor 7.6.1, Zustand, Tailwind v4) requires no changes. Four official Capacitor plugins should be added as Tier 1 installs; two more as Tier 2 stretch goals.
 
-`@capacitor/core` must move from `devDependencies` to `dependencies` since `platform.ts` imports from it at runtime. All plugin imports use dynamic `import()` inside `IS_NATIVE` guards so Vite tree-shakes them out of the web bundle entirely. No new devDependencies are needed. The existing Vite build pipeline (`npm run build` → `npx cap sync ios`) requires no modifications.
+**New Tier 1 plugins (install for v2.2):**
+- `@capacitor/app@^7.1.2`: App lifecycle events -- WebSocket reconnect on foreground return, pause streaming on background
+- `@capacitor/clipboard@^7.0.4`: Native pasteboard -- bypasses HTTPS requirement that breaks `navigator.clipboard` in server.url mode
+- `@capacitor/share@^7.0.4`: Native share sheet (UIActivityViewController) -- share code/conversations to Messages, Slack, Notes
+- `@capacitor/action-sheet@^7.0.4`: Native confirmation dialogs -- iOS-standard destructive action sheets for delete confirmations
 
-**Core technologies:**
-- `@capacitor/keyboard@7.0.6`: Reliable `keyboardWillShow`/`keyboardWillHide` events with exact pixel height — replaces fragile `visualViewport` hack. `resize: 'none'` mode is critical.
-- `@capacitor/haptics@7.0.5`: UIKit UIImpactFeedbackGenerator/UINotificationFeedbackGenerator — thin wrapper, graceful no-op on web and devices without Taptic Engine
-- `@capacitor/status-bar@7.0.6`: `Style.Dark` for light text on dark background — `setBackgroundColor()` is a NO-OP on iOS; style only
-- `@capacitor/splash-screen@7.0.5`: Manual hide timing (`launchAutoHide: false`) — prevents white flash during WKWebView init
-- `platform.ts` (new, zero deps): Module-level `IS_NATIVE`, `API_BASE`, `WS_BASE` constants — single source of truth for all URL construction
-- `native-plugins.ts` (new, ~60 LOC): Dynamic plugin init before React mounts — matches existing `initializeWebSocket()` pattern in main.tsx
+**New Tier 2 plugins (stretch goals):**
+- `@capacitor/network@^7.0.4`: Proactive connectivity monitoring before WebSocket dies
+- `@capacitor/browser@^7.0.5`: In-app SFSafariViewController for links in AI responses
 
-**Do NOT use:** `@capacitor-community/react-hooks` — not updated for Capacitor 7. `CapacitorHttp` — patches global `fetch`, breaks WebSocket upgrade. `@capacitor/system-bars` — Capacitor 8+ only.
+**Not to install:** CapacitorHttp (breaks WebSocket), @capacitor/preferences (conflicts with Zustand persist), any camera/filesystem/geolocation plugins, any third-party swipe gesture plugins.
+
+**Build-in-app (no plugin):** Swipe-to-delete (custom touch handlers), pull-to-refresh (custom touch handlers), long-press context menus (timer + Radix ContextMenu), spring animations (CSS transitions + `spring-easing` package already installed).
 
 ### Expected Features
 
-The features divide cleanly into table stakes (things that make the app feel non-broken) and differentiators (things that make it feel premium).
+**Must have (table stakes -- missing = "feels like a website"):**
+- TS-1: Swipe-to-delete on session list (every iOS list app has this)
+- TS-2: Long-press context menu on sessions (replaces right-click)
+- TS-3: Long-press context menu on messages (Copy Text, Retry, Share)
+- TS-4: Pull-to-refresh on session list (universal since iOS 6)
+- TS-5: Status bar tap-to-scroll-top (5 lines of code, deeply ingrained muscle memory)
+- TS-8: Code block copy button at 44px touch target
+- TS-9: Haptic feedback on all new gesture completions
+- TS-10/11/12: Existing sidebar swipe, keyboard transitions, text selection (verify working)
 
-**Must have (table stakes):**
-- Reliable keyboard avoidance — current `visualViewport` hack breaks on orientation change, remount, and multitasking split
-- Status bar dark style — single API call; without it the light status bar looks broken on dark theme
-- Smooth splash-to-content transition — white flash on every app launch screams "web wrapper"
-- Touch targets ≥44px — Apple HIG minimum; desktop-optimized controls fail this audit
-- Safe-area inset compliance — all four edges; existing CSS only handles top/bottom
+**Should have (differentiators -- "feels better than native"):**
+- D-2: Share sheet integration via @capacitor/share
+- D-6: Contextual haptic language (consistent feedback policy across all actions)
+- D-7: Inline code block expand to full-screen sheet
+- D-10: Tap code block to copy (whole block, quick-tap gesture)
 
-**Should have (differentiators):**
-- Haptic feedback on message send, errors, and key interactions — physically confirms actions
-- 120Hz spring animation tuning — CSS transitions auto-upgrade to 120Hz; spring configs should be tightened for iOS via CSS media query, not JS
-- Bundled assets mode — sub-second app launch, UI shell loads without network
-- Keyboard-aware composer with scroll preservation — composer stays pinned above keyboard, auto-scrolls to latest message on keyboard open
-
-**Defer to v2.2+:**
-- Push notifications — APNS backend integration, not needed for personal use
-- Face ID / biometric auth — current JWT auth doesn't warrant it
-- Offline conversation cache — fundamentally incompatible with AI assistant purpose
-- iPad split-screen, share extension, native file picker — all add complexity for unclear value
+**Defer to v2.3+:**
+- D-1: Swipe-to-reply (high complexity, requires backend threading support that may not exist)
+- D-3: Keyboard accessory toolbar (risk of conflicting with native keyboard resize mode)
+- D-5: Spring navigation transitions (10-16h, diminishing returns for SPA)
+- D-8: Two-direction swipe on sessions (doubles gesture complexity)
+- D-9: Sticky date headers (requires message list restructuring)
+- Local notifications, biometric auth, privacy screen plugins
 
 ### Architecture Approach
 
-The architecture introduces a thin two-layer abstraction below the existing React/Zustand stack. The Platform Abstraction Layer (`platform.ts`) centralizes URL construction — all four network files (`api-client.ts`, `auth.ts`, `websocket-client.ts`, `shell-ws-client.ts`) import from it and prepend `API_BASE` or `WS_BASE`. On web, both are empty strings, making the change a zero-cost no-op. The Plugin Bridge Layer (`native-plugins.ts`) initializes all four Capacitor plugins before React mounts, following the existing `initializeWebSocket()` precedent. Components remain completely platform-unaware: ChatComposer.tsx gains one `if (IS_NATIVE) return` guard; everything else is CSS consuming the `--keyboard-offset` custom property set by the plugin layer.
+All gesture logic lives in three custom hooks (`useSwipeAction`, `usePullToRefresh`, `useLongPress`) under `src/hooks/`, extending the existing raw touch event pattern from `Sidebar.tsx`. No gesture library. Each hook checks `useMobile()` internally and returns no-op handlers on desktop. Visual position updates use direct DOM mutation via refs (same as the streaming buffer's useRef + rAF pattern) -- never `useState` for drag positions, which would cause 60 re-renders/second. New shared components (`SwipeableRow`, `PullToRefreshIndicator`, `LongPressContextMenu`) compose these hooks. No Zustand store changes needed -- all gesture state is local. Total bundle impact: ~2.4KB gzipped of application code versus ~6-10KB for `@use-gesture/react`.
 
 **Major components:**
-1. `platform.ts` — Module-level `IS_NATIVE`/`API_BASE`/`WS_BASE` constants; zero runtime overhead after module load; everything else imports from here
-2. `native-plugins.ts` — Plugin lifecycle management; dynamic imports for tree-shaking; sets CSS variables directly, no React coupling
-3. `api-client.ts` / `auth.ts` — One-line `${API_BASE}${path}` prepend; behavior unchanged on web (empty prefix)
-4. `websocket-client.ts` / `shell-ws-client.ts` — `IS_NATIVE` branch for absolute WS URL construction
-5. `capacitor.config.ts` — `Keyboard.resize: 'none'` is critical; `SplashScreen.launchAutoHide: false`; `CapacitorHttp.enabled: false`
-6. `server/index.js` — One-line CORS addition: `'capacitor://localhost'`
-
-**Architectural constraint to enforce:** Platform checks MUST NOT be scattered through UI components. They belong only in `platform.ts` (URL logic) and `native-plugins.ts` (plugin lifecycle). Components are platform-unaware and consume CSS variables or call `getSpring()` from `motion.ts`.
+1. **Gesture hooks** (`useSwipeAction`, `usePullToRefresh`, `useLongPress`) -- platform-conditional touch event tracking, threshold detection, haptic integration
+2. **SwipeableRow** wrapper -- translates child content to reveal action buttons behind, single-active-row enforcement
+3. **PullToRefreshIndicator** -- spinner that follows pull gesture distance with rubber-band resistance
+4. **LongPressContextMenu** -- message-level context menu with Copy Text, Retry, Share actions
+5. **Native plugin utilities** (`clipboard.ts`, `app-lifecycle.ts`, `share.ts`) -- following existing `haptics.ts` setter-injection pattern
 
 ### Critical Pitfalls
 
-1. **Dual keyboard handler race condition** — Capacitor Keyboard plugin + existing `visualViewport` hack both set `--keyboard-offset`, causing double-offset or visible thrashing. Prevention: `if (IS_NATIVE) return` at the top of ChatComposer's keyboard effect. `resize: 'none'` in capacitor.config.ts is mandatory. Must be addressed in the keyboard integration phase.
+1. **React passive event listeners block `preventDefault()` on touch events** -- React 17+ attaches all listeners passively. Calling `e.preventDefault()` in `onTouchMove` is silently a no-op. Use `useEffect` with DOM `addEventListener({ passive: false })` for any swipe gesture that needs to block scrolling. This is the number-one gotcha and will cause immediate confusion.
 
-2. **`capacitor://localhost` breaks all fetch/WebSocket** — In bundled mode, relative URLs like `/api/sessions` resolve to `capacitor://localhost/api/sessions` (nonexistent). App loads HTML but has no data — silent total failure. Prevention: centralized `API_BASE` constant in `platform.ts`, `capacitor://localhost` in Express CORS whitelist. Must be the first change made.
+2. **iOS back gesture conflicts with custom horizontal swipes** -- WKWebView's `allowsBackForwardNavigationGestures` is true by default. Must disable in Swift `ViewController.swift` since Loom is an SPA with no navigation stack. Also reserve left 20px edge zone.
 
-3. **CapacitorHttp global fetch patch breaks WebSocket** — Capacitor 7's optional HTTP interceptor patches `window.fetch` globally and interferes with WebSocket upgrade requests. Prevention: explicitly set `CapacitorHttp: { enabled: false }` in capacitor.config.ts.
+3. **`touch-action: pan-y` does not work reliably in Safari/WKWebView** -- Do not rely on CSS `touch-action` for gesture discrimination. Use JavaScript direction-commitment heuristic: track first 10px of movement, commit to horizontal or vertical, then act accordingly.
 
-4. **SplashScreen white flash on dark theme** — WKWebView default background is white; flashes between splash and first meaningful paint. Prevention: set WKWebView `backgroundColor` in Swift to match `--surface-base` (~#2b2521), `launchAutoHide: false`, call `SplashScreen.hide()` from `useEffect` after React mounts.
+4. **`overscroll-behavior: none` ignored by WKWebView's native UIScrollView** -- Pull-to-refresh cannot rely on CSS overscroll control. Either implement via native `UIRefreshControl` Capacitor plugin or disable `scrollView.bounces` in Swift and build a pure-web pull indicator.
 
-5. **rAF capped at 60fps in WKWebView — JS springs cannot hit 120Hz** — Apple throttles `requestAnimationFrame` to 60fps in WKWebView (WebKit Bug 173434, filed 2017, unresolved for embedded WKWebView as of 2026). CSS transitions/animations DO run at 120Hz. Prevention: lean into CSS transitions for motion; tune CSS duration tokens via `@media (hover: none) and (pointer: coarse)` (not duration math based on frame counts); reserve Framer LazyMotion only for gesture-driven interactions.
+5. **rAF capped at 60fps in WKWebView** -- CSS transitions run at 120Hz on ProMotion, JS animations do not. All visible animations must use CSS transitions. rAF is for logic only (scroll position, intersection detection).
 
-6. **Safe-area `env()` does not update during keyboard** — `env(safe-area-inset-bottom)` stays at its resting value (34px on iPhone 16 Pro Max) when keyboard is open. Capacitor's `keyboardHeight` already includes this distance from screen bottom. Prevention: toggle `data-keyboard-open` attribute from Keyboard plugin events to switch CSS from `env(safe-area-inset-bottom)` to `var(--keyboard-offset)` padding strategy.
-
-7. **Font loading race in WKWebView** — Self-hosted woff2 fonts (Inter, JetBrains Mono) fail intermittently (~20% cold starts) due to WKURLSchemeHandler initialization race. Prevention: `<link rel="preload" crossorigin>` for critical fonts in index.html. The `crossorigin` attribute is required by spec even for same-origin fonts.
-
-8. **iOS build requires macOS** — `cap sync` works on Linux; `xcodebuild` does not. Options: Xcode Cloud (Apple CI), GitHub Actions macOS runner, or direct Mac access. Plan this before Phase 5 begins.
-
-Additional pitfalls (moderate severity): `position: fixed` inside CSS transform contexts loses viewport-relative positioning in WKWebView (audit ElectricBorder, modal overlays, sidebar animations); `StatusBar.setBackgroundColor()` is a no-op on iOS — status bar background is always the content behind it; haptics must be debounced (50ms minimum) or the Taptic Engine throttles and goes silent.
+6. **Nested `backdrop-filter: blur()` causes rendering artifacts** -- Limit to one visible blur layer at a time. Use smaller blur radius on mobile (6px vs 10px). Increase glass surface opacity on mobile for readability in bright ambient light.
 
 ## Implications for Roadmap
 
-All changes follow a strict dependency order: platform abstraction first (everything depends on it), then native plugin integration, then polish and device validation.
+Based on research, the work breaks cleanly into 4 phases following the dependency chain: touch foundations first, then gestures that build on them, then visual polish, then plugin integration that enhances the complete experience.
 
-### Phase 1: Platform Foundation
-**Rationale:** Every other feature requires correct URL routing and CORS. Without this, the app is completely non-functional in bundled mode regardless of how well other features are implemented. Zero user-visible changes on web — pure infrastructure with zero behavioral risk.
-**Delivers:** `platform.ts` with `IS_NATIVE`/`API_BASE`/`WS_BASE`; `api-client.ts` / `auth.ts` / `websocket-client.ts` / `shell-ws-client.ts` updated to use absolute URLs on native; `capacitor://localhost` CORS origin added to Express; `CapacitorHttp.enabled: false` in capacitor.config.ts
-**Avoids:** Pitfall 2 (CORS/URL failure), Pitfall 3 (CapacitorHttp interference), Pitfall 8 (window.location.host in bundled mode)
+### Phase 1: Touch Foundations and Scroll Performance
 
-### Phase 2: Keyboard and Composer
-**Rationale:** Keyboard handling is the highest-impact UX change — it is what makes the app feel broken or native on first use. Must come before haptics or 120Hz work because it establishes the `native-plugins.ts` init pattern and `IS_NATIVE` guard pattern that subsequent phases follow.
-**Delivers:** `native-plugins.ts` with Keyboard plugin listeners; `capacitor.config.ts` with `Keyboard.resize: 'none'`; ChatComposer.tsx `IS_NATIVE` early return; `keyboardDidHide` reflow fix; `data-keyboard-open` attribute for CSS safe-area switching; scroll-to-latest-message on keyboard open
-**Avoids:** Pitfall 1 (dual handler race), Pitfall 9 (safe-area double-offset), Pitfall 14 (black gap on keyboard dismiss)
+**Rationale:** Touch targets, typography legibility, scroll performance, and keyboard behavior form the foundation that all gesture and visual work builds on. Fixing a 32px button after building swipe-to-delete means re-testing every gesture. Scroll performance issues (GPU layers, sticky positioning, keyboard viewport bugs) must be resolved before adding gesture complexity.
+**Delivers:** All interactive elements at 44px touch targets, mobile-optimized typography, validated scroll performance on real device, keyboard dismiss bug workarounds, LiveSessionBanner sticky behavior verified.
+**Addresses:** Touch target sizing (TS-8), text selection verification (TS-12), input focus transitions (TS-11), scroll anchoring validation (TS-7), rubber band verification (TS-6)
+**Avoids:** Pitfall 5 (keyboard viewport shift), Pitfall 11 (will-change GPU memory), Pitfall 13 (CSS transitions broken after keyboard), Pitfall 16 (sticky positioning in nested scroll)
 
-### Phase 3: Status Bar, Splash Screen, and Touch Polish
-**Rationale:** These are additive to `native-plugins.ts` (same init pattern, same file) with no new architectural surface. Splash screen and status bar remove the most visually jarring "web wrapper" tells. Touch targets and safe-area audit are best done together as a single layout review pass.
-**Delivers:** StatusBar `Style.Dark` + `overlaysWebView: true`; SplashScreen with `launchAutoHide: false` and color-matched background; WKWebView `backgroundColor` in Swift; touch target audit (44px enforcement on all interactive elements); full safe-area audit (all four edges); font preload in index.html; landscape lock (`UISupportedInterfaceOrientations` to portrait) or left/right safe-area padding
-**Avoids:** Pitfall 4 (white flash), Pitfall 5 (StatusBar iOS color limitations), Pitfall 10 (font loading race), Pitfall 11 (position:fixed in transform context), Pitfall 12 (landscape safe-area)
+### Phase 2: Core Gesture System
 
-### Phase 4: Haptics and Motion
-**Rationale:** Haptics require correct touch targets (Phase 3) to be meaningful — haptic feedback on a 30px target is worse than no haptic. 120Hz CSS tuning is a stylesheet change and safe to do alongside haptics.
-**Delivers:** `useHaptic()` hook with 50ms debounce and `prefers-reduced-motion` guard; haptic calls on message send, errors, navigation, and key interactions; CSS duration tokens tuned for touch devices via `@media (hover: none) and (pointer: coarse)`; `getSpring()` in `motion.ts` returning platform-aware configs; `CADisableMinimumFrameDurationOnPhone: true` in Info.plist
-**Avoids:** Pitfall 6 (haptic throttle from over-firing), Pitfall 7 (rAF 60fps — CSS-first strategy avoids the problem)
+**Rationale:** The three gesture hooks are the highest-impact work. Swipe-to-delete, long-press context menus, and pull-to-refresh are what users try within seconds of opening the app. They must be built after touch foundations are solid, and they share architectural patterns (raw touch events, direction commitment, haptic integration) that should be implemented together.
+**Delivers:** Swipe-to-delete on sessions, long-press context menus on sessions and messages, pull-to-refresh on session list, status bar tap-to-scroll-top, comprehensive haptic feedback across all interactions.
+**Addresses:** TS-1 (swipe-to-delete), TS-2 (long-press sessions), TS-3 (long-press messages), TS-4 (pull-to-refresh), TS-5 (status bar tap), TS-9 (haptics), D-6 (haptic language)
+**Avoids:** Pitfall 1 (iOS back gesture conflict), Pitfall 2 (touch-action:pan-y), Pitfall 3 (passive event listeners), Pitfall 4 (overscroll-behavior ignored), Pitfall 7 (native context menu conflict), Pitfall 9 (pull-to-refresh vs overscroll), Pitfall 12 (swipe vs sidebar gesture conflict)
 
-### Phase 5: Bundled Assets Validation
-**Rationale:** Building and running the actual Capacitor app requires Mac access and is the integration test for all previous phases. Separating this from implementation avoids arranging Mac access multiple times and enables Phases 1-4 to be written and unit-tested on Linux.
-**Delivers:** Full `npm run build` → `cap sync ios` → `xcodebuild` pipeline validated; all features tested on device; font loading confirmed; API calls from `capacitor://localhost` origin confirmed; `VITE_API_BASE_URL` build-time env var workflow documented
-**Avoids:** Pitfall 13 (Linux build limitation), Pitfall 10 (font race confirmed on device), Pitfall 18 (cap sync env var timing)
+### Phase 3: Visual Polish
+
+**Rationale:** OLED backgrounds, glass surfaces, and spring animation tuning are visual refinements that should come after the interaction model is stable. Changing visual layers while gesture thresholds are still being tuned creates unnecessary churn. Glass effects interact with backdrop-filter nesting (Pitfall 8) and must be tested after all modals/overlays are in their final state.
+**Delivers:** OLED-optimized near-black background, glass morphism surfaces with mobile-tuned opacity, CSS spring curves for sidebar/modal transitions, contrast audit for mobile readability.
+**Addresses:** VISUAL-01 (OLED), VISUAL-02 (glass), VISUAL-03/04/05 (springs), VISUAL-08 (contrast)
+**Avoids:** Pitfall 6 (rAF 60fps cap -- CSS only), Pitfall 8 (nested backdrop-filter), Pitfall 14 (OLED smearing), Pitfall 15 (glass unreadable on mobile)
+
+### Phase 4: Native Plugin Integration and Differentiators
+
+**Rationale:** Capacitor plugins (App lifecycle, Clipboard, Share, Action Sheet, Browser, Network) enhance the gesture and visual work from phases 2-3 but do not block it. WebSocket reconnect on app resume is important but the app works without it. Share sheet wires into the long-press context menus built in Phase 2. Clipboard plugin enhances the copy functionality already working via web APIs. These are last-mile improvements.
+**Delivers:** App lifecycle handling (WS reconnect on foreground), native clipboard, share sheet on code blocks and messages, native action sheets for destructive confirmations, in-app browser for links, network status monitoring.
+**Addresses:** D-2 (share sheet), D-7 (code expand), D-10 (tap to copy), app lifecycle resilience
+**Avoids:** Pitfall 10 (server.url caching -- version check on app resume)
 
 ### Phase Ordering Rationale
 
-- **Foundation first, features second:** Pitfalls 2, 3, and 8 all cause silent total failure that is discovered only on device and can mask every other problem. Fix URL routing before writing a single plugin call.
-- **Keyboard before haptics:** `native-plugins.ts` is established in Phase 2; Phase 4 adds to it. Avoids creating the file twice and ensures consistent guard pattern throughout.
-- **Touch audit before haptics:** Haptic feedback on elements that lack proper touch targets is a net negative — it signals an interaction on something that was hard to hit. Phase 3 audit precedes Phase 4 haptic integration.
-- **Mac build last:** Phases 1-4 are written and unit-tested on Linux. Mac access is a scarce resource; consolidate all Xcode work into one session.
-- **CSS motion before JS motion:** The 120Hz wins are CSS-native. Duration token changes in Phase 4 alongside haptics is correct — it is a stylesheet change, not an architectural one.
+- **Touch foundations before gestures:** A 32px button inside a SwipeableRow creates a maddening touch target problem. Fix foundations first.
+- **Gestures before visual polish:** Gesture threshold tuning requires real-device testing loops. Do not add visual complexity until interactions are stable.
+- **Visual polish before plugins:** Glass effects and OLED backgrounds affect the visual context of share sheets and action sheets. Get the visual layer right, then wire in native chrome.
+- **All phases need real-device testing:** The simulator does not reproduce WKWebView compositor behavior, OLED physics, or touch-action quirks. Every phase must include on-device validation.
 
 ### Research Flags
 
-Phases with standard patterns (skip `/gsd:research-phase`):
-- **Phase 1:** URL abstraction is a well-documented Capacitor pattern; `isNativePlatform()` is authoritative; CORS change is one line
-- **Phase 2:** Keyboard plugin API is fully documented; `resize: 'none'` + CSS variable pattern is established in both official docs and community issues
-- **Phase 3:** StatusBar and SplashScreen APIs are single-purpose; touch target audit is mechanical HTML/CSS work
+Phases likely needing deeper research during planning:
+- **Phase 2 (Gestures):** Pull-to-refresh implementation choice (native UIRefreshControl via custom Capacitor plugin vs pure-web) needs a spike. The research identified that `overscroll-behavior: none` is ignored in WKWebView, which may force the native approach. Also: the swipe-to-delete vs sidebar swipe-to-close conflict (Pitfall 12) needs careful prototyping.
+- **Phase 3 (Visual):** Glass effect performance and readability on real device needs empirical testing -- the research provides guidelines (6px blur, higher opacity) but the exact values depend on Loom's specific color palette and surface hierarchy.
 
-Phases that may benefit from targeted pre-planning research:
-- **Phase 4:** `useHaptic()` hook design — review existing Loom hook patterns (`src/src/hooks/`) before implementing to ensure consistency; Web Animations API as potential alternative to Framer Motion for compositor-driven 120Hz springs
-- **Phase 5:** Xcode Cloud or GitHub Actions macOS runner setup — cloud CI options evolve rapidly; verify current pricing and Capacitor compatibility before committing to a build path
+Phases with standard patterns (skip research-phase):
+- **Phase 1 (Touch Foundations):** Well-documented CSS changes (touch targets, typography). The pitfalls are known and have clear workarounds.
+- **Phase 4 (Plugins):** All plugins are official Capacitor with stable APIs. The integration follows the established `native-plugins.ts` pattern exactly. No research needed.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All four plugins are official Capacitor 7 releases; npm versions verified 2026-03-27; peerDeps confirmed against existing @capacitor/core 7.6.1 |
-| Features | HIGH | Apple HIG requirements are stable; Capacitor plugin APIs are stable; anti-features correctly scoped based on project purpose and existing architecture |
-| Architecture | HIGH | Existing codebase analyzed directly (file:line references in ARCHITECTURE.md); patterns derived from existing `initializeWebSocket()` and `motion.ts` constants; all 4 network files identified and integration surface bounded |
-| Pitfalls | HIGH for plugin issues, MEDIUM for 120Hz | Pitfalls 1-9 confirmed via GitHub issues (#1143, #2194, #7585), official docs, and WebKit bug tracker; 120Hz rAF unlock in WKWebView is unconfirmed for third-party apps |
+| Stack | HIGH | All plugin versions verified via npm registry 2026-03-28. Peer deps confirmed. Zero version conflicts. Existing native-plugins.ts pattern provides clear integration template. |
+| Features | HIGH | Table stakes derived from Apple HIG + NNGroup research + reference app analysis (iMessage, WhatsApp, Telegram, Discord, GitHub Mobile). Complexity estimates based on existing codebase architecture. |
+| Architecture | HIGH | Primary reference is existing Sidebar.tsx swipe implementation (proven in production). Custom hook pattern matches established codebase conventions. Bundle size estimates grounded in source-level analysis. |
+| Pitfalls | HIGH | Every critical pitfall sourced from official WebKit bug trackers, Capacitor GitHub issues, or framework-level documentation. WKWebView-specific behaviors verified against multiple independent sources. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **120Hz rAF in WKWebView:** Whether `CADisableMinimumFrameDurationOnPhone` in Info.plist unlocks `requestAnimationFrame` (not just CAAnimation) in embedded WKWebView is not officially confirmed. The CSS-first strategy is the correct hedge regardless. Requires device testing to measure actual rAF frame intervals.
-- **Spring duration tuning values:** The stiffness/damping multipliers for iOS spring configs are aesthetic estimates — no published benchmarks exist for ProMotion spring configs. On-device iteration required after Phase 4 implementation.
-- **Font preload `crossorigin` attribute:** Required by spec for font preloads but can cause double-fetches in some WKWebView versions. Verify no duplicate font requests in Xcode network profiler during Phase 5.
-- **Mac build access:** Phase 5 is blocked until a Mac build environment is arranged. Resolve this before starting Phase 4 so there is no idle wait time after implementation.
-- **`safe-area-inset-bottom` keyboard behavior:** Research documents this stays static — device testing in Phase 5 should confirm the `data-keyboard-open` CSS toggle mitigation works correctly on iPhone 16 Pro Max.
+- **Pull-to-refresh implementation choice:** Research identified two viable paths (native UIRefreshControl vs pure-web). A 2-hour spike during Phase 2 planning should build both prototypes and compare feel on device. The web approach is simpler but may fight WKWebView's native UIScrollView bounce.
+- **Long-press vs text selection coexistence:** The recommended CSS approach (user-select:none on container, user-select:text on content) is theoretically sound and matches how Discord/Telegram handle it, but needs real-device validation. If it does not work, fall back to whole-message copy only (Discord's approach).
+- **Swipe-to-reply backend support:** Deferred to v2.3+, but worth a quick investigation during v2.2 to determine if the Claude SDK session protocol can accept reply context. This would inform whether D-1 is feasible for a future milestone.
+- **Server.url caching in WKWebView:** Vite's content-hashed filenames should handle this, but nginx cache headers should be audited during Phase 1 to confirm. No code change needed if headers are correct.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Capacitor Keyboard Plugin API](https://capacitorjs.com/docs/apis/keyboard) — resize modes, event payloads, keyboardHeight units
-- [Capacitor Haptics Plugin API](https://capacitorjs.com/docs/apis/haptics) — ImpactStyle/NotificationStyle enums, graceful degradation
-- [Capacitor Status Bar Plugin API](https://capacitorjs.com/docs/apis/status-bar) — Style.Dark, iOS backgroundColor no-op, overlaysWebView
-- [Capacitor Splash Screen Plugin API](https://capacitorjs.com/docs/apis/splash-screen) — launchAutoHide, fadeOutDuration, hide() timing
-- [Capacitor JavaScript Utilities](https://capacitorjs.com/docs/basics/utilities) — isNativePlatform(), getPlatform()
-- [Apple Human Interface Guidelines: Touch Targets](https://developer.apple.com/design/human-interface-guidelines/accessibility#Controls-and-interactions) — 44pt minimum
-- [Ionic CORS Troubleshooting](https://ionicframework.com/docs/troubleshooting/cors) — capacitor://localhost origin handling
-- [WebKit Bug 173434](https://bugs.webkit.org/show_bug.cgi?id=173434) — rAF 60fps throttle in WKWebView (filed 2017)
-- [Apple Developer Forums: WKWebView 120Hz](https://developer.apple.com/forums/thread/773222) — rAF cap confirmed; CSS at 120Hz confirmed
+- [Apple HIG: Gestures](https://developer.apple.com/design/human-interface-guidelines/gestures)
+- [Apple HIG: Context Menus](https://developer.apple.com/design/human-interface-guidelines/context-menus)
+- [Capacitor Official Plugin APIs](https://capacitorjs.com/docs/apis) -- App, Clipboard, Share, Action Sheet, Network, Browser
+- [NNGroup: Contextual Swipe](https://www.nngroup.com/articles/contextual-swipe/)
+- [WebKit Bug Trackers](https://bugs.webkit.org/) -- 192564 (keyboard viewport), 176454 (overscroll-behavior), 173434 (120Hz rAF)
+- Existing codebase: Sidebar.tsx, haptics.ts, native-plugins.ts, platform.ts, useKeyboardOffset.ts, base.css
+- npm registry version verification (2026-03-28)
 
 ### Secondary (MEDIUM confidence)
-- [Capacitor CORS Issue #1143](https://github.com/ionic-team/capacitor/issues/1143) — capacitor:// scheme CORS handling
-- [Capacitor Plugins Issue #2194](https://github.com/ionic-team/capacitor-plugins/issues/2194) — WKWebView black gap on keyboard dismiss
-- [Capacitor Issue #7585](https://github.com/ionic-team/capacitor/issues/7585) — CapacitorHttp WebSocket interference
-- [Flutter CADisableMinimumFrameDurationOnPhone](https://github.com/flutter/flutter/issues/94508) — Info.plist ProMotion key documentation
-- [safe-area-inset-bottom keyboard behavior](https://webventures.rejh.nl/blog/2025/safe-area-inset-bottom-does-not-update/) — does not update with keyboard
-- [Capacitor best practice for mobile-only plugin imports](https://forum.ionicframework.com/t/best-practice-for-importing-mobile-only-capacitor-plugins/210090) — dynamic import pattern
+- [Capacitor GitHub Issues/Discussions](https://github.com/ionic-team/capacitor) -- gesture conflicts, WKWebView behavior, keyboard issues
+- [@use-gesture/react documentation](https://use-gesture.netlify.app/docs/faq/) -- passive event listener analysis
+- [Ionic/Cordova iOS issues](https://github.com/apache/cordova-ios/issues) -- CSS animation compositor bug, overscroll behavior
+- Reference app analysis (iMessage, WhatsApp, Telegram, Discord, GitHub Mobile, Blink Shell, Working Copy)
 
 ### Tertiary (LOW confidence)
-- Spring duration multipliers (stiffness * 1.2, damping * 1.1 for 120Hz) — aesthetic estimate; no established benchmark; requires device iteration
+- Community blog posts on WKWebView scroll bounce control -- multiple approaches documented, effectiveness varies by iOS version
+- @capacitor-community/privacy-screen compatibility claim -- peer dep says >=7.0.0 but no first-party verification
 
 ---
-*Research completed: 2026-03-27*
+*Research completed: 2026-03-28*
 *Ready for roadmap: yes*
