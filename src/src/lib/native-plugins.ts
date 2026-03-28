@@ -90,7 +90,10 @@ export function _resetForTesting(): void {
  * Errors are caught and logged -- a failed plugin should not crash the app.
  */
 export async function initializeNativePlugins(): Promise<void> {
-  if (isInitialized || !IS_NATIVE) return;
+  if (isInitialized || !IS_NATIVE) {
+    resolveReady();
+    return;
+  }
   isInitialized = true;
 
   // Mark the document for CSS conditional styling (D-08).
@@ -159,6 +162,9 @@ export async function hideSplashWhenReady(): Promise<void> {
   if (!splashModule) return;
 
   let dismissed = false;
+  // Declare before dismiss() to avoid temporal dead zone if code is reordered.
+  let unsubscribe: () => void = () => {};
+
   const dismiss = () => {
     if (dismissed) return;
     dismissed = true;
@@ -172,11 +178,12 @@ export async function hideSplashWhenReady(): Promise<void> {
 
   // SS-1: One-argument subscribe form. The store uses `persist` middleware only,
   // NOT `subscribeWithSelector`. The two-argument form silently fails.
-  const unsubscribe = useConnectionStore.subscribe((state) => {
+  unsubscribe = useConnectionStore.subscribe((state) => {
     if (state.providers.claude.status === 'connected') dismiss();
   });
 
   // Check current state immediately (connection may already be established)
+  // eslint-disable-next-line loom/no-external-store-mutation -- startup utility, not a component
   const currentState = useConnectionStore.getState();
   if (currentState.providers.claude.status === 'connected') {
     dismiss();
