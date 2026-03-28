@@ -5,6 +5,26 @@ import { App } from '@/App';
 import { initializeNativePlugins, hideSplashWhenReady } from '@/lib/native-plugins';
 import { initializeWebSocket } from '@/lib/websocket-init';
 
+// ─── Reload telemetry (iOS diagnostics) ──────────────────────────
+// Detects WKWebView content process kills by comparing timestamps.
+// Check Safari Web Inspector console for "[reload-telemetry]" entries.
+{
+  const key = 'loom-last-load-ts';
+  const now = Date.now();
+  const prev = localStorage.getItem(key);
+  if (prev) {
+    const elapsed = now - Number(prev);
+    if (elapsed < 60_000) {
+      console.warn(`[reload-telemetry] Page reloaded after ${elapsed}ms — likely WKWebView content process kill`);
+    } else {
+      console.info(`[reload-telemetry] Fresh load (${Math.round(elapsed / 1000)}s since last)`);
+    }
+  } else {
+    console.info('[reload-telemetry] First load (no previous timestamp)');
+  }
+  localStorage.setItem(key, String(now));
+}
+
 // Fire-and-forget native plugin init BEFORE React render tree mounts.
 // Must run before initializeWebSocket so Keyboard resize mode is configured first.
 void initializeNativePlugins();

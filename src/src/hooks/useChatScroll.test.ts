@@ -1,7 +1,7 @@
 /**
  * useChatScroll tests -- IntersectionObserver sentinel + ResizeObserver auto-follow.
  *
- * Mocks: IntersectionObserver, ResizeObserver, requestAnimationFrame, sessionStorage.
+ * Mocks: IntersectionObserver, ResizeObserver, requestAnimationFrame, localStorage.
  * Tests verify IO sentinel, auto-scroll, pill debounce, session switch, unread tracking,
  * user gesture detection, stream re-engagement, scroll position save/restore, statusTap.
  */
@@ -104,17 +104,17 @@ function flushAllRafs(): void {
   }
 }
 
-// sessionStorage mock
-const sessionStorageData: Record<string, string> = {};
-const mockSessionStorage = {
-  getItem: vi.fn((key: string) => sessionStorageData[key] ?? null),
-  setItem: vi.fn((key: string, value: string) => { sessionStorageData[key] = value; }),
-  removeItem: vi.fn((key: string) => { delete sessionStorageData[key]; }),
-  clear: vi.fn(() => { for (const key of Object.keys(sessionStorageData)) delete sessionStorageData[key]; }),
-  get length() { return Object.keys(sessionStorageData).length; },
-  key: vi.fn((index: number) => Object.keys(sessionStorageData)[index] ?? null),
+// localStorage mock (scroll positions persisted here to survive WKWebView process kills)
+const localStorageData: Record<string, string> = {};
+const mockLocalStorage = {
+  getItem: vi.fn((key: string) => localStorageData[key] ?? null),
+  setItem: vi.fn((key: string, value: string) => { localStorageData[key] = value; }),
+  removeItem: vi.fn((key: string) => { delete localStorageData[key]; }),
+  clear: vi.fn(() => { for (const key of Object.keys(localStorageData)) delete localStorageData[key]; }),
+  get length() { return Object.keys(localStorageData).length; },
+  key: vi.fn((index: number) => Object.keys(localStorageData)[index] ?? null),
 };
-vi.stubGlobal('sessionStorage', mockSessionStorage);
+vi.stubGlobal('localStorage', mockLocalStorage);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -168,7 +168,7 @@ describe('useChatScroll', () => {
     roInstances = [];
     rafCallbacks = [];
     rafIdCounter = 1;
-    mockSessionStorage.clear();
+    mockLocalStorage.clear();
     vi.clearAllMocks();
 
     const mod = await import('./useChatScroll');
@@ -534,7 +534,7 @@ describe('useChatScroll', () => {
 
   // ─── Scroll Position Save/Restore ─────────────────────────────────────
 
-  it('scroll triggers throttled sessionStorage save', () => {
+  it('scroll triggers throttled localStorage save', () => {
     const { container } = setupHook({ sessionId: 'save-test' });
 
     // Simulate scroll (dispatch scroll event on container)
@@ -544,7 +544,7 @@ describe('useChatScroll', () => {
     });
 
     // Before debounce, nothing saved
-    expect(mockSessionStorage.setItem).not.toHaveBeenCalledWith(
+    expect(mockLocalStorage.setItem).not.toHaveBeenCalledWith(
       expect.stringContaining('save-test'),
       expect.any(String),
     );
@@ -552,18 +552,18 @@ describe('useChatScroll', () => {
     // After 200ms trailing throttle
     act(() => { vi.advanceTimersByTime(200); });
 
-    expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
+    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
       expect.stringContaining('save-test'),
       '250',
     );
   });
 
-  it('session switch restores scroll position from sessionStorage', () => {
+  it('session switch restores scroll position from localStorage', () => {
     const container = makeScrollContainer();
     const scrollContainerRef = { current: container } as RefObject<HTMLDivElement | null>;
 
-    // Pre-populate sessionStorage for session-2
-    sessionStorageData['loom-scroll-session-2'] = '300';
+    // Pre-populate localStorage for session-2
+    localStorageData['loom-scroll-session-2'] = '300';
 
     const { rerender, result } = renderHook(
       (props) => useChatScroll(props),
@@ -591,7 +591,8 @@ describe('useChatScroll', () => {
       messageCount: 3,
     });
 
-    // rAF should be scheduled for restore
+    // Double-rAF: flush twice (outer rAF schedules inner rAF for layout)
+    act(() => { flushAllRafs(); });
     act(() => { flushAllRafs(); });
 
     expect(newContainer.scrollTop).toBe(300);

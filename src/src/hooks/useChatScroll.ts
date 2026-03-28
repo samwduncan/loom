@@ -10,7 +10,7 @@
  * - Debounced React state (200ms) for pill visibility only
  * - User gesture detection (wheel/touchmove) for auto-scroll disengage
  * - Session switch reset, stream re-engagement, unread tracking
- * - Scroll position save/restore via sessionStorage
+ * - Scroll position save/restore via localStorage (survives WKWebView process kills)
  * - iOS statusTap support (Capacitor window event)
  *
  * Constitution: Selector-only store access (4.2), named exports (2.2).
@@ -208,12 +208,12 @@ export function useChatScroll({
       }
       lastScrollTop = currentScrollTop;
 
-      // Throttled save to sessionStorage
+      // Throttled save to localStorage (survives WKWebView content process kills)
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(() => {
         const el = scrollContainerRef.current;
         if (el) {
-          sessionStorage.setItem(
+          localStorage.setItem(
             `${SCROLL_STORAGE_PREFIX}${sessionId}`,
             String(el.scrollTop),
           );
@@ -233,22 +233,38 @@ export function useChatScroll({
     };
   }, [scrollContainerRef, sessionId, schedulePillUpdate]);
 
-  // ─── Scroll position restore on session switch ──────────────────────
+  // ─── Scroll position restore on session switch / reload ─────────────
+  // Deferred: waits until messageCount > 0 so the container has scrollable
+  // content. Uses localStorage (survives WKWebView content process kills).
   const restoredSessionRef = useRef<string | null>(null);
+  const pendingRestoreRef = useRef<number | null>(null);
+
+  // Phase 1: on session change, read saved position and mark pending
   useEffect(() => {
     if (restoredSessionRef.current === sessionId) return;
     restoredSessionRef.current = sessionId;
 
-    const saved = sessionStorage.getItem(`${SCROLL_STORAGE_PREFIX}${sessionId}`);
-    if (saved !== null) {
+    const saved = localStorage.getItem(`${SCROLL_STORAGE_PREFIX}${sessionId}`);
+    pendingRestoreRef.current = saved !== null ? Number(saved) : null;
+  }, [sessionId]);
+
+  // Phase 2: apply pending restore once messages are in the DOM
+  useEffect(() => {
+    if (pendingRestoreRef.current === null || messageCount === 0) return;
+
+    const target = pendingRestoreRef.current;
+    pendingRestoreRef.current = null;
+
+    // Double-rAF: first frame for DOM update, second for layout
+    requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const el = scrollContainerRef.current;
-        if (el) {
-          el.scrollTop = Number(saved);
+        if (el && target > 0) {
+          el.scrollTop = target;
         }
       });
-    }
-  }, [sessionId, scrollContainerRef]);
+    });
+  }, [messageCount, scrollContainerRef]);
 
   // ─── iOS statusTap ──────────────────────────────────────────────────
   useEffect(() => {
