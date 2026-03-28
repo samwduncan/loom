@@ -48,6 +48,7 @@ html {
 
 body {
   margin: 0;
+  height: 100%;
   overflow: hidden;
   overscroll-behavior: none;
   font-family: var(--font-ui, 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif);
@@ -55,6 +56,10 @@ body {
   line-height: 1.5;
   color: var(--text-primary);
   background-color: var(--surface-base);
+}
+
+#root {
+  height: 100%;
 }
 
 /* Default border color override (Tailwind v4 defaults to currentColor) */
@@ -161,11 +166,13 @@ body {
   }
 }
 
-/* D-06/D-08: No CSS transition on native -- iOS drives the keyboard animation natively.
-   Adding a CSS transition on top creates double-animation / visual lag.
-   The data-native attribute is set by native-plugins.ts at startup. */
-@media (max-width: 767px) {
-  html[data-native] .app-shell {
-    transition: none;
-  }
+/* Native: use position:fixed instead of h-dvh. WKWebView's dvh calculation
+   with viewport-fit=cover is unreliable — the height can be wrong, causing
+   the grid 1fr row to collapse and push all auto rows (composer, status) to
+   the top. position:fixed;inset:0 always fills the actual screen. */
+html[data-native] .app-shell {
+  position: fixed;
+  inset: 0;
+  height: auto;
+  transition: none;
 }
