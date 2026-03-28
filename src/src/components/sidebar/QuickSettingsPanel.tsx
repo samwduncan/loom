@@ -11,6 +11,7 @@
 import { useState, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { SlidersHorizontal } from 'lucide-react';
+import { hapticSelection } from '@/lib/haptics';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import { useQuickSettingsShortcut } from '@/hooks/useQuickSettingsShortcut';
@@ -74,9 +75,9 @@ export function QuickSettingsPanel(_props: QuickSettingsPanelProps) {
         <h3 className="text-sm font-medium text-foreground mb-3">Quick Settings</h3>
         <div className="flex flex-col gap-3">
           {([
-            { id: 'qs-thinking', label: 'Show thinking', desc: 'Expand thinking blocks by default', checked: thinkingExpanded, onChange: toggleThinking },
-            { id: 'qs-auto-expand', label: 'Auto-expand tools', desc: 'Show tool call details automatically', checked: autoExpandTools, onChange: toggleAutoExpandTools },
-            { id: 'qs-raw-params', label: 'Show raw params', desc: 'Display raw JSON parameters', checked: showRawParams, onChange: toggleShowRawParams },
+            { id: 'qs-thinking', label: 'Show thinking', desc: 'Expand thinking blocks by default', checked: thinkingExpanded, onChange: (_checked: boolean) => { hapticSelection(); toggleThinking(); } },
+            { id: 'qs-auto-expand', label: 'Auto-expand tools', desc: 'Show tool call details automatically', checked: autoExpandTools, onChange: (_checked: boolean) => { hapticSelection(); toggleAutoExpandTools(); } },
+            { id: 'qs-raw-params', label: 'Show raw params', desc: 'Display raw JSON parameters', checked: showRawParams, onChange: (_checked: boolean) => { hapticSelection(); toggleShowRawParams(); } },
           ] as const).map((toggle) => (
             <div key={toggle.id} className="flex items-center justify-between">
               <div className="flex flex-col gap-0.5">

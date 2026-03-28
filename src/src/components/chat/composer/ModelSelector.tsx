@@ -8,6 +8,7 @@
  */
 
 import { ChevronDown } from 'lucide-react';
+import { hapticSelection } from '@/lib/haptics';
 import { cn } from '@/utils/cn';
 import { ProviderLogo } from '@/components/sidebar/ProviderLogo';
 import {
@@ -60,7 +61,7 @@ export function ModelSelector({ selectedProvider, onSelect }: ModelSelectorProps
             key={provider}
             type="button"
             data-testid="model-option"
-            onClick={() => onSelect(provider)}
+            onClick={() => { hapticSelection(); onSelect(provider); }}
             className={cn(
               'model-selector-option',
               provider === selectedProvider && 'bg-surface-active',
