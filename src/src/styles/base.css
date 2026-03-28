@@ -156,9 +156,11 @@ body {
   }
 }
 
-/* ─── Keyboard Avoidance (interactive-widget=overlays-content) ──────── */
-/* The keyboard overlays the viewport; we shrink the shell by --keyboard-offset
-   so the composer stays visible above the keyboard. */
+/* ─── Keyboard Avoidance (web only) ──────── */
+/* Web browsers: keyboard overlays the viewport; we shrink the shell by
+   --keyboard-offset so the composer stays visible above the keyboard.
+   Native: WKWebView's default Body resize handles this automatically —
+   no padding-bottom or transition needed. */
 @media (max-width: 767px) {
   .app-shell {
     padding-bottom: var(--keyboard-offset, 0px);
@@ -166,13 +168,13 @@ body {
   }
 }
 
-/* Native: use position:fixed instead of h-dvh. WKWebView's dvh calculation
-   with viewport-fit=cover is unreliable — the height can be wrong, causing
-   the grid 1fr row to collapse and push all auto rows (composer, status) to
-   the top. position:fixed;inset:0 always fills the actual screen. */
+/* Native: WKWebView handles keyboard resize natively. Override the web
+   keyboard-offset padding and use position:fixed for reliable full-screen
+   layout (dvh is unreliable with viewport-fit=cover in WKWebView). */
 html[data-native] .app-shell {
   position: fixed;
   inset: 0;
   height: auto;
+  padding-bottom: 0 !important;
   transition: none;
 }

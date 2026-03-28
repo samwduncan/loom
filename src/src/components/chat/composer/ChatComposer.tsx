@@ -213,7 +213,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
   }, [canStop, streamSessionId]);
 
   // Keyboard avoidance: platform-aware offset via native events or viewport fallback
-  useKeyboardOffset({ scrollContainerRef: scrollContainerRef ?? undefined });
+  useKeyboardOffset();
 
   // Handle mention selection: add to mentions array, remove @query from input
   const handleMentionSelect = useCallback(

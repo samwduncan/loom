@@ -140,7 +140,7 @@ describe('native-plugins', () => {
     platformMock.IS_NATIVE = true;
     await initializeNativePlugins();
 
-    expect(mockKeyboard.setResizeMode).toHaveBeenCalledWith({ mode: 'none' });
+    // setResizeMode no longer called — using WKWebView default Body resize
     expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledWith({ isVisible: true });
   });
 
@@ -155,7 +155,7 @@ describe('native-plugins', () => {
     platformMock.IS_NATIVE = true;
 
     // Override the mock to reject on next call
-    mockKeyboard.setResizeMode.mockRejectedValueOnce(new Error('Plugin unavailable'));
+    mockKeyboard.setAccessoryBarVisible.mockRejectedValueOnce(new Error('Plugin unavailable'));
 
     await initializeNativePlugins();
 
@@ -173,7 +173,7 @@ describe('native-plugins', () => {
     await initializeNativePlugins();
     await initializeNativePlugins();
 
-    expect(mockKeyboard.setResizeMode).toHaveBeenCalledTimes(1);
+    expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledTimes(1);
   });
 
   it('nativePluginsReady resolves after successful init', async () => {
@@ -233,7 +233,7 @@ describe('native-plugins', () => {
 
   it('Keyboard failure does not prevent StatusBar/SplashScreen init', async () => {
     platformMock.IS_NATIVE = true;
-    mockKeyboard.setResizeMode.mockRejectedValueOnce(new Error('Keyboard crash'));
+    mockKeyboard.setAccessoryBarVisible.mockRejectedValueOnce(new Error('Keyboard crash'));
 
     await initializeNativePlugins();
 
@@ -402,7 +402,7 @@ describe('native-plugins', () => {
     await initializeNativePlugins();
 
     // Keyboard, StatusBar, and SplashScreen should all still work
-    expect(mockKeyboard.setResizeMode).toHaveBeenCalledWith({ mode: 'none' });
+    // setResizeMode no longer called — using WKWebView default Body resize
     expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledWith({ isVisible: true });
     expect(mockStatusBar.setStyle).toHaveBeenCalledWith({ style: 'DARK' });
     // setHapticsModule called (haptics initialized after splash)

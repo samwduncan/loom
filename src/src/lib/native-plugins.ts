@@ -109,10 +109,12 @@ export async function initializeNativePlugins(): Promise<void> {
       const mod = await import('@capacitor/keyboard');
       keyboardModule = mod;
 
-      const { Keyboard, KeyboardResize } = mod;
+      const { Keyboard } = mod;
 
-      // KEY-05, D-17: App manages padding-bottom, not WKWebView auto-resize.
-      await Keyboard.setResizeMode({ mode: KeyboardResize.None });
+      // Let WKWebView handle keyboard avoidance natively (default Body resize).
+      // Previously used KeyboardResize.None + manual --keyboard-offset, but this
+      // causes an intermittent race condition on real devices where setResizeMode()
+      // fires async after mount, breaking the layout. Native resize is reliable.
 
       // D-18: Show the iOS input accessory bar (Done button) for text inputs.
       await Keyboard.setAccessoryBarVisible({ isVisible: true });
