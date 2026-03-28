@@ -336,8 +336,22 @@ const wss = new WebSocketServer({
 // Make WebSocket server available to routes
 app.locals.wss = wss;
 
+const ALLOWED_ORIGINS = [
+    'https://samsara.tailad2401.ts.net:5443',
+    'http://100.86.4.57:5184',
+    'http://localhost:5184',
+    'capacitor://localhost',
+];
+
 app.use(cors({
-    origin: ['https://samsara.tailad2401.ts.net:5443', 'http://100.86.4.57:5184', 'http://localhost:5184'],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (same-origin, curl, etc.)
+        if (!origin) return callback(null, true);
+        if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+        // Debug: log unrecognized origins during development (remove before v2.2)
+        console.warn('[CORS] Rejected unrecognized origin:', origin);
+        callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
 }));
 app.use(express.json({
     limit: '50mb',
