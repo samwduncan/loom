@@ -125,7 +125,7 @@
 - [x] **Phase 59: Platform Foundation** - URL abstraction, CORS whitelist, and Capacitor config -- prerequisite for all native features -- completed 2026-03-28
 - [x] **Phase 60: Keyboard & Composer** - Replace visualViewport hack with Capacitor Keyboard plugin for reliable keyboard avoidance (completed 2026-03-28)
 - [x] **Phase 61: Touch, Layout & Native Plugins** - Touch target audit, safe-area refinement, StatusBar, SplashScreen, and gesture handling (completed 2026-03-28)
-- [ ] **Phase 62: Haptics & Motion** - Haptic feedback on key interactions, 120Hz spring tuning for ProMotion displays
+- [x] **Phase 62: Haptics & Motion** - Haptic feedback on key interactions, 120Hz spring tuning for ProMotion displays (completed 2026-03-28)
 - [ ] **Phase 63: Bundled Assets & Device Validation** - cap sync pipeline, bundled asset loading, and on-device integration testing
 
 ## Phase Details
@@ -186,11 +186,11 @@ Plans:
   2. Spring/transition durations feel snappier on 120Hz displays compared to 60Hz (not just faster, but tighter)
   3. Haptic feedback respects `prefers-reduced-motion` and degrades gracefully on web (no errors, just silent no-op)
   4. Info.plist includes ProMotion opt-in so CSS animations run at native 120Hz refresh rate
-**Plans:** 0/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
-- [ ] 62-01-PLAN.md -- Haptics module + Capacitor plugin init (haptics.ts, native-plugins.ts)
-- [ ] 62-02-PLAN.md -- Spring tuning + ProMotion Info.plist opt-in (motion.ts, tokens.css, Info.plist)
-- [ ] 62-03-PLAN.md -- Wire haptics into UI components (ChatComposer, ToolChip, ModelSelector, QuickSettings)
+- [x] 62-01-PLAN.md -- Haptics module + Capacitor plugin init (haptics.ts, native-plugins.ts)
+- [x] 62-02-PLAN.md -- Spring tuning + ProMotion Info.plist opt-in (motion.ts, tokens.css, Info.plist)
+- [x] 62-03-PLAN.md -- Wire haptics into UI components (ChatComposer, ToolChip, ModelSelector, QuickSettings)
 **UI hint**: yes
 
 ### Phase 63: Bundled Assets & Device Validation
@@ -235,7 +235,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 | 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
 | 60. Keyboard & Composer | 2/2 | Complete    | 2026-03-28 |
 | 61. Touch, Layout & Native Plugins | 2/2 | Complete    | 2026-03-28 |
-| 62. Haptics & Motion | 0/3 | Planned    |  |
+| 62. Haptics & Motion | 3/3 | Complete   | 2026-03-28 |
 | 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |
 
 ## Backlog (Future Milestones)
