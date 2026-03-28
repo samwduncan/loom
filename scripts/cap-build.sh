@@ -6,7 +6,7 @@ set -euo pipefail
 # Build, validate, and sync pipeline for Capacitor iOS
 # ============================================================
 
-REPO_DIR="/home/swd/loom"
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SRC_DIR="$REPO_DIR/src"
 DIST_DIR="$SRC_DIR/dist"
 MIN_ASSET_COUNT=20
@@ -39,8 +39,11 @@ step "Step 3: TypeScript check"
 ok "TypeScript compilation passed"
 
 # Step 4: Vite build (outputs to src/dist/ — Capacitor's webDir)
+# --base ./ produces relative asset paths required by Capacitor's file:// scheme.
+# This is only set here, NOT in vite.config.ts, to avoid breaking web SPA routing
+# where ./assets/foo.js would resolve wrong at deep routes like /chat/session-id.
 step "Step 4: Vite build"
-(cd "$SRC_DIR" && npx vite build) || fail "Vite build failed"
+(cd "$SRC_DIR" && npx vite build --base ./) || fail "Vite build failed"
 ok "Frontend built to src/dist/"
 
 # Step 5: Validate build
