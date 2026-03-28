@@ -161,7 +161,7 @@ describe('useChatScroll', () => {
   let useChatScroll: typeof import('./useChatScroll').useChatScroll;
 
   beforeEach(async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date'] });
     mockIsStreaming = false;
     mockIsNative = false;
     ioInstances = [];
@@ -221,13 +221,12 @@ describe('useChatScroll', () => {
     // First scroll away
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
     expect(result.current.showPill).toBe(true);
 
     // Sentinel enters viewport
     act(() => { triggerIO(io, true); });
-    // Before debounce fires, pill may still be true
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
     expect(result.current.showPill).toBe(false);
     expect(result.current.isAtBottomRef.current).toBe(true);
   });
@@ -237,7 +236,7 @@ describe('useChatScroll', () => {
 
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     expect(result.current.showPill).toBe(true);
     expect(result.current.isAtBottomRef.current).toBe(false);
@@ -253,7 +252,7 @@ describe('useChatScroll', () => {
     // IO says sentinel exited (during programmatic scroll)
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     // Should NOT have changed because auto-scrolling is active
     expect(result.current.isAtBottomRef.current).toBe(true);
@@ -285,7 +284,7 @@ describe('useChatScroll', () => {
     // Scroll away first
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     const initialRafCount = rafCallbacks.length;
 
@@ -320,7 +319,7 @@ describe('useChatScroll', () => {
     // Scroll away and add unread
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
     expect(result.current.showPill).toBe(true);
 
     // Rerender with new messages while scrolled up (generates unread)
@@ -330,7 +329,7 @@ describe('useChatScroll', () => {
       isStreaming: false,
       messageCount: 8,
     });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
     expect(result.current.unreadCount).toBe(3);
 
     // Switch session
@@ -341,7 +340,7 @@ describe('useChatScroll', () => {
       isStreaming: false,
       messageCount: 0,
     });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     expect(result.current.isAtBottomRef.current).toBe(true);
     expect(result.current.unreadCount).toBe(0);
@@ -356,11 +355,11 @@ describe('useChatScroll', () => {
     // Scroll away first
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     // Call scrollToBottom
     act(() => { result.current.scrollToBottom(); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     expect(container.scrollTo).toHaveBeenCalledWith(
       expect.objectContaining({ top: expect.any(Number), behavior: 'smooth' }),
@@ -420,7 +419,7 @@ describe('useChatScroll', () => {
     // Scroll away
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
     expect(result.current.isAtBottomRef.current).toBe(false);
 
     // Stream starts
@@ -461,7 +460,7 @@ describe('useChatScroll', () => {
     // Scroll away
     const io = getLastIO();
     act(() => { triggerIO(io, false); });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     // New messages arrive
     rerender({
@@ -470,7 +469,7 @@ describe('useChatScroll', () => {
       isStreaming: false,
       messageCount: 8,
     });
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     expect(result.current.unreadCount).toBe(3);
   });
@@ -527,7 +526,7 @@ describe('useChatScroll', () => {
     );
 
     // After 200ms trailing throttle
-    vi.advanceTimersByTime(200);
+    act(() => { vi.advanceTimersByTime(200); });
 
     expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
       expect.stringContaining('save-test'),
