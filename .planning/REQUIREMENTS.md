@@ -39,7 +39,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Motion & Animation
 
-- [x] **MOTION-01**: Device refresh rate detected (60Hz vs 120Hz) at runtime
+- [x] **MOTION-01**: ProMotion 120Hz rendering enabled via Info.plist opt-in (runtime detection unnecessary for CSS-first motion strategy)
 - [x] **MOTION-02**: Spring/transition durations adapted for 120Hz ProMotion displays
 - [x] **MOTION-03**: Info.plist includes `CADisableMinimumFrameDurationOnPhone` for ProMotion opt-in
 
