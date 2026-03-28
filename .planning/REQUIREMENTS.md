@@ -25,17 +25,17 @@ Requirements for this milestone. Each maps to roadmap phases.
 ### Touch & Layout
 
 - [ ] **TOUCH-01**: All interactive elements have 44px+ touch targets at mobile breakpoint
-- [ ] **TOUCH-02**: Safe-area insets applied correctly on all four edges
-- [ ] **TOUCH-03**: App shell prevents rubber-band overscroll at page level
+- [x] **TOUCH-02**: Safe-area insets applied correctly on all four edges
+- [x] **TOUCH-03**: App shell prevents rubber-band overscroll at page level
 - [ ] **TOUCH-04**: Gesture back navigation handled gracefully (no conflict with sidebar drawer)
 - [ ] **TOUCH-05**: Primary actions (send, stop) positioned within thumb-zone reach
 
 ### Native Plugins
 
-- [ ] **NATIVE-01**: Status bar shows light text on dark background matching app theme
-- [ ] **NATIVE-02**: Splash screen matches app background and hides smoothly after React mounts
+- [x] **NATIVE-01**: Status bar shows light text on dark background matching app theme
+- [x] **NATIVE-02**: Splash screen matches app background and hides smoothly after React mounts
 - [ ] **NATIVE-03**: Haptic feedback on message send, tool completion, and error states
-- [ ] **NATIVE-04**: Capacitor plugins load via dynamic imports (tree-shaken from web builds)
+- [x] **NATIVE-04**: Capacitor plugins load via dynamic imports (tree-shaken from web builds)
 
 ### Motion & Animation
 
@@ -98,14 +98,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KEY-04 | Phase 60 | Complete |
 | KEY-05 | Phase 60 | Complete |
 | TOUCH-01 | Phase 61 | Pending |
-| TOUCH-02 | Phase 61 | Pending |
-| TOUCH-03 | Phase 61 | Pending |
+| TOUCH-02 | Phase 61 | Complete |
+| TOUCH-03 | Phase 61 | Complete |
 | TOUCH-04 | Phase 61 | Pending |
 | TOUCH-05 | Phase 61 | Pending |
-| NATIVE-01 | Phase 61 | Pending |
-| NATIVE-02 | Phase 61 | Pending |
+| NATIVE-01 | Phase 61 | Complete |
+| NATIVE-02 | Phase 61 | Complete |
 | NATIVE-03 | Phase 62 | Pending |
-| NATIVE-04 | Phase 61 | Pending |
+| NATIVE-04 | Phase 61 | Complete |
 | MOTION-01 | Phase 62 | Pending |
 | MOTION-02 | Phase 62 | Pending |
 | MOTION-03 | Phase 62 | Pending |
