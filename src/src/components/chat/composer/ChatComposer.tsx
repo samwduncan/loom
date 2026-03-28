@@ -31,6 +31,7 @@ import { useImageAttachments } from './useImageAttachments';
 import { useFileMentions } from '@/hooks/useFileMentions';
 import { extractSessionTitle } from '@/lib/extract-session-title';
 import { useSlashCommands } from '@/hooks/useSlashCommands';
+import { useKeyboardOffset } from '@/hooks/useKeyboardOffset';
 import { ComposerKeyboardHints } from './ComposerKeyboardHints';
 import { ImagePreviewRow } from './ImagePreviewRow';
 import { MentionChipRow } from './MentionChipRow';
@@ -210,26 +211,8 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canStop, streamSessionId]);
 
-  // Keyboard avoidance fallback for browsers without interactive-widget support
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const vv = window.visualViewport;
-    if (!vv) return;
-
-    function handleResize() {
-      const viewport = window.visualViewport;
-      if (!viewport) return;
-      // When keyboard is open, visualViewport.height < window.innerHeight
-      const keyboardHeight = window.innerHeight - viewport.height;
-      document.documentElement.style.setProperty(
-        '--keyboard-offset',
-        keyboardHeight > 50 ? `${keyboardHeight}px` : '0px',
-      );
-    }
-
-    vv.addEventListener('resize', handleResize);
-    return () => vv.removeEventListener('resize', handleResize);
-  }, []);
+  // Keyboard avoidance: platform-aware offset via native events or viewport fallback
+  useKeyboardOffset({ scrollContainerRef: scrollContainerRef ?? undefined });
 
   // Handle mention selection: add to mentions array, remove @query from input
   const handleMentionSelect = useCallback(
