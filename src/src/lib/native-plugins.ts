@@ -2,8 +2,8 @@
  * Native plugin initialization -- configures Capacitor plugins at app startup.
  *
  * Called once from main.tsx before React mounts. On native (Capacitor),
- * dynamically imports @capacitor/keyboard, @capacitor/status-bar, and
- * @capacitor/splash-screen. On web, this is a no-op.
+ * dynamically imports @capacitor/keyboard, @capacitor/status-bar,
+ * @capacitor/splash-screen, and @capacitor/haptics. On web, this is a no-op.
  *
  * The dynamic imports ensure native-only packages are never bundled in the web build.
  *
@@ -11,6 +11,7 @@
  */
 
 import { IS_NATIVE } from '@/lib/platform';
+import { setHapticsModule } from '@/lib/haptics';
 import { useConnectionStore } from '@/stores/connection';
 
 /** The dynamically imported @capacitor/keyboard module, or null on web / failure. */
@@ -66,6 +67,7 @@ export function _resetForTesting(): void {
   isInitialized = false;
   keyboardModule = null;
   splashModule = null;
+  setHapticsModule(null);
   if (splashFallbackTimer !== null) {
     clearTimeout(splashFallbackTimer);
     splashFallbackTimer = null;
@@ -83,6 +85,7 @@ export function _resetForTesting(): void {
  * 2. Dynamically imports @capacitor/keyboard and configures resize mode + accessory bar
  * 3. Dynamically imports @capacitor/status-bar and sets dark style with app background
  * 4. Dynamically imports @capacitor/splash-screen and caches module for hideSplashWhenReady()
+ * 5. Dynamically imports @capacitor/haptics and injects module into haptics.ts via setHapticsModule()
  *
  * On web, this is a no-op that returns immediately.
  *
@@ -133,6 +136,15 @@ export async function initializeNativePlugins(): Promise<void> {
     } catch (err: unknown) {
       console.warn('[native-plugins] SplashScreen plugin failed to load:', err);
       splashModule = null;
+    }
+
+    // --- Haptics plugin (separate try/catch -- SS-7) ---
+    try {
+      const hapticsMod = await import('@capacitor/haptics');
+      setHapticsModule(hapticsMod);
+    } catch (err: unknown) {
+      console.warn('[native-plugins] Haptics plugin failed to load:', err);
+      setHapticsModule(null);
     }
   } finally {
     resolveReady();
