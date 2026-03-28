@@ -506,6 +506,17 @@ describe('useChatScroll', () => {
     expect(container.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
   });
 
+  it('statusTap does NOT trigger scrollTo when IS_NATIVE is false', () => {
+    // Default mockIsNative is false
+    const { container } = setupHook({});
+
+    act(() => {
+      window.dispatchEvent(new Event('statusTap'));
+    });
+
+    expect(container.scrollTo).not.toHaveBeenCalled();
+  });
+
   // ─── Scroll Position Save/Restore ─────────────────────────────────────
 
   it('scroll triggers throttled sessionStorage save', () => {
