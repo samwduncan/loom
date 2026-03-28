@@ -9,9 +9,10 @@
 - ✅ **v1.4 "The Navigator"** - Phases 38-43 (shipped 2026-03-18)
 - ✅ **v1.5 "The Craft"** - Phases 44-47 (shipped 2026-03-20)
 - ✅ **v2.0 "The Engine"** - Phases 50-58 (shipped 2026-03-27)
-- 🚧 **v2.1 "The Mobile"** - Phases 59-63 (in progress)
-- 📋 **v2.2 "The Power"** - (planned)
-- 📋 **v2.3 "The Polish"** - (planned)
+- ✅ **v2.1 "The Mobile"** - Phases 59-63 (shipped 2026-03-28)
+- 🚧 **v2.2 "The Touch"** - Phases 64-68 (in progress)
+- 📋 **v2.3 "The Power"** - (planned)
+- 📋 **v2.4 "The Polish"** - (planned)
 - 📋 **v3.0 "The Vision"** - (planned)
 
 ## Phases
@@ -114,107 +115,104 @@
 
 </details>
 
-### v2.1 "The Mobile" (Phases 59-63)
+<details>
+<summary>✅ v2.1 "The Mobile" (Phases 59-63) -- SHIPPED 2026-03-28</summary>
 
-**Milestone Goal:** Make Loom a native-feeling iOS app on iPhone 16 Pro Max via Capacitor -- reliable keyboard avoidance, touch-first interactions, 120Hz springs, and bundled assets for offline-capable fast loads.
+- [x] Phase 59: Platform Foundation (3/3 plans) -- completed 2026-03-28
+- [x] Phase 60: Keyboard & Composer (2/2 plans) -- completed 2026-03-28
+- [x] Phase 61: Touch, Layout & Native Plugins (2/2 plans) -- completed 2026-03-28
+- [x] Phase 62: Haptics & Motion (3/3 plans) -- completed 2026-03-28
+- [x] Phase 63: Bundled Assets & Device Validation (2/2 plans) -- completed 2026-03-28
+
+</details>
+
+### v2.2 "The Touch" (Phases 64-68)
+
+**Milestone Goal:** Transform Loom from a scaled-down desktop app into a purpose-built iOS daily-driver -- every element sized, spaced, and animated for touch on iPhone 16 Pro Max. Scroll performance validated at 60fps, touch targets at 44px, gestures feel native.
 
 **Phase Numbering:**
-- Integer phases (59, 60, 61...): Planned milestone work
-- Decimal phases (59.1, 59.2): Urgent insertions (marked with INSERTED)
+- Integer phases (64, 65, 66...): Planned milestone work
+- Decimal phases (64.1, 64.2): Urgent insertions (marked with INSERTED)
 
-- [x] **Phase 59: Platform Foundation** - URL abstraction, CORS whitelist, and Capacitor config -- prerequisite for all native features -- completed 2026-03-28
-- [x] **Phase 60: Keyboard & Composer** - Replace visualViewport hack with Capacitor Keyboard plugin for reliable keyboard avoidance (completed 2026-03-28)
-- [x] **Phase 61: Touch, Layout & Native Plugins** - Touch target audit, safe-area refinement, StatusBar, SplashScreen, and gesture handling (completed 2026-03-28)
-- [x] **Phase 62: Haptics & Motion** - Haptic feedback on key interactions, 120Hz spring tuning for ProMotion displays (completed 2026-03-28)
-- [x] **Phase 63: Bundled Assets & Device Validation** - cap sync pipeline, bundled asset loading, and on-device integration testing (completed 2026-03-28)
+- [ ] **Phase 64: Scroll Performance** - Eliminate scroll jank sources, validate 60fps on real device with 50+ messages
+- [ ] **Phase 65: Touch Target Compliance** - Fix all 7 touch target violations to meet Apple's 44px minimum
+- [ ] **Phase 66: Typography & Spacing** - Mobile-optimized font sizes, spacing, and text density
+- [ ] **Phase 67: iOS-Native Gestures** - Swipe-to-delete, pull-to-refresh, long-press context menus, app lifecycle, native share/clipboard
+- [ ] **Phase 68: Visual Polish** - OLED blacks, glass effects, spring tuning, contrast compliance for iOS
 
 ## Phase Details
 
-### Phase 59: Platform Foundation
-**Goal**: App can communicate with the Express backend from both web (same-origin) and Capacitor bundled (remote server) modes without code changes
-**Depends on**: Nothing (foundation for this milestone)
-**Requirements**: PLAT-01, PLAT-02, PLAT-03, PLAT-04
+### Phase 64: Scroll Performance
+**Goal**: Chat scrolling sustains 60fps on iPhone 16 Pro Max with 50+ messages -- the #1 blocker for daily-driver usage eliminated
+**Depends on**: Nothing (highest priority, must be first)
+**Requirements**: SCROLL-01, SCROLL-02, SCROLL-03, SCROLL-04, SCROLL-05, SCROLL-06, SCROLL-07, SCROLL-08, SCROLL-09, SCROLL-10
 **Success Criteria** (what must be TRUE):
-  1. Opening the app in a regular browser works identically to before -- zero behavioral change on web
-  2. All fetch() calls in the codebase route through the centralized URL helper (no hardcoded relative paths remain)
-  3. WebSocket connections construct correct absolute URLs when running inside Capacitor
-  4. Express accepts requests from `capacitor://localhost` origin without CORS errors
-**Plans:** 1/3 plans executed
-Plans:
-- [x] 59-01-PLAN.md -- Platform detection module (platform.ts + tests + capacitor.config.ts)
-- [ ] 59-02-PLAN.md -- HTTP fetch migration (api-client.ts, auth.ts, useUsageMetrics.ts)
-- [ ] 59-03-PLAN.md -- WebSocket migration + CORS whitelist (websocket-client.ts, shell-ws-client.ts, server/index.js)
-
-### Phase 60: Keyboard & Composer
-**Goal**: Keyboard avoidance works reliably on iOS via native Capacitor events instead of the fragile visualViewport hack
-**Depends on**: Phase 59
-**Requirements**: KEY-01, KEY-02, KEY-03, KEY-04, KEY-05
-**Success Criteria** (what must be TRUE):
-  1. Opening the keyboard on iOS slides the composer up smoothly with no jank, flicker, or double-offset
-  2. The message list auto-scrolls so the latest message stays visible when the keyboard opens
-  3. Dismissing the keyboard returns the composer to its resting position with no black gap or layout jump
-  4. The existing visualViewport hack is disabled on native (no dual-handler race condition)
-  5. WKWebView does not auto-resize the viewport when the keyboard appears (resize mode set to `none`)
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 60-01-PLAN.md -- Install @capacitor/keyboard, create native-plugins.ts, wire main.tsx, conditional CSS transition
-- [x] 60-02-PLAN.md -- Create useKeyboardOffset hook, integrate into ChatComposer, fix safe-area CSS stacking
+  1. User can scroll rapidly through a 50+ message conversation on iPhone 16 Pro Max with zero visible stutter
+  2. During active streaming, the message list auto-scrolls to bottom without jank or frame drops
+  3. Tapping the iOS status bar scrolls the chat message list to the top with smooth animation
+  4. Rubber band bounce feels native on both message list and session list scroll containers
+  5. No React setState calls fire inside scroll event handlers (ref + debounced state only)
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 61: Touch, Layout & Native Plugins
-**Goal**: The app looks and feels right on iOS -- proper status bar, smooth launch, correct touch targets, and no layout quirks
-**Depends on**: Phase 60
-**Requirements**: TOUCH-01, TOUCH-02, TOUCH-03, TOUCH-04, TOUCH-05, NATIVE-01, NATIVE-02, NATIVE-03, NATIVE-04
+### Phase 65: Touch Target Compliance
+**Goal**: Every interactive element in Loom meets Apple's 44px minimum touch target -- users can reliably tap any button or control on iPhone without missing
+**Depends on**: Phase 64 (scroll fixes may affect message layout, stabilize first)
+**Requirements**: TOUCH-01, TOUCH-02, TOUCH-03, TOUCH-04, TOUCH-05, TOUCH-06, TOUCH-07
 **Success Criteria** (what must be TRUE):
-  1. Every interactive element (buttons, links, inputs, toggles) has at least a 44px touch target on mobile
-  2. Status bar shows light text on dark background, matching the app theme
-  3. App launches with a color-matched splash screen that fades smoothly into the React app (no white flash)
-  4. Swiping back from the left edge navigates correctly without conflicting with the sidebar drawer
-  5. Safe-area insets are respected on all four edges (top status bar, bottom home indicator, notch sides)
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 61-01-PLAN.md -- StatusBar + SplashScreen plugins, overscroll prevention, safe-area audit
-- [x] 61-02-PLAN.md -- Comprehensive touch target audit, gesture handling, thumb-zone verification
+  1. ThinkingDisclosure, ToolCardShell header, ProjectHeader, template buttons, and Detach button all measure 44px+ in Safari DevTools
+  2. All sidebar interactive elements (session items, group headers, action buttons) have min-height 44px
+  3. Focus rings on all 44px+ targets are visible with 2px minimum stroke width
+  4. No tap target smaller than 44px exists anywhere in the app on mobile breakpoint (< 768px)
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 62: Haptics & Motion
-**Goal**: Key interactions have physical feedback and animations feel tuned for 120Hz ProMotion displays
-**Depends on**: Phase 61
-**Requirements**: MOTION-01, MOTION-02, MOTION-03, NATIVE-03
+### Phase 66: Typography & Spacing
+**Goal**: Text is comfortable to read at mobile viewing distance -- font sizes, line heights, and spacing optimized for iPhone density
+**Depends on**: Phase 65 (touch target sizing affects visual density)
+**Requirements**: TYPO-01, TYPO-02, TYPO-03, TYPO-04, TYPO-05, TYPO-06, TYPO-07, TYPO-08
 **Success Criteria** (what must be TRUE):
-  1. Sending a message, completing a tool call, and hitting an error each produce distinct haptic feedback
-  2. Spring/transition durations feel snappier on 120Hz displays compared to 60Hz (not just faster, but tighter)
-  3. Haptic feedback respects `prefers-reduced-motion` and degrades gracefully on web (no errors, just silent no-op)
-  4. Info.plist includes ProMotion opt-in so CSS animations run at native 120Hz refresh rate
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 62-01-PLAN.md -- Haptics module + Capacitor plugin init (haptics.ts, native-plugins.ts)
-- [x] 62-02-PLAN.md -- Spring tuning + ProMotion Info.plist opt-in (motion.ts, tokens.css, Info.plist)
-- [x] 62-03-PLAN.md -- Wire haptics into UI components (ChatComposer, ToolChip, ModelSelector, QuickSettings)
+  1. No text element in the app renders below 12px font size on mobile (DateGroupHeader, labels, secondary text all at minimum)
+  2. Chat message body text renders at 15px with code blocks at 18px monospace -- comfortable at arm's length
+  3. Session list shows more items per screen with py-2 density and single-line truncated titles
+  4. Keyboard opening does not cause text field labels or token counts to shrink or jump
+  5. All body text maintains 1.6 minimum line-height for mobile readability
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 63: Bundled Assets & Device Validation
-**Goal**: The Capacitor app loads from bundled HTML/CSS/JS with remote API calls, and all previous phases work correctly on a real iPhone
-**Depends on**: Phase 62
-**Requirements**: BUNDLE-01, BUNDLE-02, BUNDLE-03, BUNDLE-04
+### Phase 67: iOS-Native Gestures
+**Goal**: Users interact with Loom through native iOS patterns -- swipe-to-delete, pull-to-refresh, long-press context menus, haptic feedback, and proper app lifecycle
+**Depends on**: Phase 65 (gestures need proper touch target sizing), Phase 66 (gesture overlays need correct typography)
+**Requirements**: GESTURE-01, GESTURE-02, GESTURE-03, GESTURE-04, GESTURE-05, GESTURE-06, GESTURE-07, GESTURE-08, GESTURE-09, GESTURE-10
 **Success Criteria** (what must be TRUE):
-  1. `npm run build` followed by `cap sync ios` produces a working iOS app bundle
-  2. App loads its UI shell from bundled assets (sub-second launch) and fetches data from the remote Express server
-  3. Losing server/VPN connection shows a clear error state (not a blank screen or silent failure)
-  4. The full launch flow (splash -> auth -> content) completes without any white flash or visual discontinuity
-  5. On-device spot check: keyboard, touch targets, haptics, status bar, safe-area, and springs all work as designed
-**Plans:** 2/2 plans complete
-Plans:
-- [x] 63-01-PLAN.md -- Vite base path, white flash prevention, cap-build.sh script
-- [x] 63-02-PLAN.md -- Connection error handling, native messaging, device validation checklist
+  1. User can swipe left on a session item to reveal a delete action, and pull down on the session list to refresh
+  2. Long-pressing a session item opens a context menu with Copy ID, Rename, Delete, Export options
+  3. Long-pressing a message bubble opens a context menu with Copy Text, Retry, Share options
+  4. Returning the app from background automatically reconnects the WebSocket within 2 seconds
+  5. Share and delete confirmations use native iOS sheets (UIActivityViewController, action sheet) on native, Radix fallbacks on web
+**Plans**: TBD
+**UI hint**: yes
 
-### v2.2 "The Power" (Planned)
+### Phase 68: Visual Polish
+**Goal**: Loom looks stunning on OLED -- true blacks save power, glass effects render smoothly, springs feel native at 120Hz, and contrast meets accessibility standards
+**Depends on**: Phase 67 (all features in place for holistic visual review)
+**Requirements**: VISUAL-01, VISUAL-02, VISUAL-03, VISUAL-04, VISUAL-05, VISUAL-06, VISUAL-07, VISUAL-08, VISUAL-09, VISUAL-10
+**Success Criteria** (what must be TRUE):
+  1. Outermost background is true black (oklch(0 0 0)) while surface hierarchy (base/raised/overlay) remains distinguishable
+  2. Glass blur effects on modals and command palette render at 60fps without stutter on iPhone 16 Pro Max
+  3. Spring animations feel snappy and native at 120Hz -- sidebar, toasts, and tool cards complete in under 300ms
+  4. All text passes WCAG AA contrast (4.5:1 minimum), body text passes AAA (7:1) against all surface levels
+  5. Accent color is vibrant against OLED black without burn-in risk (medium saturation, no large solid accent fields)
+**Plans**: TBD
+**UI hint**: yes
+
+### v2.3 "The Power" (Planned)
 
 - [ ] Multi-provider tabbed workspaces (Claude, Gemini, Codex)
 - [ ] MCP server management UI
 - [ ] Plugin/skill management UI
 
-### v2.3 "The Polish" (Planned)
+### v2.4 "The Polish" (Planned)
 
 - [ ] Aurora/WebGL ambient overlay (GPU feasibility gated)
 - [ ] Comprehensive spring physics on all interactions
@@ -231,21 +229,21 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
+Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
-| 60. Keyboard & Composer | 2/2 | Complete    | 2026-03-28 |
-| 61. Touch, Layout & Native Plugins | 2/2 | Complete    | 2026-03-28 |
-| 62. Haptics & Motion | 3/3 | Complete    | 2026-03-28 |
-| 63. Bundled Assets & Device Validation | 2/2 | Complete   | 2026-03-28 |
+| 64. Scroll Performance | 0/? | Not started | - |
+| 65. Touch Target Compliance | 0/? | Not started | - |
+| 66. Typography & Spacing | 0/? | Not started | - |
+| 67. iOS-Native Gestures | 0/? | Not started | - |
+| 68. Visual Polish | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
 
-- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v2.2/v3.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
-- **Phases 48-49 (v1.5 deferred)** -- DecryptedText reveals, StarBorder accents, spacing/typography audit. Deprioritized in favor of engine work; revisit during v2.3 "The Polish."
+- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v2.3/v3.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
+- **Phases 48-49 (v1.5 deferred)** -- DecryptedText reveals, StarBorder accents, spacing/typography audit. Deprioritized in favor of engine work; revisit during v2.4 "The Polish."
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-28 after Phase 63 planning*
+*Last updated: 2026-03-28 after v2.2 "The Touch" roadmap creation*

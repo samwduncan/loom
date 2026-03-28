@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
-status: Defining requirements
-stopped_at: Requirements defined, roadmap pending
-last_updated: "2026-03-28T18:30:00.000Z"
+status: Ready to plan
+stopped_at: Roadmap created, ready for Phase 64 planning
+last_updated: "2026-03-28T19:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -19,14 +19,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** v2.2 "The Touch" — iOS daily-driver polish
+**Current focus:** v2.2 "The Touch" -- Phase 64: Scroll Performance
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-28 — Milestone v2.2 started
+Phase: 64 of 68 (Scroll Performance)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-03-28 -- Roadmap created for v2.2 (5 phases, 45 requirements)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -40,26 +42,26 @@ Last activity: 2026-03-28 — Milestone v2.2 started
 
 ### Decisions
 
-- [v2.2] Milestone focuses on iOS UX polish, not new features — establish daily-driver baseline before v2.3 power features
-- [v2.2] INFRA requirements all pre-completed from v2.1 + hotfixes (nginx symlink, CORS, WKWebView grid fix)
-- [v2.2] OLED true black only on outermost background — surface hierarchy (oklch 0.15-0.23) preserved for depth
-- [v2.2] Pinch-to-zoom excluded — conflicts with maximum-scale=1.0 viewport meta needed for input zoom prevention
-- [v2.2] Server.url mode = fast iteration (5s build → force-quit → check) — no Capacitor rebuild for CSS/JS changes
-- [v2.2] Ionic Framework patterns adopted: contain:layout size style, will-change:scroll-position, minmax(0,1fr) grid fix
+- [v2.2] Scroll performance is Phase 64 (first) -- #1 blocker, everything else meaningless if scrolling broken
+- [v2.2] Fix architecture, NOT add virtualization -- JS execution is bottleneck, not DOM size (research confirms)
+- [v2.2] SCROLL-06 first internally: delete dead useScrollAnchor.ts before modifying scroll system
+- [v2.2] Custom gesture hooks (useSwipeAction, usePullToRefresh, useLongPress), NOT @use-gesture/react -- research recommends custom but GESTURE-07 requirement stands
+- [v2.2] 4 new Capacitor plugins: @capacitor/app, @capacitor/clipboard, @capacitor/share, @capacitor/action-sheet
+- [v2.2] OLED true black only on outermost background -- surface hierarchy preserved for depth
 
 ### Pending Todos
 
-- Roadmap creation (gsd-roadmapper)
-- Phase planning and execution
+- Phase 64 planning (`/gsd:plan-phase 64`)
 
 ### Blockers/Concerns
 
-- Can't see iOS app directly from Linux — depend on user feedback and Claude Relay for MAC testing
+- Can't see iOS app directly from Linux -- depend on user feedback and Claude Relay for Mac testing
 - Safari Web Inspector debugging requires Mac connection
-- 120Hz spring tuning and scroll perf validation require real device
+- 120Hz spring tuning, scroll perf, and gesture validation all require real device
+- Long-press context menu must avoid conflicting with iOS text selection (see research PITFALLS.md)
 
 ## Session Continuity
 
-Last session: 2026-03-28T18:30:00.000Z
-Stopped at: Requirements defined, roadmap pending
-Resume: Create roadmap, then `/gsd:plan-phase 64`
+Last session: 2026-03-28T19:00:00.000Z
+Stopped at: Roadmap created with 5 phases (64-68), 45 requirements mapped
+Resume: `/gsd:plan-phase 64`

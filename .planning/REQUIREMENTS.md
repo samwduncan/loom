@@ -8,20 +8,20 @@
 
 ## Requirements Overview
 
-v2.2 transforms Loom from a "desktop app scaled to mobile" into a purpose-built iOS experience. Three pillars: touch targets meet Apple's 44px minimum, typography & spacing optimized for mobile density, scroll performance validated on real device. 39 total requirements across 6 categories.
+v2.2 transforms Loom from a "desktop app scaled to mobile" into a purpose-built iOS experience. Three pillars: touch targets meet Apple's 44px minimum, typography & spacing optimized for mobile density, scroll performance validated on real device. 45 total requirements across 5 categories.
 
 ---
 
 ## TOUCH: Touch Target Compliance
 
-User can reliably tap interactive elements on iPhone without missing. All targets ≥44px × 44px per Apple HIG.
+User can reliably tap interactive elements on iPhone without missing. All targets >=44px x 44px per Apple HIG.
 
 - [ ] **TOUCH-01**: ThinkingDisclosure trigger button displays 44px minimum touch target height
   - _Acceptance:_ Measure pixel height in Safari DevTools mobile mode on iPhone 16 Pro Max; CSS class `.thinking-disclosure-trigger` has min-height or padding-y to guarantee 44px.
   - _Why:_ Currently ~20px; causes frequent mis-taps during stream watching.
 
 - [ ] **TOUCH-02**: ToolCardShell header expands to 44px minimum touch target height
-  - _Acceptance:_ `.tool-card-shell-header` has min-height: 44px or equivalent padding-y × 2.
+  - _Acceptance:_ `.tool-card-shell-header` has min-height: 44px or equivalent padding-y x 2.
   - _Why:_ At 8px + 12px + 8px padding = 32px effective height; too small for thick thumbs.
 
 - [ ] **TOUCH-03**: ProjectHeader (sidebar project group trigger) reaches 44px minimum touch target height
@@ -30,11 +30,11 @@ User can reliably tap interactive elements on iPhone without missing. All target
 
 - [ ] **TOUCH-04**: ChatEmptyState template suggestion buttons expand to 44px minimum height
   - _Acceptance:_ Each template pill button in ChatEmptyState has min-height: 44px and min-width: 44px.
-  - _Why:_ Currently px-3 py-1.5 ≈ 32px; especially problematic on landscape mode.
+  - _Why:_ Currently px-3 py-1.5 = 32px; especially problematic on landscape mode.
 
 - [ ] **TOUCH-05**: LiveSessionBanner Detach button reaches 44px minimum touch target height
   - _Acceptance:_ `.live-banner-detach-btn` (or equivalent) has min-height: 44px.
-  - _Why:_ Currently px-2 py-0.5 ≈ 24px; small target in top-of-screen banner.
+  - _Why:_ Currently px-2 py-0.5 = 24px; small target in top-of-screen banner.
 
 - [ ] **TOUCH-06**: All interactive elements in sidebar (session items, group headers, action buttons) have min-height: 44px
   - _Acceptance:_ Sidebar item rows and button targets audited in Playwright; no element < 44px in height.
@@ -86,11 +86,11 @@ Text scales and spaces appropriately for mobile reading; minimum font sizes meet
 
 ## SCROLL: Scroll Performance
 
-Content scrolls at 60fps on real device. This is THE highest priority — everything else is meaningless if scrolling feels broken.
+Content scrolls at 60fps on real device. This is THE highest priority -- everything else is meaningless if scrolling feels broken.
 
 ### Jank Source Elimination (audit findings)
 
-- [ ] **SCROLL-01**: Remove setState from scroll event handler — use ref + IntersectionObserver for atBottom detection
+- [ ] **SCROLL-01**: Remove setState from scroll event handler -- use ref + IntersectionObserver for atBottom detection
   - _Acceptance:_ `setAtBottom()` and `setUnreadCount()` NEVER called inside scroll event callback. atBottom state derived from IntersectionObserver on a sentinel element at the bottom of the message list.
   - _Why:_ CRITICAL. Currently fires React setState 60+ times/sec during scroll, blocking compositor on every frame. This is the #1 jank source.
 
@@ -103,8 +103,8 @@ Content scrolls at 60fps on real device. This is THE highest priority — everyt
   - _Why:_ Current implementation triggers `el.scrollTop = el.scrollHeight` on every message chunk during streaming.
 
 - [ ] **SCROLL-04**: Fix layout thrashing in useAutoResize (composer textarea)
-  - _Acceptance:_ useAutoResize separates DOM reads and writes into distinct rAF frames — no write→read→write pattern.
-  - _Why:_ Current pattern: `height='0px'` → read `scrollHeight` (forces reflow) → write `height` → write `overflowY`. Blocks main thread on every keystroke.
+  - _Acceptance:_ useAutoResize separates DOM reads and writes into distinct rAF frames -- no write->read->write pattern.
+  - _Why:_ Current pattern: `height='0px'` -> read `scrollHeight` (forces reflow) -> write `height` -> write `overflowY`. Blocks main thread on every keystroke.
 
 - [ ] **SCROLL-05**: Remove forced reflow in ActiveMessage finalization
   - _Acceptance:_ No `void container.offsetHeight` or equivalent forced-reflow pattern. Height transition uses CSS transitions or double-rAF instead.
@@ -112,7 +112,7 @@ Content scrolls at 60fps on real device. This is THE highest priority — everyt
 
 - [ ] **SCROLL-06**: Delete dead useScrollAnchor.ts hook
   - _Acceptance:_ File removed from codebase. No imports reference it.
-  - _Why:_ Contains a rAF loop calling `scrollIntoView()` every frame — 60+ forced reflows/sec. Not currently used but dangerous if accidentally imported.
+  - _Why:_ Contains a rAF loop calling `scrollIntoView()` every frame -- 60+ forced reflows/sec. Not currently used but dangerous if accidentally imported.
 
 ### Scroll Infrastructure
 
@@ -164,9 +164,9 @@ Users interact with app via native iOS gestures: swipe-to-delete, pull-to-refres
 
 - [ ] **GESTURE-07**: @use-gesture/react library for professional gesture handling
   - _Acceptance:_ All gesture hooks (swipe, long-press, pull-to-refresh) use @use-gesture/react for velocity tracking, direction detection, and conflict resolution. No raw touchstart/touchmove event handlers for new gestures.
-  - _Why:_ 6KB for battle-tested gesture math. Raw touch handlers are a half-measure — they reinvent the library poorly and miss edge cases (multi-touch, scroll conflicts, velocity thresholds).
+  - _Why:_ 6KB for battle-tested gesture math. Raw touch handlers are a half-measure -- they reinvent the library poorly and miss edge cases (multi-touch, scroll conflicts, velocity thresholds).
 
-- [ ] **GESTURE-08**: @capacitor/app lifecycle — reconnect WebSocket on foreground return
+- [ ] **GESTURE-08**: @capacitor/app lifecycle -- reconnect WebSocket on foreground return
   - _Acceptance:_ When app returns from background, WebSocket auto-reconnects within 2 seconds. Uses `App.addListener('appStateChange')`. No stale UI after backgrounding.
   - _Why:_ Currently backgrounding kills the WS connection silently and user sees stale state on return. Critical for daily-driver usage.
 
@@ -209,7 +209,7 @@ OLED blacks, glass effects, spring physics, and color tuning optimized for WKWeb
   - _Why:_ OKLCH perceptually smooth; prevents color shifts during animation.
 
 - [ ] **VISUAL-07**: Accent color (#4F46E5 or equivalent) pops against OLED black without burn-in risk
-  - _Acceptance:_ Accent uses medium saturation OKLCH; not pure bright neon; no solid accent fields > 1cm² at max brightness.
+  - _Acceptance:_ Accent uses medium saturation OKLCH; not pure bright neon; no solid accent fields > 1cm^2 at max brightness.
   - _Why:_ Bright accent on OLED can risk pixel burn at extended display; balance vibrancy with safety.
 
 - [ ] **VISUAL-08**: Text contrast minimum AA (4.5:1) on all surfaces, AAA (7:1) for body text
@@ -229,9 +229,9 @@ OLED blacks, glass effects, spring physics, and color tuning optimized for WKWeb
 ## INFRA: Infrastructure & Build Pipeline
 
 All infrastructure requirements were completed in v2.1 and this session's hotfixes:
-- ✓ INFRA-01 through INFRA-10: Capacitor config, nginx proxy, CORS, WebSocket, cache headers, portable scripts, viewport meta — all shipped.
-- ✓ nginx dist symlink fix (2026-03-28) — nginx now serves from src/dist via symlink
-- ✓ CORS origin for port 8184 added to Express ALLOWED_ORIGINS (2026-03-28)
+- INFRA-01 through INFRA-10: Capacitor config, nginx proxy, CORS, WebSocket, cache headers, portable scripts, viewport meta -- all shipped.
+- nginx dist symlink fix (2026-03-28) -- nginx now serves from src/dist via symlink
+- CORS origin for port 8184 added to Express ALLOWED_ORIGINS (2026-03-28)
 
 No new infrastructure requirements for v2.2.
 
@@ -243,12 +243,12 @@ All requirements verified with real device testing on iPhone 16 Pro Max (WKWebVi
 
 | Category | Count | Status | Notes |
 |----------|-------|--------|-------|
-| TOUCH | 7 | TBD | Touch targets measured via code audit + real device |
-| TYPO | 8 | TBD | Font sizes and spacing audited via code review + device |
-| SCROLL | 10 | TBD | Jank elimination + infrastructure + validation |
-| GESTURE | 10 | TBD | Gestures, lifecycle, share, native plugins |
-| VISUAL | 10 | TBD | Visual inspection on real device |
-| INFRA | 0 | ✓ DONE | All shipped in v2.1 + hotfixes |
+| SCROLL | 10 | TBD | Jank elimination + infrastructure + validation (Phase 64) |
+| TOUCH | 7 | TBD | Touch targets measured via code audit + real device (Phase 65) |
+| TYPO | 8 | TBD | Font sizes and spacing audited via code review + device (Phase 66) |
+| GESTURE | 10 | TBD | Gestures, lifecycle, share, native plugins (Phase 67) |
+| VISUAL | 10 | TBD | Visual inspection on real device (Phase 68) |
+| INFRA | 0 | DONE | All shipped in v2.1 + hotfixes |
 | **TOTAL** | **45** | TBD | |
 
 ---
@@ -257,9 +257,9 @@ All requirements verified with real device testing on iPhone 16 Pro Max (WKWebVi
 
 v2.2 ships when:
 
-1. All 39 requirements marked complete with evidence
-2. App tested on real iPhone 16 Pro Max for ≥30 minutes
-3. All touch targets measure ≥44px in DevTools mobile mode
+1. All 45 requirements marked complete with evidence
+2. App tested on real iPhone 16 Pro Max for >=30 minutes
+3. All touch targets measure >=44px in DevTools mobile mode
 4. Chat scroll sustains 60fps for 100-message conversation (Safari DevTools)
 5. Session list scroll sustains 60fps with 100+ sessions
 6. No visual jank during spring animations or glass effects
@@ -274,7 +274,7 @@ v2.2 ships when:
 
 | Feature | Reason | Target Milestone |
 |---------|--------|------------------|
-| Aurora WebGL overlay | GPU complexity; research needed | v2.3 "The Polish" |
+| Aurora WebGL overlay | GPU complexity; research needed | v2.4 "The Polish" |
 | Offline-first sync | Network layer overhaul; post-MVP | v2.3+ |
 | Dynamic island cutout optimization | Native plugin dev; deferred | v3.0+ |
 | Voice input in composer | Capacitor Speech plugin; future | v2.3+ |
@@ -285,52 +285,60 @@ v2.2 ships when:
 
 ## Traceability Matrix
 
-| Requirement | Phase | Est. | Owner | Status |
-|-------------|-------|------|-------|--------|
-| TOUCH-01 | 64 | 2h | TBD | Pending |
-| TOUCH-02 | 64 | 2h | TBD | Pending |
-| TOUCH-03 | 64 | 1h | TBD | Pending |
-| TOUCH-04 | 64 | 1h | TBD | Pending |
-| TOUCH-05 | 64 | 1h | TBD | Pending |
-| TOUCH-06 | 64 | 3h | TBD | Pending |
-| TOUCH-07 | 64 | 2h | TBD | Pending |
-| TYPO-01 | 64 | 1h | TBD | Pending |
-| TYPO-02 | 64 | 1h | TBD | Pending |
-| TYPO-03 | 64 | 1h | TBD | Pending |
-| TYPO-04 | 65 | 2h | TBD | Pending |
-| TYPO-05 | 65 | 1h | TBD | Pending |
-| TYPO-06 | 65 | 1h | TBD | Pending |
-| TYPO-07 | 65 | 1h | TBD | Pending |
-| TYPO-08 | 65 | 2h | TBD | Pending |
-| SCROLL-01 | 66 | 2h | TBD | Pending |
-| SCROLL-02 | 66 | 2h | TBD | Pending |
-| SCROLL-03 | 66 | 1h | TBD | Pending |
-| SCROLL-04 | 66 | 1h | TBD | Pending |
-| SCROLL-05 | 66 | 1h | TBD | Pending |
-| SCROLL-06 | 66 | 2h | TBD | Pending |
-| SCROLL-07 | 66 | 1h | TBD | Pending |
-| SCROLL-08 | 66 | 1h | TBD | Pending |
-| GESTURE-01 | 67 | 3h | TBD | Pending |
-| GESTURE-02 | 67 | 3h | TBD | Pending |
-| GESTURE-03 | 67 | 3h | TBD | Pending |
-| GESTURE-04 | 67 | 0h | TBD | Pending |
-| GESTURE-05 | 67 | 2h | TBD | Pending |
-| GESTURE-06 | 67 | 3h | TBD | Pending |
-| VISUAL-01 | 68 | 0h | TBD | Pending |
-| VISUAL-02 | 68 | 2h | TBD | Pending |
-| VISUAL-03 | 68 | 2h | TBD | Pending |
-| VISUAL-04 | 68 | 1h | TBD | Pending |
-| VISUAL-05 | 68 | 1h | TBD | Pending |
-| VISUAL-06 | 68 | 0h | TBD | Pending |
-| VISUAL-07 | 68 | 1h | TBD | Pending |
-| VISUAL-08 | 68 | 2h | TBD | Pending |
-| VISUAL-09 | 68 | 0h | TBD | Pending |
-| VISUAL-10 | 68 | 1h | TBD | Pending |
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SCROLL-01 | 64 | Pending |
+| SCROLL-02 | 64 | Pending |
+| SCROLL-03 | 64 | Pending |
+| SCROLL-04 | 64 | Pending |
+| SCROLL-05 | 64 | Pending |
+| SCROLL-06 | 64 | Pending |
+| SCROLL-07 | 64 | Pending |
+| SCROLL-08 | 64 | Pending |
+| SCROLL-09 | 64 | Pending |
+| SCROLL-10 | 64 | Pending |
+| TOUCH-01 | 65 | Pending |
+| TOUCH-02 | 65 | Pending |
+| TOUCH-03 | 65 | Pending |
+| TOUCH-04 | 65 | Pending |
+| TOUCH-05 | 65 | Pending |
+| TOUCH-06 | 65 | Pending |
+| TOUCH-07 | 65 | Pending |
+| TYPO-01 | 66 | Pending |
+| TYPO-02 | 66 | Pending |
+| TYPO-03 | 66 | Pending |
+| TYPO-04 | 66 | Pending |
+| TYPO-05 | 66 | Pending |
+| TYPO-06 | 66 | Pending |
+| TYPO-07 | 66 | Pending |
+| TYPO-08 | 66 | Pending |
+| GESTURE-01 | 67 | Pending |
+| GESTURE-02 | 67 | Pending |
+| GESTURE-03 | 67 | Pending |
+| GESTURE-04 | 67 | Pending |
+| GESTURE-05 | 67 | Pending |
+| GESTURE-06 | 67 | Pending |
+| GESTURE-07 | 67 | Pending |
+| GESTURE-08 | 67 | Pending |
+| GESTURE-09 | 67 | Pending |
+| GESTURE-10 | 67 | Pending |
+| VISUAL-01 | 68 | Pending |
+| VISUAL-02 | 68 | Pending |
+| VISUAL-03 | 68 | Pending |
+| VISUAL-04 | 68 | Pending |
+| VISUAL-05 | 68 | Pending |
+| VISUAL-06 | 68 | Pending |
+| VISUAL-07 | 68 | Pending |
+| VISUAL-08 | 68 | Pending |
+| VISUAL-09 | 68 | Pending |
+| VISUAL-10 | 68 | Pending |
+
 **Coverage:**
-- v2.2 requirements: 45 total (7 TOUCH + 8 TYPO + 10 SCROLL + 10 GESTURE + 10 VISUAL)
+- v2.2 requirements: 45 total (10 SCROLL + 7 TOUCH + 8 TYPO + 10 GESTURE + 10 VISUAL)
 - INFRA: 0 new (all shipped in v2.1)
-- Mapped to estimated phases: TBD (roadmap pending)
-- Unmapped: TBD
+- Mapped: 45/45
+- Unmapped: 0
+- Phase 64: 10 reqs (SCROLL) | Phase 65: 7 reqs (TOUCH) | Phase 66: 8 reqs (TYPO) | Phase 67: 10 reqs (GESTURE) | Phase 68: 10 reqs (VISUAL)
 
 ---
 
