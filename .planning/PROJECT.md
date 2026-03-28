@@ -87,7 +87,7 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - [x] Platform foundation — URL abstraction, CORS, Capacitor config (Phase 59, 2026-03-28)
 - [x] Touch targets & native plugins — 44px+ targets, StatusBar, SplashScreen, safe-area audit, overscroll prevention (Phase 61, 2026-03-28)
 - [x] Haptics & motion — haptic feedback on send/tool/error/selection, 120Hz ProMotion opt-in, spring tuning (Phase 62, 2026-03-28)
-- [ ] Bundled assets mode — local assets, cap sync pipeline, on-device validation
+- [x] Bundled assets mode — local assets, cap sync pipeline, on-device validation (Phase 63, 2026-03-28)
 
 **Future milestones:**
 - v2.2 "The Power" — Multi-provider tabs, MCP management
@@ -202,4 +202,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-28 after Phase 62 (Haptics & Motion) completion*
+*Last updated: 2026-03-28 after Phase 63 (Bundled Assets & Device Validation) completion*
