@@ -155,7 +155,10 @@ Plans:
   3. Dismissing the keyboard returns the composer to its resting position with no black gap or layout jump
   4. The existing visualViewport hack is disabled on native (no dual-handler race condition)
   5. WKWebView does not auto-resize the viewport when the keyboard appears (resize mode set to `none`)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 60-01-PLAN.md -- Install @capacitor/keyboard, create native-plugins.ts, wire main.tsx, conditional CSS transition
+- [ ] 60-02-PLAN.md -- Create useKeyboardOffset hook, integrate into ChatComposer, fix safe-area CSS stacking
 **UI hint**: yes
 
 ### Phase 61: Touch, Layout & Native Plugins
@@ -223,7 +226,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
-| 60. Keyboard & Composer | 0/TBD | Not started | - |
+| 60. Keyboard & Composer | 0/2 | Not started | - |
 | 61. Touch, Layout & Native Plugins | 0/TBD | Not started | - |
 | 62. Haptics & Motion | 0/TBD | Not started | - |
 | 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |
@@ -235,4 +238,4 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-28 after Phase 59 planning*
+*Last updated: 2026-03-28 after Phase 60 planning*
