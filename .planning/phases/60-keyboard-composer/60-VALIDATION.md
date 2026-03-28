@@ -38,10 +38,10 @@ created: 2026-03-28
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 60-01-01 | 01 | 1 | KEY-01, KEY-02, KEY-05 | unit | `cd src && npx vitest run src/src/hooks/useKeyboardOffset.test.ts` | ❌ W0 | ⬜ pending |
-| 60-01-02 | 01 | 1 | KEY-01 | unit | `cd src && npx vitest run src/src/lib/native-plugins.test.ts` | ❌ W0 | ⬜ pending |
-| 60-02-01 | 02 | 2 | KEY-03, KEY-04 | unit | `cd src && npx vitest run src/src/components/chat/composer/ChatComposer.test.tsx` | ✅ | ⬜ pending |
-| 60-02-02 | 02 | 2 | KEY-04 | unit | `cd src && npx vitest run src/src/hooks/useScrollAnchor.test.ts` | ❌ W0 | ⬜ pending |
+| 60-01-01 | 01 | 1 | KEY-01 | unit | `cd src && npx vitest run src/src/lib/native-plugins.test.ts` | ❌ W0 | ⬜ pending |
+| 60-01-02 | 01 | 1 | KEY-01, KEY-05 | unit | `cd src && npx vitest run src/src/lib/native-plugins.test.ts` | ❌ W0 | ⬜ pending |
+| 60-02-01 | 02 | 2 | KEY-02, KEY-03, KEY-04 | unit | `cd src && npx vitest run src/src/hooks/useKeyboardOffset.test.ts` | ❌ W0 | ⬜ pending |
+| 60-02-02 | 02 | 2 | KEY-04 | unit | `cd src && npx vitest run src/src/components/chat/composer/ChatComposer.test.tsx` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -49,10 +49,10 @@ created: 2026-03-28
 
 ## Wave 0 Requirements
 
-- [ ] `src/src/hooks/useKeyboardOffset.test.ts` — stubs for KEY-01, KEY-02, KEY-05
-- [ ] `src/src/lib/native-plugins.test.ts` — stubs for KEY-01 (plugin init)
+- [ ] `src/src/lib/native-plugins.test.ts` — stubs for KEY-01, KEY-05 (plugin init, resize mode, readiness promise)
+- [ ] `src/src/hooks/useKeyboardOffset.test.ts` — stubs for KEY-02, KEY-03, KEY-04 (offset hook, scroll coordination)
 
-*Existing ChatComposer.test.tsx and useScrollAnchor infrastructure covers KEY-03 and KEY-04 integration.*
+*Existing ChatComposer.test.tsx covers KEY-04 integration.*
 
 ---
 
