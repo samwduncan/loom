@@ -171,7 +171,10 @@ Plans:
   3. App launches with a color-matched splash screen that fades smoothly into the React app (no white flash)
   4. Swiping back from the left edge navigates correctly without conflicting with the sidebar drawer
   5. Safe-area insets are respected on all four edges (top status bar, bottom home indicator, notch sides)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 61-01-PLAN.md -- StatusBar + SplashScreen plugins, overscroll prevention, safe-area audit
+- [ ] 61-02-PLAN.md -- Comprehensive touch target audit, gesture handling, thumb-zone verification
 **UI hint**: yes
 
 ### Phase 62: Haptics & Motion
@@ -227,7 +230,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 |-------|----------------|--------|-----------|
 | 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
 | 60. Keyboard & Composer | 2/2 | Complete    | 2026-03-28 |
-| 61. Touch, Layout & Native Plugins | 0/TBD | Not started | - |
+| 61. Touch, Layout & Native Plugins | 0/2 | In progress | - |
 | 62. Haptics & Motion | 0/TBD | Not started | - |
 | 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |
 
@@ -238,4 +241,4 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-28 after Phase 60 planning*
+*Last updated: 2026-03-28 after Phase 61 planning*
