@@ -152,7 +152,11 @@
   3. Tapping the iOS status bar scrolls the chat message list to the top with smooth animation
   4. Rubber band bounce feels native on both message list and session list scroll containers
   5. No React setState calls fire inside scroll event handlers (ref + debounced state only)
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 64-01-PLAN.md -- Core scroll hook (useChatScroll) with IO sentinel, ResizeObserver auto-follow, dead code cleanup
+- [ ] 64-02-PLAN.md -- Secondary jank fixes: ActiveMessage deferred reflow, overscroll-behavior, content-visibility reconciliation
+- [ ] 64-03-PLAN.md -- statusTap verification, virtualization gate, real device 60fps validation
 **UI hint**: yes
 
 ### Phase 65: Touch Target Compliance
@@ -233,7 +237,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 64. Scroll Performance | 0/? | Not started | - |
+| 64. Scroll Performance | 0/3 | Planning complete | - |
 | 65. Touch Target Compliance | 0/? | Not started | - |
 | 66. Typography & Spacing | 0/? | Not started | - |
 | 67. iOS-Native Gestures | 0/? | Not started | - |
@@ -246,4 +250,4 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-28 after v2.2 "The Touch" roadmap creation*
+*Last updated: 2026-03-28 after Phase 64 planning complete*
