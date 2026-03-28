@@ -13,30 +13,27 @@
  *   error: full-width, no bubble constraint
  *   task_notification: full-width, no bubble constraint
  *
- * Finalized (non-streaming) messages get content-visibility: auto for
- * off-screen rendering optimization in long conversations.
+ * Content-visibility optimization is handled by the CSS .msg-item class
+ * applied in MessageList.tsx, not inline styles. See SCROLL-05 / Pitfall 5.
  *
  * Constitution: Named export (2.2), token-based styling (3.1), cn() for classes (3.6).
  */
 
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { MessageRole } from '@/types/message';
 import { cn } from '@/utils/cn';
 
 interface MessageContainerProps {
   children: ReactNode;
   role: MessageRole;
-  /** When true, disables content-visibility optimization (for actively streaming messages) */
+  /** When true, marks the message as actively streaming (no content-visibility optimization) */
   isStreaming?: boolean;
 }
 
-/** content-visibility styles for finalized messages -- skips off-screen rendering */
-const contentVisibilityStyle: CSSProperties = {
-  contentVisibility: 'auto',
-  containIntrinsicHeight: 'auto 200px',
-};
-
 export function MessageContainer({ children, role, isStreaming = false }: MessageContainerProps) {
+  // content-visibility is now handled by CSS .msg-item class on the parent wrapper
+  // in MessageList.tsx. No inline style needed here. See SCROLL-05 / Pitfall 5.
+  void isStreaming; // Kept in API for backwards compatibility; CSS class handles optimization
   return (
     <div
       className={cn(
@@ -46,7 +43,6 @@ export function MessageContainer({ children, role, isStreaming = false }: Messag
       )}
       data-role={role}
       data-testid="message-container"
-      style={!isStreaming ? contentVisibilityStyle : undefined}
     >
       {role === 'user' ? (
         <div

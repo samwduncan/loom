@@ -286,8 +286,6 @@ describe('useChatScroll', () => {
     act(() => { triggerIO(io, false); });
     act(() => { vi.advanceTimersByTime(200); });
 
-    const initialRafCount = rafCallbacks.length;
-
     // Trigger RO
     const ro = getLastRO();
     act(() => { triggerRO(ro); });

@@ -1,6 +1,9 @@
 /**
- * MessageContainer tests -- verifies content-visibility optimization
- * for finalized vs streaming messages.
+ * MessageContainer tests -- verifies CSS-only content-visibility
+ * (no inline styles) and role-based rendering.
+ *
+ * content-visibility is now applied via CSS .msg-item class in MessageList.tsx,
+ * not inline styles. See SCROLL-05 / Pitfall 5.
  */
 
 import { render, screen } from '@testing-library/react';
@@ -8,8 +11,8 @@ import { describe, expect, it } from 'vitest';
 import { MessageContainer } from './MessageContainer';
 
 describe('MessageContainer', () => {
-  describe('content-visibility optimization', () => {
-    it('applies content-visibility: auto to finalized assistant messages', () => {
+  describe('content-visibility optimization (CSS-only, no inline styles)', () => {
+    it('does not apply inline content-visibility styles to finalized assistant messages', () => {
       render(
         <MessageContainer role="assistant">
           <p>Hello</p>
@@ -17,21 +20,11 @@ describe('MessageContainer', () => {
       );
 
       const container = screen.getByTestId('message-container');
-      expect(container.style.contentVisibility).toBe('auto');
+      expect(container.style.contentVisibility).toBe('');
+      expect(container.style.containIntrinsicHeight).toBe('');
     });
 
-    it('applies contain-intrinsic-height to finalized messages', () => {
-      render(
-        <MessageContainer role="assistant">
-          <p>Hello</p>
-        </MessageContainer>,
-      );
-
-      const container = screen.getByTestId('message-container');
-      expect(container.style.containIntrinsicHeight).toBe('auto 200px');
-    });
-
-    it('does NOT apply content-visibility to streaming messages', () => {
+    it('does not apply inline content-visibility styles to streaming messages', () => {
       render(
         <MessageContainer role="assistant" isStreaming>
           <p>Streaming...</p>
@@ -42,7 +35,7 @@ describe('MessageContainer', () => {
       expect(container.style.contentVisibility).toBe('');
     });
 
-    it('applies content-visibility to finalized user messages', () => {
+    it('does not apply inline content-visibility styles to user messages', () => {
       render(
         <MessageContainer role="user">
           <p>User message</p>
@@ -50,19 +43,8 @@ describe('MessageContainer', () => {
       );
 
       const container = screen.getByTestId('message-container');
-      expect(container.style.contentVisibility).toBe('auto');
-      expect(container.style.containIntrinsicHeight).toBe('auto 200px');
-    });
-
-    it('does NOT apply content-visibility to streaming user messages', () => {
-      render(
-        <MessageContainer role="user" isStreaming>
-          <p>User streaming</p>
-        </MessageContainer>,
-      );
-
-      const container = screen.getByTestId('message-container');
       expect(container.style.contentVisibility).toBe('');
+      expect(container.style.containIntrinsicHeight).toBe('');
     });
   });
 

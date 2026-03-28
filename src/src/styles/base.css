@@ -140,6 +140,30 @@ html[data-native] body {
   border-radius: var(--space-1);
 }
 
+/* ─── Message Item Content-Visibility Optimization ──────────────
+ * Single source for content-visibility on message items.
+ * Skips rendering of off-screen messages in long conversations.
+ * 150px is the estimated average message height (compromise between
+ * shorter simple messages and longer code-heavy messages).
+ * Do NOT apply content-visibility via inline styles -- this class is
+ * the authoritative source. See SCROLL-05 / Pitfall 5.
+ */
+.msg-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 150px;
+}
+
+/* ─── Native Scroll Container Optimization ───────────────────────
+ * Applied to scroll containers on native iOS (message list, session list).
+ * will-change: scroll-position hints the compositor to promote the layer.
+ * overscroll-behavior-y intentionally omitted (SCROLL-09 / D-18).
+ * iOS rubber band bounce preserved on message list and session list.
+ * html/body already have overscroll-behavior: none to prevent page-level bounce.
+ */
+html[data-native] .native-scroll {
+  will-change: scroll-position;
+}
+
 /* ─── Safe Area Support for Notched Devices (MOBILE-04) ──────── */
 @supports (padding: env(safe-area-inset-top)) {
   /* Top safe area: notch / Dynamic Island */
