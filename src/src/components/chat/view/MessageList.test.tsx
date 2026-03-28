@@ -12,6 +12,44 @@ import { render, screen } from '@testing-library/react';
 import { MessageList } from './MessageList';
 import type { Message } from '@/types/message';
 
+// Mock IntersectionObserver (needed by useChatScroll)
+type IOInstance = {
+  callback: IntersectionObserverCallback;
+  observe: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  unobserve: ReturnType<typeof vi.fn>;
+};
+vi.stubGlobal(
+  'IntersectionObserver',
+  vi.fn(function MockIO(this: IOInstance, cb: IntersectionObserverCallback) {
+    this.callback = cb;
+    this.observe = vi.fn();
+    this.disconnect = vi.fn();
+    this.unobserve = vi.fn();
+  }),
+);
+
+// Mock ResizeObserver (needed by useChatScroll)
+type ROInstance = {
+  callback: ResizeObserverCallback;
+  observe: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  unobserve: ReturnType<typeof vi.fn>;
+};
+vi.stubGlobal(
+  'ResizeObserver',
+  vi.fn(function MockRO(this: ROInstance, cb: ResizeObserverCallback) {
+    this.callback = cb;
+    this.observe = vi.fn();
+    this.disconnect = vi.fn();
+    this.unobserve = vi.fn();
+  }),
+);
+
+// Mock requestAnimationFrame (needed by useChatScroll)
+vi.stubGlobal('requestAnimationFrame', vi.fn((cb: () => void) => { cb(); return 1; }));
+vi.stubGlobal('cancelAnimationFrame', vi.fn());
+
 // Mock stream store
 vi.mock('@/stores/stream', () => ({
   useStreamStore: vi.fn((selector: (state: { isStreaming: boolean }) => boolean) =>

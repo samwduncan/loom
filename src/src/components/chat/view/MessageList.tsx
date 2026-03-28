@@ -5,10 +5,15 @@
  * skips rendering off-screen items via content-visibility: auto. This avoids
  * the height estimation errors that cause scroll jumps in virtualization libs.
  *
+ * Scroll logic extracted to useChatScroll hook (Phase 64):
+ * - IO sentinel for atBottom detection (ref-based, no setState in scroll path)
+ * - ResizeObserver auto-follow during streaming
+ * - Debounced pill state, unread tracking, scroll position persistence
+ *
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useRef, useState, useEffect, useLayoutEffect, useCallback, memo, type RefObject } from 'react';
+import { useRef, useState, useEffect, useCallback, memo, type RefObject } from 'react';
 import { Loader2 } from 'lucide-react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
@@ -18,11 +23,10 @@ import { TaskNotificationMessage } from '@/components/chat/view/TaskNotification
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
 import { ScrollToBottomPill } from '@/components/chat/view/ScrollToBottomPill';
 import { MessageErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { useChatScroll } from '@/hooks/useChatScroll';
 import { useStreamStore } from '@/stores/stream';
 import type { Message } from '@/types/message';
 import type { ReactNode } from 'react';
-
-const SCROLL_STORAGE_PREFIX = 'loom-scroll-';
 
 export interface MessageListProps {
   messages: Message[];
@@ -65,11 +69,22 @@ const MemoizedMessageItem = memo(function MemoizedMessageItem({
 
 export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText, hasMoreMessages, isFetchingMore, onLoadMore }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
   const isStreaming = useStreamStore((state) => state.isStreaming);
-  const [atBottom, setAtBottom] = useState(true);
-  const [unreadCount, setUnreadCount] = useState(0);
+
+  // ─── useChatScroll hook (replaces ~120 lines of inline scroll logic) ──
+  const {
+    sentinelRef,
+    showPill,
+    unreadCount,
+    scrollToBottom,
+    contentWrapperRef,
+  } = useChatScroll({
+    scrollContainerRef: scrollRef,
+    sessionId,
+    isStreaming,
+    messageCount: messages.length,
+  });
 
   // ActiveMessage fade-out handling
   const [showActiveMessage, setShowActiveMessage] = useState(false);
@@ -80,28 +95,11 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     setShowActiveMessage(false);
   }, []);
 
-  // Track unread when new messages arrive while scrolled up
-  const [prevCount, setPrevCount] = useState(messages.length);
-  if (messages.length !== prevCount) {
-    if (messages.length > prevCount && !atBottom) {
-      setUnreadCount(prev => prev + (messages.length - prevCount));
-    }
-    setPrevCount(messages.length);
-  }
-
-  // Session switch — reset scroll state (adjust-state-during-render pattern)
-  const [prevSession, setPrevSession] = useState(sessionId);
-  if (prevSession !== sessionId) {
-    setPrevSession(sessionId);
-    setAtBottom(true);
-    setUnreadCount(0);
-  }
-
   // Infinite scroll: auto-load older messages when sentinel is visible
   const onLoadMoreRef = useRef(onLoadMore);
   useEffect(() => { onLoadMoreRef.current = onLoadMore; });
   useEffect(() => {
-    const sentinel = sentinelRef.current;
+    const sentinel = loadMoreSentinelRef.current;
     const container = scrollRef.current;
     if (!sentinel || !container) return;
 
@@ -128,78 +126,6 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     return () => observer.disconnect();
   }, [sessionId, hasMoreMessages]);
 
-  // Save scroll position for the previous session on switch (via effect to satisfy refs rule)
-  const prevSessionRef = useRef(sessionId);
-  useEffect(() => {
-    if (prevSessionRef.current !== sessionId) {
-      const el = scrollRef.current;
-      if (el && prevSessionRef.current) {
-        sessionStorage.setItem(`${SCROLL_STORAGE_PREFIX}${prevSessionRef.current}`, String(el.scrollTop));
-      }
-      prevSessionRef.current = sessionId;
-    }
-  }, [sessionId]);
-
-  // Scroll to saved position (or bottom) on session switch or initial messages load
-  const scrolledSessionRef = useRef<string | null>(null);
-  useLayoutEffect(() => {
-    const el = scrollRef.current;
-    if (el && messages.length > 0 && scrolledSessionRef.current !== sessionId) {
-      scrolledSessionRef.current = sessionId;
-      const savedPos = sessionStorage.getItem(`${SCROLL_STORAGE_PREFIX}${sessionId}`);
-      requestAnimationFrame(() => {
-        if (savedPos !== null) {
-          el.scrollTop = Number(savedPos);
-        } else {
-          el.scrollTop = el.scrollHeight;
-        }
-      });
-    }
-  });
-
-  // Auto-follow during streaming
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (isStreaming && atBottom && el) {
-      el.scrollTop = el.scrollHeight;
-    }
-  }, [isStreaming, atBottom, messages.length]);
-
-  // Track atBottom state + throttled scroll position save
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-    const isBottom = distFromBottom < 150;
-    setAtBottom(isBottom);
-    if (isBottom) setUnreadCount(0);
-
-    // Throttled save to sessionStorage (200ms trailing edge)
-    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(() => {
-      sessionStorage.setItem(`${SCROLL_STORAGE_PREFIX}${sessionId}`, String(el.scrollTop));
-    }, 200);
-  }, [sessionId]);
-
-  // Attach scroll listener + cleanup pending save timeout on unmount
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      el.removeEventListener('scroll', handleScroll);
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    };
-  }, [handleScroll]);
-
-  const scrollToBottom = useCallback(() => {
-    const el = scrollRef.current;
-    if (el) {
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
-    }
-    setUnreadCount(0);
-  }, []);
-
   // Ref callback merges internal scrollRef with external scrollContainerRef
   const mergedRef = useCallback((node: HTMLDivElement | null) => {
     (scrollRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
@@ -225,9 +151,9 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
       className="native-scroll h-full overflow-y-auto"
       data-testid="message-list-scroll"
     >
-      <div className="mx-auto max-w-3xl py-4">
+      <div ref={contentWrapperRef} className="mx-auto max-w-3xl py-4">
         {hasMoreMessages && (
-          <div ref={sentinelRef} className="flex justify-center py-2">
+          <div ref={loadMoreSentinelRef} className="flex justify-center py-2">
             {isFetchingMore && <Loader2 className="size-4 animate-spin text-muted" />}
           </div>
         )}
@@ -249,8 +175,10 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
           </div>
         )}
       </div>
+      {/* Bottom sentinel for IO-based atBottom detection */}
+      <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
       <ScrollToBottomPill
-        visible={!atBottom}
+        visible={showPill}
         onClick={scrollToBottom}
         unreadCount={unreadCount}
       />

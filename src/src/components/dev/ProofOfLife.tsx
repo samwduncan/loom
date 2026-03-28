@@ -14,7 +14,7 @@ import { wsClient } from '@/lib/websocket-client';
 import { useConnectionStore } from '@/stores/connection';
 import { useStreamStore } from '@/stores/stream';
 import { useTimelineStore } from '@/stores/timeline';
-import { useScrollAnchor } from '@/hooks/useScrollAnchor';
+import { useChatScroll } from '@/hooks/useChatScroll';
 import { ActiveMessage } from '@/components/chat/view/ActiveMessage';
 import { ScrollToBottomPill } from '@/components/chat/view/ScrollToBottomPill';
 import { cn } from '@/utils/cn';
@@ -53,7 +53,12 @@ export function ProofOfLife() {
   const addSession = useTimelineStore((s) => s.addSession);
 
   // Scroll anchor
-  const { sentinelRef, showPill, scrollToBottom } = useScrollAnchor(scrollContainerRef);
+  const { sentinelRef, showPill, scrollToBottom, contentWrapperRef } = useChatScroll({
+    scrollContainerRef,
+    sessionId: localId,
+    isStreaming,
+    messageCount: messages.length,
+  });
 
   // Initialize WebSocket on mount (double-init guard in websocket-init.ts)
   useEffect(() => {
@@ -185,41 +190,43 @@ export function ProofOfLife() {
         className="proof-of-life-conversation"
         data-testid="conversation-area"
       >
-        {messages.map((msg: Message) => {
-          if (msg.role === 'user') {
-            return (
-              <div key={msg.id} className="proof-of-life-user-msg">
-                {msg.content}
-              </div>
-            );
-          }
-          if (msg.role === 'assistant') {
-            return (
-              <div key={msg.id} className="proof-of-life-assistant-msg">
-                {msg.content}
-              </div>
-            );
-          }
-          return null;
-        })}
+        <div ref={contentWrapperRef}>
+          {messages.map((msg: Message) => {
+            if (msg.role === 'user') {
+              return (
+                <div key={msg.id} className="proof-of-life-user-msg">
+                  {msg.content}
+                </div>
+              );
+            }
+            if (msg.role === 'assistant') {
+              return (
+                <div key={msg.id} className="proof-of-life-assistant-msg">
+                  {msg.content}
+                </div>
+              );
+            }
+            return null;
+          })}
 
-        {/* Error display */}
-        {connectionError && (
-          <div className="proof-of-life-error" data-testid="error-display">
-            {connectionError}
-          </div>
-        )}
+          {/* Error display */}
+          {connectionError && (
+            <div className="proof-of-life-error" data-testid="error-display">
+              {connectionError}
+            </div>
+          )}
 
-        {/* Active streaming message — keep mounted during finalization fade */}
-        {showActiveMessage && (
-          <ActiveMessage
-            sessionId={localId}
-            onFinalizationComplete={handleFinalizationComplete}
-          />
-        )}
+          {/* Active streaming message — keep mounted during finalization fade */}
+          {showActiveMessage && (
+            <ActiveMessage
+              sessionId={localId}
+              onFinalizationComplete={handleFinalizationComplete}
+            />
+          )}
+        </div>
 
-        {/* Scroll anchor sentinel */}
-        <div ref={sentinelRef} />
+        {/* Bottom sentinel for IO-based atBottom detection */}
+        <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
 
         {/* Scroll pill */}
         <ScrollToBottomPill visible={showPill} onClick={scrollToBottom} />

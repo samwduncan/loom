@@ -16,7 +16,7 @@ import { useTimelineStore } from '@/stores/timeline';
 
 // ─── Mocks ─────────────────────────────────────────────────────────────────
 
-// Track rAF callbacks (needed by useScrollAnchor and useStreamBuffer)
+// Track rAF callbacks (needed by useChatScroll and useStreamBuffer)
 let rafCallbacks: Array<() => void> = [];
 let rafId = 0;
 
@@ -26,8 +26,8 @@ vi.stubGlobal('requestAnimationFrame', (cb: () => void) => {
 });
 vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
-// Mock IntersectionObserver (needed by useScrollAnchor) -- must be a constructor function
-type ObserverInstance = {
+// Mock IntersectionObserver (needed by useChatScroll) -- must be a constructor function
+type IOInstance = {
   callback: IntersectionObserverCallback;
   observe: ReturnType<typeof vi.fn>;
   disconnect: ReturnType<typeof vi.fn>;
@@ -36,8 +36,28 @@ type ObserverInstance = {
 vi.stubGlobal(
   'IntersectionObserver',
   vi.fn(function MockIntersectionObserver(
-    this: ObserverInstance,
+    this: IOInstance,
     cb: IntersectionObserverCallback,
+  ) {
+    this.callback = cb;
+    this.observe = vi.fn();
+    this.disconnect = vi.fn();
+    this.unobserve = vi.fn();
+  }),
+);
+
+// Mock ResizeObserver (needed by useChatScroll)
+type ROInstance = {
+  callback: ResizeObserverCallback;
+  observe: ReturnType<typeof vi.fn>;
+  disconnect: ReturnType<typeof vi.fn>;
+  unobserve: ReturnType<typeof vi.fn>;
+};
+vi.stubGlobal(
+  'ResizeObserver',
+  vi.fn(function MockResizeObserver(
+    this: ROInstance,
+    cb: ResizeObserverCallback,
   ) {
     this.callback = cb;
     this.observe = vi.fn();
