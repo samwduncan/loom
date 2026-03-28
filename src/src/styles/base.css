@@ -144,3 +144,12 @@ body {
     transition: padding-bottom 100ms ease-out;
   }
 }
+
+/* D-06/D-08: No CSS transition on native -- iOS drives the keyboard animation natively.
+   Adding a CSS transition on top creates double-animation / visual lag.
+   The data-native attribute is set by native-plugins.ts at startup. */
+@media (max-width: 767px) {
+  html[data-native] .app-shell {
+    transition: none;
+  }
+}
