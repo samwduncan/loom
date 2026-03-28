@@ -102,13 +102,13 @@ Content scrolls at 60fps on real device. This is THE highest priority -- everyth
   - _Acceptance:_ Streaming auto-scroll fires at most once per animation frame via rAF, not on every `messages.length` change.
   - _Why:_ Current implementation triggers `el.scrollTop = el.scrollHeight` on every message chunk during streaming.
 
-- [ ] **SCROLL-04**: Fix layout thrashing in useAutoResize (composer textarea)
-  - _Acceptance:_ useAutoResize separates DOM reads and writes into distinct rAF frames -- no write->read->write pattern.
-  - _Why:_ Current pattern: `height='0px'` -> read `scrollHeight` (forces reflow) -> write `height` -> write `overflowY`. Blocks main thread on every keystroke.
+- [ ] **SCROLL-04**: Verify useAutoResize layout pattern is acceptable at typing frequency
+  - _Acceptance:_ useAutoResize write->read->write pattern retained intentionally per D-09 -- fires at typing frequency (10-20Hz), not scroll frequency (60-120Hz). Pattern documented with `// SCROLL-04 / D-09` comment in useAutoResize.ts.
+  - _Why:_ The write->read->write is unavoidable for height measurement (must reset to 0, read scrollHeight, set final). useLayoutEffect ensures pre-paint timing. Acceptable at typing frequency.
 
-- [ ] **SCROLL-05**: Remove forced reflow in ActiveMessage finalization
-  - _Acceptance:_ No `void container.offsetHeight` or equivalent forced-reflow pattern. Height transition uses CSS transitions or double-rAF instead.
-  - _Why:_ Forces synchronous layout at the exact moment the user is likely to interact.
+- [ ] **SCROLL-05**: Defer forced reflow in ActiveMessage finalization out of scroll-critical path
+  - _Acceptance:_ `void container.offsetHeight` forced reflow deferred behind rAF + 50ms setTimeout per D-11/D-12. FLIP animation intentionally preserved -- forced reflow required for CSS height transition. Relocated out of scroll-critical path so it cannot block an active scroll frame.
+  - _Why:_ The forced reflow is inherent to the FLIP animation pattern (browser must commit start height before animating to end height). Deferring by 50ms ensures it fires between scroll frames, not during one.
 
 - [ ] **SCROLL-06**: Delete dead useScrollAnchor.ts hook
   - _Acceptance:_ File removed from codebase. No imports reference it.
