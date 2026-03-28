@@ -126,8 +126,30 @@ body {
 }
 
 /* ─── Safe Area Support for Notched Devices (MOBILE-04) ──────── */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
+@supports (padding: env(safe-area-inset-top)) {
+  /* Top safe area: notch / Dynamic Island */
+  @media (max-width: 767px) {
+    .app-shell {
+      padding-top: env(safe-area-inset-top);
+    }
+  }
+}
+
+/* ─── Keyboard Avoidance (interactive-widget=overlays-content) ──────── */
+/* The keyboard overlays the viewport; we shrink the shell by --keyboard-offset
+   so the composer stays visible above the keyboard. */
+@media (max-width: 767px) {
+  .app-shell {
+    padding-bottom: var(--keyboard-offset, 0px);
+    transition: padding-bottom 100ms ease-out;
+  }
+}
+
+/* D-06/D-08: No CSS transition on native -- iOS drives the keyboard animation natively.
+   Adding a CSS transition on top creates double-animation / visual lag.
+   The data-native attribute is set by native-plugins.ts at startup. */
+@media (max-width: 767px) {
+  html[data-native] .app-shell {
+    transition: none;
   }
 }
