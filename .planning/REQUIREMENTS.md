@@ -24,11 +24,11 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Touch & Layout
 
-- [ ] **TOUCH-01**: All interactive elements have 44px+ touch targets at mobile breakpoint
+- [x] **TOUCH-01**: All interactive elements have 44px+ touch targets at mobile breakpoint
 - [x] **TOUCH-02**: Safe-area insets applied correctly on all four edges
 - [x] **TOUCH-03**: App shell prevents rubber-band overscroll at page level
-- [ ] **TOUCH-04**: Gesture back navigation handled gracefully (no conflict with sidebar drawer)
-- [ ] **TOUCH-05**: Primary actions (send, stop) positioned within thumb-zone reach
+- [x] **TOUCH-04**: Gesture back navigation handled gracefully (no conflict with sidebar drawer)
+- [x] **TOUCH-05**: Primary actions (send, stop) positioned within thumb-zone reach
 
 ### Native Plugins
 
@@ -97,11 +97,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KEY-03 | Phase 60 | Complete |
 | KEY-04 | Phase 60 | Complete |
 | KEY-05 | Phase 60 | Complete |
-| TOUCH-01 | Phase 61 | Pending |
+| TOUCH-01 | Phase 61 | Complete |
 | TOUCH-02 | Phase 61 | Complete |
 | TOUCH-03 | Phase 61 | Complete |
-| TOUCH-04 | Phase 61 | Pending |
-| TOUCH-05 | Phase 61 | Pending |
+| TOUCH-04 | Phase 61 | Complete |
+| TOUCH-05 | Phase 61 | Complete |
 | NATIVE-01 | Phase 61 | Complete |
 | NATIVE-02 | Phase 61 | Complete |
 | NATIVE-03 | Phase 62 | Pending |

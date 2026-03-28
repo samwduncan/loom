@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
-status: Ready to execute
-stopped_at: Completed 61-01-PLAN.md
-last_updated: "2026-03-28T04:52:19.097Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 61-02-PLAN.md
+last_updated: "2026-03-28T04:53:34.657Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -47,6 +47,7 @@ Plan: 2 of 2
 | Phase 60 P01 | 3min | 2 tasks | 5 files |
 | Phase 60 P02 | 4min | 2 tasks | 4 files |
 | Phase 61 P01 | 3min | 2 tasks | 8 files |
+| Phase 61 P02 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,7 @@ Plan: 2 of 2
 - [Phase 61]: SS-7: Each Capacitor plugin in its own try/catch for failure isolation
 - [Phase 61]: SS-2: hideSplashWhenReady() awaits nativePluginsReady to avoid cold-start race
 - [Phase 61]: S-4: No touch-action: pan-y -- breaks sidebar swipe and horizontal scroll
+- [Phase 61]: FollowUpPills touch target in CSS per S-6, global Radix menu 44px override via [role=menuitem], no touch-action overrides on sidebar backdrop
 
 ### Pending Todos
 
@@ -88,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T04:52:19.095Z
-Stopped at: Completed 61-01-PLAN.md
+Last session: 2026-03-28T04:53:34.655Z
+Stopped at: Completed 61-02-PLAN.md
 Resume: `/gsd:plan-phase 59`

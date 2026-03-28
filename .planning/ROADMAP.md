@@ -124,7 +124,7 @@
 
 - [x] **Phase 59: Platform Foundation** - URL abstraction, CORS whitelist, and Capacitor config -- prerequisite for all native features -- completed 2026-03-28
 - [x] **Phase 60: Keyboard & Composer** - Replace visualViewport hack with Capacitor Keyboard plugin for reliable keyboard avoidance (completed 2026-03-28)
-- [ ] **Phase 61: Touch, Layout & Native Plugins** - Touch target audit, safe-area refinement, StatusBar, SplashScreen, and gesture handling
+- [x] **Phase 61: Touch, Layout & Native Plugins** - Touch target audit, safe-area refinement, StatusBar, SplashScreen, and gesture handling (completed 2026-03-28)
 - [ ] **Phase 62: Haptics & Motion** - Haptic feedback on key interactions, 120Hz spring tuning for ProMotion displays
 - [ ] **Phase 63: Bundled Assets & Device Validation** - cap sync pipeline, bundled asset loading, and on-device integration testing
 
@@ -171,10 +171,10 @@ Plans:
   3. App launches with a color-matched splash screen that fades smoothly into the React app (no white flash)
   4. Swiping back from the left edge navigates correctly without conflicting with the sidebar drawer
   5. Safe-area insets are respected on all four edges (top status bar, bottom home indicator, notch sides)
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 61-01-PLAN.md -- StatusBar + SplashScreen plugins, overscroll prevention, safe-area audit
-- [ ] 61-02-PLAN.md -- Comprehensive touch target audit, gesture handling, thumb-zone verification
+- [x] 61-02-PLAN.md -- Comprehensive touch target audit, gesture handling, thumb-zone verification
 **UI hint**: yes
 
 ### Phase 62: Haptics & Motion
@@ -230,7 +230,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 |-------|----------------|--------|-----------|
 | 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
 | 60. Keyboard & Composer | 2/2 | Complete    | 2026-03-28 |
-| 61. Touch, Layout & Native Plugins | 1/2 | In Progress|  |
+| 61. Touch, Layout & Native Plugins | 2/2 | Complete   | 2026-03-28 |
 | 62. Haptics & Motion | 0/TBD | Not started | - |
 | 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |
 
