@@ -139,9 +139,9 @@
   2. All fetch() calls in the codebase route through the centralized URL helper (no hardcoded relative paths remain)
   3. WebSocket connections construct correct absolute URLs when running inside Capacitor
   4. Express accepts requests from `capacitor://localhost` origin without CORS errors
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 Plans:
-- [ ] 59-01-PLAN.md -- Platform detection module (platform.ts + tests + capacitor.config.ts)
+- [x] 59-01-PLAN.md -- Platform detection module (platform.ts + tests + capacitor.config.ts)
 - [ ] 59-02-PLAN.md -- HTTP fetch migration (api-client.ts, auth.ts, useUsageMetrics.ts)
 - [ ] 59-03-PLAN.md -- WebSocket migration + CORS whitelist (websocket-client.ts, shell-ws-client.ts, server/index.js)
 
@@ -222,7 +222,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 59. Platform Foundation | 1/3 | In Progress | - |
+| 59. Platform Foundation | 1/3 | In Progress|  |
 | 60. Keyboard & Composer | 0/TBD | Not started | - |
 | 61. Touch, Layout & Native Plugins | 0/TBD | Not started | - |
 | 62. Haptics & Motion | 0/TBD | Not started | - |
@@ -235,4 +235,4 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-28 after Phase 59 plan 03 execution*
+*Last updated: 2026-03-28 after Phase 59 planning*

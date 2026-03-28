@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
-status: planning
-stopped_at: Completed 59-03-PLAN.md
-last_updated: "2026-03-28T01:38:30.000Z"
-last_activity: 2026-03-28 -- Phase 59 plan 03 complete (WS migration + CORS)
+status: Phase complete — ready for verification
+stopped_at: Completed 59-02-PLAN.md
+last_updated: "2026-03-28T01:39:15.974Z"
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 3
+  completed_plans: 1
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** v2.1 "The Mobile" -- Phase 59: Platform Foundation
+**Current focus:** Phase 59 — Platform Foundation
 
 ## Current Position
 
-Phase: 59 (1 of 5) -- Platform Foundation
-Plan: 3/3 complete
-Status: Plans executing
-Last activity: 2026-03-28 -- Phase 59 plan 03 complete (WS migration + CORS)
-
-Progress: [███░░░░░░░] 33%
+Phase: 59 (Platform Foundation) — EXECUTING
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -47,7 +41,9 @@ Progress: [███░░░░░░░] 33%
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 59 P01 | 3min | 2 tasks | 3 files |
 | Phase 59 P03 | 3min | 2 tasks | 3 files |
+| Phase 59 P02 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -62,8 +58,13 @@ Progress: [███░░░░░░░] 33%
 - [v2.1] native-plugins.ts for dynamic plugin init before React mounts -- matches initializeWebSocket() pattern
 - [v2.1] CSS-first motion strategy -- rAF capped at 60fps in WKWebView, but CSS transitions run at 120Hz
 - [v2.1] Platform checks only in platform.ts and native-plugins.ts -- UI components remain platform-unaware
+- [Phase 59]: Runtime detection via window.Capacitor global -- no @capacitor/core dependency
+- [Phase 59]: Empty-string API_BASE in web mode -- zero behavioral change for existing fetch calls
+- [Phase 59]: fetchAnon separate from apiFetch -- auth bootstrap has no token yet
 - [Phase 59]: Function-based CORS origin with debug logging for rejected origins
 - [Phase 59]: Both connect() and reconnect() in websocket-client.ts migrated to resolveWsUrl (Pitfall 1 addressed)
+- [Phase 59]: No test modifications needed for fetch migration -- web mode resolveApiUrl returns paths unchanged
+- [Phase 59]: apiFetch replaces manual getToken + header injection pattern in hooks -- simpler, auto-handles auth and JSON parsing
 
 ### Pending Todos
 
@@ -77,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T01:38:30.000Z
-Stopped at: Completed 59-03-PLAN.md
-Resume: Continue phase 59 execution or verify
+Last session: 2026-03-28T01:39:15.972Z
+Stopped at: Completed 59-02-PLAN.md
+Resume: `/gsd:plan-phase 59`

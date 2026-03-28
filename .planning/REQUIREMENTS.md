@@ -9,8 +9,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Platform Foundation
 
-- [ ] **PLAT-01**: App detects native vs web platform and configures API/WS URLs accordingly
-- [ ] **PLAT-02**: All fetch() calls route through centralized URL helper supporting same-origin (web) and remote server (Capacitor bundled) modes
+- [x] **PLAT-01**: App detects native vs web platform and configures API/WS URLs accordingly
+- [x] **PLAT-02**: All fetch() calls route through centralized URL helper supporting same-origin (web) and remote server (Capacitor bundled) modes
 - [x] **PLAT-03**: All WebSocket connections construct absolute URLs for Capacitor bundled mode
 - [x] **PLAT-04**: Express backend accepts requests from `capacitor://localhost` origin (CORS whitelist)
 
@@ -88,8 +88,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAT-01 | Phase 59 | Pending |
-| PLAT-02 | Phase 59 | Pending |
+| PLAT-01 | Phase 59 | Complete |
+| PLAT-02 | Phase 59 | Complete |
 | PLAT-03 | Phase 59 | Complete |
 | PLAT-04 | Phase 59 | Complete |
 | KEY-01 | Phase 60 | Pending |
