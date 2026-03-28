@@ -11,11 +11,12 @@
  * Constitution: Named exports only (2.2), cn() for classNames, memo() wrapped.
  */
 
-import { memo, useState } from 'react';
+import { memo, useState, useEffect, useRef } from 'react';
 import { getToolConfig } from '@/lib/tool-registry';
 import { useElapsedTime } from '@/hooks/useElapsedTime';
 import { useUIStore } from '@/stores/ui';
 import { ToolCardShell } from './ToolCardShell';
+import { hapticNotification } from '@/lib/haptics';
 import { cn } from '@/utils/cn';
 import type { ToolCallState } from '@/types/stream';
 import './tool-chip.css';
@@ -53,6 +54,19 @@ export const ToolChip = memo(function ToolChip({ toolCall, defaultExpanded }: To
       setLocalExpanded(true);
     }
   }
+
+  // Haptic feedback on tool status transitions (AR S-1: useEffect, not render phase)
+  const prevStatusRef = useRef(toolCall.status);
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = toolCall.status;
+    if (prev === toolCall.status) return; // no transition
+    if (toolCall.status === 'resolved') {
+      hapticNotification('Success'); // D-14: haptic on tool completion
+    } else if (toolCall.status === 'rejected') {
+      hapticNotification('Error'); // D-15: haptic on tool error
+    }
+  }, [toolCall.status]);
 
   return (
     <div className="tool-chip-container" data-testid="tool-chip">

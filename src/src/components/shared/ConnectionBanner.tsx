@@ -7,10 +7,11 @@
  * Shows "Connection lost" with manual reconnect button when disconnected without error.
  */
 
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { cn } from '@/utils/cn';
 import { useConnectionStore } from '@/stores/connection';
+import { hapticNotification } from '@/lib/haptics';
 import { wsClient } from '@/lib/websocket-client';
 
 export const ConnectionBanner = memo(function ConnectionBanner() {
@@ -21,6 +22,17 @@ export const ConnectionBanner = memo(function ConnectionBanner() {
       reconnectAttempts: s.providers.claude.reconnectAttempts,
     })),
   );
+
+  // Haptic feedback on connection error (AR A-1, D-15)
+  const prevErrorRef = useRef<string | null>(null);
+  useEffect(() => {
+    const isError = status === 'disconnected' && error != null;
+    const wasError = prevErrorRef.current != null;
+    prevErrorRef.current = isError ? error : null;
+    if (isError && !wasError) {
+      hapticNotification('Error');
+    }
+  }, [status, error]);
 
   // No banner when connected or initially connecting
   if (status === 'connected' || status === 'connecting') {

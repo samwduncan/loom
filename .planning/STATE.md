@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
 status: Ready to execute
-stopped_at: Completed 62-02-PLAN.md
-last_updated: "2026-03-28T05:45:57.638Z"
+stopped_at: Completed 62-01-PLAN.md
+last_updated: "2026-03-28T05:48:16.042Z"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 ## Current Position
 
 Phase: 62 (Haptics & Motion) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: 2 of 3
 | Phase 61 P01 | 3min | 2 tasks | 8 files |
 | Phase 61 P02 | 5min | 2 tasks | 9 files |
 | Phase 62 P02 | 3min | 3 tasks | 6 files |
+| Phase 62 P01 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,7 @@ Plan: 2 of 3
 - [Phase 61]: FollowUpPills touch target in CSS per S-6, global Radix menu 44px override via [role=menuitem], no touch-action overrides on sidebar backdrop
 - [Phase 62]: CADisableMinimumFrameDurationOnPhone is build-time Info.plist opt-in for 120Hz (not runtime detection)
 - [Phase 62]: Spring damping increased: SNAPPY 20->24 (+20%), BOUNCY 12->14 (+17%) for tighter feel on ProMotion
+- [Phase 62]: Date.now() throttle for hapticNotification -- simpler than setTimeout, no cleanup, matches fire-and-forget
 
 ### Pending Todos
 
@@ -93,6 +95,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T05:45:57.636Z
-Stopped at: Completed 62-02-PLAN.md
+Last session: 2026-03-28T05:48:16.040Z
+Stopped at: Completed 62-01-PLAN.md
 Resume: `/gsd:plan-phase 59`

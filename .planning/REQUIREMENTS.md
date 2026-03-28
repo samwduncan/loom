@@ -34,12 +34,12 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [x] **NATIVE-01**: Status bar shows light text on dark background matching app theme
 - [x] **NATIVE-02**: Splash screen matches app background and hides smoothly after React mounts
-- [ ] **NATIVE-03**: Haptic feedback on message send, tool completion, and error states
+- [x] **NATIVE-03**: Haptic feedback on message send, tool completion, and error states
 - [x] **NATIVE-04**: Capacitor plugins load via dynamic imports (tree-shaken from web builds)
 
 ### Motion & Animation
 
-- [x] **MOTION-01**: 120Hz ProMotion rendering enabled via Info.plist opt-in (CADisableMinimumFrameDurationOnPhone) -- CSS compositor animations automatically run at device refresh rate, no runtime detection needed
+- [x] **MOTION-01**: Device refresh rate detected (60Hz vs 120Hz) at runtime
 - [x] **MOTION-02**: Spring/transition durations adapted for 120Hz ProMotion displays
 - [x] **MOTION-03**: Info.plist includes `CADisableMinimumFrameDurationOnPhone` for ProMotion opt-in
 
@@ -104,7 +104,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOUCH-05 | Phase 61 | Complete |
 | NATIVE-01 | Phase 61 | Complete |
 | NATIVE-02 | Phase 61 | Complete |
-| NATIVE-03 | Phase 62 | Pending |
+| NATIVE-03 | Phase 62 | Complete |
 | NATIVE-04 | Phase 61 | Complete |
 | MOTION-01 | Phase 62 | Complete |
 | MOTION-02 | Phase 62 | Complete |

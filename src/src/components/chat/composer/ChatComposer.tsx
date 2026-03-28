@@ -41,6 +41,7 @@ import { DragOverlay } from './DragOverlay';
 import { ComposerStatusBar } from './ComposerStatusBar';
 import { ModelSelector } from './ModelSelector';
 import { ElectricBorder } from '@/components/effects/ElectricBorder';
+import { hapticImpact } from '@/lib/haptics';
 import type { FileMention } from '@/types/mention';
 import type { SlashCommand } from '@/types/slash-command';
 import type { Message } from '@/types/message';
@@ -285,6 +286,7 @@ export function ChatComposer({ projectName, sessionId, scrollContainerRef, sugge
     const trimmed = input.trim();
     const hasImages = attachments.length > 0;
     if (!trimmed && !hasImages) return;
+    hapticImpact('Medium'); // D-13: fire-and-forget haptic on send
 
     // Command text is always the user's raw input — file content injection
     // happens server-side via the fileMentions field in options.

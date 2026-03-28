@@ -320,6 +320,9 @@ export function ChatView() {
           scrollContainerRef={scrollContainerRef}
           searchQuery={search.debouncedQuery}
           highlightText={search.debouncedQuery ? search.highlightText : undefined}
+          hasMoreMessages={pagination.hasMore}
+          isFetchingMore={pagination.isFetchingMore}
+          onLoadMore={pagination.loadMore}
         />
       )}
       {sessionId && <LiveSessionBanner sessionId={sessionId} />}

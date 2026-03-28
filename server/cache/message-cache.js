@@ -100,6 +100,22 @@ class MessageCache {
         ORDER BY timestamp ASC
       `),
 
+      countMessagesBySession: this.db.prepare(`
+        SELECT COUNT(*) as total FROM messages
+        WHERE session_id = ?
+      `),
+
+      // Paginated: returns the N most recent messages with offset from the end.
+      // Uses a subquery to pick rows from the tail, then re-sorts ASC for display order.
+      getMessagesBySessionPaginated: this.db.prepare(`
+        SELECT raw_json FROM (
+          SELECT raw_json, timestamp FROM messages
+          WHERE session_id = ?
+          ORDER BY timestamp DESC
+          LIMIT ? OFFSET ?
+        ) sub ORDER BY timestamp ASC
+      `),
+
       getSessionMeta: this.db.prepare(`
         SELECT * FROM sessions WHERE id = ?
       `),
@@ -141,20 +157,25 @@ class MessageCache {
    * @param {Object} session
    */
   upsertSession(session) {
+    // Coerce all values to SQLite-compatible primitives (string | number | null).
+    // Callers may pass Date objects for lastActivity or non-string content fields.
+    const toStr = (v) => (v == null ? null : v instanceof Date ? v.toISOString() : String(v));
+    const toNum = (v) => (v == null ? null : Number(v) || 0);
+
     this._stmts.upsertSession.run({
-      id: session.id,
-      projectName: session.projectName,
-      summary: session.summary || 'New Session',
-      messageCount: session.messageCount || 0,
-      lastActivity: session.lastActivity || null,
-      cwd: session.cwd || null,
-      lastUserMessage: session.lastUserMessage || null,
-      lastAssistantMessage: session.lastAssistantMessage || null,
-      jsonlFile: session.jsonlFile || null,
-      jsonlMtime: session.jsonlMtime || null,
-      jsonlSize: session.jsonlSize || null,
+      id: String(session.id),
+      projectName: String(session.projectName),
+      summary: toStr(session.summary) || 'New Session',
+      messageCount: toNum(session.messageCount),
+      lastActivity: toStr(session.lastActivity),
+      cwd: toStr(session.cwd),
+      lastUserMessage: toStr(session.lastUserMessage),
+      lastAssistantMessage: toStr(session.lastAssistantMessage),
+      jsonlFile: toStr(session.jsonlFile),
+      jsonlMtime: session.jsonlMtime != null ? Number(session.jsonlMtime) : null,
+      jsonlSize: session.jsonlSize != null ? Number(session.jsonlSize) : null,
       cachedAt: new Date().toISOString(),
-      isJunk: session.isJunk || 0,
+      isJunk: toNum(session.isJunk),
     });
   }
 
@@ -222,6 +243,23 @@ class MessageCache {
   getMessagesBySession(sessionId) {
     const rows = this._stmts.getMessagesBySession.all(sessionId);
     return rows.map(row => JSON.parse(row.raw_json));
+  }
+
+  /**
+   * Get paginated messages for a session (most recent first, then re-sorted ASC).
+   * Returns { messages, total, hasMore }.
+   * @param {string} sessionId
+   * @param {number} limit
+   * @param {number} offset - offset from the most recent message (0 = latest page)
+   */
+  getMessagesBySessionPaginated(sessionId, limit, offset) {
+    const { total } = this._stmts.countMessagesBySession.get(sessionId);
+    const rows = this._stmts.getMessagesBySessionPaginated.all(sessionId, limit, offset);
+    return {
+      messages: rows.map(row => JSON.parse(row.raw_json)),
+      total,
+      hasMore: offset + limit < total,
+    };
   }
 
   /**

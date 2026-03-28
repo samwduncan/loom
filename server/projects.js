@@ -45,6 +45,7 @@ import { open } from 'sqlite';
 import os from 'os';
 import sessionManager from './sessionManager.js';
 import messageCache from './cache/message-cache.js';
+import { parseJsonlForCache } from './cache/cache-warmer.js';
 
 // Import TaskMaster detection functions
 async function detectTaskMasterFolder(projectPath) {
@@ -177,9 +178,15 @@ async function detectTaskMasterFolder(projectPath) {
 // Cache for extracted project directories
 const projectDirectoryCache = new Map();
 
+// In-memory cache for getProjects() result — invalidated by file watcher events
+let _projectsCache = null;
+let _projectsCacheTime = 0;
+const PROJECTS_CACHE_TTL_MS = 30_000; // 30s safety TTL in case watcher misses something
+
 // Clear cache when needed (called when project files change)
 function clearProjectDirectoryCache() {
   projectDirectoryCache.clear();
+  _projectsCache = null; // Also invalidate the full projects cache
 }
 
 // Load project configuration file
@@ -360,6 +367,12 @@ async function extractProjectDirectory(projectName) {
 }
 
 async function getProjects(progressCallback = null) {
+  // Serve from in-memory cache if fresh (invalidated by file watcher events)
+  const now = Date.now();
+  if (_projectsCache && (now - _projectsCacheTime) < PROJECTS_CACHE_TTL_MS) {
+    return _projectsCache;
+  }
+
   const claudeDir = path.join(os.homedir(), '.claude', 'projects');
   const config = await loadProjectConfig();
   const projects = [];
@@ -586,6 +599,10 @@ async function getProjects(progressCallback = null) {
     });
   }
 
+  // Cache the result for subsequent calls (invalidated by clearProjectDirectoryCache)
+  _projectsCache = projects;
+  _projectsCacheTime = Date.now();
+
   return projects;
 }
 
@@ -624,27 +641,83 @@ async function getSessions(projectName, limit = 5, offset = 0) {
 
       // Check which files have stale or missing cache entries
       const uncached = messageCache.getUncachedFiles(projectName, cacheJsonlFiles);
-      if (uncached.length === 0) {
-        const stale = messageCache.getStaleSessionsForProject(projectName, fileStats);
-        if (stale.length === 0) {
-          // Full cache hit -- serve from SQLite
-          const result = messageCache.getSessionsByProject(projectName, limit, offset);
-          return {
-            sessions: result.sessions.map(row => ({
-              id: row.id,
-              summary: row.summary,
-              lastActivity: row.last_activity,
-              messageCount: row.message_count,
-              cwd: row.cwd,
-              lastUserMessage: row.last_user_message,
-              lastAssistantMessage: row.last_assistant_message,
-            })),
-            hasMore: result.total > offset + limit,
-            total: result.total,
-            offset,
-            limit
-          };
+      const stale = uncached.length === 0
+        ? messageCache.getStaleSessionsForProject(projectName, fileStats)
+        : [];
+
+      // Determine files that need re-indexing
+      const filesToReindex = new Set(uncached);
+      if (stale.length > 0) {
+        // Invalidate stale sessions and re-index their files
+        for (const sessionId of stale) {
+          const meta = messageCache.getSessionMeta(sessionId);
+          if (meta?.jsonl_file) filesToReindex.add(meta.jsonl_file);
+          messageCache.invalidateSession(sessionId);
         }
+      }
+
+      // Incrementally re-index only changed files (instead of full JSONL fallback)
+      if (filesToReindex.size > 0) {
+        for (const file of filesToReindex) {
+          try {
+            const filePath = path.join(projectDir, file);
+            const { sessions, entries } = await parseJsonlForCache(filePath);
+            const stats = fileStats.get(file);
+
+            for (const [sessionId, sessionMeta] of sessions) {
+              const isJunk = sessionMeta.summary.startsWith('{ "') ? 1 : 0;
+              messageCache.upsertSession({
+                id: sessionId,
+                projectName,
+                summary: sessionMeta.summary,
+                messageCount: sessionMeta.messageCount,
+                lastActivity: sessionMeta.lastActivity,
+                cwd: sessionMeta.cwd,
+                lastUserMessage: sessionMeta.lastUserMessage,
+                lastAssistantMessage: sessionMeta.lastAssistantMessage,
+                jsonlFile: file,
+                jsonlMtime: stats?.mtimeMs || null,
+                jsonlSize: stats?.size || null,
+                isJunk,
+              });
+            }
+
+            // Re-index messages for changed sessions
+            const entriesBySession = new Map();
+            for (const entry of entries) {
+              if (!entry.sessionId) continue;
+              if (!entriesBySession.has(entry.sessionId)) {
+                entriesBySession.set(entry.sessionId, []);
+              }
+              entriesBySession.get(entry.sessionId).push(entry);
+            }
+            for (const [sessionId, sessionEntries] of entriesBySession) {
+              messageCache.insertMessages(projectName, sessionId, sessionEntries);
+            }
+          } catch (reindexError) {
+            console.warn(`[CACHE] Incremental reindex failed for ${file}:`, reindexError.message);
+          }
+        }
+      }
+
+      // Serve from cache (now fresh)
+      const result = messageCache.getSessionsByProject(projectName, limit, offset);
+      if (result.sessions.length > 0) {
+        return {
+          sessions: result.sessions.map(row => ({
+            id: row.id,
+            summary: row.summary,
+            lastActivity: row.last_activity,
+            messageCount: row.message_count,
+            cwd: row.cwd,
+            lastUserMessage: row.last_user_message,
+            lastAssistantMessage: row.last_assistant_message,
+          })),
+          hasMore: result.total > offset + limit,
+          total: result.total,
+          offset,
+          limit
+        };
       }
     }
   } catch (cacheError) {
@@ -1046,21 +1119,24 @@ async function getSessionMessages(projectName, sessionId, limit = null, offset =
       }
 
       if (isFresh) {
-        const cachedMessages = messageCache.getMessagesBySession(sessionId);
-        if (cachedMessages.length > 0) {
-          if (limit === null) {
+        if (limit !== null) {
+          // Paginated: use SQL-level LIMIT/OFFSET (avoids loading all messages into memory)
+          const result = messageCache.getMessagesBySessionPaginated(sessionId, limit, offset);
+          if (result.messages.length > 0) {
+            return {
+              messages: result.messages,
+              total: result.total,
+              hasMore: result.hasMore,
+              offset,
+              limit,
+            };
+          }
+        } else {
+          // Unpaginated: load all (backward compat)
+          const cachedMessages = messageCache.getMessagesBySession(sessionId);
+          if (cachedMessages.length > 0) {
             return cachedMessages;
           }
-          const total = cachedMessages.length;
-          const startIndex = Math.max(0, total - offset - limit);
-          const endIndex = total - offset;
-          return {
-            messages: cachedMessages.slice(startIndex, endIndex),
-            total,
-            hasMore: startIndex > 0,
-            offset,
-            limit
-          };
         }
       } else {
         // Stale -- invalidate so we re-parse
@@ -1223,6 +1299,7 @@ async function renameProject(projectName, newDisplayName) {
 
 // Delete a session from a project
 async function deleteSession(projectName, sessionId) {
+  _projectsCache = null; // Invalidate projects cache on session delete
   projectName = sanitizeProjectName(projectName);
   const projectDir = path.join(os.homedir(), '.claude', 'projects', projectName);
 

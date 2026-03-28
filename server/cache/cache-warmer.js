@@ -336,4 +336,4 @@ async function warmCache(progressCallback = null) {
   }
 }
 
-export { warmCache };
+export { warmCache, parseJsonlForCache };

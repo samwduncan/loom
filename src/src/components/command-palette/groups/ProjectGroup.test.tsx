@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { ProjectGroup } from './ProjectGroup';
 import { Command } from 'cmdk';
+import { MemoryRouter } from 'react-router-dom';
 
 // Mock apiFetch
 vi.mock('@/lib/api-client', () => ({
@@ -13,7 +14,7 @@ import { apiFetch } from '@/lib/api-client';
 const mockApiFetch = vi.mocked(apiFetch);
 
 function renderInCommand(ui: React.ReactElement) {
-  return render(<Command>{ui}</Command>);
+  return render(<MemoryRouter><Command>{ui}</Command></MemoryRouter>);
 }
 
 describe('ProjectGroup', () => {

@@ -32,6 +32,9 @@ let resolvedProjectName: string | null = null;
 let resolvedProjectPath: string | null = null;
 let resolvePromise: Promise<{ name: string; path: string }> | null = null;
 
+/** Subscribers notified when the active project changes via switchProject() */
+const projectChangeListeners = new Set<() => void>();
+
 async function resolveProject(): Promise<{ name: string; path: string }> {
   if (resolvedProjectName !== null) {
     return { name: resolvedProjectName, path: resolvedProjectPath ?? '' };
@@ -41,9 +44,14 @@ async function resolveProject(): Promise<{ name: string; path: string }> {
     try {
       const data = await apiFetch<ProjectsResponse>('/api/projects');
       const projects = Array.isArray(data) ? data : data.projects;
-      const first = projects[0];
-      const firstName = first?.name ?? '';
-      const firstPath = first?.path ?? '';
+
+      // Honour stored preference if it matches an existing project
+      const preferred = localStorage.getItem(PROJECT_STORAGE_KEY);
+      const match = preferred ? projects.find((p) => p.name === preferred) : null;
+      const chosen = match ?? projects[0];
+
+      const firstName = chosen?.name ?? '';
+      const firstPath = chosen?.path ?? '';
       resolvedProjectName = firstName;
       resolvedProjectPath = firstPath;
       if (firstName) {
@@ -72,6 +80,19 @@ async function resolveProject(): Promise<{ name: string; path: string }> {
   return { name: '', path: '' };
 }
 
+/**
+ * Switch the active project without a full page reload.
+ * Resets the module singleton, stores the preference, and notifies subscribers.
+ */
+export function switchProject(name: string, projectPath: string): void {
+  resolvedProjectName = name;
+  resolvedProjectPath = projectPath;
+  resolvePromise = null;
+  localStorage.setItem(PROJECT_STORAGE_KEY, name);
+  localStorage.setItem(PROJECT_PATH_STORAGE_KEY, projectPath);
+  projectChangeListeners.forEach((fn) => fn());
+}
+
 export function useProjectContext(): { projectName: string; projectPath: string; isLoading: boolean } {
   // "Adjust state during rendering" pattern -- initialize from resolved value
   // instead of setting state in effect synchronously (React 19 ESLint rule).
@@ -90,7 +111,20 @@ export function useProjectContext(): { projectName: string; projectPath: string;
   useEffect(() => {
     mountedRef.current = true;
 
-    if (resolvedProjectName !== null) return;
+    if (resolvedProjectName !== null) {
+      // Already resolved -- subscribe to switchProject() changes
+      const onChange = () => {
+        if (mountedRef.current) {
+          setProjectName(resolvedProjectName ?? '');
+          setProjectPath(resolvedProjectPath ?? '');
+        }
+      };
+      projectChangeListeners.add(onChange);
+      return () => {
+        mountedRef.current = false;
+        projectChangeListeners.delete(onChange);
+      };
+    }
 
     // Deduplicate concurrent calls
     if (!resolvePromise) {

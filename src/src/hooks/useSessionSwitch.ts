@@ -92,10 +92,10 @@ export function useSessionSwitch(
         });
       }
 
-      // 6. Fetch messages with abort signal (load all messages to avoid pagination scroll jumps)
+      // 6. Fetch most recent messages with abort signal (older messages loaded on demand via usePaginatedMessages)
       try {
         const data = await apiFetch<PaginatedMessagesResponse>(
-          `/api/projects/${projectName}/sessions/${sessionId}/messages?limit=10000&offset=0`,
+          `/api/projects/${projectName}/sessions/${sessionId}/messages?limit=50&offset=0`,
           {},
           abortRef.current.signal,
         );

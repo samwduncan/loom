@@ -9,6 +9,7 @@
  */
 
 import { useRef, useState, useEffect, useLayoutEffect, useCallback, memo, type RefObject } from 'react';
+import { Loader2 } from 'lucide-react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
 import { ErrorMessage } from '@/components/chat/view/ErrorMessage';
@@ -29,6 +30,9 @@ export interface MessageListProps {
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
   searchQuery?: string;
   highlightText?: (text: string) => ReactNode;
+  hasMoreMessages?: boolean;
+  isFetchingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 /** Memoized message renderer — prevents re-render on parent re-render */
@@ -59,8 +63,9 @@ const MemoizedMessageItem = memo(function MemoizedMessageItem({
 
 /** No content-visibility — browser renders all items to avoid scroll height changes */
 
-export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText }: MessageListProps) {
+export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText, hasMoreMessages, isFetchingMore, onLoadMore }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isStreaming = useStreamStore((state) => state.isStreaming);
   const [atBottom, setAtBottom] = useState(true);
@@ -91,6 +96,37 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     setAtBottom(true);
     setUnreadCount(0);
   }
+
+  // Infinite scroll: auto-load older messages when sentinel is visible
+  const onLoadMoreRef = useRef(onLoadMore);
+  onLoadMoreRef.current = onLoadMore;
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const container = scrollRef.current;
+    if (!sentinel || !container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting && onLoadMoreRef.current) {
+          // Save scroll height before prepend for anchor restoration
+          const prevHeight = container.scrollHeight;
+          const prevScroll = container.scrollTop;
+
+          onLoadMoreRef.current();
+
+          // After DOM update: restore scroll position so content doesn't jump
+          requestAnimationFrame(() => {
+            const newHeight = container.scrollHeight;
+            container.scrollTop = prevScroll + (newHeight - prevHeight);
+          });
+        }
+      },
+      { root: container, rootMargin: '200px 0px 0px 0px' },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [sessionId, hasMoreMessages]);
 
   // Save scroll position for the previous session on switch (via effect to satisfy refs rule)
   const prevSessionRef = useRef(sessionId);
@@ -190,6 +226,11 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
       data-testid="message-list-scroll"
     >
       <div className="mx-auto max-w-3xl py-4">
+        {hasMoreMessages && (
+          <div ref={sentinelRef} className="flex justify-center py-2">
+            {isFetchingMore && <Loader2 className="size-4 animate-spin text-muted" />}
+          </div>
+        )}
         {messages.map((msg) => (
           <div key={msg.id}>
             <div className="px-2 md:px-4">
