@@ -40,6 +40,9 @@ export const Sidebar = memo(function Sidebar() {
   }, [location.pathname, isMobile, isSidebarOpen, toggleSidebar]);
 
   // ─── Swipe-to-close gesture for mobile drawer ───
+  // TOUCH-04: iOS back gesture passthrough -- sidebar swipe-to-close handles left-edge
+  // swipes when open. When closed, no element intercepts (iOS back gesture works).
+  // Do NOT add touch-action: none on backdrop (D-24).
   const sidebarPanelRef = useRef<HTMLDivElement>(null);
   const touchRef = useRef({ startX: 0, swiping: false });
 

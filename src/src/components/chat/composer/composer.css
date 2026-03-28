@@ -161,19 +161,24 @@
   }
 }
 
-/* ─── Mobile Touch Targets for Mention Chips ──────────────── */
+/* ─── Mobile Touch Targets for Mention Chips & Picker Items (TOUCH-01) ── */
 
 @media (max-width: 767px) {
   .mention-chip-remove {
-    min-width: 28px;
-    min-height: 28px;
+    min-width: 44px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .mention-chip {
-    min-height: 36px;
+    min-height: 44px;
     padding: 6px 12px;
+  }
+  .mention-picker-item,
+  .slash-picker-item {
+    min-height: 44px;
+    padding: 10px 14px;
   }
 }
 
