@@ -58,8 +58,10 @@ export function useChatScroll({
 }: UseChatScrollOptions): UseChatScrollReturn {
   // ─── Hot-path refs (no React re-renders) ────────────────────────────
   const isAtBottomRef = useRef(true);
-  // Initialize to true when streaming is active on mount (avoids missing the false->true edge)
-  const isAutoScrollingRef = useRef(isStreaming);
+  // Start true: prevents initial IO observation from setting isAtBottomRef=false
+  // before the ResizeObserver can scroll to bottom on mount/session-switch.
+  // Set to false by user gestures (wheel/touchmove/upward-scroll).
+  const isAutoScrollingRef = useRef(true);
   const unreadCountRef = useRef(0);
   const rafPendingRef = useRef(false);
 
@@ -90,11 +92,15 @@ export function useChatScroll({
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ─── Session switch reset (state-during-render pattern) ─────────────
+  // ASSERT: Intentional ref access during render — these refs are mutable
+  // state owned by this hook to avoid re-renders on scroll hot path.
+  // React 19's react-hooks/refs rule doesn't account for this pattern.
+  /* eslint-disable react-hooks/refs */
   const prevSessionRef = useRef(sessionId);
   if (prevSessionRef.current !== sessionId) {
     prevSessionRef.current = sessionId;
     isAtBottomRef.current = true;
-    isAutoScrollingRef.current = false;
+    isAutoScrollingRef.current = true; // Guard IO until RO scrolls to bottom
     unreadCountRef.current = 0;
     schedulePillUpdate();
   }
@@ -117,6 +123,7 @@ export function useChatScroll({
     schedulePillUpdate();
   }
   prevIsStreamingRef.current = isStreaming;
+  /* eslint-enable react-hooks/refs */
 
   // ─── IntersectionObserver: sentinel-based atBottom detection ─────────
   useEffect(() => {

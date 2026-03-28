@@ -184,6 +184,9 @@ describe('useChatScroll', () => {
     sessionId?: string;
     messageCount?: number;
     container?: HTMLDivElement;
+    /** Keep auto-scroll guard active (default: false — disengages via wheel event).
+     *  Set true for tests that need the anti-oscillation guard (e.g., streaming). */
+    keepAutoScrollGuard?: boolean;
   }) {
     const streaming = opts?.streaming ?? false;
     const sessionId = opts?.sessionId ?? 'session-1';
@@ -209,6 +212,12 @@ describe('useChatScroll', () => {
     act(() => {
       hookResult.result.current.sentinelRef(sentinel);
     });
+
+    // isAutoScrollingRef starts true to prevent IO race on mount.
+    // Most tests expect "user has scrolled" state, so disengage by default.
+    if (!opts?.keepAutoScrollGuard) {
+      act(() => { container.dispatchEvent(new Event('wheel')); });
+    }
 
     return { ...hookResult, sentinel, container, scrollContainerRef };
   }
@@ -243,8 +252,8 @@ describe('useChatScroll', () => {
   });
 
   it('IO sentinel exiting viewport while isAutoScrollingRef is true does NOT change isAtBottomRef (anti-oscillation)', () => {
-    // Start streaming + at bottom -> auto-scrolling active
-    const { result } = setupHook({ streaming: true });
+    // Start streaming + at bottom -> auto-scrolling active (keep guard for this test)
+    const { result } = setupHook({ streaming: true, keepAutoScrollGuard: true });
 
     // isAtBottomRef should be true, auto-scrolling should be active
     expect(result.current.isAtBottomRef.current).toBe(true);
@@ -262,7 +271,7 @@ describe('useChatScroll', () => {
   // ─── ResizeObserver Auto-Follow Tests ─────────────────────────────────
 
   it('ResizeObserver callback when isAtBottom triggers rAF-throttled scrollTop assignment', () => {
-    const { container } = setupHook({ streaming: true });
+    const { container } = setupHook({ streaming: true, keepAutoScrollGuard: true });
 
     // Trigger RO
     const ro = getLastRO();
@@ -297,7 +306,7 @@ describe('useChatScroll', () => {
   });
 
   it('ResizeObserver callback skips if rAF frame already pending (throttle guard)', () => {
-    setupHook({ streaming: true });
+    setupHook({ streaming: true, keepAutoScrollGuard: true });
 
     const ro = getLastRO();
     // First trigger schedules rAF
@@ -369,7 +378,7 @@ describe('useChatScroll', () => {
   // ─── User Gesture Detection ───────────────────────────────────────────
 
   it('wheel event on container disengages auto-scroll', () => {
-    const { result, container } = setupHook({ streaming: true });
+    const { result, container } = setupHook({ streaming: true, keepAutoScrollGuard: true });
 
     expect(result.current.isAtBottomRef.current).toBe(true);
 
@@ -382,7 +391,7 @@ describe('useChatScroll', () => {
   });
 
   it('touchmove event on container disengages auto-scroll', () => {
-    const { result, container } = setupHook({ streaming: true });
+    const { result, container } = setupHook({ streaming: true, keepAutoScrollGuard: true });
 
     act(() => {
       container.dispatchEvent(new Event('touchmove'));
@@ -413,6 +422,9 @@ describe('useChatScroll', () => {
     act(() => {
       result.current.sentinelRef(document.createElement('div'));
     });
+
+    // Disengage auto-scroll guard (simulates user scroll)
+    act(() => { container.dispatchEvent(new Event('wheel')); });
 
     // Scroll away
     const io = getLastIO();
@@ -454,6 +466,9 @@ describe('useChatScroll', () => {
     act(() => {
       result.current.sentinelRef(document.createElement('div'));
     });
+
+    // Disengage auto-scroll guard (simulates user scroll)
+    act(() => { container.dispatchEvent(new Event('wheel')); });
 
     // Scroll away
     const io = getLastIO();

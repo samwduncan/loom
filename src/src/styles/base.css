@@ -212,21 +212,4 @@ html[data-native] .app-shell {
   contain: layout size style;
 }
 
-/* ─── Native Scroll Container Optimizations (Ionic patterns) ────── */
-/* Applied to main scroll areas (message list, sidebar) on native.
-   -webkit-overflow-scrolling: touch — momentum scrolling in WKWebView
-   will-change: scroll-position — compositor optimization for scroll
-   overscroll-behavior-y: contain — prevent scroll chaining to parent */
-/* ─── Message Item Content Visibility (PERF) ────────────────────
- * Skip layout/paint for off-screen messages. Safari 15.4+ supports
- * content-visibility: auto. contain-intrinsic-size prevents layout
- * shift when items enter the viewport. */
-.msg-item {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 120px;
-}
-
-html[data-native] .native-scroll {
-  will-change: scroll-position;
-  overscroll-behavior-y: contain;
-}
+/* Old .msg-item and .native-scroll rules removed — consolidated above (Phase 64). */
