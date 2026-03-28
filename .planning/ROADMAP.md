@@ -139,7 +139,11 @@
   2. All fetch() calls in the codebase route through the centralized URL helper (no hardcoded relative paths remain)
   3. WebSocket connections construct correct absolute URLs when running inside Capacitor
   4. Express accepts requests from `capacitor://localhost` origin without CORS errors
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 59-01-PLAN.md -- Platform detection module (platform.ts + tests + capacitor.config.ts)
+- [ ] 59-02-PLAN.md -- HTTP fetch migration (api-client.ts, auth.ts, useUsageMetrics.ts)
+- [ ] 59-03-PLAN.md -- WebSocket migration + CORS whitelist (websocket-client.ts, shell-ws-client.ts, server/index.js)
 
 ### Phase 60: Keyboard & Composer
 **Goal**: Keyboard avoidance works reliably on iOS via native Capacitor events instead of the fragile visualViewport hack
@@ -218,7 +222,7 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 59. Platform Foundation | 0/TBD | Not started | - |
+| 59. Platform Foundation | 0/3 | Planning complete | - |
 | 60. Keyboard & Composer | 0/TBD | Not started | - |
 | 61. Touch, Layout & Native Plugins | 0/TBD | Not started | - |
 | 62. Haptics & Motion | 0/TBD | Not started | - |
@@ -231,4 +235,4 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-27 after v2.1 roadmap creation*
+*Last updated: 2026-03-28 after Phase 59 planning*
