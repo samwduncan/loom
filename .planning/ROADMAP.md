@@ -203,7 +203,10 @@ Plans:
   3. Losing server/VPN connection shows a clear error state (not a blank screen or silent failure)
   4. The full launch flow (splash -> auth -> content) completes without any white flash or visual discontinuity
   5. On-device spot check: keyboard, touch targets, haptics, status bar, safe-area, and springs all work as designed
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 63-01-PLAN.md -- Vite base path, white flash prevention, cap-build.sh script
+- [ ] 63-02-PLAN.md -- Connection error handling, native messaging, device validation checklist
 
 ### v2.2 "The Power" (Planned)
 
@@ -235,8 +238,8 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 | 59. Platform Foundation | 3/3 | Complete | 2026-03-28 |
 | 60. Keyboard & Composer | 2/2 | Complete    | 2026-03-28 |
 | 61. Touch, Layout & Native Plugins | 2/2 | Complete    | 2026-03-28 |
-| 62. Haptics & Motion | 3/3 | Complete   | 2026-03-28 |
-| 63. Bundled Assets & Device Validation | 0/TBD | Not started | - |
+| 62. Haptics & Motion | 3/3 | Complete    | 2026-03-28 |
+| 63. Bundled Assets & Device Validation | 0/2 | Not started | - |
 
 ## Backlog (Future Milestones)
 
@@ -245,4 +248,4 @@ Phases execute in numeric order: 59 -> 59.1 -> 60 -> 60.1 -> ... -> 63
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-28 after Phase 62 planning*
+*Last updated: 2026-03-28 after Phase 63 planning*
