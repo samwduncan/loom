@@ -8,6 +8,8 @@
  * Constitution: Named exports only (2.2), no default export.
  */
 
+import { fetchAnon } from '@/lib/platform';
+
 const TOKEN_KEY = 'loom-jwt';
 
 /** In-flight refresh promise for deduplication of concurrent 401 retries. */
@@ -74,13 +76,12 @@ export async function bootstrapAuth(): Promise<string> {
     );
   }
 
-  const statusRes = await fetch('/api/auth/status');
+  const statusRes = await fetchAnon('/api/auth/status');
   const status = (await statusRes.json()) as { needsSetup: boolean }; // ASSERT: /api/auth/status returns { needsSetup }
 
   if (status.needsSetup) {
-    const res = await fetch('/api/auth/register', {
+    const res = await fetchAnon('/api/auth/register', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) {
@@ -91,9 +92,8 @@ export async function bootstrapAuth(): Promise<string> {
     return data.token;
   }
 
-  const res = await fetch('/api/auth/login', {
+  const res = await fetchAnon('/api/auth/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
 

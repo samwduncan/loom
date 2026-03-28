@@ -20,6 +20,7 @@
  */
 
 import { getToken, refreshAuth } from '@/lib/auth';
+import { resolveApiUrl } from '@/lib/platform';
 
 /**
  * In-flight GET request deduplication map.
@@ -49,7 +50,7 @@ async function processResponse<T>(res: Response): Promise<T> {
  */
 function doFetch(path: string, options: RequestInit, signal?: AbortSignal): Promise<Response> {
   const token = getToken();
-  return fetch(path, {
+  return fetch(resolveApiUrl(path), {
     ...options,
     signal,
     headers: {
