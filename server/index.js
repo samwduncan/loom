@@ -339,8 +339,10 @@ app.locals.wss = wss;
 const ALLOWED_ORIGINS = [
     'https://samsara.tailad2401.ts.net:5443',
     'http://100.86.4.57:5184',
+    'http://100.86.4.57:5555',
     'http://100.86.4.57:8184',
     'http://localhost:5184',
+    'http://localhost:5555',
     'capacitor://localhost',
 ];
 
