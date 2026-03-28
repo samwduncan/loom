@@ -1,0 +1,100 @@
+/**
+ * Native plugin initialization -- configures Capacitor plugins at app startup.
+ *
+ * Called once from main.tsx before React mounts. On native (Capacitor),
+ * dynamically imports @capacitor/keyboard and configures resize mode + accessory bar.
+ * On web, this is a no-op.
+ *
+ * The dynamic import ensures @capacitor/keyboard is never bundled in the web build.
+ *
+ * Constitution: Named exports only (2.2), no default export.
+ */
+
+import { IS_NATIVE } from '@/lib/platform';
+
+/** The dynamically imported @capacitor/keyboard module, or null on web / failure. */
+type KeyboardModule = typeof import('@capacitor/keyboard') | null;
+
+/** Double-init guard -- prevents redundant initialization from React strict mode. */
+let isInitialized = false;
+
+/** Cached reference to the dynamically imported @capacitor/keyboard module. */
+let keyboardModule: KeyboardModule = null;
+
+/** Resolve function for the readiness promise. */
+let resolveReady: () => void;
+
+/**
+ * Promise that resolves once native plugin initialization completes (success or failure).
+ *
+ * Downstream hooks (e.g., useKeyboardOffset) can await this before reading
+ * getKeyboardModule() to avoid a cold-start race where React mounts before
+ * the dynamic import resolves.
+ */
+export let nativePluginsReady: Promise<void> = new Promise<void>((resolve) => {
+  resolveReady = resolve;
+});
+
+/**
+ * Returns the dynamically imported @capacitor/keyboard module, or null
+ * if running on web or if the import failed.
+ *
+ * @returns The keyboard module or null
+ */
+export function getKeyboardModule(): KeyboardModule {
+  return keyboardModule;
+}
+
+/**
+ * Reset module state for testing. Follows the websocket-init.ts precedent
+ * of exposing a test reset function instead of relying on vi.resetModules().
+ *
+ * Resets the init guard, clears the cached module, and re-creates the
+ * readiness promise so each test starts fresh.
+ */
+export function _resetForTesting(): void {
+  isInitialized = false;
+  keyboardModule = null;
+  nativePluginsReady = new Promise<void>((resolve) => {
+    resolveReady = resolve;
+  });
+}
+
+/**
+ * Initialize native Capacitor plugins.
+ *
+ * On native platforms:
+ * 1. Sets the `data-native` attribute on `<html>` for CSS conditional styling
+ * 2. Dynamically imports @capacitor/keyboard
+ * 3. Sets keyboard resize mode to None (app manages layout, not WKWebView)
+ * 4. Enables the input accessory bar (Done button)
+ *
+ * On web, this is a no-op that returns immediately.
+ * Errors are caught and logged -- a failed keyboard plugin should not crash the app.
+ */
+export async function initializeNativePlugins(): Promise<void> {
+  if (isInitialized || !IS_NATIVE) return;
+  isInitialized = true;
+
+  // Mark the document for CSS conditional styling (D-08).
+  // Must be set before React renders so CSS rules are active on first paint.
+  document.documentElement.setAttribute('data-native', '');
+
+  try {
+    const mod = await import('@capacitor/keyboard');
+    keyboardModule = mod;
+
+    const { Keyboard, KeyboardResize } = mod;
+
+    // KEY-05, D-17: App manages padding-bottom, not WKWebView auto-resize.
+    await Keyboard.setResizeMode({ mode: KeyboardResize.None });
+
+    // D-18: Show the iOS input accessory bar (Done button) for text inputs.
+    await Keyboard.setAccessoryBarVisible({ isVisible: true });
+  } catch (err: unknown) {
+    console.warn('[native-plugins] Keyboard plugin failed to load:', err);
+    keyboardModule = null;
+  } finally {
+    resolveReady();
+  }
+}
