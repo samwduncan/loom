@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: "The Mobile"
 status: planning
-stopped_at: Phase 59 context gathered
-last_updated: "2026-03-28T01:07:29.342Z"
-last_activity: 2026-03-27 -- Roadmap created for v2.1 (5 phases, 25 requirements)
+stopped_at: Completed 59-03-PLAN.md
+last_updated: "2026-03-28T01:38:30.000Z"
+last_activity: 2026-03-28 -- Phase 59 plan 03 complete (WS migration + CORS)
 progress:
   total_phases: 5
   completed_phases: 0
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 ## Current Position
 
 Phase: 59 (1 of 5) -- Platform Foundation
-Plan: --
-Status: Ready to plan
-Last activity: 2026-03-27 -- Roadmap created for v2.1 (5 phases, 25 requirements)
+Plan: 3/3 complete
+Status: Plans executing
+Last activity: 2026-03-28 -- Phase 59 plan 03 complete (WS migration + CORS)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | - | - | - | - |
 
 *Updated after each plan completion*
+| Phase 59 P03 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,8 @@ Progress: [░░░░░░░░░░] 0%
 - [v2.1] native-plugins.ts for dynamic plugin init before React mounts -- matches initializeWebSocket() pattern
 - [v2.1] CSS-first motion strategy -- rAF capped at 60fps in WKWebView, but CSS transitions run at 120Hz
 - [v2.1] Platform checks only in platform.ts and native-plugins.ts -- UI components remain platform-unaware
+- [Phase 59]: Function-based CORS origin with debug logging for rejected origins
+- [Phase 59]: Both connect() and reconnect() in websocket-client.ts migrated to resolveWsUrl (Pitfall 1 addressed)
 
 ### Pending Todos
 
@@ -74,6 +77,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T01:07:29.340Z
-Stopped at: Phase 59 context gathered
-Resume: `/gsd:plan-phase 59`
+Last session: 2026-03-28T01:38:30.000Z
+Stopped at: Completed 59-03-PLAN.md
+Resume: Continue phase 59 execution or verify
