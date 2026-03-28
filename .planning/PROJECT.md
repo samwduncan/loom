@@ -76,22 +76,33 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - ✓ Production deployment — nginx reverse proxy, brotli/gzip, immutable caching, deploy.sh, graceful shutdown — v2.0
 - ✓ iOS mobile fixes — viewport-fit, safe-area, keyboard avoidance (visualViewport hack), WKWebView compat — v2.0
 
+### Validated (v2.1)
+
+- ✓ Capacitor Keyboard plugin — native keyboard events replace visualViewport hack (Phase 60)
+- ✓ Platform foundation — IS_NATIVE, API_BASE, WS_BASE, URL abstraction, CORS (Phase 59)
+- ✓ Touch targets & native plugins — 44px+ targets, StatusBar, SplashScreen, safe-area audit (Phase 61)
+- ✓ Haptics & motion — haptic feedback on send/tool/error/selection, 120Hz ProMotion opt-in (Phase 62)
+- ✓ Bundled assets mode — cap-build.sh, on-device validation (Phase 63)
+- ✓ WKWebView layout fixes — minmax(0,1fr) grid bug, GPU compositing, scroll optimizations (hotfix)
+- ✓ Infrastructure — nginx dist symlink, CORS port 8184, backend restart (hotfix)
+
 ### Active
 
-**Current Milestone: v2.1 "The Mobile"**
+**Current Milestone: v2.2 "The Touch"**
 
-**Goal:** Make Loom a native-feeling iOS app on iPhone 16 Pro Max via Capacitor — reliable keyboard avoidance, touch-first interactions, 120Hz springs, and bundled assets for offline-capable fast loads.
+**Goal:** Transform Loom from a scaled-down desktop app into a purpose-built iOS daily-driver — every element sized, spaced, and animated for touch on iPhone 16 Pro Max.
 
 **Target features:**
-- [x] Capacitor Keyboard plugin — native keyboard events replace visualViewport hack (Phase 60, 2026-03-28)
-- [x] Platform foundation — URL abstraction, CORS, Capacitor config (Phase 59, 2026-03-28)
-- [x] Touch targets & native plugins — 44px+ targets, StatusBar, SplashScreen, safe-area audit, overscroll prevention (Phase 61, 2026-03-28)
-- [x] Haptics & motion — haptic feedback on send/tool/error/selection, 120Hz ProMotion opt-in, spring tuning (Phase 62, 2026-03-28)
-- [x] Bundled assets mode — local assets, cap sync pipeline, on-device validation (Phase 63, 2026-03-28)
+- [ ] Touch target compliance — Fix 7 violations (ThinkingDisclosure, ToolCard headers, ProjectHeader, template buttons, Detach button, DateGroupHeader font, export buttons)
+- [ ] Typography & spacing — Mobile-optimized font sizes, session list density, date formatting, title truncation
+- [ ] Scroll performance — 60fps validated on real device with 50+ messages, content-visibility, compositor optimization
+- [ ] iOS-native gestures — Swipe-to-delete sessions, pull-to-refresh, long-press context menus, broader haptics
+- [ ] Visual polish — OLED-optimized backgrounds, glass effects tuned for WKWebView, 120Hz spring refinements, contrast compliance
+- [ ] 39 requirements across TOUCH/TYPO/SCROLL/GESTURE/VISUAL categories (see REQUIREMENTS.md)
 
 **Future milestones:**
-- v2.2 "The Power" — Multi-provider tabs, MCP management
-- v2.3 "The Polish" — Full visual transformation (aurora, WebGL, Tier 2/3 effects, comprehensive springs)
+- v2.3 "The Power" — Multi-provider tabs, MCP management
+- v2.4 "The Polish" — Full visual transformation (aurora, WebGL, Tier 2/3 effects, comprehensive springs)
 - v3.0 "The Vision" — GSD dashboard, Nextcloud, companions
 
 ### Out of Scope
@@ -202,4 +213,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-28 after Phase 63 (Bundled Assets & Device Validation) completion*
+*Last updated: 2026-03-28 after v2.2 "The Touch" milestone initialization*

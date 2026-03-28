@@ -1,30 +1,32 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: "The Mobile"
-status: Phase complete — ready for verification
-stopped_at: Completed 63-02-PLAN.md
-last_updated: "2026-03-28T06:40:44.940Z"
+milestone: v2.2
+milestone_name: "The Touch"
+status: Defining requirements
+stopped_at: Requirements defined, roadmap pending
+last_updated: "2026-03-28T18:30:00.000Z"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-27)
+See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 63 — Bundled Assets & Device Validation
+**Current focus:** v2.2 "The Touch" — iOS daily-driver polish
 
 ## Current Position
 
-Phase: 63 (Bundled Assets & Device Validation) — EXECUTING
-Plan: 2 of 2
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-28 — Milestone v2.2 started
 
 ## Performance Metrics
 
@@ -34,76 +36,30 @@ Plan: 2 of 2
 - Average duration: --
 - Total execution time: 0 hours
 
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
-
-*Updated after each plan completion*
-| Phase 59 P01 | 3min | 2 tasks | 3 files |
-| Phase 59 P03 | 3min | 2 tasks | 3 files |
-| Phase 59 P02 | 3min | 2 tasks | 3 files |
-| Phase 60 P01 | 3min | 2 tasks | 5 files |
-| Phase 60 P02 | 4min | 2 tasks | 4 files |
-| Phase 61 P01 | 3min | 2 tasks | 8 files |
-| Phase 61 P02 | 5min | 2 tasks | 9 files |
-| Phase 62 P02 | 3min | 3 tasks | 6 files |
-| Phase 62 P01 | 5min | 2 tasks | 5 files |
-| Phase 62 P03 | 2min | 2 tasks | 5 files |
-| Phase 63 P01 | 3min | 2 tasks | 3 files |
-| Phase 63 P02 | 4min | 2 tasks | 5 files |
-
 ## Accumulated Context
 
 ### Decisions
 
-- [v2.0] Capacitor 7.6.1 over 8.x -- Xcode 16+ vs 26+ requirement
-- [v2.0] API base URL abstraction is highest-value Capacitor prep
-- [v2.0] Keyboard avoidance via visualViewport hack -- works but fragile, replace with Capacitor Keyboard plugin in v2.1
-- [v2.0] CSS --keyboard-offset pattern is correct -- needs better signal source
-- [v2.0] Three-tier proxy: Tailscale Serve :5443 -> nginx :5580 -> Express :5555
-- [v2.1] platform.ts with IS_NATIVE/API_BASE/WS_BASE -- single source of truth for URL construction
-- [v2.1] native-plugins.ts for dynamic plugin init before React mounts -- matches initializeWebSocket() pattern
-- [v2.1] CSS-first motion strategy -- rAF capped at 60fps in WKWebView, but CSS transitions run at 120Hz
-- [v2.1] Platform checks only in platform.ts and native-plugins.ts -- UI components remain platform-unaware
-- [Phase 59]: Runtime detection via window.Capacitor global -- no @capacitor/core dependency
-- [Phase 59]: Empty-string API_BASE in web mode -- zero behavioral change for existing fetch calls
-- [Phase 59]: fetchAnon separate from apiFetch -- auth bootstrap has no token yet
-- [Phase 59]: Function-based CORS origin with debug logging for rejected origins
-- [Phase 59]: Both connect() and reconnect() in websocket-client.ts migrated to resolveWsUrl (Pitfall 1 addressed)
-- [Phase 59]: No test modifications needed for fetch migration -- web mode resolveApiUrl returns paths unchanged
-- [Phase 59]: apiFetch replaces manual getToken + header injection pattern in hooks -- simpler, auto-handles auth and JSON parsing
-- [Phase 60]: @capacitor/keyboard as devDep with dynamic import behind IS_NATIVE guard -- zero web bundle impact
-- [Phase 60]: data-native attribute on <html> for CSS-only native vs web branching
-- [Phase 60]: useKeyboardOffset hook: useEffect with nativePluginsReady await + cancelled flag for async safety
-- [Phase 60]: CSS max(env(safe-area-inset-bottom), var(--keyboard-offset)) prevents double-padding on notched devices
-- [Phase 61]: SS-7: Each Capacitor plugin in its own try/catch for failure isolation
-- [Phase 61]: SS-2: hideSplashWhenReady() awaits nativePluginsReady to avoid cold-start race
-- [Phase 61]: S-4: No touch-action: pan-y -- breaks sidebar swipe and horizontal scroll
-- [Phase 61]: FollowUpPills touch target in CSS per S-6, global Radix menu 44px override via [role=menuitem], no touch-action overrides on sidebar backdrop
-- [Phase 62]: CADisableMinimumFrameDurationOnPhone is build-time Info.plist opt-in for 120Hz (not runtime detection)
-- [Phase 62]: Spring damping increased: SNAPPY 20->24 (+20%), BOUNCY 12->14 (+17%) for tighter feel on ProMotion
-- [Phase 62]: Date.now() throttle for hapticNotification -- simpler than setTimeout, no cleanup, matches fire-and-forget
-- [Phase 62]: ToolChip haptics in useEffect with prevStatusRef -- not in render-phase adjust-state block (AR S-1)
-- [Phase 62]: QuickSettingsPanel onChange wrappers accept _checked: boolean for Radix Switch type compat (AR A-4)
-- [Phase 63]: base: './' affects only production build, not dev server HMR
-- [Phase 63]: cap-build.sh separate from deploy.sh -- different output dirs (src/dist/ vs repo root dist/), no service restart
-- [Phase 63]: Auth failure catch in websocket-init.ts: sets provider error + disconnected status for ConnectionBanner visibility
-- [Phase 63]: IS_NATIVE conditional in ConnectionBanner: VPN-specific message on native, generic on web
+- [v2.2] Milestone focuses on iOS UX polish, not new features — establish daily-driver baseline before v2.3 power features
+- [v2.2] INFRA requirements all pre-completed from v2.1 + hotfixes (nginx symlink, CORS, WKWebView grid fix)
+- [v2.2] OLED true black only on outermost background — surface hierarchy (oklch 0.15-0.23) preserved for depth
+- [v2.2] Pinch-to-zoom excluded — conflicts with maximum-scale=1.0 viewport meta needed for input zoom prevention
+- [v2.2] Server.url mode = fast iteration (5s build → force-quit → check) — no Capacitor rebuild for CSS/JS changes
+- [v2.2] Ionic Framework patterns adopted: contain:layout size style, will-change:scroll-position, minmax(0,1fr) grid fix
 
 ### Pending Todos
 
-None.
+- Roadmap creation (gsd-roadmapper)
+- Phase planning and execution
 
 ### Blockers/Concerns
 
-- Mac with Xcode required for on-device builds (Phase 63) -- swd has iPhone 16 Pro Max but Linux dev machine
-- 120Hz ProMotion spring tuning needs real device to feel right (Phase 62)
-- CapacitorHttp must be disabled -- patches global fetch and breaks WebSocket upgrade
+- Can't see iOS app directly from Linux — depend on user feedback and Claude Relay for MAC testing
+- Safari Web Inspector debugging requires Mac connection
+- 120Hz spring tuning and scroll perf validation require real device
 
 ## Session Continuity
 
-Last session: 2026-03-28T06:40:44.938Z
-Stopped at: Completed 63-02-PLAN.md
-Resume: `/gsd:plan-phase 59`
+Last session: 2026-03-28T18:30:00.000Z
+Stopped at: Requirements defined, roadmap pending
+Resume: Create roadmap, then `/gsd:plan-phase 64`
