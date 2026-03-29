@@ -22,6 +22,7 @@ This document defines the enforceable coding conventions, banned patterns, and s
 10. [Performance Rules](#10-performance-rules)
 11. [Motion & Animation](#11-motion--animation)
 12. [Markdown & Rendering](#12-markdown--rendering)
+13. [Touch Target & Focus Standards](#13-touch-target--focus-standards)
 
 ---
 
@@ -740,6 +741,70 @@ const sessions = await fetch('/api/sessions').then(r => r.json()); // No error h
 - REQUIRED: Long unbreakable strings (URLs, file paths, hashes) use `word-break: break-all` or `overflow-wrap: break-word`.
 - REQUIRED: Inline code uses `overflow-x: auto` if it exceeds container width.
 - REQUIRED: Links render with `target="_blank"` and `rel="noopener noreferrer"`.
+
+---
+
+## 13. Touch Target & Focus Standards
+
+### 13.1 Mobile Touch Target Minimum (44px)
+
+All interactive elements MUST have a minimum 44px touch target height on mobile (< 768px breakpoint).
+
+**Tailwind pattern (for .tsx files):**
+```
+min-h-[44px] md:min-h-0
+```
+For icon-only buttons (square targets), add width:
+```
+min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0
+```
+
+**CSS pattern (for .css files):**
+```css
+@media (max-width: 767px) {
+  .selector {
+    min-height: 44px;
+  }
+}
+```
+
+**Rules:**
+- Every `min-h-[44px]` MUST pair with `md:min-h-0` to revert on desktop
+- Every CSS `min-height: 44px` MUST be inside `@media (max-width: 767px)`
+- Use ONE sizing mechanism per element: min-height OR padding, never both (double-padding trap)
+- Elements should use `flex items-center` to vertically center content within the taller target
+
+### 13.2 Focus Ring Standard
+
+All custom interactive elements MUST use the shadcn focus ring pattern.
+
+**Tailwind pattern:**
+```
+focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50
+```
+
+**CSS pattern:**
+```css
+.selector:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
+}
+```
+
+**Rules:**
+- Components using `Button` from `ui/button.tsx` inherit the correct ring -- no action needed
+- Custom interactive elements (divs with onClick, raw buttons) MUST add the ring explicitly
+- BANNED: `focus-visible:ring-2` (2px too narrow), `box-shadow: 0 0 0 2px var(--accent-primary)` (non-standard)
+- The `--ring` CSS custom property is the single source of truth for ring color
+- **Exception:** `SkipLink.tsx` uses `focus:ring-2` (not `focus-visible:`) intentionally -- skip links must respond to all focus events including programmatic focus for accessibility
+
+### 13.3 Reference Implementations
+
+- **Touch target**: `SessionItem.tsx` line 161 (`min-h-[44px] md:min-h-0`)
+- **Touch target (icon)**: `Sidebar.tsx` hamburger button (`min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0`)
+- **Touch target (CSS)**: `tool-chip.css` (`@media (max-width: 767px) { .tool-chip { min-height: 44px; } }`)
+- **Focus ring (Tailwind)**: `ui/button.tsx` (`focus-visible:ring-[3px] focus-visible:ring-ring/50`)
+- **Focus ring (CSS)**: `tool-card-shell.css` (`.tool-card-shell-header:focus-visible`)
 
 ---
 
