@@ -141,7 +141,7 @@ describe('native-plugins', () => {
     await initializeNativePlugins();
 
     // setResizeMode no longer called — using WKWebView default Body resize
-    expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledWith({ isVisible: true });
+    expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledWith({ isVisible: false });
   });
 
   it('sets data-native attribute on document', async () => {
@@ -403,7 +403,7 @@ describe('native-plugins', () => {
 
     // Keyboard, StatusBar, and SplashScreen should all still work
     // setResizeMode no longer called — using WKWebView default Body resize
-    expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledWith({ isVisible: true });
+    expect(mockKeyboard.setAccessoryBarVisible).toHaveBeenCalledWith({ isVisible: false });
     expect(mockStatusBar.setStyle).toHaveBeenCalledWith({ style: 'DARK' });
     // setHapticsModule called (haptics initialized after splash)
     expect(mockSetHapticsModule).toHaveBeenCalled();

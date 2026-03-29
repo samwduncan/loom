@@ -116,8 +116,8 @@ export async function initializeNativePlugins(): Promise<void> {
       // causes an intermittent race condition on real devices where setResizeMode()
       // fires async after mount, breaking the layout. Native resize is reliable.
 
-      // D-18: Show the iOS input accessory bar (Done button) for text inputs.
-      await Keyboard.setAccessoryBarVisible({ isVisible: true });
+      // D-18: Hide the iOS input accessory bar -- accessory bar was visually intrusive on iPhone (Forgejo #4).
+      await Keyboard.setAccessoryBarVisible({ isVisible: false });
     } catch (err: unknown) {
       console.warn('[native-plugins] Keyboard plugin failed to load:', err);
       keyboardModule = null;
@@ -143,6 +143,7 @@ export async function initializeNativePlugins(): Promise<void> {
     // --- Haptics plugin (separate try/catch -- SS-7) ---
     try {
       const hapticsMod = await import('@capacitor/haptics');
+      console.log('[native-plugins] Haptics module loaded successfully:', !!hapticsMod?.Haptics);
       setHapticsModule(hapticsMod);
     } catch (err: unknown) {
       console.warn('[native-plugins] Haptics plugin failed to load:', err);
