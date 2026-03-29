@@ -272,7 +272,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 | 65. Touch Target Compliance | 2/2 | Complete    | 2026-03-29 |
 | 66. Typography & Spacing | 2/2 | Complete   | 2026-03-29 |
 | 67. iOS-Native Gestures | 4/4 | Awaiting Verification |  |
-| 67.1. iOS Bug Fixes | 0/5 | Not started | - |
+| 67.1. iOS Bug Fixes | 0/5 | Planned | - |
 | 68. Visual Polish | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
