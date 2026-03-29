@@ -186,7 +186,7 @@ Plans:
   5. All body text maintains 1.6 minimum line-height for mobile readability
 **Plans**: 2 plans
 Plans:
-- [ ] 66-01-PLAN.md -- Token system extension (--text-xs/sm/code) + sub-12px fixes + mobile font overrides (15px body, 18px code) + streaming parity
+- [x] 66-01-PLAN.md -- Token system extension (--text-xs/sm/code) + sub-12px fixes + mobile font overrides (15px body, 18px code) + streaming parity
 - [ ] 66-02-PLAN.md -- Verify-first sidebar/thinking/keyboard items + Playwright typography regression test + V2_CONSTITUTION Section 14
 **UI hint**: yes
 
@@ -245,7 +245,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 |-------|----------------|--------|-----------|
 | 64. Scroll Performance | 3/3 | Complete    | 2026-03-29 |
 | 65. Touch Target Compliance | 2/2 | Complete    | 2026-03-29 |
-| 66. Typography & Spacing | 0/2 | Not started | - |
+| 66. Typography & Spacing | 1/2 | In Progress|  |
 | 67. iOS-Native Gestures | 0/? | Not started | - |
 | 68. Visual Polish | 0/? | Not started | - |
 

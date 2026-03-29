@@ -50,7 +50,7 @@ User can reliably tap interactive elements on iPhone without missing. All target
 
 Text scales and spaces appropriately for mobile reading; minimum font sizes meet WCAG and Apple's comfort standards.
 
-- [ ] **TYPO-01**: DateGroupHeader uses minimum 12px font size (not 11px)
+- [x] **TYPO-01**: DateGroupHeader uses minimum 12px font size (not 11px)
   - _Acceptance:_ `.date-group-header` font-size changed from 0.6875rem (11px) to 0.75rem (12px) minimum.
   - _Why:_ WCAG AA minimum for body text; improves readability at arm's length (mobile usage pattern).
 
@@ -62,7 +62,7 @@ Text scales and spaces appropriately for mobile reading; minimum font sizes meet
   - _Acceptance:_ SidebarItem and SessionListItem titles use `truncate` class; no wrapping to 2+ lines.
   - _Why:_ Narrow sidebar on mobile means 3-line titles waste space; single line + ellipsis is cleaner.
 
-- [ ] **TYPO-04**: Chat message typography adjusts for mobile density: 15px body text, 18px for code blocks
+- [x] **TYPO-04**: Chat message typography adjusts for mobile density: 15px body text, 18px for code blocks
   - _Acceptance:_ TurnBlock and MarkdownRenderer use 15px (0.9375rem) base; code blocks 18px monospace.
   - _Why:_ Desktop uses 16px; mobile reading at closer distance benefits from 1px reduction; code needs extra size.
 
@@ -70,11 +70,11 @@ Text scales and spaces appropriately for mobile reading; minimum font sizes meet
   - _Acceptance:_ SessionListItem padding: py-2 (8px); gap between DateGroupHeader and first session: 4px.
   - _Why:_ Reduces vertical scroll distance; more sessions visible per screen on mobile.
 
-- [ ] **TYPO-06**: Action labels in modals and buttons use 14px minimum (not 12px)
+- [x] **TYPO-06**: Action labels in modals and buttons use 14px minimum (not 12px)
   - _Acceptance:_ Modal buttons, form labels, and secondary text use 14px (0.875rem) minimum on mobile.
   - _Why:_ 12px button labels strain eyes at mobile viewing distance; impacts accessibility.
 
-- [ ] **TYPO-07**: Line-height preserved at 1.6 minimum for all body text on mobile
+- [x] **TYPO-07**: Line-height preserved at 1.6 minimum for all body text on mobile
   - _Acceptance:_ No text element has line-height < 1.6; especially important for multi-line labels.
   - _Why:_ Tighter line-height (1.4) common on desktop; mobile needs more breathing room.
 
@@ -304,13 +304,13 @@ v2.2 ships when:
 | TOUCH-05 | 65 | Complete |
 | TOUCH-06 | 65 | Complete |
 | TOUCH-07 | 65 | Complete |
-| TYPO-01 | 66 | Pending |
+| TYPO-01 | 66 | Complete |
 | TYPO-02 | 66 | Pending |
 | TYPO-03 | 66 | Pending |
-| TYPO-04 | 66 | Pending |
+| TYPO-04 | 66 | Complete |
 | TYPO-05 | 66 | Pending |
-| TYPO-06 | 66 | Pending |
-| TYPO-07 | 66 | Pending |
+| TYPO-06 | 66 | Complete |
+| TYPO-07 | 66 | Complete |
 | TYPO-08 | 66 | Pending |
 | GESTURE-01 | 67 | Pending |
 | GESTURE-02 | 67 | Pending |
