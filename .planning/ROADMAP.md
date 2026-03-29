@@ -168,7 +168,10 @@ Plans:
   2. All sidebar interactive elements (session items, group headers, action buttons) have min-height 44px
   3. Focus rings on all 44px+ targets are visible with 2px minimum stroke width
   4. No tap target smaller than 44px exists anywhere in the app on mobile breakpoint (< 768px)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 65-01-PLAN.md -- Touch target sizing fixes (TOUCH-01-06) + sidebar audit + Playwright regression test
+- [ ] 65-02-PLAN.md -- Focus ring sweep across all custom components + V2_CONSTITUTION convention
 **UI hint**: yes
 
 ### Phase 66: Typography & Spacing
@@ -238,7 +241,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 64. Scroll Performance | 3/3 | Complete    | 2026-03-29 |
-| 65. Touch Target Compliance | 0/? | Not started | - |
+| 65. Touch Target Compliance | 0/2 | Planned | - |
 | 66. Typography & Spacing | 0/? | Not started | - |
 | 67. iOS-Native Gestures | 0/? | Not started | - |
 | 68. Visual Polish | 0/? | Not started | - |
@@ -250,4 +253,4 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-28 after Phase 64 planning complete*
+*Last updated: 2026-03-29 after Phase 65 planning complete*
