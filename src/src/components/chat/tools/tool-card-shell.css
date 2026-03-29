@@ -32,7 +32,7 @@
 
 .tool-card-shell-header:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 /* Top corners only when body is expanded */
@@ -113,6 +113,14 @@
 
 .tool-card-shell[data-status="rejected"] .tool-card-shell-body-inner {
   border-color: oklch(from var(--status-error) l c h / 0.3);
+}
+
+/* ─── Mobile Touch Targets ─────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .tool-card-shell-header {
+    min-height: 44px;
+  }
 }
 
 /* ─── Reduced Motion ────────────────────────────────────────────────── */

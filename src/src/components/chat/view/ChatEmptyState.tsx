@@ -54,8 +54,10 @@ export function ChatEmptyState({ onSuggestionClick }: ChatEmptyStateProps) {
                       onClick={() => onSuggestionClick(template)}
                       className={cn(
                         'rounded-lg bg-surface-raised px-3 py-1.5 text-sm text-secondary',
+                        'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center',
                         'hover:bg-surface-overlay transition-colors',
                         'border border-border/10',
+                        'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
                       )}
                     >
                       {template}

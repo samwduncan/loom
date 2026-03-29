@@ -35,8 +35,10 @@ export function ProjectHeader({
       aria-expanded={isExpanded}
       className={cn(
         'w-full flex items-center gap-2 px-3 py-2',
+        'min-h-[44px] md:min-h-0',
         'text-left font-medium text-foreground',
         'transition-[background-color] duration-[var(--duration-fast)]',
+        'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
         'session-item-hover',
         isCurrentProject && 'border-l-2 border-l-[var(--accent-primary)]',
       )}

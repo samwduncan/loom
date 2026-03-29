@@ -45,9 +45,11 @@ export function LiveSessionBanner({ sessionId }: LiveSessionBannerProps) {
         onClick={handleDetach}
         className={cn(
           'px-2 py-0.5 rounded text-xs',
+          'min-h-[44px] md:min-h-0 flex items-center',
           'bg-[var(--live-banner-btn-bg)] hover:bg-[var(--live-banner-btn-bg-hover)]',
           'text-[var(--live-banner-btn-text)] hover:text-[var(--live-banner-btn-text-hover)]',
           'transition-colors duration-[var(--duration-fast)]',
+          'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
         )}
       >
         Detach

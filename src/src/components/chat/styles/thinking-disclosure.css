@@ -30,6 +30,12 @@
   padding: 0;
 }
 
+.thinking-disclosure-trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
+  border-radius: 4px;
+}
+
 /* ─── Disclosure Arrow ───────────────────────────────────────────────── */
 
 .thinking-disclosure-arrow {
@@ -89,6 +95,14 @@
 
 .thinking-pulse {
   animation: thinking-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Mobile Touch Targets ─────────────────────────────────────────── */
+
+@media (max-width: 767px) {
+  .thinking-disclosure-trigger {
+    min-height: 44px;
+  }
 }
 
 /* ─── Reduced Motion ─────────────────────────────────────────────────── */
