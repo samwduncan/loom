@@ -10,7 +10,7 @@
   margin: var(--space-1) 0;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  background: oklch(from var(--surface-1) l c h / 0.5);
+  background: oklch(from var(--surface-raised) l c h / 0.5);
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────── */
@@ -31,7 +31,7 @@
 }
 
 .tool-group-header:hover {
-  background: oklch(from var(--surface-1) l c h / 0.3);
+  background: oklch(from var(--surface-raised) l c h / 0.3);
 }
 
 /* ─── Header: Chevron ────────────────────────────────────────────────── */

@@ -77,7 +77,7 @@
 /* ─── Thinking Inline Links ────────────────────────────────────────── */
 
 .thinking-disclosure-content a {
-  color: var(--text-accent);
+  color: var(--accent-primary);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

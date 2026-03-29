@@ -6,7 +6,7 @@
 
 /* Banner container */
 .permission-banner {
-  background: var(--surface-1);
+  background: var(--surface-raised);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg, 0.5rem);
   padding: var(--space-3, 0.75rem) var(--space-4, 1rem);

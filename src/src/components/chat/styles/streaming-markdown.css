@@ -8,7 +8,7 @@
 
 /* --- Code blocks (fenced) --- */
 .active-message .streaming-code-block {
-  background-color: var(--surface-0);
+  background-color: var(--code-surface);
   font-family: var(--font-mono);
   border-radius: 6px;
   padding: var(--space-3);
@@ -32,7 +32,7 @@
 
 /* --- Inline code --- */
 .active-message code {
-  background-color: var(--surface-1);
+  background-color: var(--code-inline-bg);
   font-family: var(--font-mono);
   font-size: var(--text-code);
   padding: 0.15em 0.35em;

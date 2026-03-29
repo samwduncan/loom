@@ -80,7 +80,7 @@
   bottom: calc(100% + 4px);
   left: 0;
   right: 0;
-  z-index: var(--z-popover);
+  z-index: var(--z-dropdown);
   max-height: 240px;
   overflow-y: auto;
   border-radius: 0.5rem;
