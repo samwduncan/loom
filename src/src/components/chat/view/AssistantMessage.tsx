@@ -18,6 +18,7 @@
 
 import { memo, type ReactNode } from 'react';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
+import { MessageContextMenu } from '@/components/chat/view/MessageContextMenu';
 import { MarkdownRenderer } from '@/components/chat/view/MarkdownRenderer';
 import { ProviderHeader } from '@/components/chat/provider-logos/ProviderHeader';
 import { ThinkingDisclosure } from '@/components/chat/view/ThinkingDisclosure';
@@ -33,6 +34,8 @@ export interface AssistantMessageProps {
   message: Message;
   /** Highlight function for search -- threaded to ThinkingDisclosure */
   highlightText?: (text: string) => ReactNode;
+  /** Callback for Retry action in context menu -- re-sends last user message */
+  onRetry?: () => void;
 }
 
 /**
@@ -54,7 +57,7 @@ function toToolCallStates(
   }));
 }
 
-export const AssistantMessage = memo(function AssistantMessage({ message, highlightText }: AssistantMessageProps) {
+export const AssistantMessage = memo(function AssistantMessage({ message, highlightText, onRetry }: AssistantMessageProps) {
   const thinkingExpanded = useUIStore((state) => state.thinkingExpanded);
   const hasToolCalls = message.toolCalls && message.toolCalls.length > 0;
   const hasThinking = message.thinkingBlocks && message.thinkingBlocks.length > 0;
@@ -66,36 +69,38 @@ export const AssistantMessage = memo(function AssistantMessage({ message, highli
   const partitions = hasToolCalls ? groupToolCalls(toolCallStates) : [];
 
   return (
-    <MessageContainer role="assistant">
-      <ProviderHeader providerId={message.providerContext.providerId} />
-      {hasThinking && (
-        <ThinkingDisclosure
-          blocks={message.thinkingBlocks!} // ASSERT: hasThinking guards truthiness of thinkingBlocks
-          isStreaming={false}
-          globalExpanded={thinkingExpanded}
-          duration={message.metadata.duration}
-          highlightText={highlightText}
-        />
-      )}
-      {highlightText ? (
-        <div className="markdown-body text-foreground text-[length:var(--text-body)] leading-relaxed whitespace-pre-wrap">
-          {highlightText(message.content)}
-        </div>
-      ) : (
-        <MarkdownRenderer content={message.content} />
-      )}
-      {partitions.map((partition, i) =>
-        partition.type === 'group' ? (
-          <ToolCallGroup
-            key={`group-${i}`}
-            tools={partition.tools}
-            errors={partition.errors}
+    <MessageContextMenu messageText={message.content} showRetry onRetry={onRetry}>
+      <MessageContainer role="assistant">
+        <ProviderHeader providerId={message.providerContext.providerId} />
+        {hasThinking && (
+          <ThinkingDisclosure
+            blocks={message.thinkingBlocks!} // ASSERT: hasThinking guards truthiness of thinkingBlocks
+            isStreaming={false}
+            globalExpanded={thinkingExpanded}
+            duration={message.metadata.duration}
+            highlightText={highlightText}
           />
+        )}
+        {highlightText ? (
+          <div className="markdown-body text-foreground text-[length:var(--text-body)] leading-relaxed whitespace-pre-wrap">
+            {highlightText(message.content)}
+          </div>
         ) : (
-          <ToolChip key={partition.tool.id} toolCall={partition.tool} />
-        ),
-      )}
-      <TokenUsage metadata={message.metadata} />
-    </MessageContainer>
+          <MarkdownRenderer content={message.content} />
+        )}
+        {partitions.map((partition, i) =>
+          partition.type === 'group' ? (
+            <ToolCallGroup
+              key={`group-${i}`}
+              tools={partition.tools}
+              errors={partition.errors}
+            />
+          ) : (
+            <ToolChip key={partition.tool.id} toolCall={partition.tool} />
+          ),
+        )}
+        <TokenUsage metadata={message.metadata} />
+      </MessageContainer>
+    </MessageContextMenu>
   );
 });

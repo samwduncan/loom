@@ -317,6 +317,7 @@ export function ChatView() {
         <MessageList
           messages={displayMessages}
           sessionId={effectiveSessionId ?? ''}
+          projectName={projectName}
           scrollContainerRef={scrollContainerRef}
           searchQuery={search.debouncedQuery}
           highlightText={search.debouncedQuery ? search.highlightText : undefined}

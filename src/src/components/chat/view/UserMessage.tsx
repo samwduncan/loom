@@ -11,6 +11,7 @@
 
 import { useState, memo, type ReactNode } from 'react';
 import { MessageContainer } from '@/components/chat/view/MessageContainer';
+import { MessageContextMenu } from '@/components/chat/view/MessageContextMenu';
 import { ImageThumbnailGrid } from '@/components/chat/view/ImageThumbnailGrid';
 import { ImageLightbox } from '@/components/chat/view/ImageLightbox';
 import { formatRelativeTime } from '@/lib/formatTime';
@@ -26,29 +27,31 @@ export const UserMessage = memo(function UserMessage({ message, highlightText }:
   const [lightboxAttachment, setLightboxAttachment] = useState<ImageAttachment | null>(null);
 
   return (
-    <div className="pb-5">
-      <MessageContainer role="user">
-        <div className="group relative">
-          {message.attachments && message.attachments.length > 0 && (
-            <ImageThumbnailGrid
-              attachments={message.attachments}
-              onImageClick={setLightboxAttachment}
-            />
-          )}
-          <div className="whitespace-pre-wrap break-words">
-            {highlightText ? highlightText(message.content) : message.content}
+    <MessageContextMenu messageText={message.content}>
+      <div className="pb-5">
+        <MessageContainer role="user">
+          <div className="group relative">
+            {message.attachments && message.attachments.length > 0 && (
+              <ImageThumbnailGrid
+                attachments={message.attachments}
+                onImageClick={setLightboxAttachment}
+              />
+            )}
+            <div className="whitespace-pre-wrap break-words">
+              {highlightText ? highlightText(message.content) : message.content}
+            </div>
+            <span className="absolute -bottom-5 right-0 text-xs text-muted opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none whitespace-nowrap">
+              {formatRelativeTime(message.metadata.timestamp)}
+            </span>
           </div>
-          <span className="absolute -bottom-5 right-0 text-xs text-muted opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none whitespace-nowrap">
-            {formatRelativeTime(message.metadata.timestamp)}
-          </span>
-        </div>
-      </MessageContainer>
-      <ImageLightbox
-        src={lightboxAttachment?.url ?? null}
-        alt={lightboxAttachment?.name}
-        open={lightboxAttachment !== null}
-        onClose={() => setLightboxAttachment(null)}
-      />
-    </div>
+        </MessageContainer>
+        <ImageLightbox
+          src={lightboxAttachment?.url ?? null}
+          alt={lightboxAttachment?.name}
+          open={lightboxAttachment !== null}
+          onClose={() => setLightboxAttachment(null)}
+        />
+      </div>
+    </MessageContextMenu>
   );
 });
