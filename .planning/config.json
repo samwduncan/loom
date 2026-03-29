@@ -10,7 +10,7 @@
     "verifier": true,
     "nyquist_validation": true,
     "adversarial_review": true,
-    "_auto_chain_active": true,
+    "_auto_chain_active": false,
     "coderabbit_review": true,
     "coderabbit_planning": true,
     "research_enabled": true,

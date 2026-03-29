@@ -138,19 +138,19 @@ Content scrolls at 60fps on real device. This is THE highest priority -- everyth
 
 Users interact with app via native iOS gestures: swipe-to-delete, pull-to-refresh, long-press context menus, haptic feedback.
 
-- [ ] **GESTURE-01**: Session list items support swipe-to-delete gesture on mobile (< 768px)
+- [x] **GESTURE-01**: Session list items support swipe-to-delete gesture on mobile (< 768px)
   - _Acceptance:_ Swipe left on SessionListItem reveals red Delete button; tap to confirm and remove session.
   - _Why:_ Native iOS pattern; users expect this in list-heavy UX; matches Apple Mail, Reminders.
 
-- [ ] **GESTURE-02**: Pull-to-refresh gesture refreshes session list on mobile
+- [x] **GESTURE-02**: Pull-to-refresh gesture refreshes session list on mobile
   - _Acceptance:_ Pull down on session list (overscroll) triggers reload; spinner shows; live sessions re-attach.
   - _Why:_ Native iOS pattern for "check for new data"; gives users sense of control.
 
-- [ ] **GESTURE-03**: Long-press on session item opens context menu (Copy ID, Rename, Delete, Export)
+- [x] **GESTURE-03**: Long-press on session item opens context menu (Copy ID, Rename, Delete, Export)
   - _Acceptance:_ Long-press (500ms hold) SessionListItem; native iOS context menu appears (or custom popover).
   - _Why:_ Mobile-native discovery; avoids clutter in list view; fast access to actions.
 
-- [ ] **GESTURE-04**: Sidebar swipe-to-open gesture (edge pan from left) works on mobile
+- [x] **GESTURE-04**: Sidebar swipe-to-open gesture (edge pan from left) works on mobile
   - _Acceptance:_ Pan from left edge of chat area opens sidebar drawer; already implemented; verify on real device.
   - _Why:_ iOS-standard navigation; users coming from native apps expect this.
 
@@ -312,10 +312,10 @@ v2.2 ships when:
 | TYPO-06 | 66 | Complete |
 | TYPO-07 | 66 | Complete |
 | TYPO-08 | 66 | Complete |
-| GESTURE-01 | 67 | Pending |
-| GESTURE-02 | 67 | Pending |
-| GESTURE-03 | 67 | Pending |
-| GESTURE-04 | 67 | Pending |
+| GESTURE-01 | 67 | Complete |
+| GESTURE-02 | 67 | Complete |
+| GESTURE-03 | 67 | Complete |
+| GESTURE-04 | 67 | Complete |
 | GESTURE-05 | 67 | Complete |
 | GESTURE-06 | 67 | Complete |
 | GESTURE-07 | 67 | Complete |
