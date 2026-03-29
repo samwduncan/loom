@@ -40,7 +40,7 @@ User can reliably tap interactive elements on iPhone without missing. All target
   - _Acceptance:_ Sidebar item rows and button targets audited in Playwright; no element < 44px in height.
   - _Why:_ Sidebar is primary navigation; high tap frequency during mobile sessions.
 
-- [ ] **TOUCH-07**: Hover/focus indicators on all 44px+ targets are visible and 2px minimum stroke
+- [x] **TOUCH-07**: Hover/focus indicators on all 44px+ targets are visible and 2px minimum stroke
   - _Acceptance:_ Focus ring, border, or background change visible at 44px size; ring-2 or border-2 class applied consistently.
   - _Why:_ VoiceOver and keyboard navigation on iPad; ensures users know they can tap.
 
@@ -303,7 +303,7 @@ v2.2 ships when:
 | TOUCH-04 | 65 | Pending |
 | TOUCH-05 | 65 | Pending |
 | TOUCH-06 | 65 | Pending |
-| TOUCH-07 | 65 | Pending |
+| TOUCH-07 | 65 | Complete |
 | TYPO-01 | 66 | Pending |
 | TYPO-02 | 66 | Pending |
 | TYPO-03 | 66 | Pending |

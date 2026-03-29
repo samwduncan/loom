@@ -171,7 +171,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [ ] 65-01-PLAN.md -- Touch target sizing fixes (TOUCH-01-06) + sidebar audit + Playwright regression test
-- [ ] 65-02-PLAN.md -- Focus ring sweep across all custom components + V2_CONSTITUTION convention
+- [x] 65-02-PLAN.md -- Focus ring sweep across all custom components + V2_CONSTITUTION convention
 **UI hint**: yes
 
 ### Phase 66: Typography & Spacing
@@ -241,7 +241,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 64. Scroll Performance | 3/3 | Complete    | 2026-03-29 |
-| 65. Touch Target Compliance | 0/2 | Planned | - |
+| 65. Touch Target Compliance | 1/2 | In Progress|  |
 | 66. Typography & Spacing | 0/? | Not started | - |
 | 67. iOS-Native Gestures | 0/? | Not started | - |
 | 68. Visual Polish | 0/? | Not started | - |
