@@ -117,11 +117,12 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (post v2.0):**
-- ~55,000 LOC TypeScript + CSS across 58 phases, 17+ plans (8 milestones)
+**Current State (post v2.1):**
+- ~55,000 LOC TypeScript + CSS across 65 phases (9 milestones)
 - Tech stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- ~1400 commits, 24-day total build (2026-03-04 to 2026-03-27)
-- 156 test files (137 unit + 19 E2E Playwright specs), 9 custom ESLint rules
+- ~1450 commits, 26-day total build (2026-03-04 to 2026-03-29)
+- 141 test files, 1476 tests, 9 custom ESLint rules
+- Phase 65 complete: 44px mobile touch targets on all interactive elements, focus rings standardized to shadcn pattern
 - Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui (15 primitives), tailwindcss-animate, cmdk, fuse.js, @codemirror/*, @xterm/*, better-sqlite3
 - Frontend at `src/`, backend at `server/` (port 5555)
 - Dev server: port 5184, production nginx on port 5580 (via Tailscale Serve :5443)
@@ -213,4 +214,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-28 after v2.2 "The Touch" milestone initialization*
+*Last updated: 2026-03-29 after Phase 65 (touch target compliance) completion*
