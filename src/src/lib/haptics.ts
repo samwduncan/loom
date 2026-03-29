@@ -109,6 +109,38 @@ export function hapticSelection(): void {
   void hapticsModule.Haptics.selectionChanged();
 }
 
+/** Haptic event names -- centralized grammar for gesture feedback (D-27). */
+export type HapticEventName =
+  | 'sessionSelect'
+  | 'sidebarToggle'
+  | 'swipeReveal'
+  | 'deleteConfirm'
+  | 'contextMenuOpen'
+  | 'pullToRefreshComplete'
+  | 'shareTriggered';
+
+const HAPTIC_EVENT_MAP: Record<HapticEventName, () => void> = {
+  sessionSelect: () => hapticSelection(),
+  sidebarToggle: () => hapticImpact('Light'),
+  swipeReveal: () => hapticImpact('Light'),
+  deleteConfirm: () => hapticNotification('Warning'),
+  contextMenuOpen: () => hapticImpact('Medium'),
+  pullToRefreshComplete: () => hapticNotification('Success'),
+  shareTriggered: () => hapticImpact('Light'),
+};
+
+/**
+ * Fire a named haptic event. Silent no-op for unknown event names.
+ *
+ * All events respect IS_NATIVE, module availability, and reduced-motion gates
+ * via the underlying hapticImpact/hapticNotification/hapticSelection functions.
+ *
+ * @param name - The haptic event name from the centralized grammar
+ */
+export function hapticEvent(name: HapticEventName): void {
+  HAPTIC_EVENT_MAP[name]?.();
+}
+
 /**
  * Reset module state for testing.
  *
