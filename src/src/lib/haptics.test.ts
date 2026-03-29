@@ -40,6 +40,7 @@ import {
   hapticImpact,
   hapticNotification,
   hapticSelection,
+  hapticEvent,
   setHapticsModule,
   _resetForTesting,
 } from '@/lib/haptics';
@@ -240,6 +241,59 @@ describe('haptics', () => {
       hapticSelection();
       hapticSelection();
       expect(mockHaptics.selectionChanged).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // --- hapticEvent centralized event map (D-27) ---
+
+  describe('hapticEvent', () => {
+    beforeEach(() => {
+      platformMock.IS_NATIVE = true;
+      setHapticsModule(hapticsCapModule);
+    });
+
+    it('sessionSelect calls hapticSelection', () => {
+      hapticEvent('sessionSelect');
+      expect(mockHaptics.selectionChanged).toHaveBeenCalledTimes(1);
+    });
+
+    it('sidebarToggle calls hapticImpact Light', () => {
+      hapticEvent('sidebarToggle');
+      expect(mockHaptics.impact).toHaveBeenCalledWith({ style: 'LIGHT' });
+    });
+
+    it('swipeReveal calls hapticImpact Light', () => {
+      hapticEvent('swipeReveal');
+      expect(mockHaptics.impact).toHaveBeenCalledWith({ style: 'LIGHT' });
+    });
+
+    it('deleteConfirm calls hapticNotification Warning', () => {
+      hapticEvent('deleteConfirm');
+      expect(mockHaptics.notification).toHaveBeenCalledWith({ type: 'WARNING' });
+    });
+
+    it('contextMenuOpen calls hapticImpact Medium', () => {
+      hapticEvent('contextMenuOpen');
+      expect(mockHaptics.impact).toHaveBeenCalledWith({ style: 'MEDIUM' });
+    });
+
+    it('pullToRefreshComplete calls hapticNotification Success', () => {
+      dateSpy.mockReturnValue(5000); // avoid throttle from prior tests
+      hapticEvent('pullToRefreshComplete');
+      expect(mockHaptics.notification).toHaveBeenCalledWith({ type: 'SUCCESS' });
+    });
+
+    it('shareTriggered calls hapticImpact Light', () => {
+      hapticEvent('shareTriggered');
+      expect(mockHaptics.impact).toHaveBeenCalledWith({ style: 'LIGHT' });
+    });
+
+    it('unknown event name is a silent no-op', () => {
+      // @ts-expect-error -- testing invalid event name
+      hapticEvent('unknownEvent');
+      expect(mockHaptics.impact).not.toHaveBeenCalled();
+      expect(mockHaptics.notification).not.toHaveBeenCalled();
+      expect(mockHaptics.selectionChanged).not.toHaveBeenCalled();
     });
   });
 });
