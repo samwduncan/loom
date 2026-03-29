@@ -16,27 +16,27 @@ v2.2 transforms Loom from a "desktop app scaled to mobile" into a purpose-built 
 
 User can reliably tap interactive elements on iPhone without missing. All targets >=44px x 44px per Apple HIG.
 
-- [ ] **TOUCH-01**: ThinkingDisclosure trigger button displays 44px minimum touch target height
+- [x] **TOUCH-01**: ThinkingDisclosure trigger button displays 44px minimum touch target height
   - _Acceptance:_ Measure pixel height in Safari DevTools mobile mode on iPhone 16 Pro Max; CSS class `.thinking-disclosure-trigger` has min-height or padding-y to guarantee 44px.
   - _Why:_ Currently ~20px; causes frequent mis-taps during stream watching.
 
-- [ ] **TOUCH-02**: ToolCardShell header expands to 44px minimum touch target height
+- [x] **TOUCH-02**: ToolCardShell header expands to 44px minimum touch target height
   - _Acceptance:_ `.tool-card-shell-header` has min-height: 44px or equivalent padding-y x 2.
   - _Why:_ At 8px + 12px + 8px padding = 32px effective height; too small for thick thumbs.
 
-- [ ] **TOUCH-03**: ProjectHeader (sidebar project group trigger) reaches 44px minimum touch target height
+- [x] **TOUCH-03**: ProjectHeader (sidebar project group trigger) reaches 44px minimum touch target height
   - _Acceptance:_ `.session-item-header` or ProjectHeader button has min-height: 44px.
   - _Why:_ Currently ~40px; inconsistent with main button standards.
 
-- [ ] **TOUCH-04**: ChatEmptyState template suggestion buttons expand to 44px minimum height
+- [x] **TOUCH-04**: ChatEmptyState template suggestion buttons expand to 44px minimum height
   - _Acceptance:_ Each template pill button in ChatEmptyState has min-height: 44px and min-width: 44px.
   - _Why:_ Currently px-3 py-1.5 = 32px; especially problematic on landscape mode.
 
-- [ ] **TOUCH-05**: LiveSessionBanner Detach button reaches 44px minimum touch target height
+- [x] **TOUCH-05**: LiveSessionBanner Detach button reaches 44px minimum touch target height
   - _Acceptance:_ `.live-banner-detach-btn` (or equivalent) has min-height: 44px.
   - _Why:_ Currently px-2 py-0.5 = 24px; small target in top-of-screen banner.
 
-- [ ] **TOUCH-06**: All interactive elements in sidebar (session items, group headers, action buttons) have min-height: 44px
+- [x] **TOUCH-06**: All interactive elements in sidebar (session items, group headers, action buttons) have min-height: 44px
   - _Acceptance:_ Sidebar item rows and button targets audited in Playwright; no element < 44px in height.
   - _Why:_ Sidebar is primary navigation; high tap frequency during mobile sessions.
 
@@ -297,12 +297,12 @@ v2.2 ships when:
 | SCROLL-08 | 64 | Pending |
 | SCROLL-09 | 64 | Complete |
 | SCROLL-10 | 64 | Pending |
-| TOUCH-01 | 65 | Pending |
-| TOUCH-02 | 65 | Pending |
-| TOUCH-03 | 65 | Pending |
-| TOUCH-04 | 65 | Pending |
-| TOUCH-05 | 65 | Pending |
-| TOUCH-06 | 65 | Pending |
+| TOUCH-01 | 65 | Complete |
+| TOUCH-02 | 65 | Complete |
+| TOUCH-03 | 65 | Complete |
+| TOUCH-04 | 65 | Complete |
+| TOUCH-05 | 65 | Complete |
+| TOUCH-06 | 65 | Complete |
 | TOUCH-07 | 65 | Complete |
 | TYPO-01 | 66 | Pending |
 | TYPO-02 | 66 | Pending |
