@@ -164,7 +164,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
   return (
     <div
       ref={mergedRef}
-      className="native-scroll h-full overflow-y-auto"
+      className="native-scroll h-full overflow-y-auto overflow-x-hidden"
       data-testid="message-list-scroll"
     >
       <div ref={contentWrapperRef} className="mx-auto max-w-3xl py-4">
