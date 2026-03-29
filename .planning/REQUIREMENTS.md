@@ -54,11 +54,11 @@ Text scales and spaces appropriately for mobile reading; minimum font sizes meet
   - _Acceptance:_ `.date-group-header` font-size changed from 0.6875rem (11px) to 0.75rem (12px) minimum.
   - _Why:_ WCAG AA minimum for body text; improves readability at arm's length (mobile usage pattern).
 
-- [ ] **TYPO-02**: ThinkingDisclosure trigger text renders at 14px minimum on mobile
+- [x] **TYPO-02**: ThinkingDisclosure trigger text renders at 14px minimum on mobile
   - _Acceptance:_ `.thinking-disclosure-trigger` font-size: 0.875rem (14px) on mobile breakpoint; no smaller.
   - _Why:_ Thinking content is secondary but still needs legibility; 12px too small for scanning during waits.
 
-- [ ] **TYPO-03**: Session titles truncate at 1 line with ellipsis on mobile (< 768px)
+- [x] **TYPO-03**: Session titles truncate at 1 line with ellipsis on mobile (< 768px)
   - _Acceptance:_ SidebarItem and SessionListItem titles use `truncate` class; no wrapping to 2+ lines.
   - _Why:_ Narrow sidebar on mobile means 3-line titles waste space; single line + ellipsis is cleaner.
 
@@ -66,7 +66,7 @@ Text scales and spaces appropriately for mobile reading; minimum font sizes meet
   - _Acceptance:_ TurnBlock and MarkdownRenderer use 15px (0.9375rem) base; code blocks 18px monospace.
   - _Why:_ Desktop uses 16px; mobile reading at closer distance benefits from 1px reduction; code needs extra size.
 
-- [ ] **TYPO-05**: Sidebar session list density optimized: py-2 items, 4px gaps between groups
+- [x] **TYPO-05**: Sidebar session list density optimized: py-2 items, 4px gaps between groups
   - _Acceptance:_ SessionListItem padding: py-2 (8px); gap between DateGroupHeader and first session: 4px.
   - _Why:_ Reduces vertical scroll distance; more sessions visible per screen on mobile.
 
@@ -78,7 +78,7 @@ Text scales and spaces appropriately for mobile reading; minimum font sizes meet
   - _Acceptance:_ No text element has line-height < 1.6; especially important for multi-line labels.
   - _Why:_ Tighter line-height (1.4) common on desktop; mobile needs more breathing room.
 
-- [ ] **TYPO-08**: Keyboard (onscreen, not physical) does not cause text field labels to shrink
+- [x] **TYPO-08**: Keyboard (onscreen, not physical) does not cause text field labels to shrink
   - _Acceptance:_ Composer input label and floating token count remain visible when soft keyboard opens; no label resize.
   - _Why:_ iOS Capacitor keyboard triggers viewport resize; prevent "jumping" label size.
 
@@ -305,13 +305,13 @@ v2.2 ships when:
 | TOUCH-06 | 65 | Complete |
 | TOUCH-07 | 65 | Complete |
 | TYPO-01 | 66 | Complete |
-| TYPO-02 | 66 | Pending |
-| TYPO-03 | 66 | Pending |
+| TYPO-02 | 66 | Complete |
+| TYPO-03 | 66 | Complete |
 | TYPO-04 | 66 | Complete |
-| TYPO-05 | 66 | Pending |
+| TYPO-05 | 66 | Complete |
 | TYPO-06 | 66 | Complete |
 | TYPO-07 | 66 | Complete |
-| TYPO-08 | 66 | Pending |
+| TYPO-08 | 66 | Complete |
 | GESTURE-01 | 67 | Pending |
 | GESTURE-02 | 67 | Pending |
 | GESTURE-03 | 67 | Pending |

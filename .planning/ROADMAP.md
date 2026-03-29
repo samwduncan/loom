@@ -136,7 +136,7 @@
 
 - [x] **Phase 64: Scroll Performance** - Eliminate scroll jank sources, validate 60fps on real device with 50+ messages (completed 2026-03-29)
 - [x] **Phase 65: Touch Target Compliance** - Fix all 7 touch target violations to meet Apple's 44px minimum (completed 2026-03-29)
-- [ ] **Phase 66: Typography & Spacing** - Mobile-optimized font sizes, spacing, and text density
+- [x] **Phase 66: Typography & Spacing** - Mobile-optimized font sizes, spacing, and text density (completed 2026-03-29)
 - [ ] **Phase 67: iOS-Native Gestures** - Swipe-to-delete, pull-to-refresh, long-press context menus, app lifecycle, native share/clipboard
 - [ ] **Phase 68: Visual Polish** - OLED blacks, glass effects, spring tuning, contrast compliance for iOS
 
@@ -187,7 +187,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 66-01-PLAN.md -- Token system extension (--text-xs/sm/code) + sub-12px fixes + mobile font overrides (15px body, 18px code) + streaming parity
-- [ ] 66-02-PLAN.md -- Verify-first sidebar/thinking/keyboard items + Playwright typography regression test + V2_CONSTITUTION Section 14
+- [x] 66-02-PLAN.md -- Verify-first sidebar/thinking/keyboard items + Playwright typography regression test + V2_CONSTITUTION Section 14
 **UI hint**: yes
 
 ### Phase 67: iOS-Native Gestures
@@ -245,7 +245,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 |-------|----------------|--------|-----------|
 | 64. Scroll Performance | 3/3 | Complete    | 2026-03-29 |
 | 65. Touch Target Compliance | 2/2 | Complete    | 2026-03-29 |
-| 66. Typography & Spacing | 1/2 | In Progress|  |
+| 66. Typography & Spacing | 2/2 | Complete   | 2026-03-29 |
 | 67. iOS-Native Gestures | 0/? | Not started | - |
 | 68. Visual Polish | 0/? | Not started | - |
 
