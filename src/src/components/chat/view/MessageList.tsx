@@ -13,7 +13,7 @@
  * Constitution: Named exports (2.2), selector-only store access (4.2).
  */
 
-import { useRef, useState, useEffect, useCallback, memo, type RefObject } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useCallback, memo, type RefObject } from 'react';
 import { Loader2 } from 'lucide-react';
 import { UserMessage } from '@/components/chat/view/UserMessage';
 import { AssistantMessage } from '@/components/chat/view/AssistantMessage';
@@ -65,7 +65,8 @@ const MemoizedMessageItem = memo(function MemoizedMessageItem({
   }
 });
 
-/** No content-visibility — browser renders all items to avoid scroll height changes */
+/** No content-visibility or contain — browser renders all items at natural height
+ *  to avoid scroll position jumps from height estimation mismatches. */
 
 export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText, hasMoreMessages, isFetchingMore, onLoadMore }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -98,6 +99,9 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
   // Infinite scroll: auto-load older messages when sentinel is visible
   const onLoadMoreRef = useRef(onLoadMore);
   useEffect(() => { onLoadMoreRef.current = onLoadMore; });
+  // Track pre-load scroll state for anchor restoration after React renders
+  const preLoadScrollRef = useRef<{ prevHeight: number; prevScroll: number } | null>(null);
+
   useEffect(() => {
     const sentinel = loadMoreSentinelRef.current;
     const container = scrollRef.current;
@@ -106,17 +110,12 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting && onLoadMoreRef.current) {
-          // Save scroll height before prepend for anchor restoration
-          const prevHeight = container.scrollHeight;
-          const prevScroll = container.scrollTop;
-
+          // Save scroll state BEFORE triggering load (React hasn't re-rendered yet)
+          preLoadScrollRef.current = {
+            prevHeight: container.scrollHeight,
+            prevScroll: container.scrollTop,
+          };
           onLoadMoreRef.current();
-
-          // After DOM update: restore scroll position so content doesn't jump
-          requestAnimationFrame(() => {
-            const newHeight = container.scrollHeight;
-            container.scrollTop = prevScroll + (newHeight - prevHeight);
-          });
         }
       },
       { root: container, rootMargin: '200px 0px 0px 0px' },
@@ -125,6 +124,23 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [sessionId, hasMoreMessages]);
+
+  // Restore scroll position AFTER React renders prepended messages.
+  // useLayoutEffect fires synchronously after DOM mutation but before paint,
+  // so the user never sees the jump.
+   
+  useLayoutEffect(() => {
+    const saved = preLoadScrollRef.current;
+    const container = scrollRef.current;
+    if (!saved || !container) return;
+    preLoadScrollRef.current = null;
+
+    const newHeight = container.scrollHeight;
+    const delta = newHeight - saved.prevHeight;
+    if (delta > 0) {
+      container.scrollTop = saved.prevScroll + delta;
+    }
+  }, [messages.length]);
 
   // Ref callback merges internal scrollRef with external scrollContainerRef
   const mergedRef = useCallback((node: HTMLDivElement | null) => {
@@ -158,7 +174,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
           </div>
         )}
         {messages.map((msg) => (
-          <div key={msg.id} className="contain-content msg-item">
+          <div key={msg.id}>
             <div className="px-2 md:px-4">
               <MessageErrorBoundary>
                 <MemoizedMessageItem msg={msg} sessionId={sessionId} highlightText={highlightText} />
