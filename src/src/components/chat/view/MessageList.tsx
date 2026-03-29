@@ -25,12 +25,16 @@ import { ScrollToBottomPill } from '@/components/chat/view/ScrollToBottomPill';
 import { MessageErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { useChatScroll } from '@/hooks/useChatScroll';
 import { useStreamStore } from '@/stores/stream';
+import { useTimelineStore } from '@/stores/timeline';
+import { wsClient } from '@/lib/websocket-client';
 import type { Message } from '@/types/message';
 import type { ReactNode } from 'react';
 
 export interface MessageListProps {
   messages: Message[];
   sessionId: string;
+  /** Project name (used as projectPath for retry WebSocket command) */
+  projectName?: string;
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
   searchQuery?: string;
   highlightText?: (text: string) => ReactNode;
@@ -44,16 +48,18 @@ const MemoizedMessageItem = memo(function MemoizedMessageItem({
   msg,
   sessionId,
   highlightText,
+  onRetry,
 }: {
   msg: Message;
   sessionId: string;
   highlightText?: (text: string) => ReactNode;
+  onRetry?: () => void;
 }) {
   switch (msg.role) {
     case 'user':
       return <UserMessage message={msg} highlightText={highlightText} />;
     case 'assistant':
-      return <AssistantMessage message={msg} highlightText={highlightText} />;
+      return <AssistantMessage message={msg} highlightText={highlightText} onRetry={onRetry} />;
     case 'error':
       return <ErrorMessage message={msg} sessionId={sessionId} />;
     case 'system':
@@ -68,10 +74,25 @@ const MemoizedMessageItem = memo(function MemoizedMessageItem({
 /** No content-visibility or contain — browser renders all items at natural height
  *  to avoid scroll position jumps from height estimation mismatches. */
 
-export function MessageList({ messages, sessionId, scrollContainerRef, searchQuery, highlightText, hasMoreMessages, isFetchingMore, onLoadMore }: MessageListProps) {
+export function MessageList({ messages, sessionId, projectName, scrollContainerRef, searchQuery, highlightText, hasMoreMessages, isFetchingMore, onLoadMore }: MessageListProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
   const isStreaming = useStreamStore((state) => state.isStreaming);
+
+  // Retry handler: re-sends last user message via WebSocket (same mechanism as ChatComposer)
+  const handleRetry = useCallback(() => {
+    if (!sessionId || !projectName) return;
+    const session = useTimelineStore.getState().sessions.find((s) => s.id === sessionId);
+    if (!session) return;
+    // Find last user message (iterate from end)
+    const lastUserMsg = [...session.messages].reverse().find((m) => m.role === 'user');
+    if (!lastUserMsg) return;
+    wsClient.send({
+      type: 'claude-command',
+      command: lastUserMsg.content,
+      options: { projectPath: projectName, sessionId },
+    });
+  }, [sessionId, projectName]);
 
   // ─── useChatScroll hook (replaces ~120 lines of inline scroll logic) ──
   const {
@@ -177,7 +198,7 @@ export function MessageList({ messages, sessionId, scrollContainerRef, searchQue
           <div key={msg.id}>
             <div className="px-2 md:px-4">
               <MessageErrorBoundary>
-                <MemoizedMessageItem msg={msg} sessionId={sessionId} highlightText={highlightText} />
+                <MemoizedMessageItem msg={msg} sessionId={sessionId} highlightText={highlightText} onRetry={handleRetry} />
               </MessageErrorBoundary>
             </div>
           </div>
