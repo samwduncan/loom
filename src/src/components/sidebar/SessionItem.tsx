@@ -112,7 +112,7 @@ export function SessionItem({
   }, [title]);
 
   const handleDoubleClick = useCallback(
-    (e: MouseEvent) => {
+    (e: React.MouseEvent) => {
       e.stopPropagation();
       startEditing();
     },
@@ -159,6 +159,7 @@ export function SessionItem({
       {isMobile && (offset < 0 || revealed) && (
         <div
           className="absolute right-0 top-0 bottom-0 w-[80px] flex items-center justify-center"
+          // eslint-disable-next-line loom/no-banned-inline-style -- dynamic swipe reveal background
           style={{ background: 'var(--status-error)' }}
         >
           <button
@@ -175,11 +176,13 @@ export function SessionItem({
       {/* Session item content (translates via offset on mobile swipe) */}
       <div
         {...(isMobile ? bind() : {})}
+        /* eslint-disable loom/no-banned-inline-style -- gesture-driven dynamic values from @use-gesture */
         style={{
           transform: isMobile && offset !== 0 ? `translateX(${offset}px)` : undefined,
           transition: active ? 'none' : 'transform var(--duration-normal) var(--ease-out)',
           touchAction: isMobile ? 'pan-y' : 'auto',
         }}
+        /* eslint-enable loom/no-banned-inline-style */
       >
         <div
           role="option"

@@ -59,16 +59,16 @@ describe('useSwipeToDelete', () => {
   it('configures useDrag with axis:x, filterTaps:true, threshold:[10, Infinity]', () => {
     renderHook(() => useSwipeToDelete());
     expect(mockUseDrag).toHaveBeenCalled();
-    const config = mockUseDrag.mock.calls[0][1];
-    expect(config.axis).toBe('x');
-    expect(config.filterTaps).toBe(true);
-    expect(config.threshold).toEqual([10, Infinity]);
+    const config = mockUseDrag.mock.calls[0]?.[1];
+    expect(config?.axis).toBe('x');
+    expect(config?.filterTaps).toBe(true);
+    expect(config?.threshold).toEqual([10, Infinity]);
   });
 
   it('configures useDrag with pointer.touch:true', () => {
     renderHook(() => useSwipeToDelete());
-    const config = mockUseDrag.mock.calls[0][1];
-    expect(config.pointer).toEqual({ touch: true });
+    const config = mockUseDrag.mock.calls[0]?.[1];
+    expect(config?.pointer).toEqual({ touch: true });
   });
 
   it('left swipe past 80px on release sets revealed=true and offset=-80', () => {
@@ -101,7 +101,7 @@ describe('useSwipeToDelete', () => {
   });
 
   it('right swipe is cancelled -- offset stays 0', () => {
-    const { result } = renderHook(() => useSwipeToDelete());
+    renderHook(() => useSwipeToDelete());
     const cancelFn = vi.fn();
 
     act(() => {
@@ -238,7 +238,7 @@ describe('useSwipeToDelete', () => {
 
   it('fires hapticEvent on threshold crossing', async () => {
     const { hapticEvent } = await import('@/lib/haptics');
-    const { result } = renderHook(() => useSwipeToDelete());
+    renderHook(() => useSwipeToDelete());
 
     act(() => {
       gestureHandler({
@@ -255,7 +255,7 @@ describe('useSwipeToDelete', () => {
 
   it('has from function in useDrag config', () => {
     renderHook(() => useSwipeToDelete());
-    const config = mockUseDrag.mock.calls[0][1];
-    expect(typeof config.from).toBe('function');
+    const config = mockUseDrag.mock.calls[0]?.[1];
+    expect(typeof config?.from).toBe('function');
   });
 });

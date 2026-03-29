@@ -76,10 +76,10 @@ describe('usePullToRefresh', () => {
         scrollRef: mockScrollRef as React.RefObject<HTMLElement>,
       }),
     );
-    const config = mockUseDrag.mock.calls[0][1];
-    expect(config.axis).toBe('y');
-    expect(config.filterTaps).toBe(true);
-    expect(config.threshold).toEqual([Infinity, 10]);
+    const config = mockUseDrag.mock.calls[0]?.[1];
+    expect(config?.axis).toBe('y');
+    expect(config?.filterTaps).toBe(true);
+    expect(config?.threshold).toEqual([Infinity, 10]);
   });
 
   it('pull past threshold triggers onRefresh callback', async () => {
@@ -249,7 +249,7 @@ describe('usePullToRefresh', () => {
         scrollRef: mockScrollRef as React.RefObject<HTMLElement>,
       }),
     );
-    const config = mockUseDrag.mock.calls[0][1];
-    expect(config.pointer).toEqual({ touch: true });
+    const config = mockUseDrag.mock.calls[0]?.[1];
+    expect(config?.pointer).toEqual({ touch: true });
   });
 });

@@ -92,7 +92,7 @@ vi.mock('@/lib/websocket-client', () => ({
 }));
 
 // Capture SessionItemContextMenu callbacks for testing
-let capturedContextMenuCallbacks: Record<string, Record<string, () => void>> = {};
+let capturedContextMenuCallbacks: Record<string, { onRename: () => void; onDelete: () => void; onPin: () => void; onExport?: () => void; onSelect?: () => void }> = {};
 vi.mock('./SessionItemContextMenu', () => ({
   SessionItemContextMenu: ({ children, sessionId, onRename, onDelete, onPin, onExport, onSelect }: {
     children: React.ReactNode;
@@ -307,7 +307,7 @@ describe('SessionList', () => {
 
       // Trigger delete via captured context menu callback
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-del']!.onDelete(); });
+      act(() => { capturedContextMenuCallbacks['sess-del']!.onDelete(); }); // ASSERT: test session created in setup
       expect(screen.getByText('Delete session?')).toBeInTheDocument();
       // Clean up by clicking Cancel
       const cancelBtn = screen.getByRole('button', { name: 'Cancel' });
@@ -327,7 +327,7 @@ describe('SessionList', () => {
       renderSessionList();
 
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-cancel']!.onDelete(); });
+      act(() => { capturedContextMenuCallbacks['sess-cancel']!.onDelete(); }); // ASSERT: test session created in setup
       const cancelBtn = screen.getByRole('button', { name: 'Cancel' });
       await user.click(cancelBtn);
       expect(screen.getByText('Keep Me')).toBeInTheDocument();
@@ -350,7 +350,7 @@ describe('SessionList', () => {
       renderSessionList();
 
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-confirm']!.onDelete(); });
+      act(() => { capturedContextMenuCallbacks['sess-confirm']!.onDelete(); }); // ASSERT: test session created in setup
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
 
@@ -382,7 +382,7 @@ describe('SessionList', () => {
       renderSessionList();
 
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-new']!.onDelete(); });
+      act(() => { capturedContextMenuCallbacks['sess-new']!.onDelete(); }); // ASSERT: test session created in setup
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
       expect(mockNavigate).toHaveBeenCalledWith('/chat/sess-old');
@@ -404,7 +404,7 @@ describe('SessionList', () => {
       renderSessionList();
 
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-last']!.onDelete(); });
+      act(() => { capturedContextMenuCallbacks['sess-last']!.onDelete(); }); // ASSERT: test session created in setup
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
       expect(mockNavigate).toHaveBeenCalledWith('/chat');
@@ -431,7 +431,7 @@ describe('SessionList', () => {
 
       // Trigger rename via captured context menu callback
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-rename']!.onRename(); });
+      act(() => { capturedContextMenuCallbacks['sess-rename']!.onRename(); }); // ASSERT: test session created in setup
 
       const input = screen.getByDisplayValue('Old Title');
       await user.clear(input);
@@ -462,7 +462,7 @@ describe('SessionList', () => {
       renderSessionList();
 
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-fail']!.onRename(); });
+      act(() => { capturedContextMenuCallbacks['sess-fail']!.onRename(); }); // ASSERT: test session created in setup
 
       const input = screen.getByDisplayValue('Original Title');
       await user.clear(input);
@@ -492,7 +492,7 @@ describe('SessionList', () => {
       renderSessionList();
 
       const { act } = await import('@testing-library/react');
-      act(() => { capturedContextMenuCallbacks['sess-success']!.onRename(); });
+      act(() => { capturedContextMenuCallbacks['sess-success']!.onRename(); }); // ASSERT: test session created in setup
 
       const input = screen.getByDisplayValue('Before Rename');
       await user.clear(input);

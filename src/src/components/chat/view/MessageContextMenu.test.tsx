@@ -169,7 +169,6 @@ describe('MessageContextMenu', () => {
     // Also check the parent context-menu-trigger wrapper
     const contextTrigger = trigger.closest('[data-slot="context-menu-trigger"]');
     if (contextTrigger) {
-      const triggerStyle = window.getComputedStyle(contextTrigger);
       // Radix may apply user-select for interaction, but we should NOT force it
       // The key assertion: our component does NOT explicitly set user-select: none
       expect(trigger.style.userSelect).not.toBe('none');
