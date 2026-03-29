@@ -19,7 +19,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 64 — scroll-performance
+**Current focus:** Phase 65 — touch-target-compliance
 
 ## Current Position
 
@@ -44,15 +44,16 @@ Plan: Not started
 - [v2.2] Custom gesture hooks (useSwipeAction, usePullToRefresh, useLongPress), NOT @use-gesture/react -- research recommends custom but GESTURE-07 requirement stands
 - [v2.2] 4 new Capacitor plugins: @capacitor/app, @capacitor/clipboard, @capacitor/share, @capacitor/action-sheet
 - [v2.2] OLED true black only on outermost background -- surface hierarchy preserved for depth
-- [Phase 64]: ActiveMessage finalization reflow deferred by rAF + 50ms setTimeout (D-12, SCROLL-05)
-- [Phase 64]: content-visibility single CSS source (.msg-item at 150px) -- inline styles removed from MessageContainer
-- [Phase 64]: overscroll-behavior: none added to html/body, .native-scroll omits overscroll-behavior-y for iOS rubber band bounce (D-18)
-- [Phase 64]: Single IO threshold -150px rootMargin (not dual 200/100px hysteresis) -- debounce absorbs flicker
-- [Phase 64]: isAutoScrollingRef initialized from isStreaming prop to handle mount-with-active-stream
+- [Phase 64]: content-visibility: auto REMOVED from messages -- caused scroll jumping with variable heights. Browser renders all items at natural height.
+- [Phase 64]: Infinite scroll anchor restoration uses useLayoutEffect (not rAF) -- fires after DOM mutation before paint
+- [Phase 64]: overflow-x: hidden on message list scroll container -- prevents code block horizontal scroll on iOS
+- [Phase 64]: Virtualization NOT needed -- 60fps at 50+ messages on iPhone 16 Pro Max confirmed
+- [Phase 64]: ActiveMessage finalization reflow deferred by rAF + 50ms setTimeout (D-12)
+- [Phase 64]: overscroll-behavior: none on html/body, .native-scroll omits for iOS rubber band bounce
 
 ### Pending Todos
 
-- Phase 64 planning (`/gsd:plan-phase 64`)
+- None
 
 ### Blockers/Concerns
 
@@ -63,6 +64,6 @@ Plan: Not started
 
 ## Session Continuity
 
-Last session: 2026-03-28T20:42:16.032Z
-Stopped at: Completed 64-01-PLAN.md
-Resume: `/gsd:plan-phase 64`
+Last session: 2026-03-29
+Stopped at: Phase 64 complete, ready to plan Phase 65
+Resume: `/gsd:discuss-phase 65`
