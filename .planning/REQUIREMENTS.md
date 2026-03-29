@@ -158,7 +158,7 @@ Users interact with app via native iOS gestures: swipe-to-delete, pull-to-refres
   - _Acceptance:_ Haptics fire on: session select, sidebar toggle, pull-to-refresh complete, context menu open, swipe-to-delete reveal. Currently only on send/tool/error/selection.
   - _Why:_ Broader haptic coverage makes the app feel more responsive and native.
 
-- [ ] **GESTURE-06**: Long-press on message gives copy/retry context menu
+- [x] **GESTURE-06**: Long-press on message gives copy/retry context menu
   - _Acceptance:_ Long-press (500ms) on message bubble opens popover with Copy Text / Retry / Share options. Uses @capacitor/clipboard for reliable copy on HTTP origins.
   - _Why:_ Mobile pattern for secondary actions; avoids extra UI chrome in message view.
 
@@ -317,7 +317,7 @@ v2.2 ships when:
 | GESTURE-03 | 67 | Pending |
 | GESTURE-04 | 67 | Pending |
 | GESTURE-05 | 67 | Complete |
-| GESTURE-06 | 67 | Pending |
+| GESTURE-06 | 67 | Complete |
 | GESTURE-07 | 67 | Complete |
 | GESTURE-08 | 67 | Complete |
 | GESTURE-09 | 67 | Complete |

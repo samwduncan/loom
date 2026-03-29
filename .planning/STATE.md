@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
 status: Ready to execute
-stopped_at: Completed 67-01-PLAN.md
-last_updated: "2026-03-29T21:23:26.320Z"
+stopped_at: Completed 67-03-PLAN.md
+last_updated: "2026-03-29T21:31:07.400Z"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 67 (ios-native-gestures) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Performance Metrics
 
@@ -61,6 +61,8 @@ Plan: 2 of 4
 - [Phase 67]: All Capacitor plugins installed as production deps (not devDependencies) to avoid tree-shaking in iOS builds
 - [Phase 67]: hapticEvent centralized grammar with 7 named events maps to underlying impact/notification/selection functions
 - [Phase 67]: useAppLifecycle debounces at 300ms to prevent reconnection storms on rapid iOS foreground/background cycles
+- [Phase 67]: Retry uses wsClient.send with claude-command matching ChatComposer send format -- ensures backend processes retry identically
+- [Phase 67]: No user-select:none on ContextMenuTrigger -- text selection preserved, Radix handles long-press via native contextmenu event
 
 ### Pending Todos
 
@@ -75,6 +77,6 @@ Plan: 2 of 4
 
 ## Session Continuity
 
-Last session: 2026-03-29T21:23:26.317Z
-Stopped at: Completed 67-01-PLAN.md
+Last session: 2026-03-29T21:31:07.397Z
+Stopped at: Completed 67-03-PLAN.md
 Resume: `/gsd:discuss-phase 65`
