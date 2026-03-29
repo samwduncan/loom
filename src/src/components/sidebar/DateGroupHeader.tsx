@@ -20,7 +20,7 @@ export function DateGroupHeader({ label }: DateGroupHeaderProps) {
       className={cn(
         'sticky top-0 z-[var(--z-sticky)]',
         'bg-surface-raised px-3 py-1.5',
-        'text-[length:0.6875rem] font-medium uppercase tracking-wider',
+        'text-[length:var(--text-xs)] font-medium uppercase tracking-wider',
         'text-muted select-none',
       )}
       role="presentation"

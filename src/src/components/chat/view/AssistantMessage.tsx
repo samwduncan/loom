@@ -78,7 +78,7 @@ export const AssistantMessage = memo(function AssistantMessage({ message, highli
         />
       )}
       {highlightText ? (
-        <div className="markdown-body text-foreground text-sm leading-relaxed whitespace-pre-wrap">
+        <div className="markdown-body text-foreground text-[length:var(--text-body)] leading-relaxed whitespace-pre-wrap">
           {highlightText(message.content)}
         </div>
       ) : (

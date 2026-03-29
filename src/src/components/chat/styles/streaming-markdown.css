@@ -24,7 +24,7 @@
 }
 
 .active-message .streaming-code-lang {
-  font-size: 0.75rem;
+  font-size: var(--text-xs); /* 12px, token consistency */
   color: var(--text-muted);
   text-transform: uppercase;
   margin-bottom: var(--space-1);

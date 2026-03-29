@@ -181,7 +181,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({ content }: Mark
   }, []);
 
   return (
-    <div className="markdown-body text-foreground text-sm leading-relaxed overflow-hidden">
+    <div className="markdown-body text-foreground text-[length:var(--text-body)] leading-relaxed overflow-hidden">
       <Markdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
