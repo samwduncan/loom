@@ -74,12 +74,18 @@ describe('tokens.css design token file', () => {
     // File should have a :root block
     expect(tokensContent).toContain(':root');
 
-    // Verify no duplicate color properties in :root
-    const rootMatch = tokensContent.match(/:root\s*\{([\s\S]*)\}/);
+    // Verify no duplicate color properties in the main :root block (not mobile override)
+    // Use non-greedy match to capture only the first :root block, stopping before
+    // the @media (max-width: 767px) { :root { ... } } mobile override block
+    const rootMatch = tokensContent.match(/:root\s*\{([^}]*)\}/);
     expect(rootMatch).not.toBeNull();
 
     const rootBlock = rootMatch![1]!; // ASSERT: regex matched :root block verified by preceding expect
     const surfaceBaseMatches = rootBlock.match(/--surface-base\s*:/g);
     expect(surfaceBaseMatches).toHaveLength(1);
+
+    // Verify --text-code appears in both main :root and mobile override
+    const textCodeMatches = tokensContent.match(/--text-code\s*:/g);
+    expect(textCodeMatches).toHaveLength(2); // base + mobile override
   });
 });

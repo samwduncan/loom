@@ -213,11 +213,9 @@ html[data-native] .native-scroll {
     line-height: 1.6;       /* TYPO-07: mobile reading comfort */
   }
 
-  /* TYPO-06: Action labels minimum 14px on mobile (per D-16, D-17) */
-  [cmdk-item],
-  [cmdk-empty] {
-    font-size: 0.875rem;    /* 14px -- already this value, defensive floor */
-  }
+  /* TYPO-06 audit: [cmdk-item]/[cmdk-empty] already render at 14px via
+   * command-palette.css:66. No override needed. Action labels in Settings
+   * modal (shadcn Button = 14px) and form labels (inherit body) also pass. */
 }
 
 /* ─── Keyboard Avoidance (web only) ──────── */

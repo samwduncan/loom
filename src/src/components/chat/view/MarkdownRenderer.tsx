@@ -43,7 +43,7 @@ const components: Components = {
     }
     return (
       <code
-        className="bg-code-inline rounded-sm px-1.5 py-0.5 font-mono text-[0.85em] break-all"
+        className="bg-code-inline rounded-sm px-1.5 py-0.5 font-mono text-[length:var(--text-code)] break-all"
         {...rest}
       >
         {children}

@@ -24,7 +24,7 @@ test.describe('Typography mobile compliance', () => {
       const issues: Array<{ tag: string; text: string; fontSize: string; className: string }> = [];
 
       // Known exceptions: badge counts (text-[10px]), desktop-only hints (lg: guard), dev components
-      const EXCEPTION_CLASSES = ['text-\\[10px\\]', 'lg:'];
+      const EXCEPTION_CLASSES = ['text-[10px]', 'lg:'];
 
       const walker = document.createTreeWalker(
         document.body,
@@ -55,7 +55,7 @@ test.describe('Typography mobile compliance', () => {
 
         // Skip known exception classes
         const fullClassName = el.className?.toString() || '';
-        const isException = EXCEPTION_CLASSES.some((cls) => fullClassName.includes(cls.replace('\\', '')));
+        const isException = EXCEPTION_CLASSES.some((cls) => fullClassName.includes(cls));
         if (isException) continue;
 
         // Also skip if any ancestor has an exception class
@@ -63,7 +63,7 @@ test.describe('Typography mobile compliance', () => {
         let ancestorException = false;
         while (ancestor) {
           const ancestorClass = ancestor.className?.toString() || '';
-          if (EXCEPTION_CLASSES.some((cls) => ancestorClass.includes(cls.replace('\\', '')))) {
+          if (EXCEPTION_CLASSES.some((cls) => ancestorClass.includes(cls))) {
             ancestorException = true;
             break;
           }
@@ -173,7 +173,7 @@ test.describe('Typography mobile compliance', () => {
       const menuExists = await menuButton.isVisible().catch(() => false);
       if (menuExists) {
         await menuButton.click();
-        await page.waitForTimeout(500);
+        await page.waitForSelector('[role="option"]', { timeout: 3000 }).catch(() => {});
       }
     }
 
