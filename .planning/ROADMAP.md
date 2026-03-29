@@ -134,7 +134,7 @@
 - Integer phases (64, 65, 66...): Planned milestone work
 - Decimal phases (64.1, 64.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 64: Scroll Performance** - Eliminate scroll jank sources, validate 60fps on real device with 50+ messages
+- [x] **Phase 64: Scroll Performance** - Eliminate scroll jank sources, validate 60fps on real device with 50+ messages (completed 2026-03-29)
 - [ ] **Phase 65: Touch Target Compliance** - Fix all 7 touch target violations to meet Apple's 44px minimum
 - [ ] **Phase 66: Typography & Spacing** - Mobile-optimized font sizes, spacing, and text density
 - [ ] **Phase 67: iOS-Native Gestures** - Swipe-to-delete, pull-to-refresh, long-press context menus, app lifecycle, native share/clipboard
@@ -156,7 +156,7 @@
 Plans:
 - [x] 64-01-PLAN.md -- Core scroll hook (useChatScroll) with IO sentinel, ResizeObserver auto-follow, dead code cleanup
 - [x] 64-02-PLAN.md -- Secondary jank fixes: ActiveMessage deferred reflow, overscroll-behavior, content-visibility reconciliation
-- [ ] 64-03-PLAN.md -- statusTap verification, virtualization gate, real device 60fps validation
+- [x] 64-03-PLAN.md -- statusTap verification, virtualization gate, real device 60fps validation
 **UI hint**: yes
 
 ### Phase 65: Touch Target Compliance
@@ -237,7 +237,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 64. Scroll Performance | 2/3 | In Progress|  |
+| 64. Scroll Performance | 3/3 | Complete    | 2026-03-29 |
 | 65. Touch Target Compliance | 0/? | Not started | - |
 | 66. Typography & Spacing | 0/? | Not started | - |
 | 67. iOS-Native Gestures | 0/? | Not started | - |
