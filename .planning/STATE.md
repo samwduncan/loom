@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
-status: Ready to execute
-stopped_at: Completed Wave 2 (67-02 + 67-03)
-last_updated: "2026-03-29T21:40:00.000Z"
+status: Awaiting device verification
+stopped_at: Completed 67-04 Task 1 (human checkpoint pending)
+last_updated: "2026-03-29T21:43:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 3
@@ -19,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 67 — ios-native-gestures
+**Current focus:** Phase 67 — ios-native-gestures (awaiting device verification)
 
 ## Current Position
 
 Phase: 67 (ios-native-gestures) — EXECUTING
-<<<<<<< Updated upstream
-Plan: 3 of 4
-=======
-Plan: 4 of 4
->>>>>>> Stashed changes
+Plan: 4 of 4 (Task 1 complete, Task 2 human checkpoint pending)
 
 ## Performance Metrics
 
@@ -67,14 +63,12 @@ Plan: 4 of 4
 - [Phase 67]: useAppLifecycle debounces at 300ms to prevent reconnection storms on rapid iOS foreground/background cycles
 - [Phase 67]: Retry uses wsClient.send with claude-command matching ChatComposer send format -- ensures backend processes retry identically
 - [Phase 67]: No user-select:none on ContextMenuTrigger -- text selection preserved, Radix handles long-press via native contextmenu event
-<<<<<<< Updated upstream
-=======
 - [Phase 67]: Export handler shares title+ID via nativeShare (not full markdown); SessionContextMenu deprecated; Radix ContextMenu for long-press context menus
->>>>>>> Stashed changes
+- [Phase 67]: Haptic on sidebar toggle buttons only (not swipe-to-close or programmatic auto-close) per D-02
 
 ### Pending Todos
 
-- None
+- Phase 67 Task 2: Real-device validation of all GESTURE requirements
 
 ### Blockers/Concerns
 
@@ -85,11 +79,6 @@ Plan: 4 of 4
 
 ## Session Continuity
 
-<<<<<<< Updated upstream
-Last session: 2026-03-29T21:31:07.397Z
-Stopped at: Completed 67-03-PLAN.md
-=======
-Last session: 2026-03-29T21:36:14.963Z
-Stopped at: Completed 67-02-PLAN.md
->>>>>>> Stashed changes
-Resume: `/gsd:discuss-phase 65`
+Last session: 2026-03-29T21:43:00.000Z
+Stopped at: Completed 67-04 Task 1 (human checkpoint pending)
+Resume: Approve 67-04 Task 2 checkpoint, then proceed to Phase 68
