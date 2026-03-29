@@ -130,7 +130,11 @@
 
   /* ─── Typography Scale ────────────────────────────────────────────
    * Bold scale: 14→18→24→32. Greater dynamic range for visual authority.
+   * --text-xs/--text-sm/--text-code fill the sub-body range (TYPO-01, D-03).
    */
+  --text-xs: 0.75rem;       /* 12px - minimum readable, DateGroupHeader, badges */
+  --text-sm: 0.8125rem;     /* 13px - compact text, git panel, tool cards */
+  --text-code: 0.8125rem;   /* 13px - monospace code blocks desktop */
   --text-body: 0.875rem;
   --text-h3: 1.125rem;
   --text-h2: 1.5rem;
@@ -217,4 +221,16 @@
    * Parameterized dimensions for shell grid columns
    */
   --sidebar-expanded-width: 280px;
+}
+
+/* ─── Mobile Typography Token Overrides (TYPO-04) ─────────────────
+ * Overrides --text-code on :root so var(--text-code) resolves to 18px
+ * everywhere on mobile — including streaming-markdown.css code blocks.
+ * This avoids specificity battles with component CSS that loads after
+ * global CSS in Vite's module graph.
+ */
+@media (max-width: 767px) {
+  :root {
+    --text-code: 1.125rem;  /* 18px code at mobile distance */
+  }
 }

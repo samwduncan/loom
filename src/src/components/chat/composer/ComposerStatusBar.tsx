@@ -173,7 +173,7 @@ export const ComposerStatusBar = memo(function ComposerStatusBar({
             )}
           >
             <div className="font-medium">{PERMISSION_LABELS[mode]}</div>
-            <div className="text-[10px] text-muted">{PERMISSION_DESCRIPTIONS[mode]}</div>
+            <div className="text-[10px] max-md:text-[length:var(--text-xs)] text-muted">{PERMISSION_DESCRIPTIONS[mode]}</div>
           </button>
         ))}
       </PopoverContent>

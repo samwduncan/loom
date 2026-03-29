@@ -188,6 +188,38 @@ html[data-native] .native-scroll {
   }
 }
 
+/* ─── Mobile Typography Overrides (TYPO-04, TYPO-07) ─────────────
+ * Mobile reading at arm's length benefits from slightly larger body
+ * text (15px vs 14px desktop) and significantly larger code (18px vs
+ * 13px desktop). Line-height 1.6 improves readability for multi-line
+ * content. Both .markdown-body (finalized) and .active-message
+ * (streaming) MUST match to prevent CLS on stream completion.
+ * Per D-02: No clamp() -- clean breakpoint split only.
+ *
+ * NOTE: Code block mobile sizing is handled via --text-code token
+ * override in tokens.css (18px on mobile). This avoids specificity
+ * battles with streaming-markdown.css which uses var(--text-code).
+ * Do NOT add explicit code font-size selectors here.
+ *
+ * TYPO-06 audit: Settings modal buttons (shadcn Button = 14px), form labels
+ * (inherit body 14px), CommandPalette items (below). All action labels >= 14px.
+ * ComposerStatusBar permission text fixed to 12px mobile floor in TSX.
+ * Metadata text (timestamps, group headings) intentionally stays at 12px per D-17.
+ */
+@media (max-width: 767px) {
+  .markdown-body,
+  .active-message {
+    font-size: 0.9375rem;   /* 15px body text at mobile distance (TYPO-04) */
+    line-height: 1.6;       /* TYPO-07: mobile reading comfort */
+  }
+
+  /* TYPO-06: Action labels minimum 14px on mobile (per D-16, D-17) */
+  [cmdk-item],
+  [cmdk-empty] {
+    font-size: 0.875rem;    /* 14px -- already this value, defensive floor */
+  }
+}
+
 /* ─── Keyboard Avoidance (web only) ──────── */
 /* Web browsers: keyboard overlays the viewport; we shrink the shell by
    --keyboard-offset so the composer stays visible above the keyboard.
