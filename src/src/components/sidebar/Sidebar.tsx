@@ -18,6 +18,7 @@ import { Settings, ChevronLeft, ChevronRight, Menu, X } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
 import { useMobile } from '@/hooks/useMobile';
+import { hapticEvent } from '@/lib/haptics';
 import { ConnectionStatusIndicator } from '@/components/shared/ConnectionStatusIndicator';
 import { NewChatButton } from './NewChatButton';
 import { SessionList } from './SessionList';
@@ -29,6 +30,13 @@ export const Sidebar = memo(function Sidebar() {
   const openModal = useUIStore((state) => state.openModal);
   const isMobile = useMobile();
   const location = useLocation();
+
+  // GESTURE-05: Wrap toggleSidebar with haptic feedback for button-triggered toggles.
+  // Swipe-to-close touch handlers are NOT modified (D-02).
+  const handleToggleWithHaptic = useCallback(() => {
+    hapticEvent('sidebarToggle');
+    toggleSidebar();
+  }, [toggleSidebar]);
 
   // Auto-close mobile drawer on route change (session select, new chat)
   const prevPathRef = useRef(location.pathname);
@@ -106,7 +114,7 @@ export const Sidebar = memo(function Sidebar() {
     if (isMobile) {
       return (
         <button
-          onClick={toggleSidebar}
+          onClick={handleToggleWithHaptic}
           className={cn(
             'fixed left-3 top-[calc(0.75rem+env(safe-area-inset-top))]',
             'z-[var(--z-overlay)] p-3',
@@ -128,7 +136,7 @@ export const Sidebar = memo(function Sidebar() {
     // Desktop: mid-left chevron
     return (
       <button
-        onClick={toggleSidebar}
+        onClick={handleToggleWithHaptic}
         className={cn(
           'fixed left-0 top-1/2 -translate-y-1/2',
           'z-[var(--z-overlay)] p-2',
@@ -161,7 +169,7 @@ export const Sidebar = memo(function Sidebar() {
           <ConnectionStatusIndicator />
         </span>
         <button
-          onClick={toggleSidebar}
+          onClick={handleToggleWithHaptic}
           className={cn(
             'p-3 md:p-1 rounded-md',
             'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
@@ -217,7 +225,7 @@ export const Sidebar = memo(function Sidebar() {
         </div>
         <button
           className="flex-1 bg-black/40 cursor-default"
-          onClick={toggleSidebar}
+          onClick={handleToggleWithHaptic}
           aria-label="Close menu"
           type="button"
           tabIndex={-1}

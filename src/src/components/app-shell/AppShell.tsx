@@ -12,6 +12,7 @@
 import { memo, lazy, Suspense } from 'react';
 import { cn } from '@/utils/cn';
 import { useUIStore } from '@/stores/ui';
+import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { Sidebar } from '@/components/sidebar/Sidebar';
 import { PanelErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { ConnectionBanner } from '@/components/shared/ConnectionBanner';
@@ -32,6 +33,9 @@ const LazyCommandPalette = lazy(() =>
 
 export const AppShell = memo(function AppShell() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
+
+  // GESTURE-08: Reconnect WebSocket on foreground return (native only)
+  useAppLifecycle();
 
   return (
     <>
