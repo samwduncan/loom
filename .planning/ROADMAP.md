@@ -138,6 +138,7 @@
 - [x] **Phase 65: Touch Target Compliance** - Fix all 7 touch target violations to meet Apple's 44px minimum (completed 2026-03-29)
 - [x] **Phase 66: Typography & Spacing** - Mobile-optimized font sizes, spacing, and text density (completed 2026-03-29)
 - [ ] **Phase 67: iOS-Native Gestures** - Swipe-to-delete, pull-to-refresh, long-press context menus, app lifecycle, native share/clipboard
+- [ ] **Phase 67.1: iOS Bug Fixes (INSERTED)** - Fix 15 Forgejo issues (#2-#17) from device testing of Phase 67
 - [ ] **Phase 68: Visual Polish** - OLED blacks, glass effects, spring tuning, contrast compliance for iOS
 
 ## Phase Details
@@ -208,6 +209,25 @@ Plans:
 - [x] 67-04-PLAN.md -- App lifecycle wiring in AppShell, sidebar haptic (Task 1 complete; Task 2 device validation pending)
 **UI hint**: yes
 
+### Phase 67.1: iOS Bug Fixes (INSERTED)
+**Goal**: Fix 15 Forgejo issues (#2-#17) discovered during real-device testing of Phase 67 -- broken context menus, gesture conflicts, haptics not firing, CSS token errors, keyboard desync, and UI density problems
+**Depends on**: Phase 67
+**Requirements**: Forgejo #2, #3, #4, #5, #6, #7, #8, #9, #10, #12, #13, #14, #15, #16, #17
+**Success Criteria** (what must be TRUE):
+  1. Long-pressing session items and messages opens context menus on iOS (not text selection)
+  2. Swipe-to-delete works inside sidebar without closing the sidebar panel
+  3. Haptic feedback fires on all gesture events
+  4. All CSS custom properties resolve to valid values (no undefined tokens)
+  5. Keyboard animation is synchronized with composer position
+**Plans**: 5 plans
+Plans:
+- [ ] 67.1-01-PLAN.md -- CSS token fixes (#8, #9, #10), Capacitor deps to production (#16), accessory bar hidden (#4)
+- [ ] 67.1-02-PLAN.md -- Sidebar edge-zone gesture isolation (#12), delete button z-ordering (#17), session list overflow (#7)
+- [ ] 67.1-03-PLAN.md -- useLongPress hook + dual-path context menus replacing Radix ContextMenu on iOS (#14, #15)
+- [ ] 67.1-04-PLAN.md -- Auto-focus prevention (#2), keyboard animation sync (#3), PTR spring animation (#13)
+- [ ] 67.1-05-PLAN.md -- Page reload investigation (#5), haptics verification (#16), mobile UI density (#6)
+**UI hint**: yes
+
 ### Phase 68: Visual Polish
 **Goal**: Loom looks stunning on OLED -- true blacks save power, glass effects render smoothly, springs feel native at 120Hz, and contrast meets accessibility standards
 **Depends on**: Phase 67 (all features in place for holistic visual review)
@@ -252,6 +272,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 | 65. Touch Target Compliance | 2/2 | Complete    | 2026-03-29 |
 | 66. Typography & Spacing | 2/2 | Complete   | 2026-03-29 |
 | 67. iOS-Native Gestures | 4/4 | Awaiting Verification |  |
+| 67.1. iOS Bug Fixes | 0/5 | Not started | - |
 | 68. Visual Polish | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
@@ -261,4 +282,4 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-29 after Phase 67 planning complete*
+*Last updated: 2026-03-29 after Phase 67.1 planning complete*
