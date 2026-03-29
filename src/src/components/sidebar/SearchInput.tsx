@@ -41,8 +41,9 @@ export function SearchInput({ value, onChange }: SearchInputProps) {
         className={cn(
           'w-full bg-surface-base border border-border rounded-md',
           'pl-7 pr-7 py-1.5 text-base md:text-sm',
+          'min-h-[44px] md:min-h-0',
           'text-foreground placeholder:text-muted',
-          'outline-none focus-visible:ring-2 focus-visible:ring-ring',
+          'outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
           'transition-colors duration-[var(--duration-fast)]',
         )}
       />
@@ -52,8 +53,9 @@ export function SearchInput({ value, onChange }: SearchInputProps) {
           onClick={handleClear}
           aria-label="Clear search"
           className={cn(
-            'absolute right-2 text-muted hover:text-foreground',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
+            'absolute right-0 top-0 h-full min-w-[44px] md:min-w-0 flex items-center justify-center',
+            'text-muted hover:text-foreground',
+            'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 rounded-sm',
             'transition-colors duration-[var(--duration-fast)]',
           )}
         >

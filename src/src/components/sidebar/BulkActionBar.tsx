@@ -34,8 +34,9 @@ export function BulkActionBar({ count, onDelete, onCancel }: BulkActionBarProps)
           aria-label={`Delete ${count} selected session${count !== 1 ? 's' : ''}`}
           className={cn(
             'p-1.5 rounded-md text-[var(--status-error)]',
+            'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center',
             'hover:bg-destructive/20',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
             'transition-colors duration-[var(--duration-fast)]',
           )}
         >
@@ -47,7 +48,8 @@ export function BulkActionBar({ count, onDelete, onCancel }: BulkActionBarProps)
           aria-label="Cancel selection"
           className={cn(
             'p-1.5 rounded-md text-muted hover:text-foreground hover:bg-surface-raised/50',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center',
+            'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
             'transition-colors duration-[var(--duration-fast)]',
           )}
         >

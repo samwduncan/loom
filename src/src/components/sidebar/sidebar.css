@@ -11,7 +11,7 @@
 /* Session item focus ring */
 .session-item-hover:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 /* Session item active state -- 3px accent left border */
@@ -35,6 +35,21 @@
 
 .context-menu-item:hover {
   background-color: var(--surface-overlay);
+}
+
+/* Mobile touch target for context menu items */
+@media (max-width: 767px) {
+  .context-menu-item {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.context-menu-item:focus-visible {
+  outline: none;
+  background-color: var(--surface-overlay);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .context-menu-item-danger {
