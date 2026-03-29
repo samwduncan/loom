@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
-status: Phase 66 complete — all plans executed, AR clean, regression gate passed
-stopped_at: Phase 67 context gathered
-last_updated: "2026-03-29T20:23:58.378Z"
+status: Ready to execute
+stopped_at: Completed 67-01-PLAN.md
+last_updated: "2026-03-29T21:23:26.320Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 11
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 66 — typography-spacing
+**Current focus:** Phase 67 — ios-native-gestures
 
 ## Current Position
 
-Phase: 66 (typography-spacing) — COMPLETE
-Plans: 2/2 complete + AR fixes
+Phase: 67 (ios-native-gestures) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
@@ -58,6 +58,9 @@ Plans: 2/2 complete + AR fixes
 - [Phase 66]: CodeBlock desktop size intentionally reduced 14px->13px (--text-code) per D-03; prior 14px was artifact of generic text-sm class
 - [Phase 66]: TYPO-02/03/05/08 all pass without code changes -- verify-first approach confirmed existing implementations are compliant
 - [Phase 66]: V2_CONSTITUTION Section 14 (Typography) documents all conventions including --text-code :root override strategy
+- [Phase 67]: All Capacitor plugins installed as production deps (not devDependencies) to avoid tree-shaking in iOS builds
+- [Phase 67]: hapticEvent centralized grammar with 7 named events maps to underlying impact/notification/selection functions
+- [Phase 67]: useAppLifecycle debounces at 300ms to prevent reconnection storms on rapid iOS foreground/background cycles
 
 ### Pending Todos
 
@@ -72,6 +75,6 @@ Plans: 2/2 complete + AR fixes
 
 ## Session Continuity
 
-Last session: 2026-03-29T20:23:58.376Z
-Stopped at: Phase 67 context gathered
+Last session: 2026-03-29T21:23:26.317Z
+Stopped at: Completed 67-01-PLAN.md
 Resume: `/gsd:discuss-phase 65`

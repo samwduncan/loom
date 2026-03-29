@@ -154,7 +154,7 @@ Users interact with app via native iOS gestures: swipe-to-delete, pull-to-refres
   - _Acceptance:_ Pan from left edge of chat area opens sidebar drawer; already implemented; verify on real device.
   - _Why:_ iOS-standard navigation; users coming from native apps expect this.
 
-- [ ] **GESTURE-05**: Haptic feedback integrated into more touch actions beyond current set
+- [x] **GESTURE-05**: Haptic feedback integrated into more touch actions beyond current set
   - _Acceptance:_ Haptics fire on: session select, sidebar toggle, pull-to-refresh complete, context menu open, swipe-to-delete reveal. Currently only on send/tool/error/selection.
   - _Why:_ Broader haptic coverage makes the app feel more responsive and native.
 
@@ -162,19 +162,19 @@ Users interact with app via native iOS gestures: swipe-to-delete, pull-to-refres
   - _Acceptance:_ Long-press (500ms) on message bubble opens popover with Copy Text / Retry / Share options. Uses @capacitor/clipboard for reliable copy on HTTP origins.
   - _Why:_ Mobile pattern for secondary actions; avoids extra UI chrome in message view.
 
-- [ ] **GESTURE-07**: @use-gesture/react library for professional gesture handling
+- [x] **GESTURE-07**: @use-gesture/react library for professional gesture handling
   - _Acceptance:_ All gesture hooks (swipe, long-press, pull-to-refresh) use @use-gesture/react for velocity tracking, direction detection, and conflict resolution. No raw touchstart/touchmove event handlers for new gestures.
   - _Why:_ 6KB for battle-tested gesture math. Raw touch handlers are a half-measure -- they reinvent the library poorly and miss edge cases (multi-touch, scroll conflicts, velocity thresholds).
 
-- [ ] **GESTURE-08**: @capacitor/app lifecycle -- reconnect WebSocket on foreground return
+- [x] **GESTURE-08**: @capacitor/app lifecycle -- reconnect WebSocket on foreground return
   - _Acceptance:_ When app returns from background, WebSocket auto-reconnects within 2 seconds. Uses `App.addListener('appStateChange')`. No stale UI after backgrounding.
   - _Why:_ Currently backgrounding kills the WS connection silently and user sees stale state on return. Critical for daily-driver usage.
 
-- [ ] **GESTURE-09**: Native share sheet for conversations and code blocks
+- [x] **GESTURE-09**: Native share sheet for conversations and code blocks
   - _Acceptance:_ Share button in message context menu and session export opens iOS native share sheet (UIActivityViewController) via @capacitor/share. Falls back to Web Share API on desktop.
   - _Why:_ Users want to share interesting AI conversations. Native share sheet gives AirDrop, Messages, Mail, Notes access.
 
-- [ ] **GESTURE-10**: Native action sheet for destructive confirmations
+- [x] **GESTURE-10**: Native action sheet for destructive confirmations
   - _Acceptance:_ Delete session confirmation uses native iOS action sheet (slides from bottom) via @capacitor/action-sheet on native. Falls back to existing Radix AlertDialog on web.
   - _Why:_ Native action sheet looks and feels right on iOS. Web-style modals feel foreign.
 
@@ -316,12 +316,12 @@ v2.2 ships when:
 | GESTURE-02 | 67 | Pending |
 | GESTURE-03 | 67 | Pending |
 | GESTURE-04 | 67 | Pending |
-| GESTURE-05 | 67 | Pending |
+| GESTURE-05 | 67 | Complete |
 | GESTURE-06 | 67 | Pending |
-| GESTURE-07 | 67 | Pending |
-| GESTURE-08 | 67 | Pending |
-| GESTURE-09 | 67 | Pending |
-| GESTURE-10 | 67 | Pending |
+| GESTURE-07 | 67 | Complete |
+| GESTURE-08 | 67 | Complete |
+| GESTURE-09 | 67 | Complete |
+| GESTURE-10 | 67 | Complete |
 | VISUAL-01 | 68 | Pending |
 | VISUAL-02 | 68 | Pending |
 | VISUAL-03 | 68 | Pending |

@@ -202,7 +202,7 @@ Plans:
   5. Share and delete confirmations use native iOS sheets (UIActivityViewController, action sheet) on native, Radix fallbacks on web
 **Plans**: 4 plans
 Plans:
-- [ ] 67-01-PLAN.md -- Dependencies + Capacitor utility modules (native-clipboard, native-share, native-actions, app-lifecycle) + haptic event map + useAppLifecycle hook
+- [x] 67-01-PLAN.md -- Dependencies + Capacitor utility modules (native-clipboard, native-share, native-actions, app-lifecycle) + haptic event map + useAppLifecycle hook
 - [ ] 67-02-PLAN.md -- Sidebar gestures: swipe-to-delete hook, pull-to-refresh hook + spinner, Radix context menu migration, SessionItem/SessionList wiring
 - [ ] 67-03-PLAN.md -- Message context menus: long-press Copy Text/Retry/Share on user and assistant messages, native share integration
 - [ ] 67-04-PLAN.md -- App lifecycle wiring in AppShell, sidebar haptic, real-device validation checkpoint
@@ -251,7 +251,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 | 64. Scroll Performance | 3/3 | Complete    | 2026-03-29 |
 | 65. Touch Target Compliance | 2/2 | Complete    | 2026-03-29 |
 | 66. Typography & Spacing | 2/2 | Complete   | 2026-03-29 |
-| 67. iOS-Native Gestures | 0/4 | Not started | - |
+| 67. iOS-Native Gestures | 1/4 | In Progress|  |
 | 68. Visual Polish | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
