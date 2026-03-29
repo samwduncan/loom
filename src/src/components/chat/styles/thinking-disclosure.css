@@ -25,7 +25,7 @@
   border: none;
   color: var(--text-muted);
   font-family: var(--font-ui);
-  font-size: 0.875rem;
+  font-size: 0.875rem; /* TYPO-02: 14px minimum -- verified, no mobile override shrinks this */
   cursor: pointer;
   padding: 0;
 }
