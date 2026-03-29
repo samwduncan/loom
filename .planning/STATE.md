@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
-status: Awaiting device verification
-stopped_at: Completed 67-04 Task 1 (human checkpoint pending)
-last_updated: "2026-03-29T21:43:00.000Z"
+status: Ready to execute
+stopped_at: Completed 67.1-01-PLAN.md
+last_updated: "2026-03-29T23:34:54.342Z"
 progress:
-  total_phases: 5
-  completed_phases: 3
-  total_plans: 11
-  completed_plans: 8
+  total_phases: 6
+  completed_phases: 4
+  total_plans: 16
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 67 — ios-native-gestures (awaiting device verification)
+**Current focus:** Phase 67.1 — ios-bug-fixes
 
 ## Current Position
 
-Phase: 67 (ios-native-gestures) — EXECUTING
-Plan: 4 of 4 (Task 1 complete, Task 2 human checkpoint pending)
+Phase: 67.1 (ios-bug-fixes) — EXECUTING
+Plan: 2 of 5
 
 ## Performance Metrics
 
@@ -65,6 +65,12 @@ Plan: 4 of 4 (Task 1 complete, Task 2 human checkpoint pending)
 - [Phase 67]: No user-select:none on ContextMenuTrigger -- text selection preserved, Radix handles long-press via native contextmenu event
 - [Phase 67]: Export handler shares title+ID via nativeShare (not full markdown); SessionContextMenu deprecated; Radix ContextMenu for long-press context menus
 - [Phase 67]: Haptic on sidebar toggle buttons only (not swipe-to-close or programmatic auto-close) per D-02
+- [Phase 67.1]: Accessory bar hidden (isVisible: false) -- Done button row visually intrusive on iPhone
+- [Phase 67.1]: Haptics diagnostic console.log added for Xcode debugging (not console.warn)
+
+### Roadmap Evolution
+
+- Phase 67.1 inserted after Phase 67: iOS Bug Fixes (URGENT) -- 8 open Forgejo issues (#2-#10) from device testing
 
 ### Pending Todos
 
@@ -79,6 +85,6 @@ Plan: 4 of 4 (Task 1 complete, Task 2 human checkpoint pending)
 
 ## Session Continuity
 
-Last session: 2026-03-29T21:43:00.000Z
-Stopped at: Completed 67-04 Task 1 (human checkpoint pending)
+Last session: 2026-03-29T23:34:54.340Z
+Stopped at: Completed 67.1-01-PLAN.md
 Resume: Approve 67-04 Task 2 checkpoint, then proceed to Phase 68
