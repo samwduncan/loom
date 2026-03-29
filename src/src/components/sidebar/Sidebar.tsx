@@ -110,7 +110,7 @@ export const Sidebar = memo(function Sidebar() {
           className={cn(
             'fixed left-3 top-[calc(0.75rem+env(safe-area-inset-top))]',
             'z-[var(--z-overlay)] p-3',
-            'min-h-[44px] min-w-[44px]',
+            'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
             'bg-surface-raised/80 backdrop-blur-sm rounded-lg',
             'border border-border/50',
             'text-muted hover:text-foreground',
