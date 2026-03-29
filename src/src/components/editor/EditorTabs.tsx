@@ -82,7 +82,7 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
               aria-label={filename}
               className={cn(
                 'px-3 py-1.5 text-xs font-[family-name:var(--font-mono)] flex items-center gap-1.5 cursor-pointer shrink-0 border-r border-border/8 transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
                 isActive
                   ? 'bg-[var(--surface-raised)] text-foreground'
                   : 'text-muted-foreground hover:text-foreground',
@@ -105,7 +105,7 @@ export function EditorTabs({ onSave }: EditorTabsProps) {
               <span className="truncate max-w-[120px]">{filename}</span>
               <button
                 type="button"
-                className="ml-1 p-0.5 rounded-sm hover:bg-[var(--surface-overlay)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="ml-1 p-0.5 rounded-sm hover:bg-[var(--surface-overlay)] transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
                 aria-label={`Close ${filename}`}
                 onClick={(e) => handleClose(e, tab)}
               >

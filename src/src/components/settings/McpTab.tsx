@@ -222,7 +222,7 @@ function ProviderSection({
             <Label htmlFor={`mcp-${provider}-env`}>Environment (KEY=VALUE, one per line)</Label>
             <textarea
               id={`mcp-${provider}-env`}
-              className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-hidden"
+              className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-hidden"
               value={form.env}
               onChange={(e) => setForm((f) => ({ ...f, env: e.target.value }))}
               placeholder={"NODE_ENV=production\nDEBUG=true"}

@@ -39,7 +39,7 @@
 
 .git-sub-tab:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-sub-tab[data-active="true"] {
@@ -90,7 +90,7 @@
 
 .git-branch-trigger:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-branch-dropdown {
@@ -136,7 +136,7 @@
 
 .git-branch-item:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-branch-item[data-current="true"] {
@@ -177,7 +177,7 @@
 
 .git-branch-new-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-branch-create-input {
@@ -219,7 +219,7 @@
 
 .git-branch-create-confirm:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-branch-create-confirm:disabled {
@@ -290,7 +290,7 @@
 
 .git-action-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-action-btn:disabled {
@@ -467,7 +467,7 @@
 
 .git-batch-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-staged-count {
@@ -578,7 +578,7 @@
 
 .git-file-discard:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 
@@ -628,7 +628,7 @@
 
 .git-generate-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-generate-btn:disabled {
@@ -680,7 +680,7 @@
 
 .git-commit-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--accent-primary);
+  box-shadow: 0 0 0 3px oklch(from var(--ring) l c h / 0.5);
 }
 
 .git-commit-btn:disabled {

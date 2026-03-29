@@ -29,7 +29,7 @@ export function NewChatButton() {
         'text-primary text-[length:var(--text-body)] font-medium',
         'bg-transparent rounded-md',
         'hover:bg-primary-muted',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
         'transition-colors duration-[var(--duration-fast)]',
         'cursor-pointer',
       )}

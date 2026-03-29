@@ -114,6 +114,7 @@ export const Sidebar = memo(function Sidebar() {
             'bg-surface-raised/80 backdrop-blur-sm rounded-lg',
             'border border-border/50',
             'text-muted hover:text-foreground',
+            'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
             'transition-colors',
           )}
           aria-label="Open menu"
@@ -166,6 +167,7 @@ export const Sidebar = memo(function Sidebar() {
             'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
             'flex items-center justify-center',
             'text-muted hover:text-foreground',
+            'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
             'transition-colors',
           )}
           aria-label={isMobile ? 'Close menu' : 'Collapse sidebar'}
@@ -187,6 +189,7 @@ export const Sidebar = memo(function Sidebar() {
               'p-3 md:p-2 rounded-md',
               'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0',
               'text-muted hover:text-foreground',
+              'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
               'transition-colors',
             )}
             aria-label="Open settings"

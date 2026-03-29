@@ -53,7 +53,7 @@ export function QuickSettingsPanel(_props: QuickSettingsPanelProps) {
             'p-2 rounded-md',
             'min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center',
             'text-muted hover:text-foreground hover:bg-surface-raised/50',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
             'transition-colors',
           )}
           aria-label="Quick settings"
