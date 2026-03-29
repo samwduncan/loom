@@ -109,6 +109,25 @@
   flex-shrink: 0;
 }
 
+/* Swipe-to-delete -- mobile only */
+@media (max-width: 767px) {
+  .swipe-delete-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 80px;
+    height: 100%;
+    background: var(--status-error);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+  }
+}
+
 /* Inline rename input -- transparent background, same font, accent underline */
 .session-rename-input {
   width: 100%;

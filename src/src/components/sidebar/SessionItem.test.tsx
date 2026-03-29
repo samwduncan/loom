@@ -8,6 +8,27 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { SessionItem } from './SessionItem';
 
+// Mock useMobile -- default to desktop (false)
+vi.mock('@/hooks/useMobile', () => ({
+  useMobile: () => false,
+}));
+
+// Mock useSwipeToDelete -- return no-op gesture state
+vi.mock('@/hooks/useSwipeToDelete', () => ({
+  useSwipeToDelete: () => ({
+    bind: () => ({}),
+    offset: 0,
+    revealed: false,
+    active: false,
+    reset: vi.fn(),
+  }),
+}));
+
+// Mock haptics
+vi.mock('@/lib/haptics', () => ({
+  hapticEvent: vi.fn(),
+}));
+
 describe('SessionItem', () => {
   const defaultProps = {
     id: 'sess-1',
@@ -16,7 +37,7 @@ describe('SessionItem', () => {
     providerId: 'claude' as const,
     isActive: false,
     onClick: vi.fn(),
-    onContextMenu: vi.fn(),
+    onDeleteRequest: vi.fn(),
     onRename: vi.fn(),
   };
 
@@ -38,15 +59,15 @@ describe('SessionItem', () => {
   });
 
   it('applies active state CSS when isActive is true', () => {
-    const { container } = render(<SessionItem {...defaultProps} isActive={true} />);
-    const item = container.firstChild as HTMLElement;
-    expect(item.className).toContain('session-item-active');
+    render(<SessionItem {...defaultProps} isActive={true} />);
+    const option = screen.getByRole('option');
+    expect(option.className).toContain('session-item-active');
   });
 
   it('does not apply active state CSS when isActive is false', () => {
-    const { container } = render(<SessionItem {...defaultProps} isActive={false} />);
-    const item = container.firstChild as HTMLElement;
-    expect(item.className).not.toContain('session-item-active');
+    render(<SessionItem {...defaultProps} isActive={false} />);
+    const option = screen.getByRole('option');
+    expect(option.className).not.toContain('session-item-active');
   });
 
   it('has role="option" for accessibility within listbox', () => {

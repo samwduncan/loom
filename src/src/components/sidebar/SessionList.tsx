@@ -5,7 +5,7 @@
  * Constitution: Named export (2.2), selector-only store access (4.2), cn() (3.6).
  */
 
-import { useState, useCallback, useEffect, useRef, type MouseEvent } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { MessageSquare, Search } from 'lucide-react';
@@ -18,19 +18,24 @@ import { useSessionSearch } from '@/hooks/useSessionSearch';
 import { useSessionPins } from '@/hooks/useSessionPins';
 import { hoistPinnedSessions } from '@/lib/sessionGrouping';
 import { useSessionSelection } from '@/hooks/useSessionSelection';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useMobile } from '@/hooks/useMobile';
 import { apiFetch } from '@/lib/api-client';
 import { useProjectContext } from '@/hooks/useProjectContext';
+import { nativeShare } from '@/lib/native-share';
+import { wsClient } from '@/lib/websocket-client';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { InlineError } from '@/components/shared/InlineError';
 import { ProjectHeader } from './ProjectHeader';
 import { DateGroupHeader } from './DateGroupHeader';
 import { SessionItem } from './SessionItem';
-import { SessionContextMenu } from './SessionContextMenu';
+import { SessionItemContextMenu } from './SessionItemContextMenu';
 import { SessionListSkeleton } from './SessionListSkeleton';
 import { NewChatButton } from './NewChatButton';
 import { DeleteSessionDialog } from './DeleteSessionDialog';
 import { SearchInput } from './SearchInput';
 import { BulkActionBar } from './BulkActionBar';
+import { PullToRefreshSpinner } from './PullToRefreshSpinner';
 import { DRAFTS_CHANGED_EVENT } from '@/components/chat/composer/useDraftPersistence';
 
 const DRAFTS_STORAGE_KEY = 'loom-composer-drafts';
@@ -96,8 +101,29 @@ export function SessionList() {
 
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ type: 'single'; id: string } | { type: 'bulk' } | null>(null);
-  const [contextMenu, setContextMenu] = useState({
-    isOpen: false, position: { x: 0, y: 0 }, sessionId: null as string | null,
+
+  const isMobile = useMobile();
+
+  // Pull-to-refresh with live session re-attachment (GESTURE-02)
+  const { bind: ptrBind, pullDistance, isRefreshing } = usePullToRefresh({
+    onRefresh: async () => {
+      // Snapshot currently live-attached sessions before refetch
+      const previouslyAttached = new Set(liveAttachedSessions);
+      await refetch();
+      // Re-attach any sessions that were live-attached before refresh
+      if (previouslyAttached.size > 0) {
+        for (const sessionId of previouslyAttached) {
+          wsClient.send({
+            type: 'attach-session',
+            sessionId,
+            projectName,
+          });
+          useStreamStore.getState().attachLiveSession(sessionId);
+        }
+      }
+    },
+    scrollRef,
+    threshold: 60,
   });
 
   const handleSessionClick = useCallback(
@@ -106,18 +132,6 @@ export function SessionList() {
       navigate(`/chat/${sessionId}`);
     }, [navigate, clearNotifiedSession],
   );
-  const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>, sessionId: string) => {
-    e.preventDefault();
-    setContextMenu({ isOpen: true, position: { x: e.clientX, y: e.clientY }, sessionId });
-  }, []);
-  const closeContextMenu = useCallback(() => {
-    setContextMenu((prev) => ({ ...prev, isOpen: false, sessionId: null }));
-  }, []);
-  const handleRename = useCallback(() => {
-    const id = contextMenu.sessionId;
-    closeContextMenu();
-    if (id) setEditingSessionId(id);
-  }, [contextMenu.sessionId, closeContextMenu]);
 
   // PERF-02: Rename is already optimistic -- updates title immediately, rolls back on API failure
   const handleSessionRename = useCallback(async (sessionId: string, newTitle: string) => {
@@ -135,22 +149,15 @@ export function SessionList() {
     }
   }, [sessions, updateSessionTitle, projectName]);
 
-  const handleDelete = useCallback(() => {
-    const id = contextMenu.sessionId;
-    closeContextMenu();
-    if (id) setDeleteTarget({ type: 'single', id });
-  }, [contextMenu.sessionId, closeContextMenu, setDeleteTarget]);
-
-  // PERF-02: Pin is client-only (localStorage) -- already instant, no API call
-  const handlePin = useCallback(() => {
-    const id = contextMenu.sessionId;
-    if (id) togglePin(id);
-  }, [contextMenu.sessionId, togglePin]);
-
-  const handleSelectFromMenu = useCallback(() => {
-    const id = contextMenu.sessionId;
-    if (id) selection.toggle(id);
-  }, [contextMenu.sessionId, selection]);
+  // Export handler -- shares session title + ID via native share or clipboard
+  const handleExport = useCallback((sessionId: string) => {
+    const session = sessions.find((s) => s.id === sessionId);
+    if (!session) return;
+    void nativeShare({
+      title: session.title,
+      text: `${session.title}\nSession ID: ${sessionId}`,
+    });
+  }, [sessions]);
 
   const handleBulkDeleteRequest = useCallback(() => {
     setDeleteTarget({ type: 'bulk' });
@@ -232,59 +239,72 @@ export function SessionList() {
       <div className="px-2 py-1.5">
         <SearchInput value={query} onChange={setQuery} />
       </div>
-      <div ref={scrollRef} className={cn('native-scroll flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list">
-        {totalVisible === 0 && isSearching && (
-          <div className="px-3 py-4">
-            <EmptyState
-              icon={<Search className="size-8" />}
-              heading="No matching sessions"
-              description="Try different search terms"
-            />
-          </div>
-        )}
-        {projectGroups.map((project) => {
-          // During active search, bypass collapsed state to show all matches
-          const isExpanded = isSearching || expandedProjects.has(project.projectName);
-          return (
-            <div key={project.projectName}>
-              <ProjectHeader
-                displayName={project.displayName}
-                sessionCount={project.visibleCount}
-                isExpanded={isExpanded}
-                onToggle={() => handleProjectToggle(project.projectName)}
-                isCurrentProject={project.projectName === projectName}
+      <div {...(isMobile ? ptrBind() : {})} style={{ touchAction: isMobile ? 'pan-x' : 'auto' }} className="flex-1 flex flex-col min-h-0">
+        <PullToRefreshSpinner pullDistance={pullDistance} isRefreshing={isRefreshing} threshold={60} />
+        <div ref={scrollRef} className={cn('native-scroll flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list" style={{ overscrollBehaviorY: 'contain' }}>
+          {totalVisible === 0 && isSearching && (
+            <div className="px-3 py-4">
+              <EmptyState
+                icon={<Search className="size-8" />}
+                heading="No matching sessions"
+                description="Try different search terms"
               />
-              {isExpanded && project.dateGroups.map((dateGroup) => (
-                <div key={dateGroup.label}>
-                  <DateGroupHeader label={dateGroup.label} />
-                  {dateGroup.sessions.map((session) => (
-                    <SessionItem
-                      key={session.id}
-                      id={session.id}
-                      title={session.title}
-                      updatedAt={session.updatedAt}
-                      providerId={session.providerId}
-                      isActive={session.id === activeSessionId}
-                      isStreaming={session.id === streamingSessionId}
-                      isLiveAttached={liveAttachedSessions.has(session.id)}
-                      hasNewActivity={notifiedSessions.has(session.id)}
-                      hasDraft={draftSessionIds.has(session.id)}
-                      isEditing={editingSessionId === session.id}
-                      searchQuery={isSearching ? query : undefined}
-                      isPinned={isPinned(session.id)}
-                      isSelecting={selection.isSelecting}
-                      isSelected={selection.selectedIds.has(session.id)}
-                      onToggleSelect={() => selection.toggle(session.id)}
-                      onClick={() => handleSessionClick(session.id)}
-                      onContextMenu={(e) => handleContextMenu(e, session.id)}
-                      onRename={handleSessionRename}
-                    />
-                  ))}
-                </div>
-              ))}
             </div>
-          );
-        })}
+          )}
+          {projectGroups.map((project) => {
+            // During active search, bypass collapsed state to show all matches
+            const isExpanded = isSearching || expandedProjects.has(project.projectName);
+            return (
+              <div key={project.projectName}>
+                <ProjectHeader
+                  displayName={project.displayName}
+                  sessionCount={project.visibleCount}
+                  isExpanded={isExpanded}
+                  onToggle={() => handleProjectToggle(project.projectName)}
+                  isCurrentProject={project.projectName === projectName}
+                />
+                {isExpanded && project.dateGroups.map((dateGroup) => (
+                  <div key={dateGroup.label}>
+                    <DateGroupHeader label={dateGroup.label} />
+                    {dateGroup.sessions.map((session) => (
+                      <SessionItemContextMenu
+                        key={session.id}
+                        sessionId={session.id}
+                        isPinned={isPinned(session.id)}
+                        onRename={() => setEditingSessionId(session.id)}
+                        onDelete={() => setDeleteTarget({ type: 'single', id: session.id })}
+                        onPin={() => togglePin(session.id)}
+                        onExport={() => handleExport(session.id)}
+                        onSelect={() => selection.toggle(session.id)}
+                      >
+                        <SessionItem
+                          id={session.id}
+                          title={session.title}
+                          updatedAt={session.updatedAt}
+                          providerId={session.providerId}
+                          isActive={session.id === activeSessionId}
+                          isStreaming={session.id === streamingSessionId}
+                          isLiveAttached={liveAttachedSessions.has(session.id)}
+                          hasNewActivity={notifiedSessions.has(session.id)}
+                          hasDraft={draftSessionIds.has(session.id)}
+                          isEditing={editingSessionId === session.id}
+                          searchQuery={isSearching ? query : undefined}
+                          isPinned={isPinned(session.id)}
+                          isSelecting={selection.isSelecting}
+                          isSelected={selection.selectedIds.has(session.id)}
+                          onToggleSelect={() => selection.toggle(session.id)}
+                          onClick={() => handleSessionClick(session.id)}
+                          onDeleteRequest={() => setDeleteTarget({ type: 'single', id: session.id })}
+                          onRename={handleSessionRename}
+                        />
+                      </SessionItemContextMenu>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
       </div>
       {selection.isSelecting && selection.selectedIds.size > 0 && (
         <BulkActionBar
@@ -293,13 +313,6 @@ export function SessionList() {
           onCancel={selection.clear}
         />
       )}
-      <SessionContextMenu
-        isOpen={contextMenu.isOpen} position={contextMenu.position}
-        onRename={handleRename} onDelete={handleDelete} onClose={closeContextMenu}
-        onPin={handlePin}
-        isPinned={contextMenu.sessionId ? isPinned(contextMenu.sessionId) : false}
-        onSelect={handleSelectFromMenu}
-      />
       <DeleteSessionDialog
         isOpen={deleteTarget !== null}
         onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}

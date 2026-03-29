@@ -42,9 +42,71 @@ const mockStreamState = {
   liveAttachedSessions: new Set<string>(),
   notifiedSessions: new Set<string>(),
   clearNotifiedSession: vi.fn(),
+  attachLiveSession: vi.fn(),
 };
 vi.mock('@/stores/stream', () => ({
-  useStreamStore: (selector: (s: typeof mockStreamState) => unknown) => selector(mockStreamState),
+  useStreamStore: Object.assign(
+    (selector: (s: typeof mockStreamState) => unknown) => selector(mockStreamState),
+    { getState: () => mockStreamState },
+  ),
+}));
+
+// Mock useMobile -- default desktop
+vi.mock('@/hooks/useMobile', () => ({
+  useMobile: () => false,
+}));
+
+// Mock usePullToRefresh -- no-op
+vi.mock('@/hooks/usePullToRefresh', () => ({
+  usePullToRefresh: () => ({
+    bind: () => ({}),
+    pullDistance: 0,
+    isRefreshing: false,
+  }),
+}));
+
+// Mock useSwipeToDelete -- no-op (used by SessionItem)
+vi.mock('@/hooks/useSwipeToDelete', () => ({
+  useSwipeToDelete: () => ({
+    bind: () => ({}),
+    offset: 0,
+    revealed: false,
+    active: false,
+    reset: vi.fn(),
+  }),
+}));
+
+// Mock haptics
+vi.mock('@/lib/haptics', () => ({
+  hapticEvent: vi.fn(),
+}));
+
+// Mock native share
+vi.mock('@/lib/native-share', () => ({
+  nativeShare: vi.fn(),
+}));
+
+// Mock websocket client
+vi.mock('@/lib/websocket-client', () => ({
+  wsClient: { send: vi.fn() },
+}));
+
+// Capture SessionItemContextMenu callbacks for testing
+let capturedContextMenuCallbacks: Record<string, Record<string, () => void>> = {};
+vi.mock('./SessionItemContextMenu', () => ({
+  SessionItemContextMenu: ({ children, sessionId, onRename, onDelete, onPin, onExport, onSelect }: {
+    children: React.ReactNode;
+    sessionId: string;
+    onRename: () => void;
+    onDelete: () => void;
+    onPin: () => void;
+    onExport?: () => void;
+    onSelect?: () => void;
+    isPinned: boolean;
+  }) => {
+    capturedContextMenuCallbacks[sessionId] = { onRename, onDelete, onPin, ...(onExport && { onExport }), ...(onSelect && { onSelect }) };
+    return children;
+  },
 }));
 
 // Mock useMultiProjectSessions
@@ -100,6 +162,7 @@ function makeProjectGroup(
 describe('SessionList', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    capturedContextMenuCallbacks = {};
     mockStreamState.isStreaming = false;
     mockStreamState.activeSessionId = null;
     useTimelineStore.setState({
@@ -230,7 +293,7 @@ describe('SessionList', () => {
   // -- Delete confirmation dialog tests --
 
   describe('delete confirmation', () => {
-    it('shows confirmation dialog when Delete is clicked from context menu', async () => {
+    it('shows confirmation dialog when Delete is triggered from context menu', async () => {
       const user = userEvent.setup();
       useTimelineStore.setState({
         sessions: [makeSession('sess-del', 'Delete Me')],
@@ -242,11 +305,13 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const option = screen.getByRole('option');
-      await user.pointer({ keys: '[MouseRight]', target: option });
-      const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
-      await user.click(deleteBtn);
+      // Trigger delete via captured context menu callback
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-del']!.onDelete(); });
       expect(screen.getByText('Delete session?')).toBeInTheDocument();
+      // Clean up by clicking Cancel
+      const cancelBtn = screen.getByRole('button', { name: 'Cancel' });
+      await user.click(cancelBtn);
     });
 
     it('closes dialog without deleting when Cancel is clicked', async () => {
@@ -261,10 +326,8 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const option = screen.getByRole('option');
-      await user.pointer({ keys: '[MouseRight]', target: option });
-      const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
-      await user.click(deleteBtn);
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-cancel']!.onDelete(); });
       const cancelBtn = screen.getByRole('button', { name: 'Cancel' });
       await user.click(cancelBtn);
       expect(screen.getByText('Keep Me')).toBeInTheDocument();
@@ -286,10 +349,8 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const option = screen.getByRole('option');
-      await user.pointer({ keys: '[MouseRight]', target: option });
-      const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
-      await user.click(deleteBtn);
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-confirm']!.onDelete(); });
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
 
@@ -320,12 +381,8 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const options = screen.getAllByRole('option');
-      const newerOption = options.find((opt) => opt.textContent?.includes('Newer Session'));
-      expect(newerOption).toBeDefined();
-      await user.pointer({ keys: '[MouseRight]', target: newerOption! }); // ASSERT: checked above
-      const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
-      await user.click(deleteBtn);
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-new']!.onDelete(); });
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
       expect(mockNavigate).toHaveBeenCalledWith('/chat/sess-old');
@@ -346,10 +403,8 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const option = screen.getByRole('option');
-      await user.pointer({ keys: '[MouseRight]', target: option });
-      const deleteBtn = screen.getByRole('menuitem', { name: 'Delete' });
-      await user.click(deleteBtn);
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-last']!.onDelete(); });
       const confirmBtn = screen.getByRole('button', { name: 'Delete' });
       await user.click(confirmBtn);
       expect(mockNavigate).toHaveBeenCalledWith('/chat');
@@ -374,10 +429,9 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const option = screen.getByRole('option');
-      await user.pointer({ keys: '[MouseRight]', target: option });
-      const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
-      await user.click(renameBtn);
+      // Trigger rename via captured context menu callback
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-rename']!.onRename(); });
 
       const input = screen.getByDisplayValue('Old Title');
       await user.clear(input);
@@ -407,10 +461,8 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const option = screen.getByRole('option');
-      await user.pointer({ keys: '[MouseRight]', target: option });
-      const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
-      await user.click(renameBtn);
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-fail']!.onRename(); });
 
       const input = screen.getByDisplayValue('Original Title');
       await user.clear(input);
@@ -439,10 +491,8 @@ describe('SessionList', () => {
       mockMultiProjectResult.expandedProjects = new Set(['test-project']);
       renderSessionList();
 
-      const option = screen.getByRole('option');
-      await user.pointer({ keys: '[MouseRight]', target: option });
-      const renameBtn = screen.getByRole('menuitem', { name: 'Rename' });
-      await user.click(renameBtn);
+      const { act } = await import('@testing-library/react');
+      act(() => { capturedContextMenuCallbacks['sess-success']!.onRename(); });
 
       const input = screen.getByDisplayValue('Before Rename');
       await user.clear(input);
