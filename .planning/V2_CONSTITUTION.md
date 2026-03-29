@@ -23,6 +23,7 @@ This document defines the enforceable coding conventions, banned patterns, and s
 11. [Motion & Animation](#11-motion--animation)
 12. [Markdown & Rendering](#12-markdown--rendering)
 13. [Touch Target & Focus Standards](#13-touch-target--focus-standards)
+14. [Typography](#14-typography)
 
 ---
 
@@ -805,6 +806,70 @@ focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50
 - **Touch target (CSS)**: `tool-chip.css` (`@media (max-width: 767px) { .tool-chip { min-height: 44px; } }`)
 - **Focus ring (Tailwind)**: `ui/button.tsx` (`focus-visible:ring-[3px] focus-visible:ring-ring/50`)
 - **Focus ring (CSS)**: `tool-card-shell.css` (`.tool-card-shell-header:focus-visible`)
+
+---
+
+## 14. Typography
+
+### 14.1 Minimum Font Size (12px)
+
+No text element in the application may render below 12px (0.75rem) on any viewport.
+
+**Rules:**
+- All font-size declarations MUST use design tokens: `var(--text-xs)` (12px), `var(--text-sm)` (13px), `var(--text-body)` (14px), `var(--text-code)` (13px), or heading tokens
+- BANNED: Hardcoded `font-size` values in rem, px, or em in component CSS/TSX (use tokens)
+- BANNED: `font-size` below `var(--text-xs)` (0.75rem / 12px) for any text element
+- **Exceptions:** Badge count indicators (`text-[10px]`) in CollapsibleMessage and desktop-only keyboard hints (behind `lg:` guard) are the only permitted sub-12px usages
+
+### 14.2 Mobile Body Text (15px / 18px Code)
+
+Chat message content uses larger font sizes on mobile (< 768px) for readability at arm's length.
+
+**Token values:**
+| Token | Desktop | Mobile (< 768px) |
+|-------|---------|-------------------|
+| Body text (`.markdown-body`, `.active-message`) | 14px (0.875rem) | 15px (0.9375rem) |
+| Code blocks (`.markdown-body code`, `.active-message code`) | 13px (0.8125rem) | 18px (1.125rem) |
+
+**Rules:**
+- Mobile body text overrides are defined in `base.css` via `@media (max-width: 767px)` -- NOT in individual component files
+- Mobile code block sizing is handled via `--text-code` token override in `tokens.css` `:root` media query -- NOT via selectors in base.css (avoids specificity battles with streaming-markdown.css)
+- Both `.markdown-body` (finalized messages) and `.active-message` (streaming) MUST be targeted in the same media query block to prevent CLS on stream completion
+- No `clamp()` for font sizes -- clean breakpoint split only (D-02)
+
+### 14.3 Line-Height Minimums
+
+| Context | Minimum | Tailwind | Notes |
+|---------|---------|----------|-------|
+| Body/reading text (mobile) | 1.6 | `leading-relaxed` (1.625) | Multi-line chat messages, session descriptions |
+| Body/reading text (desktop) | 1.5 | `leading-normal` | Standard desktop density |
+| Labels, headings, single-line | 1.4 | -- | Buttons, pills, badges, headers |
+| Compact UI elements | 1.0 | -- | Tool chips, scroll pill, disclosure arrows -- intentional |
+
+**Rules:**
+- Do NOT apply `line-height: 1.6` globally -- it wastes space on compact UI elements
+- The four intentional `line-height: 1` usages (tool-card-shell, thinking-disclosure arrow, scroll pill, tool chip) MUST NOT be changed
+
+### 14.4 Typography Token Reference
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--text-xs` | 0.75rem (12px) | Minimum readable: DateGroupHeader, badges, status bar, command palette headings |
+| `--text-sm` | 0.8125rem (13px) | Compact text: git panel, tool cards |
+| `--text-code` | 0.8125rem (13px desktop) / 1.125rem (18px mobile) | Code blocks -- mobile override via :root media query in tokens.css |
+| `--text-body` | 0.875rem (14px) | Body text, default font-size |
+| `--text-h3` | 1.125rem (18px) | Subheadings |
+| `--text-h2` | 1.5rem (24px) | Section headings |
+| `--text-h1` | 2rem (32px) | Page headings |
+
+### 14.5 Reference Implementations
+
+- **Token usage**: `DateGroupHeader.tsx` -- `text-[length:var(--text-xs)]`
+- **Token usage (CSS)**: `composer.css` -- `font-size: var(--text-xs);`
+- **Mobile body override**: `base.css` -- `@media (max-width: 767px)` block targeting `.markdown-body, .active-message`
+- **Mobile code override**: `tokens.css` -- `@media (max-width: 767px) { :root { --text-code: 1.125rem; } }`
+- **Code block token**: `CodeBlock.tsx` -- `text-[length:var(--text-code)]`
+- **Streaming parity**: `streaming-markdown.css` -- uses `var(--text-code)` for code, resolves to 18px on mobile via token override
 
 ---
 
