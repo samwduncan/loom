@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Loom is a premium web interface for AI coding agents (Claude Code, Gemini, Codex) that transforms the black-box CLI experience into a visually stunning, multi-agent workspace. Built on a from-scratch React frontend with a 10/10 quality standard, consuming the existing CloudCLI Node.js backend. The full conversation experience is shipped with rich markdown, Shiki syntax highlighting, 6 purpose-built tool cards, streaming at 60fps, auto-resize composer, permission banners, activity status, and CSS visual effects. Now a daily-driver with error resilience, composer intelligence (@-mentions, slash commands), full accessibility compliance, and performance-optimized rendering.
+Loom is a dual-platform interface for AI coding agents (Claude Code, Gemini, Codex) — a React web app for desktop and a React Native iOS app for mobile. Built to replace SSH + terminal for interacting with Claude Code CLI on a remote dev server. The web app is a daily-driver with rich markdown, Shiki highlighting, 6 tool cards, 60fps streaming, accessibility, and CSS visual effects. The native iOS app (v3.0) targets ChatGPT/Claude-level polish with native gestures, push notifications, Dynamic Island, and 120Hz spring physics.
 
 ## Core Value
 
@@ -86,52 +86,64 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - ✓ WKWebView layout fixes — minmax(0,1fr) grid bug, GPU compositing, scroll optimizations (hotfix)
 - ✓ Infrastructure — nginx dist symlink, CORS port 8184, backend restart (hotfix)
 
+### Validated (v2.2 — partial, closed)
+
+- ✓ Scroll performance — useChatScroll hook, overflow-x:hidden, useLayoutEffect restoration, 60fps at 50+ messages (Phase 64)
+- ✓ Touch target compliance — 44px mobile targets on all interactive elements, shadcn focus ring standard (Phase 65)
+- ✓ Mobile typography — font size overrides, CodeBlock desktop 13px, V2_CONSTITUTION Section 14 (Phase 66)
+- ✓ Gesture foundations — hapticEvent centralized grammar, useAppLifecycle, context menus, sidebar swipe deadzone (Phase 67/67.1)
+- ⚠️ v2.2 CLOSED 2026-03-30 — Capacitor/WKWebView approach abandoned. 5/7 critical iOS bugs architecturally unfixable in WKWebView. Remaining requirements (GESTURE, VISUAL categories) superseded by v3.0 native app.
+
 ### Active
 
-**Current Milestone: v2.2 "The Touch"**
+**Current Milestone: v3.0 "The App"**
 
-**Goal:** Transform Loom from a scaled-down desktop app into a purpose-built iOS daily-driver — every element sized, spaced, and animated for touch on iPhone 16 Pro Max.
+**Goal:** Build a native iOS app with React Native + Expo that replaces the Capacitor WebView approach — delivering a gesture-first, polished mobile experience with native capabilities the web can't provide.
 
 **Target features:**
-- [ ] Touch target compliance — Fix 7 violations (ThinkingDisclosure, ToolCard headers, ProjectHeader, template buttons, Detach button, DateGroupHeader font, export buttons)
-- [ ] Typography & spacing — Mobile-optimized font sizes, session list density, date formatting, title truncation
-- [ ] Scroll performance — 60fps validated on real device with 50+ messages, content-visibility, compositor optimization
-- [ ] iOS-native gestures — Swipe-to-delete sessions, pull-to-refresh, long-press context menus, broader haptics
-- [ ] Visual polish — OLED-optimized backgrounds, glass effects tuned for WKWebView, 120Hz spring refinements, contrast compliance
-- [ ] 39 requirements across TOUCH/TYPO/SCROLL/GESTURE/VISUAL categories (see REQUIREMENTS.md)
+- [ ] Native iOS chat client connecting to existing Loom backend (WebSocket + REST)
+- [ ] Push notifications for Claude questions/permission requests with approve/deny actions
+- [ ] Session management (list, create, switch, search, pin)
+- [ ] Dynamic Island showing active session status
+- [ ] Native gestures, keyboard handling, 120Hz spring physics (react-native-reanimated)
+- [ ] Design-first: pixel-level reference from ChatGPT/Claude iOS, then integrate Loom features, then elevate
+
+**Architecture:**
+- Web app (Vite + React): Continues as desktop/laptop experience
+- Native app (Expo + React Native): New iOS client, shares backend + stores + API hooks
+- Backend (Express + WebSocket): Unchanged, platform-agnostic
 
 **Future milestones:**
-- v2.3 "The Power" — Multi-provider tabs, MCP management
-- v2.4 "The Polish" — Full visual transformation (aurora, WebGL, Tier 2/3 effects, comprehensive springs)
-- v3.0 "The Vision" — GSD dashboard, Nextcloud, companions
+- v3.1+ — Dynamic Island, file upload, terminal, settings, multi-project workspace
+- v4.0 "The Power" — Multi-provider tabs, MCP management (formerly v2.3)
+- v5.0 "The Polish" — Full visual transformation (formerly v2.4)
 
 ### Out of Scope
 
 - **Multi-user / auth system** — Single-user tool; backend already handles auth
 - **AI model training** — Loom consumes models, doesn't train them
 - **Full IDE replacement** — Complements VS Code/Cursor, doesn't replace
-- **Light mode** — Dark-only for M1-M3; potential M5 stretch goal
+- **Light mode** — Dark-only; potential future stretch goal
 - **Arbitrary LLM providers** — Claude, Gemini, Codex only (backend constraint)
 - **Character-by-character typewriter** — Anti-pattern; use batch rendering via rAF buffer
-- **Conversation branching** — Reconsidering for v2.1+ (competitive parity)
+- **Android** — iOS-only for v3.0; Android deferred until iOS is daily-driver quality
+- **Port web UI to RN** — Redesign for mobile from scratch, don't convert div/span to View/Text
+- **Capacitor/WKWebView** — Dead end for gesture-heavy chat apps (proven by v2.2)
 
 ## Context
 
-**Current State (post v2.1):**
-- ~55,000 LOC TypeScript + CSS across 65 phases (9 milestones)
-- Tech stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- ~1450 commits, 26-day total build (2026-03-04 to 2026-03-29)
+**Current State (post v2.2 close):**
+- Web app: ~55,000 LOC TypeScript + CSS across 67 phases (10 milestones)
+- Web stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
+- ~1500 commits, 27-day total build (2026-03-04 to 2026-03-30)
 - 141 test files, 1476 tests, 9 custom ESLint rules
-- Phase 65 complete: 44px mobile touch targets on all interactive elements, focus rings standardized to shadcn pattern
-- Dependencies: react-markdown, shiki, DOMPurify, diff, shadcn/ui (15 primitives), tailwindcss-animate, cmdk, fuse.js, @codemirror/*, @xterm/*, better-sqlite3
-- Frontend at `src/`, backend at `server/` (port 5555)
+- Web frontend at `src/`, backend at `server/` (port 5555)
 - Dev server: port 5184, production nginx on port 5580 (via Tailscale Serve :5443)
-- Full workspace with: chat, file tree, code editor, terminal, git panel, settings, command palette, @-mentions, slash commands, quick settings, accessibility, performance optimizations
-- SQLite cache layer for sub-second session loads, live session attach via JSONL file watcher
-- Mobile-responsive: sidebar drawer, touch targets, safe-area, keyboard avoidance (visualViewport hack)
-- Capacitor 7.6.1 scaffold ready, server.url mode working on iPhone 16 Pro Max
-- WCAG AA contrast compliance, full keyboard navigation, screen reader support
-- Backend: auth auto-retry, WebSocket heartbeat, systemd auto-start, graceful shutdown, deploy.sh pipeline
+- Full desktop workspace: chat, file tree, code editor, terminal, git panel, settings, command palette
+- SQLite cache, live session attach, WCAG AA, keyboard navigation, screen reader support
+- Backend: auth auto-retry, WebSocket heartbeat, systemd auto-start, graceful shutdown, deploy.sh
+- Capacitor approach ABANDONED — WKWebView can't deliver native iOS quality for gesture-heavy chat
+- v3.0 native app (React Native + Expo) starting: new `mobile/` directory, shares backend + stores
 
 **Known Tech Debt:**
 - CMD-14 deferred: recent commands need command registry for re-execution
@@ -149,9 +161,12 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 ## Constraints
 
 - **Backend**: Keep existing CloudCLI Node.js server — no backend rewrite
-- **Tech Stack**: Vite + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- **Quality Bar**: 10/10 or iterate. Automated enforcement from commit #1.
-- **Design**: No hardcoded colors, no inline styles for static values, all animations through defined tokens. Constitution enforced via ESLint.
+- **Web Stack**: Vite + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
+- **Native Stack**: Expo + React Native, react-native-reanimated, react-native-gesture-handler, Expo Router
+- **Quality Bar**: Match ChatGPT/Claude iOS polish, then exceed it. Design before code.
+- **Design**: Design-first process — pixel-level reference analysis → Loom integration → elevation beyond
+- **Scope**: v3.0 = connect + chat + notifications + beauty. Everything else in later milestones.
+- **Creative Process**: Bard leads creative exploration, Claude curates and implements
 
 ## Key Decisions
 
@@ -214,4 +229,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-29 after Phase 65 (touch target compliance) completion*
+*Last updated: 2026-03-30 after v3.0 "The App" milestone start*

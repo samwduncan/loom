@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: "The App"
-status: Starting new milestone
-stopped_at: Closed v2.2, starting v3.0
-last_updated: "2026-03-30T02:15:00.000Z"
+status: Defining requirements
+stopped_at: Milestone initialized, defining requirements
+last_updated: "2026-03-30T03:00:00.000Z"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -16,15 +16,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-28)
+See: .planning/PROJECT.md (updated 2026-03-30)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
 **Current focus:** v3.0 "The App" — React Native + Expo iOS app
 
 ## Current Position
 
-Milestone: v3.0 (The App) — STARTING
-Next step: Design phase — Bard creative teardown of ChatGPT/Claude iOS, Native App Soul document
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-30 — Milestone v3.0 started
 
 ## Performance Metrics
 
@@ -38,64 +40,32 @@ Next step: Design phase — Bard creative teardown of ChatGPT/Claude iOS, Native
 
 ### Decisions
 
-- [v2.2] Scroll performance is Phase 64 (first) -- #1 blocker, everything else meaningless if scrolling broken
-- [v2.2] Fix architecture, NOT add virtualization -- JS execution is bottleneck, not DOM size (research confirms)
-- [v2.2] SCROLL-06 first internally: delete dead useScrollAnchor.ts before modifying scroll system
-- [v2.2] Custom gesture hooks (useSwipeAction, usePullToRefresh, useLongPress), NOT @use-gesture/react -- research recommends custom but GESTURE-07 requirement stands
-- [v2.2] 4 new Capacitor plugins: @capacitor/app, @capacitor/clipboard, @capacitor/share, @capacitor/action-sheet
-- [v2.2] OLED true black only on outermost background -- surface hierarchy preserved for depth
-- [Phase 64]: content-visibility: auto REMOVED from messages -- caused scroll jumping with variable heights. Browser renders all items at natural height.
-- [Phase 64]: Infinite scroll anchor restoration uses useLayoutEffect (not rAF) -- fires after DOM mutation before paint
-- [Phase 64]: overflow-x: hidden on message list scroll container -- prevents code block horizontal scroll on iOS
-- [Phase 64]: Virtualization NOT needed -- 60fps at 50+ messages on iPhone 16 Pro Max confirmed
-- [Phase 64]: ActiveMessage finalization reflow deferred by rAF + 50ms setTimeout (D-12)
-- [Phase 64]: overscroll-behavior: none on html/body, .native-scroll omits for iOS rubber band bounce
-- [Phase 65]: D-05 supersedes TOUCH-07: ring-[3px] ring-ring/50 replaces ring-2 as standard
-- [Phase 65]: SkipLink.tsx excluded from focus ring sweep -- uses focus:ring-2 for programmatic focus a11y
-- [Phase 65]: All focus rings standardized to 3px oklch (shadcn pattern) -- replaced 2px var(--accent-primary) in sidebar.css and tool-card-shell.css
-- [Phase 65]: Playwright touch target test uses CSS class injection for streaming-dependent components -- avoids needing real backend streaming
-- [Phase 66]: Token override on :root in tokens.css media query (not selector in base.css) to avoid specificity battle with streaming-markdown.css
-- [Phase 66]: CodeBlock desktop size intentionally reduced 14px->13px (--text-code) per D-03; prior 14px was artifact of generic text-sm class
-- [Phase 66]: TYPO-02/03/05/08 all pass without code changes -- verify-first approach confirmed existing implementations are compliant
-- [Phase 66]: V2_CONSTITUTION Section 14 (Typography) documents all conventions including --text-code :root override strategy
-- [Phase 67]: All Capacitor plugins installed as production deps (not devDependencies) to avoid tree-shaking in iOS builds
-- [Phase 67]: hapticEvent centralized grammar with 7 named events maps to underlying impact/notification/selection functions
-- [Phase 67]: useAppLifecycle debounces at 300ms to prevent reconnection storms on rapid iOS foreground/background cycles
-- [Phase 67]: Retry uses wsClient.send with claude-command matching ChatComposer send format -- ensures backend processes retry identically
-- [Phase 67]: No user-select:none on ContextMenuTrigger -- text selection preserved, Radix handles long-press via native contextmenu event
-- [Phase 67]: Export handler shares title+ID via nativeShare (not full markdown); SessionContextMenu deprecated; Radix ContextMenu for long-press context menus
-- [Phase 67]: Haptic on sidebar toggle buttons only (not swipe-to-close or programmatic auto-close) per D-02
-- [Phase 67.1]: Accessory bar hidden (isVisible: false) -- Done button row visually intrusive on iPhone
-- [Phase 67.1]: Haptics diagnostic console.log added for Xcode debugging (not console.warn)
-- [Phase 67.1]: Direction change: kill swipe-to-delete, use context menus like ChatGPT/Claude iOS. Full-width swipe-to-close on sidebar restored.
-- [Phase 67.1]: Design benchmark: ChatGPT iOS and Claude iOS for density, spacing, interaction patterns. Stop inventing, copy what works.
-- [Phase 67.1]: getBoundingClientRect for edge zone detection (not raw clientX) -- reliable regardless of sidebar transform state
-- [Phase 67.1]: z-[var(--z-sticky)] for intra-component z-index elevation on delete button (per loom/no-raw-z-index ESLint rule)
-- [Phase 67.1]: useEffect to sync onLongPress ref (not direct assignment during render) -- react-hooks/refs ESLint rule
-- [Phase 67.1]: No e.preventDefault() in useLongPress touchstart -- preserves vertical scrolling, CSS handles text selection suppression
-- [Phase 67.1]: data-long-press-target on session items only (not messages) -- preserves text selection on message content
-- [Phase 67.1]: .popover-menu-item class in base.css (not .context-menu-item) -- avoids cascade conflict with sidebar.css
+- [v3.0] Capacitor/WKWebView abandoned — 5/7 critical iOS bugs architecturally unfixable
+- [v3.0] React Native + Expo for iOS — native gestures, keyboard, scroll work correctly by default
+- [v3.0] Web app continues as desktop experience — no changes to existing web codebase
+- [v3.0] Design-first approach — pixel-level ChatGPT/Claude iOS analysis before any RN code
+- [v3.0] Bard leads creative exploration, Claude curates and implements
+- [v3.0] Scope small — connect + chat + notifications + beauty for v1, everything else later
+- [v3.0] ~30-40% code transfers from web: Zustand stores, API hooks, stream multiplexer, auth
 
 ### Roadmap Evolution
 
-- v2.2 "The Touch" CLOSED 2026-03-30 — Capacitor/WKWebView approach abandoned after 67.1 device testing proved 5/7 iOS bugs architecturally unfixable
+- v2.2 "The Touch" CLOSED 2026-03-30 — Pivoted to native after 67.1 device testing
 - v3.0 "The App" replaces v3.0 "The Vision" — React Native + Expo iOS app
-- 14 open Forgejo issues moved to Backlog — will be addressed by native app architecture
-- Platform research: .planning/phases/67.1-ios-bug-fixes/PLATFORM-RESEARCH.md
-- Library research: .planning/phases/67.1-ios-bug-fixes/LIBRARY-RESEARCH.md
+- v2.3 "The Power" → v4.0 (deferred until native app is stable)
+- v2.4 "The Polish" → v5.0 (deferred until native app is stable)
+- 14 open Forgejo issues moved to Backlog — native architecture resolves most
 
 ### Pending Todos
 
-- v3.0 Phase 1: Design phase — Bard creative teardown of ChatGPT/Claude iOS, Native App Soul document
-- v3.0 Phase 2+: Expo scaffold, core chat, push notifications
+(None — defining requirements)
 
 ### Blockers/Concerns
 
-- None — clean start with new architecture
+- None — clean start with proven architecture
 
 ## Session Continuity
 
-Last session: 2026-03-30T02:15:00.000Z
-Stopped at: Closed v2.2, saved strategic direction for v3.0
-Resume: /gsd:new-milestone v3.0 "The App"
-Resume: Approve 67-04 Task 2 checkpoint, then proceed to Phase 68
+Last session: 2026-03-30T03:00:00.000Z
+Stopped at: Defining requirements for v3.0
+Resume: Continue requirements → roadmap in current session
