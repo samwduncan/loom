@@ -17,13 +17,11 @@
  */
 
 import { useState, useCallback, type KeyboardEvent, type ReactNode } from 'react';
-import { Pin, Trash2 } from 'lucide-react';
+import { Pin } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { formatRelativeTime } from '@/lib/formatTime';
 import { Checkbox } from '@/components/ui/checkbox';
 import { hapticEvent } from '@/lib/haptics';
-import { useMobile } from '@/hooks/useMobile';
-import { useSwipeToDelete } from '@/hooks/useSwipeToDelete';
 import { ProviderLogo } from './ProviderLogo';
 import type { ProviderId } from '@/types/provider';
 import './sidebar.css';
@@ -88,8 +86,7 @@ export function SessionItem({
 }: SessionItemProps) {
   const [isEditingLocal, setIsEditingLocal] = useState(false);
   const [editValue, setEditValue] = useState(title);
-  const isMobile = useMobile();
-  const { bind, offset, revealed, active, reset } = useSwipeToDelete();
+  // swipe-to-delete removed — session actions via context menu (ChatGPT/Claude iOS pattern)
 
   const isEditing = isEditingProp || isEditingLocal;
 
@@ -148,42 +145,7 @@ export function SessionItem({
     }
   }, [isEditing, isSelecting, onToggleSelect, onClick]);
 
-  const handleSwipeDelete = useCallback(() => {
-    reset();
-    onDeleteRequest?.();
-  }, [reset, onDeleteRequest]);
-
   return (
-    <div className="relative overflow-hidden">
-      {/* Delete button behind (positioned absolute right) -- mobile only */}
-      {isMobile && (offset < 0 || revealed) && (
-        <div
-          className="absolute right-0 top-0 bottom-0 w-[80px] z-[var(--z-sticky)] flex items-center justify-center"
-          // eslint-disable-next-line loom/no-banned-inline-style -- dynamic swipe reveal background
-          style={{ background: 'var(--status-error)', pointerEvents: 'auto' }}
-        >
-          <button
-            onClick={handleSwipeDelete}
-            className="flex flex-col items-center justify-center gap-1 w-full h-full text-foreground cursor-pointer border-none"
-            aria-label="Delete session"
-            type="button"
-          >
-            <Trash2 size={18} />
-            <span className="text-sm font-medium">Delete</span>
-          </button>
-        </div>
-      )}
-      {/* Session item content (translates via offset on mobile swipe) */}
-      <div
-        {...(isMobile ? bind() : {})}
-        /* eslint-disable loom/no-banned-inline-style -- gesture-driven dynamic values from @use-gesture */
-        style={{
-          transform: isMobile && offset !== 0 ? `translateX(${offset}px)` : undefined,
-          transition: active ? 'none' : 'transform var(--duration-normal) var(--ease-out)',
-          touchAction: isMobile ? 'pan-y' : 'auto',
-        }}
-        /* eslint-enable loom/no-banned-inline-style */
-      >
         <div
           role="option"
           aria-selected={isActive}
@@ -270,7 +232,5 @@ export function SessionItem({
             </span>
           </div>
         </div>
-      </div>
-    </div>
   );
 }

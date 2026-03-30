@@ -52,25 +52,14 @@ export const Sidebar = memo(function Sidebar() {
   // swipes when open. When closed, no element intercepts (iOS back gesture works).
   // Do NOT add touch-action: none on backdrop (D-24).
   const sidebarPanelRef = useRef<HTMLDivElement>(null);
-  const touchRef = useRef({ startX: 0, swiping: false, isEdgeSwipe: false });
+  const touchRef = useRef({ startX: 0, swiping: false });
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     if (!touch) return;
     touchRef.current.startX = touch.clientX;
     touchRef.current.swiping = false;
-
-    // Gesture zone isolation: only activate sidebar-close from the right edge
-    // (last 30px of sidebar panel width, closest to main content area).
-    // Interior swipes fall through to child handlers (swipe-to-delete).
-    // Use getBoundingClientRect for reliable position regardless of sidebar transform.
-    const EDGE_ZONE_WIDTH = 30;
-    const rect = sidebarPanelRef.current?.getBoundingClientRect();
-    touchRef.current.isEdgeSwipe = rect
-      ? touch.clientX > (rect.right - EDGE_ZONE_WIDTH)
-      : false;
-
-    if (sidebarPanelRef.current && touchRef.current.isEdgeSwipe) {
+    if (sidebarPanelRef.current) {
       sidebarPanelRef.current.style.transition = 'none';
     }
   }, []);
@@ -78,8 +67,6 @@ export const Sidebar = memo(function Sidebar() {
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     if (!touch) return;
-    // Only track sidebar-close if touch started in edge zone
-    if (!touchRef.current.isEdgeSwipe) return;
 
     const deltaX = touch.clientX - touchRef.current.startX;
     if (deltaX < -10) touchRef.current.swiping = true;
@@ -90,12 +77,6 @@ export const Sidebar = memo(function Sidebar() {
   }, []);
 
   const handleTouchEnd = useCallback(() => {
-    if (!touchRef.current.isEdgeSwipe) {
-      touchRef.current.isEdgeSwipe = false;
-      return;
-    }
-    touchRef.current.isEdgeSwipe = false;
-
     if (!sidebarPanelRef.current) return;
     const el = sidebarPanelRef.current;
 
