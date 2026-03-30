@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.2
-milestone_name: "The Touch"
-status: Ready to execute
-stopped_at: Completed 67.1-03-PLAN.md
-last_updated: "2026-03-30T01:40:22.218Z"
+milestone: v3.0
+milestone_name: "The App"
+status: Starting new milestone
+stopped_at: Closed v2.2, starting v3.0
+last_updated: "2026-03-30T02:15:00.000Z"
 progress:
-  total_phases: 6
-  completed_phases: 4
-  total_plans: 16
-  completed_plans: 14
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 67.1 — ios-bug-fixes
+**Current focus:** v3.0 "The App" — React Native + Expo iOS app
 
 ## Current Position
 
-Phase: 67.1 (ios-bug-fixes) — EXECUTING
-Plan: 4 of 5
+Milestone: v3.0 (The App) — STARTING
+Next step: Design phase — Bard creative teardown of ChatGPT/Claude iOS, Native App Soul document
 
 ## Performance Metrics
 
@@ -78,21 +78,24 @@ Plan: 4 of 5
 
 ### Roadmap Evolution
 
-- Phase 67.1 inserted after Phase 67: iOS Bug Fixes (URGENT) -- 8 open Forgejo issues (#2-#10) from device testing
+- v2.2 "The Touch" CLOSED 2026-03-30 — Capacitor/WKWebView approach abandoned after 67.1 device testing proved 5/7 iOS bugs architecturally unfixable
+- v3.0 "The App" replaces v3.0 "The Vision" — React Native + Expo iOS app
+- 14 open Forgejo issues moved to Backlog — will be addressed by native app architecture
+- Platform research: .planning/phases/67.1-ios-bug-fixes/PLATFORM-RESEARCH.md
+- Library research: .planning/phases/67.1-ios-bug-fixes/LIBRARY-RESEARCH.md
 
 ### Pending Todos
 
-- Phase 67 Task 2: Real-device validation of all GESTURE requirements
+- v3.0 Phase 1: Design phase — Bard creative teardown of ChatGPT/Claude iOS, Native App Soul document
+- v3.0 Phase 2+: Expo scaffold, core chat, push notifications
 
 ### Blockers/Concerns
 
-- Can't see iOS app directly from Linux -- depend on user feedback and Claude Relay for Mac testing
-- Safari Web Inspector debugging requires Mac connection
-- 120Hz spring tuning, scroll perf, and gesture validation all require real device
-- Long-press context menu must avoid conflicting with iOS text selection (see research PITFALLS.md)
+- None — clean start with new architecture
 
 ## Session Continuity
 
-Last session: 2026-03-30T01:40:22.215Z
-Stopped at: Completed 67.1-03-PLAN.md
+Last session: 2026-03-30T02:15:00.000Z
+Stopped at: Closed v2.2, saved strategic direction for v3.0
+Resume: /gsd:new-milestone v3.0 "The App"
 Resume: Approve 67-04 Task 2 checkpoint, then proceed to Phase 68

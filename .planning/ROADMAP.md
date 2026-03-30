@@ -10,10 +10,10 @@
 - ✅ **v1.5 "The Craft"** - Phases 44-47 (shipped 2026-03-20)
 - ✅ **v2.0 "The Engine"** - Phases 50-58 (shipped 2026-03-27)
 - ✅ **v2.1 "The Mobile"** - Phases 59-63 (shipped 2026-03-28)
-- 🚧 **v2.2 "The Touch"** - Phases 64-68 (in progress)
-- 📋 **v2.3 "The Power"** - (planned)
-- 📋 **v2.4 "The Polish"** - (planned)
-- 📋 **v3.0 "The Vision"** - (planned)
+- ✅ **v2.2 "The Touch"** - Phases 64-67.1 (closed 2026-03-30, Capacitor approach abandoned)
+- 📋 **v2.3 "The Power"** - (planned, web only)
+- 📋 **v2.4 "The Polish"** - (planned, web only)
+- 📋 **v3.0 "The App"** - React Native + Expo iOS app (replaces Capacitor)
 
 ## Phases
 
@@ -126,20 +126,20 @@
 
 </details>
 
-### v2.2 "The Touch" (Phases 64-68)
+### v2.2 "The Touch" (Phases 64-67.1) — CLOSED 2026-03-30
 
-**Milestone Goal:** Transform Loom from a scaled-down desktop app into a purpose-built iOS daily-driver -- every element sized, spaced, and animated for touch on iPhone 16 Pro Max. Scroll performance validated at 60fps, touch targets at 44px, gestures feel native.
+**Milestone Goal:** Transform Loom from a scaled-down desktop app into a purpose-built iOS daily-driver.
 
-**Phase Numbering:**
-- Integer phases (64, 65, 66...): Planned milestone work
-- Decimal phases (64.1, 64.2): Urgent insertions (marked with INSERTED)
+**Outcome:** Phases 64-66 shipped (scroll, touch targets, typography). Phase 67 gestures partially shipped. Phase 67.1 bug fixes revealed that 5 of 7 critical iOS bugs are architecturally unfixable in WKWebView. **Capacitor approach abandoned.** Remaining iOS work moved to Backlog — will be addressed by v3.0 React Native app.
 
-- [x] **Phase 64: Scroll Performance** - Eliminate scroll jank sources, validate 60fps on real device with 50+ messages (completed 2026-03-29)
-- [x] **Phase 65: Touch Target Compliance** - Fix all 7 touch target violations to meet Apple's 44px minimum (completed 2026-03-29)
-- [x] **Phase 66: Typography & Spacing** - Mobile-optimized font sizes, spacing, and text density (completed 2026-03-29)
-- [ ] **Phase 67: iOS-Native Gestures** - Swipe-to-delete, pull-to-refresh, long-press context menus, app lifecycle, native share/clipboard
-- [ ] **Phase 67.1: iOS Bug Fixes (INSERTED)** - Fix 15 Forgejo issues (#2-#17) from device testing of Phase 67
-- [ ] **Phase 68: Visual Polish** - OLED blacks, glass effects, spring tuning, contrast compliance for iOS
+**Research produced:** PLATFORM-RESEARCH.md (competitor architecture analysis), LIBRARY-RESEARCH.md (component ecosystem survey). Both in `.planning/phases/67.1-ios-bug-fixes/`.
+
+- [x] **Phase 64: Scroll Performance** (completed 2026-03-29)
+- [x] **Phase 65: Touch Target Compliance** (completed 2026-03-29)
+- [x] **Phase 66: Typography & Spacing** (completed 2026-03-29)
+- [~] **Phase 67: iOS-Native Gestures** (partially complete — Plans 01-04 executed, Task 2 device validation deferred)
+- [~] **Phase 67.1: iOS Bug Fixes** (partially complete — Plans 01-03 + 2 hotfixes, Plans 04-05 abandoned)
+- [ ] ~~**Phase 68: Visual Polish**~~ (abandoned — will be native app work in v3.0)
 
 ## Phase Details
 
