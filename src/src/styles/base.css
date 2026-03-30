@@ -243,3 +243,38 @@ html[data-native] .app-shell {
 }
 
 /* Old .msg-item and .native-scroll rules removed — consolidated above (Phase 64). */
+
+/* ─── Long-press Popover Menu Items (mobile context menu replacement) ──
+ * Used by SessionItemContextMenu and MessageContextMenu on mobile.
+ * Uses .popover-menu-item (NOT .context-menu-item which is defined in
+ * sidebar.css with different properties -- cascade conflict avoidance).
+ */
+.popover-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: var(--text-sm);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  min-height: 44px;
+  color: var(--foreground);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.popover-menu-item:active {
+  background: var(--surface-raised);
+}
+
+.popover-menu-item.text-destructive {
+  color: var(--status-error);
+}
+
+/* ─── Suppress iOS text selection and callout on long-press trigger elements ──
+ * Applied via data-long-press-target attribute on session items (NOT messages).
+ * Messages must preserve text selection. */
+[data-long-press-target] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
