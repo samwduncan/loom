@@ -1,7 +1,7 @@
 # Requirements: Loom v3.0 "The App"
 
 **Defined:** 2026-03-30
-**Core Value:** Make AI agent work visible, beautiful, and controllable — now with native iOS capabilities the web can't provide
+**Core Value:** Make AI agent work visible, beautiful, and controllable -- now with native iOS capabilities the web can't provide
 
 ## v3.0 Requirements
 
@@ -10,9 +10,9 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 ### Scaffolding
 
 - [ ] **SCAFF-01**: Developer can build and install Expo dev build on iPhone 16 Pro Max via EAS Build
-- [ ] **SCAFF-02**: Monorepo configured with npm workspaces — `packages/shared/`, `apps/web/`, `apps/mobile/`
-- [ ] **SCAFF-03**: Shared package contains types, Zustand store factories, WebSocket client, stream multiplexer, and API client
-- [ ] **SCAFF-04**: Both Vite (web) and Metro (native) resolve shared package imports correctly
+- [ ] **SCAFF-02**: Shared code directory (`shared/`) created at repo root with types, Zustand store factories, WebSocket client, stream multiplexer, and API client
+- [ ] **SCAFF-03**: Native app (`mobile/`) created with Expo Router, coexists with web app (`src/`) without restructuring
+- [ ] **SCAFF-04**: Both Vite (web) and Metro (native) resolve `shared/` imports correctly -- web app builds with zero regressions
 - [ ] **SCAFF-05**: Apple Developer Program enrolled with APNs certificates configured for push notifications
 - [ ] **SCAFF-06**: NativeWind v4 configured with representative styling validated on device
 
@@ -58,7 +58,7 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 - [ ] **POLISH-02**: User can share code blocks or full conversations via native iOS share sheet
 - [ ] **POLISH-03**: User can copy message content via context menu
 - [ ] **POLISH-04**: Follow-up suggestion chips appear after assistant responses
-- [ ] **POLISH-05**: Full VoiceOver accessibility — all elements labeled, navigation order logical
+- [ ] **POLISH-05**: Full VoiceOver accessibility -- all elements labeled, navigation order logical
 - [ ] **POLISH-06**: User can pin sessions for quick access
 - [ ] **POLISH-07**: User can search sessions by title
 
@@ -86,65 +86,65 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 | Feature | Reason |
 |---------|--------|
 | Terminal/shell on mobile | Mobile is a remote control for the agent, not a workstation |
-| File tree/editor on mobile | Same — use desktop web for workspace features |
+| File tree/editor on mobile | Same -- use desktop web for workspace features |
 | Offline mode | Loom requires server connection by design |
-| Bottom tab navigation | Anti-pattern for chat apps — sidebar drawer matches ChatGPT/Claude iOS |
+| Bottom tab navigation | Anti-pattern for chat apps -- sidebar drawer matches ChatGPT/Claude iOS |
 | WebView for chat rendering | Exact problem we're escaping from Capacitor |
-| Character-by-character typewriter | Anti-pattern — batch rendering via debounced setState |
-| Android in v3.0 | iOS-only first — doubles testing surface if done in parallel |
+| Character-by-character typewriter | Anti-pattern -- batch rendering via debounced setState |
+| Android in v3.0 | iOS-only first -- doubles testing surface if done in parallel |
 | Port web UI components to RN | 100% new components designed mobile-first from reference apps |
-| Light mode | Dark-only for v3.0 — matches web app constraint |
+| Light mode | Dark-only for v3.0 -- matches web app constraint |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCAFF-01 | — | Pending |
-| SCAFF-02 | — | Pending |
-| SCAFF-03 | — | Pending |
-| SCAFF-04 | — | Pending |
-| SCAFF-05 | — | Pending |
-| SCAFF-06 | — | Pending |
-| CHAT-01 | — | Pending |
-| CHAT-02 | — | Pending |
-| CHAT-03 | — | Pending |
-| CHAT-04 | — | Pending |
-| CHAT-05 | — | Pending |
-| CHAT-06 | — | Pending |
-| CHAT-07 | — | Pending |
-| CHAT-08 | — | Pending |
-| CHAT-09 | — | Pending |
-| CHAT-10 | — | Pending |
-| CHAT-11 | — | Pending |
-| CHAT-12 | — | Pending |
-| NATIVE-01 | — | Pending |
-| NATIVE-02 | — | Pending |
-| NATIVE-03 | — | Pending |
-| NATIVE-04 | — | Pending |
-| NATIVE-05 | — | Pending |
-| NATIVE-06 | — | Pending |
-| NATIVE-07 | — | Pending |
-| NATIVE-08 | — | Pending |
-| AGENT-01 | — | Pending |
-| AGENT-02 | — | Pending |
-| AGENT-03 | — | Pending |
-| AGENT-04 | — | Pending |
-| AGENT-05 | — | Pending |
-| AGENT-06 | — | Pending |
-| AGENT-07 | — | Pending |
-| POLISH-01 | — | Pending |
-| POLISH-02 | — | Pending |
-| POLISH-03 | — | Pending |
-| POLISH-04 | — | Pending |
-| POLISH-05 | — | Pending |
-| POLISH-06 | — | Pending |
-| POLISH-07 | — | Pending |
+| SCAFF-01 | Phase 68 | Pending |
+| SCAFF-02 | Phase 68 | Pending |
+| SCAFF-03 | Phase 68 | Pending |
+| SCAFF-04 | Phase 68 | Pending |
+| SCAFF-05 | Phase 68 | Pending |
+| SCAFF-06 | Phase 68 | Pending |
+| CHAT-01 | Phase 69 | Pending |
+| CHAT-02 | Phase 69 | Pending |
+| CHAT-03 | Phase 69 | Pending |
+| CHAT-04 | Phase 69 | Pending |
+| CHAT-05 | Phase 70 | Pending |
+| CHAT-06 | Phase 70 | Pending |
+| CHAT-07 | Phase 70 | Pending |
+| CHAT-08 | Phase 70 | Pending |
+| CHAT-09 | Phase 69 | Pending |
+| CHAT-10 | Phase 69 | Pending |
+| CHAT-11 | Phase 69 | Pending |
+| CHAT-12 | Phase 70 | Pending |
+| NATIVE-01 | Phase 71 | Pending |
+| NATIVE-02 | Phase 71 | Pending |
+| NATIVE-03 | Phase 71 | Pending |
+| NATIVE-04 | Phase 71 | Pending |
+| NATIVE-05 | Phase 71 | Pending |
+| NATIVE-06 | Phase 71 | Pending |
+| NATIVE-07 | Phase 71 | Pending |
+| NATIVE-08 | Phase 71 | Pending |
+| AGENT-01 | Phase 72 | Pending |
+| AGENT-02 | Phase 72 | Pending |
+| AGENT-03 | Phase 72 | Pending |
+| AGENT-04 | Phase 72 | Pending |
+| AGENT-05 | Phase 72 | Pending |
+| AGENT-06 | Phase 72 | Pending |
+| AGENT-07 | Phase 72 | Pending |
+| POLISH-01 | Phase 73 | Pending |
+| POLISH-02 | Phase 73 | Pending |
+| POLISH-03 | Phase 73 | Pending |
+| POLISH-04 | Phase 73 | Pending |
+| POLISH-05 | Phase 73 | Pending |
+| POLISH-06 | Phase 73 | Pending |
+| POLISH-07 | Phase 73 | Pending |
 
 **Coverage:**
-- v3.0 requirements: 39 total
-- Mapped to phases: 0
-- Unmapped: 39 ⚠️
+- v3.0 requirements: 40 total
+- Mapped to phases: 40
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-30*
-*Last updated: 2026-03-30 after initial definition*
+*Last updated: 2026-03-30 after roadmap revision (Phase 69 split, phase renumbering)*

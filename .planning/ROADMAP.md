@@ -11,9 +11,9 @@
 - ✅ **v2.0 "The Engine"** - Phases 50-58 (shipped 2026-03-27)
 - ✅ **v2.1 "The Mobile"** - Phases 59-63 (shipped 2026-03-28)
 - ✅ **v2.2 "The Touch"** - Phases 64-67.1 (closed 2026-03-30, Capacitor approach abandoned)
-- 📋 **v2.3 "The Power"** - (planned, web only)
-- 📋 **v2.4 "The Polish"** - (planned, web only)
-- 📋 **v3.0 "The App"** - React Native + Expo iOS app (replaces Capacitor)
+- 🚧 **v3.0 "The App"** - Phases 68-73 (in progress)
+- 📋 **v4.0 "The Power"** - (planned, web multi-provider tabs + MCP management)
+- 📋 **v5.0 "The Polish"** - (planned, web visual transformation)
 
 ## Phases
 
@@ -126,22 +126,34 @@
 
 </details>
 
-### v2.2 "The Touch" (Phases 64-67.1) — CLOSED 2026-03-30
+<details>
+<summary>✅ v2.2 "The Touch" (Phases 64-67.1) -- CLOSED 2026-03-30</summary>
 
-**Milestone Goal:** Transform Loom from a scaled-down desktop app into a purpose-built iOS daily-driver.
+**Outcome:** Phases 64-66 shipped (scroll, touch targets, typography). Phase 67 gestures partially shipped. Phase 67.1 bug fixes revealed that 5 of 7 critical iOS bugs are architecturally unfixable in WKWebView. **Capacitor approach abandoned.** Remaining iOS work moved to v3.0 React Native app.
 
-**Outcome:** Phases 64-66 shipped (scroll, touch targets, typography). Phase 67 gestures partially shipped. Phase 67.1 bug fixes revealed that 5 of 7 critical iOS bugs are architecturally unfixable in WKWebView. **Capacitor approach abandoned.** Remaining iOS work moved to Backlog — will be addressed by v3.0 React Native app.
+- [x] Phase 64: Scroll Performance (3/3 plans) -- completed 2026-03-29
+- [x] Phase 65: Touch Target Compliance (2/2 plans) -- completed 2026-03-29
+- [x] Phase 66: Typography & Spacing (2/2 plans) -- completed 2026-03-29
+- [~] Phase 67: iOS-Native Gestures (4/4 plans, Task 2 device validation deferred)
+- [~] Phase 67.1: iOS Bug Fixes (3/5 plans, Plans 04-05 abandoned)
 
-**Research produced:** PLATFORM-RESEARCH.md (competitor architecture analysis), LIBRARY-RESEARCH.md (component ecosystem survey). Both in `.planning/phases/67.1-ios-bug-fixes/`.
+</details>
 
-- [x] **Phase 64: Scroll Performance** (completed 2026-03-29)
-- [x] **Phase 65: Touch Target Compliance** (completed 2026-03-29)
-- [x] **Phase 66: Typography & Spacing** (completed 2026-03-29)
-- [~] **Phase 67: iOS-Native Gestures** (partially complete — Plans 01-04 executed, Task 2 device validation deferred)
-- [~] **Phase 67.1: iOS Bug Fixes** (partially complete — Plans 01-03 + 2 hotfixes, Plans 04-05 abandoned)
-- [ ] ~~**Phase 68: Visual Polish**~~ (abandoned — will be native app work in v3.0)
+### v3.0 "The App" (Phases 68-73) -- IN PROGRESS
+
+**Milestone Goal:** Build a native iOS app with React Native + Expo that replaces the Capacitor WebView approach -- delivering a gesture-first, polished mobile experience with native capabilities the web cannot provide: actionable push notifications, 120Hz spring physics, and native gesture recognizers.
+
+- [ ] **Phase 68: Scaffolding & Design** - Expo dev build on device, shared/ code extraction, NativeWind, Apple certs, Native App Soul doc
+- [ ] **Phase 69: Chat Foundation** - Streaming markdown PoC, session list, basic messaging, auth, WebSocket lifecycle
+- [ ] **Phase 70: Chat Polish** - Tool cards, thinking blocks, code blocks, 60fps at 50+ messages, 120Hz keyboard
+- [ ] **Phase 71: Native Feel** - Haptics, spring physics, gestures, safe areas, 120Hz ProMotion
+- [ ] **Phase 72: Agent Features** - Inline permissions, push notifications with approve/deny, deep linking
+- [ ] **Phase 73: Polish & Accessibility** - Syntax highlighting, share sheet, VoiceOver, session management extras
 
 ## Phase Details
+
+<details>
+<summary>v2.2 Phase Details (closed -- reference only)</summary>
 
 ### Phase 64: Scroll Performance
 **Goal**: Chat scrolling sustains 60fps on iPhone 16 Pro Max with 50+ messages -- the #1 blocker for daily-driver usage eliminated
@@ -154,132 +166,154 @@
   4. Rubber band bounce feels native on both message list and session list scroll containers
   5. No React setState calls fire inside scroll event handlers (ref + debounced state only)
 **Plans**: 3 plans
-Plans:
-- [x] 64-01-PLAN.md -- Core scroll hook (useChatScroll) with IO sentinel, ResizeObserver auto-follow, dead code cleanup
-- [x] 64-02-PLAN.md -- Secondary jank fixes: ActiveMessage deferred reflow, overscroll-behavior, content-visibility reconciliation
-- [x] 64-03-PLAN.md -- statusTap verification, virtualization gate, real device 60fps validation
-**UI hint**: yes
 
 ### Phase 65: Touch Target Compliance
 **Goal**: Every interactive element in Loom meets Apple's 44px minimum touch target -- users can reliably tap any button or control on iPhone without missing
-**Depends on**: Phase 64 (scroll fixes may affect message layout, stabilize first)
+**Depends on**: Phase 64
 **Requirements**: TOUCH-01, TOUCH-02, TOUCH-03, TOUCH-04, TOUCH-05, TOUCH-06, TOUCH-07
 **Success Criteria** (what must be TRUE):
   1. ThinkingDisclosure, ToolCardShell header, ProjectHeader, template buttons, and Detach button all measure 44px+ in Safari DevTools
-  2. All sidebar interactive elements (session items, group headers, action buttons) have min-height 44px
+  2. All sidebar interactive elements have min-height 44px
   3. Focus rings on all 44px+ targets are visible with 2px minimum stroke width
-  4. No tap target smaller than 44px exists anywhere in the app on mobile breakpoint (< 768px)
+  4. No tap target smaller than 44px exists anywhere in the app on mobile breakpoint
 **Plans**: 2 plans
-Plans:
-- [x] 65-01-PLAN.md -- Touch target sizing fixes (TOUCH-01-06) + sidebar audit + Playwright regression test
-- [x] 65-02-PLAN.md -- Focus ring sweep across all custom components + V2_CONSTITUTION convention
-**UI hint**: yes
 
 ### Phase 66: Typography & Spacing
 **Goal**: Text is comfortable to read at mobile viewing distance -- font sizes, line heights, and spacing optimized for iPhone density
-**Depends on**: Phase 65 (touch target sizing affects visual density)
+**Depends on**: Phase 65
 **Requirements**: TYPO-01, TYPO-02, TYPO-03, TYPO-04, TYPO-05, TYPO-06, TYPO-07, TYPO-08
 **Success Criteria** (what must be TRUE):
-  1. No text element in the app renders below 12px font size on mobile (DateGroupHeader, labels, secondary text all at minimum)
-  2. Chat message body text renders at 15px with code blocks at 18px monospace -- comfortable at arm's length
-  3. Session list shows more items per screen with py-2 density and single-line truncated titles
+  1. No text element in the app renders below 12px font size on mobile
+  2. Chat message body text renders at 15px with code blocks at 18px monospace
+  3. Session list shows more items per screen with optimized density
   4. Keyboard opening does not cause text field labels or token counts to shrink or jump
   5. All body text maintains 1.6 minimum line-height for mobile readability
 **Plans**: 2 plans
-Plans:
-- [x] 66-01-PLAN.md -- Token system extension (--text-xs/sm/code) + sub-12px fixes + mobile font overrides (15px body, 18px code) + streaming parity
-- [x] 66-02-PLAN.md -- Verify-first sidebar/thinking/keyboard items + Playwright typography regression test + V2_CONSTITUTION Section 14
-**UI hint**: yes
 
 ### Phase 67: iOS-Native Gestures
 **Goal**: Users interact with Loom through native iOS patterns -- swipe-to-delete, pull-to-refresh, long-press context menus, haptic feedback, and proper app lifecycle
-**Depends on**: Phase 65 (gestures need proper touch target sizing), Phase 66 (gesture overlays need correct typography)
-**Requirements**: GESTURE-01, GESTURE-02, GESTURE-03, GESTURE-04, GESTURE-05, GESTURE-06, GESTURE-07, GESTURE-08, GESTURE-09, GESTURE-10
-**Success Criteria** (what must be TRUE):
-  1. User can swipe left on a session item to reveal a delete action, and pull down on the session list to refresh
-  2. Long-pressing a session item opens a context menu with Copy ID, Rename, Delete, Export options
-  3. Long-pressing a message bubble opens a context menu with Copy Text, Retry, Share options
-  4. Returning the app from background automatically reconnects the WebSocket within 2 seconds
-  5. Share and delete confirmations use native iOS sheets (UIActivityViewController, action sheet) on native, Radix fallbacks on web
+**Depends on**: Phase 65, Phase 66
+**Requirements**: GESTURE-01 through GESTURE-10
 **Plans**: 4 plans
-Plans:
-- [x] 67-01-PLAN.md -- Dependencies + Capacitor utility modules (native-clipboard, native-share, native-actions, app-lifecycle) + haptic event map + useAppLifecycle hook
-- [x] 67-02-PLAN.md -- Sidebar gestures: swipe-to-delete hook, pull-to-refresh hook + spinner, Radix context menu migration, SessionItem/SessionList wiring
-- [x] 67-03-PLAN.md -- Message context menus: long-press Copy Text/Retry/Share on user and assistant messages, native share integration
-- [x] 67-04-PLAN.md -- App lifecycle wiring in AppShell, sidebar haptic (Task 1 complete; Task 2 device validation pending)
-**UI hint**: yes
 
 ### Phase 67.1: iOS Bug Fixes (INSERTED)
-**Goal**: Fix 15 Forgejo issues (#2-#17) discovered during real-device testing of Phase 67 -- broken context menus, gesture conflicts, haptics not firing, CSS token errors, keyboard desync, and UI density problems
+**Goal**: Fix Forgejo issues discovered during real-device testing of Phase 67
 **Depends on**: Phase 67
-**Requirements**: Forgejo #2, #3, #4, #5, #6, #7, #8, #9, #10, #12, #13, #14, #15, #16, #17
-**Success Criteria** (what must be TRUE):
-  1. Long-pressing session items and messages opens context menus on iOS (not text selection)
-  2. Swipe-to-delete works inside sidebar without closing the sidebar panel
-  3. Haptic feedback fires on all gesture events
-  4. All CSS custom properties resolve to valid values (no undefined tokens)
-  5. Keyboard animation is synchronized with composer position
-**Plans**: 5 plans
-Plans:
-- [x] 67.1-01-PLAN.md -- CSS token fixes (#8, #9, #10), Capacitor deps to production (#16), accessory bar hidden (#4)
-- [x] 67.1-02-PLAN.md -- Sidebar edge-zone gesture isolation (#12), delete button z-ordering (#17), session list overflow (#7)
-- [x] 67.1-03-PLAN.md -- useLongPress hook + dual-path context menus replacing Radix ContextMenu on iOS (#14, #15)
-- [ ] 67.1-04-PLAN.md -- Auto-focus prevention (#2), keyboard animation sync (#3), PTR spring animation (#13)
-- [ ] 67.1-05-PLAN.md -- Page reload investigation (#5), haptics verification (#16), mobile UI density (#6)
-**UI hint**: yes
+**Plans**: 5 plans (3 complete, 2 abandoned)
 
-### Phase 68: Visual Polish
-**Goal**: Loom looks stunning on OLED -- true blacks save power, glass effects render smoothly, springs feel native at 120Hz, and contrast meets accessibility standards
-**Depends on**: Phase 67 (all features in place for holistic visual review)
-**Requirements**: VISUAL-01, VISUAL-02, VISUAL-03, VISUAL-04, VISUAL-05, VISUAL-06, VISUAL-07, VISUAL-08, VISUAL-09, VISUAL-10
+</details>
+
+### Phase 68: Scaffolding & Design
+**Goal**: Developer has a working Expo dev build on iPhone 16 Pro Max with shared business logic, AND the visual direction is locked via a Native App Soul document before any UI code
+**Depends on**: Nothing (first phase of v3.0)
+**Requirements**: SCAFF-01, SCAFF-02, SCAFF-03, SCAFF-04, SCAFF-05, SCAFF-06
 **Success Criteria** (what must be TRUE):
-  1. Outermost background is true black (oklch(0 0 0)) while surface hierarchy (base/raised/overlay) remains distinguishable
-  2. Glass blur effects on modals and command palette render at 60fps without stutter on iPhone 16 Pro Max
-  3. Spring animations feel snappy and native at 120Hz -- sidebar, toasts, and tool cards complete in under 300ms
-  4. All text passes WCAG AA contrast (4.5:1 minimum), body text passes AAA (7:1) against all surface levels
-  5. Accent color is vibrant against OLED black without burn-in risk (medium saturation, no large solid accent fields)
+  1. Developer can run `eas build --profile development` and install the resulting build on iPhone 16 Pro Max
+  2. A test screen imports types and a Zustand store factory from `shared/` and renders data correctly on device
+  3. Existing web app at `src/` builds and runs identically (zero regressions -- web app NOT moved)
+  4. NativeWind styling renders correctly on device -- representative components match design intent
+  5. Apple Developer Program enrolled with APNs push notification certificates configured
+  6. Native App Soul document written and approved by swd: visual language, spacing grid, typography, animation philosophy, screen-by-screen specs for session list, chat, tool cards, permissions, composer
+**Plans**: TBD
+**UI hint**: yes
+**Design gate**: Phase 69 CANNOT start until Native App Soul doc is approved. Bard creative review required.
+
+### Phase 69: Chat Foundation
+**Goal**: User can send a message and see a streaming markdown response in the native app -- the core messaging loop works end-to-end with session management and auth
+**Depends on**: Phase 68 (dev build + shared code + design approval)
+**Requirements**: CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-09, CHAT-10, CHAT-11
+**Success Criteria** (what must be TRUE):
+  1. react-native-streamdown proof-of-concept renders real Claude streaming output on device (validated as first plan -- if fails, pivot to manual renderer)
+  2. User can see a list of sessions grouped by project, create a new session, and send a message that produces a streaming markdown response
+  3. User can switch between sessions via sidebar drawer (swipe from left edge)
+  4. App authenticates via JWT stored in iOS Keychain, shows connection banner when disconnected
+  5. WebSocket reconnects automatically on foreground with exponential backoff (AppState lifecycle)
 **Plans**: TBD
 **UI hint**: yes
 
-### v2.3 "The Power" (Planned)
+### Phase 70: Chat Polish
+**Goal**: The chat experience is complete -- tool cards, thinking blocks, code blocks, 60fps performance, and 120Hz keyboard avoidance make it indistinguishable from ChatGPT iOS core UX
+**Depends on**: Phase 69 (streaming + sessions working)
+**Requirements**: CHAT-05, CHAT-06, CHAT-07, CHAT-08, CHAT-12
+**Success Criteria** (what must be TRUE):
+  1. User can see tool call cards (Read/Write/Execute/Search/Bash/MCP) with status indicators and expand/collapse during active streaming
+  2. Thinking blocks render with expand/collapse disclosure, code blocks render in monospace
+  3. Scrolling through 50+ messages sustains 60fps with no jank (FlashList optimized, memoized components)
+  4. Keyboard avoidance animates at 120Hz in sync with iOS keyboard via react-native-keyboard-controller
+  5. Side-by-side with ChatGPT iOS: message density, spacing, and responsiveness are comparable
+**Plans**: TBD
+**UI hint**: yes
 
-- [ ] Multi-provider tabbed workspaces (Claude, Gemini, Codex)
-- [ ] MCP server management UI
-- [ ] Plugin/skill management UI
+### Phase 71: Native Feel
+**Goal**: The app feels like a native iOS app, not a React Native app -- every interaction has haptic feedback, every transition uses spring physics at 120Hz, and all gesture patterns match iOS conventions
+**Depends on**: Phase 70
+**Requirements**: NATIVE-01, NATIVE-02, NATIVE-03, NATIVE-04, NATIVE-05, NATIVE-06, NATIVE-07, NATIVE-08
+**Success Criteria** (what must be TRUE):
+  1. Every interactive element fires appropriate haptic feedback -- send (impact medium), tool complete (success), permission request (warning), error (error), swipe threshold (selection)
+  2. All transitions (screen push, modal present, drawer open, card expand) use spring physics via react-native-reanimated running at 120Hz on ProMotion display
+  3. User can swipe left on a session to reveal a delete action, long-press a message for Copy/Retry/Share context menu, and pull down on the session list to refresh
+  4. Safe area insets correctly handle the Dynamic Island notch area and home indicator on all screens, and status bar adapts to light/dark based on the current surface
+  5. With iOS Reduce Motion enabled, all spring animations are replaced with immediate transitions and no animation plays
+**Plans**: TBD
+**UI hint**: yes
 
-### v2.4 "The Polish" (Planned)
+### Phase 72: Agent Features
+**Goal**: User can manage their AI coding agent from the lock screen -- approve file writes via push notification, get alerted when sessions complete, and interact with permission requests inline in the chat
+**Depends on**: Phase 70 (chat UI for inline permissions), Phase 71 (haptics for notification feedback)
+**Requirements**: AGENT-01, AGENT-02, AGENT-03, AGENT-04, AGENT-05, AGENT-06, AGENT-07
+**Success Criteria** (what must be TRUE):
+  1. When Claude requests permission (file write, command execution), an inline Approve/Deny UI appears above the composer with haptic feedback on tap
+  2. User receives a push notification within 5 seconds of a permission request, and can tap Approve or Deny directly from the notification without opening the app
+  3. User receives a push notification when a session completes or encounters an error, and tapping it deep-links directly to that session in the app
+  4. Backend registers device push tokens via a new API endpoint and sends notifications through Expo Push Service, with token refresh handled on app launch
+  5. When the app is backgrounded, silent push keeps session state in sync so returning to the app shows current state without a loading delay
+**Plans**: TBD
+**Research flag**: `/gsd:research-phase` required -- push spans APNs, Expo Push API, notification actions, deep linking, backend new endpoint
 
-- [ ] Aurora/WebGL ambient overlay (GPU feasibility gated)
-- [ ] Comprehensive spring physics on all interactions
-- [ ] Tier 2/3 visual effects (Iridescence, LiquidChrome, Border Beam, etc.)
-- [ ] Full motion refinement pass
+### Phase 73: Polish & Accessibility
+**Goal**: The app ships at a quality level that matches or exceeds ChatGPT iOS -- syntax-highlighted code, native sharing, full VoiceOver support, and session management conveniences
+**Depends on**: Phase 72
+**Requirements**: POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05, POLISH-06, POLISH-07
+**Success Criteria** (what must be TRUE):
+  1. Code blocks render with syntax highlighting (approach decided in first plan -- native Text or WebView-per-block), visually distinguishable from prose text
+  2. User can share code blocks or full conversations via the native iOS share sheet, and copy message content from the context menu
+  3. Follow-up suggestion chips appear after assistant responses, and tapping one sends it as the next message
+  4. A VoiceOver user can navigate the entire app -- session list, chat messages, composer, tool cards, permission requests -- with logical focus order and descriptive labels
+  5. User can pin sessions for quick access at the top of the session list, and search sessions by title with real-time filtering
+**Plans**: TBD
+**UI hint**: yes
 
-### v3.0 "The Vision" (Planned)
+## Known Risks & Contingencies
 
-- [ ] GSD visual dashboard
-- [ ] Nextcloud integration
-- [ ] Companion system (conditional on feasibility)
-- [ ] CodeRabbit integration
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Apple Developer enrollment delay (24-48hrs) | Blocks EAS Build + push certs | Trigger enrollment immediately before Phase 68; have Apple Support contact ready |
+| EAS Build iteration speed (5-15 min/build) | Slows debugging of native issues | If >1 day on build failures, switch to `eas build --local` with Xcode |
+| Tailscale access from native app | Blocks all backend communication | Verify native app reaches 100.86.4.57:5555 before Phase 68 ends |
+| react-native-streamdown v0.1.1 instability | Core rendering broken | Phase 69 Plan 1 is a 1-day PoC; fallback is manual Reanimated + Text renderer |
+| macOS/Xcode availability for local builds | EAS cloud-only (15 min cycles) | Budget build time accordingly; Mac mini available for local builds |
+| Vision fragmentation across 6 phases | App ships "functional but soulless" | Native App Soul doc as Phase 68 gate; Bard visual review per phase; ChatGPT iOS comparison at every checkpoint |
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
+Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 64. Scroll Performance | 3/3 | Complete    | 2026-03-29 |
-| 65. Touch Target Compliance | 2/2 | Complete    | 2026-03-29 |
-| 66. Typography & Spacing | 2/2 | Complete   | 2026-03-29 |
-| 67. iOS-Native Gestures | 4/4 | Awaiting Verification |  |
-| 67.1. iOS Bug Fixes | 3/5 | In Progress|  |
-| 68. Visual Polish | 0/? | Not started | - |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 68. Scaffolding & Design | v3.0 | 0/? | Not started | - |
+| 69. Chat Foundation | v3.0 | 0/? | Not started | - |
+| 70. Chat Polish | v3.0 | 0/? | Not started | - |
+| 71. Native Feel | v3.0 | 0/? | Not started | - |
+| 72. Agent Features | v3.0 | 0/? | Not started | - |
+| 73. Polish & Accessibility | v3.0 | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
 
-- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v2.3/v3.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
-- **Phases 48-49 (v1.5 deferred)** -- DecryptedText reveals, StarBorder accents, spacing/typography audit. Deprioritized in favor of engine work; revisit during v2.4 "The Polish."
+- **Subagent Monitoring Panel** -- When Claude spawns subagents (Agent tool), show active subagents in a panel/overlay. Click to view a subagent's real-time conversation stream. Requires backend multiplexing of child process output through parent WebSocket. Inspired by [claude-esp](https://github.com/phiat/claude-esp). (v4.0 scope -- needs backend `claude-sdk.js` changes to expose child process streams.)
+- **Phases 48-49 (v1.5 deferred)** -- DecryptedText reveals, StarBorder accents, spacing/typography audit. Deprioritized in favor of engine work; revisit during v5.0 "The Polish."
+- **14 open Forgejo issues from v2.2** -- Most architecturally resolved by React Native (native gestures, keyboard, scroll). Verify closure during v3.0 device testing.
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-29 after Phase 67.1 planning complete*
+*Last updated: 2026-03-30 after v3.0 "The App" roadmap revised (cross-vendor review: +design gate, +Phase 69 split, -monorepo refactor, +risks)*
