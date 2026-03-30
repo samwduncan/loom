@@ -118,6 +118,7 @@ export function SessionList() {
             sessionId,
             projectName,
           });
+          // eslint-disable-next-line loom/no-external-store-mutation -- re-attach live sessions after pull-to-refresh
           useStreamStore.getState().attachLiveSession(sessionId);
         }
       }
@@ -239,9 +240,11 @@ export function SessionList() {
       <div className="px-2 py-1.5">
         <SearchInput value={query} onChange={setQuery} />
       </div>
+      {/* eslint-disable-next-line loom/no-banned-inline-style -- gesture-driven dynamic touchAction from usePullToRefresh */}
       <div {...(isMobile ? ptrBind() : {})} style={{ touchAction: isMobile ? 'pan-x' : 'auto' }} className="flex-1 flex flex-col min-h-0">
         <PullToRefreshSpinner pullDistance={pullDistance} isRefreshing={isRefreshing} threshold={60} />
-        <div ref={scrollRef} className={cn('native-scroll flex-1 overflow-y-auto')} role="listbox" aria-label="Chat sessions list" style={{ overscrollBehaviorY: 'contain' }}>
+        {/* eslint-disable-next-line loom/no-banned-inline-style -- overscrollBehaviorY requires inline style (no Tailwind utility) */}
+        <div ref={scrollRef} className={cn('native-scroll flex-1 overflow-y-auto overflow-x-hidden')} role="listbox" aria-label="Chat sessions list" style={{ overscrollBehaviorY: 'contain' }}>
           {totalVisible === 0 && isSearching && (
             <div className="px-3 py-4">
               <EmptyState

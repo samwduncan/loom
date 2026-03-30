@@ -158,13 +158,13 @@ export function SessionItem({
       {/* Delete button behind (positioned absolute right) -- mobile only */}
       {isMobile && (offset < 0 || revealed) && (
         <div
-          className="absolute right-0 top-0 bottom-0 w-[80px] flex items-center justify-center"
+          className="absolute right-0 top-0 bottom-0 w-[80px] z-[var(--z-sticky)] flex items-center justify-center"
           // eslint-disable-next-line loom/no-banned-inline-style -- dynamic swipe reveal background
-          style={{ background: 'var(--status-error)' }}
+          style={{ background: 'var(--status-error)', pointerEvents: 'auto' }}
         >
           <button
             onClick={handleSwipeDelete}
-            className="swipe-delete-btn"
+            className="flex flex-col items-center justify-center gap-1 w-full h-full text-foreground cursor-pointer border-none"
             aria-label="Delete session"
             type="button"
           >
