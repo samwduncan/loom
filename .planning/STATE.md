@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
 status: Ready to execute
-stopped_at: Completed 67.1-01-PLAN.md
-last_updated: "2026-03-29T23:34:54.342Z"
+stopped_at: Completed 67.1-02-PLAN.md
+last_updated: "2026-03-30T01:24:23.503Z"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 16
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 67.1 (ios-bug-fixes) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Performance Metrics
 
@@ -67,6 +67,8 @@ Plan: 2 of 5
 - [Phase 67]: Haptic on sidebar toggle buttons only (not swipe-to-close or programmatic auto-close) per D-02
 - [Phase 67.1]: Accessory bar hidden (isVisible: false) -- Done button row visually intrusive on iPhone
 - [Phase 67.1]: Haptics diagnostic console.log added for Xcode debugging (not console.warn)
+- [Phase 67.1]: getBoundingClientRect for edge zone detection (not raw clientX) -- reliable regardless of sidebar transform state
+- [Phase 67.1]: z-[var(--z-sticky)] for intra-component z-index elevation on delete button (per loom/no-raw-z-index ESLint rule)
 
 ### Roadmap Evolution
 
@@ -85,6 +87,6 @@ Plan: 2 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-29T23:34:54.340Z
-Stopped at: Completed 67.1-01-PLAN.md
+Last session: 2026-03-30T01:24:23.501Z
+Stopped at: Completed 67.1-02-PLAN.md
 Resume: Approve 67-04 Task 2 checkpoint, then proceed to Phase 68
