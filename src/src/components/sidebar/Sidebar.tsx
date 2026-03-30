@@ -52,13 +52,15 @@ export const Sidebar = memo(function Sidebar() {
   // swipes when open. When closed, no element intercepts (iOS back gesture works).
   // Do NOT add touch-action: none on backdrop (D-24).
   const sidebarPanelRef = useRef<HTMLDivElement>(null);
-  const touchRef = useRef({ startX: 0, swiping: false });
+  const touchRef = useRef({ startX: 0, startY: 0, swiping: false, locked: false });
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     if (!touch) return;
     touchRef.current.startX = touch.clientX;
+    touchRef.current.startY = touch.clientY;
     touchRef.current.swiping = false;
+    touchRef.current.locked = false;
     if (sidebarPanelRef.current) {
       sidebarPanelRef.current.style.transition = 'none';
     }
@@ -67,9 +69,22 @@ export const Sidebar = memo(function Sidebar() {
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     if (!touch) return;
+    // Once locked to vertical scrolling, don't activate swipe-to-close
+    if (touchRef.current.locked) return;
 
     const deltaX = touch.clientX - touchRef.current.startX;
-    if (deltaX < -10) touchRef.current.swiping = true;
+    const deltaY = touch.clientY - touchRef.current.startY;
+
+    // Lock to vertical scroll if vertical movement exceeds horizontal
+    if (!touchRef.current.swiping && Math.abs(deltaY) > 15 && Math.abs(deltaY) > Math.abs(deltaX)) {
+      touchRef.current.locked = true;
+      return;
+    }
+
+    // Require 20px horizontal left-swipe with predominantly horizontal angle
+    if (!touchRef.current.swiping && deltaX < -20 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      touchRef.current.swiping = true;
+    }
     if (touchRef.current.swiping && sidebarPanelRef.current) {
       const clamped = Math.min(0, deltaX);
       sidebarPanelRef.current.style.transform = `translateX(${clamped}px)`;
