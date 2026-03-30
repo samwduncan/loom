@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: "The Touch"
 status: Ready to execute
-stopped_at: Completed 67.1-02-PLAN.md
-last_updated: "2026-03-30T01:24:23.503Z"
+stopped_at: Completed 67.1-03-PLAN.md
+last_updated: "2026-03-30T01:40:22.218Z"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 16
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 67.1 (ios-bug-fixes) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -67,8 +67,14 @@ Plan: 3 of 5
 - [Phase 67]: Haptic on sidebar toggle buttons only (not swipe-to-close or programmatic auto-close) per D-02
 - [Phase 67.1]: Accessory bar hidden (isVisible: false) -- Done button row visually intrusive on iPhone
 - [Phase 67.1]: Haptics diagnostic console.log added for Xcode debugging (not console.warn)
+- [Phase 67.1]: Direction change: kill swipe-to-delete, use context menus like ChatGPT/Claude iOS. Full-width swipe-to-close on sidebar restored.
+- [Phase 67.1]: Design benchmark: ChatGPT iOS and Claude iOS for density, spacing, interaction patterns. Stop inventing, copy what works.
 - [Phase 67.1]: getBoundingClientRect for edge zone detection (not raw clientX) -- reliable regardless of sidebar transform state
 - [Phase 67.1]: z-[var(--z-sticky)] for intra-component z-index elevation on delete button (per loom/no-raw-z-index ESLint rule)
+- [Phase 67.1]: useEffect to sync onLongPress ref (not direct assignment during render) -- react-hooks/refs ESLint rule
+- [Phase 67.1]: No e.preventDefault() in useLongPress touchstart -- preserves vertical scrolling, CSS handles text selection suppression
+- [Phase 67.1]: data-long-press-target on session items only (not messages) -- preserves text selection on message content
+- [Phase 67.1]: .popover-menu-item class in base.css (not .context-menu-item) -- avoids cascade conflict with sidebar.css
 
 ### Roadmap Evolution
 
@@ -87,6 +93,6 @@ Plan: 3 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-30T01:24:23.501Z
-Stopped at: Completed 67.1-02-PLAN.md
+Last session: 2026-03-30T01:40:22.215Z
+Stopped at: Completed 67.1-03-PLAN.md
 Resume: Approve 67-04 Task 2 checkpoint, then proceed to Phase 68

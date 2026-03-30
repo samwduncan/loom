@@ -223,7 +223,7 @@ Plans:
 Plans:
 - [x] 67.1-01-PLAN.md -- CSS token fixes (#8, #9, #10), Capacitor deps to production (#16), accessory bar hidden (#4)
 - [x] 67.1-02-PLAN.md -- Sidebar edge-zone gesture isolation (#12), delete button z-ordering (#17), session list overflow (#7)
-- [ ] 67.1-03-PLAN.md -- useLongPress hook + dual-path context menus replacing Radix ContextMenu on iOS (#14, #15)
+- [x] 67.1-03-PLAN.md -- useLongPress hook + dual-path context menus replacing Radix ContextMenu on iOS (#14, #15)
 - [ ] 67.1-04-PLAN.md -- Auto-focus prevention (#2), keyboard animation sync (#3), PTR spring animation (#13)
 - [ ] 67.1-05-PLAN.md -- Page reload investigation (#5), haptics verification (#16), mobile UI density (#6)
 **UI hint**: yes
@@ -272,7 +272,7 @@ Phases execute in numeric order: 64 -> 64.1 -> 65 -> 65.1 -> ... -> 68
 | 65. Touch Target Compliance | 2/2 | Complete    | 2026-03-29 |
 | 66. Typography & Spacing | 2/2 | Complete   | 2026-03-29 |
 | 67. iOS-Native Gestures | 4/4 | Awaiting Verification |  |
-| 67.1. iOS Bug Fixes | 2/5 | In Progress|  |
+| 67.1. iOS Bug Fixes | 3/5 | In Progress|  |
 | 68. Visual Polish | 0/? | Not started | - |
 
 ## Backlog (Future Milestones)
