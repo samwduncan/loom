@@ -1,770 +1,543 @@
-# Domain Pitfalls: iOS Polish for Existing Capacitor Web App
+# Pitfalls Research: Adding React Native + Expo iOS App to Existing Web + Backend
 
-**Domain:** Adding iOS-native gestures, visual effects, and touch polish to an existing React + Capacitor 7.6.1 chat app running in WKWebView server.url mode
-**Researched:** 2026-03-28
-**Platform:** iPhone 16 Pro Max, iOS 17+, Capacitor 7.6.1, Vite 7, React 19
+**Domain:** Adding a React Native iOS chat app to an existing React web + Express/WebSocket backend project (solo developer)
+**Researched:** 2026-03-30
+**Confidence:** HIGH (multiple verified sources, direct Capacitor failure experience, competitor analysis)
+**Prior art:** Loom v2.2 Capacitor/WKWebView failure post-mortem (15 plans, 5/7 bugs architecturally unfixable)
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites, broken UX, or multi-day debugging sessions.
+Mistakes that cause rewrites, multi-week delays, or abandoned features. These are ordered by likelihood and severity for this specific project.
 
 ---
 
-### Pitfall 1: iOS Back Gesture Conflict with Custom Swipe Gestures
+### Pitfall 1: Porting Web UI to React Native Instead of Redesigning
 
-**What goes wrong:** Adding horizontal swipe gestures (swipe-to-delete on session items, swipe-to-open sidebar) conflicts with iOS's built-in edge-swipe-to-go-back gesture. When users start a swipe near the left edge, both the native navigation gesture AND the custom gesture fire, causing a jarring double-action: the session item slides AND the WKWebView navigates back.
+**What goes wrong:**
+The developer copies the web app's component structure, layout logic, and interaction patterns into React Native, replacing `div` with `View` and `span` with `Text`. The result looks like a web app crammed into a phone -- wrong density, wrong gestures, wrong navigation paradigm. Users describe it as "doesn't feel like it belongs on iPhone."
 
-**Why it happens:** WKWebView's `allowsBackForwardNavigationGestures` is true by default. Capacitor does not disable it. The iOS gesture recognizer has priority over web touch events, but doesn't fully suppress them -- both fire.
+**Why it happens:**
+Natural instinct for a developer who built the web app. You already have working components, tested patterns, and a mental model of how the UI fits together. Re-implementing the same design in RN primitives feels efficient. But web patterns (CSS Grid, Tailwind utility classes, hover states, cursor interactions, desktop-density layouts) have no native equivalent. What works at 1440px with a mouse is wrong at 393px with a thumb.
 
-**Consequences:** Users accidentally navigate away from the app when swiping session items near the left edge. The app shell may show a blank page or the WKWebView's back-stack snapshot. Recovery requires tapping forward or reloading.
+**How to avoid:**
+- Design the mobile UI from scratch using reference apps (ChatGPT iOS, Claude iOS) as the starting point, NOT the existing web layout
+- Only transfer business logic: Zustand stores, API hooks, WebSocket client, streaming multiplexer, auth flow, tool-call registry
+- Treat UI components as "new code" -- no copy-paste from `src/components/` to `mobile/`
+- Follow Apple's Human Interface Guidelines for navigation shells, spacing, and density
+- Use native navigation (Expo Router's stack/tab navigators) instead of recreating web navigation
 
-**Prevention:**
+**Warning signs:**
+- Finding yourself writing `Platform.OS === 'ios' ? webStyle : nativeStyle` conditional logic in shared components
+- Components that have both `className` and `style` props
+- Typography that looks too big or too small without explicit tuning for mobile density
+- swd says "everything is too big" or "doesn't feel iOS-native" (this has happened before)
 
-In `ios/App/App/ViewController.swift` (or a Capacitor plugin), disable back-forward gestures since Loom is an SPA with no native navigation stack:
-
-```swift
-// In CAPBridgeViewController subclass
-override func viewDidLoad() {
-    super.viewDidLoad()
-    bridge?.webView?.allowsBackForwardNavigationGestures = false
-}
-```
-
-For swipe-to-delete specifically, reserve the left 20px edge zone for iOS native gestures and only allow swipe-to-delete from touches starting >20px from the left edge:
-
-```typescript
-const handleTouchStart = (e: React.TouchEvent) => {
-  const touch = e.touches[0];
-  if (!touch) return;
-  // Skip if touch starts in iOS edge-swipe zone
-  if (IS_NATIVE && touch.clientX < 20) return;
-  startX.current = touch.clientX;
-};
-```
-
-**Detection:** Test on real device by swiping from the very left edge of the screen. If you see a page-back animation or the whole WKWebView content slides right, the conflict exists.
-
-**Phase:** GESTURE (Phase 67) -- must be addressed before implementing swipe-to-delete.
+**Phase to address:**
+Design phase (before any code). The three-phase creative process (clone, integrate, elevate) documented in design_philosophy.md directly prevents this. Non-negotiable gate: swd approves visual direction before implementation begins.
 
 ---
 
-### Pitfall 2: `touch-action: pan-y` Does NOT Work in Safari/WKWebView for Gesture Discrimination
+### Pitfall 2: The Vision Fragmentation Problem (Solo Developer)
 
-**What goes wrong:** Setting `touch-action: pan-y` on a swipe-to-delete container (intending to allow vertical scroll but capture horizontal swipe) does NOT behave as expected in Safari. Safari has historically had incomplete support for `touch-action` values beyond `auto` and `manipulation`. Even with Safari 18.2 fixing serialization order, the actual gesture discrimination is unreliable -- diagonal gestures get cancelled, vertical scrolling gets stuck, or the swipe gesture never fires.
+**What goes wrong:**
+A 15-20 phase roadmap fragments creative vision across weeks of incremental execution. By phase 10, the original aesthetic intent is diluted. Compromises accumulate. Each phase is technically correct but the whole doesn't cohere. The result is "design by accretion" -- functional but soulless, exactly what happened across the web app's 50+ phases.
 
-**Why it happens:** Safari/WebKit uses a different gesture recognition pipeline than Chrome. The `touch-action` CSS property is partially implemented -- `pan-x` and `pan-y` values may be parsed but don't always gate gestures correctly. The browser's built-in momentum scrolling has its own gesture recognizer that takes priority.
+**Why it happens:**
+GSD (and all task-based methodologies) decompose holistic goals into atomic tasks. A task list can specify "build session list with spring animation" but cannot convey "the session list should feel like flipping through a deck of cards." The creative vision exists in the spaces between tasks, and those spaces get lost when execution spans 15+ phase boundaries.
 
-**Consequences:** Horizontal swipe gestures on list items break vertical scrolling. Users can swipe a session item but then can't scroll the session list. Or vice versa -- scrolling works but swipe-to-delete never triggers because the browser steals the touch.
+For a solo developer, there's nobody to maintain the meta-vision while you execute. You ARE both the visionary and the builder, and the builder personality dominates during implementation because shipping tasks feels productive.
 
-**Prevention:**
+**How to avoid:**
+- Create a "Native App Soul" document before any implementation -- the visual language, animation philosophy, reference screenshots with annotations, interaction personality
+- Limit v3.0 to 3-5 phases maximum. Ship three things beautifully: chat, sessions, notifications
+- Every phase reads the soul document first. Every device test compares to reference apps side-by-side
+- Bard reviews every visual component as a creative partner (not a gate -- a collaborator)
+- Iterate WITHIN phases until the bar is met, instead of creating new phases to fix visual gaps
+- Accept slower velocity. The web app shipped fast because engineering was the bottleneck. The native app will be slower because creative excellence is the bottleneck. That is correct.
 
-Do NOT rely on `touch-action: pan-y` for gesture discrimination on iOS. Instead, use a JavaScript-based approach with an initial-direction heuristic:
+**Warning signs:**
+- Phase plans stop referencing the design soul document
+- Device tests happen without reference app comparison
+- "We'll polish that later" appearing in completion notes
+- More than 5 phases planned for v3.0
 
-```typescript
-const DIRECTION_THRESHOLD = 10; // px before committing to direction
-
-const handleTouchMove = (e: React.TouchEvent) => {
-  const touch = e.touches[0];
-  if (!touch || !startRef.current) return;
-
-  const dx = touch.clientX - startRef.current.x;
-  const dy = touch.clientY - startRef.current.y;
-
-  // Haven't committed to a direction yet
-  if (!directionRef.current) {
-    if (Math.abs(dx) > DIRECTION_THRESHOLD || Math.abs(dy) > DIRECTION_THRESHOLD) {
-      // Commit: if more horizontal than vertical, it's a swipe
-      directionRef.current = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
-    }
-    return; // Wait for direction commitment
-  }
-
-  if (directionRef.current === 'vertical') return; // Let browser handle scroll
-
-  // Horizontal swipe: prevent scroll, apply transform
-  e.preventDefault(); // Only works with non-passive listener!
-  applySwipeTransform(dx);
-};
-```
-
-The `touch-action: manipulation` already set on `<body>` in base.css is correct (disables double-tap zoom and pinch-zoom). Do NOT override it with `pan-y` or `pan-x` on child elements.
-
-**Detection:** Test on real iPhone: try to scroll the session list vertically when a session item has `touch-action: pan-y`. If scrolling feels sticky or unresponsive, this pitfall has been triggered.
-
-**Phase:** GESTURE (Phase 67) -- critical for swipe-to-delete implementation.
+**Phase to address:**
+Pre-implementation (Phase 0/Design). The implementation guardrails document already identifies this risk. Enforce it ruthlessly.
 
 ---
 
-### Pitfall 3: React's Passive Event Listeners Block `preventDefault()` on Touch Events
+### Pitfall 3: WebSocket Connection State Mismanagement on iOS
 
-**What goes wrong:** Calling `e.preventDefault()` inside a React `onTouchMove` handler does nothing on iOS. The gesture you're trying to capture (e.g., horizontal swipe) still triggers the browser's built-in scroll. The console shows: "Unable to preventDefault inside passive event listener invocation."
+**What goes wrong:**
+The app connects to the backend WebSocket on launch, but when iOS backgrounds the app, the WebSocket silently dies. When the user returns, messages are missing, the connection appears alive but isn't, or buffered callbacks fire all at once causing UI chaos. Streaming sessions appear frozen or jump-cut to completion.
 
-**Why it happens:** React 17+ attaches all event listeners to the root, and since iOS 11.3, all root-level touch event listeners are passive by default. React's synthetic event system does not pass `{ passive: false }` -- it CAN'T, because it uses event delegation on the root. When you call `e.preventDefault()` in a React `onTouchMove`, you're calling it on a passive listener, which is a no-op.
+**Why it happens:**
+iOS suspends JavaScript execution within ~5-30 seconds of backgrounding. The WebSocket's TCP connection may survive briefly (iOS keeps the socket open for a grace period) but the JS side can't process messages. When the app foregrounds, one of three things happens: (1) the connection is dead and needs reconnection, (2) iOS buffered WebSocket messages and fires them all at once, or (3) the connection looks alive but the server has already timed out and closed it. The existing backend has WebSocket heartbeat logic that will kill idle connections.
 
-**Consequences:** Custom horizontal swipe gestures (swipe-to-delete) can't prevent the browser from simultaneously scrolling vertically. The UI jitters as both horizontal translation AND vertical scroll happen at once.
+**How to avoid:**
+- Listen to `AppState` changes (`active`, `inactive`, `background`) and explicitly manage the connection lifecycle
+- On `background`: gracefully close the WebSocket (don't rely on iOS to maintain it)
+- On `active`: reconnect with exponential backoff, request state diff from backend
+- Queue outgoing messages when disconnected; flush on reconnect
+- Backend already has heartbeat -- coordinate the client timeout with the server timeout
+- For streaming sessions: store the session ID so reconnection can resume the stream or fetch the completed result
+- NEVER assume the connection is alive just because `readyState === WebSocket.OPEN` -- the server may have already closed its end
 
-**Prevention:**
+**Warning signs:**
+- Messages appearing out of order after foregrounding
+- "Connection lost" banner flashing briefly on every app resume
+- Streaming sessions stuck at partial content with no completion
+- Backend logs showing many rapid connect/disconnect cycles
 
-Use `useEffect` to attach touch listeners directly to the DOM element with `{ passive: false }`:
-
-```typescript
-useEffect(() => {
-  const el = itemRef.current;
-  if (!el) return;
-
-  const onTouchMove = (e: TouchEvent) => {
-    if (isSwipingRef.current) {
-      e.preventDefault(); // This WORKS because listener is non-passive
-      applySwipeTransform(e);
-    }
-  };
-
-  // MUST be { passive: false } to allow preventDefault
-  el.addEventListener('touchmove', onTouchMove, { passive: false });
-  return () => el.removeEventListener('touchmove', onTouchMove);
-}, []);
-```
-
-Do NOT use React's `onTouchMove` prop for gestures that need `preventDefault`. Use it only for gestures that don't need to block scrolling (like tracking a move for visual feedback).
-
-If using `@use-gesture`, you MUST use the `target` option with a ref instead of the `...bind()` spread pattern, AND set `eventOptions: { passive: false }`:
-
-```typescript
-useDrag(handler, {
-  target: itemRef,
-  eventOptions: { passive: false },
-  axis: 'x',
-  filterTaps: true,
-});
-```
-
-**Detection:** Open Safari DevTools console. If you see "Unable to preventDefault inside passive event listener" warnings, your gesture handler is bound passively.
-
-**Phase:** GESTURE (Phase 67) -- must be addressed in every swipe/drag gesture implementation.
+**Phase to address:**
+Foundation/networking phase. This must be solved before the chat screen works reliably. The existing `WebSocketClient` and `tryReconnect()` logic from the web app provides a starting point, but the background/foreground lifecycle is entirely new.
 
 ---
 
-### Pitfall 4: `overscroll-behavior: none` is Ignored in WKWebView
+### Pitfall 4: FlatList Performance Death in Chat (Streaming + Variable Heights)
 
-**What goes wrong:** The CSS `overscroll-behavior: none` (already set on `html` and `body` in base.css) does NOT suppress rubber-band bounce in WKWebView. Users see the rubber-band overscroll when pulling down on the chat message list, even though the CSS says it shouldn't bounce.
+**What goes wrong:**
+Using React Native's `FlatList` naively for a chat message list results in: dropped frames during scrolling, blank areas while streaming, janky scroll-to-bottom behavior, and visible layout jumps as messages change height (markdown renders, code blocks expand, tool calls animate). Discord's iOS team explicitly called out that "RN lists don't perform well for dynamic content" and built a custom native list.
 
-**Why it happens:** WKWebView uses its own scroll view (`UIScrollView`) under the hood, and `overscroll-behavior` is a web-standard CSS property that WebKit recognizes but the underlying native scroll view ignores. The bounce behavior is controlled by `UIScrollView.bounces`, which CSS cannot reach.
+**Why it happens:**
+Chat messages are the worst case for virtualized lists: variable heights (short text vs. long code blocks), content that changes size during streaming, new items appended at the bottom while the user may be scrolled up, and rich content (images, code, tool cards) that's expensive to measure. `FlatList` measures items on the JS thread, and variable-height items can't use `getItemLayout` for O(1) scroll offset calculation.
 
-**Consequences:** Pull-to-refresh (GESTURE-02) becomes unreliable because the rubber-band bounce interferes with custom pull-to-refresh detection. Users see both the native bounce AND any custom pull-to-refresh indicator, creating a jarring double-animation.
+**How to avoid:**
+- Start with `FlashList` (by Shopify) instead of `FlatList` -- it has better recycling and estimation
+- Implement `estimatedItemSize` for FlashList based on message type heuristics (text ~60px, code ~200px, tool card ~120px)
+- Memoize message components aggressively with `React.memo` and stable keys
+- Separate streaming content from the list's render cycle -- accumulate tokens in a ref, flush to the list item on debounced intervals (similar to the web app's rAF buffer pattern)
+- For streaming messages, render the active message OUTSIDE the list (pinned to bottom) and move it INTO the list on completion
+- Use `removeClippedSubviews` and tune `windowSize` (10-15 for chat)
+- Profile with Chrome DevTools "Highlight updates" to catch re-render cascades
+- Enable React Compiler (Babel plugin) -- it auto-memoizes and is "the best thing you can do to optimize" Expo apps
 
-**Prevention:**
+**Warning signs:**
+- Scroll FPS drops below 50 with 20+ messages
+- Visible blank areas ("white flash") while fast-scrolling
+- Layout jumps as streaming messages grow
+- `VirtualizedList: You have a large list that is slow to update` console warning
 
-For pull-to-refresh, you have two options:
-
-**Option A (Recommended): Use native `UIRefreshControl` via a Capacitor plugin.** This is the iOS-native approach and feels exactly right:
-
-```swift
-// Custom Capacitor plugin
-@objc func enablePullToRefresh(_ call: CAPPluginCall) {
-    DispatchQueue.main.async {
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(self.handleRefresh), for: .valueChanged)
-        self.bridge?.webView?.scrollView.refreshControl = refreshControl
-    }
-}
-```
-
-Then notify the web app via `window.dispatchEvent(new CustomEvent('native-refresh'))`.
-
-**Option B: Disable bounce entirely and implement a pure-web pull-to-refresh.** Set `scrollView.bounces = false` in native code, then implement a custom pull indicator using touch events. This is harder to get right and will never feel as native.
-
-For the chat message list specifically, you probably want bounce disabled (no pull-to-refresh on chat) but pull-to-refresh on the session list. This means per-scroll-container control, which requires native code:
-
-```swift
-// Disable bounce on the main WKWebView scroll view
-bridge?.webView?.scrollView.bounces = false
-// The web app handles per-container scroll via its own overflow elements
-```
-
-**Detection:** On real iPhone, pull down firmly at the top of the session list. If you see the entire WKWebView bounce (background shows through), `overscroll-behavior` is being ignored.
-
-**Phase:** GESTURE (Phase 67) -- affects pull-to-refresh implementation choice.
+**Phase to address:**
+Chat screen implementation phase. This is the hardest single screen to build. Budget extra time. Consider building a proof-of-concept chat list before committing to a rendering strategy. The web app's lesson from Phase 64 (content-visibility was harmful for variable-height messages) applies here too -- test assumptions early.
 
 ---
 
-### Pitfall 5: WKWebView Keyboard Dismissal Leaves Viewport Shifted (iOS 12-26)
+### Pitfall 5: Push Notification Complexity Cascade
 
-**What goes wrong:** After the keyboard dismisses, `position: fixed` elements bounce up and down, `visualViewport.offsetTop` doesn't reset to 0, and `visualViewport.height` stays smaller than `window.innerHeight`. The composer ends up floating in the wrong position, or the entire app shell has a gap at the bottom.
+**What goes wrong:**
+Push notifications sound simple ("send a message when Claude asks a question") but the implementation spans: Apple Developer Program enrollment, APNs certificate/key setup, Expo push token registration, server-side notification sending, background processing, notification actions (approve/deny), deep linking from notification tap, and token refresh lifecycle. Each step has its own failure modes. The developer burns a week on infrastructure that isn't visible and doesn't work on simulators.
 
-**Why it happens:** This is a long-running WebKit bug (filed as WebKit bug 192564, still open). When `viewport-fit=cover` is set (required for safe-area support on notched devices), keyboard dismissal doesn't properly restore the viewport geometry. The issue persists across iOS 12 through iOS 26 beta.
+**Why it happens:**
+Push notifications are an inherently distributed system: your app registers with Apple, gets a device token, sends it to your backend, your backend sends it to Expo's push service (or directly to APNs), Apple delivers it to the device, iOS decides whether to show it based on focus/DND/settings, the user interacts, and that interaction routes back to your app via deep linking. Every hop can fail silently.
 
-**Consequences:** After using the composer (typing, sending), the app shell has a phantom gap at the bottom. The gap grows with repeated keyboard open/close cycles. Users must scroll or interact to reset the layout.
+Additionally: push notifications cannot be tested on iOS Simulator. They require a physical device, a valid Apple Developer certificate, and (as of Expo SDK 53) a development build -- Expo Go no longer supports push on Android, and iOS push has always required dev builds. So you need the full EAS Build pipeline working before you can even test.
 
-**Prevention:**
+**How to avoid:**
+- Use Expo's push notification service (not raw APNs) -- it handles token translation, receipt tracking, and retry logic
+- Set up EAS Build and Apple Developer certificates in the FIRST phase, not when you need notifications
+- Track both the Expo push token AND the native device token in the backend
+- Implement notifications in a focused phase, not as an afterthought bolted onto chat
+- Build the server-side notification sender as a standalone module that watches for permission requests and model questions
+- Test with TestFlight builds on real devices from day one
+- Start with simple text notifications. Add actionable notifications (approve/deny buttons) in a later phase
+- Handle the "user denied notification permission" case gracefully -- it's not an error, it's a choice
 
-The existing `useKeyboardOffset` hook already handles the web fallback path. For the native path (`IS_NATIVE === true`), the hook is currently a no-op, relying on WKWebView's default Body resize. This is correct for Loom because:
+**Warning signs:**
+- "It works in Expo Go" (no it doesn't -- push requires dev builds)
+- Notifications arrive in foreground but not background
+- Token refresh after app update breaks delivery
+- Deep link from notification opens wrong screen or crashes
 
-1. The `.app-shell` uses `position: fixed; inset: 0` on native (base.css line 182)
-2. The `contain: layout size style` prevents layout from leaking
-
-However, add a safety net for the keyboard dismissal bug:
-
-```typescript
-// In useKeyboardOffset, add a focusout listener for native
-if (IS_NATIVE) {
-  const handleFocusOut = () => {
-    // Force layout recalculation after keyboard dismisses
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-    });
-  };
-  document.addEventListener('focusout', handleFocusOut);
-  return () => document.removeEventListener('focusout', handleFocusOut);
-}
-```
-
-**Detection:** On real iPhone, tap the composer to open keyboard, type something, then dismiss keyboard. Check if there's a gap at the bottom of the app. Repeat 5 times -- the bug is sometimes intermittent.
-
-**Phase:** SCROLL (Phase 66) -- must be verified during scroll performance validation.
+**Phase to address:**
+Dedicated notification phase AFTER chat is working and the EAS Build pipeline is proven. Don't combine notification work with chat UI work -- the debugging contexts are completely different (network/server vs. UI/UX).
 
 ---
 
-### Pitfall 6: `requestAnimationFrame` Capped at 60fps in WKWebView (ProMotion Ignored)
+### Pitfall 6: Expo Go Comfort Zone -- Avoiding Development Builds
 
-**What goes wrong:** Spring animations driven by `requestAnimationFrame` (rAF) run at 60fps maximum in WKWebView, even on iPhone 16 Pro Max with its 120Hz ProMotion display. CSS animations run at 120Hz, creating a visible disconnect: CSS-driven UI elements animate at 120fps while JS-driven elements stutter at 60fps.
+**What goes wrong:**
+The developer stays in Expo Go for too long because it's fast and frictionless (scan QR code, see changes). But Expo Go has a fixed set of native modules. The moment you need a library with custom native code (react-native-skia for GPU effects, custom notification actions, background processing, Dynamic Island), Expo Go breaks. The transition to development builds forces learning EAS Build, certificate management, and longer iteration cycles. If this transition happens mid-project, it disrupts momentum.
 
-**Why it happens:** Apple intentionally caps rAF at 60Hz in WKWebView to save battery. Safari 18.3+ has a developer flag to unlock 120Hz rAF, but this flag only applies to Safari itself, not to WKWebView used by third-party apps (like Capacitor). This is a deliberate platform restriction, not a bug.
+**Why it happens:**
+Expo Go feels magical compared to Xcode. Hot reload, no compile step, works on any device. The developer avoids the development build transition because it introduces friction: EAS Build takes 5-15 minutes per build (cloud) or requires local Xcode setup, certificates need provisioning, and the iteration cycle slows from 1 second to minutes. This is especially painful for a solo developer who's used to Vite's sub-second HMR.
 
-**Consequences:** Any spring animation driven by JavaScript (e.g., via Framer Motion, GSAP, or custom rAF loops) will look noticeably less smooth than CSS transitions. Side-by-side, the CSS sidebar animation at 120Hz looks buttery while the JS spring on a modal looks choppy.
+**How to avoid:**
+- Start with a development build from day one. Skip Expo Go entirely
+- Run `eas build --profile development --platform ios` in the first hour of the project
+- Use `npx expo start --dev-client` instead of `npx expo start` (Expo Go)
+- Set up EAS Build credentials (Apple Developer account, distribution certificate, provisioning profile) in the scaffolding phase
+- EAS handles certificate management automatically if you let it -- don't fight the system
+- Use `eas build --local` if you have Xcode on a Mac to avoid cloud build queues
+- Development builds still support fast refresh via Metro -- the iteration speed penalty is only for native code changes, not JS changes
 
-**Prevention:**
+**Warning signs:**
+- Using `npx expo start` without `--dev-client`
+- Deferring library installation "because it needs a dev build"
+- Testing only on Expo Go and finding everything works, then discovering device-specific crashes when switching to dev builds
+- Plans that say "will switch to dev builds later"
 
-This is exactly why the existing architectural decision to prefer CSS transitions over JS animation is correct. Double down on it:
+**Phase to address:**
+Phase 0/scaffolding. Before any feature code. The development build IS the foundation.
 
-1. **Use CSS transitions for all UI animations.** CSS transitions run on the compositor at 120Hz:
-   ```css
-   .sidebar-panel {
-     transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
-   }
-   ```
+---
 
-2. **CSS `@keyframes` for springs.** Approximate spring physics with a cubic-bezier that matches the spring curve:
-   ```css
-   /* Approximation of spring(mass:1, stiffness:200, damping:20) */
-   transition-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
-   ```
+### Pitfall 7: Over-Sharing Code Between Web and Native
 
-3. **Only use rAF for non-visual work** (scroll position calculation, intersection detection). Never for driving visual animation on native.
+**What goes wrong:**
+In pursuit of DRY, the developer creates a shared package with Zustand stores, API hooks, AND component abstractions. The shared components use platform conditionals everywhere (`Platform.OS === 'web' ? <div> : <View>`), creating Frankenstein components that are hard to test, hard to debug, and produce suboptimal results on both platforms. The monorepo configuration consumes days of setup. Metro bundler can't resolve web dependencies. Web build breaks because of RN-only packages.
 
-4. **If LazyMotion/Framer Motion is used for a spring**, know that it will max out at 60fps on native. This is acceptable for low-frequency animations (modal entry) but visible on high-frequency ones (drag follow, sidebar swipe).
+**Why it happens:**
+"30-40% code sharing" sounds like you should create a shared package for that 30-40%. But the sharable code is almost entirely non-visual: stores, hooks, API clients, types, constants. This code doesn't need a monorepo -- it can be copied (initially) or extracted into a simple shared directory. The monorepo complexity is high: Metro requires specific configuration to resolve dependencies from hoisted `node_modules`, Vite and Metro have different module resolution strategies, and React Native doesn't support export maps by default.
 
-**Detection:** On real iPhone, compare a CSS transition animation vs. a rAF-driven animation side by side. The rAF version will look noticeably less smooth.
+**How to avoid:**
+- Start with a simple directory structure, NOT a monorepo:
+  ```
+  /src        -- Web app (Vite + React, unchanged)
+  /mobile     -- React Native app (Expo)
+  /shared     -- Plain TypeScript (stores, types, API hooks, constants)
+  /server     -- Backend (unchanged)
+  ```
+- `/shared` exports only platform-agnostic code: types, Zustand store definitions, API client, WebSocket protocol, streaming logic
+- NO shared UI components. The web has `div/span/CSS`, native has `View/Text/StyleSheet` -- accept the duplication
+- If monorepo becomes necessary later, migrate then. Don't pay the complexity cost upfront
+- Validate that `/shared` imports work in BOTH Metro (RN) and Vite (web) before writing shared code
+- Avoid barrel files (`index.ts` re-exports) -- they cause bundler issues in Metro
 
-**Phase:** VISUAL (Phase 68) -- affects spring animation tuning for VISUAL-03 and VISUAL-04.
+**Warning signs:**
+- `Platform.OS` checks in shared code
+- Metro build errors about unresolved modules from `node_modules`
+- Web build breaks after installing a React Native package
+- More than a day spent on monorepo/workspace configuration
+
+**Phase to address:**
+Scaffolding phase. Define the directory structure and sharing boundary. Prove imports work in both directions before writing features.
+
+---
+
+### Pitfall 8: Thinking in Web Layout Instead of Native Layout
+
+**What goes wrong:**
+The developer writes layout code using web mental models: percentage widths, media queries, CSS Grid, absolute positioning, nested flex with complex alignment. React Native's Flexbox is similar to CSS Flexbox but NOT identical (defaults differ: `flexDirection` is `column`, not `row`). There is no CSS Grid. There are no media queries (use `Dimensions` or `useWindowDimensions`). Percentage-based layouts often produce layout bugs because RN calculates percentages differently. The result is layouts that don't feel right but the developer can't figure out why.
+
+**Why it happens:**
+After 50+ phases of Tailwind CSS, web layout patterns are deeply ingrained. RN's layout engine looks like Flexbox but has subtle differences that produce unexpected results. The developer doesn't realize they're thinking in web paradigms until they've spent hours debugging a layout that "should work."
+
+**How to avoid:**
+- Learn React Native's Flexbox defaults: `flexDirection: 'column'`, `alignItems: 'stretch'`
+- Use `flex: 1` liberally -- it's the primary layout mechanism in RN
+- Prefer absolute values (in density-independent pixels) over percentages for spacing
+- Use `SafeAreaView` (or `useSafeAreaInsets` from `react-native-safe-area-context`) for notch/Dynamic Island areas
+- Use NativeWind (Tailwind for RN) if you want familiar utility classes, but know that it maps to StyleSheet, not CSS -- not all Tailwind classes work
+- Study the reference apps' layout patterns: iOS apps use consistent safe-area insets, system-standard spacing (8/16/20pt grid), and platform-specific component sizes
+
+**Warning signs:**
+- Using `width: '50%'` and getting unexpected results
+- Layouts that look correct in portrait but break in landscape
+- Content hidden behind the notch or Dynamic Island
+- Elements overlapping or clipping unexpectedly
+
+**Phase to address:**
+First UI phase. Build one screen (session list) correctly, establish layout patterns, then replicate.
 
 ---
 
 ## Moderate Pitfalls
 
-Mistakes that cause hours of debugging or suboptimal UX but don't require rewrites.
+### Pitfall 9: Streaming Markdown Rendering Performance
+
+**What goes wrong:**
+Re-parsing the entire accumulated markdown text on every streaming chunk causes exponential slowdown. With a 500-token response, you parse markdown 500 times, and each parse is longer than the last. The UI stutters, animations drop frames, and the app feels unresponsive during long responses.
+
+**Why it happens:**
+The web app solved this with a two-phase renderer (rAF innerHTML during streaming, react-markdown for finalized). React Native doesn't have innerHTML -- everything goes through the React reconciler. Naive streaming renders trigger full markdown re-parse on every token.
+
+**How to avoid:**
+- Use `react-native-streamdown` (by Software Mansion) -- built specifically for streaming markdown in RN with memoization and incremental parsing
+- Accumulate tokens in a shared value or ref, debounce rendering to ~100ms intervals
+- Only re-render changed paragraphs, not the entire message
+- For code blocks: detect block boundaries and only re-highlight when a block is complete
+- Consider a simpler renderer during streaming (plain text with basic formatting) that upgrades to full markdown on completion -- mirrors the web app's two-phase pattern
+
+**Warning signs:**
+- UI freezes during long code block generation
+- Scroll-to-bottom animation drops frames during streaming
+- CPU spikes visible in React DevTools profiler during streaming
+
+**Phase to address:**
+Chat implementation phase. Prototype streaming rendering early -- this determines the entire chat experience quality.
 
 ---
 
-### Pitfall 7: Long-Press Triggers Native iOS Context Menu (Link Preview / Image Preview)
+### Pitfall 10: Reanimated/Gesture Handler Misuse
 
-**What goes wrong:** Implementing a custom long-press context menu (GESTURE-03, GESTURE-06) conflicts with iOS's built-in context menu. When a user long-presses on a session item or message, they see BOTH your custom React popover AND the native iOS context menu (with "Open Link", "Copy", "Share" options). Or worse, the native menu fires and your custom handler never runs.
+**What goes wrong:**
+Animations run on the JS thread instead of the UI thread, causing dropped frames during gesture-driven interactions. Gesture callbacks trigger `setState` on every frame, blocking the JS thread. The developer writes smooth animation code that works in isolation but stutters when the chat list is scrolling or streaming is active.
 
-**Why it happens:** WKWebView has a built-in long-press gesture recognizer that shows native previews for links and images. This recognizer fires at ~450ms. If your custom handler also fires at 500ms, there's a race condition. Capacitor doesn't have a `SuppressesLongPressGesture` option (Cordova did).
+**Why it happens:**
+Web developers are used to `useState` + CSS transitions. In React Native, `useState` for animation values runs on the JS thread and must bridge to native for every frame. Reanimated's `useSharedValue` + `useAnimatedStyle` run entirely on the UI thread via worklets, bypassing the JS thread. But the API is different enough that web developers default to the familiar pattern.
 
-**Prevention:**
+**How to avoid:**
+- ALWAYS use `useSharedValue` (not `useState`) for animation-driven values
+- ALWAYS use `useAnimatedStyle` for animated component styles
+- Use `runOnJS` only when you MUST update React state (e.g., after a gesture completes)
+- Wrap gesture objects in `useMemo` to prevent reattachment on every render
+- Use `simultaneousWithExternalGesture` to handle gesture conflicts (swipe-to-delete + list scroll)
+- Profile animations with the React Native performance monitor -- target 60fps minimum, 120fps on ProMotion
 
-Suppress the native context menu with CSS and the `contextmenu` event:
+**Warning signs:**
+- Using `Animated.Value` (old API) instead of `useSharedValue` (Reanimated)
+- `runOnJS` called inside gesture `onUpdate` handlers (should be `onEnd` only)
+- Animation code using `setState` instead of shared values
+- Visible jank when swiping while the list is loading
 
-```css
-/* Suppress native long-press callout on elements where we have custom menus */
-.session-item,
-.message-bubble {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-```
-
-```typescript
-// Prevent the native context menu from firing
-el.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-}, { passive: false });
-```
-
-In capacitor.config.ts, disable link previews:
-
-```typescript
-ios: {
-  allowsLinkPreview: false, // Suppress iOS link preview on long-press
-}
-```
-
-Then implement your custom long-press with a timer:
-
-```typescript
-const LONG_PRESS_MS = 500;
-let timer: ReturnType<typeof setTimeout> | null = null;
-let moved = false;
-
-const onTouchStart = () => {
-  moved = false;
-  timer = setTimeout(() => {
-    if (!moved) {
-      hapticImpact('Medium');
-      showContextMenu();
-    }
-  }, LONG_PRESS_MS);
-};
-
-const onTouchMove = (e: TouchEvent) => {
-  // Cancel if finger moved more than 10px
-  const dx = Math.abs(e.touches[0].clientX - startX);
-  const dy = Math.abs(e.touches[0].clientY - startY);
-  if (dx > 10 || dy > 10) {
-    moved = true;
-    if (timer) clearTimeout(timer);
-  }
-};
-
-const onTouchEnd = () => {
-  if (timer) clearTimeout(timer);
-};
-```
-
-**Detection:** Long-press on a link inside a message on real iPhone. If the native "Open / Copy / Share" popover appears, suppression is incomplete.
-
-**Phase:** GESTURE (Phase 67) -- GESTURE-03 and GESTURE-06.
+**Phase to address:**
+First phase with animations (likely chat screen). Establish the animation pattern correctly from the start.
 
 ---
 
-### Pitfall 8: Nested `backdrop-filter: blur()` Causes WKWebView Rendering Glitches
+### Pitfall 11: Apple Developer Program and Certificate Maze
 
-**What goes wrong:** Having a modal with `backdrop-filter: blur(10px)` that overlays a sidebar also using `backdrop-filter: blur()` causes visual artifacts in WKWebView. The blur either disappears, renders as a solid color, or creates a "double blur" that looks like frosted glass on top of frosted glass -- unreadable.
+**What goes wrong:**
+The developer can't test on their device because certificates are wrong, provisioning profiles don't match, or the Apple Developer account isn't set up for the right capabilities. EAS Build fails with cryptic signing errors. Days lost to Apple infrastructure before writing a line of feature code.
 
-**Why it happens:** WebKit's compositor has a known limitation with nested backdrop-filter elements. Each backdrop-filter creates a new stacking context and requires a separate compositing pass. When stacked, the GPU memory pressure can cause the renderer to fall back to a non-blurred path, or the blur accumulates beyond readability.
+**Why it happens:**
+Apple's code signing system is notoriously complex: distribution certificates, development certificates, provisioning profiles (development, ad hoc, App Store), bundle identifiers, capabilities (push notifications, background modes), and entitlements. EAS Build automates much of this, but it still requires an Apple Developer Program membership ($99/year), correct account permissions, and initial configuration.
 
-**Consequences:** Opening the command palette (which has glass effect) while the sidebar is open (which may also have glass) creates visual garbage. The SettingsModal overlay looks correct in Chrome DevTools but broken on real iPhone.
+**How to avoid:**
+- Enroll in Apple Developer Program BEFORE starting development (activation can take 24-48 hours)
+- Let EAS manage certificates automatically: `eas credentials` handles generation and storage
+- Use `eas build --profile development --platform ios` for the first build immediately after scaffold
+- Register your test device's UDID for ad hoc provisioning (EAS can register devices for you)
+- Add capabilities incrementally: start with just "push notifications" -- add background modes, associated domains, etc. as needed
+- Keep your Apple ID 2FA device accessible during builds (Apple requires re-auth periodically)
 
-**Prevention:**
+**Warning signs:**
+- "No matching provisioning profile" errors from EAS Build
+- "Code signing identity not found" in build logs
+- Push notifications work in development but not TestFlight (different APNs environment)
+- App crashes on launch on real device but works in simulator
 
-1. **Limit backdrop-filter to ONE visible layer at a time.** When a modal opens, remove blur from the background layer:
-   ```css
-   .sidebar.modal-open {
-     backdrop-filter: none; /* Remove while modal is showing */
-   }
-   ```
-
-2. **Use a smaller blur radius on mobile.** 10px is expensive; 4-6px looks nearly as good with half the GPU cost:
-   ```css
-   @media (max-width: 767px) {
-     .glass-surface {
-       backdrop-filter: blur(6px);
-     }
-   }
-   ```
-
-3. **Never nest more than 2 backdrop-filter elements in the same stacking context.** Audit the DOM tree before adding new glass effects.
-
-4. **Use `will-change: transform` on the blurred element** to force GPU compositing:
-   ```css
-   .glass-surface {
-     will-change: transform;
-     backdrop-filter: blur(6px);
-     -webkit-backdrop-filter: blur(6px); /* Still needed for older iOS */
-   }
-   ```
-
-**Detection:** Open command palette on top of sidebar on real iPhone. If the blur disappears or creates a solid-color overlay, nesting is the issue.
-
-**Phase:** VISUAL (Phase 68) -- VISUAL-02 glass effects.
+**Phase to address:**
+Phase 0/scaffolding. Solve this before any feature code. A working development build on your iPhone should be the first milestone.
 
 ---
 
-### Pitfall 9: Pull-to-Refresh Fights with Existing `overscroll-behavior: none` and Scroll Anchoring
+### Pitfall 12: Ignoring iOS App Lifecycle for Chat State
 
-**What goes wrong:** Implementing pull-to-refresh (GESTURE-02) in the session list conflicts with the existing `overscroll-behavior: none` on `<body>`. The pull gesture never triggers because the browser (or the CSS rule) prevents the overscroll that would normally indicate a pull. Additionally, if using the JS-based approach, the scroll anchor logic in `useScrollAnchor` fights the pull gesture -- it tries to keep the scroll at the bottom while the pull tries to scroll past the top.
+**What goes wrong:**
+The app loses context when iOS force-quits it for memory, when the user switches apps, or when a phone call interrupts. The user returns to find: wrong session loaded, chat scrolled to wrong position, composer content lost, or a stale "connecting..." state that never resolves.
 
-**Why it happens:** `overscroll-behavior: none` on `<body>` prevents scroll chaining globally. But pull-to-refresh requires overscroll at the top of the list. The scroll container needs `overscroll-behavior-y: contain` (not `none`) to allow the pull but prevent chaining to the parent. However, the session list is in the sidebar, not the main body.
+**Why it happens:**
+iOS aggressively manages app lifecycle. An app can be suspended (JS execution halted), then terminated entirely without warning. React Native persists component state in memory -- when the app is terminated, all state is lost. The web app uses `persist` middleware on Zustand stores (localStorage), but React Native needs `AsyncStorage` or `expo-secure-store` as the persistence backend.
 
-**Consequences:** Pull-to-refresh either never triggers (overscroll blocked), or it triggers but the scroll anchor logic immediately cancels it (thinks user is scrolling, not pulling).
+**How to avoid:**
+- Use Zustand's `persist` middleware with `AsyncStorage` as the storage backend for critical state: active session ID, sidebar state, composer draft
+- Save scroll position on background transition (AppState listener)
+- Restore state on app launch: load last session, restore scroll, check connection
+- Handle the "app was terminated" case: on launch, check if the persisted session still exists on the backend
+- Don't persist transient state: streaming progress, WebSocket connection state, animation values
 
-**Prevention:**
+**Warning signs:**
+- App always opens to session list instead of last active session
+- Composer draft lost after switching to another app and back
+- Stale data showing from a previous session after termination and relaunch
 
-The session list sidebar scroll container should have:
-
-```css
-.session-list-scroll {
-  overflow-y: auto;
-  overscroll-behavior-y: contain; /* Allow overscroll but contain it */
-  /* NOT 'none' -- need overscroll for pull detection */
-}
-```
-
-The pull-to-refresh detection should be a separate concern from scroll anchoring. Use a dedicated state machine:
-
-```typescript
-type PullState = 'idle' | 'pulling' | 'threshold' | 'refreshing';
-
-// Only enter 'pulling' when scrollTop === 0 AND touch is moving down
-const handleTouchMove = (e: TouchEvent) => {
-  if (scrollContainerRef.current?.scrollTop !== 0) return; // Not at top
-  const dy = e.touches[0].clientY - startY;
-  if (dy > 0 && pullState === 'idle') {
-    setPullState('pulling');
-  }
-};
-```
-
-Keep `overscroll-behavior: none` on `<body>` (prevents the whole page from bouncing) but use `overscroll-behavior-y: contain` on the specific scroll container that needs pull-to-refresh.
-
-**Detection:** Scroll the session list to the very top, then pull down. If nothing happens, overscroll is blocked. If the whole page bounces, scroll chaining leaked.
-
-**Phase:** GESTURE (Phase 67) -- GESTURE-02 implementation.
+**Phase to address:**
+Foundation phase, alongside WebSocket connection management. State persistence and app lifecycle are intertwined.
 
 ---
 
-### Pitfall 10: Server.url Mode Creates Unpredictable Caching for CSS/JS Assets
+### Pitfall 13: NativeWind / Styling Expectations Mismatch
 
-**What goes wrong:** In server.url mode, WKWebView loads assets from the remote dev server (or nginx). WKWebView's HTTP cache aggressively caches CSS and JS files. After deploying a new version, users see stale styles or stale JavaScript -- glass effects from the old build, missing gesture handlers from the new build, or half-old/half-new component rendering.
+**What goes wrong:**
+The developer adopts NativeWind expecting Tailwind parity and discovers: no CSS Grid, no `hover:`, limited `gap` support in older RN versions, no `content-visibility`, no `::before`/`::after` pseudo-elements, no CSS animations (`@keyframes`), and subtle differences in how `flex` shorthand resolves. Styling that "should work" produces visual bugs or crashes.
 
-**Why it happens:** WKWebView honors HTTP cache headers, but it also has its own process-level cache that survives app backgrounding. The `cleartext: true` config doesn't affect caching behavior. Unlike a regular browser, there's no easy "hard refresh" -- force-quitting the app doesn't always clear the WKWebView cache.
+**Why it happens:**
+NativeWind (Tailwind CSS for React Native) maps Tailwind utility classes to React Native StyleSheet objects. But React Native's style engine is a subset of CSS. NativeWind v4 is significantly better than v2 (supports CSS variables, media queries, container queries) but still can't paper over fundamental RN layout limitations.
 
-**Consequences:** After deploying a new build with gesture handlers, users don't get the new code until the cache expires (or the app is fully killed and relaunched, sometimes multiple times). CSS changes don't apply, causing visual regressions that are "fixed" but invisible to the user.
+**How to avoid:**
+- Read NativeWind v4's compatibility table before starting. Know what's supported and what isn't.
+- Accept that some web styles will need Reanimated replacements: CSS transitions become `withSpring`/`withTiming`, `@keyframes` become worklet animations
+- Use `StyleSheet.create` for complex styles that NativeWind can't express
+- Don't use NativeWind for animation-driven styles -- use Reanimated's `useAnimatedStyle` instead
+- Test on real device early -- NativeWind bugs often only manifest on device, not Metro's web target
 
-**Prevention:**
+**Warning signs:**
+- `className` prop not applying styles (likely missing NativeWind babel plugin)
+- Styles work on web target but break on iOS
+- Layout looks different between Expo Go and production build
 
-Loom already uses Vite's content-hashed filenames (e.g., `index-a1b2c3.js`), which should bust caches on asset changes. Verify this is working:
-
-1. **Check nginx headers** -- ensure `Cache-Control: immutable, max-age=31536000` is set for hashed assets and `Cache-Control: no-cache` for `index.html`:
-   ```nginx
-   location ~* \.[0-9a-f]{8}\.(js|css)$ {
-     add_header Cache-Control "immutable, max-age=31536000";
-   }
-   location = / {
-     add_header Cache-Control "no-cache";
-   }
-   ```
-
-2. **After deploy, increment a query param on the server.url** in capacitor.config.ts to bust the HTML cache:
-   ```typescript
-   server: {
-     url: process.env.CAPACITOR_SERVER_URL
-       ? `${process.env.CAPACITOR_SERVER_URL}?v=${Date.now()}`
-       : undefined,
-   }
-   ```
-   This is only needed during development -- production bundled mode doesn't have this issue.
-
-3. **Add a version check** in the app that compares client-side JS version with server-reported version and forces a reload on mismatch.
-
-**Detection:** Deploy a CSS change (e.g., change an OKLCH color token). Load the app on iPhone. If the old color shows, caching is stale. Check Safari DevTools Network tab for "304 Not Modified" on index.html.
-
-**Phase:** All phases -- ongoing concern during development and testing.
+**Phase to address:**
+Scaffolding phase. Establish the styling approach (NativeWind vs StyleSheet vs hybrid) and validate it works for 3-4 representative components before committing.
 
 ---
 
-### Pitfall 11: `will-change` Overuse Causes GPU Memory Pressure and Black Flashes
-
-**What goes wrong:** Adding `will-change: transform` to too many elements (every session item, every message, every tool card) causes WKWebView to create excessive compositor layers. On iPhone, GPU memory is limited. When the limit is exceeded, layers start getting evicted and re-created, causing black flashes or blank rectangles during scroll.
-
-**Why it happens:** Each `will-change: transform` creates a separate GPU texture. On a chat with 50+ messages, each with a tool card, that's 100+ compositor layers. iPhone 16 Pro Max has 8GB RAM, but GPU texture memory is a fraction of that. WKWebView is less aggressive about layer management than Safari.
-
-**Consequences:** Scrolling through a long conversation causes random black rectangles to flash where messages should be. The issue is intermittent and hard to reproduce in simulators (which have access to Mac GPU memory).
-
-**Prevention:**
-
-1. **Apply `will-change` only to elements that are ACTIVELY animating.** Remove it after animation completes:
-   ```typescript
-   el.style.willChange = 'transform';
-   el.addEventListener('transitionend', () => {
-     el.style.willChange = 'auto';
-   }, { once: true });
-   ```
-
-2. **Never put `will-change` in a CSS rule that applies to repeated list items.** The `.msg-item` class should NOT have `will-change: transform`. Use it only on the sidebar panel, modals, and other singleton elements.
-
-3. **The existing `content-visibility: auto` on `.msg-item` is correct** -- it already handles off-screen optimization without creating GPU layers.
-
-4. **Use Safari DevTools "Layers" panel** to count compositor layers. Stay under 50 active layers.
-
-**Detection:** Scroll rapidly through a 100+ message conversation on real iPhone. If you see black rectangles or blank spaces that fill in after a moment, GPU layers are being evicted.
-
-**Phase:** SCROLL (Phase 66) -- SCROLL-06 GPU compositing verification.
-
----
-
-### Pitfall 12: Swipe-to-Delete Gesture Conflicts with Existing Sidebar Swipe-to-Close
-
-**What goes wrong:** Loom already has a swipe-to-close gesture on the sidebar (Sidebar.tsx, line 42-101). Adding swipe-to-delete on session items INSIDE the sidebar creates a gesture conflict. A horizontal swipe on a session item could mean: (a) swipe-to-delete this session, OR (b) swipe to close the entire sidebar. Both gestures listen for the same touchmove direction (leftward horizontal swipe).
-
-**Why it happens:** Both gestures are registered on overlapping DOM elements. The sidebar swipe-to-close listens on the sidebar panel ref, and the swipe-to-delete would listen on individual session items inside that panel. Touch events bubble from session items to the sidebar panel.
-
-**Consequences:** Swiping left on a session item either: always closes the sidebar (parent captures first), always triggers delete (child prevents propagation), or sometimes one and sometimes the other (race condition).
-
-**Prevention:**
-
-Use `stopPropagation()` on the session item's touch handler to prevent the event from reaching the sidebar's swipe-to-close handler:
-
-```typescript
-// In SwipeableSessionItem
-const handleTouchMove = (e: React.TouchEvent) => {
-  if (isSwipingRef.current) {
-    e.stopPropagation(); // Prevent sidebar's swipe-to-close from firing
-    applySwipeTransform(e);
-  }
-};
-```
-
-Additionally, add a velocity/distance threshold difference:
-- Swipe-to-delete: requires >60px horizontal displacement on the session item
-- Swipe-to-close sidebar: requires >100px horizontal displacement (already set at line 78)
-
-Ensure the sidebar swipe-to-close only activates on touches that start on the sidebar panel itself (not on session items):
-
-```typescript
-const handleTouchStart = (e: React.TouchEvent) => {
-  // Only capture swipe-to-close on sidebar chrome (header, footer),
-  // NOT on session items which have their own swipe handler
-  const target = e.target as HTMLElement;
-  if (target.closest('[data-swipeable-item]')) return;
-  // ... existing swipe-to-close logic
-};
-```
-
-**Detection:** On mobile, open sidebar and try to swipe-delete a session. If the entire sidebar closes instead, the gesture conflict exists.
-
-**Phase:** GESTURE (Phase 67) -- GESTURE-01 implementation.
-
----
-
-## Minor Pitfalls
-
-Issues that cause subtle UX degradation but are easy to fix once identified.
-
----
-
-### Pitfall 13: CSS Transitions Break After Keyboard Use on Some iOS Versions
-
-**What goes wrong:** After the keyboard has been used (opened and closed), CSS transitions on animated elements stop working or run at incorrect speeds. Elements snap to their final state instead of animating.
-
-**Why it happens:** A known iOS/WKWebView bug (tracked in Cordova iOS issue #796) where keyboard interaction disrupts the animation compositor state. The WKWebView's compositor sometimes fails to re-initialize properly after a viewport resize triggered by keyboard show/hide.
-
-**Prevention:**
-
-Force a compositor reset after keyboard dismissal:
-
-```typescript
-// Add to useKeyboardOffset's native path
-const handleFocusOut = () => {
-  requestAnimationFrame(() => {
-    // Force compositor to recalculate
-    document.body.style.opacity = '0.999';
-    requestAnimationFrame(() => {
-      document.body.style.opacity = '';
-    });
-  });
-};
-```
-
-This is a "poke the compositor" hack, but it's the standard workaround used by Ionic framework internally.
-
-**Detection:** Type in the composer (keyboard opens), send a message (keyboard closes), then immediately expand a ThinkingDisclosure or ToolCard. If the expand animation snaps instead of transitioning, this bug is active.
-
-**Phase:** SCROLL (Phase 66) -- verify during scroll performance testing.
-
----
-
-### Pitfall 14: OLED True Black (#000) Creates "Smearing" on Dark Content During Scroll
-
-**What goes wrong:** Using true black (`oklch(0 0 0)`) as the background for VISUAL-01 causes "black smearing" on OLED displays during fast scroll. Pixels transitioning from true black to gray/colored have noticeably slower response times than pixels transitioning between two non-black values.
-
-**Why it happens:** OLED pixels in their "off" state (true black) take longer to turn on than pixels that are already emitting some light. During fast scrolling, this creates a ghosting/smearing effect where dark content appears to trail or blur.
-
-**Prevention:**
-
-Use near-black instead of true black for the outermost background:
-
-```css
-/* VISUAL-01: Use near-black, not true black, for OLED */
-html {
-  background-color: oklch(0.05 0 0); /* Near-black, not pure black */
-}
-body {
-  background-color: var(--surface-base); /* oklch(0.15) -- elevated surface */
-}
-```
-
-The power savings difference between `oklch(0 0 0)` and `oklch(0.05 0 0)` is negligible (OLED pixels at 5% brightness use ~2% of full power). The smear reduction is worth it.
-
-**Detection:** Scroll fast through a long conversation with code blocks (which have lighter backgrounds). If dark text smears or trails during scroll, true black is causing OLED ghosting.
-
-**Phase:** VISUAL (Phase 68) -- VISUAL-01 OLED background.
-
----
-
-### Pitfall 15: Desktop-Pretty Glass Effects Look Terrible on Small Mobile Screens
-
-**What goes wrong:** Glass morphism effects (backdrop-filter blur with semi-transparent backgrounds) that look gorgeous on a 27" desktop display look muddy, low-contrast, and unreadable on a 6.7" iPhone screen. The blur radius that creates a subtle frosted-glass effect on desktop creates an illegible smear on mobile.
-
-**Why it happens:** On mobile: (1) the blurred background contains denser content (more text per cm of screen), (2) the viewing angle is closer, (3) ambient light varies more (indoor/outdoor), and (4) the physical pixel density is higher, making blur artifacts more visible. Additionally, dark mode glass effects on dark backgrounds create near-zero contrast between the glass surface and its contents.
-
-**Consequences:** Modals, command palette, and settings panels look beautiful in Chrome DevTools mobile preview but are hard to read on real iPhone in daylight.
-
-**Prevention:**
-
-1. **Increase background opacity on mobile** to compensate for reduced contrast:
-   ```css
-   @media (max-width: 767px) {
-     .glass-surface {
-       /* Desktop: oklch(0.15 / 0.6), Mobile: more opaque */
-       background: oklch(0.15 0 0 / 0.85);
-       backdrop-filter: blur(6px); /* Smaller radius */
-     }
-   }
-   ```
-
-2. **Test in direct sunlight.** DevTools cannot simulate the contrast reduction caused by bright ambient light on a glossy screen.
-
-3. **Ensure text on glass surfaces meets AAA contrast (7:1)** since the glass background is semi-transparent and thus variable. Test against both best-case and worst-case blurred content behind the glass.
-
-**Detection:** Take the phone outside or hold it under a bright desk lamp. If you can't read text in modals, the glass effect needs more opacity.
-
-**Phase:** VISUAL (Phase 68) -- VISUAL-02 glass effects, VISUAL-08 contrast.
-
----
-
-### Pitfall 16: `position: sticky` Breaks in WKWebView Nested Scroll Containers
-
-**What goes wrong:** The LiveSessionBanner (SCROLL-08) or DateGroupHeader uses `position: sticky` to stay pinned during scroll. In WKWebView, sticky positioning fails silently inside nested scroll containers -- the element just scrolls away with everything else.
-
-**Why it happens:** WKWebView's sticky implementation requires the sticky element's containing block to be the scroll container itself. If there's an intermediate `overflow: hidden` or `overflow: auto` parent between the sticky element and its scroll container, sticky behavior breaks. This is a Safari/WebKit limitation, not a standards issue.
-
-**Prevention:**
-
-Audit the DOM tree between any sticky element and its scroll parent. Ensure no intermediate ancestor has `overflow: hidden`:
-
-```typescript
-// Debug utility to check sticky viability
-function canSticky(el: HTMLElement): boolean {
-  let parent = el.parentElement;
-  while (parent && parent !== el.closest('[style*="overflow"]')) {
-    const style = getComputedStyle(parent);
-    if (style.overflow !== 'visible') {
-      console.warn('Sticky broken by', parent, 'overflow:', style.overflow);
-      return false;
-    }
-    parent = parent.parentElement;
-  }
-  return true;
-}
-```
-
-If sticky won't work, fall back to `position: fixed` with manual offset calculation (which the app already does for the LiveSessionBanner).
-
-**Detection:** On real iPhone, scroll the message list with a sticky header visible. If the header scrolls away instead of staying pinned, a parent overflow is breaking it.
-
-**Phase:** SCROLL (Phase 66) -- SCROLL-08 sticky header behavior.
-
----
-
-### Pitfall 17: Haptic Feedback Timing Mismatch Creates "Laggy" Feel
-
-**What goes wrong:** Firing haptic feedback AFTER the visual response (e.g., after a state update completes) creates a perceptible delay between touch and feedback. Users feel the tap, see the UI change 16ms later, then feel the haptic 50-100ms after that. This makes the app feel sluggish rather than responsive.
-
-**Why it happens:** Haptic calls go through the Capacitor bridge (JS -> Swift -> Taptic Engine), which adds ~30-50ms of latency. If the haptic is fired inside a `setState` callback or after an async operation, the total delay becomes noticeable.
-
-**Prevention:**
-
-Fire haptics BEFORE or SIMULTANEOUS with the visual change, never after:
-
-```typescript
-const handleSessionSelect = (sessionId: string) => {
-  // Fire haptic FIRST -- it goes through native bridge async
-  hapticSelection();
-  // Then update state -- visual change happens on next frame
-  navigate(`/session/${sessionId}`);
-};
-```
-
-The existing haptics.ts module already fires with `void Haptics.impact()` (fire-and-forget), which is correct. The key is calling it at the right point in the handler -- at the top, before any async work.
-
-**Detection:** Tap rapidly between sessions. If the haptic feels "late" compared to the visual transition, the firing order is wrong.
-
-**Phase:** GESTURE (Phase 67) -- GESTURE-05 expanded haptics.
-
----
-
-## Phase-Specific Warnings
-
-| Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Phase 64: Touch Targets | Touch target changes affecting existing layout | Test after EVERY change on real device; padding increase can push adjacent elements |
-| Phase 65: Typography | Font size increase causing text overflow/truncation | Test with long session titles (100+ chars) and multi-language text |
-| Phase 66: Scroll Performance | Measuring perf in Simulator instead of real device | Simulator uses Mac GPU; ALWAYS validate on physical iPhone |
-| Phase 66: Scroll Performance | Adding `will-change` to fix jank but causing GPU memory issues | Use Safari DevTools Layers panel; stay under 50 active layers |
-| Phase 66: Scroll Performance | CSS transitions broken after keyboard use | Compositor reset hack (Pitfall 13) |
-| Phase 66: Scroll Performance | `position: sticky` silently broken by nested overflow | Audit DOM tree between sticky element and scroll parent (Pitfall 16) |
-| Phase 67: Gestures (swipe-to-delete) | React `onTouchMove` passive listener prevents `preventDefault` | Use `useEffect` with DOM addEventListener `{ passive: false }` |
-| Phase 67: Gestures (swipe-to-delete) | Conflict with existing sidebar swipe-to-close | Use `stopPropagation` and different displacement thresholds |
-| Phase 67: Gestures (swipe-to-delete) | iOS back gesture conflict on left edge | Disable `allowsBackForwardNavigationGestures` in Swift |
-| Phase 67: Gestures (pull-to-refresh) | CSS `overscroll-behavior: none` blocks pull detection | Consider native UIRefreshControl via Capacitor plugin |
-| Phase 67: Gestures (long-press) | Native iOS context menu conflicts with custom menu | Set `-webkit-touch-callout: none` and `allowsLinkPreview: false` |
-| Phase 68: Visual (glass) | Nested backdrop-filter causes rendering artifacts | Limit to ONE visible blur layer at a time |
-| Phase 68: Visual (OLED) | True black smearing during fast scroll | Use near-black `oklch(0.05 0 0)` instead of pure black |
-| Phase 68: Visual (springs) | rAF animations capped at 60fps in WKWebView | Use CSS transitions for all visible animations; rAF for logic only |
-| Phase 68: Visual (contrast) | Glass effects unreadable on mobile in bright light | Increase glass opacity on mobile; test outdoors |
-
----
+## Technical Debt Patterns
+
+Shortcuts that seem reasonable but create long-term problems.
+
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Copy stores instead of sharing them | Fast start, no monorepo setup | Two copies drift, bugs fixed in one not the other | v3.0 only -- extract shared package before v3.1 |
+| Skip TypeScript strict mode in mobile app | Faster prototyping, fewer type errors to fix | Catches bugs at runtime instead of compile time, harder to share types | Never -- strict mode from day one |
+| Use Expo Go for initial development | Instant iteration, no build step | Must transition to dev builds for push/native modules, breaking change mid-project | Never for this project -- dev builds from start |
+| Inline styles instead of design system | Ship faster, no style infrastructure | Inconsistent spacing/colors, hard to change theme later | First prototype only -- design system before second screen |
+| Test only on iPhone 16 Pro Max | Primary device, fast feedback | Misses issues on older devices, different screen sizes | Acceptable for v3.0 if targeting single device |
+| Skip automated tests for UI | Faster shipping, less infrastructure | Regressions on every change, no confidence in refactors | MVP only -- add tests before v3.1 |
+
+## Integration Gotchas
+
+Common mistakes when connecting to the existing backend.
+
+| Integration | Common Mistake | Correct Approach |
+|-------------|----------------|------------------|
+| WebSocket (existing) | Assuming connection persists across app lifecycle | Implement connect-on-foreground, disconnect-on-background with AppState listener |
+| JWT Auth (existing) | Storing token in AsyncStorage (unencrypted) | Use `expo-secure-store` for JWT tokens -- encrypted at rest on iOS |
+| REST API (existing) | Hardcoding server URL | Use environment variables via `expo-constants` + app.config.ts; different URLs for dev/staging/prod |
+| Push notifications (new) | Sending Expo push token to backend without device identification | Track device ID + push token + platform in backend; handle token refresh on app update |
+| Streaming (existing) | Using the web app's rAF innerHTML approach | Replace with React reconciler approach: accumulate in ref, debounce-render to components |
+| Backend CORS | Not configuring CORS for the native app's origin | Native apps don't send Origin headers -- CORS isn't an issue, but the backend might reject requests without Origin if configured to require it |
+| File uploads | Using FormData (web) for image attachments | Use `expo-image-picker` + `expo-file-system` for iOS-native file handling; FormData still works for upload but file access is different |
+
+## Performance Traps
+
+Patterns that work at small scale but fail as usage grows.
+
+| Trap | Symptoms | Prevention | When It Breaks |
+|------|----------|------------|----------------|
+| Re-rendering entire message list on each streaming token | Scroll jank, dropped frames | Memoize message items, isolate streaming to active message component | Immediately -- visible from first message |
+| Loading all sessions in sidebar at once | Slow app launch, memory pressure | Paginate session list, lazy-load session content | 50+ sessions |
+| Storing full message content in Zustand (no pagination) | Growing memory, eventually OOM | Paginate messages, keep only visible window + buffer in memory | 200+ messages in a session |
+| Inline function props in FlatList renderItem | Every list item re-renders on parent state change | Extract renderItem to a memoized component, use `useCallback` or React Compiler | 20+ items in list |
+| Large images in chat (base64 in state) | Memory spike, scroll jank | Display thumbnails in list, load full images on tap/zoom only | 3+ images in conversation |
+| Shiki syntax highlighting on every render | CPU spike on code-heavy responses | Cache highlighted output by content hash, highlight only on completion | 5+ code blocks visible |
+
+## Security Mistakes
+
+| Mistake | Risk | Prevention |
+|---------|------|------------|
+| JWT in AsyncStorage | Token readable by any app on jailbroken device | Use `expo-secure-store` (iOS Keychain) |
+| Backend URL in source code | URL extractable from app binary | Use environment config; but note this is a personal tool on Tailscale -- risk is low |
+| No certificate pinning | MITM on public networks | Low risk on Tailscale private network; implement later if needed |
+| Push notification payload contains sensitive content | Lock screen shows message content | Use notification content-extension to redact on lock screen, or send silent notifications that trigger local fetch |
+| Expo push token sent over HTTP | Token interceptable | Backend already uses HTTPS via Tailscale Serve -- verify this path |
+
+## UX Pitfalls
+
+Common user experience mistakes specific to chat apps on iOS.
+
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| Keyboard covers composer on smaller screens | Can't see what you're typing | Use `KeyboardAvoidingView` + `useKeyboardHandler` from `react-native-keyboard-controller` |
+| No haptic feedback on interactions | App feels dead/web-like | Use `expo-haptics` on send, receive, tool complete, permission request |
+| Hard-cut transitions between screens | Feels cheap compared to ChatGPT | Use `react-native-reanimated` shared element transitions + spring physics |
+| Pull-to-refresh on chat (like a feed) | Chat is not a feed -- PTR is wrong paradigm | Scroll to top to load history; no PTR. New messages appear at bottom |
+| Context menu that looks web-like (dropdown list) | Breaks iOS mental model | Use native-feeling context menus (react-native-context-menu-view for UIMenu integration) |
+| Text selection that conflicts with gestures | Can't copy message text | Separate tap (navigation) from long-press (selection) with clear timing thresholds |
+| Notification badge count not updating | User thinks no new messages | Implement `expo-notifications` badge management; clear on app open |
+
+## "Looks Done But Isn't" Checklist
+
+Things that appear complete but are missing critical pieces.
+
+- [ ] **Chat screen:** Often missing scroll-to-bottom on new message when user is near bottom (not AT bottom) -- verify threshold behavior
+- [ ] **WebSocket reconnection:** Often missing message gap detection -- verify no messages lost during reconnect by comparing message IDs
+- [ ] **Push notifications:** Often missing foreground notification handling -- verify notifications still appear as banners when app is active
+- [ ] **Session list:** Often missing optimistic updates -- verify new session appears immediately, not after server roundtrip
+- [ ] **Keyboard avoidance:** Often missing interactive dismiss (drag-to-dismiss keyboard) -- verify gesture works on chat screen
+- [ ] **Deep linking:** Often missing cold start handling -- verify notification tap launches correct session when app is terminated
+- [ ] **Streaming:** Often missing cancel/abort behavior -- verify user can stop generation mid-stream
+- [ ] **Dark mode:** Often missing status bar color sync -- verify status bar text is light on dark background (not default black)
+- [ ] **Safe areas:** Often missing landscape orientation handling -- verify (or explicitly disable rotation)
+
+## Recovery Strategies
+
+When pitfalls occur despite prevention, how to recover.
+
+| Pitfall | Recovery Cost | Recovery Steps |
+|---------|---------------|----------------|
+| Ported web UI (too web-like) | HIGH -- redesign from scratch | Accept the cost. The web UI code is a sunk cost. Start from reference app screenshots. Faster to rebuild mobile-native than to fix web-ported layouts |
+| Vision fragmentation (15 phases in, looks bland) | MEDIUM -- creative reset | Pause implementation. Revisit soul document. Do a focused "design sprint" comparing current state to ChatGPT iOS. Fix the worst 3 screens. Then continue |
+| WebSocket state bugs | LOW -- focused fix | Add AppState listener, implement reconnection protocol, test with real backgrounding. Isolated change, doesn't affect UI |
+| FlatList performance | MEDIUM -- significant refactor | Consider FlashList migration or custom native list component (like Discord). May require extracting streaming to a separate view outside the list |
+| Certificate/build pipeline failure | LOW -- follow docs | Run `eas credentials` to regenerate. Let EAS manage everything. Don't manually manage certificates |
+| Over-shared code (monorepo pain) | MEDIUM -- restructure | Move to simple `/shared` directory. Copy files that need platform-specific changes into `/mobile`. Accept duplication for clarity |
+
+## Pitfall-to-Phase Mapping
+
+How roadmap phases should address these pitfalls.
+
+| Pitfall | Prevention Phase | Verification |
+|---------|------------------|--------------|
+| P1: Porting web UI | Design phase (Phase 0) | swd approves mockups/wireframes that look nothing like web app layout |
+| P2: Vision fragmentation | Design phase + every phase | Side-by-side comparison with ChatGPT iOS at every device test |
+| P3: WebSocket lifecycle | Foundation/networking phase | Background app for 30s, foreground, verify no missing messages |
+| P4: FlatList performance | Chat screen phase | Scroll 100+ messages at 60fps; stream 500-token response without jank |
+| P5: Push notification complexity | Dedicated notification phase | Send test push from backend, receive on device, tap to open correct session |
+| P6: Expo Go comfort zone | Scaffolding phase (Phase 0) | Development build running on iPhone before any feature code |
+| P7: Over-sharing code | Scaffolding phase | Both Vite (web) and Metro (mobile) build successfully with shared code |
+| P8: Web layout thinking | First UI screen phase | Layout passes visual comparison against reference app at identical screen size |
+| P9: Streaming markdown perf | Chat screen phase | 500-token streaming response renders at 60fps with no visible stutter |
+| P10: Reanimated misuse | First animated component | Animation profiled at 120fps on ProMotion device |
+| P11: Apple certificates | Scaffolding phase | `eas build` succeeds, app installs and runs on physical device |
+| P12: App lifecycle state | Foundation phase | Kill app, relaunch, verify correct session/state restoration |
+| P13: NativeWind mismatch | Scaffolding phase | 3-4 representative components render correctly with chosen styling approach |
+
+## Capacitor-to-React-Native Transition: Lessons That Apply
+
+These are NOT about migrating Capacitor code (there's nothing to migrate -- clean break). These are patterns from the Capacitor experience that should inform how the RN app is built.
+
+| Capacitor Lesson | Application to RN |
+|------------------|-------------------|
+| Fix cascades (fixing A breaks B breaks C) | In RN, this happens with gesture conflicts. Use `simultaneousWithExternalGesture` and explicit gesture priority from the start, not as fixes after conflicts emerge |
+| "Workaround only" bugs | If something requires a workaround in RN (it shouldn't for gestures/keyboard/scroll), consider it a red flag. RN should handle these natively. If it doesn't, the library choice is wrong |
+| Batch testing found everything broken | Test EACH screen on device as you build it. Not "build 5 screens, then test." The Capacitor experience proved this conclusively |
+| Polish on shaky foundation | Don't add spring physics, haptics, or visual effects until the underlying screen works correctly (correct data, correct layout, correct scroll). Polish amplifies quality; it can't fix broken foundations |
+| Sunk cost bias (15 plans deep) | Set an explicit "stop and reassess" checkpoint at phase 3. If it doesn't feel native after 3 phases, something fundamental is wrong. Don't continue hoping it gets better -- that's the Capacitor pattern |
+
+## Solo Developer-Specific Risks
+
+| Risk | Why It's Amplified for Solo | Mitigation |
+|------|---------------------------|------------|
+| Decision fatigue | Every tech choice, every design decision, every architecture call lands on one person | Pre-commit to the stack (Expo, Reanimated, FlashList). Don't re-evaluate mid-project unless something is clearly broken |
+| No code review | Nobody catches the "this will be a problem in 3 phases" patterns | Bard architectural review on each phase. Adversarial review on critical phases |
+| Context loss between sessions | After a break, forgetting why a decision was made | Document decisions in MEMORY.md and phase completion notes. Read them before resuming |
+| Parallel maintenance burden | Web app + mobile app + backend = 3 things to keep working | Web app is DONE for v3.0. Don't touch it. Backend changes should be additive only (new notification endpoint) |
+| Overcommitting scope | "Since I'm already in here, let me also add..." | v3.0 ships EXACTLY three features beautifully: chat, sessions, notifications. Dynamic Island, file uploads, terminal, settings all wait for v3.1+ |
+| Burnout from infrastructure | Days of certificates, build config, monorepo setup feel unproductive | Budget infrastructure explicitly. "Phase 0: scaffolding" with zero UI expectations. Celebrate a working dev build as a milestone |
+| Testing only the happy path | Solo dev tests what they expect to work | Explicitly test: backgrounding mid-stream, poor network, kill-and-relaunch, first launch with no sessions, 100+ messages in a session |
 
 ## Sources
 
-**WKWebView Gesture Conflicts:**
-- [touch-action: disable webview swipe back behavior (W3C PointerEvents #358)](https://github.com/w3c/pointerevents/issues/358)
-- [allowsBackForwardNavigationGestures (Apple Developer Docs)](https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu)
-- [WKWebView Swipe Back Gesture (Apple Developer Forums)](https://developer.apple.com/forums/thread/766975)
+### Verified (HIGH confidence)
+- [Fernando Rojo: I learned React Native as a web developer, and I got everything wrong](https://fernandorojo.co/mistakes) -- Web dev migration mistakes
+- [Expo: Best Practices for Reducing Lag](https://expo.dev/blog/best-practices-for-reducing-lag-in-expo-apps) -- React Compiler, worklets, performance
+- [Expo: Development Builds vs Expo Go](https://expo.dev/blog/expo-go-vs-development-builds) -- When to use each, limitations
+- [Expo: Monorepos](https://docs.expo.dev/guides/monorepos/) -- Official monorepo guidance
+- [Expo: Push Notifications FAQ](https://docs.expo.dev/push-notifications/faq/) -- Common issues and solutions
+- [Expo: Config Plugins](https://docs.expo.dev/config-plugins/plugins/) -- Native module integration
+- [React Native: Optimizing FlatList](https://reactnative.dev/docs/optimizing-flatlist-configuration) -- Official performance guide
+- [RN WebSocket background issue #11795](https://github.com/facebook/react-native/issues/11795) -- iOS background WebSocket behavior
+- [RN WebSocket termination issue #26731](https://github.com/facebook/react-native/issues/26731) -- App termination with open WebSocket
+- [Discord: How Discord achieves native iOS performance with React Native](https://discord.com/blog/how-discord-achieves-native-ios-performance-with-react-native) -- Custom list, native modules, gesture handling
+- [Reanimated Performance Guide](https://docs.swmansion.com/react-native-reanimated/docs/guides/performance/) -- UI thread vs JS thread
+- [Software Mansion: react-native-streamdown](https://github.com/software-mansion-labs/react-native-streamdown) -- Streaming markdown for RN
 
-**touch-action Support:**
-- [touch-action and scrolling directional lock (W3C #303)](https://github.com/w3c/pointerevents/issues/303)
-- [touch-action: pan-y prevents L shaped gestures (@use-gesture #640)](https://github.com/pmndrs/use-gesture/discussions/640)
-- [WebKit Features in Safari 18.2](https://webkit.org/blog/16301/webkit-features-in-safari-18-2/)
+### Verified (MEDIUM confidence)
+- [Expo: From Web to Native with React](https://expo.dev/blog/from-web-to-native-with-react) -- Migration patterns
+- [Ably: Realtime apps with React Native and WebSockets](https://ably.com/topic/websockets-react-native) -- WebSocket best practices
+- [App Store Review Guidelines Checklist (2025)](https://nextnative.dev/blog/app-store-review-guidelines) -- Common rejection reasons
+- [Callstack: React Native Wrapped 2025](https://www.callstack.com/blog/react-native-wrapped-2025-a-month-by-month-recap-of-the-year) -- Ecosystem state
 
-**Passive Event Listeners:**
-- [@use-gesture FAQ: passive events](https://use-gesture.netlify.app/docs/faq/)
-- [Prevent Default Behavior of Gesture (@use-gesture #1)](https://github.com/pmndrs/use-gesture/issues/1)
-- [Blocking Navigation Gestures on iOS Safari](https://pqina.nl/blog/blocking-navigation-gestures-on-ios-13-4/)
+### Project-specific (HIGH confidence -- lived experience)
+- Loom v2.2 Capacitor post-mortem: 5/7 iOS bugs architecturally unfixable in WKWebView
+- Phase 67.1 PLATFORM-RESEARCH.md: Competitor architecture analysis
+- Implementation guardrails document: Vision fragmentation risk assessment
+- Lessons from Capacitor document: Cascade pattern, sunk cost, testing discipline
 
-**WKWebView overscroll-behavior:**
-- [Disable rubber-band bounce scrolling in iOS WKWebView](https://feedback.base44.com/p/disable-rubber-band-bounce-scrolling-in-ios-wkwebview-wrapper)
-- [CSS overscroll-behavior WebKit Bug #176454](https://bugs.webkit.org/show_bug.cgi?id=176454)
-- [DisallowOverscroll not working on iOS 16 (Cordova #1244)](https://github.com/apache/cordova-ios/issues/1244)
-
-**Keyboard/Viewport Issues:**
-- [Keyboard dismissal leaves viewport shifted (WebKit #192564)](https://bugs.webkit.org/show_bug.cgi?id=192564)
-- [Capacitor keyboard resize CSS rules not reevaluated (#6430)](https://github.com/ionic-team/capacitor/issues/6430)
-- [Webview glitch on keyboard open (#5535)](https://github.com/ionic-team/capacitor/issues/5535)
-
-**Animation Performance:**
-- [WKWebView 120Hz Support (Apple Developer Forums)](https://developer.apple.com/forums/thread/773222)
-- [Support for 120Hz requestAnimationFrame (WebKit #173434)](https://bugs.webkit.org/show_bug.cgi?id=173434)
-- [Web Animation Performance Tier List (Motion Magazine)](https://motion.dev/magazine/web-animation-performance-tier-list)
-- [CSS animations break after keyboard use (Cordova iOS #796)](https://github.com/apache/cordova-ios/issues/796)
-
-**Context Menu / Long Press:**
-- [SuppressesLongPressGesture in Capacitor (Discussion #3208)](https://github.com/ionic-team/capacitor/discussions/3208)
-- [How to Prevent Default Context Menu on Long Press](https://additionalknowledge.com/2024/08/02/how-to-prevent-the-default-context-menu-live-preview-on-long-press-in-mobile-safari-chrome/)
-
-**Visual Effects:**
-- [How to fix filter: blur() performance in Safari](https://graffino.com/til/how-to-fix-filter-blur-performance-issue-in-safari/)
-- [Backdrop Filter Blur rendering issues in Safari](https://copyprogramming.com/howto/backdrop-filter-blur-box-shadow-not-rendering-properly-in-safari)
-- [Dark Mode Design Best Practices (NNG)](https://www.nngroup.com/articles/dark-mode-users-issues/)
-
-**Server.url / Caching:**
-- [WKWebView localhost same-origin policy (Capacitor #788)](https://github.com/ionic-team/capacitor/issues/788)
-- [Capacitor iOS swipe back gesture (Discussion #3137)](https://github.com/ionic-team/capacitor/discussions/3137)
-
-**Capacitor WKWebView Configuration:**
-- [Adjusting WKWebView settings (Capacitor #1097)](https://github.com/ionic-team/capacitor/issues/1097)
-- [Capacitor WKWebView bouncing issue iOS 16 (#5907)](https://github.com/ionic-team/capacitor/issues/5907)
+---
+*Pitfalls research for: Adding React Native + Expo iOS app to existing Loom web + backend project*
+*Researched: 2026-03-30*

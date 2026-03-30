@@ -1,605 +1,699 @@
-# Architecture Patterns: iOS-Native Gestures in React + Capacitor
+# Architecture Patterns: React Native + Expo iOS Chat Client
 
-**Domain:** iOS-native gesture integration for existing React/Capacitor chat app
-**Researched:** 2026-03-28
-**Overall confidence:** HIGH
-
----
-
-## Executive Summary
-
-Loom already has a working touch gesture infrastructure: `Sidebar.tsx` implements swipe-to-close via raw `onTouchStart`/`onTouchMove`/`onTouchEnd` handlers with direct DOM transform manipulation. This pattern works, is zero-dependency, and should be extended (not replaced) for swipe-to-delete, pull-to-refresh, long-press context menus, and enhanced haptics.
-
-**Recommendation: Raw touch event handlers via custom hooks. No gesture library.**
-
-Rationale: The codebase already uses raw touch handlers in Sidebar.tsx. Adding `@use-gesture/react` (~6KB gzipped for `useDrag` alone, ~10KB for the full bundle) introduces a dependency for functionality achievable in ~250 lines of custom hooks. The project has zero runtime gesture dependencies today. The Constitution's "zero new production deps for v2.0" precedent and the principle of keeping bundle lean argue against adding one for 4 gestures. The existing sidebar swipe code proves the team can build this.
+**Domain:** Native iOS chat client for AI coding agents, sharing backend with existing React web app
+**Researched:** 2026-03-30
+**Overall confidence:** HIGH (Expo docs verified, existing codebase audited line-by-line, competitor patterns analyzed)
 
 ---
 
 ## Recommended Architecture
 
-### Gesture Hook Layer
-
-All gesture logic lives in custom hooks under `src/hooks/`, never in components. Components receive gesture bind props and render. This follows the existing pattern where `useMobile()`, `useScrollAnchor()`, and `useKeyboardOffset()` encapsulate platform-specific behavior.
+### System Overview
 
 ```
-src/hooks/
-  useSwipeAction.ts       -- Swipe-left to reveal action buttons
-  usePullToRefresh.ts     -- Pull-down overscroll to trigger refresh
-  useLongPress.ts         -- Long-press (500ms) to trigger context menu
+                        Tailscale Network (100.86.4.57)
+                                    |
+                  +-----------------+-----------------+
+                  |                                   |
+           +------+------+                   +--------+--------+
+           |  Web Client  |                   | Native Client   |
+           | (Vite+React) |                   | (Expo+RN)       |
+           |  apps/web/   |                   | apps/mobile/    |
+           +------+------+                   +--------+--------+
+                  |                                   |
+                  |    +------------------------+     |
+                  +--->|   @loom/shared          |<---+
+                       |   packages/shared/      |
+                       |                         |
+                       |   types/    (13 files)  |
+                       |   stores/   (3 stores)  |
+                       |   api/      (ws + rest) |
+                       |   streaming/ (mux)      |
+                       +------------------------+
+                                    |
+                           +--------+--------+
+                           |  Express Backend |
+                           |  server/         |
+                           |  Port 5555       |
+                           |  WS: /ws, /shell |
+                           |  REST: /api/*    |
+                           +-----------------+
 ```
 
-### Platform-Conditional Strategy
+**Three-layer architecture:**
+1. **Backend** (unchanged) -- Express + WebSocket, platform-agnostic, JWT auth
+2. **Shared package** -- Types, Zustand stores, WebSocket client, stream multiplexer, API client
+3. **Platform apps** -- Web (Vite + React) and Native (Expo + RN), each with their own UI components
 
-Gestures are **mobile-only** (`< 768px` via `useMobile()`) and **native-enhanced** (haptics via `IS_NATIVE`). The web experience remains completely unchanged -- no gesture handlers attach on desktop. This is the same guard pattern used by the existing sidebar swipe code.
+### Monorepo Structure
 
-```
-Component
-  -> useMobile() ? bind gesture handlers : no handlers
-  -> IS_NATIVE ? hapticImpact('Light') : silent no-op
-```
+Use **npm workspaces**. Not Turborepo, not Nx, not pnpm.
 
-The platform conditionals live **inside the hooks**, not at call sites. Each hook checks `useMobile()` internally and returns no-op handlers on desktop. This keeps component code clean.
-
-### Component Boundaries
-
-| Component | Change Type | Gesture | Notes |
-|-----------|-------------|---------|-------|
-| `SessionItem` | WRAP | Swipe-to-delete, long-press | Wrapped in SwipeableRow |
-| `SessionList` | MODIFY | Pull-to-refresh | Add pull indicator + touch handlers to scroll container |
-| `MessageContainer` | MODIFY | Long-press context menu | Add useLongPress for copy/retry |
-| `Sidebar` | NONE | Already has swipe-to-close | Existing pattern is the architectural template |
-| `SessionContextMenu` | NONE | Already positioned by `{ x, y }` | Works as-is for long-press origin |
-
-### New Components
-
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| `SwipeableRow` | Reusable swipe-to-reveal wrapper | `src/components/shared/SwipeableRow.tsx` |
-| `PullToRefreshIndicator` | Spinner/arrow that follows pull gesture | `src/components/shared/PullToRefreshIndicator.tsx` |
-| `LongPressContextMenu` | Context menu for message long-press | `src/components/shared/LongPressContextMenu.tsx` |
-
-### Data Flow Overview
+**Rationale:** npm is the current package manager (package-lock.json exists). Expo SDK 55 auto-detects monorepos and configures Metro resolution. Turborepo adds caching/orchestration complexity that a solo dev with 3 packages does not need. The ROI of Turborepo is negative at this scale.
 
 ```
-                 GESTURE HOOKS (new)                    EXISTING INFRASTRUCTURE
-         ┌─────────────────────────────┐        ┌──────────────────────────────┐
-         │  useSwipeAction             │        │  haptics.ts                  │
-         │    touchStart/Move/End      │───────>│    hapticImpact('Light')     │
-         │    -> offset (translateX)   │        │    hapticSelection()         │
-         ├─────────────────────────────┤        ├──────────────────────────────┤
-         │  useLongPress               │        │  SessionContextMenu          │
-         │    touchStart -> 500ms timer│───────>│    position: { x, y }        │
-         │    -> onLongPress(position) │        │    (portaled to body)        │
-         ├─────────────────────────────┤        ├──────────────────────────────┤
-         │  usePullToRefresh           │        │  useMultiProjectSessions     │
-         │    touchMove when scrollY=0 │───────>│    refetch()                 │
-         │    -> pullDistance           │        │                              │
-         └─────────────────────────────┘        └──────────────────────────────┘
-                      │                                        │
-                      v                                        v
-              SwipeableRow.tsx                         SessionList.tsx
-              PullToRefreshIndicator.tsx               SessionItem.tsx
-              LongPressContextMenu.tsx                 MessageContainer.tsx
+loom/
+  package.json                # Root: workspaces config + root scripts
+  packages/
+    shared/                   # @loom/shared -- platform-agnostic business logic
+      package.json            # name: "@loom/shared", peerDeps: react, zustand
+      tsconfig.json           # strict mode, composite project references
+      src/
+        types/                # Pure TypeScript interfaces (zero runtime)
+          message.ts          # Message, MessageRole, MessageMetadata, ToolCall, ThinkingBlock
+          session.ts          # Session, SessionMetadata, ProjectGroup
+          provider.ts         # ProviderId, ProviderContext, ConnectionStatus, ProviderConnection
+          websocket.ts        # ServerMessage, ClientMessage, ClaudeSDKData, all SDK types
+          stream.ts           # ThinkingState, ToolCallState
+          api.ts              # API response types
+          index.ts            # Barrel re-export
+        stores/               # Zustand store factories (accept storage adapter)
+          timeline.ts         # createTimelineStore(storage) -- sessions, messages
+          stream.ts           # createStreamStore() -- ephemeral, no persistence
+          connection.ts       # createConnectionStore(storage) -- provider connections
+          index.ts
+        api/                  # Network layer (standard WebSocket + fetch)
+          websocket-client.ts # WebSocketClient class (URL resolver injected)
+          stream-multiplexer.ts # Pure function message router
+          api-client.ts       # configureApi() + apiFetch<T>() with injected base URL
+          index.ts
+        utils/                # Pure utility functions
+          index.ts
+  apps/
+    web/                      # Existing web frontend (moved from src/)
+      package.json            # Depends on @loom/shared
+      vite.config.ts
+      tsconfig.json           # paths: @/* -> src/*
+      src/
+        components/           # Web React components (div/span/CSS)
+        hooks/                # Web-specific: useChatScroll, useStreamBuffer, useLongPress
+        stores/               # Web-specific: ui.ts (sidebar/modals), file.ts (editor)
+        lib/                  # platform.ts, streaming-markdown.ts, native-plugins.ts
+    mobile/                   # New Expo + React Native iOS app
+      package.json            # Depends on @loom/shared
+      app.config.ts           # Expo config (plugins, build settings)
+      metro.config.js         # Auto-configured by Expo SDK 55 for monorepo
+      eas.json                # EAS Build profiles (dev, preview, production)
+      app/                    # Expo Router file-based routes
+        _layout.tsx           # Root: GestureHandlerRootView + providers + store init
+        (auth)/
+          _layout.tsx         # Auth flow layout
+          login.tsx           # Server connection + JWT login
+        (app)/
+          _layout.tsx         # Drawer layout (session sidebar)
+          (tabs)/
+            _layout.tsx       # Tab navigator (Chat | Settings)
+            index.tsx         # Active chat (default tab)
+            settings.tsx      # Settings screen
+          chat/
+            [id].tsx          # Chat screen (pushed from session list)
+        modal/
+          permission.tsx      # Permission request overlay
+      src/
+        components/           # RN components (View/Text/Pressable)
+        hooks/                # RN-specific: useNativeStreamBuffer, useAppLifecycle
+        stores/               # RN-specific: ui-mobile.ts
+        lib/                  # RN platform.ts, push service, haptics
+        theme/                # NativeWind config, OKLCH token mapping
+  server/                     # Express backend (unchanged, stays at root)
 ```
+
+**Root package.json:**
+
+```json
+{
+  "name": "loom",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:mobile": "npm run start -w apps/mobile",
+    "dev:server": "node server/index.js",
+    "build:shared": "tsc -p packages/shared/tsconfig.json",
+    "test": "npm run test --workspaces --if-present"
+  }
+}
+```
+
+**Critical monorepo rule:** React and React Native must be singletons. The `@loom/shared` package declares `react` and `zustand` as `peerDependencies`, not `dependencies`. Only the app packages install them. Use `overrides` in root package.json if version conflicts arise.
 
 ---
 
-## Pattern 1: Swipe-to-Delete (GESTURE-01)
+## Component Boundaries
 
-### Architecture
+### Shared vs Platform-Specific (Based on Codebase Audit)
 
-A `SwipeableRow` wrapper component handles the touch mechanics. The content translates right-to-left, revealing a fixed-position delete button behind it. This matches iOS Mail/Reminders exactly.
+I audited every file in the current `src/src/` directory. Here is the definitive shareability map:
 
-**Data flow:**
+**Transfers to @loom/shared (zero changes needed):**
+
+| Current File | Target Location | Why Sharable |
+|-------------|-----------------|-------------|
+| `types/message.ts` | `shared/types/` | Pure TS interfaces (Message, ToolCall, ThinkingBlock) |
+| `types/session.ts` | `shared/types/` | Pure TS interfaces (Session, SessionMetadata) |
+| `types/provider.ts` | `shared/types/` | Pure TS interfaces (ProviderId, ConnectionStatus) |
+| `types/websocket.ts` | `shared/types/` | Discriminated unions (ServerMessage, ClientMessage) + `isServerMessage` guard |
+| `types/stream.ts` | `shared/types/` | Pure TS interfaces |
+| `types/api.ts` | `shared/types/` | API response types |
+| `lib/stream-multiplexer.ts` | `shared/api/` | Pure functions, callback injection, zero React/DOM deps |
+
+**Transfers to @loom/shared (minor refactoring needed):**
+
+| Current File | Refactoring Required | Why |
+|-------------|---------------------|-----|
+| `stores/timeline.ts` | Convert to factory function, inject storage adapter | Uses `persist` middleware with `localStorage` |
+| `stores/stream.ts` | None -- no persistence | Ephemeral store, no DOM deps |
+| `stores/connection.ts` | Convert to factory function, inject storage adapter | Uses `persist` middleware |
+| `lib/websocket-client.ts` | Inject URL resolver via constructor (remove `platform.ts` import) | Currently imports `resolveWsUrl` from platform.ts |
+
+**Stays in apps/web (platform-specific):**
+
+| File | Why Not Sharable |
+|------|-----------------|
+| `stores/ui.ts` | Sidebar state, modal state -- different navigation model on mobile |
+| `stores/file.ts` | CodeMirror editor state, file tree -- desktop-only features |
+| `hooks/useStreamBuffer.ts` | rAF + innerHTML + DOM mutation -- web rendering strategy |
+| `hooks/useChatScroll.ts` | DOM ScrollTop, IntersectionObserver, ResizeObserver |
+| `hooks/useKeyboardOffset.ts` | Capacitor keyboard events + visualViewport (irrelevant in RN) |
+| `hooks/useLongPress.ts` | DOM touch events (RN has native gesture handler) |
+| `hooks/useFileMentions.ts` | UI-coupled autocomplete (rebuild for RN UI) |
+| `hooks/useFileTree.ts` | Desktop feature, not in v3.0 scope |
+| `hooks/useGit*.ts` | Desktop feature, not in v3.0 scope |
+| `hooks/useShellWebSocket.ts` | Terminal feature, not in v3.0 scope |
+| `lib/platform.ts` | Capacitor detection, `import.meta.env`, `window.location` |
+| `lib/streaming-markdown.ts` | DOM innerHTML converter |
+| `lib/native-plugins.ts` | Capacitor plugins (dead code for RN) |
+| All components | div/span/className -- fundamentally different primitives |
+
+**Estimated code sharing:** ~35% of business logic LOC. 0% of UI components.
+
+---
+
+## Data Flow
+
+### WebSocket Message Lifecycle (Shared Layer)
+
+The beauty of the existing architecture is that the stream multiplexer is already decoupled from React. It uses callback injection, meaning the same multiplexer code works for both web and native:
+
 ```
-SwipeableRow
-  ├── [Delete action]     (positioned absolute, behind content, bg-red)
-  └── [Children content]  (translateX via ref during drag, transition on release)
+[Backend WebSocket Frame]
+    |
+    | JSON: { type: "claude-response", data: { type: "assistant", message: { content: [...] } } }
+    v
+WebSocketClient.handleMessage()              [packages/shared/api/]
+    |
+    | Parses JSON, validates via isServerMessage()
+    v
+onMessageCb(msg: ServerMessage)              [injected callback]
+    |
+    v
+streamMultiplexer.routeMessage(msg, cbs)     [packages/shared/api/]
+    |
+    | Routes based on msg.type and nested data.type
+    |
+    +---> cbs.onContentToken(text)           -> StreamStore
+    +---> cbs.onThinkingBlock(id, text)      -> StreamStore
+    +---> cbs.onToolUseStart(toolCall)       -> StreamStore
+    +---> cbs.onToolResult(id, output)       -> StreamStore
+    +---> cbs.onStreamEnd(sessionId, code)   -> TimelineStore
+    +---> cbs.onPermissionRequest(req)       -> StreamStore
+    +---> cbs.onTokenBudget(used, total)     -> StreamStore
+    +---> cbs.onSessionCreated(id)           -> TimelineStore
+    +---> cbs.onActiveSessions(sessions)     -> ConnectionStore
+    v
+[Platform-specific rendering]
 ```
 
-**Implementation pattern:**
+**What changes per platform:** Only the rendering layer. The callbacks wire to the same Zustand stores, which trigger re-renders in platform-specific components.
+
+### Token Streaming: Web vs Native
+
+**Web (preserves existing rAF architecture):**
+
+```
+wsClient.subscribeContent(token)
+    |
+    v
+useStreamBuffer.onToken(token)       [apps/web]
+    |  Appends to bufferRef.current (pure string concat, zero React)
+    v
+requestAnimationFrame paint loop
+    |  Reads bufferRef.current
+    |  convertStreamingMarkdown(text) -> HTML string
+    |  node.innerHTML = html          -> DOM mutation
+    v
+On isStreaming false -> true transition:
+    |  onFlush(bufferRef.current)     -> TimelineStore.addMessage
+```
+
+**Native (new -- batched state flush):**
+
+```
+wsClient.subscribeContent(token)
+    |
+    v
+useNativeStreamBuffer.onToken(token)  [apps/mobile]
+    |  Appends to stringRef.current (same principle: no React re-render per token)
+    |
+    |  Every ~100ms OR every ~16 tokens (whichever comes first):
+    |  setState(stringRef.current)    -> Triggers React re-render of active message
+    v
+ActiveMessage component re-renders
+    |  react-native-streamdown or manual markdown -> native Text/View
+    v
+FlashList (inverted) maintains scroll position
+    |  maintainVisibleContentPosition handles auto-scroll
+    v
+On isStreaming false -> true transition:
+    |  flush to TimelineStore.addMessage (same as web)
+```
+
+**Key difference:** Web bypasses React entirely during streaming (rAF + innerHTML). Native MUST go through React (no innerHTML in RN), but batching to ~10 re-renders/sec instead of ~100 tokens/sec keeps performance acceptable. The 60Hz budget is 16.6ms per frame; rendering a markdown chunk takes ~2-5ms.
+
+### Auth Flow (Identical for Both Platforms)
+
+```
+App Launch
+    |
+    v
+Check stored JWT
+    |  Web: localStorage
+    |  Native: expo-secure-store (iOS Keychain)
+    |
+    +-- No token --> Login screen
+    |                |
+    |                v
+    |                POST /api/auth/login or /api/auth/register
+    |                |
+    |                v
+    |                Store JWT, proceed
+    |
+    +-- Has token --> GET /health (validates server reachability)
+    |                |
+    |                +-- 200 OK --> Connect WebSocket with ?token=jwt
+    |                +-- Error --> Clear token, show login
+```
+
+Zero backend changes. The JWT auth is already platform-agnostic.
+
+---
+
+## Shared Code Patterns
+
+### Pattern 1: Factory Stores with Storage Injection
+
+The 3 stores that use `persist` middleware (timeline, connection) need platform-specific storage:
 
 ```typescript
-// useSwipeAction.ts -- custom hook
-export function useSwipeAction(options: {
-  onAction: () => void;
-  actionWidth?: number;
-  threshold?: number;
+// packages/shared/src/stores/timeline.ts
+import { create } from 'zustand';
+import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import type { Message } from '../types/message';
+import type { Session } from '../types/session';
+import type { ProviderId } from '../types/provider';
+
+interface TimelineState {
+  sessions: Session[];
+  activeSessionId: string | null;
+  activeProviderId: ProviderId;
+  addSession: (session: Session) => void;
+  removeSession: (sessionId: string) => void;
+  setActiveSession: (sessionId: string | null) => void;
+  addMessage: (sessionId: string, message: Message) => void;
+  updateMessage: (sessionId: string, messageId: string, updates: Partial<Message>) => void;
+  // ... rest of current timeline store interface
+}
+
+export function createTimelineStore(storage: StateStorage) {
+  return create<TimelineState>()(
+    persist(
+      immer((set) => ({
+        sessions: [],
+        activeSessionId: null,
+        activeProviderId: 'claude' as ProviderId,
+        // ... all current store actions (identical logic)
+      })),
+      {
+        name: 'loom-timeline',
+        storage: createJSONStorage(() => storage),
+        partialize: (state) => ({
+          sessions: state.sessions.map((s) => ({
+            id: s.id,
+            title: s.title,
+            providerId: s.providerId,
+            createdAt: s.createdAt,
+            updatedAt: s.updatedAt,
+            metadata: s.metadata,
+          })),
+          activeSessionId: state.activeSessionId,
+          activeProviderId: state.activeProviderId,
+        }),
+      }
+    )
+  );
+}
+```
+
+**Web wiring:**
+```typescript
+// apps/web/src/stores/timeline.ts
+import { createTimelineStore } from '@loom/shared/stores';
+
+export const useTimelineStore = createTimelineStore(localStorage);
+```
+
+**Native wiring (MMKV for speed):**
+```typescript
+// apps/mobile/src/stores/timeline.ts
+import { createTimelineStore } from '@loom/shared/stores';
+import { MMKV } from 'react-native-mmkv';
+
+const mmkv = new MMKV();
+const mmkvStorage = {
+  getItem: (name: string) => mmkv.getString(name) ?? null,
+  setItem: (name: string, value: string) => mmkv.set(name, value),
+  removeItem: (name: string) => mmkv.delete(name),
+};
+
+export const useTimelineStore = createTimelineStore(mmkvStorage);
+```
+
+### Pattern 2: WebSocket Client with Injected URL Resolver
+
+The current `WebSocketClient` imports `resolveWsUrl` from `platform.ts`. This couples it to web-specific URL resolution. Refactor to constructor injection:
+
+```typescript
+// packages/shared/src/api/websocket-client.ts
+export type UrlResolver = (path: string, token: string) => string;
+
+export class WebSocketClient {
+  private resolveUrl: UrlResolver;
+  // ... all existing private fields
+
+  constructor(resolveUrl: UrlResolver) {
+    this.resolveUrl = resolveUrl;
+  }
+
+  connect(token: string): void {
+    this.token = token;
+    this.setState('connecting');
+    const url = this.resolveUrl('/ws', token);
+    this.ws = new WebSocket(url);
+    // ... rest of connect() unchanged
+  }
+
+  // ... all other methods unchanged
+}
+```
+
+**Web wiring:**
+```typescript
+// apps/web/src/lib/ws-init.ts
+import { WebSocketClient } from '@loom/shared/api';
+
+function resolveWsUrl(path: string, token: string): string {
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${window.location.host}${path}?token=${token}`;
+}
+
+export const wsClient = new WebSocketClient(resolveWsUrl);
+```
+
+**Native wiring:**
+```typescript
+// apps/mobile/src/lib/ws-init.ts
+import { WebSocketClient } from '@loom/shared/api';
+
+const SERVER = 'ws://100.86.4.57:5555';
+
+function resolveWsUrl(path: string, token: string): string {
+  return `${SERVER}${path}?token=${token}`;
+}
+
+export const wsClient = new WebSocketClient(resolveWsUrl);
+```
+
+### Pattern 3: API Client with Platform Configuration
+
+```typescript
+// packages/shared/src/api/api-client.ts
+let baseUrl = '';
+let getToken: () => string | null = () => null;
+
+export function configureApi(config: {
+  baseUrl: string;
+  getToken: () => string | null;
 }) {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const startXRef = useRef(0);
-  const currentXRef = useRef(0);
-  const swipingRef = useRef(false);
-  const isMobile = useMobile();
+  baseUrl = config.baseUrl;
+  getToken = config.getToken;
+}
 
-  // Return no-op on desktop
-  if (!isMobile) {
-    return { elementRef, handlers: {}, isOpen: false, reset: () => {} };
+export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getToken();
+  const res = await fetch(`${baseUrl}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options?.headers as Record<string, string> | undefined),
+    },
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`API ${res.status}: ${text}`);
   }
-
-  const handlers = {
-    onTouchStart: (e: React.TouchEvent) => {
-      startXRef.current = e.touches[0]!.clientX; // ASSERT: touches[0] exists on touchstart
-      swipingRef.current = false;
-      // Remove transition for 1:1 tracking during drag
-      if (elementRef.current) {
-        elementRef.current.style.transition = 'none';
-      }
-    },
-    onTouchMove: (e: React.TouchEvent) => {
-      const deltaX = e.touches[0]!.clientX - startXRef.current; // ASSERT: touches[0] exists
-      if (deltaX < -10) swipingRef.current = true;
-      if (swipingRef.current && elementRef.current) {
-        const clamped = Math.max(-ACTION_WIDTH, Math.min(0, deltaX));
-        currentXRef.current = clamped;
-        elementRef.current.style.transform = `translateX(${clamped}px)`;
-      }
-    },
-    onTouchEnd: () => {
-      const el = elementRef.current;
-      if (!el) return;
-      el.style.transition = 'transform 200ms var(--ease-out)';
-      if (currentXRef.current < -threshold) {
-        el.style.transform = `translateX(-${ACTION_WIDTH}px)`;
-        hapticImpact('Light');
-      } else {
-        el.style.transform = 'translateX(0)';
-      }
-      swipingRef.current = false;
-    },
-  };
-
-  return { elementRef, handlers, /* ... */ };
+  return res.json();
 }
 ```
 
-**Key design decisions:**
+**Web init:** `configureApi({ baseUrl: '', getToken: () => localStorage.getItem('token') })`
+**Native init:** `configureApi({ baseUrl: 'http://100.86.4.57:5555', getToken: () => cachedToken })`
 
-1. **Direct DOM mutation via ref** -- NOT React state. Same pattern as existing Sidebar.tsx swipe handler. Using `useState` for transform position would re-render the entire SessionItem on every touch frame (~60 events/second). Ref-based DOM mutation is zero-render overhead.
-
-2. **`transition: 'none'` during drag, `transition: '200ms ease-out'` on release** -- Exact same pattern as existing `Sidebar.tsx` lines 55-56 and 77-79. Users get 1:1 tracking during drag, smooth snap on release.
-
-3. **Action button width: 80px** -- iOS standard for single-action swipe reveals.
-
-4. **Swipe threshold: 40px** (half action width) to commit the reveal.
-
-5. **Constitution compliance:** Inline `style={{ transform }}` is explicitly allowed per Section 3.2: "Dynamically computed dimensions."
-
-6. **Single-active pattern:** When one row opens via swipe, any previously open row snaps closed. Achieved via a shared ref/context that tracks the currently-open row ID.
-
-7. **Haptic feedback:** `hapticImpact('Light')` when crossing the threshold (already no-op on web).
-
-### Platform Isolation
+### Pattern 4: Inverted FlashList for Chat Messages
 
 ```typescript
-// In SessionList.tsx -- SwipeableRow only wraps on mobile
-{dateGroup.sessions.map((session) => (
-  <SwipeableRow
-    key={session.id}
-    onDelete={() => handleDeleteRequest(session.id)}
-    disabled={!isMobile}  // no-op wrapper on desktop
-  >
-    <SessionItem {...sessionProps} />
-  </SwipeableRow>
-))}
+// apps/mobile/src/components/chat/ChatMessageList.tsx
+import { FlashList } from '@shopify/flash-list';
+import { useTimelineStore } from '../../stores/timeline';
+
+export function ChatMessageList({ sessionId }: { sessionId: string }) {
+  const messages = useTimelineStore(
+    (s) => s.sessions.find((sess) => sess.id === sessionId)?.messages ?? []
+  );
+
+  return (
+    <FlashList
+      data={messages}
+      inverted
+      renderItem={({ item }) => <ChatMessage message={item} />}
+      keyExtractor={(item) => item.id}
+      estimatedItemSize={120}
+    />
+  );
+}
 ```
 
-Desktop: `SwipeableRow` with `disabled` renders children directly, no handlers attached, zero overhead.
+FlashList v2 is 10x faster than FlatList on JS thread via cell recycling. `inverted` renders newest at bottom. `maintainVisibleContentPosition` (enabled by default in v2) keeps scroll stable during streaming.
 
----
-
-## Pattern 2: Pull-to-Refresh (GESTURE-02)
-
-### Architecture
-
-Pull-to-refresh applies ONLY to the session list scroll container (`SessionList.tsx`), NOT the chat message list (which has infinite scroll / auto-follow semantics that conflict with pull-down behavior).
-
-The existing `overscroll-behavior-y: contain` on `.native-scroll` prevents scroll chaining to the parent, which is correct. We implement a custom pull indicator that appears above the list content.
-
-**Data flow:**
-```
-SessionList scroll container (ref={scrollRef})
-  -> usePullToRefresh(scrollRef, refetch)
-    -> Monitors touchmove when scrollTop === 0
-    -> Sets pullDistance state (drives indicator height)
-    -> Calls refetch() on release past threshold
-    -> Shows PullToRefreshIndicator with spinner
-```
-
-**Implementation pattern:**
+### Pattern 5: App Lifecycle-Aware WebSocket
 
 ```typescript
-// usePullToRefresh.ts
-export function usePullToRefresh(
-  scrollRef: RefObject<HTMLDivElement | null>,
-  onRefresh: () => Promise<void> | void,
-) {
-  const [pullDistance, setPullDistance] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const startYRef = useRef(0);
-  const isPullingRef = useRef(false);
-  const isMobile = useMobile();
+// apps/mobile/src/hooks/useAppLifecycleWebSocket.ts
+import { useEffect, useRef } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 
-  // No-op on desktop
-  if (!isMobile) {
-    return { pullDistance: 0, isRefreshing: false, handlers: {} };
-  }
+export function useAppLifecycleWebSocket(wsClient: WebSocketClient) {
+  const appState = useRef(AppState.currentState);
 
-  const handlers = {
-    onTouchStart: (e: React.TouchEvent) => {
-      // Only start pulling when already at top of scroll
-      if (scrollRef.current && scrollRef.current.scrollTop <= 0) {
-        startYRef.current = e.touches[0]!.clientY; // ASSERT: touches[0] exists
-        isPullingRef.current = true;
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (nextState: AppStateStatus) => {
+      if (appState.current === 'background' && nextState === 'active') {
+        // Foreground: reconnect and sync state
+        wsClient.tryReconnect();
+      } else if (nextState === 'background') {
+        // Background: disconnect gracefully (iOS kills idle WS anyway)
+        wsClient.disconnect();
       }
-    },
-    onTouchMove: (e: React.TouchEvent) => {
-      if (!isPullingRef.current) return;
-      const deltaY = e.touches[0]!.clientY - startYRef.current; // ASSERT: touches[0] exists
-      if (deltaY > 0 && scrollRef.current && scrollRef.current.scrollTop <= 0) {
-        // Rubber-band resistance: diminishing returns
-        const pull = Math.min(deltaY * 0.4, MAX_PULL);
-        setPullDistance(pull);
-      } else {
-        // User scrolled normally -- cancel pull
-        isPullingRef.current = false;
-        setPullDistance(0);
-      }
-    },
-    onTouchEnd: async () => {
-      if (pullDistance > REFRESH_THRESHOLD) {
-        setIsRefreshing(true);
-        hapticNotification('Success');
-        await onRefresh();
-        setIsRefreshing(false);
-      }
-      setPullDistance(0);
-      isPullingRef.current = false;
-    },
-  };
-
-  return { pullDistance, isRefreshing, handlers };
+      appState.current = nextState;
+    });
+    return () => sub.remove();
+  }, [wsClient]);
 }
 ```
 
-**Key design decisions:**
-
-1. **Rubber-band factor: `deltaY * 0.4`** -- Prevents over-pull, feels iOS-native. Real iOS uses a square-root curve; linear 0.4x is close enough.
-
-2. **Threshold: 60px to trigger, max 120px** -- Matches iOS system pull-to-refresh activation distance.
-
-3. **Must NOT interfere with normal scroll** -- Only activates when `scrollTop <= 0`. If user is mid-scroll and reaches top, pull behavior does not activate until the NEXT touchstart at top.
-
-4. **`overscroll-behavior-y: contain`** already set on `.native-scroll` in `base.css` -- prevents browser's native pull-to-refresh and scroll chaining. Our custom implementation takes over.
-
-5. **Integration with existing `refetch()`** -- `useMultiProjectSessions` already exposes `refetch()`. Pull-to-refresh calls it directly.
-
-6. **Haptic: `hapticNotification('Success')`** when the refresh triggers.
-
-### CSS for Indicator
-
-```css
-/* In SessionList or shared pull-to-refresh.css */
-.pull-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  color: var(--text-muted);
-  font-size: var(--text-body);
-  transition: height 200ms var(--ease-out);
-}
-
-.pull-indicator svg {
-  transition: transform 200ms var(--ease-out);
-}
-```
-
-Height is driven by `pullDistance` via inline style (Constitution-allowed for dynamic dimensions).
+iOS suspends JS execution 5-30 seconds after backgrounding. The WebSocket will die. Explicit lifecycle management prevents stale connection state.
 
 ---
 
-## Pattern 3: Long-Press Context Menu (GESTURE-03, GESTURE-06)
+## Navigation Architecture
 
-### Architecture
+**Use Expo Router** (file-based routing built on React Navigation).
 
-A `useLongPress` hook starts a timer on `touchstart`, fires the callback at 500ms if the finger hasn't moved, and cancels on `touchmove` (> 10px movement) or `touchend`.
+### Route Structure
 
-**Two use sites:**
-1. **SessionItem** (GESTURE-03) -- long-press opens existing `SessionContextMenu` with Pin, Rename, Select, Delete
-2. **MessageContainer** (GESTURE-06) -- long-press opens new `LongPressContextMenu` with Copy Text, Retry
-
-**Data flow:**
 ```
-SessionItem
-  -> useLongPress({ onLongPress: openContextMenu })
-    -> onTouchStart: start 500ms setTimeout
-    -> onTouchMove: cancel if moved > 10px
-    -> onTouchEnd: cancel timer, prevent click if already fired
-    -> Timer fires: hapticImpact('Medium'), call onLongPress({ x, y })
-```
-
-**Implementation pattern:**
-
-```typescript
-// useLongPress.ts
-interface LongPressOptions {
-  onLongPress: (position: { x: number; y: number }) => void;
-  delay?: number;
-  moveThreshold?: number;
-}
-
-export function useLongPress({
-  onLongPress,
-  delay = 500,
-  moveThreshold = 10,
-}: LongPressOptions) {
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const startPosRef = useRef({ x: 0, y: 0 });
-  const firedRef = useRef(false);
-  const isMobile = useMobile();
-
-  const cancel = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => cancel, [cancel]);
-
-  if (!isMobile) return {};
-
-  return {
-    onTouchStart: (e: React.TouchEvent) => {
-      const touch = e.touches[0]!; // ASSERT: touches[0] exists on touchstart
-      startPosRef.current = { x: touch.clientX, y: touch.clientY };
-      firedRef.current = false;
-
-      timerRef.current = setTimeout(() => {
-        firedRef.current = true;
-        hapticImpact('Medium');
-        onLongPress({ x: touch.clientX, y: touch.clientY });
-      }, delay);
-    },
-    onTouchMove: (e: React.TouchEvent) => {
-      const touch = e.touches[0]!; // ASSERT: touches[0] exists on touchmove
-      const dx = Math.abs(touch.clientX - startPosRef.current.x);
-      const dy = Math.abs(touch.clientY - startPosRef.current.y);
-      if (dx > moveThreshold || dy > moveThreshold) {
-        cancel();
-      }
-    },
-    onTouchEnd: (e: React.TouchEvent) => {
-      cancel();
-      if (firedRef.current) {
-        e.preventDefault(); // Prevent click after long-press
-      }
-    },
-  };
-}
+app/
+  _layout.tsx                 # Root: GestureHandlerRootView, providers
+  (auth)/
+    _layout.tsx               # Stack layout for auth screens
+    login.tsx                 # Server URL + JWT login
+  (app)/
+    _layout.tsx               # Drawer navigator (session sidebar)
+    (chat)/
+      _layout.tsx             # Stack for chat screens
+      index.tsx               # Active session chat view
+      [id].tsx                # Specific session (deep link target)
+    settings.tsx              # Settings screen
+  modal/
+    permission.tsx            # Permission request modal overlay
 ```
 
-**Key design decisions:**
+**Navigation pattern:** Drawer with session list + nested stack for chat screens. This matches ChatGPT iOS exactly: swipe from left edge for session sidebar, tap a session to navigate, active chat fills the screen.
 
-1. **500ms delay** matches iOS system long-press timing exactly.
+**Why drawer instead of tabs:** Loom is a single-context chat app. Tab bars waste 49pt of vertical space that the composer needs. ChatGPT and Claude both use sidebar drawer navigation. Anti-Feature AF-3 in FEATURES.md explicitly rejects bottom tabs.
 
-2. **Movement threshold: 10px** -- same as existing sidebar swipe detection in `Sidebar.tsx` line 63.
-
-3. **Must suppress iOS default callout** -- CSS `-webkit-touch-callout: none` on elements with long-press handlers.
-
-4. **`e.preventDefault()` on touchend after long-press fires** -- prevents the subsequent click event from navigating to the session.
-
-5. **Position from touchstart** -- captured when the press begins, used for menu positioning. This is where the menu should appear (under the finger).
-
-6. **Existing SessionContextMenu works as-is** -- it already takes `position: { x: number; y: number }` and portals to `document.body`. No modifications needed to reuse it for long-press.
-
-7. **New LongPressContextMenu for messages** -- similar structure to SessionContextMenu but with Copy Text and Retry options. Reuses the `context-menu-item` CSS class from `sidebar.css`.
-
-### Suppress iOS Default Callout
-
-```css
-/* In base.css -- only on native to not break desktop text selection */
-html[data-native] .long-press-target {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-```
-
-Applied via `className="long-press-target"` on elements with `useLongPress` handlers. Desktop (`html:not([data-native])`) retains normal text selection and browser context menus.
-
----
-
-## Pattern 4: Sidebar Swipe-to-Open Verification (GESTURE-04)
-
-### Architecture
-
-Already implemented in `Sidebar.tsx` lines 46-101. The REQUIREMENTS.md marks GESTURE-04 as "already implemented; verify on real device" with 0h estimate.
-
-**No code changes needed.** Real-device verification only.
-
-The existing implementation uses the exact same raw touch event pattern recommended for all new gestures, confirming architectural consistency.
-
----
-
-## Pattern 5: Broader Haptics (GESTURE-05)
-
-### Architecture
-
-The existing `haptics.ts` module with `hapticImpact()`, `hapticNotification()`, and `hapticSelection()` is the single integration point. No new infrastructure needed -- just add calls at the right moments in existing code.
-
-**New haptic touch points:**
-
-| Action | Haptic Call | Integration Point | Risk |
-|--------|-----------|-------------------|------|
-| Session select (tap) | `hapticSelection()` | `SessionItem.onClick` handler | NONE |
-| Sidebar toggle | `hapticImpact('Light')` | `Sidebar.toggleSidebar` callback | NONE |
-| Pull-to-refresh trigger | `hapticNotification('Success')` | `usePullToRefresh` hook | NONE |
-| Context menu open | `hapticImpact('Medium')` | `useLongPress` hook | NONE |
-| Swipe crosses threshold | `hapticImpact('Light')` | `useSwipeAction` hook | NONE |
-| Delete confirmed | `hapticNotification('Warning')` | Delete action tap handler | NONE |
-
-All haptic functions are already no-ops on web (guarded by `IS_NATIVE` internally). No platform guards needed at call sites. No new dependencies -- all functions already exist in `haptics.ts`.
+**Why Expo Router over bare React Navigation:** Expo Router IS React Navigation with file-based routing on top. It eliminates ~40 lines of navigator configuration. Typed routes, automatic deep linking, and React Navigation's full API are all available.
 
 ---
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Adding @use-gesture/react
-**What:** Installing `@use-gesture/react` for swipe/drag/long-press gesture handling.
-**Why bad:** ~6KB gzipped for `useDrag` alone. The codebase already demonstrates the raw touch pattern in `Sidebar.tsx`. Adds a dependency that must be maintained and could conflict with WKWebView touch handling edge cases. The library's value proposition (velocity calculations, spring integration, multi-touch) is irrelevant here -- we need basic single-finger swipe and timer-based long-press.
-**Instead:** Custom hooks following the established `Sidebar.tsx` touch handler pattern. ~250 lines of application code replaces a library dependency.
+### Anti-Pattern 1: Porting Web Components to RN
 
-### Anti-Pattern 2: Attaching Gesture Handlers on Desktop
-**What:** Binding touch/pointer event handlers globally regardless of viewport width.
-**Why bad:** Desktop users don't need swipe-to-delete, pull-to-refresh, or long-press. Adding handlers creates potential for unintended interactions with mouse drag, right-click context menus, and text selection. Also wastes event listener overhead.
-**Instead:** Guard with `useMobile()` inside hooks -- only return real handlers at `< 768px`. Return no-op empty objects on desktop. The `useMobile()` hook (via `useSyncExternalStore`) is the single source of truth for this breakpoint.
+**What:** Replacing `div` with `View` and `className` with `style` in copied web components.
 
-### Anti-Pattern 3: CSS-Only Gestures
-**What:** Attempting swipe-to-delete or pull-to-refresh with pure CSS scroll-snap, `:active`, or overscroll effects.
-**Why bad:** CSS has no concept of gesture velocity, rubber-banding, or threshold-based action triggers. Cannot integrate with state (delete/refresh callbacks). Cannot fire haptics. The visual result would feel non-native.
-**Instead:** Raw touch events for gesture tracking, CSS transitions for the visual animation on release.
+**Why bad:** RN layout defaults differ (flexDirection: column, no CSS cascade, no pseudo-elements). The web app was designed for desktop density (1440px+ with mouse). A port will feel "too big, too web-like" -- exactly what swd flagged during Capacitor testing.
 
-### Anti-Pattern 4: Capacitor Native Gesture Plugins
-**What:** Using `capacitor-plugin-swipe-gestures` or building a native Swift gesture recognizer for in-app gestures.
-**Why bad:** Native gesture plugins compete with WKWebView's gesture system, causing conflicts (double-fire, gesture stealing). The web view already receives all touch events. Native plugins are appropriate for gestures that need to work OUTSIDE the web view (e.g., native navigation bar), not for in-app content interactions.
-**Instead:** Web touch events work perfectly in WKWebView. No native bridge crossing needed.
+**Instead:** Design mobile screens from scratch using ChatGPT/Claude iOS as pixel-level references. Share ONLY business logic (stores, API, types). UI components are 100% new code.
 
-### Anti-Pattern 5: Single God Hook for All Gestures
-**What:** One `useGestures()` hook that handles swipe, long-press, pull-to-refresh, and pinch simultaneously.
-**Why bad:** Different gestures have incompatible lifecycles. Swipe needs continuous position tracking. Long-press needs a timer that cancels on movement. Pull-to-refresh needs scroll position awareness. Combining them creates gesture conflict resolution complexity.
-**Instead:** One hook per gesture type, composed at the component level via separate event handler props.
+### Anti-Pattern 2: react-native-web for "Universal" Components
 
-### Anti-Pattern 6: Using useState for Drag Position
-**What:** `const [x, setX] = useState(0)` updated on every touchmove event.
-**Why bad:** Causes React re-render on every touch frame (~60/sec). Each render re-runs the component function, diffs the virtual DOM, and commits to DOM. For a list item with children, this is visible jank on mobile.
-**Instead:** Direct DOM mutation via ref (`elementRef.current.style.transform = ...`). This is the exact pattern used in `Sidebar.tsx` (line 65) and the streaming buffer (useRef + rAF, bypass React reconciler).
+**What:** Building components with `View`/`Text` and using react-native-web to render them on the web too.
 
----
+**Why bad for this project:** The web app has 50+ polished components using Tailwind v4, Radix, DOM APIs. Converting to react-native-web primitives would degrade the web experience. This approach makes sense for greenfield; it is destructive for a mature web app.
 
-## Integration Points with Existing Code
+**Instead:** Accept that web and native UI codebases are separate. Share the 35% that's sharable (stores, types, API). The two apps can look different -- they serve different contexts.
 
-### Store Changes: NONE
+### Anti-Pattern 3: Socket.IO
 
-No Zustand store changes required. All gesture state is local to the gesture hooks (useRef for tracking, useState only for final snap states like "is open" or "is refreshing"). The gesture outcomes (delete, refresh, copy) call existing store actions or API functions that already exist.
+**What:** Adding Socket.IO because "it's easier than raw WebSocket."
 
-### CSS Changes
+**Why bad:** The backend uses `ws` (raw WebSocket). The existing `WebSocketClient` already handles reconnection, heartbeat, content stream subscription, and backlog buffering. Adding Socket.IO means rewriting the backend protocol. React Native supports standard `WebSocket` natively.
 
-| File | Change | Impact |
-|------|--------|--------|
-| `base.css` | Add `.long-press-target` rules (native-only) | Suppress iOS callout on gesture targets |
-| `sidebar.css` | Add swipe-to-delete action button styles | Red delete button behind row |
-| New: `swipeable-row.css` | SwipeableRow component positioning | Action button absolute positioning |
-| New: `pull-to-refresh.css` | Pull indicator spinner + transition | Indicator height + spinner rotation |
+### Anti-Pattern 4: Sharing Navigation State
 
-### Existing Code Modifications
+**What:** Putting screen-level state (scroll position, input draft, selected tool) in shared Zustand stores.
 
-| File | Modification | Risk |
-|------|-------------|------|
-| `SessionItem.tsx` | Add `useLongPress` handlers, `long-press-target` class | LOW -- additive |
-| `SessionList.tsx` | Wrap items in `SwipeableRow`, add pull-to-refresh handlers | LOW -- additive |
-| `SessionList.tsx` | Add `PullToRefreshIndicator` above list content | LOW -- new DOM node |
-| `MessageContainer.tsx` | Add `useLongPress` for copy/retry menu | LOW -- new behavior |
-| `haptics.ts` | No changes -- just more call sites | NONE |
-| `SessionContextMenu.tsx` | No changes -- already accepts position | NONE |
+**Why bad:** Causes stale state when navigating between screens. Expo Router manages screen lifecycle. Navigation-scoped state should live in React state or Reanimated shared values.
 
-### Bundle Size Impact
+**Instead:** Reserve Zustand for truly global state: sessions, streaming, connection, active session.
 
-| Addition | Source Size | Gzipped Est. | Type |
-|----------|-----------|-------------|------|
-| `useSwipeAction` hook | ~2KB | ~0.5KB | Application code |
-| `usePullToRefresh` hook | ~1.5KB | ~0.4KB | Application code |
-| `useLongPress` hook | ~1KB | ~0.3KB | Application code |
-| `SwipeableRow` component | ~1.5KB | ~0.4KB | Application code |
-| `PullToRefreshIndicator` component | ~1KB | ~0.3KB | Application code |
-| `LongPressContextMenu` component | ~1KB | ~0.3KB | Application code |
-| CSS additions | ~0.5KB | ~0.2KB | Styles |
-| **Total** | **~8.5KB** | **~2.4KB** | **Zero new deps** |
+### Anti-Pattern 5: Over-Eager Monorepo Setup
 
-Compare: `@use-gesture/react` would add ~6KB gzipped for `useDrag` alone (plus the hook wrapper overhead), or ~10KB for the full package. The custom approach is lighter AND more tailored to the codebase's existing patterns.
+**What:** Spending 2+ days configuring the monorepo before writing any feature code.
 
----
+**Why bad:** Metro bundler resolution, TypeScript project references, workspace linking, and barrel file issues can consume days. The shared code is ~10 files of types and ~5 files of logic.
 
-## Build Order (Phase 67 Structure)
-
-Based on dependency analysis, the gesture features should be built in this order:
-
-### Step 1: Shared Gesture Hooks (~2 hours)
-Build `useLongPress`, `useSwipeAction`, `usePullToRefresh` hooks with unit tests. These have no component dependencies and can be tested in isolation with simulated touch events (Testing Library `fireEvent.touchStart` etc.).
-
-- `useLongPress` -- simplest, test first
-- `useSwipeAction` -- medium complexity, depends on understanding threshold mechanics
-- `usePullToRefresh` -- needs scroll position awareness
-
-### Step 2: SwipeableRow + Swipe-to-Delete (~3 hours)
-Build `SwipeableRow` wrapper component with `swipeable-row.css`. Integrate into `SessionList` around `SessionItem`. Test with real touch simulation.
-
-Dependencies: Step 1 (`useSwipeAction`)
-
-### Step 3: Long-Press Context Menus (~3 hours)
-Wire `useLongPress` into `SessionItem` (reuse existing `SessionContextMenu` -- zero new component needed). Build `LongPressContextMenu` for messages. Wire into `MessageContainer`. Add `.long-press-target` CSS to `base.css`.
-
-Dependencies: Step 1 (`useLongPress`)
-
-### Step 4: Pull-to-Refresh (~2 hours)
-Build `PullToRefreshIndicator` component. Wire `usePullToRefresh` into `SessionList` scroll container. Connect to existing `refetch()` from `useMultiProjectSessions`.
-
-Dependencies: Step 1 (`usePullToRefresh`)
-
-### Step 5: Broader Haptics (~1 hour)
-Add haptic calls to session select, sidebar toggle, and other touch points listed in Pattern 5. All calls use existing `haptics.ts` functions. Test on device.
-
-Dependencies: None (can parallel with Steps 2-4)
-
-### Step 6: Sidebar Swipe Verification (~0.5 hours)
-Verify existing GESTURE-04 on real iPhone 16 Pro Max. No code changes expected.
-
-Dependencies: None (can parallel)
-
-**Total estimate: ~11.5 hours** (aligns with REQUIREMENTS.md Phase 67 budget of ~14 hours with testing buffer)
-
-Steps 2, 3, 4 can run in parallel after Step 1 completes. Step 5 can run in parallel with everything.
+**Instead:** Start simple: copy the 15 sharable files into `packages/shared/`. Validate that both Vite and Metro can import them. If workspace resolution causes issues, fall back to a plain `shared/` directory at the repo root with TypeScript path aliases. The monorepo is a packaging concern, not an architectural concern.
 
 ---
 
 ## Scalability Considerations
 
-| Concern | At 50 sessions | At 500 sessions | At 2000 sessions |
-|---------|---------------|-----------------|------------------|
-| Swipe handlers per row | One set per visible item, passive until touched | Same -- `content-visibility: auto` skips off-screen | Consider virtualization at this scale |
-| Long-press timers | One active at a time (single-finger interaction) | Same | Same |
-| Pull-to-refresh | Single instance on SessionList | Same | Same |
-| DOM transforms during swipe | GPU-composited (`translateX`), no layout thrash | Same | Same |
-| Event listener count | ~3 per visible SessionItem | Same (off-screen items have no active listeners) | Same (browser doesn't fire events on `content-visibility: auto` hidden items) |
+| Concern | At launch (v3.0, 1 user) | At v3.1+ (features grow) | If Android later |
+|---------|--------------------------|---------------------------|-------------------|
+| **Code sharing** | ~35% (types + stores + API) | Grows as more logic extracts | ~95% between iOS/Android |
+| **Bundle size** | ~15-20MB (standard RN app) | +~2MB if Skia added for effects | Same |
+| **Build time** | EAS Build: ~10min cloud, ~5min local | Metro cache effective | Add Android build target |
+| **State** | 3 shared + 1 mobile UI store | Add settings to shared when needed | Same stores |
+| **Navigation** | 4-5 screens | Add file view, terminal screens | Same Expo Router |
+| **WebSocket** | 1 connection, single backend | Same | Same |
+| **Message perf** | FlashList handles 1000+ messages | Cell recycling scales linearly | Same |
 
-The architecture scales well because:
-- Touch handlers only fire on active user interaction (passive until touched)
-- `content-visibility: auto` on `.msg-item` already skips layout for off-screen items
-- No gesture state in Zustand -- all local to hooks via useRef
-- `SwipeableRow` transform is GPU-composited (`translateX`), causes no layout thrash
-- Timer-based long-press has negligible memory footprint (one setTimeout at a time)
+---
+
+## Backend Integration Points
+
+### Zero Backend Changes for Core Chat
+
+The backend is already platform-agnostic:
+
+1. **WebSocket auth:** `?token=<jwt>` query param -- works from any client
+2. **REST auth:** `Authorization: Bearer <jwt>` -- standard HTTP
+3. **CORS:** Not an issue for native apps (no Origin header sent)
+4. **API contract:** 47+ endpoints in BACKEND_API_CONTRACT.md, all JSON/HTTP
+5. **WebSocket protocol:** `ServerMessage` / `ClientMessage` discriminated unions, no browser assumptions
+
+### One Backend Addition for Push Notifications (later phase)
+
+```
+POST /api/push/register     -- { pushToken: string, platform: 'ios' }
+POST /api/push/unregister   -- { pushToken: string }
+```
+
+Backend changes:
+1. New SQLite table: `push_tokens` (token, platform, user_id, created_at)
+2. When permission request fires and no WebSocket client connected: send APNs via Expo Push API
+3. Handle notification action response via existing WebSocket or new REST endpoint
+
+This is the ONLY backend change. It belongs in a dedicated phase AFTER chat works.
+
+---
+
+## Shared Code Migration Plan (5 Steps)
+
+### Step 1: Extract Types (zero risk, zero changes)
+
+Move 6 type files from `src/src/types/` to `packages/shared/src/types/`. These are pure TypeScript interfaces with zero runtime code. Replace `@/types/` import paths with `../types/` or package imports.
+
+Files: `message.ts`, `session.ts`, `provider.ts`, `websocket.ts`, `stream.ts`, `api.ts`
+
+### Step 2: Extract Stream Multiplexer (low risk)
+
+Move `stream-multiplexer.ts`. It already has zero React imports, zero store imports, and uses callback injection. The only change is import paths.
+
+### Step 3: Extract WebSocket Client (low risk, minor refactor)
+
+Move `websocket-client.ts`. Refactor: replace `import { resolveWsUrl } from '@/lib/platform'` with constructor-injected URL resolver (see Pattern 2 above). All other code is unchanged.
+
+### Step 4: Extract Zustand Stores (medium risk)
+
+Convert `timeline.ts` and `connection.ts` from singleton stores to factory functions that accept a `StateStorage` adapter. `stream.ts` moves as-is (no persistence). Move test files too.
+
+**Risk:** The `immer` + `persist` middleware composition needs testing. Run the existing store tests against the refactored factories with an in-memory storage mock.
+
+### Step 5: Update Web App Imports
+
+Mechanical find-and-replace: `@/types/*` -> `@loom/shared/types/*`, `@/stores/timeline` -> local re-export that calls the factory. TypeScript compiler validates each change.
 
 ---
 
 ## Sources
 
-- Existing `Sidebar.tsx` swipe-to-close implementation (primary architectural reference, lines 46-101)
-- [@use-gesture/react npm](https://www.npmjs.com/package/@use-gesture/react) -- evaluated, rejected: ~6KB gzipped for useDrag
-- [@use-gesture/react tree shaking](https://github.com/pmndrs/use-gesture/issues/315) -- individual hooks available but still heavier than custom
-- [react-swipe-to-delete-ios](https://github.com/arnaudambro/react-swipe-to-delete-ios) -- zero-dep reference implementation
-- [CSS overscroll-behavior MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/overscroll-behavior) -- already in use in base.css
-- [Chrome blog on overscroll-behavior](https://developer.chrome.com/blog/overscroll-behavior) -- pull-to-refresh control strategies
-- [Capacitor gesture plugin discussion](https://github.com/ionic-team/capacitor/discussions/3208) -- evaluated native plugins, rejected
-- [iOS WKWebView context menu discussion](https://github.com/ionic-team/capacitor/discussions/3208) -- CSS approach preferred over native
-- [iOS Safari overscroll control](https://www.bram.us/2016/05/02/prevent-overscroll-bounce-in-ios-mobilesafari-pure-css/) -- CSS strategies for WKWebView
-- Loom V2 Constitution (Sections 2.2, 3.1, 3.2, 3.6) -- compliance constraints
-- Loom REQUIREMENTS.md (GESTURE-01 through GESTURE-06) -- feature specifications
-- Loom `haptics.ts` -- existing haptic feedback infrastructure
-- Loom `useMobile.ts` -- existing mobile breakpoint detection hook
+### Official Documentation (HIGH confidence)
+- [Expo Monorepo Guide](https://docs.expo.dev/guides/monorepos/) -- Workspace configuration, Metro auto-detection
+- [Expo Router Introduction](https://docs.expo.dev/router/introduction/) -- File-based routing, layout components
+- [Expo Push Notifications Setup](https://docs.expo.dev/push-notifications/push-notifications-setup/) -- APNs + EAS credentials
+- [React Native Reanimated Performance](https://docs.swmansion.com/react-native-reanimated/docs/guides/performance/) -- UI thread worklets
+- [React Native Gesture Handler](https://docs.swmansion.com/react-native-gesture-handler/docs/) -- Native gesture recognizers
+- [FlashList v2 Announcement](https://shopify.engineering/flashlist-v2) -- Cell recycling, maintainVisibleContentPosition
+- [NativeWind v4 Docs](https://www.nativewind.dev/docs/getting-started/installation) -- Tailwind classes in RN
+- [Expo SDK 55](https://expo.dev/changelog/sdk-54) -- RN 0.83, React 19.2, New Architecture only
 
----
-*Architecture research for: iOS-native gestures in Loom v2.2 "The Touch"*
-*Researched: 2026-03-28*
+### Competitor Architecture (HIGH confidence)
+- [Discord RN Blog](https://discord.com/blog/how-discord-achieves-native-ios-performance-with-react-native) -- Custom lists, native modules
+- [PLATFORM-RESEARCH.md](../phases/67.1-ios-bug-fixes/PLATFORM-RESEARCH.md) -- Full competitor analysis (ChatGPT, Claude, Slack, Telegram)
+
+### Community / npm (MEDIUM confidence)
+- [react-native-streamdown](https://github.com/software-mansion-labs/react-native-streamdown) -- v0.1.1, streaming markdown
+- [Zustand + MMKV](https://github.com/mrousavy/react-native-mmkv/blob/main/docs/WRAPPER_ZUSTAND_PERSIST_MIDDLEWARE.md) -- Storage adapter pattern
+- [Expo Live Activities](https://expo.dev/blog/home-screen-widgets-and-live-activities-in-expo) -- Dynamic Island from RN
+
+### Project-Specific (HIGH confidence, audited codebase)
+- `src/src/stores/` -- 5 Zustand stores: timeline, stream, ui, connection, file
+- `src/src/types/` -- 13 type files defining the complete data contract
+- `src/src/lib/websocket-client.ts` -- WebSocketClient with callback injection
+- `src/src/lib/stream-multiplexer.ts` -- Pure function multiplexer with MultiplexerCallbacks
+- `src/src/hooks/useStreamBuffer.ts` -- rAF + innerHTML streaming architecture (web-specific)
+- `server/` -- Express 4, WebSocket (ws), JWT auth, 47+ REST endpoints
