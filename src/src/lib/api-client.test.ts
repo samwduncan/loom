@@ -1,19 +1,35 @@
 /**
- * API Client tests -- verifies auth header injection, error handling, and AbortSignal passthrough.
+ * API Client tests -- verifies the web wrapper around shared createApiClient.
+ *
+ * Tests auth header injection, error handling, deduplication,
+ * AbortSignal passthrough, and 401 retry.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { apiFetch, clearInflightRequests } from './api-client';
 
-// Mock auth module
-vi.mock('@/lib/auth', () => ({
-  getToken: vi.fn(),
-  refreshAuth: vi.fn(),
+// Use vi.hoisted() so mock fns are available when vi.mock() factories run (hoisted)
+const { mockGetToken, mockRefreshAuth } = vi.hoisted(() => ({
+  mockGetToken: vi.fn(),
+  mockRefreshAuth: vi.fn(),
 }));
 
-import { getToken, refreshAuth } from '@/lib/auth';
-const mockGetToken = vi.mocked(getToken);
-const mockRefreshAuth = vi.mocked(refreshAuth);
+vi.mock('@/lib/auth', () => ({
+  getToken: mockGetToken,
+  refreshAuth: mockRefreshAuth,
+  webAuthProvider: {
+    getToken: mockGetToken,
+    setToken: vi.fn(),
+    clearToken: vi.fn(),
+  },
+}));
+
+// Mock platform module -- resolveApiUrl returns path unchanged
+vi.mock('@/lib/platform', () => ({
+  resolveApiUrl: (path: string) => path,
+}));
+
+// Import after mocks are set up
+import { apiFetch, clearInflightRequests } from './api-client';
 
 describe('apiFetch', () => {
   beforeEach(() => {

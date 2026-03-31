@@ -1,13 +1,13 @@
 /**
- * Auth module — JWT storage, retrieval, and auto-auth bootstrap.
+ * Auth module -- JWT storage, retrieval, and auto-auth bootstrap (web platform).
  *
- * Consumed by both the WebSocket client (ws://.../ws?token=<jwt>) and
- * future HTTP API client. Handles auto-registration on first boot and
- * auto-login thereafter. No login UI in M1.
+ * Exports webAuthProvider implementing the shared AuthProvider interface,
+ * plus standalone functions for backward compatibility.
  *
  * Constitution: Named exports only (2.2), no default export.
  */
 
+import type { AuthProvider } from '@loom/shared/lib/auth';
 import { fetchAnon } from '@/lib/platform';
 
 const TOKEN_KEY = 'loom-jwt';
@@ -15,16 +15,27 @@ const TOKEN_KEY = 'loom-jwt';
 /** In-flight refresh promise for deduplication of concurrent 401 retries. */
 let refreshPromise: Promise<string> | null = null;
 
+/**
+ * Web AuthProvider implementation -- localStorage-based token storage.
+ * Passed to shared API client and WebSocket client factories.
+ */
+export const webAuthProvider: AuthProvider = {
+  getToken: () => localStorage.getItem(TOKEN_KEY),
+  setToken: (token: string) => localStorage.setItem(TOKEN_KEY, token),
+  clearToken: () => localStorage.removeItem(TOKEN_KEY),
+};
+
+// Standalone functions for backward compatibility (used throughout web codebase)
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY);
+  return webAuthProvider.getToken();
 }
 
 export function setToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
+  webAuthProvider.setToken(token);
 }
 
 export function clearToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
+  webAuthProvider.clearToken();
 }
 
 /**
@@ -50,7 +61,7 @@ export async function refreshAuth(): Promise<string> {
 /**
  * Auto-auth flow:
  * 1. Return existing token if one exists in localStorage.
- * 2. Check /api/auth/status — if needsSetup, POST /api/auth/register.
+ * 2. Check /api/auth/status -- if needsSetup, POST /api/auth/register.
  * 3. Otherwise POST /api/auth/login.
  * 4. On login failure, throw for fallback UI.
  *

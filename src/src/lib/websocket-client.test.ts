@@ -81,7 +81,17 @@ beforeEach(() => {
     },
   });
 
-  client = new WebSocketClient();
+  client = new WebSocketClient({
+    resolveWsUrl: (path: string, token: string) => {
+      // Mimic web platform behavior: derive ws URL from mock window.location
+      return `ws://localhost:5184${path}?token=${token}`;
+    },
+    auth: {
+      getToken: () => null,
+      setToken: () => {},
+      clearToken: () => {},
+    },
+  });
   onMessage = vi.fn();
   onStateChange = vi.fn();
   client.configure({ onMessage, onStateChange });
