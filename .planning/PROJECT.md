@@ -94,6 +94,15 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 - ✓ Gesture foundations — hapticEvent centralized grammar, useAppLifecycle, context menus, sidebar swipe deadzone (Phase 67/67.1)
 - ⚠️ v2.2 CLOSED 2026-03-30 — Capacitor/WKWebView approach abandoned. 5/7 critical iOS bugs architecturally unfixable in WKWebView. Remaining requirements (GESTURE, VISUAL categories) superseded by v3.0 native app.
 
+### Validated (v3.0 — Phase 68)
+
+- ✓ Shared code extraction — @loom/shared npm workspace with 13 types, 5 Zustand store factories, 5 lib modules (auth, API client, WebSocket, multiplexer, tool registry) — Phase 68
+- ✓ Web app rewiring — all web stores/libs import from @loom/shared, zero regressions (1548 tests pass) — Phase 68
+- ✓ Expo React Native scaffold — mobile/ with Drawer+Stack navigation, MMKV storage, SecureStore auth, EAS config — Phase 68
+- ✓ NativeWind design primitives — 5 components (SurfaceCard, TextHierarchy, Button, ListItem, GlassSurface) with UI-SPEC tokens — Phase 68
+- ✓ Native App Soul document — 626-line authoritative visual contract for Phases 69-73, spring physics, 12 screens, anti-patterns — Phase 68
+- ⚠️ Apple Developer enrollment — payment submitted, awaiting activation (Forgejo #23) — Phase 68
+
 ### Active
 
 **Current Milestone: v3.0 "The App"**
@@ -132,14 +141,16 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (post v2.2 close):**
+**Current State (Phase 68 complete — 2026-03-31):**
 - Web app: ~55,000 LOC TypeScript + CSS across 67 phases (10 milestones)
+- Shared: @loom/shared package with 13 types, 5 store factories, 5 lib modules, 143 tests
+- Mobile: Expo React Native app scaffold (mobile/) with NativeWind + 5 design primitives
 - Web stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- ~1500 commits, 27-day total build (2026-03-04 to 2026-03-30)
-- 141 test files, 1476 tests, 9 custom ESLint rules
-- Web frontend at `src/`, backend at `server/` (port 5555)
-- Dev server: port 5184, production nginx on port 5580 (via Tailscale Serve :5443)
-- Full desktop workspace: chat, file tree, code editor, terminal, git panel, settings, command palette
+- Mobile stack: Expo SDK 54 + React Native, Expo Router, NativeWind v4, MMKV, SecureStore
+- ~1500+ commits, 28-day total build (2026-03-04 to 2026-03-31)
+- 156 test files, 1691 tests (1548 web + 143 shared), 9 custom ESLint rules
+- Web frontend at `src/`, mobile at `mobile/`, shared at `shared/`, backend at `server/`
+- Dev server: port 5184, backend port 5555, production nginx on port 5580
 - SQLite cache, live session attach, WCAG AA, keyboard navigation, screen reader support
 - Backend: auth auto-retry, WebSocket heartbeat, systemd auto-start, graceful shutdown, deploy.sh
 - Capacitor approach ABANDONED — WKWebView can't deliver native iOS quality for gesture-heavy chat
