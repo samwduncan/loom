@@ -47,3 +47,35 @@ export type { ConnectionState, ConnectionStore } from './stores/connection';
 export { createUIStore } from './stores/ui';
 export type { UIState, UIStore } from './stores/ui';
 export { createFileStore } from './stores/file';
+
+// Lib -- Auth
+export type { AuthProvider } from './lib/auth';
+
+// Lib -- API client
+export { createApiClient } from './lib/api-client';
+export type { ApiClientOptions, ApiClient } from './lib/api-client';
+
+// Lib -- WebSocket client
+export { WebSocketClient } from './lib/websocket-client';
+export type { WsConnectionState, WebSocketClientOptions } from './lib/websocket-client';
+
+// Lib -- Stream multiplexer
+export {
+  routeClaudeResponse,
+  routeServerMessage,
+  getToolActivityText,
+} from './lib/stream-multiplexer';
+export type { MultiplexerCallbacks } from './lib/stream-multiplexer';
+
+// Lib -- Tool registry types
+export type { ToolCardProps, ToolConfig } from './lib/tool-registry-types';
+export {
+  TOOL_DISPLAY_NAMES,
+  TOOL_CATEGORIES,
+  truncatePath,
+  truncateCommand,
+  defaultChipLabel,
+  bashChipLabel,
+  filePathChipLabel,
+  patternChipLabel,
+} from './lib/tool-registry-types';
