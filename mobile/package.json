@@ -1,0 +1,6 @@
+{
+  "name": "@loom/mobile",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Loom iOS app (React Native + Expo) -- placeholder for workspace resolution"
+}
