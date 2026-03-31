@@ -214,7 +214,17 @@
   4. NativeWind styling renders correctly on device -- representative components match design intent
   5. Apple Developer Program enrolled with APNs push notification certificates configured
   6. Native App Soul document written and approved by swd: visual language, spacing grid, typography, animation philosophy, screen-by-screen specs for session list, chat, tool cards, permissions, composer
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+- [ ] 68-01-PLAN.md -- npm workspaces + shared/ types + store factories + tests
+- [ ] 68-02-PLAN.md -- shared/ lib extraction + web import rewiring + regression gate
+- [ ] 68-03-PLAN.md -- Expo app scaffolding + Router + EAS dev build
+- [ ] 68-04-PLAN.md -- NativeWind config + 5 design primitives + device validation
+- [ ] 68-05-PLAN.md -- Native App Soul doc: Bard creative analysis
+- [ ] 68-06-PLAN.md -- Native App Soul doc: formalization + swd approval
+- [ ] 68-07-PLAN.md -- Apple Developer enrollment + APNs push certificates
+
 **UI hint**: yes
 **Design gate**: Phase 69 CANNOT start until Native App Soul doc is approved. Bard creative review required.
 
@@ -301,7 +311,7 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 68. Scaffolding & Design | v3.0 | 0/? | Not started | - |
+| 68. Scaffolding & Design | v3.0 | 0/7 | Planning complete | - |
 | 69. Chat Foundation | v3.0 | 0/? | Not started | - |
 | 70. Chat Polish | v3.0 | 0/? | Not started | - |
 | 71. Native Feel | v3.0 | 0/? | Not started | - |
@@ -316,4 +326,4 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-30 after v3.0 "The App" roadmap revised (cross-vendor review: +design gate, +Phase 69 split, -monorepo refactor, +risks)*
+*Last updated: 2026-03-31 after Phase 68 planning complete (7 plans, 4 waves)*
