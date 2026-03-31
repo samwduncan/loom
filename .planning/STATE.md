@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: "The App"
 status: Ready to execute
-stopped_at: Completed 68-06-PLAN.md
-last_updated: "2026-03-31T14:42:10.430Z"
+stopped_at: Completed 68-03-PLAN.md
+last_updated: "2026-03-31T15:04:01.022Z"
 progress:
   total_phases: 11
   completed_phases: 4
   total_plans: 23
-  completed_plans: 18
+  completed_plans: 20
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-30)
 ## Current Position
 
 Phase: 68 (scaffolding-design) — EXECUTING
-Plan: 5 of 7
+Plan: 7 of 7
 
 ## Performance Metrics
 
@@ -52,6 +52,11 @@ Plan: 5 of 7
 - [Phase 68]: No color overrides from UI-SPEC baseline -- dusty rose accent and warm charcoal confirmed
 - [Phase 68]: Bold (700) weight ONLY for Large Title (28px); all else Regular (400) or Semibold (600)
 - [Phase 68]: SF Symbols primary for system UI, Lucide fallback for Loom-specific icons
+- [Phase 68]: WsConnectionState renamed from ConnectionState in shared/; web re-exports as alias for backward compat
+- [Phase 68]: Type re-export pattern (src/types/* -> shared/types/*) preserves all existing @/types/* imports
+- [Phase 68]: react-native-reanimated v3.19.5 over v4 -- avoids react-native-worklets peer dep, simpler dep tree
+- [Phase 68]: Expo SDK 54 (not 55) -- 54 is latest stable; plan referenced nonexistent SDK 55
+- [Phase 68]: Metro watchFolders includes monorepo root for shared/ workspace live updates in RN dev
 
 ### Roadmap Evolution
 
@@ -71,6 +76,6 @@ None -- clean start with proven architecture.
 
 ## Session Continuity
 
-Last session: 2026-03-31T14:42:10.428Z
-Stopped at: Completed 68-06-PLAN.md
+Last session: 2026-03-31T15:04:01.019Z
+Stopped at: Completed 68-03-PLAN.md
 Resume: `/gsd:discuss-phase 68`

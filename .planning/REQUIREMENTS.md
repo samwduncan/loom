@@ -9,9 +9,9 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 
 ### Scaffolding
 
-- [ ] **SCAFF-01**: Developer can build and install Expo dev build on iPhone 16 Pro Max via EAS Build
+- [x] **SCAFF-01**: Developer can build and install Expo dev build on iPhone 16 Pro Max via EAS Build
 - [x] **SCAFF-02**: Shared code directory (`shared/`) created at repo root with types, Zustand store factories, WebSocket client, stream multiplexer, and API client
-- [ ] **SCAFF-03**: Native app (`mobile/`) created with Expo Router, coexists with web app (`src/`) without restructuring
+- [x] **SCAFF-03**: Native app (`mobile/`) created with Expo Router, coexists with web app (`src/`) without restructuring
 - [x] **SCAFF-04**: Both Vite (web) and Metro (native) resolve `shared/` imports correctly -- web app builds with zero regressions
 - [ ] **SCAFF-05**: Apple Developer Program enrolled with APNs certificates configured for push notifications
 - [ ] **SCAFF-06**: NativeWind v4 configured with representative styling validated on device
@@ -99,9 +99,9 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCAFF-01 | Phase 68 | Pending |
+| SCAFF-01 | Phase 68 | Complete |
 | SCAFF-02 | Phase 68 | Complete |
-| SCAFF-03 | Phase 68 | Pending |
+| SCAFF-03 | Phase 68 | Complete |
 | SCAFF-04 | Phase 68 | Complete |
 | SCAFF-05 | Phase 68 | Pending |
 | SCAFF-06 | Phase 68 | Pending |
