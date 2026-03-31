@@ -238,7 +238,15 @@ Plans:
   3. User can switch between sessions via sidebar drawer (swipe from left edge)
   4. App authenticates via JWT stored in iOS Keychain, shows connection banner when disconnected
   5. WebSocket reconnects automatically on foreground with exponential backoff (AppState lifecycle)
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 69-01-PLAN.md -- Streaming markdown PoC + foundational libs (springs, colors, websocket-init, dynamic color)
+- [ ] 69-02-PLAN.md -- Auth prompt + connection banner + root layout wiring
+- [ ] 69-03-PLAN.md -- Session list drawer + search + new chat + project picker
+- [ ] 69-04-PLAN.md -- Chat screen + message list + composer + streaming integration
+- [ ] 69-05-PLAN.md -- Integration wiring + device verification checkpoint
+
 **UI hint**: yes
 
 ### Phase 70: Chat Polish
@@ -312,7 +320,7 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 68. Scaffolding & Design | v3.0 | 7/7 | Complete    | 2026-03-31 |
-| 69. Chat Foundation | v3.0 | 0/? | Not started | - |
+| 69. Chat Foundation | v3.0 | 0/5 | Planned | - |
 | 70. Chat Polish | v3.0 | 0/? | Not started | - |
 | 71. Native Feel | v3.0 | 0/? | Not started | - |
 | 72. Agent Features | v3.0 | 0/? | Not started | - |
@@ -326,4 +334,4 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-03-31 after Phase 68 planning complete (7 plans, 4 waves)*
+*Last updated: 2026-03-31 after Phase 69 planning complete (5 plans, 3 waves)*
