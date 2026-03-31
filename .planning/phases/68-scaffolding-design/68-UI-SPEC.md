@@ -36,13 +36,11 @@ Declared values (multiples of 4, inherited from web app's 4px grid):
 |-------|-------|-----------------|-------|
 | xs | 4px | `p-1`, `gap-1` | Icon gaps, inline padding |
 | sm | 8px | `p-2`, `gap-2` | Compact element spacing, list item internal padding |
-| md | 12px | `p-3`, `gap-3` | Card internal padding |
-| lg | 16px | `p-4`, `gap-4` | Default section padding, screen horizontal padding |
-| xl | 20px | `p-5`, `gap-5` | Comfortable list item vertical spacing |
-| 2xl | 24px | `p-6`, `gap-6` | Section gaps between content groups |
-| 3xl | 32px | `p-8`, `gap-8` | Major section breaks |
-| 4xl | 48px | `p-12`, `gap-12` | Page-level top/bottom padding |
-| 5xl | 64px | `p-16`, `gap-16` | Reserved (splash, onboarding) |
+| md | 16px | `p-4`, `gap-4` | Card internal padding, default section padding, screen horizontal padding |
+| lg | 24px | `p-6`, `gap-6` | Section gaps between content groups |
+| xl | 32px | `p-8`, `gap-8` | Major section breaks |
+| 2xl | 48px | `p-12`, `gap-12` | Page-level top/bottom padding |
+| 3xl | 64px | `p-16`, `gap-16` | Reserved (splash, onboarding) |
 
 Exceptions:
 - Touch targets: 44pt minimum height for all interactive elements (Apple HIG). Use `min-h-[44px]` or `h-11` (44px).
@@ -56,15 +54,14 @@ Font loading: Inter and JetBrains Mono installed via `expo-font` or bundled as a
 
 | Role | Size | Weight | Line Height | NativeWind Classes | Usage |
 |------|------|--------|-------------|-------------------|-------|
-| Caption | 12px | 400 (regular) | 1.33 (16px) | `text-xs font-normal` | Timestamps, metadata, badges |
-| Label | 13px | 500 (medium) | 1.38 (18px) | `text-[13px] font-medium` | Tool card labels, secondary info |
+| Caption | 12px | 400 (regular) | 1.33 (16px) | `text-xs font-normal` | Timestamps, metadata, badges, tool card labels, secondary info |
 | Body | 15px | 400 (regular) | 1.6 (24px) | `text-[15px] font-normal` | Chat message body, list descriptions |
 | Heading | 17px | 600 (semibold) | 1.29 (22px) | `text-[17px] font-semibold` | Screen titles, section headers, session names |
 | Code | 14px | 400 (regular) | 1.43 (20px) | `text-sm font-mono` | Code blocks, monospace content |
 
-**Rationale:** Sizes follow iOS Dynamic Type "Large" (default) scale. 15px body matches Apple HIG recommendation for readable content at arm's length. 17px heading matches iOS navigation bar title size. 12px caption is the minimum readable size on iOS (matching web constraint).
+**Rationale:** Sizes follow iOS Dynamic Type "Large" (default) scale. 15px body matches Apple HIG recommendation for readable content at arm's length. 17px heading matches iOS navigation bar title size. 12px caption is the minimum readable size on iOS (matching web constraint). The former 13px Label role is merged into Caption at 12px -- tool card labels and secondary info use Caption size.
 
-**Weights:** Only 3 weights allowed in Phase 68 primitives: regular (400), medium (500), semibold (600). No bold (700) or light (300) without Soul doc approval.
+**Weights:** Only 2 weights allowed in Phase 68 primitives: regular (400) and semibold (600). No medium (500), bold (700), or light (300) without Soul doc approval.
 
 **tailwind.config.js theme extension:**
 ```js
@@ -90,7 +87,7 @@ All colors derived from the web app's OKLCH tokens (D-20). Converted to RGB for 
 |------|-------------|----------------|-----------------|-------|
 | **Dominant (60%)** | `oklch(0.20 0.010 32)` | `rgb(46, 42, 40)` | `surface-base` | Screen backgrounds, scroll areas |
 | **Sunken** | `oklch(0.17 0.010 32)` | `rgb(38, 35, 33)` | `surface-sunken` | Drawer background, inset areas |
-| **Secondary (30%)** | `oklch(0.23 0.008 32)` | `surface-raised` | `surface-raised` | Cards, list items, elevated surfaces |
+| **Secondary (30%)** | `oklch(0.23 0.008 32)` | `rgb(54, 50, 48)` | `surface-raised` | Cards, list items, elevated surfaces |
 | **Overlay** | `oklch(0.27 0.007 32)` | `rgb(62, 59, 56)` | `surface-overlay` | Modals, popovers, context menus |
 | **Accent (10%)** | `oklch(0.63 0.14 20)` | `rgb(196, 108, 88)` | `accent` | See reserved-for list below |
 | **Text Primary** | `oklch(0.90 0.02 30)` | `rgb(230, 222, 216)` | `text-primary` | Body text, headings |
@@ -143,6 +140,15 @@ colors: {
 
 ---
 
+## Visual Focal Points
+
+| Screen | Focal Point | Rationale |
+|--------|-------------|-----------|
+| Session list | Screen title ("Loom") and the most recent session card at the top of the list | User's eye enters at the title, drops to the first actionable item. The most recent session card uses `surface-raised` background to separate it from the `surface-base` scroll area. |
+| NativeWind test screen | "Design Primitives" heading and the first rendered Surface Card | Validates NativeWind pipeline -- the card with shadow/blur is the visual proof point. |
+
+---
+
 ## Copywriting Contract
 
 Phase 68 placeholder screens need copy. These screens are navigation scaffolds that prove routing works -- they will be replaced by real implementations in Phase 69+.
@@ -151,17 +157,21 @@ Phase 68 placeholder screens need copy. These screens are navigation scaffolds t
 |---------|------|
 | **Primary CTA** | Not applicable (Phase 68 has no user-facing CTAs -- scaffolding only) |
 | **Session list placeholder heading** | Loom |
-| **Session list placeholder body** | Sessions will appear here |
+| **Session list placeholder body** | No sessions yet |
 | **Chat screen placeholder heading** | Chat |
 | **Chat screen placeholder body** | Select a session or start a new one |
 | **Settings placeholder heading** | Settings |
-| **Settings placeholder body** | Configuration options coming soon |
+| **Settings placeholder body** | Server and model configuration -- Phase 70 |
 | **Notifications placeholder heading** | Notifications |
-| **Notifications placeholder body** | Push notifications coming in Phase 72 |
+| **Notifications placeholder body** | Push notifications -- Phase 72 |
 | **NativeWind test screen heading** | Design Primitives |
 | **NativeWind test screen body** | Validating typography, color, spacing, depth, and blur |
 | **Connection error (if test screen has network check)** | Cannot reach server. Check that Tailscale is connected and the backend is running on port 5555. |
-| **Empty state (generic)** | Nothing here yet |
+| **Empty state: session list** | No sessions yet |
+| **Empty state: chat (no session selected)** | Select a session or start a new one |
+| **Empty state: settings** | Server and model configuration -- Phase 70 |
+| **Empty state: notifications** | Push notifications -- Phase 72 |
+| **Empty state: search** | No results |
 | **Destructive actions** | None in Phase 68 (no data modification in placeholder screens) |
 
 **Tone:** Minimal, lowercase-friendly, no exclamation marks. Match ChatGPT iOS placeholder energy -- informational, not enthusiastic. No emoji in placeholder copy.
@@ -189,18 +199,18 @@ Phase 68 builds 5 design system primitives to validate the NativeWind pipeline o
 
 ### 3. Button with States
 - Height: `min-h-[44px]` (Apple HIG touch target)
-- Padding: `px-6 py-3` (24px horizontal, 12px vertical)
+- Padding: `px-6 py-4` (24px horizontal, 16px vertical)
 - Background: `bg-accent` (primary CTA), `bg-surface-raised` (secondary)
-- Text: `text-accent-fg font-semibold` (primary), `text-text-primary font-medium` (secondary)
+- Text: `text-accent-fg font-semibold` (primary), `text-text-primary font-semibold` (secondary)
 - Border radius: `rounded-xl` (12px, matching card radius)
 - Pressed state: Opacity reduction to 0.7 via `activeOpacity={0.7}` on `TouchableOpacity` or `Pressable` with opacity style
 - Disabled state: Opacity 0.4, no press handler
 
 ### 4. List Item
 - Height: `min-h-[56px]` (comfortable touch target, larger than minimum 44px)
-- Padding: `px-4 py-3` (16px horizontal, 12px vertical)
+- Padding: `px-4 py-4` (16px all around)
 - Background: `bg-surface-base` (default), `bg-surface-raised` on press
-- Title: `text-base font-medium text-text-primary` (15px, 500)
+- Title: `text-base font-semibold text-text-primary` (15px, 600)
 - Subtitle: `text-xs text-text-secondary` (12px, 400)
 - Border bottom: `border-b border-border-subtle`
 - Right chevron: Text `>` in `text-text-muted` (icon library TBD by Soul doc)
