@@ -26,9 +26,9 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 - [ ] **CHAT-06**: User can see thinking blocks with expand/collapse disclosure
 - [ ] **CHAT-07**: User can see code blocks with syntax-appropriate monospace rendering
 - [ ] **CHAT-08**: User can scroll through 50+ messages at 60fps with no jank
-- [ ] **CHAT-09**: User can authenticate via JWT token with secure storage (iOS Keychain)
-- [ ] **CHAT-10**: User sees connection status banner when WebSocket disconnects
-- [ ] **CHAT-11**: App reconnects WebSocket automatically on foreground with exponential backoff
+- [x] **CHAT-09**: User can authenticate via JWT token with secure storage (iOS Keychain)
+- [x] **CHAT-10**: User sees connection status banner when WebSocket disconnects
+- [x] **CHAT-11**: App reconnects WebSocket automatically on foreground with exponential backoff
 - [ ] **CHAT-12**: Keyboard avoidance animates at 120Hz in sync with iOS keyboard
 
 ### Native Feel
@@ -113,9 +113,9 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 | CHAT-06 | Phase 70 | Pending |
 | CHAT-07 | Phase 70 | Pending |
 | CHAT-08 | Phase 70 | Pending |
-| CHAT-09 | Phase 69 | Pending |
-| CHAT-10 | Phase 69 | Pending |
-| CHAT-11 | Phase 69 | Pending |
+| CHAT-09 | Phase 69 | Complete |
+| CHAT-10 | Phase 69 | Complete |
+| CHAT-11 | Phase 69 | Complete |
 | CHAT-12 | Phase 70 | Pending |
 | NATIVE-01 | Phase 71 | Pending |
 | NATIVE-02 | Phase 71 | Pending |
