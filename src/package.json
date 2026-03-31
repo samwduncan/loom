@@ -19,6 +19,7 @@
     "cap:open": "cap open ios"
   },
   "dependencies": {
+    "@loom/shared": "*",
     "@capacitor/action-sheet": "^7.0.4",
     "@capacitor/app": "^7.1.2",
     "@capacitor/clipboard": "^7.0.4",

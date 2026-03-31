@@ -1,15 +1,5 @@
 /**
- * API response types -- shared contracts between hooks and API client.
- *
- * Constitution §5.4: API response types live in types/.
+ * API response types -- re-export from shared package.
  */
 
-import type { BackendEntry } from '@/lib/transformMessages';
-
-export interface PaginatedMessagesResponse {
-  messages: BackendEntry[];
-  total: number;
-  hasMore: boolean;
-  offset: number;
-  limit: number;
-}
+export * from '@loom/shared/types/api';

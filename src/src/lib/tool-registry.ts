@@ -4,6 +4,9 @@
  * Pure TypeScript module with a Map-based registry. Components (icon, renderCard)
  * use createElement to avoid JSX requirement, keeping this as .ts not .tsx.
  *
+ * Types and chip label helpers imported from @loom/shared.
+ * React components and Lucide icons remain web-only.
+ *
  * 6 registered tools (Bash, Read, Edit, Write, Glob, Grep) self-register at
  * module scope with Lucide icons and per-tool card components.
  * Unknown tools get a graceful default config with Wrench icon.
@@ -14,6 +17,15 @@
 import { createElement } from 'react';
 import type { ComponentType } from 'react';
 import type { ToolCallStatus } from '@/types/stream';
+import {
+  bashChipLabel,
+  filePathChipLabel,
+  patternChipLabel,
+  defaultChipLabel,
+} from '@loom/shared/lib/tool-registry-types';
+
+// Re-export shared types for backward compatibility
+export type { ToolCardProps } from '@loom/shared/lib/tool-registry-types';
 
 // Lucide icons
 import {
@@ -35,43 +47,21 @@ import { GlobToolCard } from '@/components/chat/tools/GlobToolCard';
 import { GrepToolCard } from '@/components/chat/tools/GrepToolCard';
 
 // ---------------------------------------------------------------------------
-// Public interfaces
+// Web-specific ToolConfig (with React ComponentType for icon/renderCard)
 // ---------------------------------------------------------------------------
-
-export interface ToolCardProps {
-  toolName: string;
-  input: Record<string, unknown>;
-  output: string | null;
-  isError: boolean;
-  status: ToolCallStatus;
-}
 
 export interface ToolConfig {
   displayName: string;
   icon: ComponentType;
   getChipLabel: (input: Record<string, unknown>) => string;
   stateColors?: Partial<Record<ToolCallStatus, string>>;
-  renderCard: ComponentType<ToolCardProps>;
-}
-
-// ---------------------------------------------------------------------------
-// Truncation helpers (private)
-// ---------------------------------------------------------------------------
-
-function truncatePath(path: string, maxLen = 40): string {
-  if (path.length <= maxLen) return path;
-  return '...' + path.slice(-(maxLen - 3));
-}
-
-function truncateCommand(cmd: string, maxLen = 40): string {
-  if (cmd.length <= maxLen) return cmd;
-  return cmd.slice(0, maxLen - 3) + '...';
-}
-
-function defaultChipLabel(input: Record<string, unknown>): string {
-  const json = JSON.stringify(input);
-  if (json.length <= 40) return json;
-  return json.slice(0, 37) + '...';
+  renderCard: ComponentType<{
+    toolName: string;
+    input: Record<string, unknown>;
+    output: string | null;
+    isError: boolean;
+    status: ToolCallStatus;
+  }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -104,7 +94,13 @@ function DefaultIcon() {
 // Default tool card (fallback for unregistered tools)
 // ---------------------------------------------------------------------------
 
-function DefaultToolCard(props: ToolCardProps) {
+function DefaultToolCard(props: {
+  toolName: string;
+  input: Record<string, unknown>;
+  output: string | null;
+  isError: boolean;
+  status: ToolCallStatus;
+}) {
   const { input, output, isError } = props;
 
   // Structured key-value rows for input
@@ -169,34 +165,6 @@ export function getToolConfig(toolName: string): ToolConfig {
 
 export function getRegisteredToolNames(): string[] {
   return [...registry.keys()];
-}
-
-// ---------------------------------------------------------------------------
-// Chip label extractors (per-tool)
-// ---------------------------------------------------------------------------
-
-function bashChipLabel(input: Record<string, unknown>): string {
-  const cmd = typeof input.command === 'string' ? input.command : null;
-  if (!cmd) return 'Bash';
-  return truncateCommand(cmd);
-}
-
-function filePathChipLabel(
-  fallbackName: string,
-  input: Record<string, unknown>,
-): string {
-  const fp = typeof input.file_path === 'string' ? input.file_path : null;
-  if (!fp) return fallbackName;
-  return truncatePath(fp);
-}
-
-function patternChipLabel(
-  fallbackName: string,
-  input: Record<string, unknown>,
-): string {
-  const pat = typeof input.pattern === 'string' ? input.pattern : null;
-  if (!pat) return fallbackName;
-  return pat.length > 40 ? pat.slice(0, 37) + '...' : pat;
 }
 
 // ---------------------------------------------------------------------------
