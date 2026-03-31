@@ -244,7 +244,7 @@ Plans:
 - [x] 69-01-PLAN.md -- Streaming markdown PoC + foundational libs (springs, colors, websocket-init, dynamic color)
 - [x] 69-02-PLAN.md -- Auth prompt + connection banner + root layout wiring
 - [x] 69-03-PLAN.md -- Session list drawer + search + new chat + project picker
-- [ ] 69-04-PLAN.md -- Chat screen + message list + composer + streaming integration
+- [x] 69-04-PLAN.md -- Chat screen + message list + composer + streaming integration
 - [ ] 69-05-PLAN.md -- Integration wiring + device verification checkpoint
 
 **UI hint**: yes
@@ -320,7 +320,7 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 68. Scaffolding & Design | v3.0 | 7/7 | Complete    | 2026-03-31 |
-| 69. Chat Foundation | v3.0 | 3/5 | In Progress|  |
+| 69. Chat Foundation | v3.0 | 4/5 | In Progress|  |
 | 70. Chat Polish | v3.0 | 0/? | Not started | - |
 | 71. Native Feel | v3.0 | 0/? | Not started | - |
 | 72. Agent Features | v3.0 | 0/? | Not started | - |
