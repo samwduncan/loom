@@ -220,7 +220,7 @@ Plans:
 - [x] 68-01-PLAN.md -- npm workspaces + shared/ types + store factories + tests
 - [x] 68-02-PLAN.md -- shared/ lib extraction + web import rewiring + regression gate
 - [x] 68-03-PLAN.md -- Expo app scaffolding + Router + EAS dev build
-- [ ] 68-04-PLAN.md -- NativeWind config + 5 design primitives + device validation
+- [x] 68-04-PLAN.md -- NativeWind config + 5 design primitives + device validation
 - [x] 68-05-PLAN.md -- Native App Soul doc: Bard creative analysis
 - [x] 68-06-PLAN.md -- Native App Soul doc: formalization + swd approval
 - [x] 68-07-PLAN.md -- Apple Developer enrollment + APNs push certificates
@@ -311,7 +311,7 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 68. Scaffolding & Design | v3.0 | 6/7 | In Progress|  |
+| 68. Scaffolding & Design | v3.0 | 7/7 | Complete   | 2026-03-31 |
 | 69. Chat Foundation | v3.0 | 0/? | Not started | - |
 | 70. Chat Polish | v3.0 | 0/? | Not started | - |
 | 71. Native Feel | v3.0 | 0/? | Not started | - |

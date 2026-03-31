@@ -14,7 +14,7 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 - [x] **SCAFF-03**: Native app (`mobile/`) created with Expo Router, coexists with web app (`src/`) without restructuring
 - [x] **SCAFF-04**: Both Vite (web) and Metro (native) resolve `shared/` imports correctly -- web app builds with zero regressions
 - [ ] **SCAFF-05**: Apple Developer Program enrolled with APNs certificates configured for push notifications
-- [ ] **SCAFF-06**: NativeWind v4 configured with representative styling validated on device
+- [x] **SCAFF-06**: NativeWind v4 configured with representative styling validated on device
 
 ### Chat
 
@@ -104,7 +104,7 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 | SCAFF-03 | Phase 68 | Complete |
 | SCAFF-04 | Phase 68 | Complete |
 | SCAFF-05 | Phase 68 | Pending |
-| SCAFF-06 | Phase 68 | Pending |
+| SCAFF-06 | Phase 68 | Complete |
 | CHAT-01 | Phase 69 | Pending |
 | CHAT-02 | Phase 69 | Pending |
 | CHAT-03 | Phase 69 | Pending |
