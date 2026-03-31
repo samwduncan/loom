@@ -8,13 +8,7 @@
  */
 
 import { createConnectionStore } from '@loom/shared/stores/connection';
-import type { StateStorage } from 'zustand/middleware';
-
-const localStorageAdapter: StateStorage = {
-  getItem: (name: string) => localStorage.getItem(name),
-  setItem: (name: string, value: string) => localStorage.setItem(name, value),
-  removeItem: (name: string) => localStorage.removeItem(name),
-};
+import { localStorageAdapter } from '@/lib/storage-adapter';
 
 export const useConnectionStore = createConnectionStore(localStorageAdapter);
 

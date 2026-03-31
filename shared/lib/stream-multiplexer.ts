@@ -192,13 +192,13 @@ export function routeClaudeResponse(
       // Extract token usage from modelUsage (keyed by model name)
       const modelUsage = data.modelUsage ?? {};
       const modelKeys = Object.keys(modelUsage);
-      const modelName = modelKeys[0]; // e.g. "claude-sonnet-4-6-20250514"
+      const modelName = modelKeys[0] ?? undefined; // e.g. "claude-sonnet-4-6-20250514"
       let inputTokens = 0;
       let outputTokens = 0;
       let cacheReadTokens = 0;
 
       for (const key of modelKeys) {
-        const usage = modelUsage[key] as Record<string, number> | undefined;
+        const usage = modelUsage[key] as Record<string, number> | undefined; // ASSERT: modelUsage values are usage objects from Claude SDK
         if (usage && typeof usage === 'object') {
           inputTokens += usage.input_tokens ?? 0;
           outputTokens += usage.output_tokens ?? 0;

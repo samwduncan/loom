@@ -51,7 +51,7 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
     if (!res.ok) {
       throw new Error(`API error ${res.status}: ${res.statusText}`);
     }
-    return res.json() as Promise<T>;
+    return res.json() as Promise<T>; // ASSERT: Response.json() returns unknown; caller controls T via generic
   }
 
   /**
@@ -66,7 +66,7 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
       headers: {
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(fetchOpts.headers as Record<string, string> | undefined),
+        ...(fetchOpts.headers as Record<string, string> | undefined), // ASSERT: RequestInit.headers includes Record<string,string>
       },
     });
   }
@@ -86,7 +86,7 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
     if (!retryRes.ok) {
       throw new Error(`API error ${retryRes.status}: ${retryRes.statusText}`);
     }
-    return retryRes.json() as Promise<T>;
+    return retryRes.json() as Promise<T>; // ASSERT: Response.json() returns unknown; caller controls T via generic
   }
 
   async function apiFetch<T>(

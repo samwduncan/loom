@@ -8,13 +8,7 @@
  */
 
 import { createUIStore } from '@loom/shared/stores/ui';
-import type { StateStorage } from 'zustand/middleware';
-
-const localStorageAdapter: StateStorage = {
-  getItem: (name: string) => localStorage.getItem(name),
-  setItem: (name: string, value: string) => localStorage.setItem(name, value),
-  removeItem: (name: string) => localStorage.removeItem(name),
-};
+import { localStorageAdapter } from '@/lib/storage-adapter';
 
 export const useUIStore = createUIStore(localStorageAdapter);
 

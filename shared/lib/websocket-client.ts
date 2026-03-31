@@ -40,7 +40,6 @@ export class WebSocketClient {
   private readonly maxReconnectDelay = 30_000;
 
   private readonly resolveWsUrl: (path: string, token: string) => string;
-  private readonly auth: AuthProvider;
 
   // Callback injection -- set once during app init
   private onMessageCb: ((msg: ServerMessage) => void) | null = null;
@@ -55,7 +54,6 @@ export class WebSocketClient {
 
   constructor(options: WebSocketClientOptions) {
     this.resolveWsUrl = options.resolveWsUrl;
-    this.auth = options.auth;
   }
 
   /**
@@ -265,7 +263,7 @@ export class WebSocketClient {
   private handleMessage(event: MessageEvent): void {
     let parsed: unknown;
     try {
-      parsed = JSON.parse(event.data as string);
+      parsed = JSON.parse(event.data as string); // ASSERT: MessageEvent.data is string for JSON text frames
     } catch {
       console.warn('[WebSocketClient] Failed to parse message:', event.data);
       return;
