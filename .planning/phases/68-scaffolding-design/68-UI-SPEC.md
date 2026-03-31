@@ -171,7 +171,7 @@ Phase 68 placeholder screens need copy. These screens are navigation scaffolds t
 | **Empty state: chat (no session selected)** | Select a session or start a new one |
 | **Empty state: settings** | Server and model configuration -- Phase 70 |
 | **Empty state: notifications** | Push notifications -- Phase 72 |
-| **Empty state: search** | No results |
+| **Empty state: search** | No sessions match your search |
 | **Destructive actions** | None in Phase 68 (no data modification in placeholder screens) |
 
 **Tone:** Minimal, lowercase-friendly, no exclamation marks. Match ChatGPT iOS placeholder energy -- informational, not enthusiastic. No emoji in placeholder copy.
