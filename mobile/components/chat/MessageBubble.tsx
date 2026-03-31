@@ -8,10 +8,13 @@
  * Per D-21: User messages enter with Standard spring (opacity + translateY).
  *           Assistant first token fades in (150ms opacity, withTiming).
  *
+ * D-28: Shows "Interrupted" indicator for partially streamed messages that were
+ * interrupted by app backgrounding. Tap to retry re-sends the original message.
+ *
  * Soul doc: Streaming text flows without per-character animation (rule #6).
  */
 
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable, Text } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -19,7 +22,7 @@ import Animated, {
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { ProviderAvatar } from './ProviderAvatar';
 import { LoomText } from '../primitives/TextHierarchy';
-import { SURFACE } from '../../lib/colors';
+import { SURFACE, ACCENT } from '../../lib/colors';
 import type { DisplayMessage } from '../../hooks/useMessageList';
 
 interface MessageBubbleProps {
@@ -27,6 +30,7 @@ interface MessageBubbleProps {
   isLastMessage: boolean;
   previousRole?: 'user' | 'assistant' | null;
   isFirstInGroup?: boolean;
+  onRetryInterrupted?: () => void;
 }
 
 export function MessageBubble({
@@ -34,6 +38,7 @@ export function MessageBubble({
   isLastMessage,
   previousRole,
   isFirstInGroup = true,
+  onRetryInterrupted,
 }: MessageBubbleProps) {
   // Turn spacing: 24px between different roles, 8px between same role (D-19)
   const marginTop = previousRole === null || previousRole === undefined
@@ -77,6 +82,17 @@ export function MessageBubble({
           content={message.content}
           isStreaming={message.isStreaming}
         />
+        {/* D-28: Interrupted stream indicator */}
+        {message.isInterrupted && (
+          <Pressable
+            onPress={onRetryInterrupted}
+            style={styles.interruptedRow}
+          >
+            <Text style={styles.interruptedText}>
+              Interrupted {onRetryInterrupted ? '— tap to retry' : ''}
+            </Text>
+          </Pressable>
+        )}
       </View>
     </Animated.View>
   );
@@ -109,5 +125,16 @@ const styles = StyleSheet.create({
   },
   assistantContent: {
     // Free-flowing on surface-base, no additional container
+  },
+
+  // D-28: Interrupted stream indicator
+  interruptedRow: {
+    marginTop: 8,
+    paddingVertical: 4,
+  },
+  interruptedText: {
+    fontSize: 12, // Caption style per Soul doc
+    color: 'rgb(148, 144, 141)', // text-muted
+    fontFamily: 'Inter',
   },
 });

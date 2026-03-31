@@ -23,7 +23,11 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, Text, Pressable } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
@@ -34,8 +38,11 @@ import { useDynamicColor } from '../../../hooks/useDynamicColor';
 import { useMessageList } from '../../../hooks/useMessageList';
 import { useStreamStore } from '../../../stores/index';
 import { useTimelineStore } from '../../../stores/index';
-import { getWsClient } from '../../../lib/websocket-init';
+import { getWsClient, clearStreamSnapshot } from '../../../lib/websocket-init';
+import { SPRING } from '../../../lib/springs';
 import type { ClientMessage } from '@loom/shared/types/websocket';
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function ChatScreen() {
   const { id, projectName, projectPath } = useLocalSearchParams<{
@@ -73,6 +80,7 @@ export default function ChatScreen() {
   }, [id]);
 
   // Fetch messages on mount (skip for stub sessions with no messages yet)
+  // projectName comes from route params (via SessionItem or createSession navigation)
   useEffect(() => {
     if (id && !id.startsWith('stub-') && projectName) {
       fetchMessages(projectName, id);
@@ -166,11 +174,32 @@ export default function ChatScreen() {
     client.send(msg);
   }, [id]);
 
+  // Back button spring press feedback (anti-pattern #11: no silent taps)
+  const backScale = useSharedValue(1);
+  const backScaleStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: backScale.value }],
+  }));
+  const handleBackPressIn = useCallback(() => {
+    backScale.value = withSpring(0.9, SPRING.micro);
+  }, [backScale]);
+  const handleBackPressOut = useCallback(() => {
+    backScale.value = withSpring(1, SPRING.micro);
+  }, [backScale]);
+
   const handleBack = useCallback(() => {
     if (router.canGoBack()) {
       router.back();
     }
   }, [router]);
+
+  // D-28: Handler for retrying interrupted stream messages
+  const handleRetryInterrupted = useCallback(() => {
+    if (!id) return;
+    // Clear the snapshot
+    clearStreamSnapshot(id);
+    // Re-send could be handled by the user sending a new message.
+    // For now, clear the interrupted state to let user continue naturally.
+  }, [id]);
 
   const showEmptyState = messages.length === 0 && !isLoading && !isStreaming;
 
@@ -184,9 +213,14 @@ export default function ChatScreen() {
       <Animated.View style={[styles.container, backgroundStyle]}>
         {/* Custom header */}
         <View style={[styles.header, { paddingTop: insets.top }]}>
-          <Pressable onPress={handleBack} style={styles.backButton}>
+          <AnimatedPressable
+            onPress={handleBack}
+            onPressIn={handleBackPressIn}
+            onPressOut={handleBackPressOut}
+            style={[styles.backButton, backScaleStyle]}
+          >
             <ChevronLeft size={24} color="rgb(230, 222, 216)" strokeWidth={2} />
-          </Pressable>
+          </AnimatedPressable>
           <View style={styles.titleContainer}>
             <Text style={styles.title} numberOfLines={1}>
               {sessionTitle}

@@ -287,7 +287,10 @@ export function useSessions(): UseSessionsReturn {
       // First message from composer will include { projectPath } in options,
       // which triggers backend session creation. onSessionCreated in
       // websocket-init.ts will replace stubId with real ID.
-      router.push(`/(stack)/chat/${stubId}`);
+      router.push({
+        pathname: '/(stack)/chat/[id]',
+        params: { id: stubId, projectName, projectPath },
+      });
     },
     [],
   );

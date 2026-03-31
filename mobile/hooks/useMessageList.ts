@@ -14,6 +14,7 @@ import type { Message } from '@loom/shared/types/message';
 import { useStreamStore } from '../stores/index';
 import { useTimelineStore } from '../stores/index';
 import { getWsClient } from '../lib/websocket-init';
+import { getStreamSnapshot, clearStreamSnapshot } from '../lib/websocket-init';
 import { apiClient } from '../lib/api-client';
 
 export interface DisplayMessage {
@@ -23,6 +24,8 @@ export interface DisplayMessage {
   timestamp: string;
   showTimestamp: boolean;
   isStreaming: boolean;
+  /** D-28: Message was interrupted by app backgrounding during stream */
+  isInterrupted?: boolean;
 }
 
 interface UseMessageListReturn {
@@ -112,8 +115,48 @@ export function useMessageList(): UseMessageListReturn {
     }
   }, []);
 
+  // D-28: Check for interrupted stream snapshot on mount/foreground
+  const [interruptedSnapshot, setInterruptedSnapshot] = useState<{
+    sessionId: string;
+    content: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (activeSessionId) {
+      const snapshot = getStreamSnapshot(activeSessionId);
+      if (snapshot && snapshot.content) {
+        setInterruptedSnapshot(snapshot);
+      }
+    }
+  }, [activeSessionId, isStreaming]);
+
+  // Clear interrupted snapshot when a new stream starts for this session
+  useEffect(() => {
+    if (isStreaming && activeSessionId && interruptedSnapshot?.sessionId === activeSessionId) {
+      setInterruptedSnapshot(null);
+      clearStreamSnapshot(activeSessionId);
+    }
+  }, [isStreaming, activeSessionId, interruptedSnapshot]);
+
   // Build display messages
   const displayMessages: DisplayMessage[] = toDisplayMessages(fetchedMessages);
+
+  // D-28: Append interrupted message if snapshot exists and no active stream
+  if (!isStreaming && interruptedSnapshot && interruptedSnapshot.content) {
+    const lastTimestamp = displayMessages.length > 0
+      ? displayMessages[displayMessages.length - 1].timestamp
+      : null;
+    const snapTime = new Date().toISOString();
+    displayMessages.push({
+      id: `interrupted-${interruptedSnapshot.sessionId}`,
+      role: 'assistant',
+      content: interruptedSnapshot.content,
+      timestamp: snapTime,
+      showTimestamp: shouldShowTimestamp(snapTime, lastTimestamp),
+      isStreaming: false,
+      isInterrupted: true,
+    });
+  }
 
   // During streaming, append a virtual assistant message
   if (isStreaming && streamingContent) {

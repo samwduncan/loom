@@ -37,6 +37,8 @@ interface SessionItemProps {
   title: string;
   updatedAt: string;
   provider: string;
+  projectName: string;
+  projectPath: string;
   isActive: boolean;
   isStreaming?: boolean;
   index: number;
@@ -62,6 +64,8 @@ export function SessionItem({
   title,
   updatedAt,
   provider,
+  projectName,
+  projectPath,
   isActive,
   isStreaming = false,
   index,
@@ -162,8 +166,11 @@ export function SessionItem({
 
   const handlePress = useCallback(() => {
     onPress();
-    router.push(`/(stack)/chat/${id}`);
-  }, [id, onPress]);
+    router.push({
+      pathname: '/(stack)/chat/[id]',
+      params: { id, projectName, projectPath },
+    });
+  }, [id, projectName, projectPath, onPress]);
 
   return (
     <Animated.View style={entranceStyle}>

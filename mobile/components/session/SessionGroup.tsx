@@ -56,6 +56,8 @@ export function SessionGroup({
           title={session.title}
           updatedAt={session.updatedAt}
           provider={session.provider}
+          projectName={session.projectName}
+          projectPath={session.projectPath}
           isActive={session.id === activeSessionId}
           isStreaming={session.id === streamingSessionId}
           index={indexOffset + i}

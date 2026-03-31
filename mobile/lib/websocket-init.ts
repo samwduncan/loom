@@ -14,6 +14,7 @@
  */
 
 import { AppState, type AppStateStatus } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
 import { WebSocketClient } from '@loom/shared/lib/websocket-client';
 import type { WsConnectionState } from '@loom/shared/lib/websocket-client';
 import { routeServerMessage } from '@loom/shared/lib/stream-multiplexer';
@@ -24,6 +25,56 @@ import { nativeAuthProvider } from './auth-provider';
 import { useTimelineStore } from '../stores/index';
 import { useConnectionStore } from '../stores/index';
 import { useStreamStore } from '../stores/index';
+
+// ---------------------------------------------------------------------------
+// D-28: MMKV for interrupted stream snapshots
+// ---------------------------------------------------------------------------
+
+const mmkv = new MMKV();
+
+/** Key prefix for interrupted stream snapshots in MMKV. */
+const STREAM_SNAPSHOT_PREFIX = 'interrupted_stream_';
+
+export interface InterruptedStreamSnapshot {
+  sessionId: string;
+  content: string;
+  timestamp: string;
+}
+
+/**
+ * Save a snapshot of interrupted stream content to MMKV.
+ * Called when app goes to background while streaming is active.
+ */
+function saveStreamSnapshot(sessionId: string, content: string): void {
+  const snapshot: InterruptedStreamSnapshot = {
+    sessionId,
+    content,
+    timestamp: new Date().toISOString(),
+  };
+  mmkv.set(`${STREAM_SNAPSHOT_PREFIX}${sessionId}`, JSON.stringify(snapshot));
+}
+
+/**
+ * Read an interrupted stream snapshot from MMKV.
+ * Returns null if no snapshot exists for the given session.
+ */
+export function getStreamSnapshot(sessionId: string): InterruptedStreamSnapshot | null {
+  const raw = mmkv.getString(`${STREAM_SNAPSHOT_PREFIX}${sessionId}`);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as InterruptedStreamSnapshot;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear the interrupted stream snapshot for a session.
+ * Called after display or when a new stream starts.
+ */
+export function clearStreamSnapshot(sessionId: string): void {
+  mmkv.delete(`${STREAM_SNAPSHOT_PREFIX}${sessionId}`);
+}
 
 // ---------------------------------------------------------------------------
 // Module state
@@ -40,6 +91,9 @@ let backgroundTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Tracks whether we're inside a streaming response */
 let isCurrentlyStreaming = false;
+
+/** D-28: Accumulates stream content tokens for background snapshot */
+let streamContentAccumulator = '';
 
 /** 200ms debounce timer for activity text updates (matches web app) */
 let activityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -84,6 +138,7 @@ export async function initializeWebSocket(): Promise<void> {
   const callbacks: MultiplexerCallbacks = {
     // 1. onContentToken -- routes to content stream subscribers, NOT a store action
     onContentToken: (text) => {
+      streamContentAccumulator += text; // D-28: accumulate for background snapshot
       wsClient!.emitContent(text); // ASSERT: wsClient is non-null after init
     },
 
@@ -128,6 +183,10 @@ export async function initializeWebSocket(): Promise<void> {
 
     // 7. onStreamStart
     onStreamStart: () => {
+      streamContentAccumulator = ''; // D-28: reset for new stream
+      // D-28: clear any stale snapshot for the active session
+      const sid = streamStore().activeSessionId;
+      if (sid) clearStreamSnapshot(sid);
       streamStore().startStream();
     },
 
@@ -138,6 +197,7 @@ export async function initializeWebSocket(): Promise<void> {
         clearTimeout(activityDebounceTimer);
         activityDebounceTimer = null;
       }
+      streamContentAccumulator = ''; // D-28: clear on normal completion
       streamStore().endStream();
     },
 
@@ -151,7 +211,14 @@ export async function initializeWebSocket(): Promise<void> {
       streamStore().setActiveSessionId(sid);
 
       const tl = useTimelineStore.getState();
-      if (!tl.sessions.some((s) => s.id === sid)) {
+
+      // Check if we have a stub session that should be replaced with the real ID.
+      // The stub pattern creates "stub-{timestamp}" IDs that get swapped here
+      // when the backend assigns a real session ID.
+      const currentActiveId = tl.activeSessionId;
+      if (currentActiveId && currentActiveId.startsWith('stub-')) {
+        tl.replaceSessionId(currentActiveId, sid);
+      } else if (!tl.sessions.some((s) => s.id === sid)) {
         tl.addSession({
           id: sid,
           title: 'New Chat',
@@ -325,6 +392,22 @@ export async function initializeWebSocket(): Promise<void> {
           wsClient.connect(token);
         }
       } else if (nextState === 'background') {
+        // D-28: Snapshot partial stream content to MMKV if streaming is active.
+        // This preserves the content so it can be shown as "Interrupted" on
+        // foreground return if the stream doesn't complete.
+        const currentStreamState = useStreamStore.getState();
+        if (currentStreamState.isStreaming || isCurrentlyStreaming) {
+          const sid = currentStreamState.activeSessionId;
+          if (sid && streamContentAccumulator) {
+            saveStreamSnapshot(sid, streamContentAccumulator);
+          }
+          // Mark the stream as interrupted in the store (preserves partial
+          // content without full endStream reset)
+          currentStreamState.clearStreamingFlag();
+          isCurrentlyStreaming = false;
+          streamContentAccumulator = '';
+        }
+
         // Background: start 30s grace period before disconnect
         backgroundTimer = setTimeout(() => {
           wsClient?.disconnect();

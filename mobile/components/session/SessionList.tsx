@@ -12,12 +12,14 @@
 
 import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, RefreshControl, Pressable } from 'react-native';
+import { SPRING } from '../../lib/springs';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withRepeat,
   withTiming,
+  withSpring,
 } from 'react-native-reanimated';
 import { Settings } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -86,7 +88,10 @@ export function SessionList(_props: DrawerContentComponentProps) {
   } = useSessions();
 
   const { isConnected } = useConnection();
-  const streamingSessionId = useStreamStore((s) => s.activeSessionId);
+  const streamActiveSessionId = useStreamStore((s) => s.activeSessionId);
+  const isStreamActive = useStreamStore((s) => s.isStreaming);
+  // Only show streaming indicator when both session ID is set AND stream is active
+  const streamingSessionId = isStreamActive ? streamActiveSessionId : null;
 
   const [isPickerVisible, setPickerVisible] = useState(false);
   const [isRefreshing, setRefreshing] = useState(false);
@@ -125,6 +130,12 @@ export function SessionList(_props: DrawerContentComponentProps) {
   // Count total sessions for empty state check
   const totalSessions = projects.reduce((sum, p) => sum + p.sessions.length, 0);
   const hasNoSessions = !isLoading && totalSessions === 0 && pinnedSessions.length === 0;
+
+  // Settings button spring press (anti-pattern #11: no silent taps)
+  const settingsScale = useSharedValue(1);
+  const settingsScaleStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: settingsScale.value }],
+  }));
 
   // Calculate stagger index offset across groups
   let runningIndex = pinnedSessions.length;
@@ -221,6 +232,8 @@ export function SessionList(_props: DrawerContentComponentProps) {
                 title={session.title}
                 updatedAt={session.updatedAt}
                 provider={session.provider}
+                projectName={session.projectName}
+                projectPath={session.projectPath}
                 isActive={session.id === activeSessionId}
                 isStreaming={session.id === streamingSessionId}
                 index={i}
@@ -265,13 +278,17 @@ export function SessionList(_props: DrawerContentComponentProps) {
           borderTopColor: 'rgba(255, 255, 255, 0.05)',
         }}
       >
-        <Pressable
-          onPress={() => router.push('/(drawer)/settings')}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={{ minHeight: 44, minWidth: 44, justifyContent: 'center' }}
-        >
-          <Settings size={20} color="rgb(148, 144, 141)" />
-        </Pressable>
+        <Animated.View style={settingsScaleStyle}>
+          <Pressable
+            onPress={() => router.push('/(drawer)/settings')}
+            onPressIn={() => { settingsScale.value = withSpring(0.9, SPRING.micro); }}
+            onPressOut={() => { settingsScale.value = withSpring(1, SPRING.micro); }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={{ minHeight: 44, minWidth: 44, justifyContent: 'center' }}
+          >
+            <Settings size={20} color="rgb(148, 144, 141)" />
+          </Pressable>
+        </Animated.View>
 
         {/* Connection dot: 8px, success (green) / destructive (red) */}
         <View

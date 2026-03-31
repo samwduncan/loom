@@ -2,55 +2,78 @@
  * Drawer index screen -- main content area inside the drawer.
  *
  * When an active session exists, redirects to chat/[id].
- * When no session is active, shows a placeholder empty state.
- * (EmptyChat component will be built in Plan 04.)
+ * When no session is active, shows EmptyChat with a New Chat action.
+ *
+ * The drawer navigator wraps this screen; opening the drawer from here
+ * shows the SessionList. The EmptyChat component is from Plan 04.
  */
 
-import { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { useEffect, useState, useCallback } from 'react';
+import { View } from 'react-native';
 import { router } from 'expo-router';
 import { useTimelineStore } from '../../stores/index';
-import { SURFACE, ACCENT } from '../../lib/colors';
+import { SURFACE } from '../../lib/colors';
+import { EmptyChat } from '../../components/empty/EmptyChat';
 import { NewChatButton } from '../../components/session/NewChatButton';
+import { ProjectPicker } from '../../components/session/ProjectPicker';
+import { useSessions } from '../../hooks/useSessions';
 
 export default function DrawerIndexScreen() {
   const activeSessionId = useTimelineStore((s) => s.activeSessionId);
+  const { createSession } = useSessions();
+  const [isPickerVisible, setPickerVisible] = useState(false);
 
   useEffect(() => {
-    if (activeSessionId) {
-      router.replace(`/(stack)/chat/${activeSessionId}`);
+    if (activeSessionId && !activeSessionId.startsWith('stub-')) {
+      // Navigate to the active chat session.
+      // Use push (not replace) so the user can navigate back to drawer index.
+      router.push({
+        pathname: '/(stack)/chat/[id]',
+        params: { id: activeSessionId },
+      });
     }
   }, [activeSessionId]);
 
-  // No active session -- show empty state (Plan 04 will build EmptyChat)
+  const handleNewChat = useCallback(() => {
+    setPickerVisible(true);
+  }, []);
+
+  const handleSelectProject = useCallback(
+    (projectName: string, projectPath: string) => {
+      createSession(projectName, projectPath);
+    },
+    [createSession],
+  );
+
+  // No active session -- show empty state with New Chat action
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: SURFACE.base,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 24,
       }}
     >
-      <Text
+      <EmptyChat modelName="Claude" />
+
+      {/* New Chat button at bottom */}
+      <View
         style={{
-          fontSize: 15,
-          color: 'rgb(148, 144, 141)',
-          textAlign: 'center',
-          marginBottom: 16,
+          paddingHorizontal: 24,
+          paddingBottom: 40,
+          maxWidth: 280,
+          alignSelf: 'center',
+          width: '100%',
         }}
       >
-        Select a session or start a new one
-      </Text>
-      <View style={{ width: '100%', maxWidth: 280 }}>
-        <NewChatButton
-          onPress={() => {
-            // Open the drawer to show session list + New Chat
-            // Drawer navigation triggers via the drawer navigator
-          }}
-        />
+        <NewChatButton onPress={handleNewChat} />
       </View>
+
+      {/* Project Picker modal */}
+      <ProjectPicker
+        visible={isPickerVisible}
+        onClose={() => setPickerVisible(false)}
+        onSelectProject={handleSelectProject}
+      />
     </View>
   );
 }
