@@ -59,16 +59,14 @@ export function AuthPrompt({ onLogin }: AuthPromptProps) {
       <Animated.View entering={FadeIn.duration(300)}>
         <LoomText
           variant="heading"
-          className="text-text-primary"
-          style={{ fontSize: 28, fontWeight: '700', marginBottom: 8 }}
+          style={{ fontSize: 28, fontWeight: '700', marginBottom: 8, color: 'rgb(230, 222, 216)' }}
         >
           Loom
         </LoomText>
 
         <LoomText
           variant="body"
-          className="text-text-muted"
-          style={{ fontSize: 15, marginBottom: 32 }}
+          style={{ fontSize: 15, marginBottom: 32, color: 'rgb(191, 186, 182)' }}
         >
           Enter your JWT token to connect
         </LoomText>
@@ -100,7 +98,7 @@ export function AuthPrompt({ onLogin }: AuthPromptProps) {
       />
 
       {/* Server URL display */}
-      <LoomText variant="caption" className="text-text-muted" style={{ marginBottom: 8 }}>
+      <LoomText variant="caption" style={{ marginBottom: 8, color: 'rgb(191, 186, 182)' }}>
         Server: {API_BASE}
       </LoomText>
 
