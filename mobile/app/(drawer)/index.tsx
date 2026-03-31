@@ -22,6 +22,20 @@ export default function SessionListScreen() {
             View Design Primitives
           </Text>
         </Pressable>
+        <Pressable
+          style={({ pressed }) => ({
+            marginTop: 8,
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            backgroundColor: pressed ? 'rgb(62, 59, 56)' : 'rgb(54, 50, 48)',
+            borderRadius: 12,
+          })}
+          onPress={() => router.push('/(stack)/markdown-poc')}
+        >
+          <Text style={{ color: 'rgb(230, 222, 216)', fontSize: 15, textAlign: 'center' }}>
+            Markdown PoC
+          </Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
