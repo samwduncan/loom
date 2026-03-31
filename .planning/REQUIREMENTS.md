@@ -18,9 +18,9 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 
 ### Chat
 
-- [ ] **CHAT-01**: User can view a scrollable list of chat sessions grouped by project
-- [ ] **CHAT-02**: User can create a new chat session and select a project
-- [ ] **CHAT-03**: User can switch between sessions via sidebar drawer (swipe from left edge)
+- [x] **CHAT-01**: User can view a scrollable list of chat sessions grouped by project
+- [x] **CHAT-02**: User can create a new chat session and select a project
+- [x] **CHAT-03**: User can switch between sessions via sidebar drawer (swipe from left edge)
 - [x] **CHAT-04**: User can send a message and see streaming markdown response in real-time
 - [ ] **CHAT-05**: User can see tool call cards (Read/Write/Execute/Search/Bash/MCP) with expand/collapse and status indicators
 - [ ] **CHAT-06**: User can see thinking blocks with expand/collapse disclosure
@@ -105,9 +105,9 @@ Requirements for the native iOS app. Each maps to roadmap phases.
 | SCAFF-04 | Phase 68 | Complete |
 | SCAFF-05 | Phase 68 | Pending |
 | SCAFF-06 | Phase 68 | Complete |
-| CHAT-01 | Phase 69 | Pending |
-| CHAT-02 | Phase 69 | Pending |
-| CHAT-03 | Phase 69 | Pending |
+| CHAT-01 | Phase 69 | Complete |
+| CHAT-02 | Phase 69 | Complete |
+| CHAT-03 | Phase 69 | Complete |
 | CHAT-04 | Phase 69 | Complete |
 | CHAT-05 | Phase 70 | Pending |
 | CHAT-06 | Phase 70 | Pending |
