@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: "The App"
 status: Ready to execute
-stopped_at: Completed 68-01-PLAN.md
-last_updated: "2026-03-31T14:33:33.080Z"
+stopped_at: Completed 68-06-PLAN.md
+last_updated: "2026-03-31T14:42:10.430Z"
 progress:
   total_phases: 11
   completed_phases: 4
   total_plans: 23
-  completed_plans: 17
+  completed_plans: 18
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-30)
 ## Current Position
 
 Phase: 68 (scaffolding-design) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 
 ## Performance Metrics
 
@@ -48,6 +48,10 @@ Plan: 4 of 7
 - [Phase 68]: User messages in bubbles, assistant free-flowing; spring physics on every interaction; dynamic color responds to conversation state; SF Symbols for icons
 - [Phase 68]: Zustand factory pattern with StateStorage injection for cross-platform stores
 - [Phase 68]: WsThinkingBlock rename to resolve export collision between message.ts and websocket.ts
+- [Phase 68]: Soul doc at .planning/ root (not phase dir) as living document for Phases 69-73
+- [Phase 68]: No color overrides from UI-SPEC baseline -- dusty rose accent and warm charcoal confirmed
+- [Phase 68]: Bold (700) weight ONLY for Large Title (28px); all else Regular (400) or Semibold (600)
+- [Phase 68]: SF Symbols primary for system UI, Lucide fallback for Loom-specific icons
 
 ### Roadmap Evolution
 
@@ -67,6 +71,6 @@ None -- clean start with proven architecture.
 
 ## Session Continuity
 
-Last session: 2026-03-31T14:33:33.077Z
-Stopped at: Completed 68-01-PLAN.md
+Last session: 2026-03-31T14:42:10.428Z
+Stopped at: Completed 68-06-PLAN.md
 Resume: `/gsd:discuss-phase 68`
