@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: "The App"
 status: Ready to execute
-stopped_at: Completed 68-07-PLAN.md (human-action items documented)
-last_updated: "2026-03-31T14:21:12.561Z"
+stopped_at: Completed 68-05-PLAN.md (Native App Soul Draft)
+last_updated: "2026-03-31T14:27:25.925Z"
 progress:
   total_phases: 11
   completed_phases: 4
   total_plans: 23
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-30)
 ## Current Position
 
 Phase: 68 (scaffolding-design) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: 2 of 7
 - [v3.0] Bard leads creative exploration, Claude curates and implements
 - [v3.0] ~35% code transfers from web: Zustand stores, stream multiplexer, WebSocket client, types
 - [Phase 68]: 68-07: All tasks are human-action checkpoints -- Apple Developer enrollment and APNs config documented as async checklist
+- [Phase 68]: User messages in bubbles, assistant free-flowing; spring physics on every interaction; dynamic color responds to conversation state; SF Symbols for icons
 
 ### Roadmap Evolution
 
@@ -64,6 +65,6 @@ None -- clean start with proven architecture.
 
 ## Session Continuity
 
-Last session: 2026-03-31T14:21:12.559Z
-Stopped at: Completed 68-07-PLAN.md (human-action items documented)
+Last session: 2026-03-31T14:27:25.923Z
+Stopped at: Completed 68-05-PLAN.md (Native App Soul Draft)
 Resume: `/gsd:discuss-phase 68`
