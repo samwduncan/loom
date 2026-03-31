@@ -1,18 +1,36 @@
+/**
+ * Drawer layout -- the ONLY Drawer navigator in the app.
+ *
+ * Root layout uses Slot (not Drawer) per S-7 fix. This is the single
+ * Drawer navigator that provides the sidebar session list.
+ *
+ * Custom drawer content: SessionList component (Soul-doc compliant).
+ * swipeEdgeWidth: 20 -- matches Soul doc "opens from left edge (first 20px)".
+ * Drawer width: 300px per Soul doc Session List spec.
+ */
+
 import { Drawer } from 'expo-router/drawer';
+import { SessionList } from '../../components/session/SessionList';
+import { SURFACE } from '../../lib/colors';
 
 export default function DrawerLayout() {
   return (
     <Drawer
+      drawerContent={(props) => <SessionList {...props} />}
       screenOptions={{
-        headerStyle: { backgroundColor: 'rgb(38, 35, 33)' },
-        headerTintColor: 'rgb(230, 222, 216)',
-        drawerStyle: { backgroundColor: 'rgb(38, 35, 33)' },
-        drawerActiveTintColor: 'rgb(196, 108, 88)',
-        drawerInactiveTintColor: 'rgb(191, 186, 182)',
+        headerShown: false,
+        drawerStyle: {
+          backgroundColor: SURFACE.sunken,
+          width: 300,
+        },
+        sceneStyle: {
+          backgroundColor: SURFACE.base,
+        },
+        swipeEdgeWidth: 20,
       }}
     >
-      <Drawer.Screen name="index" options={{ title: 'Loom' }} />
-      <Drawer.Screen name="settings" options={{ title: 'Settings' }} />
+      <Drawer.Screen name="index" options={{ headerShown: false }} />
+      <Drawer.Screen name="settings" options={{ headerShown: false }} />
     </Drawer>
   );
 }

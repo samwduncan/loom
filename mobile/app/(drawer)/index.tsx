@@ -1,42 +1,56 @@
-import { View, Text, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+/**
+ * Drawer index screen -- main content area inside the drawer.
+ *
+ * When an active session exists, redirects to chat/[id].
+ * When no session is active, shows a placeholder empty state.
+ * (EmptyChat component will be built in Plan 04.)
+ */
 
-export default function SessionListScreen() {
+import { useEffect } from 'react';
+import { View, Text } from 'react-native';
+import { router } from 'expo-router';
+import { useTimelineStore } from '../../stores/index';
+import { SURFACE, ACCENT } from '../../lib/colors';
+import { NewChatButton } from '../../components/session/NewChatButton';
+
+export default function DrawerIndexScreen() {
+  const activeSessionId = useTimelineStore((s) => s.activeSessionId);
+
+  useEffect(() => {
+    if (activeSessionId) {
+      router.replace(`/(stack)/chat/${activeSessionId}`);
+    }
+  }, [activeSessionId]);
+
+  // No active session -- show empty state (Plan 04 will build EmptyChat)
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'rgb(46, 42, 40)' }} edges={['bottom']}>
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 }}>
-        <Text style={{ fontSize: 17, fontWeight: '600', color: 'rgb(230, 222, 216)' }}>Loom</Text>
-        <Text style={{ fontSize: 15, color: 'rgb(148, 144, 141)', marginTop: 8 }}>No sessions yet</Text>
-        <Pressable
-          style={({ pressed }) => ({
-            marginTop: 16,
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            backgroundColor: pressed ? 'rgb(62, 59, 56)' : 'rgb(54, 50, 48)',
-            borderRadius: 12,
-          })}
-          onPress={() => router.push('/(stack)/design-primitives')}
-        >
-          <Text style={{ color: 'rgb(230, 222, 216)', fontSize: 15, textAlign: 'center' }}>
-            View Design Primitives
-          </Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => ({
-            marginTop: 8,
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            backgroundColor: pressed ? 'rgb(62, 59, 56)' : 'rgb(54, 50, 48)',
-            borderRadius: 12,
-          })}
-          onPress={() => router.push('/(stack)/markdown-poc')}
-        >
-          <Text style={{ color: 'rgb(230, 222, 216)', fontSize: 15, textAlign: 'center' }}>
-            Markdown PoC
-          </Text>
-        </Pressable>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: SURFACE.base,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 24,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 15,
+          color: 'rgb(148, 144, 141)',
+          textAlign: 'center',
+          marginBottom: 16,
+        }}
+      >
+        Select a session or start a new one
+      </Text>
+      <View style={{ width: '100%', maxWidth: 280 }}>
+        <NewChatButton
+          onPress={() => {
+            // Open the drawer to show session list + New Chat
+            // Drawer navigation triggers via the drawer navigator
+          }}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
