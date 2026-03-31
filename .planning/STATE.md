@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: "The App"
 status: Ready to execute
-stopped_at: Completed 68-05-PLAN.md (Native App Soul Draft)
-last_updated: "2026-03-31T14:27:25.925Z"
+stopped_at: Completed 68-01-PLAN.md
+last_updated: "2026-03-31T14:33:33.080Z"
 progress:
   total_phases: 11
   completed_phases: 4
   total_plans: 23
-  completed_plans: 16
+  completed_plans: 17
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-30)
 ## Current Position
 
 Phase: 68 (scaffolding-design) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 
 ## Performance Metrics
 
@@ -46,6 +46,8 @@ Plan: 3 of 7
 - [v3.0] ~35% code transfers from web: Zustand stores, stream multiplexer, WebSocket client, types
 - [Phase 68]: 68-07: All tasks are human-action checkpoints -- Apple Developer enrollment and APNs config documented as async checklist
 - [Phase 68]: User messages in bubbles, assistant free-flowing; spring physics on every interaction; dynamic color responds to conversation state; SF Symbols for icons
+- [Phase 68]: Zustand factory pattern with StateStorage injection for cross-platform stores
+- [Phase 68]: WsThinkingBlock rename to resolve export collision between message.ts and websocket.ts
 
 ### Roadmap Evolution
 
@@ -65,6 +67,6 @@ None -- clean start with proven architecture.
 
 ## Session Continuity
 
-Last session: 2026-03-31T14:27:25.923Z
-Stopped at: Completed 68-05-PLAN.md (Native App Soul Draft)
+Last session: 2026-03-31T14:33:33.077Z
+Stopped at: Completed 68-01-PLAN.md
 Resume: `/gsd:discuss-phase 68`
