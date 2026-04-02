@@ -22,7 +22,8 @@
  */
 
 import { useEffect, useRef, useCallback } from 'react';
-import { View, StyleSheet, Text, Pressable, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, Text, Pressable, Keyboard, KeyboardAvoidingView } from 'react-native';
+import { SURFACE } from '../../../lib/colors';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -212,7 +213,7 @@ export default function ChatScreen() {
       />
       <KeyboardAvoidingView
         behavior="padding"
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: SURFACE.base }}
       >
         <Animated.View style={[styles.container, backgroundStyle]}>
           {/* Header */}

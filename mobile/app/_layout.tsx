@@ -20,7 +20,7 @@ import '../global.css';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { KeyboardProvider } from 'react-native-keyboard-controller';
+// KeyboardProvider removed — using RN's built-in KeyboardAvoidingView per screen
 import { Slot } from 'expo-router';
 import { AuthPrompt } from '../components/connection/AuthPrompt';
 import { ConnectionBanner } from '../components/connection/ConnectionBanner';
@@ -45,7 +45,6 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: SURFACE.base }}>
-      <KeyboardProvider>
         {isLoading ? (
           // Splash state -- prevents blank flash while reading token from Keychain
           <View
@@ -66,7 +65,6 @@ export default function RootLayout() {
             <Slot />
           </View>
         )}
-      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }
