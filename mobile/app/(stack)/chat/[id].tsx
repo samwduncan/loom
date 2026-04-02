@@ -22,8 +22,7 @@
  */
 
 import { useEffect, useRef, useCallback } from 'react';
-import { View, StyleSheet, Text, Pressable, Keyboard } from 'react-native';
-import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
+import { View, StyleSheet, Text, Pressable, Keyboard, KeyboardAvoidingView, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -233,8 +232,9 @@ export default function ChatScreen() {
         </View>
 
         <KeyboardAvoidingView
-          behavior="padding"
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1 }}
+          keyboardVerticalOffset={insets.top + 56}
         >
           {/* Content -- tap to dismiss keyboard */}
           <Pressable
