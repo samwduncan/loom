@@ -1,30 +1,22 @@
 /**
- * Composer -- glass backdrop chat input with expanding TextInput, send/stop button, and status bar.
+ * Composer -- chat input bar with expanding TextInput, send/stop button, and status.
  *
- * Per D-14: Glass backdrop (blur showing last messages), or opaque surface-raised fallback.
- * Per D-16: Wrapped in KeyboardStickyView from react-native-keyboard-controller for
- * perfect iOS keyboard curve matching (NOT a spring).
- * Per D-17: Glass first, fallback to opaque if performance issues on device.
+ * Layout: opaque surface-raised bar with border-top. GlassSurface removed —
+ * its overflow:hidden + nested flex:1 was collapsing the layout and clipping
+ * the send button. Blur can be re-added once layout is stable on device.
  *
- * Layout:
- * - GlassSurface with border-t border-border-subtle
- * - ComposerInput (expanding, with attachment button)
- * - SendButton (positioned right of input, vertically centered)
- * - ComposerStatus (below input)
- * - Safe area bottom inset as bottom padding
- *
- * On send: clear input text, contract to single line (Standard spring).
- * During streaming: SendButton shows stop icon, input disabled.
+ * Parent screen (ChatScreen) wraps in KeyboardAvoidingView behavior="padding",
+ * so NO manual safe-area bottom padding here — KAV already accounts for it.
+ * We only add insets.bottom when keyboard is NOT showing (to clear home indicator).
  */
 
 import { useState, useCallback } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-// KeyboardStickyView removed — parent screen handles keyboard avoidance
-import { GlassSurface } from '../primitives/GlassSurface';
 import { ComposerInput } from './ComposerInput';
 import { SendButton } from './SendButton';
 import { ComposerStatus } from './ComposerStatus';
+import { SURFACE } from '../../lib/colors';
 
 interface ComposerProps {
   isStreaming: boolean;
@@ -48,42 +40,38 @@ export function Composer({ isStreaming, onSendMessage, onStopStreaming }: Compos
   }, [onStopStreaming]);
 
   return (
-    <View>
-      <GlassSurface
-        intensity={40}
-        className="rounded-none"
-        style={styles.surface}
-      >
-        <View style={styles.inputRow}>
-          <View style={styles.inputWrapper}>
-            <ComposerInput
-              value={text}
-              onChangeText={setText}
-              onSubmit={handleSend}
-              disabled={isStreaming}
-            />
-          </View>
-          <View style={styles.sendWrapper}>
-            <SendButton
-              hasText={text.trim().length > 0}
-              isStreaming={isStreaming}
-              onSend={handleSend}
-              onStop={handleStop}
-            />
-          </View>
+    <View style={styles.container}>
+      <View style={styles.inputRow}>
+        <View style={styles.inputWrapper}>
+          <ComposerInput
+            value={text}
+            onChangeText={setText}
+            onSubmit={handleSend}
+            disabled={isStreaming}
+          />
         </View>
-        <ComposerStatus />
-        {/* Safe area bottom inset */}
-        {insets.bottom > 0 && <View style={{ height: insets.bottom }} />}
-      </GlassSurface>
+        <View style={styles.sendWrapper}>
+          <SendButton
+            hasText={text.trim().length > 0}
+            isStreaming={isStreaming}
+            onSend={handleSend}
+            onStop={handleStop}
+          />
+        </View>
+      </View>
+      <ComposerStatus />
+      {/* Bottom safe area — only needed to clear home indicator.
+          When keyboard is open, KAV handles the offset. */}
+      <View style={{ height: insets.bottom }} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  surface: {
+  container: {
+    backgroundColor: SURFACE.raised,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.07)', // border-subtle
+    borderTopColor: 'rgba(255, 255, 255, 0.07)',
   },
   inputRow: {
     flexDirection: 'row',

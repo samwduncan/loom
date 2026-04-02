@@ -244,8 +244,7 @@ export function ProjectPicker({ visible, onClose, onSelectProject }: ProjectPick
                         marginTop: 2,
                       }}
                     >
-                      {project.sessions.length} session{project.sessions.length !== 1 ? 's' : ''} {'\u00B7'}{' '}
-                      {project.fullPath}
+                      {project.sessions.length} session{project.sessions.length !== 1 ? 's' : ''}
                     </Text>
                   </View>
                 </Pressable>

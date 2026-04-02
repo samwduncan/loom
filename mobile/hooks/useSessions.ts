@@ -268,7 +268,7 @@ export function useSessions(): UseSessionsReturn {
       // which triggers backend session creation. onSessionCreated in
       // websocket-init.ts will replace stubId with real ID.
       router.push({
-        pathname: '/(stack)/chat/[id]',
+        pathname: '/chat/[id]',
         params: { id: stubId, projectName, projectPath },
       });
     },

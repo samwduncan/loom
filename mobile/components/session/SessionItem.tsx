@@ -167,7 +167,7 @@ export function SessionItem({
   const handlePress = useCallback(() => {
     onPress();
     router.push({
-      pathname: '/(stack)/chat/[id]',
+      pathname: '/chat/[id]',
       params: { id, projectName, projectPath },
     });
   }, [id, projectName, projectPath, onPress]);
@@ -267,7 +267,7 @@ export function SessionItem({
                     marginTop: 2,
                   }}
                 >
-                  {relativeTime(updatedAt)} {provider !== 'claude' ? `\u00B7 ${provider}` : ''}
+                  {updatedAt ? relativeTime(updatedAt) : ''}
                 </Text>
               </View>
             </AnimatedPressable>

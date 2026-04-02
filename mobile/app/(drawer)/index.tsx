@@ -28,7 +28,7 @@ export default function DrawerIndexScreen() {
       // Navigate to the active chat session.
       // Use push (not replace) so the user can navigate back to drawer index.
       router.push({
-        pathname: '/(stack)/chat/[id]',
+        pathname: '/chat/[id]',
         params: { id: activeSessionId },
       });
     }
