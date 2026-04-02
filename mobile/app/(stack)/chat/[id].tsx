@@ -22,7 +22,8 @@
  */
 
 import { useEffect, useRef, useCallback } from 'react';
-import { View, StyleSheet, Text, Pressable } from 'react-native';
+import { View, StyleSheet, Text, Pressable, Keyboard } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -211,7 +212,7 @@ export default function ChatScreen() {
         }}
       />
       <Animated.View style={[styles.container, backgroundStyle]}>
-        {/* Custom header */}
+        {/* Custom header — outside KeyboardAvoidingView so it doesn't shift */}
         <View style={[styles.header, { paddingTop: insets.top }]}>
           <AnimatedPressable
             onPress={handleBack}
@@ -231,25 +232,35 @@ export default function ChatScreen() {
           </View>
         </View>
 
-        {/* Content */}
-        {showEmptyState ? (
-          <EmptyChat
-            modelName="Claude"
-            projectName={projectPath || projectName}
-          />
-        ) : (
-          <MessageList
-            messages={messages}
-            isStreaming={isStreaming}
-          />
-        )}
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={{ flex: 1 }}
+        >
+          {/* Content -- tap to dismiss keyboard */}
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => Keyboard.dismiss()}
+          >
+            {showEmptyState ? (
+              <EmptyChat
+                modelName="Claude"
+                projectName={projectPath || projectName}
+              />
+            ) : (
+              <MessageList
+                messages={messages}
+                isStreaming={isStreaming}
+              />
+            )}
+          </Pressable>
 
-        {/* Composer */}
-        <Composer
-          isStreaming={isStreaming}
-          onSendMessage={handleSendMessage}
-          onStopStreaming={handleStopStreaming}
-        />
+          {/* Composer */}
+          <Composer
+            isStreaming={isStreaming}
+            onSendMessage={handleSendMessage}
+            onStopStreaming={handleStopStreaming}
+          />
+        </KeyboardAvoidingView>
       </Animated.View>
     </>
   );

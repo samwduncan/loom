@@ -115,8 +115,9 @@ export function ComposerInput({ value, onChangeText, onSubmit, disabled = false 
           editable={!disabled}
           style={styles.input}
           textAlignVertical="top"
-          returnKeyType="default"
+          returnKeyType="send"
           blurOnSubmit={false}
+          enablesReturnKeyAutomatically={true}
         />
       </Animated.View>
     </View>

@@ -20,7 +20,7 @@
 import { useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { KeyboardStickyView } from 'react-native-keyboard-controller';
+// KeyboardStickyView removed — parent screen handles keyboard avoidance
 import { GlassSurface } from '../primitives/GlassSurface';
 import { ComposerInput } from './ComposerInput';
 import { SendButton } from './SendButton';
@@ -48,7 +48,7 @@ export function Composer({ isStreaming, onSendMessage, onStopStreaming }: Compos
   }, [onStopStreaming]);
 
   return (
-    <KeyboardStickyView>
+    <View>
       <GlassSurface
         intensity={40}
         className="rounded-none"
@@ -76,7 +76,7 @@ export function Composer({ isStreaming, onSendMessage, onStopStreaming }: Compos
         {/* Safe area bottom inset */}
         {insets.bottom > 0 && <View style={{ height: insets.bottom }} />}
       </GlassSurface>
-    </KeyboardStickyView>
+    </View>
   );
 }
 
