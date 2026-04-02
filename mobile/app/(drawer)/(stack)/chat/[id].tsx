@@ -245,6 +245,7 @@ export default function ChatScreen() {
               <EmptyChat
                 modelName="Claude"
                 projectName={projectPath || projectName}
+                onSuggestion={(prompt) => handleSendMessage(prompt)}
               />
             ) : (
               <MessageList

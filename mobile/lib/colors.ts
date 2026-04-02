@@ -18,12 +18,13 @@ export const ERROR_BG = 'rgb(44, 42, 42)';      // cooler, desaturated
 // Timing config for color transitions (not springs -- springs are for position/scale)
 export const COLOR_TIMING = { duration: 500, easing: Easing.out(Easing.cubic) };
 
-// 4-tier surface hierarchy
+// 4-tier surface hierarchy — 16-20 RGB unit jumps for phone readability.
+// Previous values (8-unit jumps) were imperceptible on device at arm's length.
 export const SURFACE = {
-  sunken:  'rgb(38, 35, 33)',  // Tier 0: drawer bg, inset areas, code blocks
-  base:    'rgb(46, 42, 40)',  // Tier 1: chat bg, scroll areas, default canvas
-  raised:  'rgb(54, 50, 48)',  // Tier 2: cards, user bubbles, list items on press
-  overlay: 'rgb(62, 59, 56)',  // Tier 3: modals, popovers, context menus
+  sunken:  'rgb(28, 26, 24)',  // Tier 0: drawer bg, inset areas — darkest
+  base:    'rgb(44, 40, 38)',  // Tier 1: chat bg, default canvas
+  raised:  'rgb(64, 60, 57)',  // Tier 2: cards, composer, user bubbles (+20 from base)
+  overlay: 'rgb(82, 78, 74)',  // Tier 3: modals, popovers (+18 from raised)
 } as const;
 
 // Semantic colors
