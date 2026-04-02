@@ -210,32 +210,31 @@ export default function ChatScreen() {
           headerShown: false,
         }}
       />
-      <Animated.View style={[styles.container, backgroundStyle]}>
-        {/* Custom header — outside KeyboardAvoidingView so it doesn't shift */}
-        <View style={[styles.header, { paddingTop: insets.top }]}>
-          <AnimatedPressable
-            onPress={handleBack}
-            onPressIn={handleBackPressIn}
-            onPressOut={handleBackPressOut}
-            style={[styles.backButton, backScaleStyle]}
-          >
-            <ChevronLeft size={24} color="rgb(230, 222, 216)" strokeWidth={2} />
-          </AnimatedPressable>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title} numberOfLines={1}>
-              {sessionTitle}
-            </Text>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={{ flex: 1 }}
+      >
+        <Animated.View style={[styles.container, backgroundStyle]}>
+          {/* Header */}
+          <View style={[styles.header, { paddingTop: insets.top }]}>
+            <AnimatedPressable
+              onPress={handleBack}
+              onPressIn={handleBackPressIn}
+              onPressOut={handleBackPressOut}
+              style={[styles.backButton, backScaleStyle]}
+            >
+              <ChevronLeft size={24} color="rgb(230, 222, 216)" strokeWidth={2} />
+            </AnimatedPressable>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title} numberOfLines={1}>
+                {sessionTitle}
+              </Text>
+            </View>
+            <View style={styles.modelIndicator}>
+              <Text style={styles.modelText}>Claude</Text>
+            </View>
           </View>
-          <View style={styles.modelIndicator}>
-            <Text style={styles.modelText}>Claude</Text>
-          </View>
-        </View>
 
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1 }}
-          keyboardVerticalOffset={insets.top + 56}
-        >
           {/* Content -- tap to dismiss keyboard */}
           <Pressable
             style={{ flex: 1 }}
@@ -260,8 +259,8 @@ export default function ChatScreen() {
             onSendMessage={handleSendMessage}
             onStopStreaming={handleStopStreaming}
           />
-        </KeyboardAvoidingView>
-      </Animated.View>
+        </Animated.View>
+      </KeyboardAvoidingView>
     </>
   );
 }
