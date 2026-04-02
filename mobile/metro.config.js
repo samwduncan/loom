@@ -24,4 +24,22 @@ config.resolver.extraNodeModules = {
   "react-dom": path.resolve(projectRoot, "node_modules/react-dom"),
 };
 
+// Block root node_modules react/react-native from being resolved
+// This is the hard guarantee — extraNodeModules alone isn't sufficient
+// because transitive deps can still find the root copy
+const rootReactPaths = [
+  path.resolve(monorepoRoot, "node_modules", "react"),
+  path.resolve(monorepoRoot, "node_modules", "react-native"),
+  path.resolve(monorepoRoot, "node_modules", "react-dom"),
+];
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const blockPatterns = rootReactPaths.map(
+  (p) => new RegExp(`^${escapeRegex(p)}(/|$)`)
+);
+const existingBlockList = config.resolver.blockList || [];
+const blockArray = Array.isArray(existingBlockList)
+  ? existingBlockList
+  : [existingBlockList];
+config.resolver.blockList = [...blockArray, ...blockPatterns];
+
 module.exports = withNativeWind(config, { input: "./global.css" });
