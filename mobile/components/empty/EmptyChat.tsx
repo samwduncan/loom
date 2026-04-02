@@ -28,7 +28,7 @@ export function EmptyChat({ modelName = 'Claude', projectName }: EmptyChatProps)
         .mass(1.0)}
       style={styles.container}
     >
-      <ProviderAvatar provider="claude" />
+      <ProviderAvatar provider="claude" size={48} />
       <LoomText variant="body" style={styles.modelName}>
         {modelName}
       </LoomText>
@@ -52,15 +52,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
   },
   modelName: {
-    marginTop: 12,
-    color: 'rgb(191, 186, 182)', // text-secondary
+    marginTop: 16,
+    fontSize: 17,
+    fontWeight: '600',
+    color: 'rgb(191, 186, 182)',
   },
   helpText: {
-    marginTop: 4,
-    color: 'rgb(230, 222, 216)', // text-primary
+    marginTop: 6,
+    fontSize: 15,
+    color: 'rgb(230, 222, 216)',
   },
   projectName: {
-    marginTop: 8,
-    color: 'rgb(148, 144, 141)', // text-muted
+    marginTop: 12,
+    color: 'rgb(148, 144, 141)',
   },
 });

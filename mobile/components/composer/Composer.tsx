@@ -72,6 +72,12 @@ const styles = StyleSheet.create({
     backgroundColor: SURFACE.raised,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.07)',
+    // Depth: composer floats above content
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
   inputRow: {
     flexDirection: 'row',

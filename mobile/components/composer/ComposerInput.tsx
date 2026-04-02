@@ -39,7 +39,7 @@ interface ComposerInputProps {
   disabled?: boolean;
 }
 
-/** Line height for body text (15px * 1.6 = 24px) */
+/** Line height for body text — 17px prevents iOS auto-zoom */
 const LINE_HEIGHT = 24;
 /** Max 6 lines before internal scroll */
 const MAX_LINES = 6;
@@ -141,14 +141,14 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flex: 1,
-    borderRadius: 16, // rounded-2xl
+    borderRadius: 22, // pill shape — matches ChatGPT/Claude iOS
     borderWidth: 1,
-    paddingHorizontal: 16, // px-4
-    paddingVertical: 12,   // py-3
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
   input: {
     flex: 1,
-    fontSize: 15,
+    fontSize: 17, // 17px prevents iOS keyboard auto-zoom
     fontFamily: 'Inter',
     color: 'rgb(230, 222, 216)',
     lineHeight: LINE_HEIGHT,

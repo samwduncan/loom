@@ -46,12 +46,12 @@ export function ComposerStatus() {
     ),
   }));
 
-  // Token display
+  // Token display — hide count when idle (looks like debug output)
   const tokenText = resultTokens
     ? `${resultTokens.output} tokens`
     : isStreaming
       ? 'Streaming...'
-      : '0 tokens';
+      : '';
 
   const displayModel = modelName || 'Claude';
 

@@ -217,14 +217,14 @@ export function SessionItem({
               style={[
                 pressStyle,
                 {
-                  minHeight: 56,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
+                  minHeight: 48,
+                  marginHorizontal: 8,
+                  paddingHorizontal: 12,
+                  paddingVertical: 10,
                   flexDirection: 'row',
                   alignItems: 'center',
                   backgroundColor: isActive ? SURFACE.raised : 'transparent',
-                  borderLeftWidth: isActive ? 3 : 0,
-                  borderLeftColor: isActive ? ACCENT : 'transparent',
+                  borderRadius: 10,
                 },
               ]}
             >

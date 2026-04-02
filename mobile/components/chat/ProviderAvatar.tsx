@@ -10,6 +10,7 @@ import { ACCENT } from '../../lib/colors';
 
 interface ProviderAvatarProps {
   provider?: 'claude' | 'codex' | 'gemini';
+  size?: number;
 }
 
 const PROVIDER_CONFIG = {
@@ -18,15 +19,15 @@ const PROVIDER_CONFIG = {
   gemini: { color: 'rgb(88, 140, 210)', label: 'G' },
 } as const;
 
-export function ProviderAvatar({ provider = 'claude' }: ProviderAvatarProps) {
+export function ProviderAvatar({ provider = 'claude', size = 24 }: ProviderAvatarProps) {
   const config = PROVIDER_CONFIG[provider];
 
   return (
     <View
       style={{
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+        width: size,
+        height: size,
+        borderRadius: size / 2,
         backgroundColor: config.color,
         alignItems: 'center',
         justifyContent: 'center',
@@ -34,7 +35,7 @@ export function ProviderAvatar({ provider = 'claude' }: ProviderAvatarProps) {
     >
       <Text
         style={{
-          fontSize: 12,
+          fontSize: size * 0.5,
           fontWeight: '600',
           color: 'rgb(255, 255, 255)',
           fontFamily: 'Inter',
