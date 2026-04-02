@@ -1,11 +1,11 @@
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
-import { SurfaceCard } from '../../components/primitives/SurfaceCard';
-import { LoomText } from '../../components/primitives/TextHierarchy';
-import { Button } from '../../components/primitives/Button';
-import { ListItem } from '../../components/primitives/ListItem';
-import { GlassSurface } from '../../components/primitives/GlassSurface';
+import { SurfaceCard } from '../../../components/primitives/SurfaceCard';
+import { LoomText } from '../../../components/primitives/TextHierarchy';
+import { Button } from '../../../components/primitives/Button';
+import { ListItem } from '../../../components/primitives/ListItem';
+import { GlassSurface } from '../../../components/primitives/GlassSurface';
 
 export default function DesignPrimitivesScreen() {
   return (

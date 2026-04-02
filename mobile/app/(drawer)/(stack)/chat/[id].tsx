@@ -23,7 +23,7 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, Text, Pressable, Keyboard, KeyboardAvoidingView } from 'react-native';
-import { SURFACE } from '../../../lib/colors';
+import { SURFACE } from '../../../../lib/colors';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -32,15 +32,15 @@ import Animated, {
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
-import { MessageList } from '../../../components/chat/MessageList';
-import { Composer } from '../../../components/composer/Composer';
-import { EmptyChat } from '../../../components/empty/EmptyChat';
-import { useDynamicColor } from '../../../hooks/useDynamicColor';
-import { useMessageList } from '../../../hooks/useMessageList';
-import { useStreamStore } from '../../../stores/index';
-import { useTimelineStore } from '../../../stores/index';
-import { getWsClient, clearStreamSnapshot } from '../../../lib/websocket-init';
-import { SPRING } from '../../../lib/springs';
+import { MessageList } from '../../../../components/chat/MessageList';
+import { Composer } from '../../../../components/composer/Composer';
+import { EmptyChat } from '../../../../components/empty/EmptyChat';
+import { useDynamicColor } from '../../../../hooks/useDynamicColor';
+import { useMessageList } from '../../../../hooks/useMessageList';
+import { useStreamStore } from '../../../../stores/index';
+import { useTimelineStore } from '../../../../stores/index';
+import { getWsClient, clearStreamSnapshot } from '../../../../lib/websocket-init';
+import { SPRING } from '../../../../lib/springs';
 import type { ClientMessage } from '@loom/shared/types/websocket';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);

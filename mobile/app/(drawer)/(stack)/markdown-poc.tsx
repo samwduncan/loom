@@ -13,8 +13,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MarkdownRendererPoC } from '../../components/chat/MarkdownRendererPoC';
-import { MarkdownRenderer } from '../../components/chat/MarkdownRenderer';
+import { MarkdownRendererPoC } from '../../../components/chat/MarkdownRendererPoC';
+import { MarkdownRenderer } from '../../../components/chat/MarkdownRenderer';
 
 // Comprehensive test markdown covering all D-02 elements
 const TEST_MARKDOWN = `# Heading 1
