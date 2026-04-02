@@ -235,7 +235,7 @@ export default function ChatScreen() {
         {showEmptyState ? (
           <EmptyChat
             modelName="Claude"
-            projectName={projectName}
+            projectName={projectPath || projectName}
           />
         ) : (
           <MessageList

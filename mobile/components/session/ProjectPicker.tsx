@@ -28,9 +28,9 @@ interface ProjectFromApi {
   name: string;
   displayName: string;
   path: string;
-  provider: 'claude' | 'codex' | 'gemini';
-  sessionCount: number;
-  lastActivity: string;
+  fullPath: string;
+  isCustomName: boolean;
+  sessions: { id: string; summary: string; lastActivity: string; messageCount: number }[];
 }
 
 interface ProjectPickerProps {
@@ -106,7 +106,7 @@ export function ProjectPicker({ visible, onClose, onSelectProject }: ProjectPick
 
   const handleSelect = useCallback(
     (project: ProjectFromApi) => {
-      onSelectProject(project.name, project.path);
+      onSelectProject(project.name, project.fullPath);
       onClose();
     },
     [onSelectProject, onClose],
@@ -221,8 +221,7 @@ export function ProjectPicker({ visible, onClose, onSelectProject }: ProjectPick
                       width: 8,
                       height: 8,
                       borderRadius: 4,
-                      backgroundColor:
-                        PROVIDER_COLORS[project.provider] ?? 'rgb(148, 144, 141)',
+                      backgroundColor: ACCENT,
                       marginRight: 12,
                     }}
                   />
@@ -245,8 +244,8 @@ export function ProjectPicker({ visible, onClose, onSelectProject }: ProjectPick
                         marginTop: 2,
                       }}
                     >
-                      {project.sessionCount} session{project.sessionCount !== 1 ? 's' : ''} \u00B7{' '}
-                      {project.provider}
+                      {project.sessions.length} session{project.sessions.length !== 1 ? 's' : ''} {'\u00B7'}{' '}
+                      {project.fullPath}
                     </Text>
                   </View>
                 </Pressable>

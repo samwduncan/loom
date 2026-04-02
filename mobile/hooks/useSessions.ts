@@ -30,22 +30,19 @@ interface ProjectFromApi {
   name: string;
   displayName: string;
   path: string;
-  provider: 'claude' | 'codex' | 'gemini';
-  sessionCount: number;
-  lastActivity: string;
+  fullPath: string;
+  isCustomName: boolean;
+  sessions: { id: string; summary: string; lastActivity: string; messageCount: number }[];
 }
 
 interface SessionFromApi {
   id: string;
-  title: string;
-  createdAt: string;
-  updatedAt: string;
-  metadata?: {
-    tokenBudget?: number | null;
-    contextWindowUsed?: number | null;
-    totalCost?: number | null;
-    messageCount?: number | null;
-  };
+  summary: string;
+  lastActivity: string;
+  messageCount: number;
+  cwd: string;
+  lastUserMessage: string | null;
+  lastAssistantMessage: string | null;
 }
 
 interface SessionsApiResponse {
@@ -163,48 +160,31 @@ export function useSessions(): UseSessionsReturn {
     try {
       const projects = await apiClient.apiFetch<ProjectFromApi[]>('/api/projects');
 
-      const projectsWithSessions: ProjectWithSessions[] = await Promise.all(
-        projects.map(async (project) => {
-          try {
-            const resp = await apiClient.apiFetch<SessionsApiResponse>(
-              `/api/projects/${encodeURIComponent(project.name)}/sessions?limit=50`,
-            );
+      const currentPinned = getPinnedIds();
+      const projectsWithSessions: ProjectWithSessions[] = projects.map((project) => {
+        const sessions: SessionData[] = (project.sessions || []).map((s) => ({
+          id: s.id,
+          title: s.summary || 'Untitled',
+          updatedAt: s.lastActivity,
+          provider: 'claude',
+          projectName: project.name,
+          projectPath: project.fullPath,
+          isPinned: currentPinned.includes(s.id),
+        }));
 
-            const currentPinned = getPinnedIds();
-            const sessions: SessionData[] = resp.sessions.map((s) => ({
-              id: s.id,
-              title: s.title || 'Untitled',
-              updatedAt: s.updatedAt,
-              provider: project.provider,
-              projectName: project.name,
-              projectPath: project.path,
-              isPinned: currentPinned.includes(s.id),
-            }));
+        // Sort by last activity descending
+        sessions.sort(
+          (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
 
-            // Sort by last activity descending
-            sessions.sort(
-              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-            );
-
-            return {
-              name: project.name,
-              displayName: project.displayName,
-              path: project.path,
-              provider: project.provider,
-              sessions,
-            };
-          } catch {
-            // If a single project fails, return it with empty sessions
-            return {
-              name: project.name,
-              displayName: project.displayName,
-              path: project.path,
-              provider: project.provider,
-              sessions: [],
-            };
-          }
-        }),
-      );
+        return {
+          name: project.name,
+          displayName: project.displayName,
+          path: project.fullPath,
+          provider: 'claude',
+          sessions,
+        };
+      });
 
       // Sort projects by most recent session activity
       projectsWithSessions.sort((a, b) => {
