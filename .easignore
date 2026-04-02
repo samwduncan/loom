@@ -1,0 +1,12 @@
+# EAS Build - monorepo upload filter
+# Include: mobile/, shared/, root package.json + lockfile + scripts
+# Exclude: heavy stuff not needed for mobile build
+
+node_modules/
+.git/
+.planning/
+server/
+public/
+src/
+*.service
+.env*

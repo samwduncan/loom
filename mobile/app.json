@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.siteboon.loom"
+      "bundleIdentifier": "com.siteboon.loom",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "plugins": [
       "expo-router",
@@ -21,8 +24,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "TBD_AFTER_EAS_INIT"
+        "projectId": "e140bdcb-495b-4d8f-a6bb-c3c5f5e5e401"
       }
-    }
+    },
+    "owner": "cazeo"
   }
 }

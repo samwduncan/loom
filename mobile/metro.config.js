@@ -8,12 +8,12 @@ const monorepoRoot = path.resolve(projectRoot, "..");
 const config = getDefaultConfig(projectRoot);
 
 // Watch the shared/ workspace package for live updates
-config.watchFolders = [monorepoRoot];
+config.watchFolders = [...(config.watchFolders || []), monorepoRoot];
 
-// Ensure Metro resolves packages from the monorepo root node_modules
+// Resolve from mobile's own node_modules first, then monorepo root
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
-  path.resolve(monorepoRoot, "node_modules"),
+  ...(config.resolver.nodeModulesPaths || []),
 ];
 
 module.exports = withNativeWind(config, { input: "./global.css" });
