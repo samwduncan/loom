@@ -16,4 +16,12 @@ config.resolver.nodeModulesPaths = [
   ...(config.resolver.nodeModulesPaths || []),
 ];
 
+// Force single copies of React — prevents duplicate React instances
+// when shared/ imports resolve react from the monorepo root
+config.resolver.extraNodeModules = {
+  react: path.resolve(projectRoot, "node_modules/react"),
+  "react-native": path.resolve(projectRoot, "node_modules/react-native"),
+  "react-dom": path.resolve(projectRoot, "node_modules/react-dom"),
+};
+
 module.exports = withNativeWind(config, { input: "./global.css" });
