@@ -145,7 +145,7 @@
 
 - [ ] **Phase 68: Scaffolding & Design** - Expo dev build on device, shared/ code extraction, NativeWind, Apple certs, Native App Soul doc
 - [ ] **Phase 69: Chat Foundation** - Streaming markdown PoC, session list, basic messaging, auth, WebSocket lifecycle
-- [ ] **Phase 70: Chat Polish** - Tool cards, thinking blocks, code blocks, 60fps at 50+ messages, 120Hz keyboard
+- [ ] **Phase 70: UI Rebuild** - Clone ChatGPT/Claude iOS patterns: legend-list, keyboard-controller, message layout, composer, session list, empty state
 - [ ] **Phase 71: Native Feel** - Haptics, spring physics, gestures, safe areas, 120Hz ProMotion
 - [ ] **Phase 72: Agent Features** - Inline permissions, push notifications with approve/deny, deep linking
 - [ ] **Phase 73: Polish & Accessibility** - Syntax highlighting, share sheet, VoiceOver, session management extras
@@ -249,18 +249,23 @@ Plans:
 
 **UI hint**: yes
 
-### Phase 70: Chat Polish
-**Goal**: The chat experience is complete -- tool cards, thinking blocks, code blocks, 60fps performance, and 120Hz keyboard avoidance make it indistinguishable from ChatGPT iOS core UX
-**Depends on**: Phase 69 (streaming + sessions working)
+### Phase 70: UI Rebuild — Clone ChatGPT/Claude iOS Patterns
+**Goal**: Rebuild the entire mobile UI layer from the researched reference implementations -- the app must be visually indistinguishable from ChatGPT/Claude iOS in layout, density, and interaction quality. Phase 69 business logic (auth, WebSocket, stores, streaming) is preserved; ALL UI components are replaced.
+**Depends on**: Phase 69 (business logic intact, UI layer being replaced)
 **Requirements**: CHAT-05, CHAT-06, CHAT-07, CHAT-08, CHAT-12
 **Success Criteria** (what must be TRUE):
-  1. User can see tool call cards (Read/Write/Execute/Search/Bash/MCP) with status indicators and expand/collapse during active streaming
-  2. Thinking blocks render with expand/collapse disclosure, code blocks render in monospace
-  3. Scrolling through 50+ messages sustains 60fps with no jank (FlashList optimized, memoized components)
-  4. Keyboard avoidance animates at 120Hz in sync with iOS keyboard via react-native-keyboard-controller
-  5. Side-by-side with ChatGPT iOS: message density, spacing, and responsiveness are comparable
+  1. Message list uses legend-list with `alignItemsAtEnd` + `maintainScrollAtEnd` -- no inverted FlatList. 50+ messages at 60fps.
+  2. Keyboard avoidance uses react-native-keyboard-controller (`translate-with-padding`) -- 120Hz sync with iOS keyboard, no layout jumps.
+  3. Message layout matches reference apps: user messages in right-aligned colored bubbles, assistant messages flat left-aligned (no bubble), small avatar for assistant only.
+  4. Composer is a unified pill (input + send as one visual unit), auto-growing TextInput (max 6 lines), attachment button outside pill.
+  5. Session list uses temporal grouping (Today/Yesterday/Previous 7 Days), not project-based. Context menu (rename/delete) via Zeego.
+  6. Empty state has centered greeting + 4-6 suggestion chips in 2-column grid.
+  7. Tool call cards render with status indicators and expand/collapse during active streaming.
+  8. Thinking blocks render with expand/collapse disclosure, code blocks render in monospace.
+  9. Side-by-side with ChatGPT iOS: message density, spacing, and responsiveness are comparable -- validated on device.
 **Plans**: TBD
 **UI hint**: yes
+**Research**: mobile/.planning/research/ (9 files, 152KB -- BARD-PRIME-DEEP-DIVE.md is the primary reference)
 
 ### Phase 71: Native Feel
 **Goal**: The app feels like a native iOS app, not a React Native app -- every interaction has haptic feedback, every transition uses spring physics at 120Hz, and all gesture patterns match iOS conventions
@@ -321,7 +326,7 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 |-------|-----------|----------------|--------|-----------|
 | 68. Scaffolding & Design | v3.0 | 7/7 | Complete    | 2026-03-31 |
 | 69. Chat Foundation | v3.0 | 5/5 | Complete   | 2026-03-31 |
-| 70. Chat Polish | v3.0 | 0/? | Not started | - |
+| 70. UI Rebuild | v3.0 | 0/? | Not started | - |
 | 71. Native Feel | v3.0 | 0/? | Not started | - |
 | 72. Agent Features | v3.0 | 0/? | Not started | - |
 | 73. Polish & Accessibility | v3.0 | 0/? | Not started | - |
