@@ -177,7 +177,7 @@
   6. Tests cover auth flow (login, token persist, token clear), WebSocket lifecycle (connect, reconnect, foreground resume), and drawer navigation state
 **Plans**: 4 plans
 Plans:
-- [ ] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
+- [x] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
 - [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
 - [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
 - [ ] 74-04-PLAN.md -- Connection banner + unit tests
@@ -258,7 +258,7 @@ Phases execute in numeric order: 74 -> 75 -> 76 -> 77
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 74. Shell & Connection | v3.1 | 0/4 | Planning complete | - |
+| 74. Shell & Connection | v3.1 | 1/4 | In Progress|  |
 | 75. Chat Core | v3.1 | 0/? | Not started | - |
 | 76. Session & Interaction | v3.1 | 0/? | Not started | - |
 | 77. Loom Integration | v3.1 | 0/? | Not started | - |

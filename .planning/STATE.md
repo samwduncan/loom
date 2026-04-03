@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: "The App (Rebuilt)"
-status: planning
-stopped_at: Phase 74 context gathered
-last_updated: "2026-04-03T17:27:01.652Z"
-last_activity: 2026-04-03 — Roadmap created for v3.1
+status: Ready to execute
+stopped_at: Completed 74-01-PLAN.md
+last_updated: "2026-04-03T18:46:17.629Z"
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 4
+  completed_plans: 1
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 74 — Shell & Connection
+**Current focus:** Phase 74 — shell-connection
 
 ## Current Position
 
-Phase: 74 (1 of 4) — Shell & Connection
-Plan: —
-Status: Ready to plan
-Last activity: 2026-04-03 — Roadmap created for v3.1
-
-Progress: [░░░░░░░░░░] 0%
+Phase: 74 (shell-connection) — EXECUTING
+Plan: 2 of 4
 
 ## Performance Metrics
 
@@ -51,6 +45,8 @@ Progress: [░░░░░░░░░░] 0%
 - [v3.1] Key libs: react-native-keyboard-controller, zeego, @gorhom/bottom-sheet v5, reanimated 4.1
 - [v3.1] Keep: shared/, mobile/lib/, mobile/hooks/, Expo scaffold. Rebuild: mobile/components/, mobile/app/
 - [v3.1] 4 phases (74-77): Shell & Connection -> Chat Core -> Session & Interaction -> Loom Integration
+- [Phase 74]: Moved test deps (jest, jest-expo, @types/jest) from dependencies to devDependencies
+- [Phase 74]: Added testPathIgnorePatterns for .reference/ to prevent Private Mind tests from running in Jest
 
 ### Research Flags
 
@@ -63,6 +59,6 @@ Progress: [░░░░░░░░░░] 0%
 
 ## Session Continuity
 
-Last session: 2026-04-03T17:27:01.650Z
-Stopped at: Phase 74 context gathered
+Last session: 2026-04-03T18:46:17.627Z
+Stopped at: Completed 74-01-PLAN.md
 Resume: `/gsd:plan-phase 74`
