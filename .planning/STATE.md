@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: "The App (Rebuilt)"
 status: Ready to execute
-stopped_at: Completed 74-01-PLAN.md
-last_updated: "2026-04-03T18:46:17.629Z"
+stopped_at: Completed 74-02-PLAN.md
+last_updated: "2026-04-03T18:52:42.745Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 74 (shell-connection) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Performance Metrics
 
@@ -47,6 +47,9 @@ Plan: 2 of 4
 - [v3.1] 4 phases (74-77): Shell & Connection -> Chat Core -> Session & Interaction -> Loom Integration
 - [Phase 74]: Moved test deps (jest, jest-expo, @types/jest) from dependencies to devDependencies
 - [Phase 74]: Added testPathIgnorePatterns for .reference/ to prevent Private Mind tests from running in Jest
+- [Phase 74]: AuthScreen accepts error prop from useAuth for verbatim error display
+- [Phase 74]: Font loading gates both fontsLoaded AND isLoading -- prevents system font flash
+- [Phase 74]: CONN-07 already correct in websocket-init.ts -- no fix needed, only verification
 
 ### Research Flags
 
@@ -59,6 +62,6 @@ Plan: 2 of 4
 
 ## Session Continuity
 
-Last session: 2026-04-03T18:46:17.627Z
-Stopped at: Completed 74-01-PLAN.md
+Last session: 2026-04-03T18:52:42.743Z
+Stopped at: Completed 74-02-PLAN.md
 Resume: `/gsd:plan-phase 74`

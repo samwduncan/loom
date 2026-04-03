@@ -57,13 +57,13 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Connection & Auth
 
-- [ ] **CONN-01**: User authenticates via login screen
-- [ ] **CONN-02**: Auth token persists in iOS Keychain (SecureStore)
-- [ ] **CONN-03**: WebSocket connects on app launch
+- [x] **CONN-01**: User authenticates via login screen
+- [x] **CONN-02**: Auth token persists in iOS Keychain (SecureStore)
+- [x] **CONN-03**: WebSocket connects on app launch
 - [ ] **CONN-04**: WebSocket reconnects on disconnect with exponential backoff
 - [ ] **CONN-05**: Connection banner shows when disconnected
 - [ ] **CONN-06**: Stream content persists during app background (MMKV snapshot)
-- [ ] **CONN-07**: App resumes WebSocket on foreground with correct auth
+- [x] **CONN-07**: App resumes WebSocket on foreground with correct auth
 
 ## Future Requirements
 
@@ -148,13 +148,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TOOL-04 | Phase 77 | Pending |
 | TOOL-05 | Phase 77 | Pending |
 | TOOL-06 | Phase 77 | Pending |
-| CONN-01 | Phase 74 | Pending |
-| CONN-02 | Phase 74 | Pending |
-| CONN-03 | Phase 74 | Pending |
+| CONN-01 | Phase 74 | Complete |
+| CONN-02 | Phase 74 | Complete |
+| CONN-03 | Phase 74 | Complete |
 | CONN-04 | Phase 74 | Pending |
 | CONN-05 | Phase 74 | Pending |
 | CONN-06 | Phase 77 | Pending |
-| CONN-07 | Phase 74 | Pending |
+| CONN-07 | Phase 74 | Complete |
 
 **Coverage:**
 - v3.1 requirements: 35 total
