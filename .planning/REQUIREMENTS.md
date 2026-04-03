@@ -1,99 +1,103 @@
-# Requirements: Loom v3.1 "The App (Rebuilt)"
+# Requirements: Loom v4.0 "The Command Center"
 
 **Defined:** 2026-04-03
-**Core Value:** Make AI agent work visible, beautiful, and controllable — every tool call, every code write, every MCP interaction should be a satisfying visual experience that enhances understanding of what the agent is doing.
+**Core Value:** Make AI agent work visible, beautiful, and controllable — from anywhere
 
-## v3.1 Requirements
+## v4.0 Requirements
 
 Requirements for this milestone. Each maps to roadmap phases.
 
-### Navigation & Layout
+### Chat Shell
 
-- [x] **NAV-01**: User sees slide drawer with session list on swipe-right or hamburger tap
-- [x] **NAV-02**: User navigates between drawer and chat screen with animated transition
-- [x] **NAV-03**: App shell respects iOS safe areas (notch, Dynamic Island, home indicator)
-- [x] **NAV-04**: Main content shifts with parallax effect when drawer opens
+- [ ] **CHAT-01**: User can view sessions grouped by status (running/recent) in a navigation drawer
+- [ ] **CHAT-02**: User can create a new chat session and send messages
+- [ ] **CHAT-03**: User can view streamed AI responses with markdown rendering
+- [ ] **CHAT-04**: User can view tool call cards inline (Bash, Read, Edit, Write, Glob, Grep)
+- [ ] **CHAT-05**: User can expand/collapse thinking blocks during and after inference
+- [ ] **CHAT-06**: User can view code blocks with syntax highlighting and copy button
+- [ ] **CHAT-07**: User can switch between sessions preserving scroll position
+- [ ] **CHAT-08**: User can authenticate with server via JWT token stored in iOS Keychain
+- [ ] **CHAT-09**: User sees connection status and WebSocket reconnects automatically
+- [ ] **CHAT-10**: User can search sessions by title
+- [ ] **CHAT-11**: User can delete sessions with swipe gesture
+- [ ] **CHAT-12**: User can approve/deny permission requests inline in chat
 
-### Chat UI
+### Push Notifications
 
-- [ ] **CHAT-01**: User sees messages in inverted FlatList — user bubbles right/accent, assistant left/neutral
-- [ ] **CHAT-02**: User sees streaming markdown rendered with syntax highlighting as AI responds
-- [ ] **CHAT-03**: User sees thinking indicator before first token arrives
-- [ ] **CHAT-04**: Message list auto-scrolls to latest during streaming
-- [ ] **CHAT-05**: User sees scroll-to-bottom button when scrolled up
-- [ ] **CHAT-06**: User can copy message text via long-press
-- [ ] **CHAT-07**: Messages appear with spring-physics entering animation
-- [ ] **CHAT-08**: Elevated surfaces use glass/blur effects per Soul doc hierarchy
-- [ ] **CHAT-09**: Thinking disclosure blocks expand/collapse
+- [ ] **PUSH-01**: User receives push notification when a session completes
+- [ ] **PUSH-02**: User can tap notification to deep-link into the specific session
+- [ ] **PUSH-03**: User receives push notification when an agent needs permission
+- [ ] **PUSH-04**: User can approve/deny permission directly from notification action buttons
+- [ ] **PUSH-05**: User can configure notification granularity (all / failures only / permissions only)
+- [ ] **PUSH-06**: Server sends push via Expo Push Service on session events
 
-### Composer
+### Agent Management
 
-- [ ] **COMP-01**: Composer auto-grows as user types (up to max height, then scrolls)
-- [ ] **COMP-02**: Keyboard avoidance smoothly pushes content up (react-native-keyboard-controller)
-- [ ] **COMP-03**: Send button reflects state (disabled/empty, enabled/ready, stop/streaming)
-- [ ] **COMP-04**: Haptic feedback on message send
-- [ ] **COMP-05**: New chat shows prompt suggestion chips that pre-fill composer
-- [ ] **COMP-06**: Stop button replaces send during active streaming
+- [ ] **AGENT-01**: User can spawn a new AI agent session (Claude/Codex/Gemini) from the app
+- [ ] **AGENT-02**: User can view a dashboard of all agent sessions with status badges
+- [ ] **AGENT-03**: User can view live output from a running agent session
+- [ ] **AGENT-04**: User can kill a running agent session
+- [ ] **AGENT-05**: User can see aggregate stats (running count, completed today, failures)
+- [ ] **AGENT-06**: Backend manages agent lifecycle via TmuxTransport (spawn, capture-pane, send-keys, cleanup)
+- [ ] **AGENT-07**: Backend stores agent session metadata in SQLite
+- [ ] **AGENT-08**: Backend exposes REST API for agent CRUD (POST/GET/DELETE /api/tasks)
+- [ ] **AGENT-09**: Backend streams live output via WebSocket (100ms capture-pane polling)
 
-### Session Management
+### Dynamic Island + Live Activities
 
-- [ ] **SESS-01**: Sessions grouped by date in drawer (Today, Yesterday, Last Week, etc.)
-- [ ] **SESS-02**: User can create new session from drawer
-- [ ] **SESS-03**: User can switch sessions by tapping in drawer
-- [ ] **SESS-04**: User can search sessions by title
-- [ ] **SESS-05**: User can pin sessions to top of list
-- [ ] **SESS-06**: User can delete sessions via swipe or context menu
-- [ ] **SESS-07**: Sessions grouped by project with collapsible project headers
-- [ ] **SESS-08**: Native iOS context menu on session items (rename, pin, delete) via zeego
+- [ ] **ISLAND-01**: Active session status appears in Dynamic Island compact view (name + status)
+- [ ] **ISLAND-02**: Expanded Dynamic Island shows session name, token count, elapsed time, progress bar
+- [ ] **ISLAND-03**: Tapping Dynamic Island deep-links to the active session
+- [ ] **ISLAND-04**: Live Activity starts when a task begins and ends within 5s of completion
+- [ ] **ISLAND-05**: Server pushes APNs Live Activity updates every 5-10 seconds during streaming
 
-### Loom Tools
+### Relay Security
 
-- [ ] **TOOL-01**: Tool call cards appear inline in message stream (Bash, Read, Edit, Write, Glob, Grep)
-- [ ] **TOOL-02**: Tool cards show state transitions (pending → running → complete/error)
-- [ ] **TOOL-03**: User can expand/collapse tool call details
-- [ ] **TOOL-04**: Permission requests appear as elevated inline cards with approve/deny
-- [ ] **TOOL-05**: User can approve/deny permission with single tap + haptic
-- [ ] **TOOL-06**: Multiple consecutive tool calls collapse into accordion group
+- [ ] **RELAY-01**: Relay requires JWT authentication for all WebSocket connections
+- [ ] **RELAY-02**: Agent registration includes agent type, capabilities, and tmux session ID
+- [ ] **RELAY-03**: 3-layer presence detection (WS ping, agent heartbeat, orchestrator health check)
+- [ ] **RELAY-04**: Unauthorized relay connections are rejected with error message
 
-### Connection & Auth
+### HITL Protocol
 
-- [x] **CONN-01**: User authenticates via login screen
-- [x] **CONN-02**: Auth token persists in iOS Keychain (SecureStore)
-- [x] **CONN-03**: WebSocket connects on app launch
-- [x] **CONN-04**: WebSocket reconnects on disconnect with exponential backoff
-- [x] **CONN-05**: Connection banner shows when disconnected
-- [ ] **CONN-06**: Stream content persists during app background (MMKV snapshot)
-- [x] **CONN-07**: App resumes WebSocket on foreground with correct auth
+- [ ] **HITL-01**: HITL protocol architecture designed (relay message flow, timeout, edge cases)
+- [ ] **HITL-02**: Agent can request human permission via relay message (permission.request)
+- [ ] **HITL-03**: Permission request delivered as push notification with approve/deny actions
+- [ ] **HITL-04**: Permission request appears inline in chat when app is foreground
+- [ ] **HITL-05**: Permission response delivered back to agent via relay (permission.response)
+- [ ] **HITL-06**: Permission request times out after configurable duration with auto-deny
 
-## Future Requirements
+### Cross-Agent Communication
 
-Deferred to future milestones. Tracked but not in current roadmap.
+- [ ] **XAGENT-01**: Orchestrator can assign tasks to agents via relay (task.assign)
+- [ ] **XAGENT-02**: Agents report completion or failure via relay (task.complete / task.error)
+- [ ] **XAGENT-03**: Agents send heartbeat with status (idle/working/waiting) via relay
+- [ ] **XAGENT-04**: Orchestrator detects dead agents via missed heartbeats
 
-### Push & Live (v4.0)
+### Testing Infrastructure
 
-- **PUSH-01**: User receives push notification when Claude asks a question
-- **PUSH-02**: User can approve/deny permission from notification action
-- **PUSH-03**: Dynamic Island shows active session status and model name
-- **PUSH-04**: Live Activities track long-running sessions
+- [ ] **TEST-01**: Mobile components render in Storybook 9 for isolation testing
+- [ ] **TEST-02**: Maestro E2E tests capture screenshots for visual regression
+- [ ] **TEST-03**: Kimi visual QA evaluates screenshots and produces scored JSON report
+- [ ] **TEST-04**: Testing pipeline integrated into dev workflow (lint → types → jest → Maestro → Kimi)
 
-### Multi-Provider (v4.0)
+## Future Requirements (v5.0+)
 
-- **PROV-01**: User can switch between Claude, Codex, Gemini providers
-- **PROV-02**: Provider tabs show concurrent sessions
-- **PROV-03**: Shared context between provider tabs
+Acknowledged but deferred. Not in current roadmap.
 
-### Extended Features (v4.0)
+### HITL — Dynamic Island Approval
+- **HITL-DI-01**: User can approve/deny permission requests from Dynamic Island compact view
+- **HITL-DI-02**: User can approve/deny permission requests from Dynamic Island expanded view
 
-- **EXT-01**: File upload from iOS photo library or Files app
-- **EXT-02**: Integrated terminal/shell
-- **EXT-03**: Settings screen (appearance, API keys, providers)
-- **EXT-04**: Model selector in composer area
+### Full Orchestration
+- **ORCH-01**: Orchestrator can fan-out tasks to multiple agents simultaneously
+- **ORCH-02**: Orchestrator collects and compares responses from multiple agents (result aggregation)
+- **ORCH-03**: Orchestrator manages task dependency graphs (agent B waits for agent A)
+- **ORCH-04**: Agents can send direct messages to other agents (bypass orchestrator)
 
-### Visual Polish (v5.0)
-
-- **VIS-01**: Dynamic color shifts during streaming (hue warmth, accent pulse)
-- **VIS-02**: Aurora/ambient effects during streaming
-- **VIS-03**: Advanced glass surface effects (frosted, animated)
+### Mobile Extras
+- **WIDGET-01**: Home screen widget shows running agent count and failures
+- **WIDGET-02**: Home screen widget allows one-tap agent spawn
 
 ## Out of Scope
 
@@ -101,13 +105,15 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Android app | iOS-first; defer until iOS is daily-driver quality |
-| Swipe-to-reply | Needs backend reply threading support |
-| Character-by-character typewriter | Soul doc explicitly forbids; anti-pattern |
-| Gifted-chat as base | Wrong abstraction for AI streaming (fights customization) |
-| Paid chat SDK (Stream, Sendbird) | Vendor lock-in, overkill for single-user app |
-| Pure black backgrounds | Soul doc: darkest surface is rgb(38,35,33), not #000 |
-| Port web UI to React Native | Redesign from scratch, don't convert div/span to View/Text |
+| Android | iOS-only until iOS is daily-driver quality |
+| Light mode | Dark-only; potential future stretch goal |
+| Full IDE in mobile | Complement desktop, don't replace — Loom is a control plane |
+| Capacitor/WKWebView | Dead end, proven by v2.2 (5/7 critical bugs architecturally unfixable) |
+| LLM-to-LLM conversation routing | Agents talk to Loom, not each other — simplifies protocol |
+| Aurora/visual effects | Deferred to v6.0 "The Polish" — don't lead with polish |
+| Multi-user / auth system | Single-user tool; backend already handles auth |
+| Port web UI to RN | Redesign for mobile from scratch, not convert div/span to View/Text |
+| Agent-to-agent direct messaging | YAGNI — orchestrator mediates all communication for v4.0 |
 
 ## Traceability
 
@@ -115,52 +121,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | Phase 74 | Complete |
-| NAV-02 | Phase 74 | Complete |
-| NAV-03 | Phase 74 | Complete |
-| NAV-04 | Phase 74 | Complete |
-| CHAT-01 | Phase 75 | Pending |
-| CHAT-02 | Phase 75 | Pending |
-| CHAT-03 | Phase 75 | Pending |
-| CHAT-04 | Phase 75 | Pending |
-| CHAT-05 | Phase 76 | Pending |
-| CHAT-06 | Phase 76 | Pending |
-| CHAT-07 | Phase 77 | Pending |
-| CHAT-08 | Phase 77 | Pending |
-| CHAT-09 | Phase 75 | Pending |
-| COMP-01 | Phase 75 | Pending |
-| COMP-02 | Phase 75 | Pending |
-| COMP-03 | Phase 75 | Pending |
-| COMP-04 | Phase 76 | Pending |
-| COMP-05 | Phase 76 | Pending |
-| COMP-06 | Phase 75 | Pending |
-| SESS-01 | Phase 76 | Pending |
-| SESS-02 | Phase 76 | Pending |
-| SESS-03 | Phase 76 | Pending |
-| SESS-04 | Phase 76 | Pending |
-| SESS-05 | Phase 76 | Pending |
-| SESS-06 | Phase 76 | Pending |
-| SESS-07 | Phase 76 | Pending |
-| SESS-08 | Phase 76 | Pending |
-| TOOL-01 | Phase 77 | Pending |
-| TOOL-02 | Phase 77 | Pending |
-| TOOL-03 | Phase 77 | Pending |
-| TOOL-04 | Phase 77 | Pending |
-| TOOL-05 | Phase 77 | Pending |
-| TOOL-06 | Phase 77 | Pending |
-| CONN-01 | Phase 74 | Complete |
-| CONN-02 | Phase 74 | Complete |
-| CONN-03 | Phase 74 | Complete |
-| CONN-04 | Phase 74 | Complete |
-| CONN-05 | Phase 74 | Complete |
-| CONN-06 | Phase 77 | Pending |
-| CONN-07 | Phase 74 | Complete |
+| *(populated by roadmapper)* | | |
 
 **Coverage:**
-- v3.1 requirements: 35 total
-- Mapped to phases: 35
-- Unmapped: 0
+- v4.0 requirements: 42 total
+- Mapped to phases: 0
+- Unmapped: 42 ⚠️
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after roadmap creation — all 35 requirements mapped to Phases 74-77*
+*Last updated: 2026-04-03 after initial definition*
