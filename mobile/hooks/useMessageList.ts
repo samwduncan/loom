@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import type { Message } from '@loom/shared/types/message';
+import type { Message, ToolCall, ThinkingBlock } from '@loom/shared/types/message';
 import { useStreamStore } from '../stores/index';
 import { useTimelineStore } from '../stores/index';
 import { getWsClient } from '../lib/websocket-init';
@@ -26,6 +26,10 @@ export interface DisplayMessage {
   isStreaming: boolean;
   /** D-28: Message was interrupted by app backgrounding during stream */
   isInterrupted?: boolean;
+  /** AR fix #5: Historical tool calls for segment rendering */
+  toolCalls?: ToolCall[];
+  /** AR fix #5: Historical thinking blocks for segment rendering */
+  thinkingBlocks?: ThinkingBlock[];
 }
 
 interface UseMessageListReturn {
@@ -58,6 +62,8 @@ function toDisplayMessages(messages: Message[]): DisplayMessage[] {
       timestamp: msg.metadata.timestamp,
       showTimestamp: shouldShowTimestamp(msg.metadata.timestamp, prevTimestamp),
       isStreaming: false,
+      toolCalls: msg.toolCalls,           // AR fix #5: carry through
+      thinkingBlocks: msg.thinkingBlocks, // AR fix #5: carry through
     });
   }
   return result;
