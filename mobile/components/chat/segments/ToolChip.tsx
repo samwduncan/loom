@@ -16,7 +16,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
