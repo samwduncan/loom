@@ -59,7 +59,14 @@ Phase 74 (Shell & Connection) completed 2026-04-03: Auth, WebSocket lifecycle, d
   2. User can create a new session, send a message, and see a streamed AI response with markdown rendering, syntax-highlighted code blocks, tool call cards, and expandable thinking blocks
   3. User can search sessions by title, delete sessions with swipe gesture, and approve/deny permission requests inline in chat
   4. App authenticates via JWT in iOS Keychain and WebSocket reconnects automatically on network changes
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [ ] 75-01-PLAN.md -- Foundation: deps, theme Small typography, message segment parser, date section utility
+- [ ] 75-02-PLAN.md -- Drawer upgrade: date-grouped SectionList, search, swipe-delete, toast system
+- [ ] 75-03-PLAN.md -- Content segments: TextSegment (markdown), CodeBlockSegment (syntax highlighting), ThinkingSegment (expand/collapse)
+- [ ] 75-04-PLAN.md -- Interactive segments: ToolChip + ToolDetailSheet (bottom sheet), PermissionCard (approve/deny)
+- [ ] 75-05-PLAN.md -- Composer (3-state FSM) + MessageList + MessageItem + UserBubble + AssistantMessage + StreamingIndicator
+- [ ] 75-06-PLAN.md -- Chat screen wiring, scroll position preservation, providers, end-to-end verification checkpoint
 **UI hint**: yes
 
 ### Phase 76: Push Notifications
@@ -176,7 +183,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 75. Chat Shell | v4.0 | 0/TBD | Not started | - |
+| 75. Chat Shell | v4.0 | 0/6 | Planning complete | - |
 | 76. Push Notifications | v4.0 | 0/TBD | Not started | - |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
@@ -198,4 +205,4 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-04-03 after v4.0 roadmap creation (11 phases, 50 requirements, fine granularity)*
+*Last updated: 2026-04-03 after Phase 75 planning (6 plans, 4 waves)*
