@@ -31,7 +31,6 @@ import CodeHighlighter from 'react-native-code-highlighter';
 import atomOneDark from 'react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark';
 import { showToast } from '../../../lib/toast';
 import { createStyles } from '../../../theme/createStyles';
-import { theme } from '../../../theme/theme';
 
 // ---------------------------------------------------------------------------
 // Props
