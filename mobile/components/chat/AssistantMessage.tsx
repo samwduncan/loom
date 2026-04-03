@@ -76,13 +76,18 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
   const storeThinking = useStreamStore((s) => s.thinkingState?.blocks ?? []);
   const storePermission = useStreamStore((s) => s.activePermissionRequest);
 
-  const toolCalls: ToolCallState[] = message.isStreaming
-    ? storeToolCalls
-    : (message.toolCalls ?? []).map(mapToolCallToState);
+  const toolCalls: ToolCallState[] = useMemo(
+    () =>
+      message.isStreaming
+        ? storeToolCalls
+        : (message.toolCalls ?? []).map(mapToolCallToState),
+    [message.isStreaming, storeToolCalls, message.toolCalls],
+  );
 
-  const thinkingBlocks = message.isStreaming
-    ? storeThinking
-    : (message.thinkingBlocks ?? []);
+  const thinkingBlocks = useMemo(
+    () => (message.isStreaming ? storeThinking : (message.thinkingBlocks ?? [])),
+    [message.isStreaming, storeThinking, message.thinkingBlocks],
+  );
 
   const permissionRequest = message.isStreaming ? storePermission : null;
 
@@ -98,7 +103,6 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
         permissionRequest,
         message.isStreaming,
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [message.content, toolCalls, thinkingBlocks, permissionRequest, message.isStreaming],
   );
 

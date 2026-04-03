@@ -22,7 +22,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 import { ArrowUp, Square } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';

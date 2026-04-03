@@ -23,7 +23,6 @@ import type { ToolCallState } from '@loom/shared/types/stream';
 import { MessageItem } from './MessageItem';
 import { StreamingIndicator } from './StreamingIndicator';
 import { ToolDetailSheet } from './segments/ToolDetailSheet';
-import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
 
 // ---------------------------------------------------------------------------
