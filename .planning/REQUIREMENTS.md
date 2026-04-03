@@ -10,14 +10,14 @@ Requirements for this milestone. Each maps to roadmap phases.
 ### Chat Shell
 
 - [x] **CHAT-01**: User can view sessions grouped by status (running/recent) in a navigation drawer
-- [ ] **CHAT-02**: User can create a new chat session and send messages
+- [x] **CHAT-02**: User can create a new chat session and send messages
 - [x] **CHAT-03**: User can view streamed AI responses with markdown rendering
 - [x] **CHAT-04**: User can view tool call cards inline (Bash, Read, Edit, Write, Glob, Grep)
 - [x] **CHAT-05**: User can expand/collapse thinking blocks during and after inference
 - [x] **CHAT-06**: User can view code blocks with syntax highlighting and copy button
 - [x] **CHAT-07**: User can switch between sessions preserving scroll position
-- [ ] **CHAT-08**: User can authenticate with server via JWT token stored in iOS Keychain
-- [ ] **CHAT-09**: User sees connection status and WebSocket reconnects automatically
+- [x] **CHAT-08**: User can authenticate with server via JWT token stored in iOS Keychain
+- [x] **CHAT-09**: User sees connection status and WebSocket reconnects automatically
 - [x] **CHAT-10**: User can search sessions by title
 - [x] **CHAT-11**: User can delete sessions with swipe gesture
 - [x] **CHAT-12**: User can approve/deny permission requests inline in chat
@@ -122,14 +122,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CHAT-01 | Phase 75 | Complete |
-| CHAT-02 | Phase 75 | Pending |
+| CHAT-02 | Phase 75 | Complete |
 | CHAT-03 | Phase 75 | Complete |
 | CHAT-04 | Phase 75 | Complete |
 | CHAT-05 | Phase 75 | Complete |
 | CHAT-06 | Phase 75 | Complete |
 | CHAT-07 | Phase 75 | Complete |
-| CHAT-08 | Phase 75 | Pending |
-| CHAT-09 | Phase 75 | Pending |
+| CHAT-08 | Phase 75 | Complete |
+| CHAT-09 | Phase 75 | Complete |
 | CHAT-10 | Phase 75 | Complete |
 | CHAT-11 | Phase 75 | Complete |
 | CHAT-12 | Phase 75 | Complete |
