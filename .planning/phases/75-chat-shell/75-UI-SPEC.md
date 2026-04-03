@@ -53,16 +53,16 @@ Exceptions:
 
 All values from `mobile/theme/theme.ts` + Soul doc typography overrides. Font loaded as `Inter-Regular`, `Inter-SemiBold`, `JetBrainsMono-Regular` in `_layout.tsx`.
 
+4 sizes, 2 weights. Monospace at Body size reads visually smaller (~13-14px equivalent) due to fixed-width letterforms, so no separate code size is needed.
+
 | Role | Size | Weight | Line Height | Font Family | Usage |
 |------|------|--------|-------------|-------------|-------|
 | Large Title | 28px | SemiBold (600) | 34px (1.21) | Inter-SemiBold | Drawer heading "Loom" only |
 | Heading | 17px | SemiBold (600) | 22px (1.29) | Inter-SemiBold | Navigation header session title, section headers |
-| Body | 15px | Regular (400) | 24px (1.60) | Inter-Regular | Message text (user + assistant), permission card description, empty state copy |
-| Subheading | 13px | Regular (400) | 18px (1.38) | Inter-Regular | Tool card labels, section metadata, composer status bar |
-| Caption | 12px | Regular (400) | 16px (1.33) | Inter-Regular | Date group headers, relative timestamps, code block language label, "Thought for Xs" |
-| Code | 14px | Regular (400) | 20px (1.43) | JetBrainsMono-Regular | Code blocks, file paths in tool detail, command text |
+| Body | 15px | Regular (400) | 24px (1.60) | Inter-Regular / JetBrainsMono-Regular (code) | Message text (user + assistant), permission card description, empty state copy, code blocks, file paths in tool detail, command text |
+| Small | 13px | Regular (400) | 18px (1.38) | Inter-Regular | Tool card labels, section metadata, composer status bar, date group headers, relative timestamps, code block language label, "Thought for Xs" |
 
-**Note:** Subheading (13px) is from Soul doc but not yet in `theme.typography`. Must be added during implementation. Bold (700) is prohibited except if needed for Large Title (currently uses 600, which is correct).
+**Note:** Small (13px) merges the former Subheading and Caption roles. Not yet in `theme.typography` -- must be added during implementation. Bold (700) is prohibited; maximum weight is SemiBold (600).
 
 ---
 
@@ -87,13 +87,12 @@ Accent `rgb(196, 108, 88)` is used ONLY on these elements:
 1. Send button background (when text present, with glow shadow)
 2. Active session indicator dot in drawer (pulsing during streaming)
 3. Approve button background on permission cards
-4. Connection status dot (connected state)
-5. Streaming indicator line (2px pulsing line at bottom of message area)
-6. Scroll-to-bottom pill text
-7. "New Chat" button in empty session list
-8. Code block "Copy" button text
-9. Tool chip status dot (running state)
-10. Search match highlight background (accent at 0.15 opacity)
+4. Streaming indicator line (2px pulsing line at bottom of message area)
+5. Scroll-to-bottom pill text
+6. "New Chat" button in empty session list
+7. Code block "Copy" button text
+8. Tool chip status dot (running state)
+9. Search match highlight background (accent at 0.15 opacity)
 
 ### Text Colors
 
@@ -101,7 +100,7 @@ Accent `rgb(196, 108, 88)` is used ONLY on these elements:
 |-------|-------|-------|
 | text-primary | `rgb(230, 222, 216)` | Message text, headings, button labels |
 | text-secondary | `rgb(191, 186, 182)` | Session subtitle (drawer), tool card body, secondary info |
-| text-muted | `rgb(148, 144, 141)` | Timestamps, placeholders, "Thought for Xs" label, caption text, thinking block text |
+| text-muted | `rgb(148, 144, 141)` | Timestamps, placeholders, "Thought for Xs" label, Small text, thinking block text |
 
 ### Border Colors
 
@@ -145,7 +144,7 @@ All color transitions use `withTiming(value, { duration: 500, easing: Easing.out
 | Tool chip: running | Tool icon + tool name + pulse animation | D-01 |
 | Tool chip: complete | Tool icon + tool name + checkmark | D-01 |
 | Tool chip: error | Tool icon + tool name + X icon | D-01 |
-| Thinking: collapsed | "Thought for Xs" (caption, text-muted) with subtle divider | D-06 |
+| Thinking: collapsed | "Thought for Xs" (Small, text-muted) with subtle divider | D-06 |
 | Code block: copy feedback | "Copied" toast with haptic | D-15 |
 | Composer status bar | Model name + connection dot + token count (when available) | D-29 |
 | Stop button | Stop icon (square) replaces send icon during streaming | D-27 |
