@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: false
 preset: none
 created: 2026-04-03
+revised: 2026-04-03
 ---
 
 # Phase 74 -- UI Design Contract
@@ -57,20 +58,19 @@ Font loading via `expo-font` from `mobile/assets/fonts/`. Theme object maps all 
 
 | Role | Size | Weight | Line Height | Theme Key | Usage in Phase 74 |
 |------|------|--------|-------------|-----------|-------------------|
-| Large Title | 28px | 700 (bold) | 1.14 (34px) | `typography.largeTitle` | "Loom" heading in drawer header ONLY |
+| Large Title | 28px | 600 (semibold) | 1.14 (34px) | `typography.largeTitle` | "Loom" heading in drawer header ONLY |
 | Heading | 17px | 600 (semibold) | 1.29 (22px) | `typography.heading` | Chat screen title, auth screen heading, navigation bar titles |
-| Body | 15px | 400 (regular) | 1.6 (24px) | `typography.body` | Auth field labels, session titles in drawer list, empty state body, connection banner text |
+| Body | 15px | 400 (regular) | 1.6 (24px) | `typography.body` | Auth field labels, session titles in drawer list, empty state body, connection banner text, composer placeholder text, secondary metadata |
 | Caption | 12px | 400 (regular) | 1.33 (16px) | `typography.caption` | Session relative dates, connection status label, server URL hint |
-| Subheading | 13px | 400 (regular) | 1.38 (18px) | `typography.subheading` | Composer placeholder text, secondary metadata |
-| Code | 14px | 400 (regular) | 1.43 (20px) | `typography.code` | Token/URL input fields (monospace content) |
+
+**Monospace treatment:** Token/URL input fields use Body size (15px) or Caption size (12px) with `fontFamily: 'JetBrains Mono'` applied contextually. Monospace is a font-family override, not a separate scale entry.
 
 **Weight rules:**
-- Bold (700): ONLY for Large Title ("Loom" in drawer header). Nowhere else.
-- Semibold (600): Headings, button labels, session names.
+- Semibold (600): Large Title, Heading, button labels, session names.
 - Regular (400): Body text, captions, input fields, descriptions.
-- No other weights permitted (no 300, no 500).
+- No other weights permitted (no 300, no 500, no 700).
 
-**Source:** Soul doc Typography Overrides + 68-UI-SPEC.md baseline.
+**Source:** Soul doc Typography Overrides + 68-UI-SPEC.md baseline. Revised to comply with 4-size / 2-weight maximum.
 
 ---
 
@@ -121,7 +121,7 @@ All values from `mobile/lib/colors.ts` (device-calibrated with wider RGB jumps f
 
 ### Accent Reserved-For List (Phase 74 Scope)
 
-1. "Connect" button on auth screen (primary CTA)
+1. "Connect to Loom" button on auth screen (primary CTA)
 2. "New Chat" button in drawer
 3. Connection status dot (when connected)
 
@@ -209,9 +209,9 @@ Every interactive tap produces haptic feedback. No silent taps.
 |---------|------|
 | Loom icon | Centered, 64px, `text.primary` color |
 | Heading | "Connect to Loom" -- Heading style (17px semibold), `text.primary`, centered |
-| Server URL field | Pre-filled `100.86.4.57:5555`, Code style (14px mono), `surface.raised` background, `border.subtle` border, `radii.md` corners, 44px min-height, `md` (16px) horizontal padding |
+| Server URL field | Pre-filled `100.86.4.57:5555`, Body style (15px) with `fontFamily: 'JetBrains Mono'`, `surface.raised` background, `border.subtle` border, `radii.md` corners, 44px min-height, `md` (16px) horizontal padding |
 | Token field | Placeholder "JWT Token", Body style (15px regular), same styling as URL field, secure text entry |
-| Connect button | "Connect" label, Heading weight (semibold), `accent` background, `accentFg` text, `radii.md` corners, 44px height, full width, Glow shadow when enabled |
+| Connect button | "Connect to Loom" label, Heading weight (semibold), `accent` background, `accentFg` text, `radii.md` corners, 44px height, full width, Glow shadow when enabled |
 | Error message | Below button, Caption style (12px), `destructive` color, hidden when no error |
 | Keyboard avoidance | `react-native-keyboard-controller` KeyboardAvoidingView wraps content |
 
@@ -229,7 +229,7 @@ Every interactive tap produces haptic feedback. No silent taps.
 
 | Element | Spec |
 |---------|------|
-| Drawer header | "Loom" Large Title (28px bold, `text.primary`), top-aligned with `lg` (24px) top padding + safe area inset |
+| Drawer header | "Loom" Large Title (28px semibold, `text.primary`), top-aligned with `lg` (24px) top padding + safe area inset |
 | New Chat button | Below header, full-width minus `md` (16px) horizontal margin. 44px height, `accent` background, `accentFg` text, "New Chat" Heading weight, `radii.md` corners |
 | Session list | FlatList of sessions below New Chat button. Each item: 56px min-height, `md` (16px) horizontal padding, `sm` (8px) vertical padding |
 | Session item title | Body style (15px semibold), `text.primary`, single line, truncated with ellipsis |
@@ -251,7 +251,7 @@ Every interactive tap produces haptic feedback. No silent taps.
 
 | Element | Spec |
 |---------|------|
-| Navigation header | 56px height, `surface.base` background (or Glass if performance allows). Hamburger icon (SF Symbol `line.3.horizontal`, 24px, `text.secondary`) left with `md` padding. Session title centered: Heading style (17px semibold, `text.primary`). Safe area top inset applied above header. |
+| Navigation header | 56px height, `surface.base` background (or Glass if performance allows). Hamburger icon (SF Symbol `line.3.horizontal`, 24px, `text.secondary`, `accessibilityLabel="Open navigation"`) left with `md` padding. Session title centered: Heading style (17px semibold, `text.primary`). Safe area top inset applied above header. |
 | Empty state icon | Claude icon or Loom icon, 48px, centered, `text.muted` color at 0.6 opacity |
 | Empty state text | "How can I help?" -- Body style (15px regular), `text.muted`, centered below icon with `sm` (8px) gap |
 | Composer shell | Fixed bottom. `surface.raised` background, `radii.xl` top corners (20px). `md` (16px) horizontal padding, `sm` (8px) vertical padding. Safe area bottom inset below. |
@@ -294,7 +294,7 @@ Every interactive tap produces haptic feedback. No silent taps.
 | **Auth screen URL placeholder** | 100.86.4.57:5555 |
 | **Auth screen token label** | Token |
 | **Auth screen token placeholder** | JWT Token |
-| **Primary CTA (auth)** | Connect |
+| **Primary CTA (auth)** | Connect to Loom |
 | **Auth CTA connecting state** | Connecting... |
 | **Auth error: invalid token** | Invalid token. Check that the token is correct and the server is reachable. |
 | **Auth error: server unreachable** | Cannot reach server. Check that Tailscale is connected and the backend is running on port 5555. |
@@ -315,6 +315,18 @@ Every interactive tap produces haptic feedback. No silent taps.
 
 ---
 
+## Accessibility Requirements
+
+| Element | Requirement |
+|---------|-------------|
+| Hamburger icon (chat header) | `accessibilityLabel="Open navigation"` -- icon-only button requires explicit label |
+| Connection status dot (drawer footer) | `accessibilityLabel` set dynamically: "Connected" / "Disconnected" / "Reconnecting" |
+| Connect button | Label text "Connect to Loom" is self-descriptive -- no additional accessibility label needed |
+| Session list items | `accessibilityRole="button"`, label includes session title |
+| Reduce motion | All springs replaced with 0ms instant transitions when `AccessibilityInfo.isReduceMotionEnabled` is true |
+
+---
+
 ## Interaction Contracts
 
 ### Auth Flow (CONN-01, CONN-02)
@@ -323,7 +335,7 @@ Every interactive tap produces haptic feedback. No silent taps.
 2. Token found -> attempt auto-connect (show splash/loading)
 3. Token valid -> navigate to drawer shell (skip auth screen)
 4. Token invalid or missing -> show auth screen
-5. User enters server URL + token -> taps "Connect"
+5. User enters server URL + token -> taps "Connect to Loom"
 6. Success -> persist token to Keychain -> navigate to drawer shell
 7. Failure -> show error message below button, fields retain values
 
@@ -355,7 +367,7 @@ Every interactive tap produces haptic feedback. No silent taps.
 
 | Screen | Focal Point | Rationale |
 |--------|-------------|-----------|
-| Auth screen | "Connect" button (accent, centered) | User's eye enters at heading, drops to the accent-colored CTA. The warm accent against dark surface creates a clear visual target. |
+| Auth screen | "Connect to Loom" button (accent, centered) | User's eye enters at heading, drops to the accent-colored CTA. The warm accent against dark surface creates a clear visual target. |
 | Drawer | "New Chat" button (accent, top) + most recent session | Eye enters at "Loom" heading, drops to accent CTA, then to the first session item. Active session has left accent border. |
 | Chat placeholder | "How can I help?" (centered) | Centered empty state draws the eye. Composer at bottom is secondary -- visual-only in this phase. |
 
@@ -368,6 +380,18 @@ Every interactive tap produces haptic feedback. No silent taps.
 | Not applicable | N/A | React Native project -- no shadcn, no component registries |
 
 All components are built from scratch using React Native core components (`View`, `Text`, `Pressable`, `TextInput`, `FlatList`) + theme tokens. No third-party component registries.
+
+---
+
+## Revision Log
+
+| Date | Changes | Reason |
+|------|---------|--------|
+| 2026-04-03 | Initial draft | UI-SPEC created |
+| 2026-04-03 | Typography: removed Subheading (13px) and Code (14px) scale entries; reassigned usages to Body (15px) with contextual `fontFamily` override for monospace | Checker Dimension 4: exceeded 4-size maximum |
+| 2026-04-03 | Typography: dropped Bold (700) weight; "Loom" drawer heading changed from bold to semibold (600) | Checker Dimension 4: exceeded 2-weight maximum |
+| 2026-04-03 | Copywriting: changed primary CTA from "Connect" to "Connect to Loom" | Checker Dimension 1: single-word CTA lacked specificity |
+| 2026-04-03 | Added `accessibilityLabel="Open navigation"` to hamburger icon spec; added Accessibility Requirements section | Checker Dimension 2: icon-only button missing accessibility label |
 
 ---
 
