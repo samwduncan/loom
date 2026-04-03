@@ -15,11 +15,11 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **CHAT-04**: User can view tool call cards inline (Bash, Read, Edit, Write, Glob, Grep)
 - [x] **CHAT-05**: User can expand/collapse thinking blocks during and after inference
 - [x] **CHAT-06**: User can view code blocks with syntax highlighting and copy button
-- [ ] **CHAT-07**: User can switch between sessions preserving scroll position
+- [x] **CHAT-07**: User can switch between sessions preserving scroll position
 - [ ] **CHAT-08**: User can authenticate with server via JWT token stored in iOS Keychain
 - [ ] **CHAT-09**: User sees connection status and WebSocket reconnects automatically
-- [ ] **CHAT-10**: User can search sessions by title
-- [ ] **CHAT-11**: User can delete sessions with swipe gesture
+- [x] **CHAT-10**: User can search sessions by title
+- [x] **CHAT-11**: User can delete sessions with swipe gesture
 - [x] **CHAT-12**: User can approve/deny permission requests inline in chat
 
 ### Push Notifications
@@ -127,11 +127,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-04 | Phase 75 | Complete |
 | CHAT-05 | Phase 75 | Complete |
 | CHAT-06 | Phase 75 | Complete |
-| CHAT-07 | Phase 75 | Pending |
+| CHAT-07 | Phase 75 | Complete |
 | CHAT-08 | Phase 75 | Pending |
 | CHAT-09 | Phase 75 | Pending |
-| CHAT-10 | Phase 75 | Pending |
-| CHAT-11 | Phase 75 | Pending |
+| CHAT-10 | Phase 75 | Complete |
+| CHAT-11 | Phase 75 | Complete |
 | CHAT-12 | Phase 75 | Complete |
 | PUSH-01 | Phase 76 | Pending |
 | PUSH-02 | Phase 76 | Pending |

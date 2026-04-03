@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
 status: Ready to execute
-stopped_at: Completed 75-04-PLAN.md
-last_updated: "2026-04-03T23:41:36.853Z"
+stopped_at: Completed 75-02-PLAN.md
+last_updated: "2026-04-03T23:41:52.268Z"
 progress:
   total_phases: 11
   completed_phases: 0
@@ -49,6 +49,8 @@ Plan: 4 of 6
 - [Phase 75]: Toast uses module-scoped callback pattern (not React Context) for global imperative access
 - [Phase 75]: ToolChip React.memo with id+status custom comparator for minimal re-renders
 - [Phase 75]: narrowInput() helper safely narrows unknown PermissionRequest.input to Record<string, unknown>
+- [Phase 75]: Swipeable (legacy) over ReanimatedSwipeable for swipe-to-delete in drawer
+- [Phase 75]: pendingDeletes ref pattern with 5s setTimeout for optimistic delete with undo and error recovery
 
 ### Blockers/Concerns
 
@@ -56,6 +58,6 @@ None currently identified.
 
 ## Session Continuity
 
-Last session: 2026-04-03T23:41:29.870Z
-Stopped at: Completed 75-04-PLAN.md
+Last session: 2026-04-03T23:41:52.266Z
+Stopped at: Completed 75-02-PLAN.md
 Resume: `/gsd:plan-phase 75`
