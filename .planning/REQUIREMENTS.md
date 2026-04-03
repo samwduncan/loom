@@ -115,52 +115,52 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| NAV-04 | — | Pending |
-| CHAT-01 | — | Pending |
-| CHAT-02 | — | Pending |
-| CHAT-03 | — | Pending |
-| CHAT-04 | — | Pending |
-| CHAT-05 | — | Pending |
-| CHAT-06 | — | Pending |
-| CHAT-07 | — | Pending |
-| CHAT-08 | — | Pending |
-| CHAT-09 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| COMP-04 | — | Pending |
-| COMP-05 | — | Pending |
-| COMP-06 | — | Pending |
-| SESS-01 | — | Pending |
-| SESS-02 | — | Pending |
-| SESS-03 | — | Pending |
-| SESS-04 | — | Pending |
-| SESS-05 | — | Pending |
-| SESS-06 | — | Pending |
-| SESS-07 | — | Pending |
-| SESS-08 | — | Pending |
-| TOOL-01 | — | Pending |
-| TOOL-02 | — | Pending |
-| TOOL-03 | — | Pending |
-| TOOL-04 | — | Pending |
-| TOOL-05 | — | Pending |
-| TOOL-06 | — | Pending |
-| CONN-01 | — | Pending |
-| CONN-02 | — | Pending |
-| CONN-03 | — | Pending |
-| CONN-04 | — | Pending |
-| CONN-05 | — | Pending |
-| CONN-06 | — | Pending |
-| CONN-07 | — | Pending |
+| NAV-01 | Phase 74 | Pending |
+| NAV-02 | Phase 74 | Pending |
+| NAV-03 | Phase 74 | Pending |
+| NAV-04 | Phase 74 | Pending |
+| CHAT-01 | Phase 75 | Pending |
+| CHAT-02 | Phase 75 | Pending |
+| CHAT-03 | Phase 75 | Pending |
+| CHAT-04 | Phase 75 | Pending |
+| CHAT-05 | Phase 76 | Pending |
+| CHAT-06 | Phase 76 | Pending |
+| CHAT-07 | Phase 77 | Pending |
+| CHAT-08 | Phase 77 | Pending |
+| CHAT-09 | Phase 75 | Pending |
+| COMP-01 | Phase 75 | Pending |
+| COMP-02 | Phase 75 | Pending |
+| COMP-03 | Phase 75 | Pending |
+| COMP-04 | Phase 76 | Pending |
+| COMP-05 | Phase 76 | Pending |
+| COMP-06 | Phase 75 | Pending |
+| SESS-01 | Phase 76 | Pending |
+| SESS-02 | Phase 76 | Pending |
+| SESS-03 | Phase 76 | Pending |
+| SESS-04 | Phase 76 | Pending |
+| SESS-05 | Phase 76 | Pending |
+| SESS-06 | Phase 76 | Pending |
+| SESS-07 | Phase 76 | Pending |
+| SESS-08 | Phase 76 | Pending |
+| TOOL-01 | Phase 77 | Pending |
+| TOOL-02 | Phase 77 | Pending |
+| TOOL-03 | Phase 77 | Pending |
+| TOOL-04 | Phase 77 | Pending |
+| TOOL-05 | Phase 77 | Pending |
+| TOOL-06 | Phase 77 | Pending |
+| CONN-01 | Phase 74 | Pending |
+| CONN-02 | Phase 74 | Pending |
+| CONN-03 | Phase 74 | Pending |
+| CONN-04 | Phase 74 | Pending |
+| CONN-05 | Phase 74 | Pending |
+| CONN-06 | Phase 77 | Pending |
+| CONN-07 | Phase 74 | Pending |
 
 **Coverage:**
 - v3.1 requirements: 35 total
-- Mapped to phases: 0
-- Unmapped: 35
+- Mapped to phases: 35
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after initial definition*
+*Last updated: 2026-04-03 after roadmap creation — all 35 requirements mapped to Phases 74-77*
