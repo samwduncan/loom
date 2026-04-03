@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.1
-milestone_name: "The App (Rebuilt)"
-status: Phase complete — ready for verification
-stopped_at: Completed 74-04-PLAN.md
-last_updated: "2026-04-03T19:09:56.818Z"
+milestone: v4.0
+milestone_name: "The Command Center"
+status: Defining requirements
+stopped_at: Milestone started
+last_updated: "2026-04-03"
 progress:
-  total_phases: 4
+  total_phases: 0
   completed_phases: 0
-  total_plans: 4
-  completed_plans: 3
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,12 +19,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable
-**Current focus:** Phase 74 — shell-connection
+**Current focus:** Defining requirements for v4.0
 
 ## Current Position
 
-Phase: 74 (shell-connection) — EXECUTING
-Plan: 4 of 4
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-03 — Milestone v4.0 started
 
 ## Performance Metrics
 
@@ -40,33 +42,29 @@ Plan: 4 of 4
 
 - [v3.0] Capacitor/WKWebView abandoned -- 5/7 critical iOS bugs architecturally unfixable
 - [v3.0] Shared code extraction to @loom/shared -- types, stores, API, WebSocket, multiplexer
-- [v3.1] Council review (Codex + Bard): unanimous "build fresh, use Private Mind as reference"
-- [v3.1] FlatList inverted (not legend-list) -- ChatterUI reverted after 8 days in production
-- [v3.1] Key libs: react-native-keyboard-controller, zeego, @gorhom/bottom-sheet v5, reanimated 4.1
-- [v3.1] Keep: shared/, mobile/lib/, mobile/hooks/, Expo scaffold. Rebuild: mobile/components/, mobile/app/
-- [v3.1] 4 phases (74-77): Shell & Connection -> Chat Core -> Session & Interaction -> Loom Integration
-- [Phase 74]: Moved test deps (jest, jest-expo, @types/jest) from dependencies to devDependencies
-- [Phase 74]: Added testPathIgnorePatterns for .reference/ to prevent Private Mind tests from running in Jest
-- [Phase 74]: AuthScreen accepts error prop from useAuth for verbatim error display
-- [Phase 74]: Font loading gates both fontsLoaded AND isLoading -- prevents system font flash
-- [Phase 74]: CONN-07 already correct in websocket-init.ts -- no fix needed, only verification
-- [Phase 74]: drawerAnimationSpec not a real prop on @react-navigation/drawer v7 -- spring physics hardcoded in drawer-layout source
-- [Phase 74]: Lucide Menu icon over SF Symbols for hamburger -- works universally without native build
-- [Phase 74]: PressableScale reusable animated component for spring press feedback (scale 0.97 + haptic)
-- [Phase 74-shell-connection]: D-14 MMKV snapshot verified as already implemented from Phase 69 -- no code changes needed
-- [Phase 74-shell-connection]: Jest monorepo config: moduleNameMapper for React resolution, RNTL_SKIP_DEPS_CHECK, worklets mock with 12 symbols
+- [v3.1] Council review (Codex + Bard + Claude): unanimous "build fresh, use Private Mind as reference"
+- [v3.1] Phase 74 completed (shell/connection) but v3.1 direction pivoted to control plane vision
+- [v4.0] Push notifications before UI polish -- highest value, shortest path
+- [v4.0] Cross-agent orchestration is YAGNI -- build 3-message version, not 8
+- [v4.0] Relay auth mandatory before agents communicate
+- [v4.0] HITL protocol needs architectural design before building
+- [v4.0] Timeline: 10-12 phases (continuing from Phase 75)
 
 ### Research Flags
 
-- mobile/.planning/research/ — PATTERNS-PLAYBOOK.md (primary reference for all phase planning)
-- .planning/NATIVE-APP-SOUL.md — Visual contract (springs, surfaces, colors, typography)
+- .planning/research/MOBILE-FEASIBILITY-SYNTHESIS.md — All 4 pillars validated
+- .planning/research/agent-orchestration-architecture.md — Relay protocol design, spawn patterns
+- .planning/research/UI-PATTERN-MAP.md — Every surface mapped to reference app patterns
+- .planning/research/TESTING-INFRASTRUCTURE.md — Three-layer testing pyramid + Kimi visual QA
+- .planning/research/relay-protocol-design.md — Message format, presence detection
+- mobile/.planning/research/ios-server-management-apps.md — Blink Shell, Termius, ServerCat analysis
 
 ### Blockers/Concerns
 
-- Apple Developer enrollment status unknown (submitted payment before Phase 68, may be active now)
+- None currently identified
 
 ## Session Continuity
 
-Last session: 2026-04-03T19:09:56.816Z
-Stopped at: Completed 74-04-PLAN.md
-Resume: `/gsd:plan-phase 74`
+Last session: 2026-04-03
+Stopped at: Milestone v4.0 started — defining requirements
+Resume: Continue with requirements definition

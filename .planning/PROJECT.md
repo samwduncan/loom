@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Loom is a dual-platform interface for AI coding agents (Claude Code, Gemini, Codex) — a React web app for desktop and a React Native iOS app for mobile. Built to replace SSH + terminal for interacting with Claude Code CLI on a remote dev server. The web app is a daily-driver with rich markdown, Shiki highlighting, 6 tool cards, 60fps streaming, accessibility, and CSS visual effects. The native iOS app (v3.0) targets ChatGPT/Claude-level polish with native gestures, push notifications, Dynamic Island, and 120Hz spring physics.
+Loom is the control plane for AI-powered development — a React web app for desktop and a React Native iOS app as mobile command center. The web app is a daily-driver with rich markdown, Shiki highlighting, 6 tool cards, 60fps streaming, accessibility, and CSS visual effects. The iOS app provides remote agent management: spawn/monitor/kill AI sessions (Claude, Codex, Gemini) via tmux, receive push notifications on completion, approve permissions from Dynamic Island, and orchestrate cross-agent workflows — all from iPhone.
 
 ## Core Value
 
@@ -105,33 +105,38 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Active
 
-**Current Milestone: v3.1 "The App (Rebuilt)"**
+**Current Milestone: v4.0 "The Command Center"**
 
-**Goal:** Build fresh iOS chat app using Private Mind as read-only reference — a ChatGPT/Claude iOS clone that delivers Loom's unique power, with proven mobile patterns instead of inventing UI from scratch.
+**Goal:** Transform Loom into the AI development control plane — tmux-backed sessions, push notifications, agent management, Dynamic Island, and relay orchestration, all accessible from iPhone.
 
 **Target features:**
-- [ ] Clone-quality chat UI (drawer nav, session grouping, inverted message list, keyboard handling)
-- [ ] Streaming markdown with tool call visualization and permission approve/deny
-- [ ] Session management (create, switch, search, pin, delete, multi-project grouping)
-- [ ] Native gestures, spring physics, haptics, 120Hz animations
-- [ ] Connection resilience (WebSocket reconnect, background stream persistence)
-- [ ] Design coherence: Loom features look native to the chat shell, not bolted on
+- [ ] Chat shell — Private Mind-adapted chat UI with Loom stores, streaming, tool cards
+- [ ] Push notifications — Session completion, permission requests, deep links
+- [ ] tmux agent management — Spawn/monitor/kill AI sessions from the app
+- [ ] Dynamic Island + Live Activities — Streaming session status and progress
+- [ ] Relay auth & security — JWT-based relay authentication
+- [ ] HITL protocol — Agent asks phone for permission (approve/deny from notification)
+- [ ] Cross-agent communication — Light relay protocol (task.assign/progress/complete)
+- [ ] Testing infrastructure — Storybook 9 + Maestro E2E + Kimi visual QA
 
 **Architecture:**
-- Web app (Vite + React): Continues as desktop/laptop experience — unchanged
+- Web app (Vite + React): Continues as desktop experience — unchanged
 - Native app (Expo + React Native): Rebuilt mobile/components/ and mobile/app/ from scratch
 - Shared (@loom/shared): Types, store factories, API client, WebSocket, multiplexer — unchanged
-- Backend (Express + WebSocket): Unchanged, platform-agnostic
+- Backend (Express + WebSocket): Extended with AgentManager, TmuxTransport, push service, relay protocol
+- Relay (claude-relay): Extended with auth, task protocol, presence detection
 
 **Approach:**
-- Private Mind (software-mansion-labs/private-mind) as read-only reference in mobile/.reference/
-- Keep: shared/, mobile/lib/, mobile/hooks/, Expo scaffold (app.json, eas.json, metro.config)
-- Rebuild: mobile/components/ (all), mobile/app/ (all routes/screens)
-- 4 phases max, weekly device testing against ChatGPT iOS
+- Private Mind as pattern reference (~30% reuse) for chat shell
+- Push notifications early (highest value, shortest path)
+- Cross-agent orchestration late (YAGNI — 3-message version, not 8)
+- Don't lead with UI polish — that's the trap from 4 previous restarts
+- HITL protocol designed before built
+- 10-12 phases, continuing from Phase 75
 
 **Future milestones:**
-- v4.0 "The Power" — Multi-provider tabs, MCP management, Dynamic Island, push notifications
-- v5.0 "The Polish" — Full visual transformation (formerly v2.4)
+- v5.0 "The Power" — Multi-provider tabs, MCP management (formerly v2.3)
+- v6.0 "The Polish" — Full visual transformation (formerly v2.4)
 
 ### Out of Scope
 
@@ -147,18 +152,20 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (v3.1 starting — 2026-04-03):**
+**Current State (v4.0 starting — 2026-04-03):**
 - Web app: ~55,000 LOC TypeScript + CSS across 69 phases (10 milestones) — daily-driver quality
 - Shared: @loom/shared package with 13 types, 5 store factories, 5 lib modules, 143 tests
-- Mobile: Expo React Native scaffold (mobile/) — Phase 68 scaffold + Phase 69 screens (superseded, rebuilding)
+- Mobile: Expo React Native scaffold (mobile/) — Phase 68 scaffold + Phase 74 shell/connection work
 - Web stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
 - Mobile stack: Expo SDK 54 + React Native, Expo Router, MMKV, SecureStore
 - ~1500+ commits, 31-day total build (2026-03-04 to 2026-04-03)
 - Web frontend at `src/`, mobile at `mobile/`, shared at `shared/`, backend at `server/`
 - Dev server: port 5184, backend port 5555, production nginx on port 5580
 - Private Mind reference: mobile/.reference/private-mind/ (gitignored, read-only)
-- v3.0 Phases 68-69 complete; Phase 69 UI "foundationally flawed" — built without reference study
-- Council review (Codex + Bard): unanimous "build fresh, use Private Mind as reference"
+- Existing relay: claude-relay MCP server running on port 9999
+- Apple Developer: ENROLLED (Individual, Team ID 8ZWR46MYS5), EAS builds working
+- Research complete: feasibility (all 4 pillars validated), orchestration architecture, UI pattern map, testing infrastructure
+- Council review (Claude + Bard + Codex): unanimous — push before polish, orchestration late, 10-12 phases
 
 **Known Tech Debt:**
 - CMD-14 deferred: recent commands need command registry for re-execution
@@ -244,4 +251,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 after v3.1 "The App (Rebuilt)" milestone start*
+*Last updated: 2026-04-03 after v4.0 "The Command Center" milestone start*
