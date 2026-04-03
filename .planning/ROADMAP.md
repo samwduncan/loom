@@ -263,7 +263,16 @@ Plans:
   7. Tool call cards render with status indicators and expand/collapse during active streaming.
   8. Thinking blocks render with expand/collapse disclosure, code blocks render in monospace.
   9. Side-by-side with ChatGPT iOS: message density, spacing, and responsiveness are comparable -- validated on device.
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+- [ ] 70-01-PLAN.md -- Install legend-list, zeego, wire KeyboardProvider + LegendList
+- [ ] 70-02-PLAN.md -- Composer polish + message bubble refinement (spacing, colors, avatar)
+- [ ] 70-03-PLAN.md -- Session list temporal grouping + Zeego context menus
+- [ ] 70-04-PLAN.md -- Empty state polish (6 chips, semi-transparent, staggered animation)
+- [ ] 70-05-PLAN.md -- Tool call cards + thinking blocks + code blocks
+- [ ] 70-06-PLAN.md -- Integration pass + device verification checkpoint
+
 **UI hint**: yes
 **Research**: mobile/.planning/research/ (9 files, 152KB -- BARD-PRIME-DEEP-DIVE.md is the primary reference)
 
@@ -326,7 +335,7 @@ Phases execute in numeric order: 68 -> 69 -> 70 -> 71 -> 72 -> 73
 |-------|-----------|----------------|--------|-----------|
 | 68. Scaffolding & Design | v3.0 | 7/7 | Complete    | 2026-03-31 |
 | 69. Chat Foundation | v3.0 | 5/5 | Complete   | 2026-03-31 |
-| 70. UI Rebuild | v3.0 | 0/? | Not started | - |
+| 70. UI Rebuild | v3.0 | 0/6 | Planning complete | - |
 | 71. Native Feel | v3.0 | 0/? | Not started | - |
 | 72. Agent Features | v3.0 | 0/? | Not started | - |
 | 73. Polish & Accessibility | v3.0 | 0/? | Not started | - |
