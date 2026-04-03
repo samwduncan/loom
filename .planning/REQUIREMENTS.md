@@ -1,150 +1,166 @@
-# Requirements: Loom v3.0 "The App"
+# Requirements: Loom v3.1 "The App (Rebuilt)"
 
-**Defined:** 2026-03-30
-**Core Value:** Make AI agent work visible, beautiful, and controllable -- now with native iOS capabilities the web can't provide
+**Defined:** 2026-04-03
+**Core Value:** Make AI agent work visible, beautiful, and controllable — every tool call, every code write, every MCP interaction should be a satisfying visual experience that enhances understanding of what the agent is doing.
 
-## v3.0 Requirements
+## v3.1 Requirements
 
-Requirements for the native iOS app. Each maps to roadmap phases.
+Requirements for this milestone. Each maps to roadmap phases.
 
-### Scaffolding
+### Navigation & Layout
 
-- [x] **SCAFF-01**: Developer can build and install Expo dev build on iPhone 16 Pro Max via EAS Build
-- [x] **SCAFF-02**: Shared code directory (`shared/`) created at repo root with types, Zustand store factories, WebSocket client, stream multiplexer, and API client
-- [x] **SCAFF-03**: Native app (`mobile/`) created with Expo Router, coexists with web app (`src/`) without restructuring
-- [x] **SCAFF-04**: Both Vite (web) and Metro (native) resolve `shared/` imports correctly -- web app builds with zero regressions
-- [ ] **SCAFF-05**: Apple Developer Program enrolled with APNs certificates configured for push notifications
-- [x] **SCAFF-06**: NativeWind v4 configured with representative styling validated on device
+- [ ] **NAV-01**: User sees slide drawer with session list on swipe-right or hamburger tap
+- [ ] **NAV-02**: User navigates between drawer and chat screen with animated transition
+- [ ] **NAV-03**: App shell respects iOS safe areas (notch, Dynamic Island, home indicator)
+- [ ] **NAV-04**: Main content shifts with parallax effect when drawer opens
 
-### Chat
+### Chat UI
 
-- [x] **CHAT-01**: User can view a scrollable list of chat sessions grouped by project
-- [x] **CHAT-02**: User can create a new chat session and select a project
-- [x] **CHAT-03**: User can switch between sessions via sidebar drawer (swipe from left edge)
-- [x] **CHAT-04**: User can send a message and see streaming markdown response in real-time
-- [ ] **CHAT-05**: User can see tool call cards (Read/Write/Execute/Search/Bash/MCP) with expand/collapse and status indicators
-- [ ] **CHAT-06**: User can see thinking blocks with expand/collapse disclosure
-- [ ] **CHAT-07**: User can see code blocks with syntax-appropriate monospace rendering
-- [ ] **CHAT-08**: User can scroll through 50+ messages at 60fps with no jank
-- [x] **CHAT-09**: User can authenticate via JWT token with secure storage (iOS Keychain)
-- [x] **CHAT-10**: User sees connection status banner when WebSocket disconnects
-- [x] **CHAT-11**: App reconnects WebSocket automatically on foreground with exponential backoff
-- [ ] **CHAT-12**: Keyboard avoidance animates at 120Hz in sync with iOS keyboard
+- [ ] **CHAT-01**: User sees messages in inverted FlatList — user bubbles right/accent, assistant left/neutral
+- [ ] **CHAT-02**: User sees streaming markdown rendered with syntax highlighting as AI responds
+- [ ] **CHAT-03**: User sees thinking indicator before first token arrives
+- [ ] **CHAT-04**: Message list auto-scrolls to latest during streaming
+- [ ] **CHAT-05**: User sees scroll-to-bottom button when scrolled up
+- [ ] **CHAT-06**: User can copy message text via long-press
+- [ ] **CHAT-07**: Messages appear with spring-physics entering animation
+- [ ] **CHAT-08**: Elevated surfaces use glass/blur effects per Soul doc hierarchy
+- [ ] **CHAT-09**: Thinking disclosure blocks expand/collapse
 
-### Native Feel
+### Composer
 
-- [ ] **NATIVE-01**: All interactive elements have haptic feedback (send, tool complete, permission, error, swipe)
-- [ ] **NATIVE-02**: All transitions use spring physics via react-native-reanimated at 120Hz ProMotion
-- [ ] **NATIVE-03**: User can swipe-to-delete sessions from the session list
-- [ ] **NATIVE-04**: User can long-press messages for context menu (Copy, Retry, Share)
-- [ ] **NATIVE-05**: User can pull-to-refresh the session list
-- [ ] **NATIVE-06**: Status bar adapts to content (light/dark based on surface)
-- [ ] **NATIVE-07**: Safe area insets correctly handle notch, Dynamic Island, and home indicator
-- [ ] **NATIVE-08**: All animations respect Reduce Motion accessibility setting
+- [ ] **COMP-01**: Composer auto-grows as user types (up to max height, then scrolls)
+- [ ] **COMP-02**: Keyboard avoidance smoothly pushes content up (react-native-keyboard-controller)
+- [ ] **COMP-03**: Send button reflects state (disabled/empty, enabled/ready, stop/streaming)
+- [ ] **COMP-04**: Haptic feedback on message send
+- [ ] **COMP-05**: New chat shows prompt suggestion chips that pre-fill composer
+- [ ] **COMP-06**: Stop button replaces send during active streaming
 
-### Agent
+### Session Management
 
-- [ ] **AGENT-01**: User can approve or deny permission requests inline in the chat interface
-- [ ] **AGENT-02**: User receives push notification when Claude requests permission (file write, command execution)
-- [ ] **AGENT-03**: User can approve or deny permission directly from the push notification (without opening the app)
-- [ ] **AGENT-04**: User receives push notification when a session completes or encounters an error
-- [ ] **AGENT-05**: Push notification taps deep-link to the relevant session
-- [ ] **AGENT-06**: Backend registers device push tokens and sends notifications via Expo Push Service
-- [ ] **AGENT-07**: Silent push keeps session state in sync when app is backgrounded
+- [ ] **SESS-01**: Sessions grouped by date in drawer (Today, Yesterday, Last Week, etc.)
+- [ ] **SESS-02**: User can create new session from drawer
+- [ ] **SESS-03**: User can switch sessions by tapping in drawer
+- [ ] **SESS-04**: User can search sessions by title
+- [ ] **SESS-05**: User can pin sessions to top of list
+- [ ] **SESS-06**: User can delete sessions via swipe or context menu
+- [ ] **SESS-07**: Sessions grouped by project with collapsible project headers
+- [ ] **SESS-08**: Native iOS context menu on session items (rename, pin, delete) via zeego
 
-### Polish
+### Loom Tools
 
-- [ ] **POLISH-01**: Code blocks have syntax highlighting (approach TBD: native Text or WebView-per-block)
-- [ ] **POLISH-02**: User can share code blocks or full conversations via native iOS share sheet
-- [ ] **POLISH-03**: User can copy message content via context menu
-- [ ] **POLISH-04**: Follow-up suggestion chips appear after assistant responses
-- [ ] **POLISH-05**: Full VoiceOver accessibility -- all elements labeled, navigation order logical
-- [ ] **POLISH-06**: User can pin sessions for quick access
-- [ ] **POLISH-07**: User can search sessions by title
+- [ ] **TOOL-01**: Tool call cards appear inline in message stream (Bash, Read, Edit, Write, Glob, Grep)
+- [ ] **TOOL-02**: Tool cards show state transitions (pending → running → complete/error)
+- [ ] **TOOL-03**: User can expand/collapse tool call details
+- [ ] **TOOL-04**: Permission requests appear as elevated inline cards with approve/deny
+- [ ] **TOOL-05**: User can approve/deny permission with single tap + haptic
+- [ ] **TOOL-06**: Multiple consecutive tool calls collapse into accordion group
 
-## Future Requirements (v3.1+)
+### Connection & Auth
 
-### Dynamic Island & Live Activities
+- [ ] **CONN-01**: User authenticates via login screen
+- [ ] **CONN-02**: Auth token persists in iOS Keychain (SecureStore)
+- [ ] **CONN-03**: WebSocket connects on app launch
+- [ ] **CONN-04**: WebSocket reconnects on disconnect with exponential backoff
+- [ ] **CONN-05**: Connection banner shows when disconnected
+- [ ] **CONN-06**: Stream content persists during app background (MMKV snapshot)
+- [ ] **CONN-07**: App resumes WebSocket on foreground with correct auth
 
-- **DYNISLAND-01**: Dynamic Island shows active session status (model, thinking/writing/executing)
-- **DYNISLAND-02**: Live Activity shows token count and elapsed time for long sessions
+## Future Requirements
 
-### Advanced Features
+Deferred to future milestones. Tracked but not in current roadmap.
 
-- **ADV-01**: Share Extension receives content INTO Loom from other apps
-- **ADV-02**: Spotlight search indexes session titles
-- **ADV-03**: Siri Shortcuts for common actions (new session, resume last)
-- **ADV-04**: Image attachment support (camera, photo library, paste)
-- **ADV-05**: Swipe-to-reply on individual messages
+### Push & Live (v4.0)
 
-### Platform Expansion
+- **PUSH-01**: User receives push notification when Claude asks a question
+- **PUSH-02**: User can approve/deny permission from notification action
+- **PUSH-03**: Dynamic Island shows active session status and model name
+- **PUSH-04**: Live Activities track long-running sessions
 
-- **PLAT-01**: Android support via React Native (same codebase)
+### Multi-Provider (v4.0)
+
+- **PROV-01**: User can switch between Claude, Codex, Gemini providers
+- **PROV-02**: Provider tabs show concurrent sessions
+- **PROV-03**: Shared context between provider tabs
+
+### Extended Features (v4.0)
+
+- **EXT-01**: File upload from iOS photo library or Files app
+- **EXT-02**: Integrated terminal/shell
+- **EXT-03**: Settings screen (appearance, API keys, providers)
+- **EXT-04**: Model selector in composer area
+
+### Visual Polish (v5.0)
+
+- **VIS-01**: Dynamic color shifts during streaming (hue warmth, accent pulse)
+- **VIS-02**: Aurora/ambient effects during streaming
+- **VIS-03**: Advanced glass surface effects (frosted, animated)
 
 ## Out of Scope
 
+Explicitly excluded. Documented to prevent scope creep.
+
 | Feature | Reason |
 |---------|--------|
-| Terminal/shell on mobile | Mobile is a remote control for the agent, not a workstation |
-| File tree/editor on mobile | Same -- use desktop web for workspace features |
-| Offline mode | Loom requires server connection by design |
-| Bottom tab navigation | Anti-pattern for chat apps -- sidebar drawer matches ChatGPT/Claude iOS |
-| WebView for chat rendering | Exact problem we're escaping from Capacitor |
-| Character-by-character typewriter | Anti-pattern -- batch rendering via debounced setState |
-| Android in v3.0 | iOS-only first -- doubles testing surface if done in parallel |
-| Port web UI components to RN | 100% new components designed mobile-first from reference apps |
-| Light mode | Dark-only for v3.0 -- matches web app constraint |
+| Android app | iOS-first; defer until iOS is daily-driver quality |
+| Swipe-to-reply | Needs backend reply threading support |
+| Character-by-character typewriter | Soul doc explicitly forbids; anti-pattern |
+| Gifted-chat as base | Wrong abstraction for AI streaming (fights customization) |
+| Paid chat SDK (Stream, Sendbird) | Vendor lock-in, overkill for single-user app |
+| Pure black backgrounds | Soul doc: darkest surface is rgb(38,35,33), not #000 |
+| Port web UI to React Native | Redesign from scratch, don't convert div/span to View/Text |
 
 ## Traceability
 
+Which phases cover which requirements. Updated during roadmap creation.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCAFF-01 | Phase 68 | Complete |
-| SCAFF-02 | Phase 68 | Complete |
-| SCAFF-03 | Phase 68 | Complete |
-| SCAFF-04 | Phase 68 | Complete |
-| SCAFF-05 | Phase 68 | Pending |
-| SCAFF-06 | Phase 68 | Complete |
-| CHAT-01 | Phase 69 | Complete |
-| CHAT-02 | Phase 69 | Complete |
-| CHAT-03 | Phase 69 | Complete |
-| CHAT-04 | Phase 69 | Complete |
-| CHAT-05 | Phase 70 | Pending |
-| CHAT-06 | Phase 70 | Pending |
-| CHAT-07 | Phase 70 | Pending |
-| CHAT-08 | Phase 70 | Pending |
-| CHAT-09 | Phase 69 | Complete |
-| CHAT-10 | Phase 69 | Complete |
-| CHAT-11 | Phase 69 | Complete |
-| CHAT-12 | Phase 70 | Pending |
-| NATIVE-01 | Phase 71 | Pending |
-| NATIVE-02 | Phase 71 | Pending |
-| NATIVE-03 | Phase 71 | Pending |
-| NATIVE-04 | Phase 71 | Pending |
-| NATIVE-05 | Phase 71 | Pending |
-| NATIVE-06 | Phase 71 | Pending |
-| NATIVE-07 | Phase 71 | Pending |
-| NATIVE-08 | Phase 71 | Pending |
-| AGENT-01 | Phase 72 | Pending |
-| AGENT-02 | Phase 72 | Pending |
-| AGENT-03 | Phase 72 | Pending |
-| AGENT-04 | Phase 72 | Pending |
-| AGENT-05 | Phase 72 | Pending |
-| AGENT-06 | Phase 72 | Pending |
-| AGENT-07 | Phase 72 | Pending |
-| POLISH-01 | Phase 73 | Pending |
-| POLISH-02 | Phase 73 | Pending |
-| POLISH-03 | Phase 73 | Pending |
-| POLISH-04 | Phase 73 | Pending |
-| POLISH-05 | Phase 73 | Pending |
-| POLISH-06 | Phase 73 | Pending |
-| POLISH-07 | Phase 73 | Pending |
+| NAV-01 | — | Pending |
+| NAV-02 | — | Pending |
+| NAV-03 | — | Pending |
+| NAV-04 | — | Pending |
+| CHAT-01 | — | Pending |
+| CHAT-02 | — | Pending |
+| CHAT-03 | — | Pending |
+| CHAT-04 | — | Pending |
+| CHAT-05 | — | Pending |
+| CHAT-06 | — | Pending |
+| CHAT-07 | — | Pending |
+| CHAT-08 | — | Pending |
+| CHAT-09 | — | Pending |
+| COMP-01 | — | Pending |
+| COMP-02 | — | Pending |
+| COMP-03 | — | Pending |
+| COMP-04 | — | Pending |
+| COMP-05 | — | Pending |
+| COMP-06 | — | Pending |
+| SESS-01 | — | Pending |
+| SESS-02 | — | Pending |
+| SESS-03 | — | Pending |
+| SESS-04 | — | Pending |
+| SESS-05 | — | Pending |
+| SESS-06 | — | Pending |
+| SESS-07 | — | Pending |
+| SESS-08 | — | Pending |
+| TOOL-01 | — | Pending |
+| TOOL-02 | — | Pending |
+| TOOL-03 | — | Pending |
+| TOOL-04 | — | Pending |
+| TOOL-05 | — | Pending |
+| TOOL-06 | — | Pending |
+| CONN-01 | — | Pending |
+| CONN-02 | — | Pending |
+| CONN-03 | — | Pending |
+| CONN-04 | — | Pending |
+| CONN-05 | — | Pending |
+| CONN-06 | — | Pending |
+| CONN-07 | — | Pending |
 
 **Coverage:**
-- v3.0 requirements: 40 total
-- Mapped to phases: 40
-- Unmapped: 0 ✓
+- v3.1 requirements: 35 total
+- Mapped to phases: 0
+- Unmapped: 35
 
 ---
-*Requirements defined: 2026-03-30*
-*Last updated: 2026-03-30 after roadmap revision (Phase 69 split, phase renumbering)*
+*Requirements defined: 2026-04-03*
+*Last updated: 2026-04-03 after initial definition*
