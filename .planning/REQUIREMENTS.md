@@ -121,13 +121,62 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| *(populated by roadmapper)* | | |
+| CHAT-01 | Phase 75 | Pending |
+| CHAT-02 | Phase 75 | Pending |
+| CHAT-03 | Phase 75 | Pending |
+| CHAT-04 | Phase 75 | Pending |
+| CHAT-05 | Phase 75 | Pending |
+| CHAT-06 | Phase 75 | Pending |
+| CHAT-07 | Phase 75 | Pending |
+| CHAT-08 | Phase 75 | Pending |
+| CHAT-09 | Phase 75 | Pending |
+| CHAT-10 | Phase 75 | Pending |
+| CHAT-11 | Phase 75 | Pending |
+| CHAT-12 | Phase 75 | Pending |
+| PUSH-01 | Phase 76 | Pending |
+| PUSH-02 | Phase 76 | Pending |
+| PUSH-03 | Phase 76 | Pending |
+| PUSH-04 | Phase 76 | Pending |
+| PUSH-05 | Phase 76 | Pending |
+| PUSH-06 | Phase 76 | Pending |
+| RELAY-01 | Phase 77 | Pending |
+| RELAY-02 | Phase 77 | Pending |
+| RELAY-03 | Phase 77 | Pending |
+| RELAY-04 | Phase 77 | Pending |
+| AGENT-06 | Phase 78 | Pending |
+| AGENT-07 | Phase 78 | Pending |
+| AGENT-08 | Phase 78 | Pending |
+| AGENT-09 | Phase 78 | Pending |
+| AGENT-01 | Phase 79 | Pending |
+| AGENT-02 | Phase 79 | Pending |
+| AGENT-03 | Phase 79 | Pending |
+| AGENT-04 | Phase 79 | Pending |
+| AGENT-05 | Phase 79 | Pending |
+| HITL-01 | Phase 80 | Pending |
+| HITL-02 | Phase 81 | Pending |
+| HITL-03 | Phase 81 | Pending |
+| HITL-04 | Phase 81 | Pending |
+| HITL-05 | Phase 81 | Pending |
+| HITL-06 | Phase 81 | Pending |
+| ISLAND-01 | Phase 82 | Pending |
+| ISLAND-02 | Phase 82 | Pending |
+| ISLAND-03 | Phase 82 | Pending |
+| ISLAND-04 | Phase 82 | Pending |
+| ISLAND-05 | Phase 82 | Pending |
+| XAGENT-01 | Phase 83 | Pending |
+| XAGENT-02 | Phase 83 | Pending |
+| XAGENT-03 | Phase 83 | Pending |
+| XAGENT-04 | Phase 83 | Pending |
+| TEST-01 | Phase 84 | Pending |
+| TEST-02 | Phase 84 | Pending |
+| TEST-03 | Phase 84 | Pending |
+| TEST-04 | Phase 84 | Pending |
 
 **Coverage:**
-- v4.0 requirements: 42 total
-- Mapped to phases: 0
-- Unmapped: 42 ⚠️
+- v4.0 requirements: 50 total
+- Mapped to phases: 50/50
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after initial definition*
+*Last updated: 2026-04-03 after roadmap creation (50/50 mapped)*
