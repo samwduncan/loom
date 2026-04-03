@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v3.1
 milestone_name: "The App (Rebuilt)"
-status: Ready to execute
-stopped_at: Completed 74-02-PLAN.md
-last_updated: "2026-04-03T18:52:42.745Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 74-04-PLAN.md
+last_updated: "2026-04-03T19:09:56.818Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 74 (shell-connection) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 
 ## Performance Metrics
 
@@ -50,6 +50,11 @@ Plan: 3 of 4
 - [Phase 74]: AuthScreen accepts error prop from useAuth for verbatim error display
 - [Phase 74]: Font loading gates both fontsLoaded AND isLoading -- prevents system font flash
 - [Phase 74]: CONN-07 already correct in websocket-init.ts -- no fix needed, only verification
+- [Phase 74]: drawerAnimationSpec not a real prop on @react-navigation/drawer v7 -- spring physics hardcoded in drawer-layout source
+- [Phase 74]: Lucide Menu icon over SF Symbols for hamburger -- works universally without native build
+- [Phase 74]: PressableScale reusable animated component for spring press feedback (scale 0.97 + haptic)
+- [Phase 74-shell-connection]: D-14 MMKV snapshot verified as already implemented from Phase 69 -- no code changes needed
+- [Phase 74-shell-connection]: Jest monorepo config: moduleNameMapper for React resolution, RNTL_SKIP_DEPS_CHECK, worklets mock with 12 symbols
 
 ### Research Flags
 
@@ -62,6 +67,6 @@ Plan: 3 of 4
 
 ## Session Continuity
 
-Last session: 2026-04-03T18:52:42.743Z
-Stopped at: Completed 74-02-PLAN.md
+Last session: 2026-04-03T19:09:56.816Z
+Stopped at: Completed 74-04-PLAN.md
 Resume: `/gsd:plan-phase 74`

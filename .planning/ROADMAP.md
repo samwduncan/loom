@@ -157,7 +157,7 @@
 
 **Testing Policy:** Every phase includes tests as a success criterion. Tests are written alongside implementation, not deferred. Coverage targets: store logic, state machines, data transformations, component rendering, and integration flows. Tests catch regressions early and serve as living documentation of expected behavior.
 
-- [ ] **Phase 74: Shell & Connection** - Auth, WebSocket lifecycle, drawer navigation, theme system, safe areas
+- [x] **Phase 74: Shell & Connection** - Auth, WebSocket lifecycle, drawer navigation, theme system, safe areas (completed 2026-04-03)
 - [ ] **Phase 75: Chat Core** - Message list (FlatList inverted), streaming markdown, composer with keyboard avoidance, thinking indicator
 - [ ] **Phase 76: Session & Interaction** - Session management (grouping, search, pin, delete, context menus), scroll-to-bottom, copy, prompt suggestions
 - [ ] **Phase 77: Loom Integration** - Tool call cards, permission approve/deny, accordion grouping, spring animations, glass surfaces
@@ -179,8 +179,8 @@
 Plans:
 - [x] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
 - [x] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
-- [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
-- [ ] 74-04-PLAN.md -- Connection banner + unit tests
+- [x] 74-03-PLAN.md -- Drawer navigation + chat placeholder
+- [x] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
 
 ### Phase 75: Chat Core
@@ -197,8 +197,8 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
-- [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
-- [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
+- [x] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
+- [x] 74-03-PLAN.md -- Drawer navigation + chat placeholder
 - [ ] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
 
@@ -215,8 +215,8 @@ Plans:
   6. Tests cover session CRUD operations, date/project grouping logic, search filtering, pin persistence, and context menu actions
 **Plans**: 4 plans
 Plans:
-- [ ] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
-- [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
+- [x] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
+- [x] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
 - [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
 - [ ] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
@@ -234,8 +234,8 @@ Plans:
   6. Tests cover tool card state machine (pending/running/complete/error), permission approve/deny flow, accordion grouping logic, and MMKV background persistence
 **Plans**: 4 plans
 Plans:
-- [ ] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
-- [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
+- [x] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
+- [x] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
 - [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
 - [ ] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
@@ -258,7 +258,7 @@ Phases execute in numeric order: 74 -> 75 -> 76 -> 77
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 74. Shell & Connection | v3.1 | 2/4 | In Progress|  |
+| 74. Shell & Connection | v3.1 | 4/4 | Complete   | 2026-04-03 |
 | 75. Chat Core | v3.1 | 0/? | Not started | - |
 | 76. Session & Interaction | v3.1 | 0/? | Not started | - |
 | 77. Loom Integration | v3.1 | 0/? | Not started | - |

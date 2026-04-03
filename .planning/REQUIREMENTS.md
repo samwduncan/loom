@@ -9,10 +9,10 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Navigation & Layout
 
-- [ ] **NAV-01**: User sees slide drawer with session list on swipe-right or hamburger tap
-- [ ] **NAV-02**: User navigates between drawer and chat screen with animated transition
-- [ ] **NAV-03**: App shell respects iOS safe areas (notch, Dynamic Island, home indicator)
-- [ ] **NAV-04**: Main content shifts with parallax effect when drawer opens
+- [x] **NAV-01**: User sees slide drawer with session list on swipe-right or hamburger tap
+- [x] **NAV-02**: User navigates between drawer and chat screen with animated transition
+- [x] **NAV-03**: App shell respects iOS safe areas (notch, Dynamic Island, home indicator)
+- [x] **NAV-04**: Main content shifts with parallax effect when drawer opens
 
 ### Chat UI
 
@@ -60,8 +60,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **CONN-01**: User authenticates via login screen
 - [x] **CONN-02**: Auth token persists in iOS Keychain (SecureStore)
 - [x] **CONN-03**: WebSocket connects on app launch
-- [ ] **CONN-04**: WebSocket reconnects on disconnect with exponential backoff
-- [ ] **CONN-05**: Connection banner shows when disconnected
+- [x] **CONN-04**: WebSocket reconnects on disconnect with exponential backoff
+- [x] **CONN-05**: Connection banner shows when disconnected
 - [ ] **CONN-06**: Stream content persists during app background (MMKV snapshot)
 - [x] **CONN-07**: App resumes WebSocket on foreground with correct auth
 
@@ -115,10 +115,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV-01 | Phase 74 | Pending |
-| NAV-02 | Phase 74 | Pending |
-| NAV-03 | Phase 74 | Pending |
-| NAV-04 | Phase 74 | Pending |
+| NAV-01 | Phase 74 | Complete |
+| NAV-02 | Phase 74 | Complete |
+| NAV-03 | Phase 74 | Complete |
+| NAV-04 | Phase 74 | Complete |
 | CHAT-01 | Phase 75 | Pending |
 | CHAT-02 | Phase 75 | Pending |
 | CHAT-03 | Phase 75 | Pending |
@@ -151,8 +151,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONN-01 | Phase 74 | Complete |
 | CONN-02 | Phase 74 | Complete |
 | CONN-03 | Phase 74 | Complete |
-| CONN-04 | Phase 74 | Pending |
-| CONN-05 | Phase 74 | Pending |
+| CONN-04 | Phase 74 | Complete |
+| CONN-05 | Phase 74 | Complete |
 | CONN-06 | Phase 77 | Pending |
 | CONN-07 | Phase 74 | Complete |
 
