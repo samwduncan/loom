@@ -48,6 +48,12 @@ export const theme: LoomTheme = {
       lineHeight: 24,
       fontFamily: 'Inter',
     },
+    small: {
+      fontSize: 13,
+      fontWeight: '400',
+      lineHeight: 18,
+      fontFamily: 'Inter',
+    },
     caption: {
       fontSize: 12,
       fontWeight: '400',

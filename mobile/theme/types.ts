@@ -32,6 +32,7 @@ export interface LoomTheme {
     largeTitle: TextStyle; // 28px semibold
     heading: TextStyle;    // 17px semibold
     body: TextStyle;       // 15px regular
+    small: TextStyle;      // 13px regular -- tool labels, timestamps, thinking summary, date headers
     caption: TextStyle;    // 12px regular
   };
   spacing: {
