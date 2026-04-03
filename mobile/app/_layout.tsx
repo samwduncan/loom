@@ -21,6 +21,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Slot } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { AuthScreen } from '../components/auth/AuthScreen';
+import { ConnectionBanner } from '../components/connection/ConnectionBanner';
 import { useAuth } from '../hooks/useAuth';
 import { initializeWebSocket } from '../lib/websocket-init';
 import { theme } from '../theme/theme';
@@ -63,7 +64,10 @@ export default function RootLayout() {
           ) : !isAuthenticated ? (
             <AuthScreen onLogin={login} error={error} />
           ) : (
-            <Slot />
+            <View style={{ flex: 1 }}>
+              <ConnectionBanner />
+              <Slot />
+            </View>
           )}
         </SafeAreaProvider>
       </KeyboardProvider>
