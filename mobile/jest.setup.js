@@ -1,4 +1,23 @@
-// Reanimated mock -- must be first
+// Mock react-native-worklets before reanimated imports it (reanimated 4.x dependency).
+// Must export all symbols that reanimated imports from the worklets module.
+jest.mock('react-native-worklets', () => ({
+  WorkletsModule: {},
+  RuntimeKind: { UI: 'UI', JS: 'JS' },
+  isWorkletFunction: jest.fn(() => false),
+  isWorkletRuntime: jest.fn(() => false),
+  createSerializable: jest.fn((value) => value),
+  createSynchronizable: jest.fn((value) => value),
+  serializableMappingCache: new Map(),
+  makeShareable: jest.fn((value) => value),
+  runOnUI: jest.fn((fn) => fn),
+  runOnJS: jest.fn((fn) => fn),
+  runOnRuntime: jest.fn((fn) => fn),
+  executeOnUIRuntimeSync: jest.fn((fn) => fn()),
+  callMicrotasks: jest.fn(),
+  createWorkletRuntime: jest.fn(),
+}));
+
+// Reanimated mock -- must be after worklets mock
 require('react-native-reanimated').setUpTests();
 
 // Mock expo-secure-store
@@ -46,3 +65,19 @@ jest.mock('react-native-keyboard-controller', () => ({
   KeyboardAvoidingView: 'KeyboardAvoidingView',
   useKeyboardHandler: jest.fn(),
 }));
+
+// Mock react-native AppState for websocket lifecycle tests.
+// jest-expo provides a partial RN mock but AppState.addEventListener
+// may not be available. We add it via spyOn in the setup file so
+// individual tests can control the callback.
+const { AppState } = require('react-native');
+if (!AppState.addEventListener || !AppState.addEventListener.mock) {
+  // Override addEventListener to be a jest.fn if it's not already
+  const originalAddEventListener = AppState.addEventListener;
+  AppState.addEventListener = jest.fn((...args) => {
+    if (originalAddEventListener) {
+      return originalAddEventListener.apply(AppState, args);
+    }
+    return { remove: jest.fn() };
+  });
+}
