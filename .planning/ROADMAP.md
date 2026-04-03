@@ -175,7 +175,12 @@
   4. All screens respect iOS safe areas -- no content hidden behind the Dynamic Island notch or home indicator
   5. App resumes WebSocket connection on foreground return with correct auth (no stale token, no duplicate connections)
   6. Tests cover auth flow (login, token persist, token clear), WebSocket lifecycle (connect, reconnect, foreground resume), and drawer navigation state
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
+- [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
+- [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
+- [ ] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
 
 ### Phase 75: Chat Core
@@ -189,7 +194,12 @@
   4. Composer auto-grows as the user types (up to max height then scrolls), keyboard pushes content up smoothly via react-native-keyboard-controller with no jumps
   5. Send button reflects state (disabled when empty, accent when ready, stop icon during streaming) and tapping stop halts the active stream
   6. Tests cover message rendering (bubble alignment, role distinction), streaming state transitions, composer state machine, and keyboard avoidance layout
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
+- [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
+- [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
+- [ ] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
 
 ### Phase 76: Session & Interaction
@@ -203,7 +213,12 @@
   4. Scroll-to-bottom button appears when the user scrolls up in the message list, and tapping it returns to the latest message
   5. User can copy message text via long-press, receives haptic feedback on message send, and sees prompt suggestion chips on a new empty chat
   6. Tests cover session CRUD operations, date/project grouping logic, search filtering, pin persistence, and context menu actions
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
+- [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
+- [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
+- [ ] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
 
 ### Phase 77: Loom Integration
@@ -217,7 +232,12 @@
   4. Messages appear with spring-physics entering animations, and elevated surfaces (permission cards, tool groups) use glass/blur effects per Soul doc hierarchy
   5. Stream content persists during app background via MMKV snapshot -- returning to the app shows where the stream left off without data loss
   6. Tests cover tool card state machine (pending/running/complete/error), permission approve/deny flow, accordion grouping logic, and MMKV background persistence
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 74-01-PLAN.md -- Cleanup + theme system + test infrastructure
+- [ ] 74-02-PLAN.md -- Auth screen + root layout with WebSocket init
+- [ ] 74-03-PLAN.md -- Drawer navigation + chat placeholder
+- [ ] 74-04-PLAN.md -- Connection banner + unit tests
 **UI hint**: yes
 
 ## Known Risks & Contingencies
@@ -238,7 +258,7 @@ Phases execute in numeric order: 74 -> 75 -> 76 -> 77
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 74. Shell & Connection | v3.1 | 0/? | Not started | - |
+| 74. Shell & Connection | v3.1 | 0/4 | Planning complete | - |
 | 75. Chat Core | v3.1 | 0/? | Not started | - |
 | 76. Session & Interaction | v3.1 | 0/? | Not started | - |
 | 77. Loom Integration | v3.1 | 0/? | Not started | - |
