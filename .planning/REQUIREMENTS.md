@@ -20,7 +20,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [ ] **CHAT-09**: User sees connection status and WebSocket reconnects automatically
 - [ ] **CHAT-10**: User can search sessions by title
 - [ ] **CHAT-11**: User can delete sessions with swipe gesture
-- [ ] **CHAT-12**: User can approve/deny permission requests inline in chat
+- [x] **CHAT-12**: User can approve/deny permission requests inline in chat
 
 ### Push Notifications
 
@@ -132,7 +132,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-09 | Phase 75 | Pending |
 | CHAT-10 | Phase 75 | Pending |
 | CHAT-11 | Phase 75 | Pending |
-| CHAT-12 | Phase 75 | Pending |
+| CHAT-12 | Phase 75 | Complete |
 | PUSH-01 | Phase 76 | Pending |
 | PUSH-02 | Phase 76 | Pending |
 | PUSH-03 | Phase 76 | Pending |

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
 status: Ready to execute
-stopped_at: Completed 75-01-PLAN.md
-last_updated: "2026-04-03T23:33:36.589Z"
+stopped_at: Completed 75-04-PLAN.md
+last_updated: "2026-04-03T23:41:36.853Z"
 progress:
   total_phases: 11
   completed_phases: 0
   total_plans: 6
-  completed_plans: 1
+  completed_plans: 3
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 75 (chat-shell) — EXECUTING
-Plan: 2 of 6
+Plan: 4 of 6
 
 ## Performance Metrics
 
@@ -47,6 +47,8 @@ Plan: 2 of 6
 - [v4.0] Private Mind as pattern reference (~30% reuse) for chat shell
 - [Phase 75]: Segment parser uses state machine for code block extraction, tool calls grouped after text/code
 - [Phase 75]: Toast uses module-scoped callback pattern (not React Context) for global imperative access
+- [Phase 75]: ToolChip React.memo with id+status custom comparator for minimal re-renders
+- [Phase 75]: narrowInput() helper safely narrows unknown PermissionRequest.input to Record<string, unknown>
 
 ### Blockers/Concerns
 
@@ -54,6 +56,6 @@ None currently identified.
 
 ## Session Continuity
 
-Last session: 2026-04-03T23:33:36.587Z
-Stopped at: Completed 75-01-PLAN.md
+Last session: 2026-04-03T23:41:29.870Z
+Stopped at: Completed 75-04-PLAN.md
 Resume: `/gsd:plan-phase 75`
