@@ -105,26 +105,32 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ### Active
 
-**Current Milestone: v3.0 "The App"**
+**Current Milestone: v3.1 "The App (Rebuilt)"**
 
-**Goal:** Build a native iOS app with React Native + Expo that replaces the Capacitor WebView approach — delivering a gesture-first, polished mobile experience with native capabilities the web can't provide.
+**Goal:** Build fresh iOS chat app using Private Mind as read-only reference — a ChatGPT/Claude iOS clone that delivers Loom's unique power, with proven mobile patterns instead of inventing UI from scratch.
 
 **Target features:**
-- [ ] Native iOS chat client connecting to existing Loom backend (WebSocket + REST)
-- [ ] Push notifications for Claude questions/permission requests with approve/deny actions
-- [ ] Session management (list, create, switch, search, pin)
-- [ ] Dynamic Island showing active session status
-- [ ] Native gestures, keyboard handling, 120Hz spring physics (react-native-reanimated)
-- [ ] Design-first: pixel-level reference from ChatGPT/Claude iOS, then integrate Loom features, then elevate
+- [ ] Clone-quality chat UI (drawer nav, session grouping, inverted message list, keyboard handling)
+- [ ] Streaming markdown with tool call visualization and permission approve/deny
+- [ ] Session management (create, switch, search, pin, delete, multi-project grouping)
+- [ ] Native gestures, spring physics, haptics, 120Hz animations
+- [ ] Connection resilience (WebSocket reconnect, background stream persistence)
+- [ ] Design coherence: Loom features look native to the chat shell, not bolted on
 
 **Architecture:**
-- Web app (Vite + React): Continues as desktop/laptop experience
-- Native app (Expo + React Native): New iOS client, shares backend + stores + API hooks
+- Web app (Vite + React): Continues as desktop/laptop experience — unchanged
+- Native app (Expo + React Native): Rebuilt mobile/components/ and mobile/app/ from scratch
+- Shared (@loom/shared): Types, store factories, API client, WebSocket, multiplexer — unchanged
 - Backend (Express + WebSocket): Unchanged, platform-agnostic
 
+**Approach:**
+- Private Mind (software-mansion-labs/private-mind) as read-only reference in mobile/.reference/
+- Keep: shared/, mobile/lib/, mobile/hooks/, Expo scaffold (app.json, eas.json, metro.config)
+- Rebuild: mobile/components/ (all), mobile/app/ (all routes/screens)
+- 4 phases max, weekly device testing against ChatGPT iOS
+
 **Future milestones:**
-- v3.1+ — Dynamic Island, file upload, terminal, settings, multi-project workspace
-- v4.0 "The Power" — Multi-provider tabs, MCP management (formerly v2.3)
+- v4.0 "The Power" — Multi-provider tabs, MCP management, Dynamic Island, push notifications
 - v5.0 "The Polish" — Full visual transformation (formerly v2.4)
 
 ### Out of Scope
@@ -141,20 +147,18 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (Phase 68 complete — 2026-03-31):**
-- Web app: ~55,000 LOC TypeScript + CSS across 67 phases (10 milestones)
+**Current State (v3.1 starting — 2026-04-03):**
+- Web app: ~55,000 LOC TypeScript + CSS across 69 phases (10 milestones) — daily-driver quality
 - Shared: @loom/shared package with 13 types, 5 store factories, 5 lib modules, 143 tests
-- Mobile: Expo React Native app scaffold (mobile/) with NativeWind + 5 design primitives
+- Mobile: Expo React Native scaffold (mobile/) — Phase 68 scaffold + Phase 69 screens (superseded, rebuilding)
 - Web stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
-- Mobile stack: Expo SDK 54 + React Native, Expo Router, NativeWind v4, MMKV, SecureStore
-- ~1500+ commits, 28-day total build (2026-03-04 to 2026-03-31)
-- 156 test files, 1691 tests (1548 web + 143 shared), 9 custom ESLint rules
+- Mobile stack: Expo SDK 54 + React Native, Expo Router, MMKV, SecureStore
+- ~1500+ commits, 31-day total build (2026-03-04 to 2026-04-03)
 - Web frontend at `src/`, mobile at `mobile/`, shared at `shared/`, backend at `server/`
 - Dev server: port 5184, backend port 5555, production nginx on port 5580
-- SQLite cache, live session attach, WCAG AA, keyboard navigation, screen reader support
-- Backend: auth auto-retry, WebSocket heartbeat, systemd auto-start, graceful shutdown, deploy.sh
-- Capacitor approach ABANDONED — WKWebView can't deliver native iOS quality for gesture-heavy chat
-- v3.0 native app (React Native + Expo) starting: new `mobile/` directory, shares backend + stores
+- Private Mind reference: mobile/.reference/private-mind/ (gitignored, read-only)
+- v3.0 Phases 68-69 complete; Phase 69 UI "foundationally flawed" — built without reference study
+- Council review (Codex + Bard): unanimous "build fresh, use Private Mind as reference"
 
 **Known Tech Debt:**
 - CMD-14 deferred: recent commands need command registry for re-execution
@@ -240,4 +244,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-30 after v3.0 "The App" milestone start*
+*Last updated: 2026-04-03 after v3.1 "The App (Rebuilt)" milestone start*
