@@ -22,7 +22,7 @@ module.exports = {
     // dual-React-copy issues in the monorepo (root has 19.2.4, mobile has 19.1.0).
     '^react$': '<rootDir>/node_modules/react',
     '^react/(.*)$': '<rootDir>/node_modules/react/$1',
-    '^react-test-renderer$': '<rootDir>/node_modules/react-test-renderer',
-    '^react-test-renderer/(.*)$': '<rootDir>/node_modules/react-test-renderer/$1',
+    '^react-test-renderer$': '<rootDir>/../node_modules/react-test-renderer',
+    '^react-test-renderer/(.*)$': '<rootDir>/../node_modules/react-test-renderer/$1',
   },
 };
