@@ -1,20 +1,30 @@
 /**
- * Custom drawer content -- Loom branding, New Chat button, session list,
- * and connection status footer.
+ * Full session navigation panel for the drawer.
+ *
+ * Features:
+ * - Date-grouped SectionList (Today / Yesterday / Last Week / Older)
+ * - Glass search bar with real-time filtering
+ * - Swipe-to-delete with 5s undo toast (pendingDeletes pattern)
+ * - Running session pulsing dot via stream store
+ * - Stagger entrance animation (30ms per item, max 10)
+ * - Skeleton loading placeholders (no ActivityIndicator per Soul doc anti-pattern #13)
+ * - Empty state with "No sessions yet" + New Chat button
+ * - Session press passes projectName + projectPath in router params (AR fix #2)
  *
  * Data flow:
- * - useSessions() provides projects, activeSessionId, createSession, setActiveSession
+ * - useSessions() provides projects, search, activeSessionId, createSession, deleteSession
+ * - useStreamStore for isStreaming + stream activeSessionId to detect running sessions
  * - useConnection() provides status for the footer dot
- * - Sessions are flattened from all projects and sorted by updatedAt descending
+ * - groupSessionsByDate() creates SectionList sections from flat session list
+ * - showToast() from Plan 01's toast utility for undo toast
  */
 
-import { useCallback, useRef, useEffect } from 'react';
+import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import {
   View,
   Text,
-  FlatList,
+  SectionList,
   Pressable,
-  ActivityIndicator,
 } from 'react-native';
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -24,17 +34,21 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  withDelay,
+  withRepeat,
   withTiming,
-  Easing,
-  FadeIn,
 } from 'react-native-reanimated';
 
-import { useSessions, relativeTime } from '../../hooks/useSessions';
+import { useSessions } from '../../hooks/useSessions';
 import type { SessionData } from '../../hooks/useSessions';
 import { useConnection } from '../../hooks/useConnection';
+import { useStreamStore } from '../../stores/index';
+import { groupSessionsByDate } from '../../lib/date-sections';
+import type { SectionData } from '../../lib/date-sections';
+import { showToast } from '../../lib/toast';
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
+import { SessionSearch } from './SessionSearch';
+import { SessionItem } from './SessionItem';
 
 // ---------------------------------------------------------------------------
 // Animated Pressable for spring scale feedback
@@ -42,120 +56,95 @@ import { createStyles } from '../../theme/createStyles';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-function PressableScale({
-  onPress,
-  style,
-  children,
-  accessibilityRole,
-  accessibilityLabel,
-}: {
-  onPress: () => void;
-  style?: any;
-  children: React.ReactNode;
-  accessibilityRole?: 'button' | 'link' | 'none';
-  accessibilityLabel?: string;
-}) {
-  const scale = useSharedValue(1);
+// ---------------------------------------------------------------------------
+// Skeleton placeholder for loading state
+// ---------------------------------------------------------------------------
+
+function SkeletonItem({ index }: { index: number }) {
+  const opacity = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withTiming(0.6, { duration: 1000 }),
+      -1,
+      true,
+    );
+  }, [opacity]);
+
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
   }));
 
   return (
-    <AnimatedPressable
-      onPressIn={() => {
-        scale.value = withSpring(0.97, theme.springs.micro);
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, theme.springs.micro);
-      }}
-      onPress={onPress}
-      style={[style, animatedStyle]}
-      accessibilityRole={accessibilityRole}
-      accessibilityLabel={accessibilityLabel}
-    >
-      {children}
-    </AnimatedPressable>
+    <Animated.View style={[styles.skeleton, animatedStyle]} />
+  );
+}
+
+function LoadingSkeletons() {
+  return (
+    <View style={styles.skeletonContainer}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <SkeletonItem key={i} index={i} />
+      ))}
+    </View>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Session Item
+// Empty state (D-34)
 // ---------------------------------------------------------------------------
 
-function SessionItem({
-  session,
-  isActive,
-  index,
-  onPress,
-}: {
-  session: SessionData;
-  isActive: boolean;
-  index: number;
-  onPress: () => void;
-}) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(10);
-  const hasAnimated = useRef(false);
+function EmptyState({ onNewChat }: { onNewChat: () => void }) {
+  const entryOpacity = useSharedValue(0);
+  const entryTranslateY = useSharedValue(20);
 
   useEffect(() => {
-    if (hasAnimated.current) return;
-    hasAnimated.current = true;
+    entryOpacity.value = withSpring(1, theme.springs.standard);
+    entryTranslateY.value = withSpring(0, theme.springs.standard);
+  }, [entryOpacity, entryTranslateY]);
 
-    // Stagger animation: 30ms per item, max 10 animated items
-    const delay = index < 10 ? index * 30 : 0;
-    const duration = index < 10 ? undefined : 0;
-
-    if (index < 10) {
-      opacity.value = withDelay(delay, withSpring(1, theme.springs.micro));
-      translateY.value = withDelay(delay, withSpring(0, theme.springs.micro));
-    } else {
-      opacity.value = 1;
-      translateY.value = 0;
-    }
-  }, [index, opacity, translateY]);
-
-  const entryStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: entryOpacity.value,
+    transform: [{ translateY: entryTranslateY.value }],
   }));
 
-  const bgColor = isActive
-    ? theme.colors.surface.raised
-    : 'transparent';
+  const scale = useSharedValue(1);
+  const pressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   return (
-    <Animated.View style={entryStyle}>
-      <PressableScale
-        onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          onPress();
-        }}
-        style={[
-          styles.sessionItem,
-          {
-            backgroundColor: bgColor,
-            borderLeftWidth: isActive ? 3 : 0,
-            borderLeftColor: isActive ? theme.colors.accent : 'transparent',
-            paddingLeft: isActive
-              ? theme.spacing.md - 3
-              : theme.spacing.md,
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={session.title}
-      >
-        <Text
-          style={styles.sessionTitle}
-          numberOfLines={1}
-          ellipsizeMode="tail"
+    <View style={styles.emptyContainer}>
+      <Animated.View style={[styles.emptyInner, animatedStyle]}>
+        <Text style={styles.emptyText}>No sessions yet</Text>
+        <AnimatedPressable
+          onPressIn={() => {
+            scale.value = withSpring(0.97, theme.springs.micro);
+          }}
+          onPressOut={() => {
+            scale.value = withSpring(1, theme.springs.micro);
+          }}
+          onPress={onNewChat}
+          style={[styles.emptyNewChatButton, pressStyle]}
+          accessibilityRole="button"
+          accessibilityLabel="New Chat"
         >
-          {session.title}
-        </Text>
-        <Text style={styles.sessionDate}>
-          {relativeTime(session.updatedAt)}
-        </Text>
-      </PressableScale>
-    </Animated.View>
+          <Text style={styles.emptyNewChatText}>New Chat</Text>
+        </AnimatedPressable>
+      </Animated.View>
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Search empty state
+// ---------------------------------------------------------------------------
+
+function SearchEmpty() {
+  return (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No sessions match your search</Text>
+    </View>
   );
 }
 
@@ -169,46 +158,130 @@ export function DrawerContent(props: DrawerContentComponentProps) {
     projects,
     isLoading,
     activeSessionId,
+    searchQuery,
+    setSearchQuery,
     createSession,
+    deleteSession,
     setActiveSession,
   } = useSessions();
-  const { status, isConnected, isReconnecting } = useConnection();
+  const { isConnected, isReconnecting } = useConnection();
+  const isStreaming = useStreamStore((s) => s.isStreaming);
+  const streamActiveSessionId = useStreamStore((s) => s.activeSessionId);
+
+  // Force re-render counter for pendingDeletes updates
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  // Pending deletes: session IDs -> timeout handles
+  const pendingDeletesRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   // Flatten all sessions from all projects, sorted by updatedAt descending
-  const allSessions = projects
-    .flatMap((p) => p.sessions)
-    .sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    );
+  const allSessions = useMemo(
+    () =>
+      projects
+        .flatMap((p) => p.sessions)
+        .sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        ),
+    [projects],
+  );
+
+  // Group into date sections
+  const sections = useMemo(
+    () => groupSessionsByDate(allSessions),
+    [allSessions],
+  );
+
+  // Filter out pending deletes from visible sections
+  const visibleSections = useMemo(() => {
+    return sections
+      .map((section) => ({
+        ...section,
+        data: section.data.filter((s) => !pendingDeletesRef.current.has(s.id)),
+      }))
+      .filter((section) => section.data.length > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sections, forceUpdate]);
 
   // Get first project for "New Chat" creation
   const firstProject = projects[0];
+
+  // -------------------------------------------------------------------------
+  // Handlers
+  // -------------------------------------------------------------------------
 
   const handleNewChat = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (firstProject) {
       createSession(firstProject.name, firstProject.path);
     } else {
-      // No projects loaded yet -- create stub with defaults
       createSession('default', '/home/swd/loom');
     }
     props.navigation.closeDrawer();
   }, [firstProject, createSession, props.navigation]);
 
+  // AR fix #2: pass projectName and projectPath in router params
   const handleSessionPress = useCallback(
     (session: SessionData) => {
       setActiveSession(session.id);
       router.push({
         pathname: '/chat/[id]',
-        params: { id: session.id },
+        params: {
+          id: session.id,
+          projectName: session.projectName,
+          projectPath: session.projectPath,
+        },
       });
       props.navigation.closeDrawer();
     },
     [setActiveSession, props.navigation],
   );
 
+  // AR fix #4: pendingDeletes ref pattern with 5s delayed deletion and undo
+  const handleDelete = useCallback(
+    (session: SessionData) => {
+      const sessionId = session.id;
+
+      // Schedule actual deletion after 5 seconds
+      const timer = setTimeout(() => {
+        deleteSession(session.projectName, sessionId).catch((err) => {
+          console.warn('[DrawerContent] Delete failed:', err);
+          // On error: remove from pending set so session reappears
+          pendingDeletesRef.current.delete(sessionId);
+          setForceUpdate((prev) => prev + 1);
+          showToast('Delete failed');
+        });
+        pendingDeletesRef.current.delete(sessionId);
+      }, 5000);
+
+      pendingDeletesRef.current.set(sessionId, timer);
+
+      // Hide session immediately
+      setForceUpdate((prev) => prev + 1);
+
+      showToast(
+        'Session deleted',
+        {
+          label: 'Undo',
+          onPress: () => {
+            const pendingTimer = pendingDeletesRef.current.get(sessionId);
+            if (pendingTimer) {
+              clearTimeout(pendingTimer);
+              pendingDeletesRef.current.delete(sessionId);
+              setForceUpdate((prev) => prev + 1);
+            }
+          },
+        },
+        5000,
+      );
+    },
+    [deleteSession],
+  );
+
+  // -------------------------------------------------------------------------
   // Connection status
+  // -------------------------------------------------------------------------
+
   const statusDotColor = isConnected
     ? theme.colors.success
     : isReconnecting
@@ -221,19 +294,55 @@ export function DrawerContent(props: DrawerContentComponentProps) {
       ? 'Reconnecting...'
       : 'Disconnected';
 
-  const renderSession = useCallback(
+  // -------------------------------------------------------------------------
+  // PressableScale for New Chat button
+  // -------------------------------------------------------------------------
+
+  const newChatScale = useSharedValue(1);
+  const newChatPressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: newChatScale.value }],
+  }));
+
+  // -------------------------------------------------------------------------
+  // SectionList renderers
+  // -------------------------------------------------------------------------
+
+  const renderItem = useCallback(
     ({ item, index }: { item: SessionData; index: number }) => (
       <SessionItem
         session={item}
         isActive={item.id === activeSessionId}
+        isRunning={isStreaming && streamActiveSessionId === item.id}
         index={index}
         onPress={() => handleSessionPress(item)}
+        onDelete={() => handleDelete(item)}
       />
     ),
-    [activeSessionId, handleSessionPress],
+    [activeSessionId, isStreaming, streamActiveSessionId, handleSessionPress, handleDelete],
+  );
+
+  const renderSectionHeader = useCallback(
+    ({ section: { title } }: { section: SectionData }) => (
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionHeaderText}>{title}</Text>
+      </View>
+    ),
+    [],
   );
 
   const keyExtractor = useCallback((item: SessionData) => item.id, []);
+
+  // -------------------------------------------------------------------------
+  // Determine what to show in the list area
+  // -------------------------------------------------------------------------
+
+  const hasNoSessions = allSessions.length === 0 && !isLoading;
+  const hasSearchNoResults =
+    searchQuery.trim().length > 0 && visibleSections.length === 0 && !isLoading;
+
+  // -------------------------------------------------------------------------
+  // Render
+  // -------------------------------------------------------------------------
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}>
@@ -241,30 +350,39 @@ export function DrawerContent(props: DrawerContentComponentProps) {
       <Text style={styles.brandTitle}>Loom</Text>
 
       {/* New Chat button */}
-      <PressableScale
+      <AnimatedPressable
+        onPressIn={() => {
+          newChatScale.value = withSpring(0.97, theme.springs.micro);
+        }}
+        onPressOut={() => {
+          newChatScale.value = withSpring(1, theme.springs.micro);
+        }}
         onPress={handleNewChat}
-        style={styles.newChatButton}
+        style={[styles.newChatButton, newChatPressStyle]}
         accessibilityRole="button"
         accessibilityLabel="New Chat"
       >
         <Text style={styles.newChatText}>New Chat</Text>
-      </PressableScale>
+      </AnimatedPressable>
 
-      {/* Session list */}
+      {/* Search bar */}
+      <SessionSearch query={searchQuery} onQueryChange={setSearchQuery} />
+
+      {/* Session list area */}
       <View style={styles.listContainer}>
         {isLoading ? (
-          <View style={styles.centeredState}>
-            <ActivityIndicator color={theme.colors.surface.overlay} />
-          </View>
-        ) : allSessions.length === 0 ? (
-          <View style={styles.centeredState}>
-            <Text style={styles.emptyText}>No sessions yet</Text>
-          </View>
+          <LoadingSkeletons />
+        ) : hasNoSessions ? (
+          <EmptyState onNewChat={handleNewChat} />
+        ) : hasSearchNoResults ? (
+          <SearchEmpty />
         ) : (
-          <FlatList
-            data={allSessions}
-            renderItem={renderSession}
+          <SectionList
+            sections={visibleSections}
+            renderItem={renderItem}
+            renderSectionHeader={renderSectionHeader}
             keyExtractor={keyExtractor}
+            stickySectionHeadersEnabled={false}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.listContent}
           />
@@ -318,31 +436,56 @@ const styles = createStyles((t) => ({
   listContent: {
     paddingBottom: 8,
   },
-  centeredState: {
+  sectionHeader: {
+    paddingHorizontal: t.spacing.md,
+    paddingTop: t.spacing.lg,
+    paddingBottom: t.spacing.xs,
+  },
+  sectionHeaderText: {
+    ...t.typography.small,
+    color: t.colors.text.muted,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+  },
+  // Empty state
+  emptyContainer: {
     flex: 1,
     justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+  },
+  emptyInner: {
     alignItems: 'center' as const,
   },
   emptyText: {
     ...t.typography.body,
     color: t.colors.text.muted,
+    marginBottom: t.spacing.md,
   },
-  sessionItem: {
-    minHeight: 56,
-    paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.sm,
+  emptyNewChatButton: {
+    minHeight: 44,
+    height: 44,
+    paddingHorizontal: t.spacing.xl,
+    backgroundColor: t.colors.accent,
+    borderRadius: t.radii.md,
     justifyContent: 'center' as const,
+    alignItems: 'center' as const,
   },
-  sessionTitle: {
-    ...t.typography.body,
-    fontWeight: '600' as const,
-    color: t.colors.text.primary,
+  emptyNewChatText: {
+    ...t.typography.heading,
+    color: t.colors.accentFg,
   },
-  sessionDate: {
-    ...t.typography.caption,
-    color: t.colors.text.muted,
-    marginTop: 2,
+  // Skeleton loading
+  skeletonContainer: {
+    paddingHorizontal: t.spacing.md,
+    paddingTop: t.spacing.lg,
   },
+  skeleton: {
+    height: 56,
+    backgroundColor: t.colors.surface.raised,
+    borderRadius: t.radii.md,
+    marginBottom: t.spacing.sm,
+  },
+  // Footer
   footer: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
