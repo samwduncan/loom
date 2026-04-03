@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
-status: planning
-stopped_at: Phase 75 planned (6 plans, 4 waves, AR max tier passed)
-last_updated: "2026-04-03T23:45:00.000Z"
-last_activity: 2026-04-03 -- Phase 75 planned (6 plans, AR max tier, 10 issues fixed)
+status: Ready to execute
+stopped_at: Completed 75-01-PLAN.md
+last_updated: "2026-04-03T23:33:36.589Z"
 progress:
   total_phases: 11
   completed_phases: 0
   total_plans: 6
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable -- from anywhere
-**Current focus:** Phase 75 (Chat Shell)
+**Current focus:** Phase 75 — chat-shell
 
 ## Current Position
 
-Phase: 75 of 85 (Chat Shell) -- 1 of 11 in v4.0
-Plan: 6 plans in 4 waves (AR max tier passed)
-Status: Ready to execute
-Last activity: 2026-04-03 -- Phase 75 planned with adversarial review
-
-Progress: [░░░░░░░░░░] 0%
+Phase: 75 (chat-shell) — EXECUTING
+Plan: 2 of 6
 
 ## Performance Metrics
 
@@ -51,6 +45,8 @@ Progress: [░░░░░░░░░░] 0%
 - [v4.0] Relay auth mandatory before agents communicate
 - [v4.0] HITL protocol needs design phase before implementation
 - [v4.0] Private Mind as pattern reference (~30% reuse) for chat shell
+- [Phase 75]: Segment parser uses state machine for code block extraction, tool calls grouped after text/code
+- [Phase 75]: Toast uses module-scoped callback pattern (not React Context) for global imperative access
 
 ### Blockers/Concerns
 
@@ -58,6 +54,6 @@ None currently identified.
 
 ## Session Continuity
 
-Last session: 2026-04-03T22:14:38.444Z
-Stopped at: Phase 75 UI-SPEC approved
+Last session: 2026-04-03T23:33:36.587Z
+Stopped at: Completed 75-01-PLAN.md
 Resume: `/gsd:plan-phase 75`

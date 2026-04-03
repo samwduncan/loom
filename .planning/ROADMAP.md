@@ -61,7 +61,7 @@ Phase 74 (Shell & Connection) completed 2026-04-03: Auth, WebSocket lifecycle, d
   4. App authenticates via JWT in iOS Keychain and WebSocket reconnects automatically on network changes
 **Plans**: 6 plans
 Plans:
-- [ ] 75-01-PLAN.md -- Foundation: deps, theme Small typography, message segment parser, date section utility
+- [x] 75-01-PLAN.md -- Foundation: deps, theme Small typography, message segment parser, date section utility
 - [ ] 75-02-PLAN.md -- Drawer upgrade: date-grouped SectionList, search, swipe-delete, toast system
 - [ ] 75-03-PLAN.md -- Content segments: TextSegment (markdown), CodeBlockSegment (syntax highlighting), ThinkingSegment (expand/collapse)
 - [ ] 75-04-PLAN.md -- Interactive segments: ToolChip + ToolDetailSheet (bottom sheet), PermissionCard (approve/deny)
@@ -183,7 +183,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 75. Chat Shell | v4.0 | 0/6 | Planning complete | - |
+| 75. Chat Shell | v4.0 | 1/6 | In Progress|  |
 | 76. Push Notifications | v4.0 | 0/TBD | Not started | - |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
