@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
-status: Ready to execute
-stopped_at: Completed 75-05-PLAN.md
-last_updated: "2026-04-03T23:54:47.364Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 75-06-PLAN.md
+last_updated: "2026-04-04T00:02:42.849Z"
 progress:
   total_phases: 11
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -58,6 +58,8 @@ Plan: 6 of 6
 - [Phase 75]: AR fix #5: Historical messages carry toolCalls/thinkingBlocks via DisplayMessage; mapToolCallToState in AssistantMessage
 - [Phase 75]: AR fix #9: Explicit reverse() before inverted FlatList for unambiguous message ordering
 - [Phase 75]: FlatList key={sessionId} forces remount on session switch, preventing stale message flash
+- [Phase 75]: Composed scroll handlers: useScrollToBottom.onScroll + useScrollPosition.saveOffset fire together in single callback
+- [Phase 75]: Provider stack order: GestureHandler > Keyboard > SafeArea > BottomSheet > Toast > Content
 
 ### Blockers/Concerns
 
@@ -65,6 +67,6 @@ None currently identified.
 
 ## Session Continuity
 
-Last session: 2026-04-03T23:54:47.362Z
-Stopped at: Completed 75-05-PLAN.md
+Last session: 2026-04-04T00:02:42.847Z
+Stopped at: Completed 75-06-PLAN.md
 Resume: `/gsd:plan-phase 75`

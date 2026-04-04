@@ -66,7 +66,7 @@ Plans:
 - [x] 75-03-PLAN.md -- Content segments: TextSegment (markdown), CodeBlockSegment (syntax highlighting), ThinkingSegment (expand/collapse)
 - [x] 75-04-PLAN.md -- Interactive segments: ToolChip + ToolDetailSheet (bottom sheet), PermissionCard (approve/deny)
 - [x] 75-05-PLAN.md -- Composer (3-state FSM) + MessageList + MessageItem + UserBubble + AssistantMessage + StreamingIndicator
-- [ ] 75-06-PLAN.md -- Chat screen wiring, scroll position preservation, providers, end-to-end verification checkpoint
+- [x] 75-06-PLAN.md -- Chat screen wiring, scroll position preservation, providers, end-to-end verification checkpoint
 **UI hint**: yes
 
 ### Phase 76: Push Notifications
@@ -183,7 +183,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 75. Chat Shell | v4.0 | 5/6 | In Progress|  |
+| 75. Chat Shell | v4.0 | 6/6 | Complete   | 2026-04-04 |
 | 76. Push Notifications | v4.0 | 0/TBD | Not started | - |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
