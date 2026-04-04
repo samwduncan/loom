@@ -1,7 +1,13 @@
 /**
  * Chat screen route -- fully wired chat interface for a given session ID.
  *
- * Renders: ChatHeader + (EmptyChat | MessageList) + ScrollToBottomPill + Composer
+ * Renders: Content area (EmptyChat | MessageList + ScrollToBottomPill) + ChatHeader + Composer
+ *
+ * CRITICAL RENDER ORDER: ChatHeader renders AFTER the content View in the DOM tree.
+ * expo-blur requires BlurView to render after the dynamic content (FlatList) it blurs.
+ * ChatHeader is absolutely positioned with zIndex 10 to visually stack on top.
+ * The content View gets paddingTop: HEADER_HEIGHT so both EmptyChat and MessageList
+ * are pushed below the glass header.
  *
  * Data flow:
  * - Route params provide: id, projectName, projectPath (from createSession or handleSessionPress)
@@ -16,6 +22,7 @@ import { useEffect, useCallback, useState } from 'react';
 import { View } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 import { ChatHeader } from '../../../../components/navigation/ChatHeader';
@@ -44,6 +51,14 @@ export default function ChatScreen() {
   const sessionId = id ?? 'new';
   const resolvedProjectName = projectName ?? '';
   const resolvedProjectPath = projectPath ?? '';
+
+  // Compute glass header height: safe area top + header row (56px)
+  // Fallback 44 for pre-layout when insets haven't resolved yet
+  const insets = useSafeAreaInsets();
+  const HEADER_HEIGHT = (insets?.top ?? 44) + 56;
+
+  // Model name for header indicator (D-12)
+  const modelName = useStreamStore((s) => s.modelName);
 
   // Message data
   const { messages, isLoading, isStreaming, fetchMessages } = useMessageList();
@@ -108,9 +123,9 @@ export default function ChatScreen() {
       behavior="padding"
       style={styles.container}
     >
-      <ChatHeader title={title} />
-
-      <View style={styles.content}>
+      {/* Content area -- rendered FIRST in DOM so BlurView header works.
+          paddingTop offsets both EmptyChat and MessageList below glass header. */}
+      <View style={[styles.content, { paddingTop: HEADER_HEIGHT }]}>
         {showEmptyState ? (
           <EmptyChat />
         ) : (
@@ -121,6 +136,7 @@ export default function ChatScreen() {
             onScroll={handleScroll}
             listRef={listRef}
             initialScrollOffset={initialScrollOffset}
+            headerHeight={HEADER_HEIGHT}
           />
         )}
 
@@ -130,6 +146,10 @@ export default function ChatScreen() {
           onPress={scrollToBottom}
         />
       </View>
+
+      {/* Glass header -- rendered AFTER content in DOM for BlurView blur correctness.
+          Visually stacked on top via absolute positioning + zIndex. */}
+      <ChatHeader title={title} modelName={modelName ?? ''} />
 
       <Composer
         sessionId={sessionId}

@@ -1,18 +1,29 @@
 /**
- * ChatHeader -- navigation header with hamburger icon and title.
+ * ChatHeader -- glass navigation header with hamburger icon, title, and model indicator.
  *
  * Structure:
  * - Left: hamburger icon (opens drawer via navigation.openDrawer)
  * - Center: title text (default "New Chat")
- * - Right: empty spacer to balance layout
+ * - Right: model indicator (D-12) -- shows current model name from stream store
+ *
+ * Glass treatment (D-04):
+ * - expo-blur BlurView intensity 40, dark tint
+ * - Overlay rgba(0,0,0,0.35)
+ * - Bottom border 1px border-subtle
+ * - Absolutely positioned with zIndex 10 so content scrolls under
+ *
+ * CRITICAL: ChatHeader must render AFTER dynamic content (FlatList) in the DOM
+ * tree for expo-blur to properly update its blur. ChatScreen handles this by
+ * rendering ChatHeader after the content View.
  *
  * Safe area: paddingTop set to insets.top so content clears Dynamic Island/notch.
  * Uses Lucide Menu icon (expo-symbols requires native build context).
  */
 
-import { Text, Pressable, View } from 'react-native';
+import { StyleSheet, Text, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, type DrawerNavigationProp } from '@react-navigation/native';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
@@ -28,9 +39,10 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface ChatHeaderProps {
   title?: string;
+  modelName?: string;
 }
 
-export function ChatHeader({ title = 'New Chat' }: ChatHeaderProps) {
+export function ChatHeader({ title = 'New Chat', modelName }: ChatHeaderProps) {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<DrawerNavigationProp<any>>();
   const scale = useSharedValue(1);
@@ -45,7 +57,10 @@ export function ChatHeader({ title = 'New Chat' }: ChatHeaderProps) {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.glassContainer, { paddingTop: insets.top }]}>
+      <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
+        <View style={styles.glassOverlay} />
+      </BlurView>
       <View style={styles.headerRow}>
         {/* Hamburger button */}
         <AnimatedPressable
@@ -72,16 +87,29 @@ export function ChatHeader({ title = 'New Chat' }: ChatHeaderProps) {
           {title}
         </Text>
 
-        {/* Spacer to balance hamburger */}
-        <View style={styles.spacer} />
+        {/* Model indicator (D-12) */}
+        <Text style={styles.modelIndicator} numberOfLines={1}>
+          {modelName ?? ''}
+        </Text>
       </View>
     </View>
   );
 }
 
 const styles = createStyles((t) => ({
-  container: {
-    backgroundColor: t.colors.surface.base,
+  glassContainer: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    overflow: 'hidden' as const,
+    borderBottomWidth: 1,
+    borderBottomColor: t.colors.border.subtle,
+  },
+  glassOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   headerRow: {
     height: 56,
@@ -101,8 +129,9 @@ const styles = createStyles((t) => ({
     flex: 1,
     textAlign: 'center' as const,
   },
-  spacer: {
-    width: 44,
-    height: 44,
+  modelIndicator: {
+    ...t.typography.caption,
+    color: t.colors.text.muted,
+    maxWidth: 80,
   },
 }));
