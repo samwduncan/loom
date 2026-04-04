@@ -140,11 +140,6 @@ Accent reserved for (this phase):
    - Selected row shows accent-colored checkmark (SF Symbol `checkmark`, 17px, accent color).
    - Unselected rows show no checkmark.
 
-2. **"Behavior" section:**
-   - Section header: "BEHAVIOR" (12px Caption, `text-muted`, uppercase, px-16).
-   - "Batch notifications" toggle row: title "Batch completions", subtitle "Group session completions within 5 seconds" (13px Small, `text-muted`), toggle right.
-   - Section footer: none.
-
 **Motion:**
 - Screen entrance: Navigation spring (22/130, ~300ms, horizontal slide from right).
 - Row press: Micro spring scale (0.97) + haptic Impact Light.
