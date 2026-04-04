@@ -174,6 +174,14 @@ export function DrawerContent(props: DrawerContentComponentProps) {
   // Pending deletes: session IDs -> timeout handles
   const pendingDeletesRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
+  // Clean up pending delete timers on unmount
+  useEffect(() => {
+    return () => {
+      pendingDeletesRef.current.forEach((timer) => clearTimeout(timer));
+      pendingDeletesRef.current.clear();
+    };
+  }, []);
+
   // Flatten all sessions from all projects, sorted by updatedAt descending
   const allSessions = useMemo(
     () =>

@@ -32,33 +32,33 @@ export const theme: LoomTheme = {
   typography: {
     largeTitle: {
       fontSize: 28,
-      fontWeight: '600',
+      fontWeight: '700',
       lineHeight: 34,
-      fontFamily: 'Inter',
+      fontFamily: 'Inter-SemiBold',
     },
     heading: {
       fontSize: 17,
       fontWeight: '600',
       lineHeight: 22,
-      fontFamily: 'Inter',
+      fontFamily: 'Inter-SemiBold',
     },
     body: {
       fontSize: 15,
       fontWeight: '400',
       lineHeight: 24,
-      fontFamily: 'Inter',
+      fontFamily: 'Inter-Regular',
     },
     small: {
       fontSize: 13,
       fontWeight: '400',
       lineHeight: 18,
-      fontFamily: 'Inter',
+      fontFamily: 'Inter-Regular',
     },
     caption: {
       fontSize: 12,
       fontWeight: '400',
       lineHeight: 16,
-      fontFamily: 'Inter',
+      fontFamily: 'Inter-Regular',
     },
   },
   spacing: {

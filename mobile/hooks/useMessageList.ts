@@ -9,7 +9,7 @@
  * show timestamp when 5+ minute gap between consecutive messages.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import type { Message, ToolCall, ThinkingBlock } from '@loom/shared/types/message';
 import { useStreamStore } from '../stores/index';
 import { useTimelineStore } from '../stores/index';
@@ -144,8 +144,11 @@ export function useMessageList(): UseMessageListReturn {
     }
   }, [isStreaming, activeSessionId, interruptedSnapshot]);
 
-  // Build display messages
-  const displayMessages: DisplayMessage[] = toDisplayMessages(fetchedMessages);
+  // Build display messages (memoized to avoid re-parsing on every streaming token)
+  const baseDisplayMessages = useMemo(() => toDisplayMessages(fetchedMessages), [fetchedMessages]);
+
+  // Build final array with streaming/interrupted appends
+  const displayMessages: DisplayMessage[] = [...baseDisplayMessages];
 
   // D-28: Append interrupted message if snapshot exists and no active stream
   if (!isStreaming && interruptedSnapshot && interruptedSnapshot.content) {

@@ -7,7 +7,7 @@
  * Saves are debounced (200ms) to avoid MMKV thrashing during rapid scroll events.
  */
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { MMKV } from 'react-native-mmkv';
 
 const mmkv = new MMKV();
@@ -36,6 +36,13 @@ export function useScrollPosition(): UseScrollPositionReturn {
 
   const clearOffset = useCallback((sessionId: string) => {
     mmkv.delete(`${SCROLL_KEY_PREFIX}${sessionId}`);
+  }, []);
+
+  // Clean up pending save timer on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
   }, []);
 
   return { saveOffset, getOffset, clearOffset };

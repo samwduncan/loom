@@ -205,7 +205,7 @@ const styles = createStyles((t) => ({
     fontSize: t.typography.body.fontSize,
     fontWeight: '600',
     lineHeight: t.typography.body.lineHeight,
-    fontFamily: 'Inter',
+    fontFamily: 'Inter-SemiBold',
     marginLeft: t.spacing.md,
   },
 }));

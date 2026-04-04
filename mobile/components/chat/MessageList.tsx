@@ -84,7 +84,9 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
   );
 
   // Restore initial scroll offset after data loads (CHAT-07)
-  const flatListRef = listRef ?? React.useRef<FlatList<DisplayMessage>>(null);
+  // Always create local ref unconditionally (Rules of Hooks), then pick which to use
+  const localRef = React.useRef<FlatList<DisplayMessage>>(null);
+  const flatListRef = listRef ?? localRef;
 
   useEffect(() => {
     if (initialScrollOffset && initialScrollOffset > 0 && reversedMessages.length > 0) {

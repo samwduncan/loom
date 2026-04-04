@@ -25,16 +25,16 @@ export function useScrollToBottom(hasMessages: boolean): UseScrollToBottomReturn
   const [isAtBottom, setIsAtBottom] = useState(true);
 
   const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-    const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
-    const atBottom = distanceFromBottom <= BOTTOM_THRESHOLD;
+    const { contentOffset } = event.nativeEvent;
+    // For inverted FlatList: offset 0 = bottom (newest), offset increases = scrolled up (older)
+    const atBottom = contentOffset.y <= BOTTOM_THRESHOLD;
     setIsAtBottom(atBottom);
   }, []);
 
   const scrollToBottom = useCallback(() => {
     if (listRef.current) {
-      // FlashList and FlatList both support scrollToEnd
-      listRef.current.scrollToEnd({ animated: true });
+      // For inverted FlatList: offset 0 = newest messages (visual bottom)
+      listRef.current.scrollToOffset({ offset: 0, animated: true });
       setIsAtBottom(true);
     }
   }, []);

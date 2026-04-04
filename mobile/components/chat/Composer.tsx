@@ -58,6 +58,9 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 
   // Stream state from store
   const isStreaming = useStreamStore((s) => s.isStreaming);
+  // Use active session ID from store when available (fixes stale stub-* session after replacement)
+  const storeActiveSessionId = useStreamStore((s) => s.activeSessionId);
+  const effectiveSessionId = storeActiveSessionId || sessionId;
 
   // Send button animation
   const buttonScale = useSharedValue(1);
@@ -111,9 +114,9 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
       return;
     }
 
-    const options: Record<string, unknown> = { projectPath };
-    if (sessionId && !sessionId.startsWith('stub-')) {
-      options.sessionId = sessionId;
+    const options: Record<string, unknown> = { projectPath, projectName };
+    if (effectiveSessionId && !effectiveSessionId.startsWith('stub-')) {
+      options.sessionId = effectiveSessionId;
     }
 
     wsClient.send({
@@ -128,14 +131,14 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
     fallbackTimerRef.current = setTimeout(() => {
       setComposerState((prev) => (prev === 'sending' ? 'idle' : prev));
     }, 5000);
-  }, [text, composerState, sessionId, projectPath]);
+  }, [text, composerState, effectiveSessionId, projectPath, projectName]);
 
   // -------------------------------------------------------------------------
   // Stop handler
   // -------------------------------------------------------------------------
 
   const handleStop = useCallback(() => {
-    if (composerState !== 'active' || !sessionId) return;
+    if (composerState !== 'active' || !effectiveSessionId) return;
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const wsClient = getWsClient();
@@ -143,10 +146,10 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 
     wsClient.send({
       type: 'abort-session',
-      sessionId,
+      sessionId: effectiveSessionId,
       provider: 'claude',
     });
-  }, [composerState, sessionId]);
+  }, [composerState, effectiveSessionId]);
 
   // -------------------------------------------------------------------------
   // Button press animation (Micro spring scale 0.85)

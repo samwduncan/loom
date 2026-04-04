@@ -16,7 +16,7 @@
  * @see D-22: subtle glow/highlight
  */
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   FadeIn,
@@ -80,6 +80,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function PermissionCard({ request }: PermissionCardProps) {
   const [cardState, setCardState] = useState<CardState>('pending');
+  const hasRespondedRef = useRef(false);
   const description = generateDescription(request.toolName, request.input);
 
   // Entrance animation shared values
@@ -112,6 +113,8 @@ export function PermissionCard({ request }: PermissionCardProps) {
   // ---------------------------------------------------------------------------
 
   const handleApprove = useCallback(() => {
+    if (hasRespondedRef.current) return;
+    hasRespondedRef.current = true;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const wsClient = getWsClient();
     if (wsClient) {
@@ -130,6 +133,8 @@ export function PermissionCard({ request }: PermissionCardProps) {
   // ---------------------------------------------------------------------------
 
   const handleDeny = useCallback(() => {
+    if (hasRespondedRef.current) return;
+    hasRespondedRef.current = true;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const wsClient = getWsClient();
     if (wsClient) {
