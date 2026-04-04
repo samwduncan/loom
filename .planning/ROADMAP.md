@@ -207,7 +207,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 |-------|-----------|----------------|--------|-----------|
 | 75. Chat Shell | v4.0 | 6/6 | Complete    | 2026-04-04 |
 | 76. Push Notifications | v4.0 | 4/4 | Complete   | 2026-04-04 |
-| 76.1 Visual Foundation | v4.0 | 0/3 | Not started | - |
+| 76.1 Visual Foundation | v4.0 | 0/3 | Planned | - |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
 | 79. Agent Dashboard | v4.0 | 0/TBD | Not started | - |
