@@ -24,7 +24,6 @@ import { StyleSheet, Text, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, type DrawerNavigationProp } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
-import * as Haptics from 'expo-haptics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -32,6 +31,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Menu } from 'lucide-react-native';
 
+import { haptic } from '../../lib/haptics';
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
 
@@ -52,7 +52,7 @@ export function ChatHeader({ title = 'New Chat', modelName }: ChatHeaderProps) {
   }));
 
   const handleHamburgerPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.tap();
     navigation.openDrawer();
   };
 

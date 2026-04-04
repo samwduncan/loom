@@ -351,7 +351,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
   // Determine what to show in the list area
   // -------------------------------------------------------------------------
 
-  const hasNoSessions = allSessions.length === 0 && !isLoading;
+  const hasNoSessions = allSessions.length === 0 && !isLoading && !searchQuery.trim();
   const hasSearchNoResults =
     searchQuery.trim().length > 0 && visibleSections.length === 0 && !isLoading;
 

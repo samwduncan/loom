@@ -24,9 +24,8 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
-
 import type { PermissionRequest } from '@loom/shared/stores/stream';
+import { haptic } from '../../../lib/haptics';
 import { getWsClient } from '../../../lib/websocket-init';
 import { useStreamStore } from '../../../stores/index';
 import { theme } from '../../../theme/theme';
@@ -94,7 +93,7 @@ export function PermissionCard({ request }: PermissionCardProps) {
 
   // Dramatic entrance on mount + Warning haptic
   useEffect(() => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    haptic.warning();
     opacity.value = withSpring(1, theme.springs.dramatic);
     translateY.value = withSpring(0, theme.springs.dramatic);
     cardScale.value = withSpring(1, theme.springs.dramatic);
@@ -115,15 +114,17 @@ export function PermissionCard({ request }: PermissionCardProps) {
   const handleApprove = useCallback(() => {
     if (hasRespondedRef.current) return;
     hasRespondedRef.current = true;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     const wsClient = getWsClient();
-    if (wsClient) {
-      wsClient.send({
-        type: 'claude-permission-response',
-        requestId: request.requestId,
-        allow: true,
-      });
+    if (!wsClient) {
+      hasRespondedRef.current = false; // Allow retry
+      return; // Don't clear state when disconnected — response would be lost
     }
+    haptic.success();
+    wsClient.send({
+      type: 'claude-permission-response',
+      requestId: request.requestId,
+      allow: true,
+    });
     useStreamStore.getState().clearPermissionRequest();
     setCardState('approved');
   }, [request.requestId]);
@@ -135,15 +136,17 @@ export function PermissionCard({ request }: PermissionCardProps) {
   const handleDeny = useCallback(() => {
     if (hasRespondedRef.current) return;
     hasRespondedRef.current = true;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const wsClient = getWsClient();
-    if (wsClient) {
-      wsClient.send({
-        type: 'claude-permission-response',
-        requestId: request.requestId,
-        allow: false,
-      });
+    if (!wsClient) {
+      hasRespondedRef.current = false; // Allow retry
+      return; // Don't clear state when disconnected — response would be lost
     }
+    haptic.tap();
+    wsClient.send({
+      type: 'claude-permission-response',
+      requestId: request.requestId,
+      allow: false,
+    });
     useStreamStore.getState().clearPermissionRequest();
     setCardState('denied');
   }, [request.requestId]);

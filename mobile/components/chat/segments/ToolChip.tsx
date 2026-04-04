@@ -35,10 +35,10 @@ import {
   Check,
   X,
 } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import type { LucideIcon } from 'lucide-react-native';
 
 import type { ToolCallState, ToolCallStatus } from '@loom/shared/types/stream';
+import { haptic } from '../../../lib/haptics';
 import { theme } from '../../../theme/theme';
 import { createStyles } from '../../../theme/createStyles';
 
@@ -141,7 +141,7 @@ function ToolChipInner({ toolCall, onPress }: ToolChipProps) {
   }, [scale]);
 
   const handlePress = useCallback(() => {
-    Haptics.selectionAsync();
+    haptic.selection();
     onPress();
   }, [onPress]);
 
