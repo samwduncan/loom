@@ -22,7 +22,8 @@ import { CLAUDE_MODELS } from '../shared/modelConstants.js';
 const activeSessions = new Map();
 const pendingToolApprovals = new Map();
 
-const TOOL_APPROVAL_TIMEOUT_MS = parseInt(process.env.CLAUDE_TOOL_APPROVAL_TIMEOUT_MS, 10) || 55000;
+// D-07: 120s for cold-start permission approval flow (iOS cold boot + auth + WS connect + MMKV drain)
+const TOOL_APPROVAL_TIMEOUT_MS = parseInt(process.env.CLAUDE_TOOL_APPROVAL_TIMEOUT_MS, 10) || 120000;
 
 const TOOLS_REQUIRING_INTERACTION = new Set(['AskUserQuestion']);
 
