@@ -110,7 +110,7 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 **Goal:** Transform Loom into the AI development control plane — tmux-backed sessions, push notifications, agent management, Dynamic Island, and relay orchestration, all accessible from iPhone.
 
 **Target features:**
-- [ ] Chat shell — Private Mind-adapted chat UI with Loom stores, streaming, tool cards
+- [x] Chat shell — Private Mind-adapted chat UI with Loom stores, streaming, tool cards (Phase 75)
 - [ ] Push notifications — Session completion, permission requests, deep links
 - [ ] tmux agent management — Spawn/monitor/kill AI sessions from the app
 - [ ] Dynamic Island + Live Activities — Streaming session status and progress
@@ -152,10 +152,10 @@ Make AI agent work visible, beautiful, and controllable — every tool call, eve
 
 ## Context
 
-**Current State (v4.0 starting — 2026-04-03):**
+**Current State (v4.0 Phase 75 complete — 2026-04-04):**
 - Web app: ~55,000 LOC TypeScript + CSS across 69 phases (10 milestones) — daily-driver quality
 - Shared: @loom/shared package with 13 types, 5 store factories, 5 lib modules, 143 tests
-- Mobile: Expo React Native scaffold (mobile/) — Phase 68 scaffold + Phase 74 shell/connection work
+- Mobile: Full chat shell built (Phase 75) — segment-based rendering, Composer FSM, drawer navigation, tool/permission cards, scroll preservation. Needs device testing.
 - Web stack: Vite 7 + React 19 + TypeScript, Tailwind v4, Zustand (5 stores), Vitest
 - Mobile stack: Expo SDK 54 + React Native, Expo Router, MMKV, SecureStore
 - ~1500+ commits, 31-day total build (2026-03-04 to 2026-04-03)
