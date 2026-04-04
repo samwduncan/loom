@@ -1,5 +1,5 @@
 /**
- * Composer -- Functional message composer with 3-state FSM.
+ * Composer -- Functional message composer with 3-state FSM and glass surface.
  *
  * Replaces ComposerShell with a fully wired composer that sends messages
  * via WebSocket and transforms between idle/sending/active states.
@@ -9,6 +9,11 @@
  *   sending  -> Brief transition during WS send (prevents double-send, input disabled)
  *   active   -> Streaming in progress, stop button (destructive Square icon)
  *
+ * Glass treatment (D-04, D-07):
+ *   Uses expo-blur BlurView intensity 40, dark tint, rgba(0,0,0,0.35) overlay.
+ *   USE_GLASS_COMPOSER toggle for easy fallback if keyboard-blur collision causes stutter.
+ *   Fallback: opaque surface-raised with top border (intentional, not broken).
+ *
  * AR fix #3: 5s fallback timer uses functional updater `setComposerState((prev) => ...)`
  * to avoid stale closure. Timer is cleared when isStreaming transitions to true.
  *
@@ -16,8 +21,9 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -31,6 +37,12 @@ import { createStyles } from '../../theme/createStyles';
 import { getWsClient } from '../../lib/websocket-init';
 import { useStreamStore } from '../../stores/index';
 import { ComposerStatusBar } from './ComposerStatusBar';
+
+/**
+ * Glass composer toggle. Set to false if keyboard-blur collision causes stutter (D-07).
+ * Fallback: opaque surface-raised with top border (must look intentional, not broken).
+ */
+const USE_GLASS_COMPOSER = true;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -191,14 +203,17 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   const buttonHandler = isActive ? handleStop : handleSend;
   const buttonDisabled = !isActive && !hasText;
 
+  const outerStyle = USE_GLASS_COMPOSER
+    ? [styles.glassOuter, { paddingBottom: insets.bottom + theme.spacing.sm }, theme.shadows.medium]
+    : [styles.opaqueOuter, { paddingBottom: insets.bottom + theme.spacing.sm }, theme.shadows.medium];
+
   return (
-    <View
-      style={[
-        styles.outer,
-        { paddingBottom: insets.bottom + theme.spacing.sm },
-        theme.shadows.medium,
-      ]}
-    >
+    <View style={outerStyle}>
+      {USE_GLASS_COMPOSER && (
+        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
+          <View style={styles.glassOverlay} />
+        </BlurView>
+      )}
       <View style={styles.row}>
         {/* Text input */}
         <TextInput
@@ -248,12 +263,27 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 // ---------------------------------------------------------------------------
 
 const styles = createStyles((t) => ({
-  outer: {
-    backgroundColor: t.colors.surface.raised,
-    borderTopLeftRadius: t.radii.xl,
+  glassOuter: {
+    overflow: 'hidden' as const,
+    borderTopLeftRadius: t.radii.xl, // 20px -- kept for continuity (D-04 spec is 16px, deferred)
     borderTopRightRadius: t.radii.xl,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: t.colors.border.subtle,
+  },
+  glassOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  opaqueOuter: {
+    backgroundColor: t.colors.surface.raised,
+    borderTopLeftRadius: t.radii.xl, // 20px -- kept for continuity (D-04 spec is 16px, deferred)
+    borderTopRightRadius: t.radii.xl,
+    paddingHorizontal: t.spacing.md,
+    paddingTop: t.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: t.colors.border.subtle,
   },
   row: {
     flexDirection: 'row' as const,
