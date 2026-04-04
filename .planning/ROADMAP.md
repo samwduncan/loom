@@ -98,9 +98,9 @@ Plans:
   4. All interactions have spring animation + haptic feedback (no silent taps, no instant transitions)
 **Plans**: 3 plans
 Plans:
-- [ ] 76.1-01-PLAN.md -- Foundation tokens: haptic hierarchy utility, rimLight theme token, UserBubble rim light, Soul doc update
-- [ ] 76.1-02-PLAN.md -- Glass surfaces: ChatHeader glass, Composer glass with keyboard-blur fallback, ChatScreen render order fix
-- [ ] 76.1-03-PLAN.md -- Density + interaction sweep: SessionItem density, AssistantMessage spring, drawer/composer haptics, device checkpoint
+- [x] 76.1-01-PLAN.md -- Foundation tokens: haptic hierarchy utility, rimLight theme token, UserBubble rim light, Soul doc update
+- [x] 76.1-02-PLAN.md -- Glass surfaces: ChatHeader glass, Composer glass with keyboard-blur fallback, ChatScreen render order fix
+- [x] 76.1-03-PLAN.md -- Density + interaction sweep: SessionItem density, AssistantMessage spring, drawer/composer haptics, device checkpoint
 **UI hint**: yes
 
 ### Phase 77: Relay Security
@@ -207,7 +207,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 |-------|-----------|----------------|--------|-----------|
 | 75. Chat Shell | v4.0 | 6/6 | Complete    | 2026-04-04 |
 | 76. Push Notifications | v4.0 | 4/4 | Complete   | 2026-04-04 |
-| 76.1 Visual Foundation | v4.0 | 0/3 | Planned | - |
+| 76.1 Visual Foundation | v4.0 | 3/3 | Complete   | 2026-04-04 |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
 | 79. Agent Dashboard | v4.0 | 0/TBD | Not started | - |

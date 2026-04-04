@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
-status: Phase 76.1 inserted — visual foundation urgent work
-stopped_at: Phase 76.1 context gathered (auto mode)
-last_updated: "2026-04-04T17:27:36.772Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 76.1-03-PLAN.md
+last_updated: "2026-04-04T18:39:11.173Z"
 progress:
   total_phases: 12
-  completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
+  completed_phases: 3
+  total_plans: 13
+  completed_plans: 13
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable -- from anywhere
-**Current focus:** Phase 76.1 — visual-foundation (INSERTED)
+**Current focus:** Phase 76.1 — visual-foundation
 
 ## Current Position
 
-Phase: 76.1 (visual-foundation) — NOT STARTED
-Plan: 0 of TBD
+Phase: 76.1 (visual-foundation) — EXECUTING
+Plan: 3 of 3
 
 ## Performance Metrics
 
@@ -71,6 +71,16 @@ Plan: 0 of TBD
 - [Phase 76]: wsClient.send() takes ClientMessage object, not JSON string -- plan corrected to typed usage
 - [Phase 76]: 120s permission timeout (up from 55s) for cold-start approval flow [D-07]
 - [Phase 76]: AuthenticatedApp component pattern isolates auth-dependent hooks from conditional rendering
+- [Phase 76.1]: Haptic hierarchy: 6 semantic levels (tap/transition/success/warning/error/selection) mapped to expo-haptics primitives
+- [Phase 76.1]: rimLight token: 0.5pt top border rgba(255,255,255,0.05) for depth perception on raised surfaces
+- [Phase 76.1]: Soul doc surface values updated to match device-optimized code (16-20 RGB unit jumps)
+- [Phase 76.1]: ChatHeader rendered AFTER content in DOM for expo-blur correctness, absolutely positioned with zIndex 10
+- [Phase 76.1]: USE_GLASS_COMPOSER toggle for Composer glass/opaque fallback (D-07 keyboard-blur risk)
+- [Phase 76.1]: Composer keeps 20px radii.xl for continuity (D-04 16px acknowledged, deferred)
+- [Phase 76.1]: SessionItem density: caption (12px) subtitle, 12px paddingVertical for ChatGPT iOS match (D-08)
+- [Phase 76.1]: AssistantMessage D-26 override: withSpring Standard replaces withTiming per Soul doc anti-pattern #2
+- [Phase 76.1]: Drawer open haptic via transitionEnd + !closing check (drawerOpen event doesn't exist in v7)
+- [Phase 76.1]: Typing-begins haptic: 2s cooldown via Date.now ref to prevent fatigue on rapid clear-retype
 
 ### Roadmap Evolution
 
@@ -83,6 +93,6 @@ Plan: 0 of TBD
 
 ## Session Continuity
 
-Last session: 2026-04-04T17:27:36.769Z
-Stopped at: Phase 76.1 context gathered (auto mode)
+Last session: 2026-04-04T18:39:11.170Z
+Stopped at: Completed 76.1-03-PLAN.md
 Resume: `/gsd:plan-phase 76.1`
