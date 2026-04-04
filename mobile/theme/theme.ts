@@ -104,4 +104,8 @@ export const theme: LoomTheme = {
     xl: 20,
     full: 9999,
   },
+  rimLight: {
+    borderTopWidth: 0.5,
+    borderTopColor: 'rgba(255,255,255,0.05)',
+  },
 };

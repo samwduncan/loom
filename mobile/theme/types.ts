@@ -65,4 +65,5 @@ export interface LoomTheme {
     xl: number;   // 20
     full: number; // 9999
   };
+  rimLight: ViewStyle;
 }
