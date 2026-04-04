@@ -78,7 +78,12 @@ Plans:
   2. User taps the notification and lands directly in the specific session conversation
   3. User receives a push notification when an agent needs permission and can approve/deny from notification action buttons without opening the app
   4. User can configure notification granularity in settings (all / failures only / permissions only)
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 76-01-PLAN.md -- Backend: PushService singleton, push_tokens table, REST endpoints, WS client state tracking
+- [ ] 76-02-PLAN.md -- Mobile notification infrastructure: cold-start safe listeners, MMKV preferences/queue, useNotifications hook, NotificationBanner
+- [ ] 76-03-PLAN.md -- Settings UI: reusable settings components, notification preferences screen, drawer settings icon
+- [ ] 76-04-PLAN.md -- End-to-end wiring: root layout integration, AppState WS reporting, in-app banner triggering, device verification
 **UI hint**: yes
 
 ### Phase 77: Relay Security
@@ -184,7 +189,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 75. Chat Shell | v4.0 | 6/6 | Complete    | 2026-04-04 |
-| 76. Push Notifications | v4.0 | 0/TBD | Not started | - |
+| 76. Push Notifications | v4.0 | 0/4 | Not started | - |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
 | 79. Agent Dashboard | v4.0 | 0/TBD | Not started | - |
@@ -205,4 +210,4 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 
 ---
 *Created: 2026-03-07*
-*Last updated: 2026-04-03 after Phase 75 planning (6 plans, 4 waves)*
+*Last updated: 2026-04-04 after Phase 76 planning (4 plans, 2 waves)*
