@@ -199,6 +199,7 @@ const styles = createStyles((t) => ({
     borderWidth: 1,
     borderColor: t.colors.border.subtle,
     gap: t.spacing.xs,
+    ...t.rimLight,  // D-03: top-edge rim light for depth perception
   },
   name: {
     ...t.typography.small,

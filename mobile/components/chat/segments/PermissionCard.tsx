@@ -248,6 +248,7 @@ const styles = createStyles((t) => ({
     padding: t.spacing.md,
     borderWidth: 1,
     borderColor: t.colors.border.interactive,
+    ...t.rimLight,  // D-03: top-edge rim light for depth perception
     ...t.shadows.heavy,
     ...t.shadows.glow(t.colors.accent),
   },

@@ -97,6 +97,7 @@ const styles = createStyles((t) => ({
     backgroundColor: t.colors.surface.raised,
     borderRadius: t.radii.xl,
     padding: t.spacing.md,
+    ...t.rimLight,  // D-03: top-edge rim light for depth perception
   },
   text: {
     ...t.typography.body,

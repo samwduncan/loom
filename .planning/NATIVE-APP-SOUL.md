@@ -40,7 +40,7 @@ iOS system behaviors are sacred: status bar, home indicator, Dynamic Island, edg
 **Example:** The drawer opens with a spring that matches iOS feel (Drawer spring, 350ms settle) and the edge-swipe tracks the finger exactly. But behind the drawer, the main content shifts 20px right with a parallax effect and the overlay dims proportionally -- details that iOS stock components skip.
 
 ### 5. Warmth Over Coldness
-Loom's palette is warm charcoal and dusty rose, never cool gray and blue. The typeface is Inter, not SF Pro -- because Loom has its own identity. Every color choice favors warmth. The darkest surface is `rgb(38, 35, 33)`, not `#000000`. The accent is `rgb(196, 108, 88)`, not blue.
+Loom's palette is warm charcoal and dusty rose, never cool gray and blue. The typeface is Inter, not SF Pro -- because Loom has its own identity. Every color choice favors warmth. The darkest surface is `rgb(28, 26, 24)`, not `#000000`. The accent is `rgb(196, 108, 88)`, not blue.
 
 **Example:** Side by side with ChatGPT iOS (cool dark grays, green accent), Loom feels distinctly warmer. Side by side with Claude iOS (warm browns, terracotta accent), Loom is a close sibling but with deeper surfaces and more motion.
 
@@ -107,11 +107,13 @@ Loom uses a 4-tier surface system extended with glass/blur for floating elements
 
 | Tier | Token | RGB | Usage | Shadow |
 |------|-------|-----|-------|--------|
-| 0 (Sunken) | `surface-sunken` | `rgb(38, 35, 33)` | Drawer background, inset areas, code block backgrounds | None |
-| 1 (Base) | `surface-base` | `rgb(46, 42, 40)` | Chat background, scroll areas, default canvas | None |
-| 2 (Raised) | `surface-raised` | `rgb(54, 50, 48)` | Cards, user message bubbles, list items on press | Subtle shadow |
-| 3 (Overlay) | `surface-overlay` | `rgb(62, 59, 56)` | Modals, popovers, context menus, permission cards | Medium shadow |
+| 0 (Sunken) | `surface-sunken` | `rgb(28, 26, 24)` | Drawer background, inset areas, code block backgrounds | None |
+| 1 (Base) | `surface-base` | `rgb(44, 40, 38)` | Chat background, scroll areas, default canvas | None |
+| 2 (Raised) | `surface-raised` | `rgb(64, 60, 57)` | Cards, user message bubbles, list items on press | Subtle shadow |
+| 3 (Overlay) | `surface-overlay` | `rgb(82, 78, 74)` | Modals, popovers, context menus, permission cards | Medium shadow |
 | Glass | N/A | Semi-transparent + blur | Nav header, floating composer, command palette, search input | Heavy shadow |
+
+**Note:** Surface RGB values use 16-20 unit jumps (wider than original 8-unit spec) for device readability at arm's length. Validated on iPhone hardware at 50% brightness.
 
 #### Shadow Specifications (iOS `shadow*` props)
 
@@ -130,6 +132,14 @@ Glow:    { shadowColor: accent, shadowOffset: { width: 0, height: 0 },  shadowOp
 - **Border:** 1px `border-subtle` (`rgba(255,255,255,0.07)`)
 - **Corner radius:** 16px (`rounded-2xl`)
 - **Usage:** Elements that float over scrolling content -- navigation header, floating composer bar, modal backdrops, search input in drawer.
+
+#### Rim Light
+
+- **Border width:** 0.5pt (StyleSheet.hairlineWidth on iOS)
+- **Border color:** `rgba(255,255,255,0.05)`
+- **Position:** Top edge only (`borderTopWidth`)
+- **Usage:** All `surface-raised` containers (UserBubble, ToolChip, PermissionCard, cards, composer)
+- **Purpose:** Provides depth perception beyond raw RGB difference, especially effective on fingerprint-smudged screens
 
 #### Depth Rules
 
@@ -524,7 +534,7 @@ These are explicit prohibitions. Violating any of these is a defect.
 
 ### Visual
 
-6. **No pure black (#000000) backgrounds.** All backgrounds use the warm dark palette. Darkest surface: `surface-sunken` = `rgb(38, 35, 33)`. Pure black is cold and harsh.
+6. **No pure black (#000000) backgrounds.** All backgrounds use the warm dark palette. Darkest surface: `surface-sunken` = `rgb(28, 26, 24)`. Pure black is cold and harsh.
 
 7. **No visible borders as the only depth cue.** If a card's only separation from its background is a 1px border, it lacks depth. Borders supplement shadows and surface color -- they do not replace them.
 
