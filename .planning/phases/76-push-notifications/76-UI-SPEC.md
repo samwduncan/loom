@@ -5,6 +5,7 @@ status: draft
 shadcn_initialized: false
 preset: none
 created: 2026-04-04
+revised: 2026-04-04
 ---
 
 # Phase 76 — UI Design Contract
@@ -34,7 +35,7 @@ Declared values (multiples of 4, from existing `theme.spacing`):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline padding, status dot margin |
-| sm | 8px | Compact element spacing, toggle-to-label gap |
+| sm | 8px | Compact element spacing, toggle-to-label gap, banner vertical padding |
 | md | 16px | Default element spacing, section padding, screen horizontal margin |
 | lg | 24px | Section breaks in settings, banner internal padding |
 | xl | 32px | Major section breaks |
@@ -55,7 +56,6 @@ All values from existing `theme.typography`:
 | Small | 13px | Regular (400) | 18px (1.38) | Settings section footer notes, banner dismiss timer |
 | Heading | 17px | SemiBold (600) | 22px (1.29) | Settings screen title, section headers, banner title |
 | Caption | 12px | Regular (400) | 16px (1.33) | Settings section headers (uppercase, text-muted) |
-| Large Title | 28px | Bold (700) | 34px (1.14) | Not used this phase |
 
 **Source:** `mobile/theme/theme.ts` typography tokens. No additions needed.
 
@@ -105,7 +105,7 @@ Accent reserved for (this phase):
 | Component | Change | Req |
 |-----------|--------|-----|
 | `_layout.tsx` (root) | Add notification handler setup, cold-start deep link, push token registration | PUSH-02, PUSH-06 |
-| `DrawerContent.tsx` | Add settings icon/button at bottom | PUSH-05 |
+| `DrawerContent.tsx` | Add settings icon/button at bottom, `accessibilityLabel="Notification settings"` on icon | PUSH-05 |
 
 ### Hooks
 
@@ -118,6 +118,8 @@ Accent reserved for (this phase):
 ## Screen Specifications
 
 ### Notification Settings Screen
+
+**Primary focal point:** The selected notification mode row (accent checkmark indicates current selection).
 
 **Layout:**
 - Full-screen pushed onto navigation stack from drawer (Navigation spring, horizontal slide from right).
@@ -161,6 +163,8 @@ Accent reserved for (this phase):
 
 ### In-App Notification Banner
 
+**Primary focal point:** The session name title (15px SemiBold, `text-primary`, truncated to single line).
+
 **Layout:**
 - Floating banner below status bar, overlapping content.
 - Background: glass surface (expo-blur `intensity={40}`, tint `dark`, overlay `rgba(0,0,0,0.35)`).
@@ -169,7 +173,7 @@ Accent reserved for (this phase):
 - Content row: provider icon (24px, left) + text column (title + body) + dismiss area (right).
 - Title: session name (15px Body, SemiBold, `text-primary`, single line, truncated).
 - Body: event summary (13px Small, `text-secondary`, max 2 lines, truncated).
-- Min-height: 56px. Vertical padding: 12px.
+- Min-height: 56px. Vertical padding: 8px (sm token).
 
 **Permission banner variant:**
 - Same layout plus warm accent tint: `accent` at 0.1 opacity layered behind glass.
