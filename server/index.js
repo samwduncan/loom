@@ -43,6 +43,7 @@ import { spawn } from 'child_process';
 import pty from 'node-pty';
 import fetch from 'node-fetch';
 import mime from 'mime-types';
+import crypto from 'crypto';
 
 import { getProjects, getSessions, getSessionMessages, renameProject, deleteSession, updateSessionTitle, deleteProject, addProjectManually, extractProjectDirectory, clearProjectDirectoryCache, sanitizeProjectName } from './projects.js';
 import { queryClaudeSDK, abortClaudeSDKSession, isClaudeSDKSessionActive, getActiveClaudeSDKSessions, resolveToolApproval } from './claude-sdk.js';
@@ -65,6 +66,8 @@ import cliAuthRoutes from './routes/cli-auth.js';
 import userRoutes from './routes/user.js';
 import codexRoutes from './routes/codex.js';
 import geminiRoutes from './routes/gemini.js';
+import pushRoutes from './routes/push.js';
+import { pushService } from './services/push-service.js';
 import { initializeDatabase } from './database/db.js';
 import { validateApiKey, authenticateToken, authenticateWebSocket } from './middleware/auth.js';
 import { IS_PLATFORM } from './constants/config.js';
@@ -416,6 +419,9 @@ app.use('/api/codex', authenticateToken, codexRoutes);
 
 // Gemini API Routes (protected)
 app.use('/api/gemini', authenticateToken, geminiRoutes);
+
+// Push Notification Routes (protected)
+app.use('/api/push', authenticateToken, pushRoutes);
 
 // Agent API Routes (uses API key authentication)
 app.use('/api/agent', agentRoutes);
@@ -987,7 +993,7 @@ wss.on('connection', (ws, request) => {
     if (pathname === '/shell') {
         handleShellConnection(ws);
     } else if (pathname === '/ws') {
-        handleChatConnection(ws);
+        handleChatConnection(ws, request.user);
     } else {
         console.log('[WARN] Unknown WebSocket path:', pathname);
         ws.close();
@@ -998,16 +1004,52 @@ wss.on('connection', (ws, request) => {
  * WebSocket Writer - Wrapper for WebSocket to match SSEStreamWriter interface
  */
 class WebSocketWriter {
-    constructor(ws) {
+    constructor(ws, userId) {
         this.ws = ws;
+        this.userId = userId;  // Store userId for push triggers
         this.sessionId = null;
         this.isWebSocketWriter = true;  // Marker for transport detection
     }
 
     send(data) {
+        // Send via WS if connected
         if (this.ws.readyState === 1) { // WebSocket.OPEN
             // Providers send raw objects, we stringify for WebSocket
             this.ws.send(JSON.stringify(data));
+        }
+
+        // ALWAYS trigger push service, regardless of WS state.
+        // PushService will check if user is actively viewing -- if WS is open
+        // and user is foregrounded, push is suppressed. If WS is closed,
+        // push fires (which is the primary use case per D-01).
+        this._triggerPushIfNeeded(data);
+    }
+
+    _triggerPushIfNeeded(data) {
+        if (!this.userId) return;
+
+        if (data.type === 'claude-complete') {
+            // [SS-1] Resolve human-readable session name from cache DB
+            const sessionName = pushService.getSessionName(data.sessionId);
+            pushService.notifySessionComplete(
+                this.userId, data.sessionId, sessionName,
+                data.exitCode === 0, null
+            );
+        } else if (data.type === 'claude-error') {
+            // [SS-1] Resolve human-readable session name from cache DB
+            const sessionName = pushService.getSessionName(data.sessionId);
+            pushService.notifySessionComplete(
+                this.userId, data.sessionId, sessionName,
+                false, data.error
+            );
+        } else if (data.type === 'claude-permission-request') {
+            // [SS-1] Resolve human-readable session name from cache DB
+            const sessionName = pushService.getSessionName(data.sessionId);
+            pushService.notifyPermissionRequest(
+                this.userId, data.sessionId, sessionName,
+                data.requestId, data.toolName,
+                JSON.stringify(data.input).slice(0, 80)
+            );
         }
     }
 
@@ -1021,8 +1063,10 @@ class WebSocketWriter {
 }
 
 // Handle chat WebSocket connections
-function handleChatConnection(ws) {
-    console.log('[INFO] Chat WebSocket connected');
+function handleChatConnection(ws, user) {
+    const userId = user?.id || null;
+    const wsId = crypto.randomUUID();
+    console.log('[INFO] Chat WebSocket connected', userId ? `(user: ${userId})` : '');
 
     // Heartbeat: mark alive on connect and on pong
     ws.isAlive = true;
@@ -1031,8 +1075,11 @@ function handleChatConnection(ws) {
     // Add to connected clients for project updates
     connectedClients.add(ws);
 
+    // Initialize push notification client state
+    pushService.updateClientState(userId, wsId, true, null);
+
     // Wrap WebSocket with writer for consistent interface with SSEStreamWriter
-    const writer = new WebSocketWriter(ws);
+    const writer = new WebSocketWriter(ws, userId);
 
     ws.on('message', async (message) => {
         try {
@@ -1195,6 +1242,9 @@ function handleChatConnection(ws) {
                     type: 'live-session-detached',
                     sessionId,
                 });
+            } else if (data.type === 'app-state') {
+                // Mobile app reports foreground/background + currently viewed session
+                pushService.updateClientState(userId, wsId, data.foreground, data.viewingSessionId || null);
             }
         } catch (error) {
             console.error('[ERROR] Chat WebSocket error:', error.message);
@@ -1209,6 +1259,9 @@ function handleChatConnection(ws) {
         console.log('[INFO] Chat client disconnected');
         // Remove from connected clients
         connectedClients.delete(ws);
+
+        // Clean up push notification client state
+        pushService.removeClient(wsId);
 
         // Clean up live session attachments for this client
         const attachments = clientAttachments.get(ws);
