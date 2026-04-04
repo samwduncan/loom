@@ -14,7 +14,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import * as Haptics from 'expo-haptics';
+import { haptic } from '../../lib/haptics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -136,14 +136,14 @@ export function SessionItem({
   }, [scale]);
 
   const handlePress = useCallback(() => {
-    Haptics.selectionAsync();
+    haptic.selection();
     onPress();
   }, [onPress]);
 
   const handleSwipeableOpen = useCallback(
     (direction: 'left' | 'right') => {
       if (direction === 'right') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        haptic.transition();
         onDelete();
         // Close the swipeable after triggering delete
         swipeableRef.current?.close();
@@ -213,7 +213,7 @@ const styles = createStyles((t) => ({
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.sm,
+    paddingVertical: 12, // ChatGPT iOS density (py-3), no spacing token for 12px
     backgroundColor: t.colors.surface.sunken,
   },
   textContainer: {
@@ -226,7 +226,7 @@ const styles = createStyles((t) => ({
     color: t.colors.text.primary,
   },
   subtitle: {
-    ...t.typography.small,
+    ...t.typography.caption, // 12px -- matches ChatGPT iOS subtitle density (D-08)
     color: t.colors.text.muted,
     marginTop: 2,
   },

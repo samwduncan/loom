@@ -18,6 +18,7 @@
 import { Drawer } from 'expo-router/drawer';
 import { useWindowDimensions } from 'react-native';
 import { DrawerContent } from '../../components/navigation/DrawerContent';
+import { haptic } from '../../lib/haptics';
 import { theme } from '../../theme/theme';
 
 export default function DrawerLayout() {
@@ -28,12 +29,20 @@ export default function DrawerLayout() {
       screenOptions={{
         drawerType: 'slide',
         drawerStyle: {
-          width: Math.min(width * 0.8, 320),
+          width: Math.min(width * 0.8, 320), // D-09: 80% capped at 320px
           backgroundColor: theme.colors.surface.sunken,
         },
         swipeEdgeWidth: width,
         overlayColor: 'rgba(0,0,0,0.4)',
         headerShown: false,
+      }}
+      screenListeners={{
+        transitionEnd: (e) => {
+          // D-18: Fire haptic when drawer reaches fully open (not on close)
+          if (!(e.data as { closing?: boolean }).closing) {
+            haptic.transition();
+          }
+        },
       }}
       drawerContent={(props) => <DrawerContent {...props} />}
     />

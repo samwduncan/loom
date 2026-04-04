@@ -29,7 +29,7 @@ import {
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
+import { haptic } from '../../lib/haptics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -220,7 +220,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
   // -------------------------------------------------------------------------
 
   const handleNewChat = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.tap();
     if (firstProject) {
       createSession(firstProject.name, firstProject.path);
     } else {
@@ -312,6 +312,12 @@ export function DrawerContent(props: DrawerContentComponentProps) {
     transform: [{ scale: newChatScale.value }],
   }));
 
+  // Settings button spring scale + haptic
+  const settingsScale = useSharedValue(1);
+  const settingsPressStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: settingsScale.value }],
+  }));
+
   // -------------------------------------------------------------------------
   // SectionList renderers
   // -------------------------------------------------------------------------
@@ -400,14 +406,23 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 
       {/* Connection status footer */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + theme.spacing.sm }]}>
-        <Pressable
-          onPress={() => router.push('/(drawer)/(stack)/settings/notifications')}
+        <AnimatedPressable
+          onPressIn={() => {
+            settingsScale.value = withSpring(0.97, theme.springs.micro);
+          }}
+          onPressOut={() => {
+            settingsScale.value = withSpring(1, theme.springs.micro);
+          }}
+          onPress={() => {
+            haptic.tap();
+            router.push('/(drawer)/(stack)/settings/notifications');
+          }}
           accessibilityLabel="Notification settings"
-          style={styles.settingsButton}
+          style={[styles.settingsButton, settingsPressStyle]}
           hitSlop={8}
         >
           <Settings size={20} color={theme.colors.text.secondary} />
-        </Pressable>
+        </AnimatedPressable>
         <View style={styles.footerStatus}>
           <View
             style={[styles.statusDot, { backgroundColor: statusDotColor }]}
@@ -461,7 +476,7 @@ const styles = createStyles((t) => ({
     paddingBottom: t.spacing.xs,
   },
   sectionHeaderText: {
-    ...t.typography.small,
+    ...t.typography.caption, // 12px -- matches ChatGPT iOS section header density (D-08)
     color: t.colors.text.muted,
     textTransform: 'uppercase' as const,
     letterSpacing: 0.5,

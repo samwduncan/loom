@@ -30,7 +30,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { ArrowUp, Square } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import { haptic } from '../../lib/haptics';
 
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
@@ -77,6 +77,22 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   // Send button animation
   const buttonScale = useSharedValue(1);
 
+  // D-16: Typing-begins haptic with 2-second cooldown to prevent fatigue on rapid clear-retype
+  const wasEmptyRef = useRef(true);
+  const lastTypingHapticRef = useRef(0);
+
+  useEffect(() => {
+    const isEmpty = text.trim().length === 0;
+    if (wasEmptyRef.current && !isEmpty) {
+      const now = Date.now();
+      if (now - lastTypingHapticRef.current > 2000) {
+        haptic.transition(); // D-16: typing-begins transition haptic
+        lastTypingHapticRef.current = now;
+      }
+    }
+    wasEmptyRef.current = isEmpty;
+  }, [text]);
+
   // Color transition for send -> stop (accent -> destructive)
   // Track whether we show destructive color
   const isActive = composerState === 'active';
@@ -117,7 +133,7 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   const handleSend = useCallback(() => {
     if (!text.trim() || composerState !== 'idle') return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.tap();
     setComposerState('sending');
 
     const wsClient = getWsClient();
@@ -152,7 +168,7 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   const handleStop = useCallback(() => {
     if (composerState !== 'active' || !effectiveSessionId) return;
 
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    haptic.transition();
     const wsClient = getWsClient();
     if (!wsClient) return;
 
