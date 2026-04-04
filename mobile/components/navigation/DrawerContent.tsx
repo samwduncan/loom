@@ -47,6 +47,7 @@ import type { SectionData } from '../../lib/date-sections';
 import { showToast } from '../../lib/toast';
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
+import { Settings } from 'lucide-react-native';
 import { SessionSearch } from './SessionSearch';
 import { SessionItem } from './SessionItem';
 
@@ -399,11 +400,21 @@ export function DrawerContent(props: DrawerContentComponentProps) {
 
       {/* Connection status footer */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + theme.spacing.sm }]}>
-        <View
-          style={[styles.statusDot, { backgroundColor: statusDotColor }]}
-          accessibilityLabel={statusText}
-        />
-        <Text style={styles.statusText}>{statusText}</Text>
+        <Pressable
+          onPress={() => router.push('/(drawer)/(stack)/settings/notifications')}
+          accessibilityLabel="Notification settings"
+          style={styles.settingsButton}
+          hitSlop={8}
+        >
+          <Settings size={20} color={theme.colors.text.secondary} />
+        </Pressable>
+        <View style={styles.footerStatus}>
+          <View
+            style={[styles.statusDot, { backgroundColor: statusDotColor }]}
+            accessibilityLabel={statusText}
+          />
+          <Text style={styles.statusText}>{statusText}</Text>
+        </View>
       </View>
     </View>
   );
@@ -501,6 +512,18 @@ const styles = createStyles((t) => ({
     paddingTop: t.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: t.colors.border.subtle,
+  },
+  settingsButton: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    marginRight: t.spacing.sm,
+  },
+  footerStatus: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    flex: 1,
   },
   statusDot: {
     width: 8,
