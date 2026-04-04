@@ -29,6 +29,7 @@ Transform Loom from a web-only chat interface into the AI development control pl
 
 - [ ] **Phase 75: Chat Shell** - Private Mind-adapted chat UI wired to Loom stores with streaming, tool cards, and full session management
 - [ ] **Phase 76: Push Notifications** - Session completion and permission alerts via Expo Push Service with deep links and action buttons
+- [ ] **Phase 76.1: Visual Foundation** - Clone ChatGPT/Claude iOS shell at pixel level. Fix surface colors, add glass surfaces, match drawer/chat/composer density and feel (INSERTED)
 - [ ] **Phase 77: Relay Security** - JWT authentication, agent registration, and 3-layer presence detection on relay connections
 - [ ] **Phase 78: Agent Backend** - TmuxTransport, AgentManager, SQLite metadata, REST/WS API for agent lifecycle
 - [ ] **Phase 79: Agent Dashboard** - Mobile UI for spawning, monitoring, and controlling agent sessions from iPhone
@@ -84,6 +85,22 @@ Plans:
 - [x] 76-02-PLAN.md -- Mobile notification infrastructure: cold-start safe listeners, MMKV preferences/queue, useNotifications hook, NotificationBanner
 - [x] 76-03-PLAN.md -- Settings UI: reusable settings components, notification preferences screen, drawer settings icon
 - [x] 76-04-PLAN.md -- End-to-end wiring: root layout integration, AppState WS reporting, in-app banner triggering, device verification
+**UI hint**: yes
+
+### Phase 76.1: Visual Foundation (INSERTED)
+**Goal**: App looks like it belongs next to ChatGPT iOS and Claude iOS. Clone reference app visual language at pixel level — surface colors, glass surfaces, drawer/chat/composer density, typography feel, interaction weight. Not identical, but same league.
+**Depends on**: Phase 75 (chat shell must exist), Phase 76 (push code committed)
+**Requirements**: VIS-01 (surface hierarchy matches spec), VIS-02 (glass on composer/header/search), VIS-03 (drawer matches reference density), VIS-04 (chat screen matches reference feel)
+**Success Criteria** (what must be TRUE):
+  1. User opens app next to ChatGPT iOS — drawer, chat, and composer look like they belong in the same tier
+  2. Surface colors match NATIVE-APP-SOUL.md exactly (4-tier warm charcoal + glass)
+  3. Glass surfaces on nav header, composer, and search input using expo-blur
+  4. All interactions have spring animation + haptic feedback (no silent taps, no instant transitions)
+**Plans**: 3 plans
+Plans:
+- [ ] 76.1-01-PLAN.md -- Foundation tokens: haptic hierarchy utility, rimLight theme token, UserBubble rim light, Soul doc update
+- [ ] 76.1-02-PLAN.md -- Glass surfaces: ChatHeader glass, Composer glass with keyboard-blur fallback, ChatScreen render order fix
+- [ ] 76.1-03-PLAN.md -- Density + interaction sweep: SessionItem density, AssistantMessage spring, drawer/composer haptics, device checkpoint
 **UI hint**: yes
 
 ### Phase 77: Relay Security
@@ -190,6 +207,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 |-------|-----------|----------------|--------|-----------|
 | 75. Chat Shell | v4.0 | 6/6 | Complete    | 2026-04-04 |
 | 76. Push Notifications | v4.0 | 4/4 | Complete   | 2026-04-04 |
+| 76.1 Visual Foundation | v4.0 | 0/3 | Not started | - |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
 | 79. Agent Dashboard | v4.0 | 0/TBD | Not started | - |
