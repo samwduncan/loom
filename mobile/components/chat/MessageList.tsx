@@ -40,13 +40,15 @@ interface MessageListProps {
   listRef?: React.RefObject<FlatList<DisplayMessage>>;
   /** Initial scroll offset to restore (CHAT-07: scroll preservation) */
   initialScrollOffset?: number;
+  /** Height of the glass header -- adds paddingBottom in inverted FlatList (visual top padding) */
+  headerHeight?: number;
 }
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function MessageList({ messages, isStreaming, sessionId, onScroll, listRef, initialScrollOffset }: MessageListProps) {
+export function MessageList({ messages, isStreaming, sessionId, onScroll, listRef, initialScrollOffset, headerHeight }: MessageListProps) {
   // Tool detail sheet state
   const [selectedToolCall, setSelectedToolCall] = useState<ToolCallState | null>(null);
 
@@ -113,7 +115,7 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
           minIndexForVisible: 1,
           autoscrollToTopThreshold: 100,
         }}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[styles.contentContainer, headerHeight ? { paddingBottom: headerHeight } : undefined]}
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
