@@ -81,9 +81,9 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 76-01-PLAN.md -- Backend: PushService singleton, push_tokens table, REST endpoints, WS client state tracking
-- [ ] 76-02-PLAN.md -- Mobile notification infrastructure: cold-start safe listeners, MMKV preferences/queue, useNotifications hook, NotificationBanner
+- [x] 76-02-PLAN.md -- Mobile notification infrastructure: cold-start safe listeners, MMKV preferences/queue, useNotifications hook, NotificationBanner
 - [x] 76-03-PLAN.md -- Settings UI: reusable settings components, notification preferences screen, drawer settings icon
-- [ ] 76-04-PLAN.md -- End-to-end wiring: root layout integration, AppState WS reporting, in-app banner triggering, device verification
+- [x] 76-04-PLAN.md -- End-to-end wiring: root layout integration, AppState WS reporting, in-app banner triggering, device verification
 **UI hint**: yes
 
 ### Phase 77: Relay Security
@@ -189,7 +189,7 @@ Phases execute in numeric order: 75 -> 76 -> 77 -> 78 -> 79 -> 80 -> 81 -> 82 ->
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 75. Chat Shell | v4.0 | 6/6 | Complete    | 2026-04-04 |
-| 76. Push Notifications | v4.0 | 2/4 | In Progress|  |
+| 76. Push Notifications | v4.0 | 4/4 | Complete   | 2026-04-04 |
 | 77. Relay Security | v4.0 | 0/TBD | Not started | - |
 | 78. Agent Backend | v4.0 | 0/TBD | Not started | - |
 | 79. Agent Dashboard | v4.0 | 0/TBD | Not started | - |

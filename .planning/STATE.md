@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
-status: Ready to execute
-stopped_at: Completed 76-03-PLAN.md
-last_updated: "2026-04-04T03:39:06.465Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 76-04-PLAN.md (Tasks 1-2 code, Task 3 device verify pending)
+last_updated: "2026-04-04T03:51:57.025Z"
 progress:
   total_phases: 11
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 10
 ---
 
 # Project State
@@ -68,6 +68,9 @@ Plan: 4 of 4
 - [Phase 76]: Session deep link validates by searching projects sessions array, not just server reachability [D-12]
 - [Phase 76]: Used apiFetch with PATCH method instead of plan's apiClient.patch (ApiClient only exposes apiFetch)
 - [Phase 76]: Created push-preferences.ts as blocking dep for parallel Plan 02 (Rule 3)
+- [Phase 76]: wsClient.send() takes ClientMessage object, not JSON string -- plan corrected to typed usage
+- [Phase 76]: 120s permission timeout (up from 55s) for cold-start approval flow [D-07]
+- [Phase 76]: AuthenticatedApp component pattern isolates auth-dependent hooks from conditional rendering
 
 ### Blockers/Concerns
 
@@ -75,6 +78,6 @@ None currently identified.
 
 ## Session Continuity
 
-Last session: 2026-04-04T03:39:06.462Z
-Stopped at: Completed 76-03-PLAN.md
+Last session: 2026-04-04T03:51:57.023Z
+Stopped at: Completed 76-04-PLAN.md (Tasks 1-2 code, Task 3 device verify pending)
 Resume: `/gsd:plan-phase 75`
