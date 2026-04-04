@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
-status: Phase complete — ready for verification
-stopped_at: Completed 76-04-PLAN.md (Tasks 1-2 code, Task 3 device verify pending)
-last_updated: "2026-04-04T03:51:57.025Z"
+status: Phase 76.1 inserted — visual foundation urgent work
+stopped_at: Phase 76.1 context gathered (auto mode)
+last_updated: "2026-04-04T17:27:36.772Z"
 progress:
-  total_phases: 11
+  total_phases: 12
   completed_phases: 2
   total_plans: 10
   completed_plans: 10
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable -- from anywhere
-**Current focus:** Phase 76 — push-notifications
+**Current focus:** Phase 76.1 — visual-foundation (INSERTED)
 
 ## Current Position
 
-Phase: 76 (push-notifications) — EXECUTING
-Plan: 4 of 4
+Phase: 76.1 (visual-foundation) — NOT STARTED
+Plan: 0 of TBD
 
 ## Performance Metrics
 
@@ -72,12 +72,17 @@ Plan: 4 of 4
 - [Phase 76]: 120s permission timeout (up from 55s) for cold-start approval flow [D-07]
 - [Phase 76]: AuthenticatedApp component pattern isolates auth-dependent hooks from conditional rendering
 
+### Roadmap Evolution
+
+- Phase 76.1 inserted after Phase 76: Visual Foundation — Clone ChatGPT/Claude iOS shell at pixel level (URGENT). Feature work paused until visual foundation meets reference app quality bar.
+
 ### Blockers/Concerns
 
-None currently identified.
+- Phase 76 UAT: 10/12 tests blocked on EAS build with push entitlements (provisioning profile needs --clear-credentials rebuild)
+- Visual foundation must be completed before resuming feature work
 
 ## Session Continuity
 
-Last session: 2026-04-04T03:51:57.023Z
-Stopped at: Completed 76-04-PLAN.md (Tasks 1-2 code, Task 3 device verify pending)
-Resume: `/gsd:plan-phase 75`
+Last session: 2026-04-04T17:27:36.769Z
+Stopped at: Phase 76.1 context gathered (auto mode)
+Resume: `/gsd:plan-phase 76.1`
