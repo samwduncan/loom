@@ -27,6 +27,7 @@ import { useMessageList } from '../../../../hooks/useMessageList';
 import { useScrollPosition } from '../../../../hooks/useScrollPosition';
 import { useScrollToBottom } from '../../../../hooks/useScrollToBottom';
 import { useStreamStore } from '../../../../stores/index';
+import { setCurrentViewingSessionId } from '../../../../lib/websocket-init';
 import { createStyles } from '../../../../theme/createStyles';
 
 // ---------------------------------------------------------------------------
@@ -86,6 +87,13 @@ export default function ChatScreen() {
     }
     // Run on mount and sessionId change (key={sessionId} on FlatList remounts MessageList)
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId]);
+
+  // Report viewed session to server for per-session push gating (D-01)
+  // Server uses this to suppress push notifications for the session the user is viewing
+  useEffect(() => {
+    setCurrentViewingSessionId(sessionId);
+    return () => setCurrentViewingSessionId(null);
   }, [sessionId]);
 
   // Session title: "New Chat" for stub sessions, project name otherwise

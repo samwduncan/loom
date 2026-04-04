@@ -207,7 +207,9 @@ export type ClientMessage =
   | { type: 'get-active-sessions' }
   // Live session attach
   | { type: 'attach-session'; sessionId: string; projectName: string }
-  | { type: 'detach-session'; sessionId: string };
+  | { type: 'detach-session'; sessionId: string }
+  // Push notification: mobile app reports foreground/background state for push gating
+  | { type: 'app-state'; foreground: boolean; viewingSessionId: string | null };
 
 // ---------------------------------------------------------------------------
 // Type guard

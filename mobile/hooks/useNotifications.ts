@@ -32,6 +32,7 @@ import {
 } from '../lib/push-preferences';
 import { apiClient } from '../lib/api-client';
 import { showToast } from '../lib/toast';
+import { showNotificationBanner, type BannerData } from '../components/notifications/NotificationBanner';
 import { useConnectionStore } from '../stores/index';
 import { getWsClient } from '../lib/websocket-init';
 
@@ -166,6 +167,44 @@ export function useNotifications(): void {
       cancelled = true;
     };
   }, []);
+
+  // -------------------------------------------------------------------------
+  // useEffect 1b: Foreground notification -> in-app banner (D-23)
+  //
+  // When a notification arrives while the app is foregrounded, show a
+  // glass-surface NotificationBanner instead of relying on system UI.
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        const data = notification.request.content.data as Record<
+          string,
+          unknown
+        >;
+        const type = data.type as BannerData['type'] | undefined;
+        const sessionId = data.sessionId as string | undefined;
+        const title = notification.request.content.title || 'Notification';
+        const body = notification.request.content.body || '';
+
+        showNotificationBanner({
+          title,
+          body,
+          type: (type || 'session_complete') as BannerData['type'],
+          sessionId,
+          onPress: () => {
+            if (sessionId) {
+              router.push(`/(drawer)/(stack)/chat/${sessionId}`);
+            }
+          },
+        });
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [router]);
 
   // -------------------------------------------------------------------------
   // useEffect 2: Notification response listener (warm launch)

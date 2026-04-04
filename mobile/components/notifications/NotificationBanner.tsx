@@ -36,7 +36,7 @@ import { theme } from '../../theme/theme';
 // Types
 // ---------------------------------------------------------------------------
 
-interface BannerData {
+export interface BannerData {
   title: string;
   body: string;
   type:

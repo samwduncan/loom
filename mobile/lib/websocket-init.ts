@@ -101,6 +101,9 @@ let activityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 /** AppState subscription (cleaned up on disconnect) */
 let appStateSubscription: ReturnType<typeof AppState.addEventListener> | null = null;
 
+/** Currently viewed session ID for per-session push gating (D-01) */
+let currentViewingSessionId: string | null = null;
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -108,6 +111,30 @@ let appStateSubscription: ReturnType<typeof AppState.addEventListener> | null = 
 /** Get the current WebSocket client instance. */
 export function getWsClient(): WebSocketClient | null {
   return wsClient;
+}
+
+/**
+ * Report the currently viewed session to the server for per-session push gating (D-01).
+ * Called from chat/[id].tsx on mount (sessionId) and unmount (null).
+ * Sends app-state WS message immediately if connected.
+ *
+ * [S-7] Uses getState() === 'connected', NOT isConnected() which does not exist.
+ */
+export function setCurrentViewingSessionId(sessionId: string | null): void {
+  currentViewingSessionId = sessionId;
+  // Send to server immediately if connected
+  if (wsClient && wsClient.getState() === 'connected') {
+    wsClient.send({
+      type: 'app-state',
+      foreground: AppState.currentState === 'active',
+      viewingSessionId: sessionId,
+    });
+  }
+}
+
+/** Get the currently viewed session ID. */
+function getCurrentViewingSessionId(): string | null {
+  return currentViewingSessionId;
 }
 
 /**
@@ -391,6 +418,16 @@ export async function initializeWebSocket(): Promise<void> {
         ) {
           wsClient.connect(token);
         }
+
+        // Report foreground state to server for push notification gating (D-03)
+        // [S-7] Use getState() === 'connected', NOT isConnected() which does not exist
+        if (wsClient && wsClient.getState() === 'connected') {
+          wsClient.send({
+            type: 'app-state',
+            foreground: true,
+            viewingSessionId: getCurrentViewingSessionId(),
+          });
+        }
       } else if (nextState === 'background') {
         // D-28: Snapshot partial stream content to MMKV if streaming is active.
         // This preserves the content so it can be shown as "Interrupted" on
@@ -406,6 +443,16 @@ export async function initializeWebSocket(): Promise<void> {
           currentStreamState.clearStreamingFlag();
           isCurrentlyStreaming = false;
           streamContentAccumulator = '';
+        }
+
+        // Report background state to server for push notification gating (D-03)
+        // [S-7] Use getState() === 'connected', NOT isConnected() which does not exist
+        if (wsClient && wsClient.getState() === 'connected') {
+          wsClient.send({
+            type: 'app-state',
+            foreground: false,
+            viewingSessionId: getCurrentViewingSessionId(),
+          });
         }
 
         // Background: start 30s grace period before disconnect
