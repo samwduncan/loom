@@ -91,6 +91,27 @@ const runMigrations = () => {
       db.exec('ALTER TABLE users ADD COLUMN has_completed_onboarding BOOLEAN DEFAULT 0');
     }
 
+    // Push tokens table for push notification delivery
+    try {
+      db.prepare("SELECT 1 FROM push_tokens LIMIT 0").get();
+    } catch {
+      console.log('Running migration: Creating push_tokens table');
+      db.exec(`
+        CREATE TABLE push_tokens (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          token TEXT UNIQUE NOT NULL,
+          platform TEXT NOT NULL DEFAULT 'ios',
+          user_id INTEGER NOT NULL,
+          notification_mode TEXT NOT NULL DEFAULT 'all',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        );
+        CREATE INDEX idx_push_tokens_user_id ON push_tokens(user_id);
+        CREATE INDEX idx_push_tokens_token ON push_tokens(token);
+      `);
+    }
+
     console.log('Database migrations completed successfully');
   } catch (error) {
     console.error('Error running migrations:', error.message);
@@ -348,6 +369,57 @@ const credentialsDb = {
   }
 };
 
+// Push token database operations
+const pushTokenDb = {
+  // Register or update a push token
+  upsertToken: (token, platform, userId, notificationMode) => {
+    try {
+      const stmt = db.prepare(`
+        INSERT INTO push_tokens (token, platform, user_id, notification_mode, updated_at)
+        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(token) DO UPDATE SET
+          platform = excluded.platform,
+          user_id = excluded.user_id,
+          notification_mode = excluded.notification_mode,
+          updated_at = CURRENT_TIMESTAMP
+      `);
+      stmt.run(token, platform, userId, notificationMode);
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  // Delete a push token
+  deleteToken: (token) => {
+    try {
+      const stmt = db.prepare('DELETE FROM push_tokens WHERE token = ?');
+      stmt.run(token);
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  // Get all push tokens for a user
+  getTokensForUser: (userId) => {
+    try {
+      const rows = db.prepare('SELECT id, token, platform, user_id, notification_mode, created_at, updated_at FROM push_tokens WHERE user_id = ?').all(userId);
+      return rows;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  // Update notification preference for a token
+  updatePreference: (token, notificationMode) => {
+    try {
+      const stmt = db.prepare('UPDATE push_tokens SET notification_mode = ?, updated_at = CURRENT_TIMESTAMP WHERE token = ?');
+      stmt.run(notificationMode, token);
+    } catch (err) {
+      throw err;
+    }
+  }
+};
+
 // Backward compatibility - keep old names pointing to new system
 const githubTokensDb = {
   createGithubToken: (userId, tokenName, githubToken, description = null) => {
@@ -373,5 +445,6 @@ export {
   userDb,
   apiKeysDb,
   credentialsDb,
+  pushTokenDb,
   githubTokensDb // Backward compatibility
 };
