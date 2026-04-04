@@ -29,7 +29,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [ ] **PUSH-03**: User receives push notification when an agent needs permission
 - [ ] **PUSH-04**: User can approve/deny permission directly from notification action buttons
 - [ ] **PUSH-05**: User can configure notification granularity (all / failures only / permissions only)
-- [ ] **PUSH-06**: Server sends push via Expo Push Service on session events
+- [x] **PUSH-06**: Server sends push via Expo Push Service on session events
 
 ### Agent Management
 
@@ -138,7 +138,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PUSH-03 | Phase 76 | Pending |
 | PUSH-04 | Phase 76 | Pending |
 | PUSH-05 | Phase 76 | Pending |
-| PUSH-06 | Phase 76 | Pending |
+| PUSH-06 | Phase 76 | Complete |
 | RELAY-01 | Phase 77 | Pending |
 | RELAY-02 | Phase 77 | Pending |
 | RELAY-03 | Phase 77 | Pending |
