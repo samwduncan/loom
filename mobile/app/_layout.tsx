@@ -22,6 +22,8 @@ import { Slot } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { AuthScreen } from '../components/auth/AuthScreen';
 import { ConnectionBanner } from '../components/connection/ConnectionBanner';
+import { ToolDetailSheetProvider } from '../components/chat/segments/ToolDetailSheet';
+import { ToastProvider } from '../lib/toast';
 import { useAuth } from '../hooks/useAuth';
 import { initializeWebSocket } from '../lib/websocket-init';
 import { theme } from '../theme/theme';
@@ -49,26 +51,30 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: theme.colors.surface.base }}>
       <KeyboardProvider>
         <SafeAreaProvider>
-          <StatusBar style="light" />
-          {(!fontsLoaded || isLoading) ? (
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: theme.colors.surface.base,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <ActivityIndicator color={theme.colors.surface.overlay} />
-            </View>
-          ) : !isAuthenticated ? (
-            <AuthScreen onLogin={login} error={error} />
-          ) : (
-            <View style={{ flex: 1 }}>
-              <ConnectionBanner />
-              <Slot />
-            </View>
-          )}
+          <ToolDetailSheetProvider>
+            <ToastProvider>
+              <StatusBar style="light" />
+              {(!fontsLoaded || isLoading) ? (
+                <View
+                  style={{
+                    flex: 1,
+                    backgroundColor: theme.colors.surface.base,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ActivityIndicator color={theme.colors.surface.overlay} />
+                </View>
+              ) : !isAuthenticated ? (
+                <AuthScreen onLogin={login} error={error} />
+              ) : (
+                <View style={{ flex: 1 }}>
+                  <ConnectionBanner />
+                  <Slot />
+                </View>
+              )}
+            </ToastProvider>
+          </ToolDetailSheetProvider>
         </SafeAreaProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>

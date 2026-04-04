@@ -15,8 +15,9 @@
  * StreamingIndicator rendered below FlatList.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, View } from 'react-native';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 import type { DisplayMessage } from '../../hooks/useMessageList';
 import type { ToolCallState } from '@loom/shared/types/stream';
@@ -33,13 +34,19 @@ interface MessageListProps {
   messages: DisplayMessage[];
   isStreaming: boolean;
   sessionId: string;
+  /** External scroll handler (composed with internal if any) */
+  onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  /** Ref forwarded to the FlatList for external scroll control */
+  listRef?: React.RefObject<FlatList<DisplayMessage>>;
+  /** Initial scroll offset to restore (CHAT-07: scroll preservation) */
+  initialScrollOffset?: number;
 }
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function MessageList({ messages, isStreaming, sessionId }: MessageListProps) {
+export function MessageList({ messages, isStreaming, sessionId, onScroll, listRef, initialScrollOffset }: MessageListProps) {
   // Tool detail sheet state
   const [selectedToolCall, setSelectedToolCall] = useState<ToolCallState | null>(null);
 
@@ -76,9 +83,25 @@ export function MessageList({ messages, isStreaming, sessionId }: MessageListPro
     [reversedMessages, handleToolChipPress],
   );
 
+  // Restore initial scroll offset after data loads (CHAT-07)
+  const flatListRef = listRef ?? React.useRef<FlatList<DisplayMessage>>(null);
+
+  useEffect(() => {
+    if (initialScrollOffset && initialScrollOffset > 0 && reversedMessages.length > 0) {
+      // Small delay to ensure FlatList has rendered before scrolling
+      const timer = setTimeout(() => {
+        flatListRef.current?.scrollToOffset({ offset: initialScrollOffset, animated: false });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  // Only run once per session (key={sessionId} remounts, so this runs once)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, reversedMessages.length > 0]);
+
   return (
     <View style={styles.container}>
       <FlatList
+        ref={flatListRef}
         key={sessionId}
         data={reversedMessages}
         keyExtractor={keyExtractor}
@@ -90,6 +113,8 @@ export function MessageList({ messages, isStreaming, sessionId }: MessageListPro
         }}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
       />
 
       {/* Streaming indicator below FlatList (above composer) */}
