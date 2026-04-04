@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: "The Command Center"
-status: Ready to plan
-stopped_at: Phase 76 context gathered
-last_updated: "2026-04-04T01:10:05.041Z"
+status: Ready to execute
+stopped_at: Completed 76-03-PLAN.md
+last_updated: "2026-04-04T03:39:06.465Z"
 progress:
   total_phases: 11
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 10
+  completed_plans: 8
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Make AI agent work visible, beautiful, and controllable -- from anywhere
-**Current focus:** Phase 75 — chat-shell
+**Current focus:** Phase 76 — push-notifications
 
 ## Current Position
 
-Phase: 76
-Plan: Not started
+Phase: 76 (push-notifications) — EXECUTING
+Plan: 4 of 4
 
 ## Performance Metrics
 
@@ -60,6 +60,14 @@ Plan: Not started
 - [Phase 75]: FlatList key={sessionId} forces remount on session switch, preventing stale message flash
 - [Phase 75]: Composed scroll handlers: useScrollToBottom.onScroll + useScrollPosition.saveOffset fire together in single callback
 - [Phase 75]: Provider stack order: GestureHandler > Keyboard > SafeArea > BottomSheet > Toast > Content
+- [Phase 76]: Push triggers fire from WebSocketWriter.send() regardless of WS readyState for disconnected-client push delivery
+- [Phase 76]: 30s backgroundedAt threshold prevents push spam during quick app switches (D-01)
+- [Phase 76]: Session name resolution from cache.db sessions.summary for human-readable notification titles (SS-1)
+- [Phase 76]: Module-level notification listener ONLY stores response, never calls API or navigates [S-8]
+- [Phase 76]: apiClient.apiFetch<T>() used for all API calls (shared lib has no .get/.post convenience methods)
+- [Phase 76]: Session deep link validates by searching projects sessions array, not just server reachability [D-12]
+- [Phase 76]: Used apiFetch with PATCH method instead of plan's apiClient.patch (ApiClient only exposes apiFetch)
+- [Phase 76]: Created push-preferences.ts as blocking dep for parallel Plan 02 (Rule 3)
 
 ### Blockers/Concerns
 
@@ -67,6 +75,6 @@ None currently identified.
 
 ## Session Continuity
 
-Last session: 2026-04-04T01:10:05.038Z
-Stopped at: Phase 76 context gathered
+Last session: 2026-04-04T03:39:06.462Z
+Stopped at: Completed 76-03-PLAN.md
 Resume: `/gsd:plan-phase 75`
