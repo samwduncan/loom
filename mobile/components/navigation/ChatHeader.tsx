@@ -87,10 +87,12 @@ export function ChatHeader({ title = 'New Chat', modelName }: ChatHeaderProps) {
           {title}
         </Text>
 
-        {/* Model indicator (D-12) */}
-        <Text style={styles.modelIndicator} numberOfLines={1}>
-          {modelName ?? ''}
-        </Text>
+        {/* Model indicator (D-12) — tappable for future dropdown */}
+        <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel="Model selector">
+          <Text style={styles.modelIndicator} numberOfLines={1}>
+            {modelName ?? ''}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -104,8 +106,7 @@ const styles = createStyles((t) => ({
     right: 0,
     zIndex: 10,
     overflow: 'hidden' as const,
-    borderBottomWidth: 1,
-    borderBottomColor: t.colors.border.subtle,
+    // No bottom border — glass blur defines the edge
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
