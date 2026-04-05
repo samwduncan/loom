@@ -5,7 +5,7 @@
 # Shared: @loom/shared types + store factories
 
 language: en-US
-tone_instructions: "Be direct and actionable. Focus on bugs, security, and convention violations. Skip praise. Grade issues by severity: critical (security/data loss), high (logic bugs), medium (missing validation/error handling), low (style nits). This is a solo dev project — don't suggest over-engineering."
+tone_instructions: "Be direct and actionable. Focus on bugs, security, and convention violations. Skip praise. Grade issues: critical/high/medium/low. Solo dev project — don't suggest over-engineering."
 early_access: true
 
 reviews:
@@ -18,13 +18,24 @@ reviews:
   changed_files_summary: true
   sequence_diagrams: false
   poem: false
+  estimate_code_review_effort: true
   assess_linked_issues: true
   related_issues: true
   related_prs: true
+  suggested_labels: true
+  auto_apply_labels: false
+  suggested_reviewers: false
+  enable_prompt_for_ai_agents: true
+
+  # Slop detection — flag low-quality AI-generated PRs
+  slop_detection:
+    enabled: true
+    label: "ai-slop"
 
   auto_review:
     enabled: true
     auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 10
     drafts: false
     ignore_title_keywords:
       - "WIP"
@@ -41,6 +52,7 @@ reviews:
     - "!src/public/fonts/**"
     - "!mobile/assets/fonts/**"
     - "!**/*.lock"
+    - "!**/*.snap"
 
   path_instructions:
     # ===== WEB FRONTEND =====
@@ -175,6 +187,38 @@ reviews:
       enabled: false
     unit_tests:
       enabled: false
+    # Simplify — suggest code simplifications
+    simplify:
+      enabled: true
+    # Custom recipes — triggered via @coderabbitai run <name>
+    custom:
+      - name: "touch-targets"
+        enabled: true
+        instructions: "Scan all Pressable, TouchableOpacity, and tappable View elements in mobile/ for 44px minimum touch target compliance (iOS HIG). Flag any with height/minHeight < 44 and no hitSlop compensation."
+      - name: "theme-tokens"
+        enabled: true
+        instructions: "Scan mobile/ for hardcoded color strings (rgb, rgba, #hex), spacing values not from theme.spacing, radii not from theme.radii, and fontWeight/fontFamily mismatches. Every visual value should come from the theme system."
+      - name: "dead-code"
+        enabled: true
+        instructions: "Find unused imports, unreferenced variables, unreachable code, and dead CSS/style properties across all changed files."
+
+  # Pre-merge checks — block merges on quality issues
+  pre_merge_checks:
+    docstrings:
+      mode: "disabled"
+    title:
+      mode: "report"
+    description:
+      mode: "report"
+    issue_assessment:
+      mode: "report"
+    custom_checks:
+      - name: "no-secrets"
+        mode: "fail"
+        instructions: "Fail if any API keys, tokens, passwords, or credentials are present in the diff. Check for patterns like: API_KEY=, SECRET=, password=, token=, Bearer, sk-, ghp_, gho_"
+      - name: "no-any"
+        mode: "report"
+        instructions: "Report any new usage of TypeScript 'any' type without an explanatory comment."
 
   tools:
     eslint:
@@ -199,6 +243,7 @@ chat:
   auto_reply: true
 
 issue_enrichment:
+  auto_enrich: true
   planning:
     enabled: true
     auto_planning:
@@ -208,6 +253,17 @@ issue_enrichment:
         - "enhancement"
         - "!no-plan"
         - "!bug"
+  labeling:
+    labeling_instructions:
+      - label: "mobile"
+        instructions: "Apply when changes touch mobile/ directory"
+      - label: "backend"
+        instructions: "Apply when changes touch server/ directory"
+      - label: "frontend"
+        instructions: "Apply when changes touch src/ directory"
+      - label: "shared"
+        instructions: "Apply when changes touch shared/ directory"
+    auto_apply_labels: true
 
 knowledge_base:
   opt_out: false
@@ -219,7 +275,7 @@ knowledge_base:
   learnings:
     scope: auto
   web_search:
-    enabled: false
+    enabled: true
   issues:
     scope: auto
   pull_requests:
