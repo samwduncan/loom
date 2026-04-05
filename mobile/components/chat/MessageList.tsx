@@ -1,24 +1,23 @@
 /**
- * MessageList -- Inverted FlashList rendering DisplayMessage[].
+ * MessageList -- Inverted FlatList rendering DisplayMessage[].
  *
- * Uses @shopify/flash-list for streaming performance (5-10x fewer re-renders
- * than FlatList). estimatedItemSize=400 per Galaxies-dev reference.
+ * NOTE: FlashList v2 removed `inverted` prop support. Staying with FlatList
+ * for inverted chat lists until FlashList re-adds it.
  *
  * AR fix #9: Data is explicitly reversed ([...messages].reverse()) before passing
- * to the inverted FlashList. useMessageList returns oldest-first; inverted FlashList
+ * to the inverted FlatList. useMessageList returns oldest-first; inverted FlatList
  * renders index 0 at bottom, so data must be newest-first.
  *
- * FlashList key={sessionId} per Pitfall 7 -- forces unmount/remount on session
+ * FlatList key={sessionId} per Pitfall 7 -- forces unmount/remount on session
  * switch, preventing stale message flash.
  *
- * ToolDetailSheet rendered outside FlashList (Pitfall 4) with selectedToolCall state.
- * StreamingIndicator rendered below FlashList.
+ * ToolDetailSheet rendered outside FlatList (Pitfall 4) with selectedToolCall state.
+ * StreamingIndicator rendered below FlatList.
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Keyboard, View } from 'react-native';
+import { FlatList, Keyboard, View } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
 
 import type { DisplayMessage } from '../../hooks/useMessageList';
 import type { ToolCallState } from '@loom/shared/types/stream';
@@ -37,11 +36,11 @@ interface MessageListProps {
   sessionId: string;
   /** External scroll handler (composed with internal if any) */
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
-  /** Ref forwarded to the FlashList for external scroll control */
-  listRef?: React.RefObject<FlashList<DisplayMessage>>;
+  /** Ref forwarded to the FlatList for external scroll control */
+  listRef?: React.RefObject<FlatList<DisplayMessage>>;
   /** Initial scroll offset to restore (CHAT-07: scroll preservation) */
   initialScrollOffset?: number;
-  /** Height of the glass header -- adds paddingBottom in inverted FlashList (visual top padding) */
+  /** Height of the glass header -- adds paddingBottom in inverted FlatList (visual top padding) */
   headerHeight?: number;
 }
 
@@ -53,8 +52,8 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
   // Tool detail sheet state
   const [selectedToolCall, setSelectedToolCall] = useState<ToolCallState | null>(null);
 
-  // AR fix #9: Explicitly reverse for inverted FlashList
-  // useMessageList returns oldest-first; inverted FlashList renders index 0 at bottom
+  // AR fix #9: Explicitly reverse for inverted FlatList
+  // useMessageList returns oldest-first; inverted FlatList renders index 0 at bottom
   const reversedMessages = useMemo(() => [...messages].reverse(), [messages]);
 
   const handleToolChipPress = useCallback((toolCall: ToolCallState) => {
@@ -69,9 +68,6 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
 
   const renderItem = useCallback(
     ({ item, index }: { item: DisplayMessage; index: number }) => {
-      // In reversed (newest-first) data, the next message visually below is at index-1
-      // But in inverted FlashList, "below" in display = higher index in data
-      // So the next message in the conversation (older) is at index+1
       const nextMsg = index < reversedMessages.length - 1 ? reversedMessages[index + 1] : null;
       const nextMessageRole = nextMsg?.role ?? null;
 
@@ -87,17 +83,16 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
   );
 
   // Restore initial scroll offset after data loads (CHAT-07)
-  const localRef = React.useRef<FlashList<DisplayMessage>>(null);
-  const flashListRef = listRef ?? localRef;
+  const localRef = React.useRef<FlatList<DisplayMessage>>(null);
+  const flatListRef = listRef ?? localRef;
 
   useEffect(() => {
     if (initialScrollOffset && initialScrollOffset > 0 && reversedMessages.length > 0) {
       const timer = setTimeout(() => {
-        flashListRef.current?.scrollToOffset({ offset: initialScrollOffset, animated: false });
+        flatListRef.current?.scrollToOffset({ offset: initialScrollOffset, animated: false });
       }, 100);
       return () => clearTimeout(timer);
     }
-  // Only run once per session (key={sessionId} remounts, so this runs once)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, reversedMessages.length > 0]);
 
@@ -108,15 +103,18 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
 
   return (
     <View style={styles.container}>
-      <FlashList
-        ref={flashListRef}
+      <FlatList
+        ref={flatListRef}
         key={sessionId}
         data={reversedMessages}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
-        estimatedItemSize={400}
         inverted={true}
-        contentContainerStyle={headerHeight ? { paddingBottom: headerHeight } : undefined}
+        maintainVisibleContentPosition={{
+          minIndexForVisible: 1,
+          autoscrollToTopThreshold: 100,
+        }}
+        contentContainerStyle={[styles.contentContainer, headerHeight ? { paddingBottom: headerHeight } : undefined]}
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
@@ -124,10 +122,10 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
         onTouchStart={handleTapDismiss}
       />
 
-      {/* Streaming indicator below FlashList (above composer) */}
+      {/* Streaming indicator below FlatList (above composer) */}
       <StreamingIndicator isStreaming={isStreaming} />
 
-      {/* Tool detail sheet -- outside FlashList scroll hierarchy (Pitfall 4) */}
+      {/* Tool detail sheet -- outside FlatList scroll hierarchy (Pitfall 4) */}
       <ToolDetailSheet
         toolCall={selectedToolCall}
         isVisible={!!selectedToolCall}
@@ -144,5 +142,9 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
 const styles = createStyles((t) => ({
   container: {
     flex: 1,
+  },
+  contentContainer: {
+    paddingHorizontal: t.spacing.md,
+    paddingTop: t.spacing.md, // Appears as bottom in inverted FlatList
   },
 }));
