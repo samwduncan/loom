@@ -328,3 +328,28 @@ Chat:
 | **Overall** | **5-6/10** |
 
 Key: even the Galaxies-dev reference scores 5-6/10. We need to do BETTER than it, not just copy it.
+
+### Codex Implementation Audit (GPT-5.4, file-by-file)
+
+**Feasibility: 95%.** All changes styling-only except one breaking change.
+
+**Breaking change:** SessionItem active state — removing 3px left border requires refactoring padding logic:
+```
+Current: borderLeftWidth 3 + paddingLeft adjustment (isActive ? md-3 : md)
+Target: borderLeftWidth 0 + backgroundColor highlight (no padding conditional)
+```
+Fix: Replace border+padding conditional with simple backgroundColor toggle.
+
+**Codex-recommended values (where different from Bard):**
+- Body font: 17px (Codex) vs 16px (Bard/Claude tokens) — go with 16px (iOS standard)
+- Blur intensity: 40→28 (Codex) vs keep 40 (Galaxies-dev) — test both on device
+- User bubble max-width: 85%→78% — reasonable tightening
+- User bubble padding: 16→14px — slightly tighter
+- Header height: 56→52px — subtle
+- Send button: 36→44px (touch target compliance)
+- Shadow opacity: reduce across board (0.15→0.08)
+
+**Implementation phases (Codex order):**
+1. Easy: colors.ts, UserBubble, AssistantMessage, EmptyChat, ChatHeader
+2. Moderate: theme.ts, Composer, DrawerContent
+3. High-touch: SessionItem (active state refactor)
