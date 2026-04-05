@@ -1,23 +1,17 @@
 /**
  * Composer -- Functional message composer with 3-state FSM and glass surface.
  *
- * Replaces ComposerShell with a fully wired composer that sends messages
- * via WebSocket and transforms between idle/sending/active states.
+ * Visual clone targets: better-chatbot pill shape (32px radius), ChatGPT iOS density.
+ * Glass treatment with backdrop blur, muted/60% opacity background.
+ * Send button 44x44 touch target, no glow shadow.
  *
  * FSM States (per D-28):
  *   idle     -> Send button shows ArrowUp (accent when text present, surface when empty)
  *   sending  -> Brief transition during WS send (prevents double-send, input disabled)
  *   active   -> Streaming in progress, stop button (destructive Square icon)
  *
- * Glass treatment (D-04, D-07):
- *   Uses expo-blur BlurView intensity 40, dark tint, rgba(0,0,0,0.35) overlay.
- *   USE_GLASS_COMPOSER toggle for easy fallback if keyboard-blur collision causes stutter.
- *   Fallback: opaque surface-raised with top border (intentional, not broken).
- *
  * AR fix #3: 5s fallback timer uses functional updater `setComposerState((prev) => ...)`
  * to avoid stale closure. Timer is cleared when isStreaming transitions to true.
- *
- * Haptic: Impact Light on send, Impact Medium on stop.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -244,12 +238,11 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
           textAlignVertical="center"
         />
 
-        {/* Send / Stop button */}
+        {/* Send / Stop button — 44x44 touch target, NO glow shadow */}
         <AnimatedPressable
           style={[
             styles.sendButton,
             { backgroundColor: buttonBg },
-            hasText && !isActive && theme.shadows.glow(theme.colors.accent),
             buttonAnimStyle,
           ]}
           onPress={buttonHandler}
@@ -281,25 +274,21 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 const styles = createStyles((t) => ({
   glassOuter: {
     overflow: 'hidden' as const,
-    borderTopLeftRadius: t.radii.xl, // 20px -- kept for continuity (D-04 spec is 16px, deferred)
-    borderTopRightRadius: t.radii.xl,
+    borderTopLeftRadius: t.radii.pill,  // 32px capsule
+    borderTopRightRadius: t.radii.pill,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: t.colors.border.subtle,
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(0,0,0,0.60)', // muted/60% opacity per better-chatbot
   },
   opaqueOuter: {
     backgroundColor: t.colors.surface.raised,
-    borderTopLeftRadius: t.radii.xl, // 20px -- kept for continuity (D-04 spec is 16px, deferred)
-    borderTopRightRadius: t.radii.xl,
+    borderTopLeftRadius: t.radii.pill,
+    borderTopRightRadius: t.radii.pill,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: t.colors.border.subtle,
   },
   row: {
     flexDirection: 'row' as const,
@@ -310,18 +299,20 @@ const styles = createStyles((t) => ({
     minHeight: 44,
     maxHeight: 120,
     backgroundColor: t.colors.surface.base,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: t.colors.border.subtle,
-    borderRadius: t.radii.md,
-    paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.sm,
-    ...t.typography.body,
+    borderRadius: t.radii.pill, // 32px capsule/pill shape per better-chatbot
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    fontSize: 16, // Prevents iOS auto-zoom on focus
+    fontFamily: 'Inter-Regular',
+    lineHeight: 24,
     color: t.colors.text.primary,
   },
   sendButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
     marginLeft: t.spacing.sm,
