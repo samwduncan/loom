@@ -1,9 +1,11 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-# Loom - Web UI for Claude Code CLI
-# React 19 + Vite + React Router | Express + SQLite (better-sqlite3)
+# Loom — AI Dev Control Plane
+# Web: React 19 + Vite + Tailwind v4 | Mobile: Expo SDK 53 + React Native 0.79
+# Backend: Express 4 + SQLite (better-sqlite3) + WebSocket (ws)
+# Shared: @loom/shared types + store factories
 
 language: en-US
-tone_instructions: "Be direct and actionable. Focus on bugs, security, and convention violations. Skip praise. Grade issues by severity: critical (security/data loss), high (logic bugs), medium (missing validation/error handling), low (style nits)."
+tone_instructions: "Be direct and actionable. Focus on bugs, security, and convention violations. Skip praise. Grade issues by severity: critical (security/data loss), high (logic bugs), medium (missing validation/error handling), low (style nits). This is a solo dev project — don't suggest over-engineering."
 early_access: true
 
 reviews:
@@ -31,138 +33,142 @@ reviews:
       - "[skip review]"
 
   path_filters:
-    # Exclude build artifacts and caches
     - "!**/node_modules/**"
     - "!**/dist/**"
     - "!**/.vite/**"
     - "!**/coverage/**"
-
-    # Exclude planning/working docs
     - "!.planning/**"
-
-    # Exclude vendored/third-party
     - "!src/public/fonts/**"
+    - "!mobile/assets/fonts/**"
+    - "!**/*.lock"
 
   path_instructions:
-    # --- Frontend Components ---
-    - path: "src/src/components/**"
+    # ===== WEB FRONTEND =====
+    - path: "src/components/**"
       instructions: |
-        UI components. Loom enforces strict conventions via custom ESLint rules. Review for:
-        - No hardcoded colors (use CSS variables only — oklch tokens)
-        - No raw z-index values (use --z-base, --z-sticky, --z-dropdown, --z-overlay, --z-modal, --z-toast, --z-critical tokens)
-        - No className string concatenation (use cn() utility)
-        - No inline styles for visual properties (only dynamic dimensions/transforms allowed)
-        - No CSS variable token shadowing
-        - Named exports only (no default exports except route pages)
-        - Props interface exported and named {ComponentName}Props
+        Web UI components (React 19 + Tailwind v4). Review for:
+        - No hardcoded colors (use CSS variables — oklch tokens)
+        - No raw z-index (use --z-* tokens)
+        - No className concatenation (use cn() utility)
+        - Named exports only (no default except route pages)
+        - React.memo + custom comparator for list items
+        - useCallback for callbacks to memoized children
         - Max 200 lines JSX per component
-        - React.memo + custom comparator for items in memoized lists
-        - useCallback for all callbacks passed to memoized children
 
-    - path: "src/src/components/ui/**"
+    - path: "src/components/chat/**"
       instructions: |
-        shadcn/ui primitives. Review for:
-        - Accessibility: ARIA attributes, keyboard navigation, focus management
-        - No business logic in UI primitives
-        - Consistent with shadcn/ui patterns
-
-    - path: "src/src/components/chat/**"
-      instructions: |
-        Chat/conversation UI. Performance-critical rendering path. Review for:
-        - Scroll anchor behavior (useScrollAnchor hook)
-        - Streaming buffer handling (useStreamBuffer hook)
+        Web chat UI. Performance-critical streaming path. Review for:
+        - Scroll anchor behavior, streaming buffer handling
         - Message virtualization for long conversations
         - No unnecessary re-renders during streaming
 
-    - path: "src/src/components/terminal/**"
+    - path: "src/stores/**"
       instructions: |
-        xterm.js terminal integration. Review for:
-        - WebSocket lifecycle management (connect/disconnect/reconnect)
-        - Terminal resize handling
-        - Memory leaks (xterm dispose on unmount)
+        Zustand stores (Constitution 4.1-4.5). STRICT:
+        - Selector-only access, useShallow for multi-field
+        - No cross-store imports
+        - Timeline: Immer middleware. Others: vanilla set()
 
-    # --- Stores (Constitution 4.1: exactly 4 stores) ---
-    - path: "src/src/stores/**"
+    - path: "src/hooks/**"
       instructions: |
-        Zustand stores. STRICT rules (Constitution 4.1-4.5):
-        - Exactly 4 stores allowed: timeline, stream, ui, connection. Do NOT add new stores.
-        - Selector-only access (no whole-store subscriptions)
-        - useShallow() required when selecting multiple fields
-        - No cross-store imports (orchestration happens in hooks/components)
-        - Every store must export reset() for testing
-        - Timeline store: Immer middleware for nested mutations
-        - Other stores: vanilla set() returning new objects
-        - No getState().setState() outside the store file itself
+        Custom React hooks. Review for proper dependency arrays,
+        cleanup in useEffect, no direct store mutations.
 
-    # --- Hooks ---
-    - path: "src/src/hooks/**"
+    - path: "src/lib/**"
       instructions: |
-        Custom React hooks. Review for:
-        - Proper dependency arrays
-        - Cleanup in useEffect (abort controllers, WebSocket unsubscribe, timer clearance)
-        - No direct store mutations (use store actions)
-        - Clear return type annotations
+        Core infra (WebSocket, API, parsers). Review for reconnection logic,
+        message validation, backpressure, no unhandled rejections.
 
-    # --- Lib (infrastructure) ---
-    - path: "src/src/lib/**"
+    # ===== MOBILE (React Native + Expo) =====
+    - path: "mobile/components/**"
       instructions: |
-        Core infrastructure (WebSocket, API client, parsers). Review for:
-        - WebSocket: reconnection logic, message validation, auth token handling
-        - Parsers: handle malformed input gracefully (ANSI, diff, grep output)
-        - Streaming: backpressure handling, memory management for long streams
-        - No unhandled promise rejections
+        React Native components (Expo SDK 53, RN 0.79). Review for:
+        - All colors via theme.colors.* (createStyles pattern, NOT NativeWind)
+        - All spacing via theme.spacing.* (off-grid values need justifying comment)
+        - All radii via theme.radii.* tokens
+        - 44px minimum touch targets (iOS HIG)
+        - React.memo with custom comparator on list items
+        - useCallback for all press handlers
+        - No inline styles for static properties (use createStyles)
+        - Reanimated springs from theme.springs.* (not inline configs)
 
-    # --- Types ---
-    - path: "src/src/types/**"
+    - path: "mobile/components/chat/**"
       instructions: |
-        TypeScript type definitions. Review for:
-        - No `any` types (must use // @ts-expect-error with reason)
-        - No non-null assertions without comments
-        - Discriminated unions for message types
-        - WebSocket protocol types match server implementation
+        Mobile chat UI. Performance-critical. Review for:
+        - FlatList: inverted, keyExtractor, renderItem memoized
+        - No Keyboard.dismiss() on scroll (use keyboardDismissMode)
+        - Stream rendering: useRef + rAF, not React state per token
+        - MMKV persistence: consistent key prefixes, cleanup on delete
 
-    # --- Backend ---
+    - path: "mobile/components/navigation/**"
+      instructions: |
+        Drawer, header, session list. Review for:
+        - swipeEdgeWidth respects iOS system back (not full-width)
+        - Glass surfaces: BlurView + overlay opacity consistency
+        - Stagger animations: max 10 items, 30ms delay
+        - Session operations: haptic feedback, undo pattern
+
+    - path: "mobile/theme/**"
+      instructions: |
+        Design token system (LoomTheme type). Review for:
+        - Color values match lib/colors.ts constants
+        - Typography: fontWeight must match fontFamily (500=Medium, 600=SemiBold)
+        - No duplicate token values at different names
+        - types.ts comments match actual values
+
+    - path: "mobile/lib/**"
+      instructions: |
+        Mobile infrastructure. Review for:
+        - MMKV: single shared instance preferred (not per-file new MMKV())
+        - WebSocket: reconnect on foreground via .connect(token), NOT .tryReconnect()
+        - Springs: all configs include reduceMotion: ReduceMotion.System
+        - Haptics: appropriate feedback type per action
+
+    - path: "mobile/stores/**"
+      instructions: |
+        Mobile Zustand stores (factory pattern from shared/). Review for:
+        - MMKV storage adapter for persistence
+        - Selector-only access pattern
+        - No cross-store imports
+
+    - path: "mobile/app/**"
+      instructions: |
+        Expo Router layouts and screens. Review for:
+        - SplashScreen: gate on fonts + auth, handle font error
+        - KeyboardAvoidingView or keyboard-controller usage
+        - Safe area insets applied correctly
+        - Route params: type-safe useLocalSearchParams
+
+    # ===== SHARED =====
+    - path: "shared/**"
+      instructions: |
+        Shared types and store factories used by both web and mobile. Review for:
+        - No platform-specific imports (no react-native, no DOM APIs)
+        - Generic storage adapter interfaces
+        - Discriminated unions for message/stream types
+
+    # ===== BACKEND =====
     - path: "server/**/*.js"
       instructions: |
-        Express backend with SQLite. Review for:
-        - Auth: JWT verification on protected routes, token refresh
-        - Input validation: all user input validated (req.body, req.params, req.query)
-        - SQL injection: use parameterized queries (better-sqlite3 .prepare().run())
-        - WebSocket: auth on connection, message validation
-        - No credentials or secrets in code
-        - Error handling: try/catch, proper HTTP status codes, no leaked stack traces
-        - File operations: path traversal prevention (sanitize file paths from user input)
+        Express backend + SQLite. Review for:
+        - Auth: JWT on protected routes
+        - SQL: parameterized queries only (better-sqlite3 .prepare())
+        - WebSocket: auth on upgrade, message validation
+        - No credentials in code, no leaked stack traces
+        - Path traversal prevention on file operations
 
-    - path: "server/index.js"
-      instructions: |
-        Main server file (large, 2000+ lines). Review changes carefully for:
-        - Route handler security (auth middleware applied)
-        - WebSocket upgrade handling
-        - No breaking changes to API contract (see .planning/BACKEND_API_CONTRACT.md)
-
-    # --- Tests ---
+    # ===== TESTS =====
     - path: "**/*.test.{ts,tsx}"
       instructions: |
-        Test files. Review for:
+        Test files (Vitest). Review for:
         - Store tests call reset() in beforeEach
-        - No hardcoded timeouts (use waitFor/findBy)
-        - Meaningful assertions (not just "doesn't throw")
-        - 80% coverage threshold must be maintained
+        - No hardcoded timeouts (use waitFor)
+        - Meaningful assertions
 
-    # --- Config ---
-    - path: "*.config.{js,ts}"
+    # ===== CONFIG =====
+    - path: "*.config.{js,ts,mjs}"
       instructions: |
-        Build/tool configuration. Review for:
-        - Vite proxy settings (must proxy /api, /ws, /shell to backend)
-        - ESLint: custom loom-rules must not be disabled without justification
-        - No hardcoded secrets or environment-specific values
-
-    - path: "src/eslint-rules/**"
-      instructions: |
-        Custom ESLint plugin (loom-rules). Review for:
-        - Rule logic correctness (AST visitor patterns)
-        - Test coverage for rule
-        - Clear error messages that explain WHY, not just WHAT
+        Build/tool config. No hardcoded secrets or env-specific values.
 
   finishing_touches:
     docstrings:
@@ -171,24 +177,20 @@ reviews:
       enabled: false
 
   tools:
-    # Frontend
     eslint:
       enabled: true
     biome:
       enabled: false
-    # Security
     gitleaks:
       enabled: true
     semgrep:
       enabled: true
-    # General
     markdownlint:
       enabled: false
     yamllint:
       enabled: true
     shellcheck:
       enabled: true
-    # GitHub
     github-checks:
       enabled: true
       timeout_ms: 90000
@@ -196,9 +198,6 @@ reviews:
 chat:
   auto_reply: true
 
-# Issue Planner — generates Coding Plans from GitHub Issues
-# Trigger manually: comment "@coderabbitai plan" on any issue
-# Auto-planning: creates plans for issues with matching labels
 issue_enrichment:
   planning:
     enabled: true
