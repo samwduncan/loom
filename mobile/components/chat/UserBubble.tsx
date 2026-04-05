@@ -11,8 +11,10 @@
  * Pure presentational: no store imports, no side effects.
  */
 
-import React, { useEffect, useRef } from 'react';
-import { Text, View } from 'react-native';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { ActionSheetIOS, Platform, Pressable, Text, View } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -37,6 +39,25 @@ interface UserBubbleProps {
 // ---------------------------------------------------------------------------
 
 function UserBubbleInner({ content, timestamp, showTimestamp }: UserBubbleProps) {
+  const handleLongPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Copy', 'Cancel'],
+          cancelButtonIndex: 1,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 0) {
+            Clipboard.setStringAsync(content);
+          }
+        },
+      );
+    } else {
+      Clipboard.setStringAsync(content);
+    }
+  }, [content]);
+
   const hasAnimated = useRef(false);
   const opacity = useSharedValue(hasAnimated.current ? 1 : 0);
   const translateY = useSharedValue(hasAnimated.current ? 0 : 20);
@@ -66,9 +87,11 @@ function UserBubbleInner({ content, timestamp, showTimestamp }: UserBubbleProps)
 
   return (
     <Animated.View style={[styles.container, entranceStyle]}>
-      <View style={styles.bubble}>
-        <Text style={styles.text}>{content}</Text>
-      </View>
+      <Pressable onLongPress={handleLongPress} delayLongPress={400}>
+        <View style={styles.bubble}>
+          <Text style={styles.text}>{content}</Text>
+        </View>
+      </Pressable>
       {showTimestamp && formattedTime ? (
         <Text style={styles.timestamp}>{formattedTime}</Text>
       ) : null}
