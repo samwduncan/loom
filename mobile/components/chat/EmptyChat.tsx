@@ -1,28 +1,70 @@
 /**
  * EmptyChat -- empty state for new chat sessions.
  *
- * D-33: Provider avatar (24px circle, surface-overlay bg, Bot icon) + model name
- * (Small 13px, text-muted) + "How can I help?" (Body 15px, text-primary).
- *
- * Entrance: Standard spring, opacity 0->1 on all elements.
- * Reads modelName from useStreamStore (defaults to "Claude").
+ * Features:
+ * - 50px avatar circle with 30px Bot icon
+ * - Time-based greeting ("Good morning/afternoon/evening")
+ * - Suggestion chips: horizontal ScrollView, 6 items
+ * - First-run detection via MMKV hasLaunchedBefore flag
+ * - Entrance animation: Standard spring, opacity 0->1
  */
 
-import { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { useEffect, useCallback, useRef } from 'react';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { Bot } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import { MMKV } from 'react-native-mmkv';
 
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
 import { useStreamStore } from '../../stores/index';
 
+// ---------------------------------------------------------------------------
+// Greeting helper
+// ---------------------------------------------------------------------------
+
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
+
+// ---------------------------------------------------------------------------
+// Suggestion chips
+// ---------------------------------------------------------------------------
+
+const SUGGESTIONS = [
+  'Code review',
+  'Bug fix',
+  'Research',
+  'Explain code',
+  'Refactor',
+  'Debug',
+];
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+const mmkv = new MMKV();
+
 export function EmptyChat() {
   const modelName = useStreamStore((s) => s.modelName) ?? 'Claude';
+  const isFirstLaunch = useRef(!mmkv.getBoolean('hasLaunchedBefore'));
+
+  // Mark as launched
+  useEffect(() => {
+    if (isFirstLaunch.current) {
+      mmkv.set('hasLaunchedBefore', true);
+    }
+  }, []);
 
   // Entrance animation
   const opacity = useSharedValue(0);
@@ -38,23 +80,39 @@ export function EmptyChat() {
     transform: [{ translateY: translateY.value }],
   }));
 
+  const greeting = getGreeting();
+
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.content, animatedStyle]}>
-        {/* Provider avatar */}
+        {/* Provider avatar — larger circle */}
         <View style={styles.avatar}>
           <Bot
-            size={16}
+            size={30}
             color={theme.colors.text.primary}
-            strokeWidth={2}
+            strokeWidth={1.5}
           />
         </View>
 
-        {/* Model name */}
-        <Text style={styles.modelName}>{modelName}</Text>
+        {/* Time-based greeting */}
+        <Text style={styles.greeting}>{greeting}</Text>
 
-        {/* Greeting */}
-        <Text style={styles.greeting}>How can I help?</Text>
+        {/* Subtitle */}
+        <Text style={styles.subtitle}>How can I help?</Text>
+
+        {/* Suggestion chips */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsContainer}
+          style={styles.chipsScroll}
+        >
+          {SUGGESTIONS.map((label) => (
+            <View key={label} style={styles.chip}>
+              <Text style={styles.chipText}>{label}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </Animated.View>
     </View>
   );
@@ -69,22 +127,48 @@ const styles = createStyles((t) => ({
   content: {
     alignItems: 'center' as const,
     gap: t.spacing.sm,
+    paddingHorizontal: t.spacing.lg,
   },
   avatar: {
-    width: 24,
-    height: 24,
-    borderRadius: t.radii.full,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: t.colors.surface.overlay,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
-  },
-  modelName: {
-    ...t.typography.small,
-    color: t.colors.text.muted,
+    marginBottom: t.spacing.sm,
   },
   greeting: {
-    ...t.typography.body,
+    fontSize: 24,
+    fontWeight: '600' as const,
+    fontFamily: 'Inter-SemiBold',
+    lineHeight: 30,
     color: t.colors.text.primary,
     textAlign: 'center' as const,
+  },
+  subtitle: {
+    ...t.typography.body,
+    color: t.colors.text.secondary,
+    textAlign: 'center' as const,
+  },
+  chipsScroll: {
+    marginTop: t.spacing.lg,
+    maxHeight: 48,
+  },
+  chipsContainer: {
+    gap: 12,
+    paddingHorizontal: t.spacing.xs,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: t.colors.surface.raised,
+    borderWidth: 1,
+    borderColor: t.colors.border.subtle,
+  },
+  chipText: {
+    ...t.typography.small,
+    color: t.colors.text.secondary,
   },
 }));
