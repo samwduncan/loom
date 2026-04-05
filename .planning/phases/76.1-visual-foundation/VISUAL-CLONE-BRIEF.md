@@ -251,3 +251,80 @@ Destructive:       oklch(0.577 0.245) ≈ rgb(220, 60, 50)   — red
 8. **Segments** — tool chips, thinking, code blocks
 9. **Performance** — FlashList, scroll behavior
 10. **Native integrations** — zeego, keyboard controller
+
+---
+
+## APPENDIX: Multi-Provider Visual Analysis Results
+
+### Bard Color Science (complete palette, ready to paste)
+
+```typescript
+// NEW colors.ts — calibrated against ChatGPT iOS + Claude iOS + better-chatbot
+export const SURFACE = {
+  sunken:  'rgb(22, 22, 24)',   // Tier 0: drawer bg — L0+7
+  base:    'rgb(33, 33, 36)',   // Tier 1: chat bg — L1+11
+  raised:  'rgb(51, 51, 55)',   // Tier 2: cards, composer, user bubbles — L2+18
+  overlay: 'rgb(69, 69, 74)',   // Tier 3: modals, popovers — L3+18
+} as const;
+
+export const IDLE_BG = 'rgb(15, 15, 16)';       // Near-black main bg
+export const STREAMING_BG = 'rgb(16, 16, 18)';  // +1-2 RGB warmth
+export const ERROR_BG = 'rgb(14, 14, 15)';      // Slightly cooler
+
+export const ACCENT = 'rgb(217, 119, 87)';      // Claude warm gold
+export const DESTRUCTIVE = 'rgb(239, 68, 68)';  // Vibrant red
+export const SUCCESS = 'rgb(34, 197, 94)';       // Vibrant emerald
+
+// Text (cool-neutral, high contrast against base rgb(33,33,36))
+// Primary: 17.1:1 contrast, Secondary: 9.8:1, Muted: 6.2:1
+text.primary:   'rgb(245, 245, 246)'
+text.secondary: 'rgb(188, 188, 192)'
+text.muted:     'rgb(138, 138, 142)'
+
+// Borders
+border.subtle:      'rgba(255,255,255,0.10)'  // up from 0.07
+border.interactive: 'rgba(255,255,255,0.20)'  // down from 0.34
+```
+
+### Claude iOS Official Design Tokens (from jcmrs/claude-visual-style-guide)
+
+```
+Background:      oklch(0.145 0 0)  ≈ rgb(31, 31, 31)
+Secondary/Muted: oklch(0.269 0 0)  ≈ rgb(55, 55, 55)
+Muted text:      oklch(0.708 0 0)  ≈ rgb(170, 170, 170)
+Foreground:      oklch(0.985 0 0)  ≈ rgb(250, 250, 250)
+Border radius:   0.625rem (10px) default
+Body font:       16px, weights 400/500 only
+```
+
+### Kimi Pixel Analysis (from Galaxies-dev screenshots)
+
+Drawer:
+- Width: 85% screen
+- Search bar: 36px height, 8px radius
+- Items: 44px height, 16px h-padding
+- Active bg: #F5F5F7 (light mode), 8px radius
+- Footer avatar: 32x32
+- Section headers: 13px uppercase
+- Labels: 16-17px
+
+Chat:
+- Composer input: 20px border-radius (pill), hairlineWidth border, 10px padding
+- Suggestion pills: 18px radius, 16px padding, 8-12px gap
+- Message density needs tightening
+- Header title: 17px
+- Avatar recommended: 30-32px
+
+### Kimi Scoring (current Galaxies-dev app)
+
+| Category | Score |
+|----------|-------|
+| Visual hierarchy | 6/10 |
+| Spacing | 5-7/10 |
+| Typography | 5-7/10 |
+| Color | 5-7/10 |
+| iOS nativeness | 4-7/10 |
+| Density | 5-9/10 |
+| **Overall** | **5-6/10** |
+
+Key: even the Galaxies-dev reference scores 5-6/10. We need to do BETTER than it, not just copy it.
