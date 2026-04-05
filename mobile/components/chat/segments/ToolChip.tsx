@@ -21,6 +21,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
+  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
@@ -130,7 +131,27 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 function ToolChipInner({ toolCall, onPress }: ToolChipProps) {
   const scale = useSharedValue(1);
+  const nameOpacity = useSharedValue(1);
   const Icon = getToolIcon(toolCall.toolName);
+
+  // Shimmer: animated opacity on name text during 'executing' status
+  React.useEffect(() => {
+    if (toolCall.status === 'executing') {
+      nameOpacity.value = withRepeat(
+        withSequence(
+          withTiming(0.3, { duration: 750 }),
+          withTiming(1, { duration: 750 }),
+        ),
+        -1, // infinite
+      );
+    } else {
+      nameOpacity.value = withTiming(1, { duration: 200 });
+    }
+  }, [toolCall.status, nameOpacity]);
+
+  const nameAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: nameOpacity.value,
+  }));
 
   const handlePressIn = useCallback(() => {
     scale.value = withSpring(0.97, theme.springs.micro);
@@ -164,8 +185,8 @@ function ToolChipInner({ toolCall, onPress }: ToolChipProps) {
         <Icon size={14} color={theme.colors.text.secondary} strokeWidth={2} />
       </View>
 
-      {/* Tool name */}
-      <Animated.Text style={styles.name} numberOfLines={1}>
+      {/* Tool name — shimmer opacity when executing */}
+      <Animated.Text style={[styles.name, nameAnimatedStyle]} numberOfLines={1}>
         {toolCall.toolName}
       </Animated.Text>
 

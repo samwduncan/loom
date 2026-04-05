@@ -21,16 +21,19 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withSequence,
+  withSpring,
   withTiming,
   Easing,
   cancelAnimation,
 } from 'react-native-reanimated';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
+import { Copy, Check } from 'lucide-react-native';
 import CodeHighlighter from 'react-native-code-highlighter';
 import atomOneDark from 'react-syntax-highlighter/dist/esm/styles/hljs/atom-one-dark';
 import { showToast } from '../../../lib/toast';
 import { createStyles } from '../../../theme/createStyles';
+import { theme } from '../../../theme/theme';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -53,6 +56,11 @@ function CodeBlockSegmentInner({
 }: CodeBlockSegmentProps) {
   const [copied, setCopied] = useState(false);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const iconScale = useSharedValue(1);
+
+  const iconAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: iconScale.value }],
+  }));
 
   // Streaming indicator animation (opacity pulse on bottom edge)
   const streamingOpacity = useSharedValue(isStreaming ? 0.3 : 0);
@@ -82,12 +90,16 @@ function CodeBlockSegmentInner({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     showToast('Copied', undefined, 2000);
 
+    // Micro scale spring on icon swap
+    iconScale.value = 0.5;
+    iconScale.value = withSpring(1, { damping: 12, stiffness: 300 });
+
     setCopied(true);
     if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     copyTimeoutRef.current = setTimeout(() => {
       setCopied(false);
     }, 2000);
-  }, [code]);
+  }, [code, iconScale]);
 
   // Clean up timeout on unmount
   React.useEffect(() => {
@@ -114,9 +126,13 @@ function CodeBlockSegmentInner({
           accessibilityRole="button"
           accessibilityLabel={copied ? 'Copied to clipboard' : 'Copy code to clipboard'}
         >
-          <Text style={styles.copyText}>
-            {copied ? 'Copied' : 'Copy'}
-          </Text>
+          <Animated.View style={iconAnimatedStyle}>
+            {copied ? (
+              <Check size={14} color={theme.colors.success} strokeWidth={2.5} />
+            ) : (
+              <Copy size={14} color={theme.colors.accent} strokeWidth={2} />
+            )}
+          </Animated.View>
         </Pressable>
       </View>
 

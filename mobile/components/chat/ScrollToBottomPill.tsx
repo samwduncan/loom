@@ -44,22 +44,25 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export function ScrollToBottomPill({ isVisible, onPress }: ScrollToBottomPillProps) {
   const translateY = useSharedValue(20);
   const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.8);
 
   useEffect(() => {
     if (isVisible) {
       // Standard spring entrance
       opacity.value = withSpring(1, theme.springs.standard);
       translateY.value = withSpring(0, theme.springs.standard);
+      scale.value = withSpring(1, theme.springs.standard);
     } else {
       // Fast timing exit
       opacity.value = withTiming(0, { duration: 150 });
       translateY.value = withTiming(20, { duration: 150 });
+      scale.value = withTiming(0.8, { duration: 150 });
     }
-  }, [isVisible, opacity, translateY]);
+  }, [isVisible, opacity, translateY, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
   }));
 
   const handlePress = () => {

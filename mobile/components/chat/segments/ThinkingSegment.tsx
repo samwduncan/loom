@@ -22,6 +22,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { ChevronDown } from 'lucide-react-native';
 import type { ThinkingBlock } from '@loom/shared/types/message';
 import { createStyles } from '../../../theme/createStyles';
 import { theme } from '../../../theme/theme';
@@ -118,6 +119,11 @@ function ThinkingSegmentInner({ block, isActive }: ThinkingSegmentProps) {
     [],
   );
 
+  // Chevron rotation: 0deg collapsed, 180deg expanded
+  const chevronRotation = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${isExpanded.value * 180}deg` }],
+  }));
+
   // Animated height interpolation
   const animatedContainerStyle = useAnimatedStyle(() => {
     const measuredHeight = contentHeight.current || 200; // Fallback until measured
@@ -156,6 +162,15 @@ function ThinkingSegmentInner({ block, isActive }: ThinkingSegmentProps) {
           {/* Summary label (always visible -- serves as collapsed content) */}
           <View style={styles.summaryRow}>
             <Text style={styles.summaryText}>{summaryText}</Text>
+            {!isActive && (
+              <Animated.View style={chevronRotation}>
+                <ChevronDown
+                  size={14}
+                  color={theme.colors.text.muted}
+                  strokeWidth={2}
+                />
+              </Animated.View>
+            )}
           </View>
 
           {/* Thinking text content (visible when expanded) */}
@@ -188,7 +203,9 @@ const styles = createStyles((t) => ({
   },
   summaryRow: {
     minHeight: 44, // iOS HIG 44pt touch target — visual compactness via zero padding
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 0,
   },
   summaryText: {
