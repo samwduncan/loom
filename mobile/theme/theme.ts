@@ -5,34 +5,34 @@ import type { LoomTheme } from './types';
 export const theme: LoomTheme = {
   colors: {
     surface: {
-      sunken: SURFACE.sunken,   // rgb(28, 26, 24)
-      base: SURFACE.base,       // rgb(44, 40, 38)
-      raised: SURFACE.raised,   // rgb(64, 60, 57)
-      overlay: SURFACE.overlay, // rgb(82, 78, 74)
+      sunken: SURFACE.sunken,   // rgb(22, 22, 24)
+      base: SURFACE.base,       // rgb(33, 33, 36)
+      raised: SURFACE.raised,   // rgb(51, 51, 55)
+      overlay: SURFACE.overlay, // rgb(69, 69, 74)
     },
-    accent: ACCENT,             // rgb(196, 108, 88)
-    accentFg: 'rgb(46, 42, 40)',
-    destructive: DESTRUCTIVE,   // rgb(210, 112, 88)
-    success: SUCCESS,           // rgb(82, 175, 108)
+    accent: ACCENT,             // rgb(217, 119, 87)
+    accentFg: 'rgb(15, 15, 16)',
+    destructive: DESTRUCTIVE,   // rgb(239, 68, 68)
+    success: SUCCESS,           // rgb(34, 197, 94)
     text: {
-      primary: 'rgb(230, 222, 216)',
-      secondary: 'rgb(191, 186, 182)',
-      muted: 'rgb(148, 144, 141)',
+      primary: 'rgb(245, 245, 246)',
+      secondary: 'rgb(188, 188, 192)',
+      muted: 'rgb(138, 138, 142)',
     },
     border: {
-      subtle: 'rgba(255,255,255,0.07)',
-      interactive: 'rgba(255,255,255,0.34)',
+      subtle: 'rgba(255,255,255,0.10)',
+      interactive: 'rgba(255,255,255,0.20)',
     },
     background: {
-      idle: IDLE_BG,         // rgb(46, 42, 40)
-      streaming: STREAMING_BG, // rgb(48, 43, 40)
-      error: ERROR_BG,       // rgb(44, 42, 42)
+      idle: IDLE_BG,         // rgb(15, 15, 16)
+      streaming: STREAMING_BG, // rgb(16, 16, 18)
+      error: ERROR_BG,       // rgb(14, 14, 15)
     },
   },
   typography: {
     largeTitle: {
       fontSize: 28,
-      fontWeight: '700',
+      fontWeight: '600',
       lineHeight: 34,
       fontFamily: 'Inter-SemiBold',
     },
@@ -43,7 +43,7 @@ export const theme: LoomTheme = {
       fontFamily: 'Inter-SemiBold',
     },
     body: {
-      fontSize: 15,
+      fontSize: 16,
       fontWeight: '400',
       lineHeight: 24,
       fontFamily: 'Inter-Regular',
@@ -75,25 +75,25 @@ export const theme: LoomTheme = {
     subtle: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.15,
+      shadowOpacity: 0.08,
       shadowRadius: 8,
     },
     medium: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.25,
+      shadowOpacity: 0.15,
       shadowRadius: 16,
     },
     heavy: {
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.30,
+      shadowOpacity: 0.20,
       shadowRadius: 32,
     },
     glow: (color: string) => ({
       shadowColor: color,
       shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.25,
+      shadowOpacity: 0.20,
       shadowRadius: 16,
     }),
   },
@@ -102,6 +102,7 @@ export const theme: LoomTheme = {
     md: 12,
     lg: 16,
     xl: 20,
+    pill: 32,
     full: 9999,
   },
   rimLight: {

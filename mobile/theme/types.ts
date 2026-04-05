@@ -4,34 +4,34 @@ import { type WithSpringConfig } from 'react-native-reanimated';
 export interface LoomTheme {
   colors: {
     surface: {
-      sunken: string;  // rgb(28, 26, 24) - Tier 0
-      base: string;    // rgb(44, 40, 38) - Tier 1
-      raised: string;  // rgb(64, 60, 57) - Tier 2
-      overlay: string; // rgb(82, 78, 74) - Tier 3
+      sunken: string;  // rgb(22, 22, 24) - Tier 0
+      base: string;    // rgb(33, 33, 36) - Tier 1
+      raised: string;  // rgb(51, 51, 55) - Tier 2
+      overlay: string; // rgb(69, 69, 74) - Tier 3
     };
-    accent: string;      // rgb(196, 108, 88)
-    accentFg: string;    // rgb(46, 42, 40)
-    destructive: string; // rgb(210, 112, 88)
-    success: string;     // rgb(82, 175, 108)
+    accent: string;      // rgb(217, 119, 87)
+    accentFg: string;    // rgb(15, 15, 16)
+    destructive: string; // rgb(239, 68, 68)
+    success: string;     // rgb(34, 197, 94)
     text: {
-      primary: string;   // rgb(230, 222, 216)
-      secondary: string; // rgb(191, 186, 182)
-      muted: string;     // rgb(148, 144, 141)
+      primary: string;   // rgb(245, 245, 246)
+      secondary: string; // rgb(188, 188, 192)
+      muted: string;     // rgb(138, 138, 142)
     };
     border: {
-      subtle: string;      // rgba(255,255,255,0.07)
-      interactive: string; // rgba(255,255,255,0.34)
+      subtle: string;      // rgba(255,255,255,0.10)
+      interactive: string; // rgba(255,255,255,0.20)
     };
     background: {
-      idle: string;      // rgb(46, 42, 40)
-      streaming: string; // rgb(48, 43, 40)
-      error: string;     // rgb(44, 42, 42)
+      idle: string;      // rgb(15, 15, 16)
+      streaming: string; // rgb(16, 16, 18)
+      error: string;     // rgb(14, 14, 15)
     };
   };
   typography: {
     largeTitle: TextStyle; // 28px semibold
     heading: TextStyle;    // 17px semibold
-    body: TextStyle;       // 15px regular
+    body: TextStyle;       // 16px regular
     small: TextStyle;      // 13px regular -- tool labels, timestamps, thinking summary, date headers
     caption: TextStyle;    // 12px regular
   };
@@ -63,6 +63,7 @@ export interface LoomTheme {
     md: number;   // 12
     lg: number;   // 16
     xl: number;   // 20
+    pill: number; // 32
     full: number; // 9999
   };
   rimLight: ViewStyle;
