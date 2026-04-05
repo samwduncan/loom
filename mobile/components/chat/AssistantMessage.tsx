@@ -14,9 +14,11 @@
  * First-token entrance per D-26: opacity 0->1 over 150ms.
  */
 
-import React, { useMemo } from 'react';
-import { Text, View } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { ActionSheetIOS, Platform, Pressable, Text, View } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { Bot } from 'lucide-react-native';
+import { haptic } from '../../lib/haptics';
 
 import type { DisplayMessage } from '../../hooks/useMessageList';
 import type { ToolCall } from '@loom/shared/types/message';
@@ -116,6 +118,29 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
   }, [message.timestamp]);
 
   // -------------------------------------------------------------------------
+  // Long-press copy (same pattern as UserBubble)
+  // -------------------------------------------------------------------------
+  const handleLongPress = useCallback(() => {
+    if (!message.content) return;
+    haptic.transition();
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Copy', 'Cancel'],
+          cancelButtonIndex: 1,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 0) {
+            Clipboard.setStringAsync(message.content);
+          }
+        },
+      );
+    } else {
+      Clipboard.setStringAsync(message.content);
+    }
+  }, [message.content]);
+
+  // -------------------------------------------------------------------------
   // Collect tool_use segments for flex-wrap row rendering
   // -------------------------------------------------------------------------
 
@@ -128,8 +153,8 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
         </View>
       </View>
 
-      {/* Content area */}
-      <View style={styles.content}>
+      {/* Content area -- long-press to copy */}
+      <Pressable onLongPress={handleLongPress} delayLongPress={400} style={styles.content}>
         {segments.map((seg, idx) => {
           const key = `${message.id}-seg-${idx}`;
 
@@ -169,7 +194,7 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
               return null;
           }
         })}
-      </View>
+      </Pressable>
 
       {/* Timestamp */}
       {message.showTimestamp && formattedTime ? (
