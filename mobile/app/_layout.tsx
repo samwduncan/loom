@@ -25,6 +25,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Slot } from 'expo-router';
 import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+
+// Prevent auto-hide — gate on font load
+SplashScreen.preventAutoHideAsync();
 import { AuthScreen } from '../components/auth/AuthScreen';
 import { ConnectionBanner } from '../components/connection/ConnectionBanner';
 import { NotificationBanner } from '../components/notifications/NotificationBanner';
@@ -63,6 +67,13 @@ export default function RootLayout() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Hide splash screen once fonts are loaded
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
   useEffect(() => {
     if (isAuthenticated) {
