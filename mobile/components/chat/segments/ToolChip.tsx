@@ -16,7 +16,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { ActivityIndicator, Pressable } from 'react-native';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -159,8 +159,10 @@ function ToolChipInner({ toolCall, onPress }: ToolChipProps) {
       accessibilityRole="button"
       accessibilityLabel={`${toolCall.toolName} tool call, status: ${toolCall.status}`}
     >
-      {/* Tool icon */}
-      <Icon size={14} color={theme.colors.text.secondary} strokeWidth={2} />
+      {/* Tool icon with subtle background */}
+      <View style={styles.iconBg}>
+        <Icon size={14} color={theme.colors.text.secondary} strokeWidth={2} />
+      </View>
 
       {/* Tool name */}
       <Animated.Text style={styles.name} numberOfLines={1}>
@@ -200,6 +202,14 @@ const styles = createStyles((t) => ({
     borderColor: t.colors.border.subtle,
     gap: t.spacing.xs,
     ...t.rimLight,  // D-03: top-edge rim light for depth perception
+  },
+  iconBg: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
   },
   name: {
     ...t.typography.small,

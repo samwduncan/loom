@@ -19,6 +19,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
+  Easing,
   runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
@@ -39,8 +41,8 @@ interface ThinkingSegmentProps {
 // Constants
 // ---------------------------------------------------------------------------
 
-const EXPAND_SPRING = theme.springs.expand; // { damping: 18, stiffness: 90, mass: 1.0 }
-const COLLAPSED_HEIGHT = 44; // Minimum 44px touch target for collapsed state
+const EXPAND_TIMING = { duration: 200, easing: Easing.inOut(Easing.ease) };
+const COLLAPSED_HEIGHT = 32; // Compact collapsed height (less button-like)
 
 // ---------------------------------------------------------------------------
 // Component
@@ -79,11 +81,11 @@ function ThinkingSegmentInner({ block, isActive }: ThinkingSegmentProps) {
   useEffect(() => {
     if (prevIsActive.current && !isActive) {
       // Transition from active to inactive -- auto-collapse
-      isExpanded.value = withSpring(0, EXPAND_SPRING);
+      isExpanded.value = withTiming(0, EXPAND_TIMING);
       setIsUserExpanded(false);
     } else if (!prevIsActive.current && isActive) {
       // Transition from inactive to active -- expand
-      isExpanded.value = withSpring(1, EXPAND_SPRING);
+      isExpanded.value = withTiming(1, EXPAND_TIMING);
     }
     prevIsActive.current = isActive;
   }, [isActive, isExpanded]);
@@ -103,7 +105,7 @@ function ThinkingSegmentInner({ block, isActive }: ThinkingSegmentProps) {
 
     Haptics.selectionAsync();
     const shouldExpand = isExpanded.value < 0.5;
-    isExpanded.value = withSpring(shouldExpand ? 1 : 0, EXPAND_SPRING);
+    isExpanded.value = withTiming(shouldExpand ? 1 : 0, EXPAND_TIMING);
     runOnJS(setIsUserExpanded)(shouldExpand);
   }, [isActive, isExpanded]);
 
@@ -187,9 +189,9 @@ const styles = createStyles((t) => ({
     marginVertical: t.spacing.sm,
   },
   summaryRow: {
-    minHeight: 44, // 44px touch target minimum
+    minHeight: 32, // Compact collapsed height
     justifyContent: 'center',
-    paddingVertical: t.spacing.xs,
+    paddingVertical: 2,
   },
   summaryText: {
     fontSize: t.typography.small.fontSize,
@@ -200,6 +202,9 @@ const styles = createStyles((t) => ({
   },
   contentContainer: {
     paddingBottom: t.spacing.sm,
+    borderLeftWidth: 2,
+    borderLeftColor: t.colors.text.muted,
+    paddingLeft: t.spacing.sm,
   },
   thinkingText: {
     fontSize: t.typography.body.fontSize,
