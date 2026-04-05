@@ -83,7 +83,7 @@ export function ChatHeader({ title = 'New Chat', modelName }: ChatHeaderProps) {
         </AnimatedPressable>
 
         {/* Title */}
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail" maxFontSizeMultiplier={1.3}>
           {title}
         </Text>
 

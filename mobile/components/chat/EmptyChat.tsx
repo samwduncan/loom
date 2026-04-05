@@ -95,10 +95,10 @@ export function EmptyChat() {
         </View>
 
         {/* Time-based greeting */}
-        <Text style={styles.greeting}>{greeting}</Text>
+        <Text style={styles.greeting} maxFontSizeMultiplier={1.3}>{greeting}</Text>
 
         {/* Subtitle */}
-        <Text style={styles.subtitle}>How can I help?</Text>
+        <Text style={styles.subtitle} maxFontSizeMultiplier={1.3}>How can I help?</Text>
 
         {/* Suggestion chips */}
         <ScrollView
