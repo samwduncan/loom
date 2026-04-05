@@ -337,8 +337,8 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 const styles = createStyles((t) => ({
   glassOuter: {
     overflow: 'hidden' as const,
-    borderTopLeftRadius: t.radii.pill,  // 32px capsule
-    borderTopRightRadius: t.radii.pill,
+    borderTopLeftRadius: t.radii.xl,
+    borderTopRightRadius: t.radii.xl,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
   },
@@ -348,8 +348,8 @@ const styles = createStyles((t) => ({
   },
   opaqueOuter: {
     backgroundColor: t.colors.surface.raised,
-    borderTopLeftRadius: t.radii.pill,
-    borderTopRightRadius: t.radii.pill,
+    borderTopLeftRadius: t.radii.xl,
+    borderTopRightRadius: t.radii.xl,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
   },
@@ -361,10 +361,8 @@ const styles = createStyles((t) => ({
     flex: 1,
     minHeight: 44,
     maxHeight: 160,
-    backgroundColor: t.colors.surface.base,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: t.colors.border.subtle,
-    borderRadius: t.radii.pill, // 32px capsule/pill shape per better-chatbot
+    backgroundColor: t.colors.surface.raised,
+    borderRadius: t.radii.xl, // 20px — rounded but not pill-shaped (like Claude iOS)
     overflow: 'hidden' as const,
   },
   input: {

@@ -1,17 +1,13 @@
 /**
  * EmptyChat -- empty state for new chat sessions.
  *
- * Features:
- * - 50px avatar circle with 30px Bot icon
- * - Time-based greeting ("Good morning/afternoon/evening")
- * - Suggestion chips: horizontal ScrollView, 6 items
- * - Suggestion chips (visual, not yet interactive)
- * - Entrance animation: Standard spring, opacity 0->1
+ * Modeled after Claude iOS: centered greeting with generous vertical space,
+ * minimal chrome, no visual noise. Chips are functional but understated.
  */
 
 import { useCallback, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
-import { Bot } from 'lucide-react-native';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { Sparkles } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -21,8 +17,9 @@ import Animated, {
 import { haptic } from '../../lib/haptics';
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
+
 // ---------------------------------------------------------------------------
-// Greeting helper
+// Greeting
 // ---------------------------------------------------------------------------
 
 function getGreeting(): string {
@@ -33,25 +30,15 @@ function getGreeting(): string {
 }
 
 // ---------------------------------------------------------------------------
-// Suggestion chips
+// Suggestion chips — smaller, more like Claude iOS pills
 // ---------------------------------------------------------------------------
 
 const SUGGESTIONS = [
   'Code review',
-  'Bug fix',
-  'Research',
-  'Explain code',
-  'Refactor',
   'Debug',
+  'Explain',
+  'Refactor',
 ];
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Interactive chip with micro-spring press animation
-// ---------------------------------------------------------------------------
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -88,12 +75,12 @@ function SuggestionChip({ label, onPress }: { label: string; onPress?: (text: st
 }
 
 // ---------------------------------------------------------------------------
-// Staggered element helper
+// Stagger entrance
 // ---------------------------------------------------------------------------
 
 function useStaggerEntrance(delayMs: number) {
   const opacity = useSharedValue(0);
-  const translateY = useSharedValue(12);
+  const translateY = useSharedValue(10);
 
   useEffect(() => {
     opacity.value = withDelay(delayMs, withSpring(1, theme.springs.standard));
@@ -107,60 +94,52 @@ function useStaggerEntrance(delayMs: number) {
 }
 
 // ---------------------------------------------------------------------------
-// Props
+// Component
 // ---------------------------------------------------------------------------
 
 interface EmptyChatProps {
   onSuggestionPress?: (text: string) => void;
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-
 export function EmptyChat({ onSuggestionPress }: EmptyChatProps) {
   const greeting = useMemo(() => getGreeting(), []);
 
-  // Stagger entrance: avatar 0ms, greeting 80ms, subtitle 160ms, chips 240ms
-  const avatarStyle = useStaggerEntrance(0);
-  const greetingStyle = useStaggerEntrance(80);
-  const subtitleStyle = useStaggerEntrance(160);
-  const chipsStyle = useStaggerEntrance(240);
+  const iconStyle = useStaggerEntrance(0);
+  const greetingStyle = useStaggerEntrance(100);
+  const subtitleStyle = useStaggerEntrance(180);
+  const chipsStyle = useStaggerEntrance(280);
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {/* Provider avatar -- larger circle */}
-        <Animated.View style={[styles.avatar, avatarStyle]}>
-          <Bot
-            size={30}
-            color={theme.colors.text.primary}
+        {/* Icon — like Claude's spark, not a generic bot */}
+        <Animated.View style={iconStyle}>
+          <Sparkles
+            size={32}
+            color={theme.colors.accent}
             strokeWidth={1.5}
           />
         </Animated.View>
 
-        {/* Time-based greeting */}
-        <Animated.Text style={[styles.greeting, greetingStyle]} maxFontSizeMultiplier={1.3}>{greeting}</Animated.Text>
+        {/* Greeting — large, centered, serif-like feel */}
+        <Animated.Text style={[styles.greeting, greetingStyle]} maxFontSizeMultiplier={1.3}>
+          {greeting}
+        </Animated.Text>
 
         {/* Subtitle */}
-        <Animated.Text style={[styles.subtitle, subtitleStyle]} maxFontSizeMultiplier={1.3}>How can I help?</Animated.Text>
+        <Animated.Text style={[styles.subtitle, subtitleStyle]} maxFontSizeMultiplier={1.3}>
+          How can I help?
+        </Animated.Text>
 
-        {/* Suggestion chips */}
-        <Animated.View style={chipsStyle}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.chipsContainer}
-            style={styles.chipsScroll}
-          >
-            {SUGGESTIONS.map((label) => (
-              <SuggestionChip
-                key={label}
-                label={label}
-                onPress={onSuggestionPress}
-              />
-            ))}
-          </ScrollView>
+        {/* Chips — row, not scroll. 4 items fit on screen. */}
+        <Animated.View style={[styles.chipsRow, chipsStyle]}>
+          {SUGGESTIONS.map((label) => (
+            <SuggestionChip
+              key={label}
+              label={label}
+              onPress={onSuggestionPress}
+            />
+          ))}
         </Animated.View>
       </View>
     </View>
@@ -175,49 +154,41 @@ const styles = createStyles((t) => ({
   },
   content: {
     alignItems: 'center' as const,
-    gap: t.spacing.sm,
-    paddingHorizontal: t.spacing.lg,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: t.colors.surface.overlay,
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-    marginBottom: t.spacing.sm,
+    gap: t.spacing.md,
+    paddingHorizontal: t.spacing.xl,
   },
   greeting: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '600' as const,
     fontFamily: 'Inter-SemiBold',
-    lineHeight: 30,
+    lineHeight: 28,
     color: t.colors.text.primary,
     textAlign: 'center' as const,
+    marginTop: t.spacing.sm,
   },
   subtitle: {
     ...t.typography.body,
-    color: t.colors.text.secondary,
+    color: t.colors.text.muted,
     textAlign: 'center' as const,
   },
-  chipsScroll: {
+  chipsRow: {
+    flexDirection: 'row' as const,
+    flexWrap: 'wrap' as const,
+    justifyContent: 'center' as const,
+    gap: t.spacing.sm,
     marginTop: t.spacing.lg,
-    maxHeight: 48,
-  },
-  chipsContainer: {
-    gap: 12,
-    paddingHorizontal: t.spacing.xs,
   },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: t.colors.surface.raised,
-    borderWidth: 1,
-    borderColor: t.colors.border.subtle,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: t.radii.full,
+    backgroundColor: 'transparent',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border.interactive, // Slightly more visible than subtle
   },
   chipText: {
     ...t.typography.small,
     color: t.colors.text.secondary,
   },
 }));
+

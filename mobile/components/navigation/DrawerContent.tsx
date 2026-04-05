@@ -21,6 +21,7 @@
 
 import React, { useCallback, useMemo, useRef, useState, useEffect } from 'react';
 import {
+  StyleSheet,
   View,
   Text,
   SectionList,
@@ -454,15 +455,17 @@ const styles = createStyles((t) => ({
     marginHorizontal: t.spacing.md,
     minHeight: 44,
     height: 44,
-    backgroundColor: t.colors.accent,
+    backgroundColor: t.colors.surface.raised,
     borderRadius: t.radii.md,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
     marginBottom: t.spacing.md,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border.subtle,
   },
   newChatText: {
     ...t.typography.heading,
-    color: t.colors.accentFg,
+    color: t.colors.text.primary,
   },
   listContainer: {
     flex: 1,

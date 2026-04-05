@@ -82,15 +82,20 @@ export function ChatHeader({ title = 'New Chat', modelName }: ChatHeaderProps) {
           />
         </AnimatedPressable>
 
-        {/* Title */}
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail" maxFontSizeMultiplier={1.3}>
-          {title}
-        </Text>
+        {/* Center: model name (primary) + title (secondary) — like Claude iOS */}
+        <View style={styles.titleGroup}>
+          <Text style={styles.modelName} numberOfLines={1} maxFontSizeMultiplier={1.3}>
+            {modelName || title}
+          </Text>
+          {modelName ? (
+            <Text style={styles.titleSubtext} numberOfLines={1} ellipsizeMode="tail">
+              {title}
+            </Text>
+          ) : null}
+        </View>
 
-        {/* Model indicator (D-12) */}
-        <Text style={styles.modelIndicator} numberOfLines={1}>
-          {modelName ?? ''}
-        </Text>
+        {/* Spacer to balance hamburger */}
+        <View style={styles.hamburgerButton} />
       </View>
     </View>
   );
@@ -122,15 +127,19 @@ const styles = createStyles((t) => ({
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },
-  title: {
+  titleGroup: {
+    flex: 1,
+    alignItems: 'center' as const,
+  },
+  modelName: {
     ...t.typography.heading,
     color: t.colors.text.primary,
-    flex: 1,
     textAlign: 'center' as const,
   },
-  modelIndicator: {
+  titleSubtext: {
     ...t.typography.caption,
     color: t.colors.text.muted,
-    maxWidth: 80,
+    textAlign: 'center' as const,
+    marginTop: 1,
   },
 }));
