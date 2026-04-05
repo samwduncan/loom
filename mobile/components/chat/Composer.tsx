@@ -86,6 +86,21 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
     }
   }, [effectiveSessionId]);
 
+  // Animated input height (spring-driven grow/shrink as user types multiple lines)
+  const inputHeight = useSharedValue(44);
+
+  const onContentSizeChange = useCallback(
+    (e: { nativeEvent: { contentSize: { height: number } } }) => {
+      const newHeight = Math.min(Math.max(e.nativeEvent.contentSize.height, 44), 160);
+      inputHeight.value = withSpring(newHeight, theme.springs.standard);
+    },
+    [inputHeight],
+  );
+
+  const animatedInputStyle = useAnimatedStyle(() => ({
+    height: inputHeight.value,
+  }));
+
   // Send button animation
   const buttonScale = useSharedValue(1);
 
@@ -125,6 +140,12 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   // Track whether we show destructive color
   const isActive = composerState === 'active';
   const hasText = text.trim().length > 0;
+
+  // Send button entrance/exit scale (0.6 muted when empty, 1.0 prominent with text)
+  const sendButtonScale = useSharedValue(0.6);
+  useEffect(() => {
+    sendButtonScale.value = withSpring(hasText ? 1 : 0.6, theme.springs.micro);
+  }, [hasText, sendButtonScale]);
 
   // -------------------------------------------------------------------------
   // FSM transitions driven by streaming state
@@ -224,7 +245,8 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   }, [buttonScale]);
 
   const buttonAnimStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: buttonScale.value }],
+    transform: [{ scale: buttonScale.value * sendButtonScale.value }],
+    opacity: sendButtonScale.value,
   }));
 
   // -------------------------------------------------------------------------
@@ -258,23 +280,26 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   return (
     <View style={outerStyle}>
       {USE_GLASS_COMPOSER && (
-        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill}>
+        <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill}>
           <View style={styles.glassOverlay} />
         </BlurView>
       )}
       <View style={styles.row}>
-        {/* Text input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Message"
-          placeholderTextColor={theme.colors.text.muted}
-          value={text}
-          onChangeText={setText}
-          editable={!isInputDisabled}
-          multiline
-          maxLength={100000}
-          textAlignVertical="center"
-        />
+        {/* Text input — animated height via spring on content size change */}
+        <Animated.View style={[styles.inputWrapper, animatedInputStyle]}>
+          <TextInput
+            style={styles.input}
+            placeholder="Message"
+            placeholderTextColor={theme.colors.text.muted}
+            value={text}
+            onChangeText={setText}
+            editable={!isInputDisabled}
+            multiline
+            maxLength={100000}
+            textAlignVertical="top"
+            onContentSizeChange={onContentSizeChange}
+          />
+        </Animated.View>
 
         {/* Send / Stop button — 44x44 touch target, NO glow shadow */}
         <AnimatedPressable
@@ -330,16 +355,20 @@ const styles = createStyles((t) => ({
   },
   row: {
     flexDirection: 'row' as const,
-    alignItems: 'center' as const,
+    alignItems: 'flex-end' as const,
   },
-  input: {
+  inputWrapper: {
     flex: 1,
     minHeight: 44,
-    maxHeight: 120,
+    maxHeight: 160,
     backgroundColor: t.colors.surface.base,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: t.colors.border.subtle,
     borderRadius: t.radii.pill, // 32px capsule/pill shape per better-chatbot
+    overflow: 'hidden' as const,
+  },
+  input: {
+    flex: 1,
     paddingHorizontal: 10,
     paddingVertical: 10,
     fontSize: 16, // Prevents iOS auto-zoom on focus
