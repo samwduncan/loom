@@ -34,7 +34,7 @@ import { useMessageList } from '../../../../hooks/useMessageList';
 import { useScrollPosition } from '../../../../hooks/useScrollPosition';
 import { useScrollToBottom } from '../../../../hooks/useScrollToBottom';
 import { useStreamStore } from '../../../../stores/index';
-import { setCurrentViewingSessionId } from '../../../../lib/websocket-init';
+import { getWsClient, setCurrentViewingSessionId } from '../../../../lib/websocket-init';
 import { createStyles } from '../../../../theme/createStyles';
 
 // ---------------------------------------------------------------------------
@@ -116,6 +116,29 @@ export default function ChatScreen() {
     ? 'New Chat'
     : resolvedProjectName || 'Chat';
 
+  // Suggestion chip handler: send message directly via WebSocket (same logic as Composer.handleSend)
+  const handleSuggestionPress = useCallback(
+    (text: string) => {
+      const wsClient = getWsClient();
+      if (!wsClient) return;
+
+      const options: Record<string, unknown> = {
+        projectPath: resolvedProjectPath,
+        projectName: resolvedProjectName,
+      };
+      if (sessionId && !sessionId.startsWith('stub-')) {
+        options.sessionId = sessionId;
+      }
+
+      wsClient.send({
+        type: 'claude-command',
+        command: text,
+        options,
+      });
+    },
+    [sessionId, resolvedProjectPath, resolvedProjectName],
+  );
+
   const showEmptyState = messages.length === 0 && !isLoading;
 
   return (
@@ -127,7 +150,7 @@ export default function ChatScreen() {
           paddingTop offsets both EmptyChat and MessageList below glass header. */}
       <View style={[styles.content, { paddingTop: HEADER_HEIGHT }]}>
         {showEmptyState ? (
-          <EmptyChat />
+          <EmptyChat onSuggestionPress={handleSuggestionPress} />
         ) : (
           <MessageList
             messages={messages}
