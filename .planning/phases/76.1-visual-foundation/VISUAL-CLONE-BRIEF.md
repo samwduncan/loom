@@ -353,3 +353,23 @@ Fix: Replace border+padding conditional with simple backgroundColor toggle.
 1. Easy: colors.ts, UserBubble, AssistantMessage, EmptyChat, ChatHeader
 2. Moderate: theme.ts, Composer, DrawerContent
 3. High-touch: SessionItem (active state refactor)
+
+### Motion & Interaction Specification (Bard, 2118 lines)
+
+**Full specs:** `.planning/INTERACTION-AND-ANIMATION-SPECIFICATION.md`
+**Implementation roadmap:** `.planning/ANIMATION-IMPLEMENTATION-ROADMAP.md`
+**Quick reference:** `.planning/MOTION-DESIGN-INDEX.md`
+
+Covers: streaming text behavior, 3-dot thinking indicator, message entrance animations,
+send button feedback, composer growth physics, drawer spring config, screen transitions,
+scroll physics, error states, micro-interactions. All with exact Reanimated v3 values.
+
+Key gaps in current Loom app (from audit of mobile/components/):
+- No typing/thinking indicator (3-dot bounce) — we have a 2px pulsing accent line
+- No stagger between message parts during streaming
+- Composer doesn't animate height growth (no withSpring on height change)
+- No pull-to-refresh
+- No long-press context menus on messages
+- Keyboard dismiss on scroll not configured
+- No failed message retry UI
+- Session switch is instant (no transition)
