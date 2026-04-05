@@ -76,6 +76,7 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
           message={item}
           nextMessageRole={nextMessageRole}
           onToolChipPress={handleToolChipPress}
+          index={index}
         />
       );
     },

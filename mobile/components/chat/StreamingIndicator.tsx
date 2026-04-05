@@ -13,6 +13,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { View } from 'react-native';
 import Animated, {
   cancelAnimation,
   useAnimatedStyle,
@@ -23,6 +24,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 
+import { TypingDots } from './TypingDots';
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
 
@@ -68,7 +70,14 @@ function StreamingIndicatorInner({ isStreaming }: StreamingIndicatorProps) {
 
   if (!isStreaming) return null;
 
-  return <Animated.View style={[styles.line, animatedStyle]} />;
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.dotsRow}>
+        <TypingDots />
+      </View>
+      <Animated.View style={[styles.line, animatedStyle]} />
+    </View>
+  );
 }
 
 /**
@@ -84,6 +93,13 @@ export const StreamingIndicator = React.memo(
 // ---------------------------------------------------------------------------
 
 const styles = createStyles((t) => ({
+  wrapper: {
+    gap: t.spacing.xs,
+  },
+  dotsRow: {
+    paddingHorizontal: t.spacing.md,
+    paddingVertical: t.spacing.xs,
+  },
   line: {
     height: 2,
     backgroundColor: t.colors.accent,

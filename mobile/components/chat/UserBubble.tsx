@@ -11,15 +11,10 @@
  * Pure presentational: no store imports, no side effects.
  */
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { ActionSheetIOS, Platform, Pressable, Text, View } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
 
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
@@ -58,23 +53,6 @@ function UserBubbleInner({ content, timestamp, showTimestamp }: UserBubbleProps)
     }
   }, [content]);
 
-  const hasAnimated = useRef(false);
-  const opacity = useSharedValue(hasAnimated.current ? 1 : 0);
-  const translateY = useSharedValue(hasAnimated.current ? 0 : 20);
-
-  useEffect(() => {
-    if (!hasAnimated.current) {
-      hasAnimated.current = true;
-      opacity.value = withSpring(1, theme.springs.standard);
-      translateY.value = withSpring(0, theme.springs.standard);
-    }
-  }, [opacity, translateY]);
-
-  const entranceStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
-
   // Format timestamp for display
   const formattedTime = React.useMemo(() => {
     try {
@@ -86,7 +64,7 @@ function UserBubbleInner({ content, timestamp, showTimestamp }: UserBubbleProps)
   }, [timestamp]);
 
   return (
-    <Animated.View style={[styles.container, entranceStyle]}>
+    <View style={styles.container}>
       <Pressable onLongPress={handleLongPress} delayLongPress={400}>
         <View style={styles.bubble}>
           <Text style={styles.text}>{content}</Text>
@@ -95,7 +73,7 @@ function UserBubbleInner({ content, timestamp, showTimestamp }: UserBubbleProps)
       {showTimestamp && formattedTime ? (
         <Text style={styles.timestamp}>{formattedTime}</Text>
       ) : null}
-    </Animated.View>
+    </View>
   );
 }
 

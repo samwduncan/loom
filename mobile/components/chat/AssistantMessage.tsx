@@ -14,13 +14,8 @@
  * First-token entrance per D-26: opacity 0->1 over 150ms.
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Text, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
 import { Bot } from 'lucide-react-native';
 
 import type { DisplayMessage } from '../../hooks/useMessageList';
@@ -109,27 +104,6 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
   );
 
   // -------------------------------------------------------------------------
-  // D-26 override: Phase 75 used withTiming(150ms) for assistant entrance.
-  // Soul doc anti-pattern #2 ("No withTiming for appearances") takes precedence.
-  // translateY only applied for non-streaming messages to avoid pop-in jitter.
-  // -------------------------------------------------------------------------
-  const isStreaming = message.isStreaming;
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(isStreaming ? 0 : 10);
-
-  useEffect(() => {
-    opacity.value = withSpring(1, theme.springs.standard);
-    if (!isStreaming) {
-      translateY.value = withSpring(0, theme.springs.standard);
-    }
-  }, [opacity, translateY, isStreaming]);
-
-  const entranceStyle = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{ translateY: translateY.value }],
-  }));
-
-  // -------------------------------------------------------------------------
   // Timestamp formatting
   // -------------------------------------------------------------------------
   const formattedTime = useMemo(() => {
@@ -146,7 +120,7 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
   // -------------------------------------------------------------------------
 
   return (
-    <Animated.View style={[styles.container, entranceStyle]}>
+    <View style={styles.container}>
       {/* Avatar */}
       <View style={styles.avatarRow}>
         <View style={styles.avatar}>
@@ -206,7 +180,7 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
       {message.isInterrupted && (
         <Text style={styles.interrupted}>Interrupted</Text>
       )}
-    </Animated.View>
+    </View>
   );
 }
 
