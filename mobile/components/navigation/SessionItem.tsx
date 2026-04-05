@@ -4,7 +4,8 @@
  * Features:
  * - Swipe-left-to-delete via Swipeable (react-native-gesture-handler)
  * - Pulsing accent dot for running sessions (D-10)
- * - Active session highlight with left accent border
+ * - Active session: bg highlight (raised surface) + borderRadius 12 + font-medium
+ *   NO left accent border (removed per visual clone spec)
  * - Stagger entrance animation: 30ms delay per item, max 10 animated (D-13)
  * - PressableScale with Micro spring and haptic feedback
  *
@@ -152,8 +153,6 @@ export function SessionItem({
     [onDelete],
   );
 
-  const bgColor = isActive ? theme.colors.surface.raised : 'transparent';
-
   return (
     <Animated.View style={entryStyle}>
       <Swipeable
@@ -171,21 +170,14 @@ export function SessionItem({
           style={[
             styles.itemContainer,
             pressStyle,
-            {
-              backgroundColor: bgColor,
-              borderLeftWidth: isActive ? 3 : 0,
-              borderLeftColor: isActive ? theme.colors.accent : 'transparent',
-              paddingLeft: isActive
-                ? theme.spacing.md - 3
-                : theme.spacing.md,
-            },
+            isActive && styles.activeItem,
           ]}
           accessibilityRole="button"
           accessibilityLabel={session.title}
         >
           <View style={styles.textContainer}>
             <Text
-              style={styles.title}
+              style={[styles.title, isActive && styles.activeTitle]}
               numberOfLines={1}
               ellipsizeMode="tail"
             >
@@ -209,12 +201,17 @@ export function SessionItem({
 
 const styles = createStyles((t) => ({
   itemContainer: {
-    minHeight: 56,
+    minHeight: 48,
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     paddingHorizontal: t.spacing.md,
-    paddingVertical: 12, // ChatGPT iOS density (py-3), no spacing token for 12px
-    backgroundColor: t.colors.surface.sunken,
+    paddingVertical: 10,
+    marginHorizontal: t.spacing.sm,
+    borderRadius: t.radii.md, // 12px
+    backgroundColor: 'transparent',
+  },
+  activeItem: {
+    backgroundColor: t.colors.surface.raised,
   },
   textContainer: {
     flex: 1,
@@ -222,11 +219,14 @@ const styles = createStyles((t) => ({
   },
   title: {
     ...t.typography.body,
-    fontWeight: '600' as const,
     color: t.colors.text.primary,
   },
+  activeTitle: {
+    fontWeight: '500' as const,
+    fontFamily: 'Inter-SemiBold',
+  },
   subtitle: {
-    ...t.typography.caption, // 12px -- matches ChatGPT iOS subtitle density (D-08)
+    ...t.typography.caption,
     color: t.colors.text.muted,
     marginTop: 2,
   },

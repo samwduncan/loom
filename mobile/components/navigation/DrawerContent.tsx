@@ -445,7 +445,7 @@ const styles = createStyles((t) => ({
     backgroundColor: t.colors.surface.sunken,
   },
   brandTitle: {
-    ...t.typography.largeTitle,
+    ...t.typography.heading, // 17px heading (was 28px largeTitle)
     color: t.colors.text.primary,
     paddingHorizontal: t.spacing.md,
     marginBottom: t.spacing.md,
