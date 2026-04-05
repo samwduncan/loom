@@ -164,7 +164,7 @@ export const CodeBlockSegment = React.memo(
 const styles = createStyles((t) => ({
   container: {
     backgroundColor: t.colors.surface.sunken,
-    borderRadius: t.radii.sm, // 8px (tighter, more code-like)
+    borderRadius: t.radii.sm,
     borderWidth: 1,
     borderColor: t.colors.border.subtle,
     overflow: 'hidden',

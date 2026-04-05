@@ -38,6 +38,8 @@ import { ThinkingSegment } from './segments/ThinkingSegment';
 import { ToolChip } from './segments/ToolChip';
 import { PermissionCard } from './segments/PermissionCard';
 
+const AVATAR_SIZE = 30;
+
 // ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
@@ -223,15 +225,15 @@ const styles = createStyles((t) => ({
     marginBottom: t.spacing.xs,
   },
   avatar: {
-    width: 30,
-    height: 30,
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
     borderRadius: t.radii.full,
     backgroundColor: t.colors.surface.overlay,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },
   content: {
-    marginLeft: 30 + t.spacing.sm, // avatar width + gap
+    marginLeft: AVATAR_SIZE + t.spacing.sm, // avatar width + gap
   },
   toolChipWrapper: {
     // Each tool chip in a flex-wrap row context
@@ -244,13 +246,13 @@ const styles = createStyles((t) => ({
     ...t.typography.small,
     color: t.colors.text.muted,
     marginTop: t.spacing.xs,
-    marginLeft: 30 + t.spacing.sm,
+    marginLeft: AVATAR_SIZE + t.spacing.sm,
   },
   interrupted: {
     ...t.typography.small,
     color: t.colors.destructive,
     fontStyle: 'italic' as const,
     marginTop: t.spacing.xs,
-    marginLeft: 30 + t.spacing.sm,
+    marginLeft: AVATAR_SIZE + t.spacing.sm,
   },
 }));

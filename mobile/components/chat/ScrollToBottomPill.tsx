@@ -104,14 +104,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     // Subtle border
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: theme.colors.border.subtle,
   },
   blur: {
     borderRadius: 9999,
     overflow: 'hidden',
   },
   overlay: {
-    backgroundColor: 'rgba(0,0,0,0.60)',
+    backgroundColor: theme.colors.glass,
     paddingHorizontal: 16,
     paddingVertical: 8,
     justifyContent: 'center',

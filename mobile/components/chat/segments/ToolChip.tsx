@@ -206,8 +206,8 @@ const styles = createStyles((t) => ({
   iconBg: {
     width: 22,
     height: 22,
-    borderRadius: 6,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: t.radii.sm / 2, // ~4px, subtle rounding
+    backgroundColor: 'rgba(255,255,255,0.06)', // Subtle bg, lighter than any surface tier
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },

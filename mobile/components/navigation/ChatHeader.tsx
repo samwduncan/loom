@@ -108,7 +108,7 @@ const styles = createStyles((t) => ({
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.60)', // Match composer/pill glass opacity
+    backgroundColor: t.colors.glass,
   },
   headerRow: {
     height: 56,

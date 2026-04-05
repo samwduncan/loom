@@ -4,28 +4,29 @@ import { type WithSpringConfig } from 'react-native-reanimated';
 export interface LoomTheme {
   colors: {
     surface: {
-      sunken: string;  // rgb(22, 22, 24) - Tier 0
-      base: string;    // rgb(33, 33, 36) - Tier 1
-      raised: string;  // rgb(51, 51, 55) - Tier 2
-      overlay: string; // rgb(69, 69, 74) - Tier 3
+      sunken: string;  // Tier 0: drawer bg, inset areas
+      base: string;    // Tier 1: chat bg, default canvas
+      raised: string;  // Tier 2: cards, composer, user bubbles
+      overlay: string; // Tier 3: modals, popovers
     };
-    accent: string;      // rgb(217, 119, 87)
-    accentFg: string;    // rgb(15, 15, 16)
-    destructive: string; // rgb(239, 68, 68)
-    success: string;     // rgb(34, 197, 94)
+    accent: string;
+    accentFg: string;
+    destructive: string;
+    success: string;
     text: {
-      primary: string;   // rgb(245, 245, 246)
-      secondary: string; // rgb(188, 188, 192)
-      muted: string;     // rgb(138, 138, 142)
+      primary: string;
+      secondary: string;
+      muted: string;
     };
     border: {
-      subtle: string;      // rgba(255,255,255,0.10)
-      interactive: string; // rgba(255,255,255,0.20)
+      subtle: string;
+      interactive: string;
     };
+    glass: string;  // Backdrop overlay for blur surfaces
     background: {
-      idle: string;      // rgb(15, 15, 16)
-      streaming: string; // rgb(16, 16, 18)
-      error: string;     // rgb(14, 14, 15)
+      idle: string;
+      streaming: string;
+      error: string;
     };
   };
   typography: {

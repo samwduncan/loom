@@ -5,7 +5,7 @@
  * uses one of these 6 named springs or the pull-to-refresh spring.
  *
  * All springs include reduceMotion: ReduceMotion.System so animations
- * automatically degrade when the user has Reduce Motion enabled in iOS Settings.
+ * automatically degrade when the user has Reduce Motion enabled (iOS/Android).
  *
  * Usage: withSpring(toValue, SPRING.micro)
  */

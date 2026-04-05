@@ -5,15 +5,15 @@ import type { LoomTheme } from './types';
 export const theme: LoomTheme = {
   colors: {
     surface: {
-      sunken: SURFACE.sunken,   // rgb(22, 22, 24)
-      base: SURFACE.base,       // rgb(33, 33, 36)
-      raised: SURFACE.raised,   // rgb(51, 51, 55)
-      overlay: SURFACE.overlay, // rgb(69, 69, 74)
+      sunken: SURFACE.sunken,
+      base: SURFACE.base,
+      raised: SURFACE.raised,
+      overlay: SURFACE.overlay,
     },
-    accent: ACCENT,             // rgb(217, 119, 87)
+    accent: ACCENT,
     accentFg: 'rgb(15, 15, 16)',
-    destructive: DESTRUCTIVE,   // rgb(239, 68, 68)
-    success: SUCCESS,           // rgb(34, 197, 94)
+    destructive: DESTRUCTIVE,
+    success: SUCCESS,
     text: {
       primary: 'rgb(245, 245, 246)',
       secondary: 'rgb(188, 188, 192)',
@@ -23,6 +23,7 @@ export const theme: LoomTheme = {
       subtle: 'rgba(255,255,255,0.10)',
       interactive: 'rgba(255,255,255,0.20)',
     },
+    glass: 'rgba(0,0,0,0.60)',
     background: {
       idle: IDLE_BG,         // rgb(15, 15, 16)
       streaming: STREAMING_BG, // rgb(16, 16, 18)

@@ -319,7 +319,7 @@ const styles = createStyles((t) => ({
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.60)', // muted/60% opacity per better-chatbot
+    backgroundColor: t.colors.glass,
   },
   opaqueOuter: {
     backgroundColor: t.colors.surface.raised,

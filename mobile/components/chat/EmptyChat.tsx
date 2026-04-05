@@ -5,7 +5,7 @@
  * - 50px avatar circle with 30px Bot icon
  * - Time-based greeting ("Good morning/afternoon/evening")
  * - Suggestion chips: horizontal ScrollView, 6 items
- * - First-run detection via MMKV hasLaunchedBefore flag
+ * - Suggestion chips (visual, not yet interactive)
  * - Entrance animation: Standard spring, opacity 0->1
  */
 
@@ -19,8 +19,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
-import { useStreamStore } from '../../stores/index';
-
 // ---------------------------------------------------------------------------
 // Greeting helper
 // ---------------------------------------------------------------------------
@@ -50,7 +48,6 @@ const SUGGESTIONS = [
 // ---------------------------------------------------------------------------
 
 export function EmptyChat() {
-  const modelName = useStreamStore((s) => s.modelName) ?? 'Claude';
   const greeting = useMemo(() => getGreeting(), []);
 
   // Entrance animation

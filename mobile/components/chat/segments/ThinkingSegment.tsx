@@ -18,10 +18,8 @@ import { Pressable, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
   withTiming,
   Easing,
-  runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import type { ThinkingBlock } from '@loom/shared/types/message';
@@ -106,7 +104,7 @@ function ThinkingSegmentInner({ block, isActive }: ThinkingSegmentProps) {
     Haptics.selectionAsync();
     const shouldExpand = isExpanded.value < 0.5;
     isExpanded.value = withTiming(shouldExpand ? 1 : 0, EXPAND_TIMING);
-    runOnJS(setIsUserExpanded)(shouldExpand);
+    setIsUserExpanded(shouldExpand);
   }, [isActive, isExpanded]);
 
   // Measure content height for animation
