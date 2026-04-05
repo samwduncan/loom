@@ -1,15 +1,15 @@
 /**
  * MessageList -- Inverted FlatList rendering DisplayMessage[].
  *
+ * NOTE: FlashList v2 removed `inverted` prop support. Staying with FlatList
+ * for inverted chat lists until FlashList re-adds it.
+ *
  * AR fix #9: Data is explicitly reversed ([...messages].reverse()) before passing
  * to the inverted FlatList. useMessageList returns oldest-first; inverted FlatList
  * renders index 0 at bottom, so data must be newest-first.
  *
  * FlatList key={sessionId} per Pitfall 7 -- forces unmount/remount on session
  * switch, preventing stale message flash.
- *
- * maintainVisibleContentPosition per RESEARCH.md Pitfall 1 -- prevents scroll
- * jump when new messages are added above the visible area.
  *
  * ToolDetailSheet rendered outside FlatList (Pitfall 4) with selectedToolCall state.
  * StreamingIndicator rendered below FlatList.
@@ -68,9 +68,6 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
 
   const renderItem = useCallback(
     ({ item, index }: { item: DisplayMessage; index: number }) => {
-      // In reversed (newest-first) data, the next message visually below is at index-1
-      // But in inverted FlatList, "below" in display = higher index in data
-      // So the next message in the conversation (older) is at index+1
       const nextMsg = index < reversedMessages.length - 1 ? reversedMessages[index + 1] : null;
       const nextMessageRole = nextMsg?.role ?? null;
 
@@ -86,19 +83,16 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
   );
 
   // Restore initial scroll offset after data loads (CHAT-07)
-  // Always create local ref unconditionally (Rules of Hooks), then pick which to use
   const localRef = React.useRef<FlatList<DisplayMessage>>(null);
   const flatListRef = listRef ?? localRef;
 
   useEffect(() => {
     if (initialScrollOffset && initialScrollOffset > 0 && reversedMessages.length > 0) {
-      // Small delay to ensure FlatList has rendered before scrolling
       const timer = setTimeout(() => {
         flatListRef.current?.scrollToOffset({ offset: initialScrollOffset, animated: false });
       }, 100);
       return () => clearTimeout(timer);
     }
-  // Only run once per session (key={sessionId} remounts, so this runs once)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, reversedMessages.length > 0]);
 
@@ -119,6 +113,7 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}
         scrollEventThrottle={16}
+        keyboardDismissMode="interactive"
       />
 
       {/* Streaming indicator below FlatList (above composer) */}

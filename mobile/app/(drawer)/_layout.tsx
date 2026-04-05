@@ -32,8 +32,8 @@ export default function DrawerLayout() {
           width: Math.min(width * 0.8, 320), // D-09: 80% capped at 320px
           backgroundColor: theme.colors.surface.sunken,
         },
-        swipeEdgeWidth: width,
-        overlayColor: 'rgba(0,0,0,0.4)',
+        swipeEdgeWidth: 35, // Reserve 15-20px for iOS system back gesture
+        overlayColor: 'rgba(0,0,0,0.2)',
         headerShown: false,
       }}
       screenListeners={{

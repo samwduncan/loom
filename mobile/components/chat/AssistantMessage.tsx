@@ -145,10 +145,10 @@ function AssistantMessageInner({ message, onToolChipPress }: AssistantMessagePro
 
   return (
     <Animated.View style={[styles.container, entranceStyle]}>
-      {/* Avatar placeholder */}
+      {/* Avatar */}
       <View style={styles.avatarRow}>
         <View style={styles.avatar}>
-          <Bot size={14} color={theme.colors.text.secondary} strokeWidth={2} />
+          <Bot size={16} color={theme.colors.text.secondary} strokeWidth={2} />
         </View>
       </View>
 
@@ -223,15 +223,15 @@ const styles = createStyles((t) => ({
     marginBottom: t.spacing.xs,
   },
   avatar: {
-    width: 24,
-    height: 24,
+    width: 30,
+    height: 30,
     borderRadius: t.radii.full,
     backgroundColor: t.colors.surface.overlay,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },
   content: {
-    marginLeft: 24 + t.spacing.sm, // avatar width + gap
+    marginLeft: 30 + t.spacing.sm, // avatar width + gap
   },
   toolChipWrapper: {
     // Each tool chip in a flex-wrap row context
@@ -244,13 +244,13 @@ const styles = createStyles((t) => ({
     ...t.typography.small,
     color: t.colors.text.muted,
     marginTop: t.spacing.xs,
-    marginLeft: 24 + t.spacing.sm,
+    marginLeft: 30 + t.spacing.sm,
   },
   interrupted: {
     ...t.typography.small,
     color: t.colors.destructive,
     fontStyle: 'italic' as const,
     marginTop: t.spacing.xs,
-    marginLeft: 24 + t.spacing.sm,
+    marginLeft: 30 + t.spacing.sm,
   },
 }));

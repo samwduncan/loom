@@ -83,7 +83,7 @@ export function ChatHeader({ title = 'New Chat', modelName }: ChatHeaderProps) {
         </AnimatedPressable>
 
         {/* Title */}
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail" maxFontSizeMultiplier={1.3}>
           {title}
         </Text>
 
@@ -104,12 +104,11 @@ const styles = createStyles((t) => ({
     right: 0,
     zIndex: 10,
     overflow: 'hidden' as const,
-    borderBottomWidth: 1,
-    borderBottomColor: t.colors.border.subtle,
+    // No bottom border — glass blur defines the edge
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(0,0,0,0.60)', // Match composer/pill glass opacity
   },
   headerRow: {
     height: 56,

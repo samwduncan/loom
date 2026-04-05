@@ -164,7 +164,7 @@ export const CodeBlockSegment = React.memo(
 const styles = createStyles((t) => ({
   container: {
     backgroundColor: t.colors.surface.sunken,
-    borderRadius: t.radii.md,
+    borderRadius: t.radii.sm, // 8px (tighter, more code-like)
     borderWidth: 1,
     borderColor: t.colors.border.subtle,
     overflow: 'hidden',
@@ -202,7 +202,7 @@ const styles = createStyles((t) => ({
   },
   codeText: {
     fontFamily: 'JetBrainsMono-Regular',
-    fontSize: 15,
+    fontSize: 16, // Match body font size
     lineHeight: 24,
   },
   scrollContent: {

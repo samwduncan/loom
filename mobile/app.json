@@ -8,11 +8,15 @@
     "scheme": "loom",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0F0F10"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.siteboon.loom",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+        "CADisableMinimumFrameDurationOnPhone": true,
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSAllowsLocalNetworking": true

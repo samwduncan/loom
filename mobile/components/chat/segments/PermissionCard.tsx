@@ -252,8 +252,7 @@ const styles = createStyles((t) => ({
     borderWidth: 1,
     borderColor: t.colors.border.interactive,
     ...t.rimLight,  // D-03: top-edge rim light for depth perception
-    ...t.shadows.heavy,
-    ...t.shadows.glow(t.colors.accent),
+    ...t.shadows.medium, // Single shadow, no heavy+glow collision (AR finding)
   },
   toolName: {
     ...t.typography.heading,
@@ -288,7 +287,6 @@ const styles = createStyles((t) => ({
     borderRadius: t.radii.md,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
-    ...t.shadows.glow(t.colors.accent),
   },
   approveText: {
     ...t.typography.heading,
