@@ -16,6 +16,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { MMKV } from 'react-native-mmkv';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import Animated, {
@@ -38,6 +39,10 @@ import { ComposerStatusBar } from './ComposerStatusBar';
  */
 const USE_GLASS_COMPOSER = true;
 
+// Draft persistence via MMKV (debounced 500ms, keyed by sessionId)
+const mmkv = new MMKV();
+const DRAFT_PREFIX = 'draft_';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -59,8 +64,15 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export function Composer({ sessionId, projectPath, projectName }: ComposerProps) {
   const insets = useSafeAreaInsets();
   const [composerState, setComposerState] = useState<ComposerState>('idle');
-  const [text, setText] = useState('');
+  const [text, setText] = useState(() => {
+    // Restore draft from MMKV on mount
+    if (sessionId) {
+      return mmkv.getString(`${DRAFT_PREFIX}${sessionId}`) ?? '';
+    }
+    return '';
+  });
   const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Stream state from store
   const isStreaming = useStreamStore((s) => s.isStreaming);
@@ -70,6 +82,22 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 
   // Send button animation
   const buttonScale = useSharedValue(1);
+
+  // Debounced draft persistence to MMKV
+  useEffect(() => {
+    if (!effectiveSessionId) return;
+    if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    draftTimerRef.current = setTimeout(() => {
+      if (text.trim()) {
+        mmkv.set(`${DRAFT_PREFIX}${effectiveSessionId}`, text);
+      } else {
+        mmkv.delete(`${DRAFT_PREFIX}${effectiveSessionId}`);
+      }
+    }, 500);
+    return () => {
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+    };
+  }, [text, effectiveSessionId]);
 
   // D-16: Typing-begins haptic with 2-second cooldown to prevent fatigue on rapid clear-retype
   const wasEmptyRef = useRef(true);
@@ -147,6 +175,10 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
       options,
     });
     setText('');
+    // Clear draft on send
+    if (effectiveSessionId) {
+      mmkv.delete(`${DRAFT_PREFIX}${effectiveSessionId}`);
+    }
 
     // AR fix #3: Fallback -- if stream never starts within 5s, return to idle.
     // Uses functional updater to avoid stale closure.
