@@ -42,7 +42,7 @@ interface ThinkingSegmentProps {
 // ---------------------------------------------------------------------------
 
 const EXPAND_TIMING = { duration: 200, easing: Easing.inOut(Easing.ease) };
-const COLLAPSED_HEIGHT = 32; // Compact collapsed height (less button-like)
+const COLLAPSED_HEIGHT = 44; // iOS HIG 44pt minimum touch target
 
 // ---------------------------------------------------------------------------
 // Component
@@ -189,9 +189,9 @@ const styles = createStyles((t) => ({
     marginVertical: t.spacing.sm,
   },
   summaryRow: {
-    minHeight: 32, // Compact collapsed height
+    minHeight: 44, // iOS HIG 44pt touch target — visual compactness via zero padding
     justifyContent: 'center',
-    paddingVertical: 2,
+    paddingVertical: 0,
   },
   summaryText: {
     fontSize: t.typography.small.fontSize,

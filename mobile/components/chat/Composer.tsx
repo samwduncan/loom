@@ -64,13 +64,7 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export function Composer({ sessionId, projectPath, projectName }: ComposerProps) {
   const insets = useSafeAreaInsets();
   const [composerState, setComposerState] = useState<ComposerState>('idle');
-  const [text, setText] = useState(() => {
-    // Restore draft from MMKV on mount
-    if (sessionId) {
-      return mmkv.getString(`${DRAFT_PREFIX}${sessionId}`) ?? '';
-    }
-    return '';
-  });
+  const [text, setText] = useState('');
   const fallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -79,6 +73,18 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   // Use active session ID from store when available (fixes stale stub-* session after replacement)
   const storeActiveSessionId = useStreamStore((s) => s.activeSessionId);
   const effectiveSessionId = storeActiveSessionId || sessionId;
+
+  // Restore draft when session changes (AR fix: useState initializer only runs on mount)
+  useEffect(() => {
+    if (effectiveSessionId) {
+      // Flush any pending debounce before switching
+      if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
+      const draft = mmkv.getString(`${DRAFT_PREFIX}${effectiveSessionId}`) ?? '';
+      setText(draft);
+    } else {
+      setText('');
+    }
+  }, [effectiveSessionId]);
 
   // Send button animation
   const buttonScale = useSharedValue(1);

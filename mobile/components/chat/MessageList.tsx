@@ -16,7 +16,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, Keyboard, View } from 'react-native';
+import { FlatList, View } from 'react-native';
 import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 import type { DisplayMessage } from '../../hooks/useMessageList';
@@ -96,11 +96,6 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, reversedMessages.length > 0]);
 
-  // Tap outside composer to dismiss keyboard
-  const handleTapDismiss = useCallback(() => {
-    Keyboard.dismiss();
-  }, []);
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -119,7 +114,6 @@ export function MessageList({ messages, isStreaming, sessionId, onScroll, listRe
         onScroll={onScroll}
         scrollEventThrottle={16}
         keyboardDismissMode="interactive"
-        onTouchStart={handleTapDismiss}
       />
 
       {/* Streaming indicator below FlatList (above composer) */}

@@ -222,7 +222,7 @@ const styles = createStyles((t) => ({
     color: t.colors.text.primary,
   },
   activeTitle: {
-    fontWeight: '500' as const,
+    fontWeight: '600' as const,
     fontFamily: 'Inter-SemiBold',
   },
   subtitle: {

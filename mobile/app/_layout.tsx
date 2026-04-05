@@ -26,9 +26,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Slot } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-
-// Prevent auto-hide — gate on font load
-SplashScreen.preventAutoHideAsync();
 import { AuthScreen } from '../components/auth/AuthScreen';
 import { ConnectionBanner } from '../components/connection/ConnectionBanner';
 import { NotificationBanner } from '../components/notifications/NotificationBanner';
@@ -38,6 +35,9 @@ import { useAuth } from '../hooks/useAuth';
 import { useNotifications } from '../hooks/useNotifications';
 import { initializeWebSocket } from '../lib/websocket-init';
 import { theme } from '../theme/theme';
+
+// Prevent splash auto-hide — gate on font load + auth check
+SplashScreen.preventAutoHideAsync();
 
 /**
  * Rendered only in the authenticated branch. Isolates useNotifications()
@@ -58,7 +58,7 @@ function AuthenticatedApp() {
 export default function RootLayout() {
   const { isAuthenticated, isLoading, error, checkAuth, login } = useAuth();
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
     'Inter-SemiBold': require('../assets/fonts/Inter-SemiBold.ttf'),
     'JetBrainsMono-Regular': require('../assets/fonts/JetBrainsMono-Regular.ttf'),
@@ -68,12 +68,12 @@ export default function RootLayout() {
     checkAuth();
   }, [checkAuth]);
 
-  // Hide splash screen once fonts are loaded
+  // Hide splash once bootstrap completes (fonts loaded OR failed) AND auth resolved
   useEffect(() => {
-    if (fontsLoaded) {
+    if ((fontsLoaded || fontError) && !isLoading) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError, isLoading]);
 
   useEffect(() => {
     if (isAuthenticated) {

@@ -9,16 +9,14 @@
  * - Entrance animation: Standard spring, opacity 0->1
  */
 
-import { useEffect, useCallback, useRef } from 'react';
-import { View, Text, ScrollView, Pressable } from 'react-native';
+import { useEffect, useMemo } from 'react';
+import { View, Text, ScrollView } from 'react-native';
 import { Bot } from 'lucide-react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { MMKV } from 'react-native-mmkv';
-
 import { theme } from '../../theme/theme';
 import { createStyles } from '../../theme/createStyles';
 import { useStreamStore } from '../../stores/index';
@@ -47,24 +45,13 @@ const SUGGESTIONS = [
   'Debug',
 ];
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-const mmkv = new MMKV();
-
 export function EmptyChat() {
   const modelName = useStreamStore((s) => s.modelName) ?? 'Claude';
-  const isFirstLaunch = useRef(!mmkv.getBoolean('hasLaunchedBefore'));
-
-  // Mark as launched
-  useEffect(() => {
-    if (isFirstLaunch.current) {
-      mmkv.set('hasLaunchedBefore', true);
-    }
-  }, []);
+  const greeting = useMemo(() => getGreeting(), []);
 
   // Entrance animation
   const opacity = useSharedValue(0);
@@ -79,8 +66,6 @@ export function EmptyChat() {
     opacity: opacity.value,
     transform: [{ translateY: translateY.value }],
   }));
-
-  const greeting = getGreeting();
 
   return (
     <View style={styles.container}>
