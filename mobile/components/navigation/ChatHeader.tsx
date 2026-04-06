@@ -8,7 +8,7 @@
  *
  * Glass treatment (D-04):
  * - expo-blur BlurView intensity 40, dark tint
- * - Overlay rgba(0,0,0,0.35)
+ * - Overlay t.colors.glass (rgba(33,33,31,0.75))
  * - Bottom border 1px border-subtle
  * - Absolutely positioned with zIndex 10 so content scrolls under
  *
@@ -22,7 +22,8 @@
 
 import { StyleSheet, Text, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, type DrawerNavigationProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { BlurView } from 'expo-blur';
 import Animated, {
   useSharedValue,
@@ -109,14 +110,15 @@ const styles = createStyles((t) => ({
     right: 0,
     zIndex: 10,
     overflow: 'hidden' as const,
-    // No bottom border — glass blur defines the edge
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: t.colors.border.medium,
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: t.colors.glass,
+    backgroundColor: 'rgba(19, 19, 16, 0.80)',  // Spec: base surface at 80%
   },
   headerRow: {
-    height: 56,
+    height: 44,  // ChatGPT Figma Navigation Bar height
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     paddingHorizontal: t.spacing.xs,
@@ -132,12 +134,13 @@ const styles = createStyles((t) => ({
     alignItems: 'center' as const,
   },
   modelName: {
-    ...t.typography.heading,
-    color: t.colors.text.primary,
+    ...t.typography.label,
+    fontWeight: '600' as const,
+    color: t.colors.accent,   // Brand protagonist — model name in accent
     textAlign: 'center' as const,
   },
   titleSubtext: {
-    ...t.typography.caption,
+    ...t.typography.meta,
     color: t.colors.text.muted,
     textAlign: 'center' as const,
     marginTop: 1,

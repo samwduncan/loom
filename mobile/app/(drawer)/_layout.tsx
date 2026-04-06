@@ -33,7 +33,7 @@ export default function DrawerLayout() {
           backgroundColor: theme.colors.surface.sunken,
         },
         swipeEdgeWidth: 35, // Reserve 15-20px for iOS system back gesture
-        overlayColor: 'rgba(0,0,0,0.2)',
+        overlayColor: 'rgba(33,33,31,0.35)', // Warm overlay per design system
         headerShown: false,
       }}
       screenListeners={{

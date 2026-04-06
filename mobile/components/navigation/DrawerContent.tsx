@@ -295,7 +295,7 @@ export function DrawerContent(props: DrawerContentComponentProps) {
   const statusDotColor = isConnected
     ? theme.colors.success
     : isReconnecting
-      ? theme.colors.text.muted
+      ? theme.colors.warning
       : theme.colors.destructive;
 
   const statusText = isConnected
@@ -446,7 +446,7 @@ const styles = createStyles((t) => ({
     backgroundColor: t.colors.surface.sunken,
   },
   brandTitle: {
-    ...t.typography.heading, // 17px heading (was 28px largeTitle)
+    ...t.typography.headline, // 17px heading (was 28px largeTitle)
     color: t.colors.text.primary,
     paddingHorizontal: t.spacing.md,
     marginBottom: t.spacing.md,
@@ -455,17 +455,17 @@ const styles = createStyles((t) => ({
     marginHorizontal: t.spacing.md,
     minHeight: 44,
     height: 44,
-    backgroundColor: t.colors.surface.raised,
-    borderRadius: t.radii.md,
+    backgroundColor: t.colors.accentMuted,
+    borderRadius: t.radii.xl, // 12px — NewChatButton per spec Part 7
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
     marginBottom: t.spacing.md,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: t.colors.border.subtle,
+    borderColor: 'rgba(245, 178, 65, 0.2)',
   },
   newChatText: {
-    ...t.typography.heading,
-    color: t.colors.text.primary,
+    ...t.typography.label,
+    color: t.colors.accent,
   },
   listContainer: {
     flex: 1,
@@ -479,7 +479,7 @@ const styles = createStyles((t) => ({
     paddingBottom: t.spacing.xs,
   },
   sectionHeaderText: {
-    ...t.typography.caption, // 12px -- matches ChatGPT iOS section header density (D-08)
+    ...t.typography.meta, // 12px -- matches ChatGPT iOS section header density (D-08)
     color: t.colors.text.muted,
     textTransform: 'uppercase' as const,
     letterSpacing: 0.5,
@@ -502,14 +502,16 @@ const styles = createStyles((t) => ({
     minHeight: 44,
     height: 44,
     paddingHorizontal: t.spacing.xl,
-    backgroundColor: t.colors.accent,
-    borderRadius: t.radii.md,
+    backgroundColor: t.colors.accentMuted,
+    borderRadius: t.radii.xl,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(245, 178, 65, 0.2)',
   },
   emptyNewChatText: {
-    ...t.typography.heading,
-    color: t.colors.accentFg,
+    ...t.typography.label,
+    color: t.colors.accent,
   },
   // Skeleton loading
   skeletonContainer: {
@@ -528,8 +530,8 @@ const styles = createStyles((t) => ({
     alignItems: 'center' as const,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: t.colors.border.subtle,
+    borderTopWidth: StyleSheet.hairlineWidth, // 0.5px
+    borderTopColor: t.colors.border.medium,
   },
   settingsButton: {
     minWidth: 44,
@@ -550,7 +552,7 @@ const styles = createStyles((t) => ({
     marginRight: t.spacing.sm,
   },
   statusText: {
-    ...t.typography.caption,
+    ...t.typography.meta,
     color: t.colors.text.muted,
   },
 }));

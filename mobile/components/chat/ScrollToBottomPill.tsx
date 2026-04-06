@@ -101,22 +101,21 @@ export function ScrollToBottomPill({ isVisible, onPress }: ScrollToBottomPillPro
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    bottom: 8,
+    bottom: theme.spacing.sm,                      // 8px — spec §3
     alignSelf: 'center',
-    borderRadius: 9999,
+    borderRadius: theme.radii.pill,
     overflow: 'hidden',
-    // Subtle border
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
+    borderWidth: StyleSheet.hairlineWidth,          // 0.5px — spec §1.7
+    borderColor: theme.colors.border.subtle,       // decorative edge
   },
   blur: {
-    borderRadius: 9999,
+    borderRadius: theme.radii.pill,
     overflow: 'hidden',
   },
   overlay: {
-    backgroundColor: theme.colors.glass,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    backgroundColor: theme.colors.glass,           // rgba(30,30,24,0.75) per spec §6
+    paddingHorizontal: theme.spacing.md,           // 16px
+    paddingVertical: theme.spacing.sm,             // 8px
     justifyContent: 'center',
     alignItems: 'center',
   },

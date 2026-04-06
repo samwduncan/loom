@@ -14,7 +14,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -197,35 +197,29 @@ export const ThinkingSegment = React.memo(ThinkingSegmentInner);
 
 const styles = createStyles((t) => ({
   divider: {
-    height: 1,
-    backgroundColor: t.colors.border.subtle,
-    marginVertical: t.spacing.sm,
+    height: StyleSheet.hairlineWidth,              // 0.5px — spec §1.7: no 1px borders
+    backgroundColor: t.colors.border.medium,       // spec §1.7: dividers use border.medium
+    marginVertical: t.spacing.sm,                  // 8px
   },
   summaryRow: {
-    minHeight: 44, // iOS HIG 44pt touch target — visual compactness via zero padding
+    minHeight: 44,                                 // iOS HIG 44pt touch target
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 0,
   },
   summaryText: {
-    fontSize: t.typography.small.fontSize,
-    fontWeight: t.typography.small.fontWeight,
-    lineHeight: t.typography.small.lineHeight,
-    fontFamily: 'Inter-Regular',
+    ...t.typography.label,                         // label tier (13px/500) per spec §2.1
     color: t.colors.text.muted,
   },
   contentContainer: {
-    paddingBottom: t.spacing.sm,
+    paddingBottom: t.spacing.sm,                   // 8px
     borderLeftWidth: 2,
-    borderLeftColor: t.colors.text.muted,
-    paddingLeft: t.spacing.sm,
+    borderLeftColor: t.colors.accent,              // brand accent for thinking (brand moment)
+    paddingLeft: t.spacing.sm,                     // 8px
   },
   thinkingText: {
-    fontSize: t.typography.body.fontSize,
-    fontWeight: t.typography.body.fontWeight,
-    lineHeight: t.typography.body.lineHeight,
-    fontFamily: 'Inter-Regular',
-    color: t.colors.text.muted, // Dimmed per D-07
+    ...t.typography.body,                          // body tier (16px/400) per spec §2.1
+    color: t.colors.text.muted,                    // dimmed per D-07
   },
 }));

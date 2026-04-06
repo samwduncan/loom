@@ -16,7 +16,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -41,6 +41,8 @@ import type { LucideIcon } from 'lucide-react-native';
 import type { ToolCallState, ToolCallStatus } from '@loom/shared/types/stream';
 import { haptic } from '../../../lib/haptics';
 import { theme } from '../../../theme/theme';
+import { TOOL_COLORS, CATEGORY } from '../../../lib/colors';
+import type { ColorPair } from '../../../theme/types';
 import { createStyles } from '../../../theme/createStyles';
 
 // ---------------------------------------------------------------------------
@@ -58,6 +60,27 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
 
 function getToolIcon(toolName: string): LucideIcon {
   return TOOL_ICONS[toolName] ?? Wrench;
+}
+
+// ---------------------------------------------------------------------------
+// Tool color mapping — each tool type gets a semantic category color
+// ---------------------------------------------------------------------------
+
+const TOOL_COLOR_MAP: Record<string, ColorPair | null> = {
+  Bash: TOOL_COLORS.bash,
+  Read: TOOL_COLORS.read,     // null — uses text.secondary (default, no color needed)
+  Edit: TOOL_COLORS.edit,
+  Write: TOOL_COLORS.write,   // null — uses text.secondary
+  Glob: TOOL_COLORS.glob,
+  Grep: TOOL_COLORS.grep,
+  WebFetch: TOOL_COLORS.web,
+  WebSearch: TOOL_COLORS.web,
+  Agent: TOOL_COLORS.agent,
+};
+
+function getToolColor(toolName: string): ColorPair | null {
+  const color = TOOL_COLOR_MAP[toolName];
+  return color === undefined ? CATEGORY.blue : color;
 }
 
 // ---------------------------------------------------------------------------
@@ -133,6 +156,7 @@ function ToolChipInner({ toolCall, onPress }: ToolChipProps) {
   const scale = useSharedValue(1);
   const nameOpacity = useSharedValue(1);
   const Icon = getToolIcon(toolCall.toolName);
+  const toolColor = getToolColor(toolCall.toolName);
 
   // Shimmer: animated opacity on name text during 'executing' status
   React.useEffect(() => {
@@ -172,7 +196,11 @@ function ToolChipInner({ toolCall, onPress }: ToolChipProps) {
 
   return (
     <AnimatedPressable
-      style={[styles.chip, animatedStyle]}
+      style={[
+        styles.chip,
+        toolColor ? { backgroundColor: toolColor.muted } : undefined,
+        animatedStyle,
+      ]}
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
@@ -180,13 +208,16 @@ function ToolChipInner({ toolCall, onPress }: ToolChipProps) {
       accessibilityRole="button"
       accessibilityLabel={`${toolCall.toolName} tool call, status: ${toolCall.status}`}
     >
-      {/* Tool icon with subtle background */}
-      <View style={styles.iconBg}>
-        <Icon size={14} color={theme.colors.text.secondary} strokeWidth={2} />
+      {/* Tool icon — category color if assigned, else default */}
+      <View style={[styles.iconBg, toolColor ? { backgroundColor: toolColor.muted } : undefined]}>
+        <Icon size={14} color={toolColor?.vivid ?? theme.colors.text.secondary} strokeWidth={2} />
       </View>
 
-      {/* Tool name — shimmer opacity when executing */}
-      <Animated.Text style={[styles.name, nameAnimatedStyle]} numberOfLines={1}>
+      {/* Tool name — category color or secondary text */}
+      <Animated.Text
+        style={[styles.name, toolColor ? { color: toolColor.vivid } : undefined, nameAnimatedStyle]}
+        numberOfLines={1}
+      >
         {toolCall.toolName}
       </Animated.Text>
 
@@ -215,25 +246,24 @@ const styles = createStyles((t) => ({
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     alignSelf: 'flex-start' as const,
-    backgroundColor: t.colors.surface.sunken,
-    borderRadius: t.radii.full,
-    paddingHorizontal: t.spacing.sm,
-    paddingVertical: t.spacing.xs,
-    borderWidth: 1,
-    borderColor: t.colors.border.subtle,
-    gap: t.spacing.xs,
-    ...t.rimLight,  // D-03: top-edge rim light for depth perception
+    backgroundColor: t.colors.surface.base,        // fallback bg (overridden by toolColor.muted)
+    borderRadius: t.radii.pill,                    // spec §7.2: pill shape
+    paddingHorizontal: t.spacing.sm,               // 8px
+    paddingVertical: t.spacing.xs,                 // 4px — xs for inline chip padding per spec §3
+    borderWidth: StyleSheet.hairlineWidth,          // 0.5px — spec §7.2
+    borderColor: t.colors.border.subtle,           // spec §7.2: border.subtle
+    gap: t.spacing.xs,                             // 4px — icon-to-text gap per spec §3
   },
   iconBg: {
-    width: 22,
+    width: 22,                                     // spec §7.2: 22x22px
     height: 22,
-    borderRadius: t.radii.sm / 2, // ~4px, subtle rounding
-    backgroundColor: 'rgba(255,255,255,0.06)', // Subtle bg, lighter than any surface tier
+    borderRadius: t.radii.sm,                      // 6px — spec §7.2: radius sm
+    backgroundColor: 'rgba(222,220,209,0.08)',
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },
   name: {
-    ...t.typography.small,
+    ...t.typography.label,                         // spec §7.2: label tier (13px, 500)
     color: t.colors.text.secondary,
   },
   executingDot: {

@@ -5,7 +5,7 @@
  * showNotificationBanner() can be called from anywhere.
  *
  * UI-SPEC:
- *   - Glass surface: BlurView intensity={40} tint="dark", rgba(0,0,0,0.35) overlay
+ *   - Glass surface: BlurView intensity={40} tint="dark", rgba(33,33,31,0.45) warm overlay
  *   - Entrance: navigation spring, translateY -80 to 0
  *   - Auto-dismiss: 4s standard, 8s permission
  *   - Swipe-up dismiss gesture
@@ -14,7 +14,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -71,11 +71,13 @@ function getTintColor(
 ): string | null {
   switch (type) {
     case 'permission_request':
-      return theme.colors.accent;
+      return theme.colors.warning;  // Yellow — attention/caution
     case 'session_error':
-      return theme.colors.destructive;
+      return theme.colors.destructive;  // Red — error
     case 'session_complete':
+      return theme.colors.success;  // Green — completed
     case 'batched':
+      return theme.colors.info;  // Blue — informational
     default:
       return null;
   }
@@ -227,12 +229,7 @@ function BannerView({
                   style={[
                     styles.iconDot,
                     {
-                      backgroundColor:
-                        data.type === 'session_error'
-                          ? theme.colors.destructive
-                          : data.type === 'permission_request'
-                            ? theme.colors.accent
-                            : theme.colors.success,
+                      backgroundColor: getTintColor(data.type) ?? theme.colors.success,
                     },
                   ]}
                 />
@@ -294,7 +291,7 @@ const styles = createStyles((t) => ({
     left: t.spacing.md,
     right: t.spacing.md,
     zIndex: 110, // Above ConnectionBanner (100)
-    ...t.shadows.heavy,
+    ...t.shadows.sheet,
   },
   pressable: {
     borderRadius: t.radii.xl, // 20px (2xl equivalent)
@@ -303,11 +300,11 @@ const styles = createStyles((t) => ({
   blur: {
     borderRadius: t.radii.xl,
     overflow: 'hidden',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: t.colors.border.subtle,
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    backgroundColor: t.colors.glass,
     minHeight: 56,
     paddingVertical: t.spacing.sm,
     paddingHorizontal: t.spacing.md,
@@ -329,7 +326,7 @@ const styles = createStyles((t) => ({
   iconDot: {
     width: 24,
     height: 24,
-    borderRadius: 12,
+    borderRadius: t.radii.pill,
     marginRight: t.spacing.sm,
   },
   textColumn: {

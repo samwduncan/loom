@@ -43,29 +43,29 @@ const markdownStyle: MarkdownStyle = {
     marginBottom: theme.spacing.sm,
   },
   h1: {
-    fontSize: theme.typography.heading.fontSize,
+    fontSize: theme.typography.headline.fontSize,
     fontFamily: 'Inter-SemiBold',
     fontWeight: '600',
     color: theme.colors.text.primary,
-    lineHeight: theme.typography.heading.lineHeight,
+    lineHeight: theme.typography.headline.lineHeight,
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.sm,
   },
   h2: {
-    fontSize: theme.typography.heading.fontSize,
+    fontSize: theme.typography.headline.fontSize,
     fontFamily: 'Inter-SemiBold',
     fontWeight: '600',
     color: theme.colors.text.primary,
-    lineHeight: theme.typography.heading.lineHeight,
+    lineHeight: theme.typography.headline.lineHeight,
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.sm,
   },
   h3: {
-    fontSize: theme.typography.heading.fontSize,
+    fontSize: theme.typography.headline.fontSize,
     fontFamily: 'Inter-SemiBold',
     fontWeight: '600',
     color: theme.colors.text.primary,
-    lineHeight: theme.typography.heading.lineHeight,
+    lineHeight: theme.typography.headline.lineHeight,
     marginTop: theme.spacing.sm,
     marginBottom: theme.spacing.xs,
   },
@@ -110,15 +110,15 @@ const markdownStyle: MarkdownStyle = {
   },
   code: {
     fontFamily: 'JetBrainsMono-Regular',
-    fontSize: theme.typography.body.fontSize,
+    fontSize: theme.typography.code.fontSize,       // 14px per spec §2.1
     color: theme.colors.text.primary,
-    backgroundColor: theme.colors.surface.sunken,
+    backgroundColor: theme.colors.surface.deep,     // spec §7.8: deep surface for code bg
   },
   codeBlock: {
     fontFamily: 'JetBrainsMono-Regular',
-    fontSize: theme.typography.body.fontSize,
+    fontSize: theme.typography.code.fontSize,       // 14px per spec §2.1
     color: theme.colors.text.primary,
-    backgroundColor: theme.colors.surface.sunken,
+    backgroundColor: theme.colors.surface.deep,     // spec §7.8: deep surface for code bg
     borderRadius: theme.radii.sm,
     padding: theme.spacing.sm,
     marginTop: theme.spacing.xs,
@@ -156,12 +156,12 @@ const markdownStyle: MarkdownStyle = {
     color: theme.colors.text.primary,
     lineHeight: theme.typography.body.lineHeight,
     headerFontFamily: 'Inter-SemiBold',
-    headerBackgroundColor: theme.colors.surface.sunken,
+    headerBackgroundColor: theme.colors.surface.deep,   // deep for table header
     headerTextColor: theme.colors.text.primary,
     rowEvenBackgroundColor: theme.colors.surface.base,
     rowOddBackgroundColor: theme.colors.surface.base,
-    borderColor: theme.colors.border.subtle,
-    borderWidth: 1,
+    borderColor: theme.colors.border.medium,             // spec §1.7: dividers use border.medium
+    borderWidth: 0.5,                                    // spec §1.7: 0.5px borders
     borderRadius: theme.radii.sm,
     cellPaddingHorizontal: theme.spacing.sm,
     cellPaddingVertical: theme.spacing.xs,
@@ -169,8 +169,8 @@ const markdownStyle: MarkdownStyle = {
     marginBottom: theme.spacing.sm,
   },
   thematicBreak: {
-    color: theme.colors.border.subtle,
-    height: 1,
+    color: theme.colors.border.medium,                   // spec §1.7: dividers use border.medium
+    height: 0.5,                                         // spec §1.7: 0.5px
     marginTop: theme.spacing.md,
     marginBottom: theme.spacing.md,
   },

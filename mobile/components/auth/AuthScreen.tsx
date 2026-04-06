@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { View, Text, TextInput, Pressable } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -124,7 +124,6 @@ export function AuthScreen({ onLogin, error }: AuthScreenProps) {
               style={[
                 styles.button,
                 buttonDisabled && styles.buttonDisabled,
-                !buttonDisabled && theme.shadows.glow(theme.colors.accent),
               ]}
               disabled={buttonDisabled}
               onPressIn={() => { isPressed.value = 1; }}
@@ -169,14 +168,14 @@ const styles = createStyles((t) => ({
     marginBottom: t.spacing.lg,
   },
   heading: {
-    ...t.typography.heading,
+    ...t.typography.headline,
     color: t.colors.text.primary,
     textAlign: 'center',
     marginBottom: t.spacing.xl,
   },
   label: {
-    ...t.typography.caption,
-    color: t.colors.text.secondary,
+    ...t.typography.meta,
+    color: t.colors.text.muted,
     marginBottom: t.spacing.xs,
     marginLeft: t.spacing.xs,
   },
@@ -184,10 +183,10 @@ const styles = createStyles((t) => ({
     ...t.typography.body,
     fontFamily: 'JetBrains Mono',
     color: t.colors.text.secondary,
-    backgroundColor: t.colors.surface.raised,
-    borderWidth: 1,
-    borderColor: t.colors.border.subtle,
-    borderRadius: t.radii.md,
+    backgroundColor: t.colors.surface.input,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border.strong,
+    borderRadius: t.radii.lg,
     minHeight: 44,
     paddingHorizontal: t.spacing.md,
     paddingVertical: t.spacing.sm,
@@ -202,7 +201,7 @@ const styles = createStyles((t) => ({
   button: {
     backgroundColor: t.colors.accent,
     minHeight: 44,
-    borderRadius: t.radii.md,
+    borderRadius: t.radii.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -210,15 +209,17 @@ const styles = createStyles((t) => ({
     opacity: 0.7,
   },
   buttonText: {
-    ...t.typography.heading,
+    ...t.typography.label,
     color: t.colors.accentFg,
+    fontWeight: '600' as const,
+    fontFamily: 'Inter-SemiBold',
   },
   errorContainer: {
     marginTop: t.spacing.sm,
     minHeight: 20,
   },
   errorText: {
-    ...t.typography.caption,
+    ...t.typography.meta,
     color: t.colors.destructive,
     textAlign: 'center',
   },

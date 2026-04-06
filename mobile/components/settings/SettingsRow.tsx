@@ -95,7 +95,7 @@ const styles = createStyles((t) => ({
     color: t.colors.text.primary,
   },
   subtitle: {
-    ...t.typography.small,
+    ...t.typography.meta,
     color: t.colors.text.muted,
     marginTop: 2,
   },

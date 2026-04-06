@@ -8,8 +8,9 @@
  * Safe area: paddingBottom set to insets.bottom so content clears home indicator.
  */
 
-import { View, TextInput } from 'react-native';
+import { StyleSheet, View, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 import { ArrowUp } from 'lucide-react-native';
 
 import { theme } from '../../theme/theme';
@@ -23,9 +24,12 @@ export function ComposerShell() {
       style={[
         styles.outer,
         { paddingBottom: insets.bottom + theme.spacing.sm },
-        theme.shadows.medium,
+        theme.shadows.composer,
       ]}
     >
+      <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill}>
+        <View style={styles.glassOverlay} />
+      </BlurView>
       <View style={styles.row}>
         {/* Input field */}
         <TextInput
@@ -52,11 +56,15 @@ export function ComposerShell() {
 
 const styles = createStyles((t) => ({
   outer: {
-    backgroundColor: t.colors.surface.raised,
-    borderTopLeftRadius: t.radii.xl,
-    borderTopRightRadius: t.radii.xl,
+    overflow: 'hidden' as const,
+    borderTopLeftRadius: t.radii.input,  // 24px — match Composer.tsx
+    borderTopRightRadius: t.radii.input,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
+  },
+  glassOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: t.colors.glass,
   },
   row: {
     flexDirection: 'row' as const,
@@ -65,10 +73,10 @@ const styles = createStyles((t) => ({
   input: {
     flex: 1,
     minHeight: 44,
-    backgroundColor: t.colors.surface.base,
-    borderWidth: 1,
+    backgroundColor: t.colors.surface.raised,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: t.colors.border.subtle,
-    borderRadius: t.radii.md,
+    borderRadius: t.radii['2xl'],
     paddingHorizontal: t.spacing.md,
     paddingVertical: t.spacing.sm,
     ...t.typography.body,
@@ -77,7 +85,7 @@ const styles = createStyles((t) => ({
   sendButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: t.radii.pill,
     backgroundColor: t.colors.surface.raised,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,

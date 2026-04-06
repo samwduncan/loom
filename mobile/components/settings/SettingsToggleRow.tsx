@@ -48,7 +48,7 @@ export function SettingsToggleRow({
           onValueChange={handleValueChange}
           trackColor={{
             false: theme.colors.border.subtle,
-            true: 'rgba(196, 108, 88, 0.5)', // accent at 0.5 opacity
+            true: 'rgba(235, 143, 54, 0.5)', // accent at 0.5 opacity
           }}
           thumbColor={value ? theme.colors.accent : theme.colors.surface.overlay}
           ios_backgroundColor={theme.colors.border.subtle}

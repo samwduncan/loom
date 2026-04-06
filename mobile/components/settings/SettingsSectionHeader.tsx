@@ -29,7 +29,7 @@ const styles = createStyles((t) => ({
     paddingBottom: t.spacing.sm,
   },
   label: {
-    ...t.typography.caption,
+    ...t.typography.meta,
     color: t.colors.text.muted,
     textTransform: 'uppercase' as const,
   },

@@ -204,29 +204,29 @@ const styles = createStyles((t) => ({
     minHeight: 48,
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    paddingHorizontal: t.spacing.md,
+    paddingHorizontal: t.spacing.sm + 4, // 12px — per spec h-pad
     paddingVertical: 10,
     marginHorizontal: t.spacing.sm,
-    borderRadius: t.radii.md, // 12px
+    borderRadius: t.radii.lg, // 10px — session items per spec
     backgroundColor: 'transparent',
   },
   activeItem: {
-    backgroundColor: t.colors.surface.raised,
+    backgroundColor: t.colors.accentMuted,
   },
   textContainer: {
     flex: 1,
     justifyContent: 'center' as const,
   },
   title: {
-    ...t.typography.body,
+    ...t.typography.label,       // 13px/500 — label tier per spec 7.4
     color: t.colors.text.primary,
   },
   activeTitle: {
-    fontWeight: '600' as const,
+    fontWeight: '600' as const,  // Emphasize active session
     fontFamily: 'Inter-SemiBold',
   },
   subtitle: {
-    ...t.typography.caption,
+    ...t.typography.meta,
     color: t.colors.text.muted,
     marginTop: 2,
   },
@@ -244,8 +244,9 @@ const styles = createStyles((t) => ({
     width: 80,
   },
   deleteText: {
-    color: '#ffffff',
-    ...t.typography.body,
+    ...t.typography.label,
+    color: t.colors.text.primary,
     fontWeight: '600' as const,
+    fontFamily: 'Inter-SemiBold',
   },
 }));

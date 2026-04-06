@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { Sparkles } from 'lucide-react-native';
+import { AtmosphericLayer } from './AtmosphericLayer';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -111,6 +112,8 @@ export function EmptyChat({ onSuggestionPress }: EmptyChatProps) {
 
   return (
     <View style={styles.container}>
+      {/* Atmospheric depth — behind all content, max 6% opacity */}
+      <AtmosphericLayer visible />
       <View style={styles.content}>
         {/* Icon — like Claude's spark, not a generic bot */}
         <Animated.View style={iconStyle}>
@@ -151,43 +154,42 @@ const styles = createStyles((t) => ({
     flex: 1,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
+    paddingBottom: '20%',
   },
   content: {
     alignItems: 'center' as const,
-    gap: t.spacing.md,
-    paddingHorizontal: t.spacing.xl,
+    gap: t.spacing.sm,                          // 8px — strict 8px grid per spec §3
+    paddingHorizontal: t.spacing.xl,            // 32px
   },
   greeting: {
-    fontSize: 22,
-    fontWeight: '600' as const,
-    fontFamily: 'Inter-SemiBold',
-    lineHeight: 28,
+    ...t.typography.headline,                   // 20px/600 per spec §2.1
     color: t.colors.text.primary,
     textAlign: 'center' as const,
-    marginTop: t.spacing.sm,
+    marginTop: t.spacing.sm,                    // 8px
   },
   subtitle: {
-    ...t.typography.body,
-    color: t.colors.text.muted,
+    ...t.typography.body,                       // 16px/400 per spec §2.1
+    color: t.colors.text.muted,                 // muted for section headers per spec §1.6
     textAlign: 'center' as const,
   },
   chipsRow: {
     flexDirection: 'row' as const,
     flexWrap: 'wrap' as const,
     justifyContent: 'center' as const,
-    gap: t.spacing.sm,
-    marginTop: t.spacing.lg,
+    gap: t.spacing.sm,                          // 8px — button gap per spec §3
+    marginTop: t.spacing.lg,                    // 24px
   },
   chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: t.radii.full,
+    height: 36,
+    paddingHorizontal: t.spacing.sm + t.spacing.xs, // 12px
+    justifyContent: 'center' as const,
+    borderRadius: t.radii.pill,
     backgroundColor: 'transparent',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: t.colors.border.interactive, // Slightly more visible than subtle
+    borderWidth: StyleSheet.hairlineWidth,       // 0.5px per spec §1.7
+    borderColor: t.colors.border.medium,         // default divider border
   },
   chipText: {
-    ...t.typography.small,
+    ...t.typography.label,                       // 13px/500 per spec §2.1
     color: t.colors.text.secondary,
   },
 }));

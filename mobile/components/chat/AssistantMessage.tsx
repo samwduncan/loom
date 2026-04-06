@@ -221,34 +221,33 @@ const styles = createStyles((t) => ({
   },
   avatarRow: {
     flexDirection: 'row' as const,
-    marginBottom: t.spacing.xs,
+    marginBottom: t.spacing.xs,              // 4px
   },
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
-    borderRadius: t.radii.full,
-    backgroundColor: t.colors.surface.overlay,
+    borderRadius: t.radii.pill,
+    backgroundColor: t.colors.surface.raised, // #1e1e18 per spec §1.1
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },
   content: {
-    marginLeft: AVATAR_SIZE + t.spacing.sm, // avatar width + gap
+    marginLeft: AVATAR_SIZE + t.spacing.sm,  // avatar width + 8px gap
   },
   toolChipWrapper: {
-    // Each tool chip in a flex-wrap row context
     flexDirection: 'row' as const,
     flexWrap: 'wrap' as const,
-    gap: t.spacing.sm,
-    marginVertical: t.spacing.xs,
+    gap: t.spacing.sm,                        // 8px — spec §3
+    marginVertical: t.spacing.xs,             // 4px
   },
   timestamp: {
-    ...t.typography.small,
+    ...t.typography.meta,                     // timestamps use meta tier (11px) per spec §2.1
     color: t.colors.text.muted,
     marginTop: t.spacing.xs,
     marginLeft: AVATAR_SIZE + t.spacing.sm,
   },
   interrupted: {
-    ...t.typography.small,
+    ...t.typography.meta,                     // meta tier for status labels
     color: t.colors.destructive,
     fontStyle: 'italic' as const,
     marginTop: t.spacing.xs,

@@ -9,8 +9,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { View, TextInput, Pressable } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { StyleSheet, View, TextInput, Pressable } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Search, X } from 'lucide-react-native';
 
@@ -38,42 +37,36 @@ export function SessionSearch({ query, onQueryChange }: SessionSearchProps) {
 
   return (
     <View style={styles.container}>
-      <BlurView intensity={40} tint="dark" style={styles.blur}>
-        {/* Dark overlay for glass treatment */}
-        <View style={styles.overlay} />
+      <View style={styles.content}>
+        <Search
+          size={16}
+          color={theme.colors.text.muted}
+          style={styles.searchIcon}
+        />
 
-        {/* Search content */}
-        <View style={styles.content}>
-          <Search
-            size={16}
-            color={theme.colors.text.muted}
-            style={styles.searchIcon}
-          />
+        <TextInput
+          style={styles.input}
+          value={query}
+          onChangeText={onQueryChange}
+          placeholder="Search sessions"
+          placeholderTextColor={theme.colors.text.muted}
+          autoCapitalize="none"
+          autoCorrect={false}
+          returnKeyType="search"
+          clearButtonMode="never"
+        />
 
-          <TextInput
-            style={styles.input}
-            value={query}
-            onChangeText={onQueryChange}
-            placeholder="Search sessions"
-            placeholderTextColor={theme.colors.text.muted}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="search"
-            clearButtonMode="never"
-          />
-
-          {query.length > 0 && (
-            <Pressable
-              onPress={handleClear}
-              hitSlop={{ top: 14, right: 14, bottom: 14, left: 14 }}
-              accessibilityRole="button"
-              accessibilityLabel="Clear search"
-            >
-              <X size={16} color={theme.colors.text.muted} />
-            </Pressable>
-          )}
-        </View>
-      </BlurView>
+        {query.length > 0 && (
+          <Pressable
+            onPress={handleClear}
+            hitSlop={{ top: 14, right: 14, bottom: 14, left: 14 }}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
+          >
+            <X size={16} color={theme.colors.text.muted} />
+          </Pressable>
+        )}
+      </View>
     </View>
   );
 }
@@ -86,37 +79,26 @@ const styles = createStyles((t) => ({
   container: {
     marginHorizontal: t.spacing.md,
     marginBottom: t.spacing.sm,
-    borderRadius: t.radii.lg,
-    overflow: 'hidden' as const,
-    borderWidth: 1,
-    borderColor: t.colors.border.subtle,
-  },
-  blur: {
-    height: 44,
-    justifyContent: 'center' as const,
-  },
-  overlay: {
-    position: 'absolute' as const,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    minHeight: 36,
+    backgroundColor: t.colors.surface.input,
+    borderRadius: t.radii.lg, // 12px — search input per spec
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border.strong,
   },
   content: {
-    flex: 1,
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     paddingHorizontal: t.spacing.sm,
+    minHeight: 36,
   },
   searchIcon: {
     marginRight: t.spacing.sm,
   },
   input: {
     flex: 1,
-    ...t.typography.body,
+    ...t.typography.label,
     color: t.colors.text.primary,
-    height: 44,
+    height: 36,
     paddingVertical: 0,
   },
 }));

@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -114,7 +114,7 @@ export function ConnectionBanner() {
               styles.statusDot,
               {
                 backgroundColor: isReconnecting
-                  ? theme.colors.text.muted
+                  ? theme.colors.warning
                   : theme.colors.destructive,
               },
               dotStyle,
@@ -135,16 +135,16 @@ const styles = createStyles((t) => ({
     left: t.spacing.md,
     right: t.spacing.md,
     zIndex: 100,
-    ...t.shadows.heavy,
+    ...t.shadows.sheet,
   },
   blur: {
     borderRadius: t.radii.lg,
     overflow: 'hidden',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: t.colors.border.subtle,
   },
   overlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    backgroundColor: t.colors.glass,
     flexDirection: 'row',
     alignItems: 'center',
     minHeight: 44,
@@ -154,7 +154,7 @@ const styles = createStyles((t) => ({
   statusDot: {
     width: 16,
     height: 16,
-    borderRadius: t.radii.full,
+    borderRadius: t.radii.pill,
     marginRight: t.spacing.sm,
   },
   text: {

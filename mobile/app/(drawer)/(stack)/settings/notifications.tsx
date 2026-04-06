@@ -181,7 +181,7 @@ const styles = createStyles((t) => ({
     alignItems: 'center' as const,
   },
   headerTitle: {
-    ...t.typography.heading,
+    ...t.typography.headline,
     color: t.colors.text.primary,
     flex: 1,
     textAlign: 'center' as const,
@@ -208,19 +208,19 @@ const styles = createStyles((t) => ({
     borderRadius: t.radii.md,
   },
   permissionText: {
-    ...t.typography.small,
+    ...t.typography.label,
     color: t.colors.text.secondary,
     flex: 1,
     marginRight: t.spacing.sm,
   },
   permissionLink: {
-    ...t.typography.small,
+    ...t.typography.label,
     color: t.colors.accent,
     fontWeight: '600' as const,
   },
   // Footer text below mode section
   footerText: {
-    ...t.typography.small,
+    ...t.typography.meta,
     color: t.colors.text.muted,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,

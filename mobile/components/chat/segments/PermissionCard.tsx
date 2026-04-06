@@ -17,7 +17,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   FadeIn,
   useAnimatedStyle,
@@ -244,61 +244,61 @@ export function PermissionCard({ request }: PermissionCardProps) {
 // ---------------------------------------------------------------------------
 
 const styles = createStyles((t) => ({
-  // Pending card (Tier 3 overlay with glow)
+  // Pending card (Tier 3 overlay — spec §7.5)
   card: {
-    backgroundColor: t.colors.surface.overlay,
-    borderRadius: t.radii.lg,
-    padding: t.spacing.md,
-    borderWidth: 1,
-    borderColor: t.colors.border.interactive,
-    ...t.rimLight,  // D-03: top-edge rim light for depth perception
-    ...t.shadows.medium, // Single shadow, no heavy+glow collision (AR finding)
+    backgroundColor: t.colors.surface.overlay,     // spec §7.5: overlay tier
+    borderRadius: t.radii.xl,                      // 16px — spec §4: permission cards
+    padding: t.spacing.md,                         // 16px — spec §3: card padding
+    borderWidth: StyleSheet.hairlineWidth,          // 0.5px — spec §1.7
+    borderColor: t.colors.border.strong,           // card edges use border.strong per spec §1.7
+    ...t.rimLight,
+    ...t.shadows.sheet,                            // spec §5: sheet shadow for permission cards
   },
   toolName: {
-    ...t.typography.heading,
+    ...t.typography.label,                         // spec §7.5: title = label tier
     color: t.colors.text.primary,
   },
   description: {
-    ...t.typography.body,
+    ...t.typography.body,                          // spec §7.5: description = body tier
     color: t.colors.text.secondary,
-    marginTop: t.spacing.xs,
+    marginTop: t.spacing.xs,                       // 4px
   },
   buttonRow: {
     flexDirection: 'row' as const,
-    gap: t.spacing.sm,
-    marginTop: t.spacing.md,
+    gap: t.spacing.sm,                             // 8px — spec §3: button gap
+    marginTop: t.spacing.md,                       // 16px
   },
   denyButton: {
     flex: 1,
-    height: 44,
-    backgroundColor: t.colors.surface.raised,
-    borderRadius: t.radii.md,
+    height: 44,                                    // spec §7.5: 44px height
+    backgroundColor: t.colors.surface.raised,      // spec §7.5: surface.raised for Deny
+    borderRadius: t.radii.lg,                      // 12px — spec §7.5: radius lg
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },
   denyText: {
-    ...t.typography.heading,
+    ...t.typography.label,                         // label tier for button text
     color: t.colors.text.primary,
   },
   approveButton: {
     flex: 1,
-    height: 44,
-    backgroundColor: t.colors.accent,
-    borderRadius: t.radii.md,
+    height: 44,                                    // spec §7.5: 44px height
+    backgroundColor: t.colors.accent,              // spec §7.5: accent bg for Allow
+    borderRadius: t.radii.lg,                      // 12px — spec §7.5: radius lg
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
   },
   approveText: {
-    ...t.typography.heading,
-    color: t.colors.accentFg,
+    ...t.typography.label,                         // label tier for button text
+    color: t.colors.accentFg,                      // spec §7.5: accent.fg text
   },
 
   // Compact status line (after approve/deny)
   statusLine: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: t.spacing.xs,
-    paddingVertical: t.spacing.xs,
+    gap: t.spacing.xs,                             // 4px
+    paddingVertical: t.spacing.xs,                 // 4px
   },
   statusDot: {
     width: 8,
@@ -306,7 +306,7 @@ const styles = createStyles((t) => ({
     borderRadius: 4,
   },
   statusText: {
-    ...t.typography.small,
+    ...t.typography.label,
     color: t.colors.text.secondary,
     flex: 1,
   },

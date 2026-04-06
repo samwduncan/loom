@@ -94,15 +94,15 @@ export const StreamingIndicator = React.memo(
 
 const styles = createStyles((t) => ({
   wrapper: {
-    gap: t.spacing.xs,
+    gap: t.spacing.xs,                             // 4px
   },
   dotsRow: {
-    paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.xs,
+    paddingHorizontal: t.spacing.md,               // 16px — spec §3: outer screen padding
+    paddingVertical: t.spacing.xs,                 // 4px
   },
   line: {
-    height: 2,
-    backgroundColor: t.colors.accent,
-    marginHorizontal: t.spacing.md,
+    height: 2,                                     // spec §7.8: 2px accent line
+    backgroundColor: t.colors.accent,              // spec §1.2: brand accent
+    marginHorizontal: t.spacing.md,                // 16px
   },
 }));

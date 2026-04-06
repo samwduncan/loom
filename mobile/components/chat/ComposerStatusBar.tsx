@@ -68,21 +68,21 @@ const styles = createStyles((t) => ({
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'space-between' as const,
-    paddingHorizontal: t.spacing.md,
-    paddingVertical: t.spacing.xs,
+    paddingHorizontal: t.spacing.md,               // 16px — spec §3: outer screen padding
+    paddingVertical: t.spacing.xs,                 // 4px
   },
   leftGroup: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: t.spacing.xs,
+    gap: t.spacing.xs,                             // 4px — icon-to-text gap per spec §3
   },
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 8,                                      // spec §7.10: status dots = 8px
+    height: 8,
+    borderRadius: 4,
   },
   label: {
-    ...t.typography.small,
+    ...t.typography.label,                         // spec §7.6: label tier for status bar
     color: t.colors.text.muted,
   },
 }));

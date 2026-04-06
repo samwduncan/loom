@@ -15,7 +15,7 @@
  */
 
 import React, { useCallback, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -179,28 +179,27 @@ export const CodeBlockSegment = React.memo(
 
 const styles = createStyles((t) => ({
   container: {
-    backgroundColor: t.colors.surface.sunken,
-    borderRadius: t.radii.sm,
-    borderWidth: 1,
-    borderColor: t.colors.border.subtle,
+    backgroundColor: t.colors.surface.deep,       // spec §7.8: surface.deep for code bg
+    borderRadius: t.radii.md,                      // 8px per spec §7.8
+    borderWidth: StyleSheet.hairlineWidth,          // 0.5px per spec §1.7
+    borderColor: t.colors.border.subtle,           // spec §7.8
     overflow: 'hidden',
-    marginVertical: t.spacing.xs,
+    marginVertical: t.spacing.xs,                  // 4px
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: t.spacing.sm,
-    paddingVertical: t.spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: t.colors.border.subtle,
+    backgroundColor: t.colors.surface.raised,      // spec §7.8: surface.raised for header
+    paddingHorizontal: t.spacing.sm,               // 8px
+    paddingVertical: t.spacing.xs,                 // 4px
+    borderBottomWidth: StyleSheet.hairlineWidth,    // 0.5px
+    borderBottomColor: t.colors.border.subtle,     // spec §7.8
   },
   languageLabel: {
-    fontSize: t.typography.small.fontSize,
-    fontWeight: t.typography.small.fontWeight,
-    lineHeight: t.typography.small.lineHeight,
-    fontFamily: 'Inter-Regular',
+    ...t.typography.meta,                          // spec §7.8: meta tier, uppercase
     color: t.colors.text.muted,
+    textTransform: 'uppercase' as const,
   },
   copyButton: {
     minHeight: 44,
@@ -210,27 +209,24 @@ const styles = createStyles((t) => ({
     paddingHorizontal: t.spacing.xs,
   },
   copyText: {
-    fontSize: t.typography.small.fontSize,
-    fontWeight: t.typography.small.fontWeight,
-    lineHeight: t.typography.small.lineHeight,
-    fontFamily: 'Inter-Regular',
-    color: t.colors.accent,
+    ...t.typography.label,
+    color: t.colors.accent,                        // spec §7.8: accent copy icon
   },
   codeText: {
     fontFamily: 'JetBrainsMono-Regular',
-    fontSize: 16, // Match body font size
-    lineHeight: 24,
+    fontSize: 14,                                  // spec §2.1: code = 14px
+    lineHeight: 20,
   },
   scrollContent: {
-    padding: t.spacing.sm,
-    paddingTop: t.spacing.xs,
+    padding: t.spacing.sm,                         // 8px
+    paddingTop: t.spacing.xs,                      // 4px
   },
   streamingLine: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 2,
+    height: 2,                                     // spec §7.8: 2px accent line
     backgroundColor: t.colors.accent,
   },
 }));

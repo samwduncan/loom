@@ -12,7 +12,7 @@
  */
 
 import React, { useCallback } from 'react';
-import { ActionSheetIOS, Platform, Pressable, Text, View } from 'react-native';
+import { ActionSheetIOS, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 
@@ -94,19 +94,20 @@ const styles = createStyles((t) => ({
     maxWidth: '78%',
   },
   bubble: {
-    backgroundColor: t.colors.surface.raised,
-    borderRadius: t.radii.lg, // 16px (was xl/20px)
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: t.colors.border.subtle, // ring/outline pattern, no drop shadow
+    backgroundColor: t.colors.surface.raised,   // #1e1e18 per spec §1.1
+    borderRadius: t.radii['2xl'],                // 16px
+    paddingHorizontal: t.spacing.md,             // 16px — 8px grid
+    paddingVertical: t.spacing.sm + t.spacing.xs, // 12px — 8px grid (8+4)
+    borderWidth: StyleSheet.hairlineWidth,        // 0.5px — spec §1.7
+    borderColor: t.colors.border.strong,          // card edges use border.strong per spec §1.7
+    ...t.shadows.composer,                         // subtle shadow per spec §5
   },
   text: {
     ...t.typography.body,
     color: t.colors.text.primary,
   },
   timestamp: {
-    ...t.typography.small,
+    ...t.typography.meta,                         // timestamps use meta tier per spec §2.1
     color: t.colors.text.muted,
     marginTop: t.spacing.xs,
     alignSelf: 'flex-end' as const,

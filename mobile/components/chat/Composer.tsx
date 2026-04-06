@@ -261,7 +261,7 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 
   if (isActive) {
     buttonBg = theme.colors.destructive;
-    iconColor = '#FFFFFF';
+    iconColor = theme.colors.text.primary;
   } else if (hasText) {
     buttonBg = theme.colors.accent;
     iconColor = theme.colors.accentFg;
@@ -274,13 +274,13 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
   const buttonDisabled = !isActive && !hasText;
 
   const outerStyle = USE_GLASS_COMPOSER
-    ? [styles.glassOuter, { paddingBottom: insets.bottom + theme.spacing.sm }, theme.shadows.medium]
-    : [styles.opaqueOuter, { paddingBottom: insets.bottom + theme.spacing.sm }, theme.shadows.medium];
+    ? [styles.glassOuter, { paddingBottom: insets.bottom + theme.spacing.sm }, theme.shadows.composer]
+    : [styles.opaqueOuter, { paddingBottom: insets.bottom + theme.spacing.sm }, theme.shadows.composer];
 
   return (
     <View style={outerStyle}>
       {USE_GLASS_COMPOSER && (
-        <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill}>
+        <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill}>
           <View style={styles.glassOverlay} />
         </BlurView>
       )}
@@ -301,7 +301,7 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
           />
         </Animated.View>
 
-        {/* Send / Stop button — 44x44 touch target, NO glow shadow */}
+        {/* Send / Stop button — 36px visual, hitSlop extends touch target */}
         <AnimatedPressable
           style={[
             styles.sendButton,
@@ -337,21 +337,21 @@ export function Composer({ sessionId, projectPath, projectName }: ComposerProps)
 const styles = createStyles((t) => ({
   glassOuter: {
     overflow: 'hidden' as const,
-    borderTopLeftRadius: t.radii.xl,
-    borderTopRightRadius: t.radii.xl,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: t.colors.border.medium,
   },
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: t.colors.glass,
+    backgroundColor: 'rgba(30, 30, 24, 0.75)',  // Spec: raised surface at 75%
   },
   opaqueOuter: {
     backgroundColor: t.colors.surface.raised,
-    borderTopLeftRadius: t.radii.xl,
-    borderTopRightRadius: t.radii.xl,
     paddingHorizontal: t.spacing.md,
     paddingTop: t.spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: t.colors.border.medium,
   },
   row: {
     flexDirection: 'row' as const,
@@ -361,23 +361,25 @@ const styles = createStyles((t) => ({
     flex: 1,
     minHeight: 44,
     maxHeight: 160,
-    backgroundColor: t.colors.surface.raised,
-    borderRadius: t.radii.xl, // 20px — rounded but not pill-shaped (like Claude iOS)
+    backgroundColor: t.colors.surface.input,  // Deeper input well
+    borderRadius: t.radii.xl,  // 16px
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border.strong,  // Visible border per review
     overflow: 'hidden' as const,
   },
   input: {
     flex: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingHorizontal: 16,  // Claude Figma: 16px horizontal
+    paddingVertical: 12,    // Claude Figma: 12px vertical
     fontSize: 16, // Prevents iOS auto-zoom on focus
     fontFamily: 'Inter-Regular',
-    lineHeight: 24,
+    lineHeight: 22,         // Match body lineHeight from spec
     color: t.colors.text.primary,
   },
   sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,              // Claude Figma: 36px send button
+    height: 36,
+    borderRadius: t.radii.pill, // Full circle
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
     marginLeft: t.spacing.sm,

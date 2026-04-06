@@ -15,7 +15,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   BottomSheetModal,
   BottomSheetModalProvider,
@@ -36,6 +36,8 @@ import type { LucideIcon } from 'lucide-react-native';
 
 import type { ToolCallState, ToolCallStatus } from '@loom/shared/types/stream';
 import { theme } from '../../../theme/theme';
+import { TOOL_COLORS, CATEGORY } from '../../../lib/colors';
+import type { ColorPair } from '../../../theme/types';
 import { createStyles } from '../../../theme/createStyles';
 
 // ---------------------------------------------------------------------------
@@ -59,6 +61,24 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
 
 function getToolIcon(toolName: string): LucideIcon {
   return TOOL_ICONS[toolName] ?? Wrench;
+}
+
+// Tool color mapping (matches ToolChip)
+const TOOL_COLOR_MAP: Record<string, ColorPair | null> = {
+  Bash: TOOL_COLORS.bash,
+  Read: TOOL_COLORS.read,
+  Edit: TOOL_COLORS.edit,
+  Write: TOOL_COLORS.write,
+  Glob: TOOL_COLORS.glob,
+  Grep: TOOL_COLORS.grep,
+  WebFetch: TOOL_COLORS.web,
+  WebSearch: TOOL_COLORS.web,
+  Agent: TOOL_COLORS.agent,
+};
+
+function getToolColor(toolName: string): ColorPair | null {
+  const color = TOOL_COLOR_MAP[toolName];
+  return color === undefined ? CATEGORY.blue : color;
 }
 
 // ---------------------------------------------------------------------------
@@ -151,6 +171,7 @@ export function ToolDetailSheet({ toolCall, isVisible, onDismiss }: ToolDetailSh
   if (!toolCall) return null;
 
   const Icon = getToolIcon(toolCall.toolName);
+  const toolColor = getToolColor(toolCall.toolName);
   const statusColor = getStatusColor(toolCall.status);
   const statusLabel = getStatusLabel(toolCall.status);
   const duration = computeDuration(toolCall.startedAt, toolCall.completedAt);
@@ -172,8 +193,8 @@ export function ToolDetailSheet({ toolCall, isVisible, onDismiss }: ToolDetailSh
         {/* Header: icon + name + status badge */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Icon size={20} color={theme.colors.text.secondary} strokeWidth={2} />
-            <Text style={styles.headerTitle}>{toolCall.toolName}</Text>
+            <Icon size={20} color={toolColor?.vivid ?? theme.colors.text.secondary} strokeWidth={2} />
+            <Text style={[styles.headerTitle, toolColor ? { color: toolColor.vivid } : undefined]}>{toolCall.toolName}</Text>
           </View>
           <View style={styles.statusBadge}>
             <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
@@ -268,12 +289,12 @@ function formatValue(value: unknown): string {
 
 const styles = createStyles((t) => ({
   sheetBackground: {
-    backgroundColor: t.colors.surface.overlay,
-    borderTopLeftRadius: t.radii.lg,
-    borderTopRightRadius: t.radii.lg,
+    backgroundColor: t.colors.surface.overlay,     // spec §7.3: overlay tier for sheets
+    borderTopLeftRadius: t.radii['2xl'],           // 16px
+    borderTopRightRadius: t.radii['2xl'],
   },
   sheetShadow: {
-    ...t.shadows.medium,
+    ...t.shadows.sheet,                            // spec §5: sheet shadow
   },
   handleIndicator: {
     backgroundColor: t.colors.text.muted,
@@ -282,74 +303,76 @@ const styles = createStyles((t) => ({
     borderRadius: 2,
   },
   content: {
-    paddingHorizontal: t.spacing.md,
+    paddingHorizontal: t.spacing.md,               // 16px — spec §3: card padding
   },
   header: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'space-between' as const,
-    paddingTop: t.spacing.sm,
+    paddingTop: t.spacing.sm,                      // 8px
   },
   headerLeft: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: t.spacing.sm,
+    gap: t.spacing.sm,                             // 8px
     flex: 1,
   },
   headerTitle: {
-    ...t.typography.heading,
+    ...t.typography.headline,                      // spec §7.3: tool-name heading
     color: t.colors.text.primary,
   },
   statusBadge: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    gap: t.spacing.xs,
+    gap: t.spacing.xs,                             // 4px
   },
   statusDot: {
-    width: 8,
+    width: 8,                                      // spec §7.3: dot 8px
     height: 8,
     borderRadius: 4,
   },
   statusLabel: {
-    ...t.typography.small,
+    ...t.typography.label,                         // spec §7.3: status label
   },
   divider: {
-    height: 1,
-    backgroundColor: t.colors.border.subtle,
-    marginVertical: t.spacing.md,
+    height: StyleSheet.hairlineWidth,              // 0.5px — spec §7.3
+    backgroundColor: t.colors.border.medium,       // spec §7.3: border.default = border.medium
+    marginVertical: t.spacing.md,                  // 16px
   },
   section: {
-    marginBottom: t.spacing.md,
+    marginBottom: t.spacing.md,                    // 16px
   },
   sectionLabel: {
-    ...t.typography.small,
+    ...t.typography.meta,                          // spec §7.3: meta tier labels
     color: t.colors.text.muted,
     letterSpacing: 1,
-    marginBottom: t.spacing.sm,
+    textTransform: 'uppercase' as const,
+    marginBottom: t.spacing.sm,                    // 8px
   },
   kvRow: {
-    marginBottom: t.spacing.sm,
+    marginBottom: t.spacing.sm,                    // 8px
   },
   kvKey: {
-    ...t.typography.small,
+    ...t.typography.meta,                          // spec §7.3: meta tier labels for arg keys
     color: t.colors.text.muted,
     marginBottom: 2,
   },
   kvValue: {
-    ...t.typography.body,
+    ...t.typography.body,                          // spec §7.3: body tier values
     color: t.colors.text.primary,
   },
   kvValueMono: {
-    fontFamily: 'JetBrainsMono-Regular',
+    fontFamily: 'JetBrainsMono-Regular',           // spec §7.3: code values
   },
   outputText: {
     ...t.typography.body,
     color: t.colors.text.secondary,
   },
   errorLabel: {
-    ...t.typography.small,
+    ...t.typography.meta,                          // meta tier for section labels
     color: t.colors.destructive,
     letterSpacing: 1,
+    textTransform: 'uppercase' as const,
     marginBottom: t.spacing.sm,
   },
   errorText: {
@@ -357,11 +380,11 @@ const styles = createStyles((t) => ({
     color: t.colors.destructive,
   },
   duration: {
-    ...t.typography.small,
+    ...t.typography.meta,                          // meta tier for timestamps/duration
     color: t.colors.text.muted,
     marginTop: t.spacing.sm,
   },
   bottomPad: {
-    height: t.spacing.xl,
+    height: t.spacing.xl,                          // 32px
   },
 }));
